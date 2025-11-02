@@ -610,6 +610,37 @@
             }
         }
     </style>
+
+    <!-- Schema.org para IAs y SEO -->
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Conversor de Imágenes",
+    "applicationCategory": "DeveloperApplication",
+    "description": "Convierte formatos de imagen: JPG, PNG, WebP, GIF. Redimensiona y optimiza localmente.",
+    "url": "https://meskeia.com/conversor-imagenes/",
+    "author": {
+        "@type": "Organization",
+        "name": "meskeIA"
+    },
+    "operatingSystem": "Web",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+    },
+    "featureList": [
+        "Conversión entre formatos JPG, PNG, WebP y GIF sin recompresión progresiva",
+        "Redimensionamiento por píxeles con preservación de relación de aspecto",
+        "Optimización de compresión JPEG ajustable de 0-100%",
+        "Procesamiento de imágenes en el navegador del cliente sin subida a servidor",
+        "Conversión de espacios de color RGB a escala de grises y conversión inversa",
+        "Batch processing de múltiples imágenes con parámetros uniformes",
+        "Generación de miniaturas WebP optimizadas para web"
+    ]
+}
+    </script>
 </head>
 <body>
     <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
