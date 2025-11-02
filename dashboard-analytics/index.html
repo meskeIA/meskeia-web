@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard meskeIA Analytics</title>
+    <link rel="icon" type="image/png" href="../icon_meskeia.png">
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div class="dashboard-container">
+        <!-- Header del Dashboard -->
+        <header class="dashboard-header">
+            <h1>Dashboard meskeIA Analytics</h1>
+            <p class="subtitle">Sistema de métricas de uso de aplicaciones web</p>
+            <button class="btn-refresh" onclick="cargarDatos()">
+                <span class="refresh-icon">↻</span> Actualizar Datos
+            </button>
+        </header>
+
+        <!-- Sección de Estadísticas Generales -->
+        <section class="stats-general">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-content">
+                    <h3 id="total-usos">-</h3>
+                    <p>Total de Usos</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🚀</div>
+                <div class="stat-content">
+                    <h3 id="total-aplicaciones">-</h3>
+                    <p>Aplicaciones Registradas</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-content">
+                    <h3 id="primer-uso">-</h3>
+                    <p>Primer Uso</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏰</div>
+                <div class="stat-content">
+                    <h3 id="ultimo-uso">-</h3>
+                    <p>Último Uso</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Gráficos -->
+        <section class="charts-section">
+            <!-- Top 10 Aplicaciones -->
+            <div class="chart-container">
+                <h2>🏆 Top 10 Aplicaciones Más Usadas</h2>
+                <canvas id="chartTopAplicaciones"></canvas>
+            </div>
+
+            <!-- Tendencia Temporal -->
+            <div class="chart-container">
+                <h2>📈 Tendencia de Uso (Últimos 30 Días)</h2>
+                <canvas id="chartTendenciaTemporal"></canvas>
+            </div>
+
+            <!-- Navegadores -->
+            <div class="chart-container chart-small">
+                <h2>🌐 Distribución por Navegador</h2>
+                <canvas id="chartNavegadores"></canvas>
+            </div>
+
+            <!-- Sistemas Operativos -->
+            <div class="chart-container chart-small">
+                <h2>💻 Distribución por Sistema Operativo</h2>
+                <canvas id="chartSistemasOperativos"></canvas>
+            </div>
+
+            <!-- Resoluciones -->
+            <div class="chart-container chart-small">
+                <h2>📱 Distribución por Resolución</h2>
+                <canvas id="chartResoluciones"></canvas>
+            </div>
+        </section>
+
+        <!-- Tabla de Últimos Usos -->
+        <section class="table-section">
+            <h2>📋 Últimos 50 Registros de Uso</h2>
+            <div class="table-container">
+                <table id="tablaUltimosUsos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Aplicación</th>
+                            <th>Fecha/Hora</th>
+                            <th>Navegador</th>
+                            <th>Sistema Operativo</th>
+                            <th>Resolución</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaBody">
+                        <tr>
+                            <td colspan="6" class="loading">Cargando datos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Estado de Conexión -->
+        <div class="status-bar">
+            <span id="status-indicator" class="status-loading">⏳ Cargando...</span>
+            <span id="ultima-actualizacion">-</span>
+        </div>
+    </div>
+
+    <!-- Footer meskeIA -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        © 2025 meskeIA
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

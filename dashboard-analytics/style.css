@@ -1,0 +1,468 @@
+/* Paleta de Colores meskeIA */
+:root {
+    /* Backgrounds - Inspirados en Claude */
+    --bg-primary: #FAFAFA;
+    --bg-card: #FFFFFF;
+
+    /* Identidad de marca meskeIA */
+    --primary: #2E86AB;
+    --secondary: #48A9A6;
+
+    /* Textos minimalistas */
+    --text-primary: #1A1A1A;
+    --text-secondary: #666666;
+    --text-muted: #999999;
+
+    /* Elementos estructurales */
+    --border: #E5E5E5;
+    --hover: #F5F5F5;
+    --focus: rgba(46,134,171,0.1);
+
+    /* Estados */
+    --success: #10B981;
+    --error: #EF4444;
+    --warning: #F59E0B;
+}
+
+/* Reset y Estilos Globales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    padding: 20px;
+    padding-top: 80px;
+}
+
+/* Logo meskeIA - Componente oficial */
+.meskeia-logo-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(46, 134, 171, 0.2);
+    border-radius: 12px;
+    padding: 8px 16px;
+    box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+    transition: all 0.3s ease;
+}
+
+.meskeia-logo-container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+}
+
+.meskeia-logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.meskeia-logo-icon::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    top: 10px;
+    left: 10px;
+}
+
+.meskeia-logo-icon::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #2E86AB;
+    border-radius: 50%;
+    top: 13px;
+    left: 13px;
+}
+
+.meskeia-neural-network {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+}
+
+.meskeia-neural-dot {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+}
+
+.meskeia-neural-dot:nth-child(1) { top: 4px; left: 6px; }
+.meskeia-neural-dot:nth-child(2) { top: 8px; right: 5px; }
+.meskeia-neural-dot:nth-child(3) { bottom: 6px; left: 4px; }
+.meskeia-neural-dot:nth-child(4) { bottom: 4px; right: 8px; }
+
+.meskeia-logo-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2C3E50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.meskeia-logo-text .meske {
+    color: #2E86AB;
+}
+
+.meskeia-logo-text .ia {
+    color: #48A9A6;
+    font-weight: 700;
+    position: relative;
+}
+
+.meskeia-logo-text .ia::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #48A9A6, #7FB3D3);
+    border-radius: 1px;
+}
+
+/* Contenedor Principal */
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+}
+
+/* Header del Dashboard */
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 40px;
+    background: var(--bg-card);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid var(--border);
+}
+
+.dashboard-header h1 {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.dashboard-header .subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.btn-refresh {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-refresh:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+.refresh-icon {
+    font-size: 1.2rem;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.btn-refresh:active .refresh-icon {
+    transform: rotate(180deg);
+}
+
+/* Estadísticas Generales */
+.stats-general {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(46, 134, 171, 0.15);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--focus);
+    border-radius: 12px;
+}
+
+.stat-content h3 {
+    font-size: 2rem;
+    color: var(--primary);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.stat-content p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* Sección de Gráficos */
+.charts-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.chart-container {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid var(--border);
+    grid-column: span 3;
+}
+
+.chart-container.chart-small {
+    grid-column: span 1;
+}
+
+.chart-container h2 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+/* Limitar altura de los gráficos */
+.chart-container canvas {
+    max-height: 300px !important;
+    height: 300px !important;
+}
+
+.chart-container.chart-small canvas {
+    max-height: 250px !important;
+    height: 250px !important;
+}
+
+/* Tabla de Últimos Usos */
+.table-section {
+    background: var(--bg-card);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid var(--border);
+    margin-bottom: 40px;
+}
+
+.table-section h2 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: var(--focus);
+}
+
+th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.95rem;
+    border-bottom: 2px solid var(--primary);
+}
+
+td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+tbody tr:hover {
+    background: var(--hover);
+}
+
+.loading {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Barra de Estado */
+.status-bar {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid var(--border);
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    z-index: 100;
+}
+
+.status-loading {
+    color: var(--warning);
+}
+
+.status-success {
+    color: var(--success);
+}
+
+.status-error {
+    color: var(--error);
+}
+
+#ultima-actualizacion {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-container,
+    .chart-container.chart-small {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+        padding-top: 70px;
+    }
+
+    .meskeia-logo-container {
+        top: 10px;
+        left: 10px;
+        padding: 6px 12px;
+        gap: 8px;
+    }
+
+    .meskeia-logo-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .meskeia-logo-icon::before {
+        width: 9px;
+        height: 9px;
+        top: 7.5px;
+        left: 7.5px;
+    }
+
+    .meskeia-logo-icon::after {
+        width: 4px;
+        height: 4px;
+        top: 10px;
+        left: 10px;
+    }
+
+    .meskeia-logo-text {
+        font-size: 1rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .dashboard-header .subtitle {
+        font-size: 0.95rem;
+    }
+
+    .stats-general {
+        grid-template-columns: 1fr;
+    }
+
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-content h3 {
+        font-size: 1.5rem;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+
+    th, td {
+        padding: 8px 12px;
+    }
+
+    .status-bar {
+        bottom: 50px;
+        flex-direction: column;
+        gap: 8px;
+    }
+}
