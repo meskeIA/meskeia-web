@@ -109,7 +109,6 @@ Allow: /assets/
 
 # Archivos que no necesitan indexar
 Disallow: /offline.html
-Disallow: /claude-proxy.php
 ```
 
 #### ⚠️ SITEMAP.XML - INCONSISTENCIAS DETECTADAS

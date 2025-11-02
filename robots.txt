@@ -15,7 +15,6 @@ Allow: /assets/
 
 # Archivos que no necesitan indexar
 Disallow: /offline.html
-Disallow: /claude-proxy.php
 
 # ============================================
 # CRAWLERS DE INTELIGENCIA ARTIFICIAL
