@@ -18,16 +18,7 @@ secrets.json
 # ===================================================
 # DOCUMENTACIÓN DE SEGURIDAD INTERNA (NO PUBLICAR)
 # ===================================================
-SEGURIDAD_API_KEYS.md
-PLAN_ACCION_INMEDIATA.md
-PLAN_SIMPLIFICADO.md
-README_SEGURIDAD.md
-LIMPIEZA_COMPLETADA.md
-INICIO_AQUI.txt
-EJECUTAR_LIMPIEZA.bat
-LIMPIAR_CLAUDE_SOLO.bat
-limpiar_api_keys.sh
-validar_seguridad.py
+.security/
 **/README_SEGURIDAD.md
 
 # Playwright screenshots
