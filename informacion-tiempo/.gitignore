@@ -1,0 +1,20 @@
+# API Keys y configuración sensible
+config.js
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Directorios de dependencias
+node_modules/
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
