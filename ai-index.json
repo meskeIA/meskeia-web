@@ -953,13 +953,95 @@
       ]
     }
   ],
+  "api": {
+    "version": "1.0",
+    "base_url": "https://meskeia.com/api/v1/",
+    "description": "API REST para tracking de uso de aplicaciones meskeIA con métricas y estadísticas",
+    "documentation": "https://meskeia.com/api/v1/README_API.md",
+    "endpoints": [
+      {
+        "path": "/api/v1/guardar-uso.php",
+        "method": "POST",
+        "description": "Registra el uso de una aplicación con metadatos opcionales (navegador, sistema operativo, resolución)",
+        "request_body": {
+          "aplicacion": "string (obligatorio) - Nombre de la aplicación",
+          "navegador": "string (opcional) - Navegador del usuario",
+          "sistema_operativo": "string (opcional) - Sistema operativo",
+          "resolucion": "string (opcional) - Resolución de pantalla",
+          "datos_adicionales": "object (opcional) - Datos adicionales en formato JSON"
+        },
+        "response": {
+          "status": "success",
+          "message": "Uso registrado correctamente",
+          "data": {
+            "id": "integer",
+            "aplicacion": "string",
+            "timestamp": "string (DD/MM/YYYY HH:MM:SS)"
+          }
+        }
+      },
+      {
+        "path": "/api/v1/estadisticas.php",
+        "method": "GET",
+        "description": "Consulta estadísticas de uso con filtros opcionales por aplicación, rango de fechas y límite de registros",
+        "query_params": {
+          "aplicacion": "string (opcional) - Filtrar por nombre de aplicación",
+          "desde": "string (opcional) - Fecha inicio (DD/MM/YYYY)",
+          "hasta": "string (opcional) - Fecha fin (DD/MM/YYYY)",
+          "limite": "integer (opcional, default: 100) - Número máximo de registros"
+        },
+        "response": {
+          "status": "success",
+          "filtros": "object",
+          "estadisticas": {
+            "total_usos": "integer",
+            "total_aplicaciones": "integer",
+            "primer_uso": "string",
+            "ultimo_uso": "string"
+          },
+          "registros_mostrados": "integer",
+          "data": "array de objetos con registros de uso"
+        }
+      },
+      {
+        "path": "/api/v1/aplicaciones.php",
+        "method": "GET",
+        "description": "Lista todas las aplicaciones registradas con estadísticas agregadas por aplicación",
+        "response": {
+          "status": "success",
+          "resumen": {
+            "total_aplicaciones": "integer",
+            "total_usos_global": "integer"
+          },
+          "data": "array de objetos con estadísticas por aplicación"
+        }
+      }
+    ],
+    "features": [
+      "CORS habilitado para peticiones cross-origin",
+      "Formato de respuesta JSON con UTF-8",
+      "Base de datos SQLite para almacenamiento local",
+      "Métricas de uso sin información personal identificable",
+      "Timestamps en formato español (DD/MM/YYYY HH:MM:SS)",
+      "Consultas con filtros flexibles"
+    ],
+    "use_cases": [
+      "IAs pueden consultar qué aplicaciones son más populares",
+      "Análisis de tendencias de uso por categoría",
+      "Identificar aplicaciones con bajo uso para mejorar",
+      "Reportes de uso para optimización de contenido",
+      "Dashboard de analíticas para administradores"
+    ]
+  },
   "technical_features": {
     "frontend_only": true,
-    "no_backend": true,
+    "no_backend": false,
+    "backend_api": "PHP 8.4 + SQLite",
     "local_storage": true,
     "no_cookies_tracking": false,
     "responsive_design": true,
-    "pwa_capable": false
+    "pwa_capable": false,
+    "analytics_api": true
   },
   "seo": {
     "optimized_for_ai_search": true,
