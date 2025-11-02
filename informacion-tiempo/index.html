@@ -32,6 +32,9 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="../icon_meskeia.png">
     <link rel="apple-touch-icon" href="../icon_meskeia.png">
+
+    <!-- Configuración de API Keys (NO incluido en Git) -->
+    <script src="config.js"></script>
     
     <!-- Structured Data - WebApplication -->
     <script type="application/ld+json">
@@ -1293,8 +1296,8 @@
 </div>
 
 <script>
-    // API key
-    const apiKey = 'c365c29eb6cdef0c6c36b240e47e4c4a';
+    // API key - Cargada desde config.js (NO incluido en Git)
+    const apiKey = CONFIG.OPENWEATHER_API_KEY;
     let currentLocation = { name: 'Mataró', lat: null, lon: null };
 
     // Función para actualizar el tiempo actual
