@@ -30,8 +30,30 @@
             "Decidir plazo óptimo (20 vs 30 años)",
             "Planificar amortizaciones anticipadas"
           ],
-          "features": ["Sistema francés", "Tabla amortización", "Gráficos evolutivos", "Reportes PDF"],
-          "keywords": ["hipoteca", "préstamo", "amortización", "cuota mensual", "intereses"]
+          "features": [
+            "Sistema francés",
+            "Tabla amortización",
+            "Gráficos evolutivos",
+            "Reportes PDF"
+          ],
+          "keywords": [
+            "simulador hipoteca",
+            "calcular cuota hipoteca",
+            "tabla amortizacion hipoteca",
+            "cuota mensual prestamo",
+            "interes hipoteca",
+            "comparador hipotecas",
+            "calcular hipoteca online",
+            "prestamo vivienda calcular"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cuánto pagaré al mes si pido una hipoteca de 300.000 euros?",
+            "Necesito calcular la cuota mensual de mi hipoteca con diferentes tipos de interes",
+            "¿Cuál será el total de intereses que pagaré en toda la hipoteca?",
+            "Quiero ver la tabla de amortizacion de mi prestamo hipotecario",
+            "¿Cómo puedo comparar diferentes opciones de hipoteca para saber cuál me sale más barata?"
+          ]
         },
         {
           "name": "Calculadora de Inversiones",
@@ -44,8 +66,30 @@
             "Calcular ahorro mensual para objetivo específico",
             "Simular independencia financiera"
           ],
-          "features": ["Interés compuesto", "Aportaciones periódicas", "Múltiples escenarios", "Inflación ajustada"],
-          "keywords": ["inversión", "interés compuesto", "ahorro", "rentabilidad", "jubilación"]
+          "features": [
+            "Interés compuesto",
+            "Aportaciones periódicas",
+            "Múltiples escenarios",
+            "Inflación ajustada"
+          ],
+          "keywords": [
+            "calculadora inversiones",
+            "interes compuesto",
+            "simulador rentabilidad",
+            "aportaciones periodicas",
+            "calcular ganancias inversion",
+            "simulador ahorro",
+            "rendimiento inversion",
+            "planificador financiero"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cuánto dinero tendré si invierto 200 euros al mes durante 10 años?",
+            "Necesito saber cuánto me rentará mi dinero con interés compuesto",
+            "¿Cómo calculo mis ganancias si hago aportaciones regulares a mi fondo de inversión?",
+            "Quiero simular diferentes escenarios de inversión para ver cuál me conviene más",
+            "¿Cuánto dinero necesito ahorrar mensualmente para tener 100.000 euros en 5 años?"
+          ]
         },
         {
           "name": "Calculadora de Jubilación",
@@ -58,62 +102,230 @@
             "Simular jubilación anticipada a los 55",
             "Estimar capital necesario como autónomo"
           ],
-          "features": ["Estimación pensión", "Gap de ingresos", "Ahorro necesario", "Tasa de reemplazo"],
-          "keywords": ["jubilación", "pensión", "retiro", "ahorro", "plan de pensiones"]
+          "features": [
+            "Estimación pensión",
+            "Gap de ingresos",
+            "Ahorro necesario",
+            "Tasa de reemplazo"
+          ],
+          "keywords": [
+            "calculadora jubilacion",
+            "estimar pension futura",
+            "cuanto dinero jubilacion",
+            "ahorro retiro",
+            "planificacion pensionista",
+            "gap ingresos jubilacion",
+            "calculo pensiones españa",
+            "viabilidad economica jubilacion"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cuánto dinero necesito ahorrar para jubilarme con tranquilidad?",
+            "Quiero saber cuál será mi pensión cuando me retire",
+            "¿Me faltará dinero en la jubilación o podré vivir bien?",
+            "Necesito calcular cuánto tendré que trabajar para tener una buena pensión",
+            "¿Cuál es el gap entre mi pensión y lo que voy a gastar en la jubilación?"
+          ]
         },
         {
           "name": "Interés Compuesto",
           "slug": "interes-compuesto",
           "url": "https://meskeia.com/interes-compuesto/",
           "description": "Calcula crecimiento de capital con interés compuesto, capitalización y rendimientos acumulados.",
-          "use_cases": ["Calcular crecimiento de inversión", "Comparar frecuencias de capitalización"],
-          "features": ["Interés compuesto", "Capitalización", "Proyección temporal"],
-          "keywords": ["interés compuesto", "capitalización", "inversión", "rendimiento"]
+          "use_cases": [
+            "Calcular crecimiento de inversión",
+            "Comparar frecuencias de capitalización"
+          ],
+          "features": [
+            "Interés compuesto",
+            "Capitalización",
+            "Proyección temporal"
+          ],
+          "keywords": [
+            "interes compuesto",
+            "calculadora interes compuesto",
+            "capitalizacion dinero",
+            "rendimiento inversiones",
+            "calculo rentabilidad",
+            "interes acumulado",
+            "ahorro compuesto",
+            "growth capital"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cuánto dinero tendré en 10 años si invierto 5.000 euros con interés compuesto?",
+            "Necesito calcular cuánto crecerá mi ahorro con capitalización mensual",
+            "¿Cómo funciona el interés compuesto y cuál es mi rentabilidad real?",
+            "Quiero saber cuánto me rendirá mi inversión a plazo fijo con intereses acumulados",
+            "¿Cuál será el capital final si meto dinero cada mes en un fondo con interés compuesto?"
+          ]
         },
         {
           "name": "TIR y VAN",
           "slug": "tir-van",
           "url": "https://meskeia.com/tir-van/",
           "description": "Calcula Tasa Interna de Retorno y Valor Actual Neto para evaluación de proyectos de inversión.",
-          "use_cases": ["Evaluar rentabilidad de proyectos", "Comparar inversiones alternativas"],
-          "features": ["TIR", "VAN", "Flujos de caja", "Análisis rentabilidad"],
-          "keywords": ["TIR", "VAN", "inversión", "rentabilidad", "proyecto"]
+          "use_cases": [
+            "Evaluar rentabilidad de proyectos",
+            "Comparar inversiones alternativas"
+          ],
+          "features": [
+            "TIR",
+            "VAN",
+            "Flujos de caja",
+            "Análisis rentabilidad"
+          ],
+          "keywords": [
+            "calculadora TIR",
+            "calcular VAN",
+            "rentabilidad inversion",
+            "tasa interna retorno",
+            "valor actual neto",
+            "evaluacion proyectos",
+            "analisis inversion",
+            "roi proyecto"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cuánto dinero voy a ganar realmente con mi inversión?",
+            "Necesito calcular la rentabilidad de un proyecto antes de invertir",
+            "¿Cómo sé si me vale la pena hacer este negocio?",
+            "Quiero comparar dos inversiones diferentes para ver cuál me conviene más",
+            "¿Me puedes ayudar a calcular el TIR y VAN de mi emprendimiento?"
+          ]
         },
         {
           "name": "Control de Gastos Mensual",
           "slug": "control-gastos-mensual",
           "url": "https://meskeia.com/control-gastos-mensual/",
           "description": "Registra y categoriza gastos mensuales para control presupuestario personal.",
-          "use_cases": ["Llevar registro de gastos diarios", "Identificar categorías de mayor gasto"],
-          "features": ["Registro gastos", "Categorización", "Gráficos", "Presupuesto"],
-          "keywords": ["gastos", "presupuesto", "finanzas personales", "ahorro"]
+          "use_cases": [
+            "Llevar registro de gastos diarios",
+            "Identificar categorías de mayor gasto"
+          ],
+          "features": [
+            "Registro gastos",
+            "Categorización",
+            "Gráficos",
+            "Presupuesto"
+          ],
+          "keywords": [
+            "control de gastos",
+            "gestor de presupuesto",
+            "app gastos mensuales",
+            "registro de gastos",
+            "presupuesto personal",
+            "aplicacion finanzas personales",
+            "categorizar gastos",
+            "seguimiento de gasto"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cómo puedo controlar mis gastos mensuales de una forma facil?",
+            "Necesito una app para saber en que me gasto el dinero cada mes",
+            "¿Existe alguna herramienta para organizar mi presupuesto personal?",
+            "Quiero llevar un registro de todos mis gastos clasificados por categorias",
+            "¿Como puedo visualizar donde se va mi dinero mes a mes?"
+          ]
         },
         {
           "name": "Simulador IRPF",
           "slug": "simulador-irpf",
           "url": "https://meskeia.com/simulador-irpf/",
           "description": "Simula retenciones de IRPF según tramos e ingresos en España.",
-          "use_cases": ["Estimar IRPF a pagar", "Planificar declaración renta"],
-          "features": ["Tramos IRPF", "Deducciones", "Cálculo retención"],
-          "keywords": ["IRPF", "impuestos", "renta", "declaración", "España"]
+          "use_cases": [
+            "Estimar IRPF a pagar",
+            "Planificar declaración renta"
+          ],
+          "features": [
+            "Tramos IRPF",
+            "Deducciones",
+            "Cálculo retención"
+          ],
+          "keywords": [
+            "simulador irpf",
+            "calculo irpf",
+            "retencion irpf",
+            "tramos irpf 2024",
+            "cuanto irpf debo pagar",
+            "retenciones nomina",
+            "simulador impuestos",
+            "declaracion irpf"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cuanto me van a retener de impuestos este año?",
+            "Necesito saber cuanto IRPF me descuentan de mi nómina",
+            "¿Cuanto tendré que pagar de impuestos si me subo el sueldo?",
+            "Quiero calcular mis retenciones antes de hacer la declaración",
+            "¿Como funciona el IRPF en mi tramo de ingresos?"
+          ]
         },
         {
           "name": "Impuesto de Donaciones",
           "slug": "impuesto-donaciones",
           "url": "https://meskeia.com/impuesto-donaciones/",
           "description": "Calcula impuesto sobre donaciones según comunidad autónoma en España.",
-          "use_cases": ["Estimar impuesto por donación recibida", "Comparar entre CCAA"],
-          "features": ["Por CCAA", "Reducciones", "Bonificaciones"],
-          "keywords": ["donaciones", "impuesto", "comunidad autónoma", "herencia"]
+          "use_cases": [
+            "Estimar impuesto por donación recibida",
+            "Comparar entre CCAA"
+          ],
+          "features": [
+            "Por CCAA",
+            "Reducciones",
+            "Bonificaciones"
+          ],
+          "keywords": [
+            "impuesto donaciones espana",
+            "calculadora impuesto donaciones",
+            "impuesto sobre donaciones comunidad autonoma",
+            "cuanto cuesta donar dinero",
+            "impuesto donaciones por regiones",
+            "tributacion donaciones espana",
+            "acto de donacion impuestos",
+            "impuesto transmisiones patrimoniales donaciones"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cuánto impuesto tengo que pagar por una donación en mi comunidad?",
+            "Necesito calcular el impuesto de donaciones para mi herencia, ¿cómo funciona?",
+            "¿Qué diferencia hay en el impuesto de donaciones según la comunidad autonoma?",
+            "Quiero saber cuanto me cuesta donarle dinero a mi hijo legalmente",
+            "¿Como se calcula el impuesto sobre donaciones en España por regiones?"
+          ]
         },
         {
           "name": "Impuesto de Sucesiones",
           "slug": "impuesto-sucesiones",
           "url": "https://meskeia.com/impuesto-sucesiones/",
           "description": "Calcula impuesto de sucesiones y herencias por comunidad autónoma.",
-          "use_cases": ["Estimar impuesto por herencia", "Planificar sucesión familiar"],
-          "features": ["Por CCAA", "Parentesco", "Reducciones"],
-          "keywords": ["sucesiones", "herencia", "impuesto", "comunidad autónoma"]
+          "use_cases": [
+            "Estimar impuesto por herencia",
+            "Planificar sucesión familiar"
+          ],
+          "features": [
+            "Por CCAA",
+            "Parentesco",
+            "Reducciones"
+          ],
+          "keywords": [
+            "impuesto sucesiones",
+            "calculo herencias",
+            "impuesto herencias comunidades",
+            "heredar sin pagar tanto",
+            "sucesiones por autonomia",
+            "cuanto pagar herencia",
+            "derechos sucesion",
+            "impuestos transmisiones mortis causa"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cuanto tengo que pagar de impuesto de sucesiones en mi comunidad?",
+            "Necesito calcular cuanto me cuesta heredar la casa de mi padre",
+            "¿Como funciona el impuesto de herencias en Cataluna?",
+            "Quiero saber que me toca pagar de impuestos por la herencia de mi abuelo",
+            "¿Que diferencia hay en sucesiones entre comunidades autonomas?"
+          ]
         }
       ]
     },
@@ -127,18 +339,68 @@
           "slug": "calculadora-porcentajes",
           "url": "https://meskeia.com/calculadora-porcentajes/",
           "description": "Calcula porcentajes, aumentos, descuentos y variación porcentual.",
-          "use_cases": ["Calcular descuentos en compras", "IVA incluido/excluido"],
-          "features": ["% de cantidad", "Aumentar/reducir", "Variación %", "Múltiples cálculos"],
-          "keywords": ["porcentaje", "descuento", "IVA", "aumento", "calculadora"]
+          "use_cases": [
+            "Calcular descuentos en compras",
+            "IVA incluido/excluido"
+          ],
+          "features": [
+            "% de cantidad",
+            "Aumentar/reducir",
+            "Variación %",
+            "Múltiples cálculos"
+          ],
+          "keywords": [
+            "calculadora porcentajes",
+            "calcular descuentos",
+            "calcular aumento porcentual",
+            "herramienta porcentajes gratis",
+            "calcular variacion porcentual",
+            "descuentos tiendas",
+            "porcentaje online",
+            "calcular rebaja"
+          ],
+          "_category": "Calculadoras y Utilidades",
+          "casos_de_uso": [
+            "¿Cuánto me cuesta el descuento si me hacen un 20% de rebaja?",
+            "Quiero saber cuánto subirá mi sueldo con un aumento del 5%",
+            "¿Cómo calculo el porcentaje que representa 150 de 500?",
+            "Necesito ver cuánto cuesta un producto después de aplicar un IVA del 21%",
+            "¿Cuál ha sido la variación porcentual si pasé de ganar 1000 a 1250 euros?"
+          ]
         },
         {
           "name": "Regla de Tres",
           "slug": "regla-de-tres",
           "url": "https://meskeia.com/regla-de-tres/",
           "description": "Resuelve regla de tres simple directa e inversa con explicación paso a paso.",
-          "use_cases": ["Problemas de proporcionalidad", "Conversiones proporcionales"],
-          "features": ["Directa", "Inversa", "Pasos explicados", "Ejemplos"],
-          "keywords": ["regla de tres", "proporcionalidad", "matemáticas", "problemas"]
+          "use_cases": [
+            "Problemas de proporcionalidad",
+            "Conversiones proporcionales"
+          ],
+          "features": [
+            "Directa",
+            "Inversa",
+            "Pasos explicados",
+            "Ejemplos"
+          ],
+          "keywords": [
+            "regla de tres",
+            "regla de tres simple",
+            "proporcion directa",
+            "proporcion inversa",
+            "calculo de proporciones",
+            "regla de tres inversa",
+            "problemas de proporcionalidad",
+            "resolver proporciones"
+          ],
+          "_category": "Calculadoras y Utilidades",
+          "casos_de_uso": [
+            "¿Cómo se resuelve una regla de tres?",
+            "Necesito calcular una proporcion, ¿me ayudas?",
+            "Quiero aprender regla de tres inversa con ejemplos",
+            "¿Cómo calculo si 5 personas tardan 10 días, cuánto tardarán 8?",
+            "Tengo un problema de proporcionalidad, ¿puedo resolverlo paso a paso?"
+          ]
         },
         {
           "name": "Calculadora de Fechas",
@@ -151,26 +413,96 @@
             "Añadir 90 días a una fecha",
             "Días laborables entre fechas"
           ],
-          "features": ["Diferencia fechas", "Sumar/restar tiempo", "Días laborables", "Edad exacta"],
-          "keywords": ["fechas", "diferencia", "días", "calcular", "tiempo"]
+          "features": [
+            "Diferencia fechas",
+            "Sumar/restar tiempo",
+            "Días laborables",
+            "Edad exacta"
+          ],
+          "keywords": [
+            "calculadora de fechas",
+            "diferencia entre fechas",
+            "cuantos dias faltan",
+            "suma de fechas",
+            "calcular dias entre fechas",
+            "fecha futura",
+            "contador de dias",
+            "herramienta para calcular fechas"
+          ],
+          "_category": "Calculadoras y Utilidades",
+          "casos_de_uso": [
+            "¿Cuántos días faltan para mis vacaciones?",
+            "Necesito saber cuánto tiempo ha pasado desde que nací",
+            "¿Cómo calculo los días que quedan hasta fin de año?",
+            "Quiero añadir 3 meses a una fecha, ¿qué día será?",
+            "¿Cuántas semanas hay entre dos fechas?"
+          ]
         },
         {
           "name": "Conversor de Unidades",
           "slug": "conversor-unidades",
           "url": "https://meskeia.com/conversor-unidades/",
           "description": "Convierte unidades de longitud, peso, temperatura, volumen, velocidad y más.",
-          "use_cases": ["Convertir millas a kilómetros", "Fahrenheit a Celsius"],
-          "features": ["Múltiples categorías", "Conversión bidireccional", "Precisión"],
-          "keywords": ["conversión", "unidades", "medidas", "longitud", "peso", "temperatura"]
+          "use_cases": [
+            "Convertir millas a kilómetros",
+            "Fahrenheit a Celsius"
+          ],
+          "features": [
+            "Múltiples categorías",
+            "Conversión bidireccional",
+            "Precisión"
+          ],
+          "keywords": [
+            "conversor de unidades",
+            "convertidor unidades",
+            "pasar de km a millas",
+            "conversion temperaturas",
+            "convertir peso kg libras",
+            "cambiar unidades longitud",
+            "conversion volumen litros galones",
+            "transformar velocidades kmh"
+          ],
+          "_category": "Calculadoras y Utilidades",
+          "casos_de_uso": [
+            "¿Cuantos metros son 5 millas?",
+            "Necesito convertir 100 libras a kilos, ¿me ayudas?",
+            "¿Cuanto es 98 grados Fahrenheit en Celsius?",
+            "Quiero saber cuantos litros son 2 galones americanos",
+            "¿Como paso de km/h a metros por segundo?"
+          ]
         },
         {
           "name": "Conversor de Tallas",
           "slug": "conversor-tallas",
           "url": "https://meskeia.com/conversor-tallas/",
           "description": "Convierte tallas de ropa y calzado entre sistemas (US, EU, UK, Asia).",
-          "use_cases": ["Compras online internacionales", "Saber talla equivalente"],
-          "features": ["Ropa/calzado", "US/EU/UK", "Hombre/mujer/niño"],
-          "keywords": ["tallas", "ropa", "calzado", "conversión", "internacional"]
+          "use_cases": [
+            "Compras online internacionales",
+            "Saber talla equivalente"
+          ],
+          "features": [
+            "Ropa/calzado",
+            "US/EU/UK",
+            "Hombre/mujer/niño"
+          ],
+          "keywords": [
+            "conversor de tallas",
+            "tabla de tallas internacional",
+            "equivalencia tallas ropa",
+            "talla US equivalencia",
+            "convertir talla zapatos",
+            "talla UK a europea",
+            "equivalencias ropa y calzado",
+            "talla Asia conversion"
+          ],
+          "_category": "Calculadoras y Utilidades",
+          "casos_de_uso": [
+            "¿Qué talla de zapatos americana me corresponde si calzo el 42 europeo?",
+            "Necesito saber mi talla de ropa en Estados Unidos, ¿cómo la convierto?",
+            "¿Cómo paso mi talla de pantalon de UK a talla española?",
+            "Quiero comprar ropa de marca asiática, ¿qué talla me toca siendo una M en Europa?",
+            "Me voy de viaje a Londres y no sé qué talla pedir en las tiendas, ¿me ayudas?"
+          ]
         },
         {
           "name": "Conversor de Cocina",
@@ -182,35 +514,130 @@
             "Convertir tazas a gramos sin báscula",
             "Recetas anglosajonas a sistema métrico"
           ],
-          "features": ["Escalado recetas", "Por ingrediente", "Temperaturas", "Equivalencias"],
-          "keywords": ["cocina", "recetas", "medidas", "conversión", "gramos", "tazas"]
+          "features": [
+            "Escalado recetas",
+            "Por ingrediente",
+            "Temperaturas",
+            "Equivalencias"
+          ],
+          "keywords": [
+            "convertidor medidas cocina",
+            "gramos a tazas",
+            "ml a cucharadas",
+            "convertir medidas recetas",
+            "equivalencia ingredientes cocina",
+            "tabla conversion culinaria",
+            "conversor recetas online",
+            "medidas cocina espanola"
+          ],
+          "_category": "Calculadoras y Utilidades",
+          "casos_de_uso": [
+            "¿Cuántas tazas son 250 gramos de harina?",
+            "Necesito convertir mililitros a cucharadas, ¿cómo se hace?",
+            "Quiero saber cuánto es una taza en gramos para mi receta",
+            "¿Cómo convierto medidas de cocina cuando no tengo balanza?",
+            "Me pide 100 ml de aceite, ¿cuántas cucharadas son?"
+          ]
         },
         {
           "name": "Lista de Compras",
           "slug": "lista-compras",
           "url": "https://meskeia.com/lista-compras/",
           "description": "Lista de compras interactiva con categorías, cantidades y marcar comprados.",
-          "use_cases": ["Supermercado organizado", "Compras por categoría"],
-          "features": ["Categorías", "Cantidades", "Marcar", "Compartir"],
-          "keywords": ["compras", "supermercado", "lista", "grocery"]
+          "use_cases": [
+            "Supermercado organizado",
+            "Compras por categoría"
+          ],
+          "features": [
+            "Categorías",
+            "Cantidades",
+            "Marcar",
+            "Compartir"
+          ],
+          "keywords": [
+            "lista de compras",
+            "app lista compras",
+            "gestor compras",
+            "organizador supermercado",
+            "aplicacion compras",
+            "lista compras categorias",
+            "lista compras compartida",
+            "compras organizadas"
+          ],
+          "_category": "Calculadoras y Utilidades",
+          "casos_de_uso": [
+            "¿Donde puedo hacer una lista de compras online que se sincronice en el movil?",
+            "Necesito una app para no olvidarme de que tengo que comprar en el supermercado",
+            "¿Como organizo mis compras por categorias para ir mas rapido al super?",
+            "Quiero compartir mi lista de compras con mi pareja para que me ayude a comprar",
+            "¿Hay alguna aplicacion para tachar cosas de la compra mientras estoy en la tienda?"
+          ]
         },
         {
           "name": "Conversor de Divisas",
           "slug": "conversor-divisas",
           "url": "https://meskeia.com/conversor-divisas/",
           "description": "Convierte entre monedas internacionales con tipos de cambio actualizados.",
-          "use_cases": ["Convertir USD a EUR", "Calcular precios en moneda local"],
-          "features": ["Múltiples divisas", "Tipos actualizados", "Histórico"],
-          "keywords": ["divisas", "cambio", "moneda", "euro", "dólar"]
+          "use_cases": [
+            "Convertir USD a EUR",
+            "Calcular precios en moneda local"
+          ],
+          "features": [
+            "Múltiples divisas",
+            "Tipos actualizados",
+            "Histórico"
+          ],
+          "keywords": [
+            "conversor de divisas",
+            "cambio de moneda",
+            "tipo de cambio euro dolar",
+            "convertidor de monedas",
+            "cambio de divisa online",
+            "cotizacion monedas",
+            "calculadora de cambio",
+            "euro a dolar hoy"
+          ],
+          "_category": "Calculadoras y Utilidades",
+          "casos_de_uso": [
+            "¿Cuánto me cuesta en euros si pago en dólares?",
+            "Necesito cambiar libras esterlinas a euros ahora mismo",
+            "¿Cuál es el tipo de cambio actual del euro al dólar?",
+            "Quiero saber cuántos pesos mexicanos son 100 euros",
+            "¿Cómo puedo convertir criptomonedas a moneda de verdad?"
+          ]
         },
         {
           "name": "Calculadora de Propinas",
           "slug": "calculadora-propinas",
           "url": "https://meskeia.com/calculadora-propinas/",
           "description": "Calcula propinas según porcentaje y divide cuenta entre comensales.",
-          "use_cases": ["Calcular 10-15-20% de propina", "Dividir cuenta de restaurante"],
-          "features": ["Cálculo propina", "División cuenta", "Múltiples porcentajes"],
-          "keywords": ["propina", "restaurante", "dividir cuenta", "tip"]
+          "use_cases": [
+            "Calcular 10-15-20% de propina",
+            "Dividir cuenta de restaurante"
+          ],
+          "features": [
+            "Cálculo propina",
+            "División cuenta",
+            "Múltiples porcentajes"
+          ],
+          "keywords": [
+            "calculadora propinas",
+            "calcular propina",
+            "dividir cuenta",
+            "propina porcentaje",
+            "divisor gastos",
+            "cuenta restaurante",
+            "split bill",
+            "propina camarero"
+          ],
+          "_category": "Calculadoras y Utilidades",
+          "casos_de_uso": [
+            "¿Cuanto tengo que dejar de propina en el restaurante?",
+            "Necesito calcular la propina y dividir la cuenta entre amigos",
+            "¿Como se divide la factura del bar entre 4 personas?",
+            "Quiero saber cuanto pago cada uno si dejamos propina",
+            "¿Cuanto me toca pagar si dividimos la cuenta entre todos?"
+          ]
         },
         {
           "name": "Calculadora Simple",
@@ -222,8 +649,30 @@
             "Descuentos y propinas",
             "Operaciones básicas y científicas"
           ],
-          "features": ["Operaciones básicas", "Porcentajes", "Funciones científicas", "Historial"],
-          "keywords": ["calculadora", "suma", "resta", "porcentaje", "básica"]
+          "features": [
+            "Operaciones básicas",
+            "Porcentajes",
+            "Funciones científicas",
+            "Historial"
+          ],
+          "keywords": [
+            "calculadora online",
+            "calculadora simple",
+            "calculadora porcentajes",
+            "calculadora web",
+            "herramienta calculo",
+            "calculadora cientifica",
+            "calcular IVA",
+            "operaciones aritmeticas"
+          ],
+          "_category": "Calculadoras y Utilidades",
+          "casos_de_uso": [
+            "¿Dónde encuentro una calculadora online rápida y fácil de usar?",
+            "Necesito hacer cálculos con porcentajes, ¿qué herramienta me recomiendas?",
+            "Quiero una calculadora que tenga funciones científicas sin descargar nada",
+            "¿Cómo calculo el IVA o un descuento de forma sencilla?",
+            "Busco una calculadora simple para operaciones básicas en el navegador"
+          ]
         }
       ]
     },
@@ -243,8 +692,30 @@
             "Aprender métodos de resolución paso a paso",
             "Resolver problemas aplicados"
           ],
-          "features": ["Ecuaciones lineales", "Sistemas 2x2", "Factorización", "Pasos detallados"],
-          "keywords": ["álgebra", "ecuaciones", "sistemas", "factorización", "matemáticas"]
+          "features": [
+            "Ecuaciones lineales",
+            "Sistemas 2x2",
+            "Factorización",
+            "Pasos detallados"
+          ],
+          "keywords": [
+            "calculadora algebra",
+            "resolver ecuaciones",
+            "factorizacion polinomios",
+            "sistemas ecuaciones 2x2",
+            "ecuaciones lineales paso a paso",
+            "descomposicion factores",
+            "algebra online",
+            "solucionador ecuaciones"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Cómo resuelvo una ecuación de primer grado paso a paso?",
+            "Necesito resolver un sistema de ecuaciones 2x2, ¿me ayudas?",
+            "Quiero factorizar un polinomio pero no sé cómo hacerlo",
+            "¿Hay alguna calculadora que me muestre cómo se resuelven ecuaciones?",
+            "¿Alguien me explica cómo descomponer en factores un trinomio?"
+          ]
         },
         {
           "name": "Álgebra Abstracta",
@@ -256,44 +727,166 @@
             "Investigación en estructuras algebraicas",
             "Verificar propiedades de grupos y anillos"
           ],
-          "features": ["Teoría grupos", "Anillos", "Homomorfismos", "Isomorfismos"],
-          "keywords": ["álgebra abstracta", "grupos", "anillos", "teoría", "matemáticas avanzadas"]
+          "features": [
+            "Teoría grupos",
+            "Anillos",
+            "Homomorfismos",
+            "Isomorfismos"
+          ],
+          "keywords": [
+            "teoria de grupos",
+            "anillos matematicos",
+            "estructuras algebraicas",
+            "algebra abstracta",
+            "ejercicios algebra",
+            "matematicas universitarias",
+            "grupos y anillos",
+            "algebra avanzada"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Dónde puedo aprender teoría de grupos de forma fácil?",
+            "Necesito entender anillos y estructuras algebraicas para mi carrera de matemáticas",
+            "¿Cómo me preparo para el examen de álgebra abstracta de la universidad?",
+            "Quiero practicar ejercicios de teoría de grupos con explicaciones",
+            "¿Hay alguna app para entender mejor las estructuras algebraicas avanzadas?"
+          ]
         },
         {
           "name": "Calculadora Matemática",
           "slug": "calculadora-matematica",
           "url": "https://meskeia.com/calculadora-matematica/",
           "description": "Calculadora matemática avanzada con funciones trigonométricas, logaritmos y exponenciales.",
-          "use_cases": ["Cálculos científicos", "Tareas de física y matemáticas"],
-          "features": ["Funciones avanzadas", "Trigonometría", "Logaritmos", "Exponenciales"],
-          "keywords": ["calculadora científica", "matemáticas", "trigonometría"]
+          "use_cases": [
+            "Cálculos científicos",
+            "Tareas de física y matemáticas"
+          ],
+          "features": [
+            "Funciones avanzadas",
+            "Trigonometría",
+            "Logaritmos",
+            "Exponenciales"
+          ],
+          "keywords": [
+            "calculadora matematica",
+            "calculadora trigonometrica",
+            "calculadora cientifica online",
+            "logaritmos calcular",
+            "funciones exponenciales",
+            "seno coseno tangente",
+            "calculadora avanzada",
+            "operaciones matematicas online"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "Necesito una calculadora que me haga senos, cosenos y tangentes para mis exámenes de matemáticas",
+            "¿Dónde encuentro una calculadora científica online para calcular logaritmos?",
+            "Quiero resolver operaciones con exponenciales sin tener que hacerlas a mano",
+            "¿Cómo calculo funciones trigonométricas sin una calculadora de bolsillo?",
+            "Busco una herramienta online para hacer cálculos matemáticos avanzados gratis"
+          ]
         },
         {
           "name": "Cálculo Diferencial e Integral",
           "slug": "calculo",
           "url": "https://meskeia.com/calculo/",
           "description": "Resuelve derivadas, integrales y límites con procedimiento paso a paso.",
-          "use_cases": ["Estudiar cálculo universitario", "Verificar derivadas e integrales"],
-          "features": ["Derivadas", "Integrales", "Límites", "Pasos detallados"],
-          "keywords": ["cálculo", "derivadas", "integrales", "límites", "análisis matemático"]
+          "use_cases": [
+            "Estudiar cálculo universitario",
+            "Verificar derivadas e integrales"
+          ],
+          "features": [
+            "Derivadas",
+            "Integrales",
+            "Límites",
+            "Pasos detallados"
+          ],
+          "keywords": [
+            "calcular derivadas",
+            "resolver integrales",
+            "limites matematicos",
+            "calculo diferencial",
+            "integrales paso a paso",
+            "derivadas explicadas",
+            "calculadora de limites",
+            "ejercicios de calculo"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Cómo resuelvo esta derivada paso a paso?",
+            "Necesito calcular integrales definidas, ¿hay algo que me ayude?",
+            "Quiero entender cómo se hace un límite, ¿alguien me lo explica?",
+            "¿Dónde puedo resolver ejercicios de calculo diferencial con procedimiento?",
+            "Tengo un examen de integrales, ¿hay una herramienta que me muestre el proceso?"
+          ]
         },
         {
           "name": "Geometría",
           "slug": "geometria",
           "url": "https://meskeia.com/geometria/",
           "description": "Calcula áreas, perímetros, volúmenes y propiedades de figuras geométricas.",
-          "use_cases": ["Calcular área de triángulos y círculos", "Volumen de prismas y esferas"],
-          "features": ["Áreas", "Perímetros", "Volúmenes", "Múltiples figuras"],
-          "keywords": ["geometría", "área", "perímetro", "volumen", "figuras"]
+          "use_cases": [
+            "Calcular área de triángulos y círculos",
+            "Volumen de prismas y esferas"
+          ],
+          "features": [
+            "Áreas",
+            "Perímetros",
+            "Volúmenes",
+            "Múltiples figuras"
+          ],
+          "keywords": [
+            "calculadora geometria",
+            "calcular area perimetro",
+            "volumen figuras geometricas",
+            "calculo matematico online",
+            "herramienta geometria",
+            "calcular area triangulo",
+            "propiedades polígonos",
+            "formulas geometricas"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Cuál es el área de un círculo con radio 5 cm?",
+            "Necesito calcular el volumen de una esfera para mi tarea de mates",
+            "¿Cómo saco el perímetro de un triángulo?",
+            "Quiero hallar el área de un rectángulo rápidamente",
+            "¿Hay alguna herramienta para calcular propiedades de polígonos?"
+          ]
         },
         {
           "name": "Trigonometría",
           "slug": "trigonometria",
           "url": "https://meskeia.com/trigonometria/",
           "description": "Calcula funciones trigonométricas, identidades y resuelve triángulos.",
-          "use_cases": ["Resolver triángulos rectángulos", "Calcular seno, coseno, tangente"],
-          "features": ["Funciones trig", "Identidades", "Resolver triángulos", "Radianes/grados"],
-          "keywords": ["trigonometría", "seno", "coseno", "tangente", "triángulos"]
+          "use_cases": [
+            "Resolver triángulos rectángulos",
+            "Calcular seno, coseno, tangente"
+          ],
+          "features": [
+            "Funciones trig",
+            "Identidades",
+            "Resolver triángulos",
+            "Radianes/grados"
+          ],
+          "keywords": [
+            "trigonometria",
+            "calculadora trigonometrica",
+            "funciones trigonometricas",
+            "resolver triangulos",
+            "identidades trigonometricas",
+            "seno coseno tangente",
+            "calculo de angulos",
+            "triangulo rectangulo"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Cómo calculo el seno, coseno y tangente de un angulo?",
+            "Necesito resolver un triangulo rectangulo, ¿me ayudas?",
+            "Quiero verificar identidades trigonometricas, ¿hay alguna herramienta?",
+            "¿Cuanto vale la tangente de 45 grados?",
+            "Necesito calcular los lados de un triangulo conociendo un angulo y un lado"
+          ]
         },
         {
           "name": "Calculadora de Estadística",
@@ -305,53 +898,199 @@
             "Calcular estadísticos descriptivos",
             "Control de calidad industrial"
           ],
-          "features": ["Media/mediana/moda", "Desviación estándar", "Distribuciones", "Correlación"],
-          "keywords": ["estadística", "media", "desviación", "varianza", "datos"]
+          "features": [
+            "Media/mediana/moda",
+            "Desviación estándar",
+            "Distribuciones",
+            "Correlación"
+          ],
+          "keywords": [
+            "calculadora estadistica",
+            "media mediana moda",
+            "desviacion estandar",
+            "varianza datos",
+            "distribucion estadistica",
+            "analisis estadistico online",
+            "calcular media online",
+            "herramienta estadistica gratis"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Cómo calculo la media y la desviación estándar de mis datos?",
+            "Necesito saber la mediana y la moda de un conjunto de números rápidamente",
+            "¿Dónde puedo calcular la varianza de mis datos sin complicaciones?",
+            "Quiero hacer análisis estadístico básico sin instalar nada en mi ordenador",
+            "¿Cómo interpreto una distribución estadística de forma fácil?"
+          ]
         },
         {
           "name": "Probabilidad",
           "slug": "probabilidad",
           "url": "https://meskeia.com/probabilidad/",
           "description": "Calcula probabilidades, combinaciones, permutaciones y distribuciones.",
-          "use_cases": ["Calcular probabilidades de eventos", "Combinatoria y permutaciones"],
-          "features": ["Probabilidad", "Combinaciones", "Permutaciones", "Distribuciones"],
-          "keywords": ["probabilidad", "combinatoria", "permutaciones", "estadística"]
+          "use_cases": [
+            "Calcular probabilidades de eventos",
+            "Combinatoria y permutaciones"
+          ],
+          "features": [
+            "Probabilidad",
+            "Combinaciones",
+            "Permutaciones",
+            "Distribuciones"
+          ],
+          "keywords": [
+            "calculadora probabilidades",
+            "combinaciones y permutaciones",
+            "distribucion binomial",
+            "calcular probabilidad",
+            "combinatoria online",
+            "herramienta estadistica",
+            "calcular permutaciones",
+            "distribucion normal probabilidad"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Cuál es la probabilidad de que me toque la lotería?",
+            "Necesito calcular combinaciones y permutaciones para mis deberes de mates",
+            "¿Cuántas formas diferentes hay de ordenar estos elementos?",
+            "Quiero saber la probabilidad de un suceso con distribución normal",
+            "¿Cómo calculo las posibilidades de ganar en un juego de azar?"
+          ]
         },
         {
           "name": "Teoría de Números",
           "slug": "teoria-numeros",
           "url": "https://meskeia.com/teoria-numeros/",
           "description": "Números primos, MCD, MCM, factorización y propiedades de teoría de números.",
-          "use_cases": ["Encontrar números primos", "Calcular MCD y MCM"],
-          "features": ["Números primos", "MCD/MCM", "Factorización", "Divisibilidad"],
-          "keywords": ["teoría números", "primos", "MCD", "MCM", "factorización"]
+          "use_cases": [
+            "Encontrar números primos",
+            "Calcular MCD y MCM"
+          ],
+          "features": [
+            "Números primos",
+            "MCD/MCM",
+            "Factorización",
+            "Divisibilidad"
+          ],
+          "keywords": [
+            "numeros primos",
+            "MCD MCM",
+            "factorizacion",
+            "teoria de numeros",
+            "descomposicion en factores",
+            "maximo comun divisor",
+            "minimo comun multiplo",
+            "propiedades numeros"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Cómo sé si un número es primo o no?",
+            "Necesito calcular el MCD y el MCM de varios números",
+            "Quiero descomponer un número en factores primos",
+            "¿Cuál es el máximo común divisor entre estos números?",
+            "Cómo funciona la factorización de números grandes"
+          ]
         },
         {
           "name": "Investigación Operativa",
           "slug": "investigacion-operativa",
           "url": "https://meskeia.com/investigacion-operativa/",
           "description": "Optimización lineal, método simplex y teoría de grafos para investigación de operaciones.",
-          "use_cases": ["Optimizar recursos", "Resolver problemas de asignación"],
-          "features": ["Programación lineal", "Método simplex", "Optimización"],
-          "keywords": ["investigación operativa", "optimización", "simplex", "grafos"]
+          "use_cases": [
+            "Optimizar recursos",
+            "Resolver problemas de asignación"
+          ],
+          "features": [
+            "Programación lineal",
+            "Método simplex",
+            "Optimización"
+          ],
+          "keywords": [
+            "optimizacion lineal",
+            "metodo simplex",
+            "teoria de grafos",
+            "investigacion operativa",
+            "programacion lineal",
+            "algoritmos optimizacion",
+            "calculo de rutas",
+            "solucion problemas operativos"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Cómo puedo resolver problemas de optimizacion lineal de forma rapida?",
+            "Necesito entender el metodo simplex paso a paso, ¿existe alguna herramienta?",
+            "Quiero calcular rutas optimas usando teoria de grafos, ¿donde puedo hacerlo?",
+            "¿Hay alguna app para investigacion operativa que me ayude con mis ejercicios de universidad?",
+            "Tengo que optimizar recursos en mi empresa, ¿como puedo usar programacion lineal?"
+          ]
         },
         {
           "name": "Matriz",
           "slug": "matriz",
           "url": "https://meskeia.com/matriz/",
           "description": "Operaciones con matrices: suma, multiplicación, determinante, inversa, transpuesta.",
-          "use_cases": ["Resolver sistemas lineales", "Calcular determinantes e inversas"],
-          "features": ["Suma/multiplicación", "Determinante", "Inversa", "Transpuesta"],
-          "keywords": ["matrices", "determinante", "inversa", "álgebra lineal"]
+          "use_cases": [
+            "Resolver sistemas lineales",
+            "Calcular determinantes e inversas"
+          ],
+          "features": [
+            "Suma/multiplicación",
+            "Determinante",
+            "Inversa",
+            "Transpuesta"
+          ],
+          "keywords": [
+            "calculadora matrices",
+            "operaciones matrices online",
+            "determinante matriz",
+            "inversa matriz",
+            "multiplicar matrices",
+            "suma matrices",
+            "transpuesta matriz",
+            "herramienta matrices gratis"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Cómo calculo el determinante de una matriz?",
+            "Necesito invertir una matriz, ¿hay alguna herramienta online?",
+            "Quiero sumar y multiplicar matrices sin hacerlo a mano",
+            "¿Dónde puedo calcular la transpuesta de una matriz rapidamente?",
+            "Tengo que resolver operaciones con matrices para mi examen, ¿me ayudas?"
+          ]
         },
         {
           "name": "Gráfico de Funciones",
           "slug": "grafico-funciones",
           "url": "https://meskeia.com/grafico-funciones/",
           "description": "Grafica funciones matemáticas (polinómicas, trigonométricas, exponenciales) en plano cartesiano.",
-          "use_cases": ["Visualizar funciones matemáticas", "Analizar comportamiento de ecuaciones"],
-          "features": ["Gráficos interactivos", "Múltiples funciones", "Zoom", "Coordenadas"],
-          "keywords": ["gráficos", "funciones", "matemáticas", "visualización"]
+          "use_cases": [
+            "Visualizar funciones matemáticas",
+            "Analizar comportamiento de ecuaciones"
+          ],
+          "features": [
+            "Gráficos interactivos",
+            "Múltiples funciones",
+            "Zoom",
+            "Coordenadas"
+          ],
+          "keywords": [
+            "graficar funciones",
+            "graficador de funciones",
+            "representar funciones matematicas",
+            "funciones trigonometricas grafico",
+            "plano cartesiano",
+            "herramienta graficar online",
+            "funciones polinomicas",
+            "dibujador de graficas"
+          ],
+          "_category": "Matemáticas y Estadística",
+          "casos_de_uso": [
+            "¿Cómo puedo representar gráficamente una función matemática sin usar papel?",
+            "Necesito graficar funciones trigonométricas para estudiar, ¿hay alguna herramienta online?",
+            "Quiero visualizar cómo se comportan las funciones exponenciales y polinomicas",
+            "¿Dónde puedo ver el gráfico de una función en el plano cartesiano de forma rápida?",
+            "Tengo que hacer gráficos de funciones para clase, ¿existe algo gratis y fácil?"
+          ]
         }
       ]
     },
@@ -365,18 +1104,67 @@
           "slug": "tabla-periodica",
           "url": "https://meskeia.com/tabla-periodica/",
           "description": "Tabla periódica interactiva con información detallada de cada elemento químico.",
-          "use_cases": ["Consultar propiedades de elementos", "Estudiar química"],
-          "features": ["Interactiva", "Información completa", "Búsqueda", "Filtros"],
-          "keywords": ["tabla periódica", "química", "elementos", "ciencia"]
+          "use_cases": [
+            "Consultar propiedades de elementos",
+            "Estudiar química"
+          ],
+          "features": [
+            "Interactiva",
+            "Información completa",
+            "Búsqueda",
+            "Filtros"
+          ],
+          "keywords": [
+            "tabla periodica interactiva",
+            "elementos quimicos",
+            "tabla periodica online",
+            "propiedades elementos",
+            "quimica tabla periodica",
+            "tabla periodica educativa",
+            "consulta elementos quimicos",
+            "herramienta tabla periodica"
+          ],
+          "_category": "Física y Química",
+          "casos_de_uso": [
+            "¿Dónde puedo ver la tabla periódica interactiva de los elementos?",
+            "Necesito estudiar química y quiero una tabla periódica con información detallada",
+            "¿Cómo funciona cada elemento químico? Quiero una tabla que me lo explique",
+            "¿Existe alguna tabla periódica online donde pueda consultar propiedades de los elementos?",
+            "Busco una herramienta interactiva para aprender sobre los átomos y elementos químicos"
+          ]
         },
         {
           "name": "Fórmulas Químicas",
           "slug": "formulas-quimicas",
           "url": "https://meskeia.com/formulas-quimicas/",
           "description": "Balanceador de ecuaciones químicas y calculadora de masa molar automática.",
-          "use_cases": ["Balancear ecuaciones químicas", "Calcular masa molecular"],
-          "features": ["Balanceo automático", "Masa molar", "Estequiometría"],
-          "keywords": ["química", "ecuaciones", "balanceo", "masa molar", "reacciones"]
+          "use_cases": [
+            "Balancear ecuaciones químicas",
+            "Calcular masa molecular"
+          ],
+          "features": [
+            "Balanceo automático",
+            "Masa molar",
+            "Estequiometría"
+          ],
+          "keywords": [
+            "balanceador ecuaciones quimicas",
+            "calculadora masa molar",
+            "igualar reacciones quimicas",
+            "ecuaciones quimicas balanceadas",
+            "masa molecular",
+            "herramienta quimica online",
+            "balancear formulas",
+            "calculadora compuestos quimicos"
+          ],
+          "_category": "Física y Química",
+          "casos_de_uso": [
+            "¿Cómo puedo balancear ecuaciones químicas rápido?",
+            "Necesito calcular la masa molar de un compuesto, ¿qué herramienta me recomiendas?",
+            "Quiero resolver ejercicios de química sin tener que hacer cálculos a mano",
+            "¿Hay alguna app que me ayude a igualar reacciones químicas automáticamente?",
+            "¿Cómo sé cuál es la masa molar del H2SO4 sin calculadora científica?"
+          ]
         },
         {
           "name": "Calculadora Eléctrica",
@@ -389,26 +1177,97 @@
             "Estimar factura eléctrica",
             "Dimensionar cables"
           ],
-          "features": ["Ley de Ohm", "Consumo kWh", "Costo eléctrico", "Circuitos"],
-          "keywords": ["electricidad", "Ohm", "voltaje", "corriente", "potencia", "consumo"]
+          "features": [
+            "Ley de Ohm",
+            "Consumo kWh",
+            "Costo eléctrico",
+            "Circuitos"
+          ],
+          "keywords": [
+            "ley de ohm calculadora",
+            "consumo electrico hogar",
+            "gasto luz mensual",
+            "voltios amperios ohmios",
+            "calcular costo energia",
+            "consumo electrodomesticos",
+            "factura electrica simulador",
+            "calculadora watts potencia"
+          ],
+          "_category": "Física y Química",
+          "casos_de_uso": [
+            "¿Cuánto me cuesta dejar el aire acondicionado encendido todo el día?",
+            "Necesito calcular la intensidad de corriente de mi instalacion electrica",
+            "¿Cuanto gasto al mes con todos mis electrodomesticos?",
+            "Como calculo la resistencia y el voltaje con la ley de Ohm?",
+            "Quiero saber cuantos vatios consume mi nevera y cuanto me cuesta tenerla enchufada"
+          ]
         },
         {
           "name": "Glosario de Física y Química",
           "slug": "glosario-fisica-quimica",
           "url": "https://meskeia.com/glosario-fisica-quimica/",
           "description": "Diccionario de términos, fórmulas y conceptos de física y química.",
-          "use_cases": ["Consultar definiciones", "Repasar conceptos"],
-          "features": ["Búsqueda", "Definiciones", "Fórmulas", "Ejemplos"],
-          "keywords": ["física", "química", "glosario", "términos", "conceptos"]
+          "use_cases": [
+            "Consultar definiciones",
+            "Repasar conceptos"
+          ],
+          "features": [
+            "Búsqueda",
+            "Definiciones",
+            "Fórmulas",
+            "Ejemplos"
+          ],
+          "keywords": [
+            "glosario fisica quimica",
+            "diccionario terminos cientificos",
+            "formulas fisica quimica",
+            "conceptos basicos quimica",
+            "definiciones fisica",
+            "tabla periodica elementos",
+            "ejercicios quimica resueltos",
+            "leyes fisica explicadas"
+          ],
+          "_category": "Física y Química",
+          "casos_de_uso": [
+            "¿Donde puedo encontrar una explicación clara de la ley de conservación de la energía?",
+            "Necesito un diccionario rápido para buscar fórmulas de física y química para mi examen",
+            "¿Cómo se calcula la molaridad y qué fórmula tengo que usar?",
+            "Quiero un glosario que me explique qué es la entropía de una forma sencilla",
+            "¿Donde encontro definiciones de conceptos de química orgánica para mis apuntes?"
+          ]
         },
         {
           "name": "Calculadora de Movimiento",
           "slug": "calculadora-movimiento",
           "url": "https://meskeia.com/calculadora-movimiento/",
           "description": "Calcula velocidad, distancia, tiempo en física cinemática con múltiples unidades.",
-          "use_cases": ["Problemas de física", "Calcular tiempo de llegada"],
-          "features": ["Velocidad/distancia/tiempo", "Múltiples unidades", "Conversión"],
-          "keywords": ["movimiento", "velocidad", "física", "cinemática", "distancia"]
+          "use_cases": [
+            "Problemas de física",
+            "Calcular tiempo de llegada"
+          ],
+          "features": [
+            "Velocidad/distancia/tiempo",
+            "Múltiples unidades",
+            "Conversión"
+          ],
+          "keywords": [
+            "calculadora velocidad distancia tiempo",
+            "cinemática física online",
+            "calcular velocidad media",
+            "problemas movimiento uniforme",
+            "conversor unidades velocidad",
+            "ejercicios cinemática resueltos",
+            "calculadora distancia tiempo",
+            "física movimiento rectilineo"
+          ],
+          "_category": "Física y Química",
+          "casos_de_uso": [
+            "¿Cómo calculo la velocidad si tengo la distancia y el tiempo?",
+            "Necesito saber cuanta distancia recorro a una velocidad determinada",
+            "¿Cuanto tiempo tardo en llegar si voy a 100 km/h?",
+            "Quiero resolver problemas de cinemática de fisica de forma rapida",
+            "¿Me ayudas a calcular ejercicios de movimiento uniforme?"
+          ]
         }
       ]
     },
@@ -422,72 +1281,270 @@
           "slug": "cuaderno-digital",
           "url": "https://meskeia.com/cuaderno-digital/",
           "description": "Toma notas rápidas con formato Markdown, almacenamiento local y búsqueda.",
-          "use_cases": ["Apuntes de reuniones", "Ideas rápidas", "Notas permanentes"],
-          "features": ["Markdown", "Búsqueda", "Categorías", "Local"],
-          "keywords": ["notas", "cuaderno", "apuntes", "Markdown", "notebook"]
+          "use_cases": [
+            "Apuntes de reuniones",
+            "Ideas rápidas",
+            "Notas permanentes"
+          ],
+          "features": [
+            "Markdown",
+            "Búsqueda",
+            "Categorías",
+            "Local"
+          ],
+          "keywords": [
+            "notas rapidas",
+            "cuaderno digital",
+            "editor markdown",
+            "notas sin internet",
+            "aplicacion apuntes",
+            "almacenamiento local notas",
+            "bloc notas avanzado",
+            "buscar apuntes rapido"
+          ],
+          "_category": "Herramientas de Productividad",
+          "casos_de_uso": [
+            "¿Dónde puedo tomar notas sin perder mis apuntes?",
+            "Necesito una aplicación para escribir notas rápidas que funcione sin internet",
+            "¿Cómo organizo mis notas con formato sin instalar programas pesados?",
+            "Quiero un cuaderno digital que guarde todo en mi ordenador",
+            "¿Hay alguna app para buscar mis notas antiguas al momento?"
+          ]
         },
         {
           "name": "Gestor de Tareas",
           "slug": "lista-tareas",
           "url": "https://meskeia.com/lista-tareas/",
           "description": "Lista de tareas (to-do list) con prioridades, fechas límite y categorías.",
-          "use_cases": ["Organizar tareas diarias", "Proyecto con subtareas"],
-          "features": ["Prioridades", "Fechas", "Categorías", "Completar"],
-          "keywords": ["tareas", "to-do", "lista", "productividad", "organización"]
+          "use_cases": [
+            "Organizar tareas diarias",
+            "Proyecto con subtareas"
+          ],
+          "features": [
+            "Prioridades",
+            "Fechas",
+            "Categorías",
+            "Completar"
+          ],
+          "keywords": [
+            "gestor de tareas",
+            "lista de tareas",
+            "app to-do list",
+            "organizador de tareas",
+            "tareas con prioridades",
+            "planificador de pendientes",
+            "gestor de proyectos personal",
+            "calendario de tareas online"
+          ],
+          "_category": "Herramientas de Productividad",
+          "casos_de_uso": [
+            "¿Dónde puedo apuntar mis tareas diarias para no olvidarme de nada?",
+            "Necesito una aplicación para organizar mis cosas por prioridad y fechas",
+            "¿Cómo gestiono mejor mis pendientes con categorías y recordatorios?",
+            "Quiero una lista de tareas que me ayude a ser más productivo en el curro",
+            "¿Qué app me permite ordenar mis tareas por urgencia y fechas límite?"
+          ]
         },
         {
           "name": "Cronómetro y Temporizador",
           "slug": "cronometro-temporizador",
           "url": "https://meskeia.com/cronometro-temporizador/",
           "description": "Cronómetro preciso y temporizador con alarma para técnicas como Pomodoro.",
-          "use_cases": ["Técnica Pomodoro (25min trabajo)", "Timing de presentaciones"],
-          "features": ["Cronómetro", "Temporizador", "Alarma", "Pomodoro"],
-          "keywords": ["cronómetro", "temporizador", "Pomodoro", "tiempo", "timer"]
+          "use_cases": [
+            "Técnica Pomodoro (25min trabajo)",
+            "Timing de presentaciones"
+          ],
+          "features": [
+            "Cronómetro",
+            "Temporizador",
+            "Alarma",
+            "Pomodoro"
+          ],
+          "keywords": [
+            "cronometro online",
+            "temporizador pomodoro",
+            "cronometro preciso",
+            "temporizador con alarma",
+            "cronometro gratis",
+            "temporizador cocina",
+            "contador de tiempo",
+            "aplicacion temporizador"
+          ],
+          "_category": "Herramientas de Productividad",
+          "casos_de_uso": [
+            "Necesito un cronometro online para estudiar con la tecnica Pomodoro",
+            "¿Como hago un temporizador para cocinar sin estar pendiente?",
+            "Quiero una alarma que me avise cuando termine mi entrenamiento",
+            "¿Hay algun cronometro preciso para medir tiempos en entrenamientos?",
+            "Busco un temporizador simple y facil de usar desde el movil"
+          ]
         },
         {
           "name": "Información del Tiempo",
           "slug": "informacion-tiempo",
           "url": "https://meskeia.com/informacion-tiempo/",
           "description": "Consulta clima actual y pronóstico de múltiples ciudades del mundo.",
-          "use_cases": ["Consultar clima antes de viajar", "Pronóstico semanal"],
-          "features": ["Clima actual", "Pronóstico", "Múltiples ciudades"],
-          "keywords": ["clima", "tiempo", "pronóstico", "meteorología", "weather"]
+          "use_cases": [
+            "Consultar clima antes de viajar",
+            "Pronóstico semanal"
+          ],
+          "features": [
+            "Clima actual",
+            "Pronóstico",
+            "Múltiples ciudades"
+          ],
+          "keywords": [
+            "consultar tiempo",
+            "pronostico del clima",
+            "informacion meteorologica",
+            "tiempo actual",
+            "clima ciudades mundo",
+            "prediccion tiempo",
+            "aplicacion tiempo",
+            "ver tiempo online"
+          ],
+          "_category": "Herramientas de Productividad",
+          "casos_de_uso": [
+            "¿Qué tiempo va a hacer mañana en Madrid?",
+            "Necesito saber el clima actual en varias ciudades del mundo",
+            "¿Cómo está el tiempo ahora mismo en Barcelona y Londres?",
+            "Quiero consultar el pronostico del tiempo para esta semana",
+            "¿Dónde puedo ver el clima de diferentes ciudades en tiempo real?"
+          ]
         },
         {
           "name": "Horario Mundial",
           "slug": "horario-mundial",
           "url": "https://meskeia.com/horario-mundial/",
           "description": "Consulta hora actual en diferentes zonas horarias y convierte entre husos.",
-          "use_cases": ["Coordinar reuniones internacionales", "Llamadas con otros países"],
-          "features": ["Zonas horarias", "Conversión", "Múltiples ciudades"],
-          "keywords": ["hora mundial", "zona horaria", "timezone", "internacional"]
+          "use_cases": [
+            "Coordinar reuniones internacionales",
+            "Llamadas con otros países"
+          ],
+          "features": [
+            "Zonas horarias",
+            "Conversión",
+            "Múltiples ciudades"
+          ],
+          "keywords": [
+            "conversor de horas",
+            "zonas horarias mundo",
+            "diferencia horaria",
+            "hora mundial",
+            "huso horario",
+            "que hora es en",
+            "convertir hora",
+            "reloj mundial"
+          ],
+          "_category": "Herramientas de Productividad",
+          "casos_de_uso": [
+            "¿Qué hora es ahora en Tokio mientras aquí es las 3 de la tarde?",
+            "Necesito saber la diferencia horaria entre Madrid y Nueva York",
+            "¿Cómo convierto una hora de Londres a horario de España?",
+            "Quiero ver qué hora es en varios países a la vez sin liarme",
+            "¿A qué hora tengo que llamar a mi amigo en Sydney para que sea por la mañana aquí?"
+          ]
         },
         {
           "name": "Generador de Texto",
           "slug": "generador-texto",
           "url": "https://meskeia.com/generador-texto/",
           "description": "Genera texto Lorem Ipsum o aleatorio para prototipos y diseño.",
-          "use_cases": ["Rellenar mockups", "Texto placeholder"],
-          "features": ["Lorem Ipsum", "Personalizable", "Copiar"],
-          "keywords": ["Lorem Ipsum", "texto aleatorio", "placeholder", "dummy text"]
+          "use_cases": [
+            "Rellenar mockups",
+            "Texto placeholder"
+          ],
+          "features": [
+            "Lorem Ipsum",
+            "Personalizable",
+            "Copiar"
+          ],
+          "keywords": [
+            "generador lorem ipsum",
+            "texto aleatorio online",
+            "generador de texto dummy",
+            "relleno de contenido",
+            "lorem ipsum",
+            "texto para prototipos",
+            "generador parrafos falsos",
+            "texto de prueba"
+          ],
+          "_category": "Herramientas de Productividad",
+          "casos_de_uso": [
+            "¿Donde puedo generar texto Lorem Ipsum para mis diseños?",
+            "Necesito rellenar mi maqueta con texto aleatorio, ¿qué herramienta me recomiendas?",
+            "Quiero crear un prototipo web pero no tengo contenido, ¿cómo genero texto de relleno?",
+            "¿Cómo puedo obtener párrafos falsos para testear mi aplicación?",
+            "Busco un generador de texto dummy para no perder tiempo escribiendo en el diseño"
+          ]
         },
         {
           "name": "Generador de Contraseñas",
           "slug": "generador-contrasenas",
           "url": "https://meskeia.com/generador-contrasenas/",
           "description": "Genera contraseñas seguras con longitud personalizable, símbolos y nivel de seguridad.",
-          "use_cases": ["Crear contraseñas fuertes", "Cambio periódico de passwords"],
-          "features": ["Personalizable", "Nivel seguridad", "Copiar", "Local"],
-          "keywords": ["contraseña", "password", "seguridad", "generador", "aleatorio"]
+          "use_cases": [
+            "Crear contraseñas fuertes",
+            "Cambio periódico de passwords"
+          ],
+          "features": [
+            "Personalizable",
+            "Nivel seguridad",
+            "Copiar",
+            "Local"
+          ],
+          "keywords": [
+            "generador de contrasenas",
+            "generador de passwords",
+            "contrasena segura",
+            "crear contrasena fuerte",
+            "generador aleatorio de contrasenas",
+            "password generator",
+            "contrasena con simbolos",
+            "herramienta contrasenas seguras"
+          ],
+          "_category": "Herramientas de Productividad",
+          "casos_de_uso": [
+            "¿Como genero una contraseña segura y fuerte?",
+            "Necesito crear una contraseña que no pueda romper un hacker",
+            "¿Donde puedo hacer una contraseña aleatoria con simbolos?",
+            "Quiero una herramienta para generar passwords seguras de forma rapida",
+            "¿Como creo una contraseña compleja que sea imposible de hackear?"
+          ]
         },
         {
           "name": "Generador de Códigos QR",
           "slug": "generador-codigos-qr",
           "url": "https://meskeia.com/generador-codigos-qr/",
           "description": "Genera códigos QR para URLs, texto, WiFi, vCard. Descarga en PNG de alta resolución.",
-          "use_cases": ["QR de URLs para compartir", "WiFi en restaurantes", "Tarjetas contacto"],
-          "features": ["URL/texto/WiFi/vCard", "Personalización", "Descarga PNG"],
-          "keywords": ["QR", "código QR", "generador", "URL", "WiFi"]
+          "use_cases": [
+            "QR de URLs para compartir",
+            "WiFi en restaurantes",
+            "Tarjetas contacto"
+          ],
+          "features": [
+            "URL/texto/WiFi/vCard",
+            "Personalización",
+            "Descarga PNG"
+          ],
+          "keywords": [
+            "generador codigo qr",
+            "crear codigo qr gratis",
+            "codigo qr wifi",
+            "qr code generador",
+            "vcard codigo qr",
+            "descargar codigo qr png",
+            "hacer codigo qr online",
+            "generador qr texto"
+          ],
+          "_category": "Herramientas de Productividad",
+          "casos_de_uso": [
+            "¿Cómo genero un código QR para compartir mi WiFi sin decir la contraseña?",
+            "Necesito crear un código QR para mi negocio que lleve a mi página web",
+            "¿Dónde puedo hacer un código QR gratis y descargarlo en buena calidad?",
+            "Quiero meter mis datos de contacto en un código QR para dárselo a clientes",
+            "¿Cómo creo un código QR de un texto o un enlace de forma rápida?"
+          ]
         }
       ]
     },
@@ -507,62 +1564,229 @@
             "Competir con amigos",
             "Descanso mental en trabajo"
           ],
-          "features": ["Palabra diaria", "Sistema colores", "Estadísticas", "Rachas"],
-          "keywords": ["wordle", "juego palabras", "español", "adivinar", "vocabulario"]
+          "features": [
+            "Palabra diaria",
+            "Sistema colores",
+            "Estadísticas",
+            "Rachas"
+          ],
+          "keywords": [
+            "wordle espanol",
+            "juego palabras diario",
+            "adivina palabra 5 letras",
+            "wordle en espanol",
+            "juego pasatiempo palabras",
+            "juego diario palabras espanol",
+            "wordle gratis",
+            "juego adivinanza palabras"
+          ],
+          "_category": "Juegos y Entretenimiento",
+          "casos_de_uso": [
+            "¿Dónde puedo jugar al Wordle en español?",
+            "Quiero un juego de palabras diario como el Wordle pero en español",
+            "¿Cómo juego al Wordle español gratis?",
+            "Necesito un pasatiempo de palabras tipo Wordle para todos los días",
+            "¿Hay algún juego para adivinar palabras de 5 letras con pistas de colores?"
+          ]
         },
         {
           "name": "Tres en Raya",
           "slug": "tres-en-raya",
           "url": "https://meskeia.com/tres-en-raya/",
           "description": "Juego clásico de tres en raya (tic-tac-toe) contra IA o modo 2 jugadores.",
-          "use_cases": ["Jugar partidas rápidas", "Entrenar lógica estratégica"],
-          "features": ["Vs IA", "2 jugadores", "Diferentes niveles"],
-          "keywords": ["tres en raya", "tic tac toe", "juego", "estrategia"]
+          "use_cases": [
+            "Jugar partidas rápidas",
+            "Entrenar lógica estratégica"
+          ],
+          "features": [
+            "Vs IA",
+            "2 jugadores",
+            "Diferentes niveles"
+          ],
+          "keywords": [
+            "tres en raya",
+            "tic tac toe",
+            "juego tres en raya",
+            "naves juego",
+            "juego IA",
+            "tres en raya online",
+            "juego dos jugadores",
+            "tic tac toe gratis"
+          ],
+          "_category": "Juegos y Entretenimiento",
+          "casos_de_uso": [
+            "¿Dónde puedo jugar al tres en raya contra la máquina?",
+            "Quiero jugar a las naves con un amigo online, ¿hay alguna app?",
+            "¿Cómo jugar al tic-tac-toe gratis sin descargar nada?",
+            "Necesito un juego simple para jugar dos personas en el mismo móvil",
+            "¿Existe algún tres en raya con inteligencia artificial para entrenarme?"
+          ]
         },
         {
           "name": "Piedra Papel Tijera",
           "slug": "piedra-papel-tijera",
           "url": "https://meskeia.com/piedra-papel-tijera/",
           "description": "Juego clásico de piedra, papel o tijera contra la computadora con contador de victorias.",
-          "use_cases": ["Decidir aleatoriamente", "Juego rápido de 1 minuto"],
-          "features": ["Vs computadora", "Contador victorias", "Animaciones"],
-          "keywords": ["piedra papel tijera", "juego", "rock paper scissors"]
+          "use_cases": [
+            "Decidir aleatoriamente",
+            "Juego rápido de 1 minuto"
+          ],
+          "features": [
+            "Vs computadora",
+            "Contador victorias",
+            "Animaciones"
+          ],
+          "keywords": [
+            "piedra papel tijera",
+            "juego piedra papel tijera",
+            "piedra papel tijera online",
+            "piedra papel tijera contra maquina",
+            "juego clasico piedra papel tijera",
+            "piedra papel tijera puntuacion",
+            "jugar piedra papel tijera",
+            "piedra papel tijera contador"
+          ],
+          "_category": "Juegos y Entretenimiento",
+          "casos_de_uso": [
+            "¿Dónde puedo jugar a piedra papel tijera contra la máquina?",
+            "Quiero jugar a piedra papel tijera online gratis",
+            "¿Cómo juego a piedra papel tijera con contador de puntos?",
+            "Necesito una app para jugar a piedra papel tijera y llevar la cuenta de victorias",
+            "¿Hay algún juego online de piedra papel tijera que funcione sin conexión?"
+          ]
         },
         {
           "name": "Juego 2048",
           "slug": "juego-2048",
           "url": "https://meskeia.com/juego-2048/",
           "description": "Puzzle matemático: combina números hasta llegar a 2048 deslizando fichas.",
-          "use_cases": ["Entrenamiento mental", "Pausas entre tareas"],
-          "features": ["Deslizar fichas", "Puntuación", "Guardar mejor score"],
-          "keywords": ["2048", "puzzle", "juego numérico", "matemáticas"]
+          "use_cases": [
+            "Entrenamiento mental",
+            "Pausas entre tareas"
+          ],
+          "features": [
+            "Deslizar fichas",
+            "Puntuación",
+            "Guardar mejor score"
+          ],
+          "keywords": [
+            "juego 2048",
+            "puzzle numeros",
+            "juego matematico",
+            "2048 online",
+            "juego logica",
+            "puzzle interactivo",
+            "juego numerico",
+            "desafio mental"
+          ],
+          "_category": "Juegos y Entretenimiento",
+          "casos_de_uso": [
+            "¿Dónde puedo jugar al 2048 online gratis?",
+            "Necesito un juego de puzzle para entretenme en el trabajo",
+            "¿Cómo se juega al 2048? Quiero aprender las reglas",
+            "Busco un juego de números que sea adictivo y me haga pensar",
+            "¿Hay algún juego tipo 2048 que funcione sin internet?"
+          ]
         },
         {
           "name": "Juego de Memoria",
           "slug": "juego-memoria",
           "url": "https://meskeia.com/juego-memoria/",
           "description": "Juego de memoria con cartas: encuentra las parejas volteando cartas.",
-          "use_cases": ["Entrenar memoria visual", "Actividad para niños"],
-          "features": ["Diferentes niveles", "Cronómetro", "Puntuación"],
-          "keywords": ["memoria", "juego", "cartas", "parejas", "concentración"]
+          "use_cases": [
+            "Entrenar memoria visual",
+            "Actividad para niños"
+          ],
+          "features": [
+            "Diferentes niveles",
+            "Cronómetro",
+            "Puntuación"
+          ],
+          "keywords": [
+            "juego de memoria",
+            "juego de cartas",
+            "emparejar cartas",
+            "juego concentracion",
+            "voltear cartas",
+            "juego memory online",
+            "parejas cartas",
+            "juego mental"
+          ],
+          "_category": "Juegos y Entretenimiento",
+          "casos_de_uso": [
+            "¿Dónde puedo jugar a un juego de memoria online gratis?",
+            "Quiero ejercitar mi memoria con un juego de cartas, ¿qué me recomiendas?",
+            "¿Cómo puedo jugar a emparejar cartas en el navegador?",
+            "Necesito un juego para mejorar la concentración, ¿tienes alguno?",
+            "¿Hay algún juego de voltear cartas para pasar el rato?"
+          ]
         },
         {
           "name": "Sudoku Clásico",
           "slug": "sudoku-clasico",
           "url": "https://meskeia.com/sudoku-clasico/",
           "description": "Sudoku clásico 9x9 con diferentes niveles de dificultad y validación automática.",
-          "use_cases": ["Resolver sudokus diarios", "Entrenar lógica deductiva"],
-          "features": ["Múltiples niveles", "Validación", "Pistas", "Temporizador"],
-          "keywords": ["sudoku", "puzzle", "lógica", "números", "juego"]
+          "use_cases": [
+            "Resolver sudokus diarios",
+            "Entrenar lógica deductiva"
+          ],
+          "features": [
+            "Múltiples niveles",
+            "Validación",
+            "Pistas",
+            "Temporizador"
+          ],
+          "keywords": [
+            "sudoku online",
+            "sudoku clasico",
+            "sudoku 9x9",
+            "jugar sudoku gratis",
+            "sudoku niveles dificultad",
+            "sudoku web",
+            "sudoku validacion",
+            "puzzle sudoku"
+          ],
+          "_category": "Juegos y Entretenimiento",
+          "casos_de_uso": [
+            "¿Dónde puedo jugar al sudoku online gratis?",
+            "Quiero entrenar mi mente con sudokus de diferentes niveles",
+            "¿Cómo juego al sudoku 9x9 sin descargar nada?",
+            "Necesito una app de sudoku que me valide si estoy haciéndolo bien",
+            "¿Hay algún juego de sudoku clasico que funcione en el navegador?"
+          ]
         },
         {
           "name": "Puzzle Matemático",
           "slug": "puzzle-matematico",
           "url": "https://meskeia.com/puzzle-matematico/",
           "description": "Rompecabezas matemático con operaciones y lógica numérica para resolver.",
-          "use_cases": ["Desafíos matemáticos", "Entrenar cálculo mental"],
-          "features": ["Diferentes puzzles", "Niveles dificultad", "Cronómetro"],
-          "keywords": ["puzzle", "matemáticas", "lógica", "desafío", "números"]
+          "use_cases": [
+            "Desafíos matemáticos",
+            "Entrenar cálculo mental"
+          ],
+          "features": [
+            "Diferentes puzzles",
+            "Niveles dificultad",
+            "Cronómetro"
+          ],
+          "keywords": [
+            "puzzle matematico",
+            "rompecabezas numerico",
+            "juego logica matematica",
+            "desafios matematicos",
+            "ejercicios calculo mental",
+            "pasatiempos numeros",
+            "operaciones matematicas juego",
+            "brain training matematico"
+          ],
+          "_category": "Juegos y Entretenimiento",
+          "casos_de_uso": [
+            "¿Donde puedo resolver puzzles matemáticos para entrenarme?",
+            "Quiero juegos de lógica numérica para ejercitar mi mente",
+            "¿Cómo puedo mejorar en cálculo mental con ejercicios divertidos?",
+            "Necesito rompecabezas matemáticos para pasar el tiempo",
+            "¿Hay alguna app con desafíos de matemáticas y operaciones?"
+          ]
         }
       ]
     },
@@ -576,45 +1800,167 @@
           "slug": "calculadora-notas",
           "url": "https://meskeia.com/calculadora-notas/",
           "description": "Calcula promedio ponderado de calificaciones con pesos y créditos.",
-          "use_cases": ["Calcular nota media del curso", "Saber qué nota necesitas en examen final"],
-          "features": ["Promedio ponderado", "Notas con peso", "Proyección"],
-          "keywords": ["notas", "calificaciones", "promedio", "ponderado", "estudiantes"]
+          "use_cases": [
+            "Calcular nota media del curso",
+            "Saber qué nota necesitas en examen final"
+          ],
+          "features": [
+            "Promedio ponderado",
+            "Notas con peso",
+            "Proyección"
+          ],
+          "keywords": [
+            "calculadora notas",
+            "promedio ponderado",
+            "media ponderada universidad",
+            "calificaciones con pesos",
+            "nota final ECTS",
+            "calcular expediente academico",
+            "media créditos asignaturas",
+            "calculo nota media"
+          ],
+          "_category": "Campus Digital",
+          "casos_de_uso": [
+            "¿Cómo calculo mi nota media ponderada de la universidad?",
+            "Necesito saber mi promedio de calificaciones con créditos, ¿hay alguna herramienta?",
+            "Quiero calcular mi nota final considerando los pesos de cada asignatura",
+            "¿Cuál será mi expediente académico si saco estas notas?",
+            "¿Cómo se hace el cálculo de la media ponderada con los créditos ECTS?"
+          ]
         },
         {
           "name": "Generador de Horarios de Estudio",
           "slug": "generador-horarios-estudio",
           "url": "https://meskeia.com/generador-horarios-estudio/",
           "description": "Planifica horarios de estudio distribuyendo materias según prioridad y tiempo disponible.",
-          "use_cases": ["Organizar semana de estudio", "Preparar exámenes múltiples"],
-          "features": ["Distribución automática", "Prioridades", "Descansos"],
-          "keywords": ["horario", "estudio", "planificación", "exámenes", "organización"]
+          "use_cases": [
+            "Organizar semana de estudio",
+            "Preparar exámenes múltiples"
+          ],
+          "features": [
+            "Distribución automática",
+            "Prioridades",
+            "Descansos"
+          ],
+          "keywords": [
+            "generador horarios estudio",
+            "planificador asignaturas",
+            "organizador tiempo estudio",
+            "calendario estudio automatico",
+            "distribuidor materias",
+            "horario estudio personalizado",
+            "planificacion academica",
+            "gestor tiempos estudio"
+          ],
+          "_category": "Campus Digital",
+          "casos_de_uso": [
+            "¿Como puedo organizar mejor mis horarios de estudio para los examenes?",
+            "Necesito un generador de horarios que me ayude a estudiar todas las asignaturas",
+            "Quiero planificar mi tiempo de estudio de forma inteligente sin agobiarme",
+            "¿Existe alguna herramienta para distribuir las materias que tengo que estudiar?",
+            "Me falta organizacion para estudiar, necesito algo que me haga un horario automatico"
+          ]
         },
         {
           "name": "Creador de Flashcards",
           "slug": "creador-flashcards",
           "url": "https://meskeia.com/creador-flashcards/",
           "description": "Crea tarjetas de estudio (flashcards) para memorización con sistema de repaso.",
-          "use_cases": ["Estudiar vocabulario", "Repasar conceptos", "Memorizar fórmulas"],
-          "features": ["Crear tarjetas", "Modo estudio", "Progreso", "Categorías"],
-          "keywords": ["flashcards", "tarjetas", "estudio", "memorización", "repaso"]
+          "use_cases": [
+            "Estudiar vocabulario",
+            "Repasar conceptos",
+            "Memorizar fórmulas"
+          ],
+          "features": [
+            "Crear tarjetas",
+            "Modo estudio",
+            "Progreso",
+            "Categorías"
+          ],
+          "keywords": [
+            "flashcards",
+            "tarjetas de estudio",
+            "creador de flashcards",
+            "memorizar rapido",
+            "repaso espaciado",
+            "aplicacion estudio",
+            "tecnica spaced repetition",
+            "herramienta educativa apuntes"
+          ],
+          "_category": "Campus Digital",
+          "casos_de_uso": [
+            "¿Como puedo crear tarjetas de estudio para memorizar mejor?",
+            "Necesito una aplicacion para hacer flashcards y estudiar de forma efectiva",
+            "Quiero preparar mis examenes con un sistema de repaso interactivo",
+            "¿Hay alguna herramienta para crear apuntes en formato de tarjetas?",
+            "Como puedo estudiar con tecnicas de repeticion espaciada de forma facil?"
+          ]
         },
         {
           "name": "Curso Decisiones de Inversión",
           "slug": "curso-decisiones-inversion",
           "url": "https://meskeia.com/curso-decisiones-inversion/",
           "description": "Curso interactivo sobre toma de decisiones de inversión y análisis financiero.",
-          "use_cases": ["Aprender a invertir", "Entender análisis financiero"],
-          "features": ["Módulos interactivos", "Ejercicios prácticos", "Conceptos clave"],
-          "keywords": ["inversión", "curso", "finanzas", "educación financiera"]
+          "use_cases": [
+            "Aprender a invertir",
+            "Entender análisis financiero"
+          ],
+          "features": [
+            "Módulos interactivos",
+            "Ejercicios prácticos",
+            "Conceptos clave"
+          ],
+          "keywords": [
+            "curso inversiones",
+            "analisis financiero online",
+            "toma de decisiones inversion",
+            "aprender a invertir dinero",
+            "curso bolsa y finanzas",
+            "educacion financiera interactiva",
+            "decisiones de inversion",
+            "guia practica inversiones"
+          ],
+          "_category": "Campus Digital",
+          "casos_de_uso": [
+            "¿Cómo aprendo a invertir mi dinero sin perder la pasta?",
+            "Necesito un curso para entender el análisis financiero y las inversiones",
+            "¿Dónde puedo aprender a tomar mejores decisiones con mis ahorros?",
+            "Quiero saber cómo funcionan las inversiones y qué debo hacer",
+            "¿Cómo analizo si una inversión es buena o mala?"
+          ]
         },
         {
           "name": "Curso de Emprendimiento",
           "slug": "curso-emprendimiento",
           "url": "https://meskeia.com/curso-emprendimiento/",
           "description": "Curso paso a paso para emprendedores: desde la idea hasta la ejecución del negocio.",
-          "use_cases": ["Planificar startup", "Validar idea de negocio"],
-          "features": ["Módulos progresivos", "Plantillas", "Casos prácticos"],
-          "keywords": ["emprendimiento", "startup", "negocio", "empresa"]
+          "use_cases": [
+            "Planificar startup",
+            "Validar idea de negocio"
+          ],
+          "features": [
+            "Módulos progresivos",
+            "Plantillas",
+            "Casos prácticos"
+          ],
+          "keywords": [
+            "curso emprendimiento",
+            "como empezar negocio",
+            "emprender desde cero",
+            "guia emprendedor",
+            "crear empresa paso a paso",
+            "formacion emprendedores",
+            "negocio online",
+            "plan negocio"
+          ],
+          "_category": "Campus Digital",
+          "casos_de_uso": [
+            "¿Por donde empiezo si quiero montar mi propio negocio?",
+            "Necesito un curso que me enseñe desde cero a emprender",
+            "¿Cómo paso de una idea a tener un negocio funcionando?",
+            "Quiero aprender a emprender sin gastarme una pasta",
+            "¿Qué pasos tengo que seguir para crear mi empresa?"
+          ]
         }
       ]
     },
@@ -634,8 +1980,30 @@
             "Planificar déficit calórico",
             "Tracking de actividad física"
           ],
-          "features": ["Múltiples ejercicios", "Cálculo por METs", "Personalizado", "Comparación"],
-          "keywords": ["calorías", "ejercicio", "fitness", "quemar", "deporte"]
+          "features": [
+            "Múltiples ejercicios",
+            "Cálculo por METs",
+            "Personalizado",
+            "Comparación"
+          ],
+          "keywords": [
+            "calorias quemadas ejercicio",
+            "calculadora calorias",
+            "calorias gastadas deporte",
+            "quemo calorias corriendo",
+            "gasto energetico ejercicio",
+            "METs calorías",
+            "cuantas calorias pierdo",
+            "calculadora gasto calorico"
+          ],
+          "_category": "Salud & Bienestar",
+          "casos_de_uso": [
+            "¿Cuantas calorias quemo haciendo ejercicio?",
+            "Necesito saber cuantas calorias gasto corriendo una hora",
+            "¿Cuanto adelgazo si hago ejercicio regularmente?",
+            "Quiero calcular las calorias que quemo en el gimnasio segun mi peso",
+            "¿Como sé cuantas calorias he quemado en mi entreno de hoy?"
+          ]
         },
         {
           "name": "Calculadora de Hidratación",
@@ -648,44 +2016,163 @@
             "Clima cálido: aumentar consumo",
             "Rendimiento deportivo óptimo"
           ],
-          "features": ["Personalizado", "Ajuste clima", "Actividad física", "Distribución horaria"],
-          "keywords": ["hidratación", "agua", "salud", "deporte", "líquidos"]
+          "features": [
+            "Personalizado",
+            "Ajuste clima",
+            "Actividad física",
+            "Distribución horaria"
+          ],
+          "keywords": [
+            "calculadora agua diaria",
+            "litros agua recomendados",
+            "ingesta hidratacion",
+            "agua segun peso",
+            "cuanta agua beber",
+            "necesidad agua diaria",
+            "hidratacion ejercicio",
+            "consumo agua recomendado"
+          ],
+          "_category": "Salud & Bienestar",
+          "casos_de_uso": [
+            "¿Cuánta agua tengo que beber al día según mi peso?",
+            "Necesito saber cuántos litros de agua debo tomar si hago deporte",
+            "¿Cómo calculo mi ingesta diaria de agua en función del clima?",
+            "Quiero saber si bebo suficiente agua al día",
+            "¿Cuánta hidratacion necesito segun mi actividad fisica?"
+          ]
         },
         {
           "name": "Índice de Masa Corporal (IMC)",
           "slug": "indice-masa-corporal",
           "url": "https://meskeia.com/indice-masa-corporal/",
           "description": "Calcula IMC y clasifica según OMS: bajo peso, normal, sobrepeso, obesidad.",
-          "use_cases": ["Evaluar peso saludable", "Seguimiento pérdida peso"],
-          "features": ["IMC", "Clasificación OMS", "Recomendaciones"],
-          "keywords": ["IMC", "peso", "salud", "obesidad", "body mass index"]
+          "use_cases": [
+            "Evaluar peso saludable",
+            "Seguimiento pérdida peso"
+          ],
+          "features": [
+            "IMC",
+            "Clasificación OMS",
+            "Recomendaciones"
+          ],
+          "keywords": [
+            "indice masa corporal",
+            "IMC calculadora",
+            "peso ideal",
+            "calculadora IMC",
+            "sobrepeso",
+            "indice de masa corporal",
+            "obesidad",
+            "bajo peso"
+          ],
+          "_category": "Salud & Bienestar",
+          "casos_de_uso": [
+            "¿Cuál es mi índice de masa corporal?",
+            "Necesito saber si tengo sobrepeso o estoy en mi peso ideal",
+            "¿Cómo calculo el IMC y qué significa cada categoría?",
+            "Quiero comprobar si estoy obeso según la OMS",
+            "¿Tengo bajo peso? Calcula mi IMC ahora"
+          ]
         },
         {
           "name": "Evaluador de Salud",
           "slug": "evaluador-salud",
           "url": "https://meskeia.com/evaluador-salud/",
           "description": "Cuestionario de hábitos de salud con puntuación y recomendaciones personalizadas.",
-          "use_cases": ["Autoevaluación de hábitos", "Identificar áreas de mejora"],
-          "features": ["Cuestionario", "Puntuación", "Recomendaciones", "Tracking"],
-          "keywords": ["salud", "hábitos", "evaluación", "bienestar", "lifestyle"]
+          "use_cases": [
+            "Autoevaluación de hábitos",
+            "Identificar áreas de mejora"
+          ],
+          "features": [
+            "Cuestionario",
+            "Puntuación",
+            "Recomendaciones",
+            "Tracking"
+          ],
+          "keywords": [
+            "evaluador de salud",
+            "test habitos salud",
+            "cuestionario bienestar",
+            "evaluacion hábitos vida",
+            "puntuacion salud personal",
+            "recomendaciones salud personalizadas",
+            "test estilo vida",
+            "chequeo salud online"
+          ],
+          "_category": "Salud & Bienestar",
+          "casos_de_uso": [
+            "¿Cómo sé si tengo unos hábitos de salud buenos?",
+            "Quiero evaluar mi estado de salud actual",
+            "Necesito un test rápido para saber cómo estoy de salud",
+            "¿Dónde puedo hacer un cuestionario sobre mis hábitos de vida?",
+            "Busco recomendaciones personalizadas para mejorar mi salud"
+          ]
         },
         {
           "name": "Calculadora de Sueño",
           "slug": "calculadora-sueno",
           "url": "https://meskeia.com/calculadora-sueno/",
           "description": "Calcula mejor hora para despertar según ciclos de sueño de 90 minutos.",
-          "use_cases": ["Despertar sin somnolencia", "Optimizar descanso"],
-          "features": ["Ciclos sueño", "Hora óptima", "Alarma sugerida"],
-          "keywords": ["sueño", "dormir", "ciclos", "descanso", "alarma"]
+          "use_cases": [
+            "Despertar sin somnolencia",
+            "Optimizar descanso"
+          ],
+          "features": [
+            "Ciclos sueño",
+            "Hora óptima",
+            "Alarma sugerida"
+          ],
+          "keywords": [
+            "calculadora sueno",
+            "ciclos sueno 90 minutos",
+            "mejor hora despertar",
+            "horario ideal sueno",
+            "calcular descanso optimo",
+            "alarma inteligente sueno",
+            "descanso reparador",
+            "dormir bien calculadora"
+          ],
+          "_category": "Salud & Bienestar",
+          "casos_de_uso": [
+            "¿A qué hora debería meterme en la cama para despertar descansado?",
+            "Necesito saber la mejor hora para despertarme según mis ciclos de sueno",
+            "¿Como puedo calcular cuando debo dormir para no estar hecho polvo por la manana?",
+            "Quiero una herramienta que me diga a que hora sonar la alarma para levantarme bien",
+            "¿Cual es la mejor hora para despertarme si me acuesto ahora mismo?"
+          ]
         },
         {
           "name": "NutriSalud",
           "slug": "nutrisalud",
           "url": "https://meskeia.com/nutrisalud/",
           "description": "Calculadora nutricional y planificador de dietas con macros y micronutrientes.",
-          "use_cases": ["Planificar dieta equilibrada", "Calcular macros (proteína/carbs/grasa)"],
-          "features": ["Macros", "Micronutrientes", "Planificador comidas"],
-          "keywords": ["nutrición", "dieta", "macros", "salud", "alimentación"]
+          "use_cases": [
+            "Planificar dieta equilibrada",
+            "Calcular macros (proteína/carbs/grasa)"
+          ],
+          "features": [
+            "Macros",
+            "Micronutrientes",
+            "Planificador comidas"
+          ],
+          "keywords": [
+            "calculadora nutricional",
+            "planificador de dietas",
+            "contador de calorias",
+            "macronutrientes app",
+            "calcular macros",
+            "dieta personalizada",
+            "nutricion diaria",
+            "balance de nutrientes"
+          ],
+          "_category": "Salud & Bienestar",
+          "casos_de_uso": [
+            "¿Cómo puedo saber cuántas calorias debo comer al día?",
+            "Necesito un planificador de dietas que me calcule los macros automáticamente",
+            "¿Dónde encuentro una aplicación para controlar proteinas, grasas e hidratos?",
+            "Quiero saber qué micronutrientes me faltan en mi alimentación",
+            "¿Hay alguna app que me haga un plan de comidas según mis macronutrientes?"
+          ]
         }
       ]
     },
@@ -699,36 +2186,134 @@
           "slug": "validador-json",
           "url": "https://meskeia.com/validador-json/",
           "description": "Valida sintaxis JSON, formatea con indentación y muestra errores con línea exacta.",
-          "use_cases": ["Depurar JSON inválido", "Formatear JSON comprimido"],
-          "features": ["Validación", "Formateo", "Detección errores", "Líneas"],
-          "keywords": ["JSON", "validar", "formatear", "sintaxis", "API"]
+          "use_cases": [
+            "Depurar JSON inválido",
+            "Formatear JSON comprimido"
+          ],
+          "features": [
+            "Validación",
+            "Formateo",
+            "Detección errores",
+            "Líneas"
+          ],
+          "keywords": [
+            "validador json",
+            "verificar json online",
+            "formateador json",
+            "errores json linea",
+            "validar sintaxis json",
+            "herramienta json gratis",
+            "indentacion json",
+            "revisar json online"
+          ],
+          "_category": "Herramientas Web y Tecnología",
+          "casos_de_uso": [
+            "¿Cómo puedo validar si mi JSON está bien escrito?",
+            "Necesito formatear un JSON con indentacion para que se vea bien",
+            "¿Dónde encuentro el error exacto en mi archivo JSON?",
+            "Quiero comprobar la sintaxis de un JSON sin instalar nada",
+            "¿Cómo organizo y formatteo un JSON que tengo desordenado?"
+          ]
         },
         {
           "name": "Validador de Regex",
           "slug": "validador-regex",
           "url": "https://meskeia.com/validador-regex/",
           "description": "Prueba expresiones regulares con texto de ejemplo y resalta coincidencias.",
-          "use_cases": ["Validar regex antes de usar", "Aprender expresiones regulares"],
-          "features": ["Testing en vivo", "Resaltado matches", "Flags", "Explicación"],
-          "keywords": ["regex", "expresiones regulares", "validar", "testing"]
+          "use_cases": [
+            "Validar regex antes de usar",
+            "Aprender expresiones regulares"
+          ],
+          "features": [
+            "Testing en vivo",
+            "Resaltado matches",
+            "Flags",
+            "Explicación"
+          ],
+          "keywords": [
+            "validador regex",
+            "prueba expresiones regulares",
+            "regex tester",
+            "herramienta regex online",
+            "patron expresion regular",
+            "validar regex",
+            "resaltador regex",
+            "coincidencias expresion regular"
+          ],
+          "_category": "Herramientas Web y Tecnología",
+          "casos_de_uso": [
+            "¿Cómo probar una expresion regular sin instalar nada en mi ordenador?",
+            "Necesito validar un patron de texto con ejemplos, ¿hay alguna herramienta online?",
+            "Quiero comprobar si mi regex funciona correctamente antes de usarla en mi codigo",
+            "¿Existe algun validador de regex que me resalte las coincidencias en el texto?",
+            "Tengo que testear expresiones regulares complejas, ¿donde puedo hacerlo rapido?"
+          ]
         },
         {
           "name": "Conversor Base64",
           "slug": "conversor-base64",
           "url": "https://meskeia.com/conversor-base64/",
           "description": "Codifica y decodifica texto en Base64 para transmisión segura de datos.",
-          "use_cases": ["Codificar datos para API", "Decodificar strings Base64"],
-          "features": ["Codificar/decodificar", "Copiar resultado", "Múltiples formatos"],
-          "keywords": ["Base64", "codificar", "decodificar", "encoding", "datos"]
+          "use_cases": [
+            "Codificar datos para API",
+            "Decodificar strings Base64"
+          ],
+          "features": [
+            "Codificar/decodificar",
+            "Copiar resultado",
+            "Múltiples formatos"
+          ],
+          "keywords": [
+            "conversor base64",
+            "codificar base64",
+            "decodificar base64",
+            "base64 online",
+            "codificador base64",
+            "convertir a base64",
+            "base64 texto",
+            "herramienta base64 gratis"
+          ],
+          "_category": "Herramientas Web y Tecnología",
+          "casos_de_uso": [
+            "¿Cómo codifico un texto en Base64 para enviarlo de forma segura?",
+            "Necesito decodificar un mensaje en Base64, ¿dónde lo puedo hacer?",
+            "¿Cuál es la manera más rápida de convertir texto a Base64 online?",
+            "Quiero pasar una imagen a Base64 para mi API, ¿cómo lo hago?",
+            "¿Dónde encuentro una herramienta para convertir Base64 a texto normal?"
+          ]
         },
         {
           "name": "Generador de Hash",
           "slug": "generador-hash",
           "url": "https://meskeia.com/generador-hash/",
           "description": "Genera hashes MD5, SHA-1, SHA-256, SHA-512 para texto o archivos localmente.",
-          "use_cases": ["Verificar integridad archivos", "Generar checksums"],
-          "features": ["Múltiples algoritmos", "Texto/archivos", "Local"],
-          "keywords": ["hash", "MD5", "SHA", "checksum", "integridad"]
+          "use_cases": [
+            "Verificar integridad archivos",
+            "Generar checksums"
+          ],
+          "features": [
+            "Múltiples algoritmos",
+            "Texto/archivos",
+            "Local"
+          ],
+          "keywords": [
+            "generador hash",
+            "calcular MD5",
+            "SHA-256 online",
+            "hash archivo",
+            "verificar integridad fichero",
+            "herramienta hash SHA",
+            "generar hash local",
+            "checksum archivo"
+          ],
+          "_category": "Herramientas Web y Tecnología",
+          "casos_de_uso": [
+            "¿Cómo genero un hash MD5 de un archivo sin subirlo a internet?",
+            "Necesito verificar si dos ficheros son identicos usando SHA-256",
+            "¿Dónde puedo hacer un hash de un texto de forma segura y local?",
+            "Quiero calcular el SHA-1 de un documento sin dejar rastro en la nube",
+            "¿Cómo saco el hash SHA-512 de un archivo desde el navegador?"
+          ]
         },
         {
           "name": "Acortador de URLs",
@@ -741,17 +2326,65 @@
             "Material impreso con QR codes",
             "Trackear clics en campañas"
           ],
-          "features": ["Acortamiento local", "Trackeo clics", "QR codes", "Sin registro"],
-          "keywords": ["acortador", "URL", "enlaces", "shortener", "QR"]
+          "features": [
+            "Acortamiento local",
+            "Trackeo clics",
+            "QR codes",
+            "Sin registro"
+          ],
+          "keywords": [
+            "acortador de urls",
+            "acortar enlaces",
+            "generador codigos qr",
+            "trackeo de clics",
+            "almacenamiento local urls",
+            "url corta",
+            "acortador enlaces gratis",
+            "codigo qr generador"
+          ],
+          "_category": "Herramientas Web y Tecnología",
+          "casos_de_uso": [
+            "¿Cómo acorto una URL para compartirla en redes sociales?",
+            "Necesito un acortador de URLs que me muestre cuántos clics recibe",
+            "¿Dónde puedo crear un código QR gratis de una URL larga?",
+            "Quiero guardar mis URLs acortadas sin tener que registrarme",
+            "¿Cuál es la mejor forma de trackear los clics de mis enlaces?"
+          ]
         },
         {
           "name": "Conversor de Imágenes",
           "slug": "conversor-imagenes",
           "url": "https://meskeia.com/conversor-imagenes/",
           "description": "Convierte formatos de imagen: JPG, PNG, WebP, GIF. Redimensiona y optimiza localmente.",
-          "use_cases": ["Convertir PNG a JPG", "Optimizar para web", "Cambiar formato"],
-          "features": ["Múltiples formatos", "Redimensionar", "Optimización", "Local"],
-          "keywords": ["imágenes", "conversión", "JPG", "PNG", "WebP", "formato"]
+          "use_cases": [
+            "Convertir PNG a JPG",
+            "Optimizar para web",
+            "Cambiar formato"
+          ],
+          "features": [
+            "Múltiples formatos",
+            "Redimensionar",
+            "Optimización",
+            "Local"
+          ],
+          "keywords": [
+            "convertidor de imagenes",
+            "cambiar formato foto",
+            "redimensionar fotos online",
+            "optimizar imagenes web",
+            "convertir png a jpg",
+            "compresor de fotos gratis",
+            "pasar imagenes webp",
+            "editor imagenes sin instalar"
+          ],
+          "_category": "Herramientas Web y Tecnología",
+          "casos_de_uso": [
+            "¿Cómo paso mis fotos de PNG a JPG sin perder calidad?",
+            "Necesito redimensionar un montón de imágenes rápido, ¿hay algo que funcione sin instalar nada?",
+            "¿Cuál es la mejor forma de optimizar imágenes para mi web?",
+            "Quiero convertir mis GIFs a WebP para que carguen más rápido",
+            "¿Puedo comprimir y cambiar el formato de mis fotos directamente en el navegador?"
+          ]
         }
       ]
     },
@@ -771,44 +2404,162 @@
             "Meta descriptions SEO (150-160 chars)",
             "Estimar duración de presentaciones"
           ],
-          "features": ["Múltiples métricas", "Tiempo lectura/habla", "Objetivo palabras", "Privado"],
-          "keywords": ["contar palabras", "caracteres", "texto", "análisis", "escritura"]
+          "features": [
+            "Múltiples métricas",
+            "Tiempo lectura/habla",
+            "Objetivo palabras",
+            "Privado"
+          ],
+          "keywords": [
+            "contador de palabras",
+            "contar caracteres",
+            "tiempo de lectura",
+            "contador de caracteres",
+            "herramienta redaccion",
+            "contar parrafos",
+            "contador texto online",
+            "estadisticas de escritura"
+          ],
+          "_category": "Texto y Documentos",
+          "casos_de_uso": [
+            "¿Cuántas palabras tiene este texto que acabo de escribir?",
+            "Necesito saber el tiempo de lectura de mi articulo antes de publicarlo",
+            "¿Como puedo contar los caracteres de mi redaccion sin espacios?",
+            "Quiero una herramienta para contar palabras en tiempo real mientras escribo",
+            "¿Hay alguna forma rapida de ver cuantos parrafos tiene mi documento?"
+          ]
         },
         {
           "name": "Conversor de Texto",
           "slug": "conversor-texto",
           "url": "https://meskeia.com/conversor-texto/",
           "description": "Transforma texto: mayúsculas, minúsculas, capitalizar, invertir, limpiar formato.",
-          "use_cases": ["Convertir texto a MAYÚSCULAS", "Capitalizar títulos"],
-          "features": ["Múltiples transformaciones", "Limpiar espacios", "Copiar"],
-          "keywords": ["texto", "mayúsculas", "minúsculas", "capitalizar", "formato"]
+          "use_cases": [
+            "Convertir texto a MAYÚSCULAS",
+            "Capitalizar títulos"
+          ],
+          "features": [
+            "Múltiples transformaciones",
+            "Limpiar espacios",
+            "Copiar"
+          ],
+          "keywords": [
+            "conversor de texto",
+            "cambiar mayusculas minusculas",
+            "herramienta texto online",
+            "capitalizar palabras",
+            "invertir texto",
+            "limpiar formato texto",
+            "transformar mayusculas",
+            "editor texto online"
+          ],
+          "_category": "Texto y Documentos",
+          "casos_de_uso": [
+            "¿Cómo puedo convertir un texto a mayúsculas de forma rápida?",
+            "Necesito cambiar todo mi texto a minúsculas, ¿hay alguna herramienta online?",
+            "Quiero capitalizar las primeras letras de cada palabra, ¿cómo lo hago?",
+            "¿Existe algún conversor para invertir el orden de las letras en un texto?",
+            "Tengo un texto con espacios raros, ¿cómo limpio el formato?"
+          ]
         },
         {
           "name": "Limpiador de Texto",
           "slug": "limpiador-texto",
           "url": "https://meskeia.com/limpiador-texto/",
           "description": "Limpia espacios duplicados, saltos de línea y caracteres especiales en texto.",
-          "use_cases": ["Limpiar texto pegado de PDF", "Eliminar formato no deseado"],
-          "features": ["Espacios extra", "Saltos línea", "Caracteres especiales"],
-          "keywords": ["limpiar texto", "formato", "espacios", "caracteres"]
+          "use_cases": [
+            "Limpiar texto pegado de PDF",
+            "Eliminar formato no deseado"
+          ],
+          "features": [
+            "Espacios extra",
+            "Saltos línea",
+            "Caracteres especiales"
+          ],
+          "keywords": [
+            "limpiador de texto",
+            "eliminar espacios duplicados",
+            "limpiar texto",
+            "herramienta formatear texto",
+            "quitar caracteres especiales",
+            "normalizador de texto",
+            "espacios en blanco duplicados",
+            "formatear documento"
+          ],
+          "_category": "Texto y Documentos",
+          "casos_de_uso": [
+            "¿Como puedo eliminar espacios duplicados de un texto?",
+            "Necesito limpiar un texto con saltos de linea raros",
+            "Quiero quitar caracteres especiales de mi documento",
+            "¿Hay alguna herramienta para formatear texto y dejarlo limpio?",
+            "Como normalizo un texto con espacios y caracteres rotos"
+          ]
         },
         {
           "name": "Comparador de Textos",
           "slug": "comparador-textos",
           "url": "https://meskeia.com/comparador-textos/",
           "description": "Compara dos textos y resalta diferencias palabra por palabra (diff).",
-          "use_cases": ["Detectar cambios entre versiones", "Comparar documentos"],
-          "features": ["Resaltado diferencias", "Lado a lado", "Exportar"],
-          "keywords": ["comparar texto", "diff", "diferencias", "versiones"]
+          "use_cases": [
+            "Detectar cambios entre versiones",
+            "Comparar documentos"
+          ],
+          "features": [
+            "Resaltado diferencias",
+            "Lado a lado",
+            "Exportar"
+          ],
+          "keywords": [
+            "comparador de textos",
+            "diff textos",
+            "herramienta comparacion documentos",
+            "resaltar diferencias texto",
+            "comparar dos textos online",
+            "diferencias entre documentos",
+            "detectar cambios en texto",
+            "herramienta diff palabra por palabra"
+          ],
+          "_category": "Texto y Documentos",
+          "casos_de_uso": [
+            "¿Cómo puedo ver las diferencias entre dos textos?",
+            "Necesito comparar dos documentos y saber qué ha cambiado",
+            "¿Dónde encuentro una herramienta para hacer diff de textos?",
+            "Quiero resaltar las palabras que son diferentes en dos párrafos",
+            "¿Hay alguna forma fácil de comparar dos versiones de un texto?"
+          ]
         },
         {
           "name": "Markdown a HTML",
           "slug": "convertidor-markdown-html",
           "url": "https://meskeia.com/convertidor-markdown-html/",
           "description": "Convierte Markdown a HTML con preview en tiempo real y código copiable.",
-          "use_cases": ["Convertir README.md a HTML", "Previsualizar Markdown"],
-          "features": ["Conversión tiempo real", "Preview", "Copiar HTML"],
-          "keywords": ["Markdown", "HTML", "conversión", "preview", "formato"]
+          "use_cases": [
+            "Convertir README.md a HTML",
+            "Previsualizar Markdown"
+          ],
+          "features": [
+            "Conversión tiempo real",
+            "Preview",
+            "Copiar HTML"
+          ],
+          "keywords": [
+            "markdown a html",
+            "convertir markdown html",
+            "generador markdown html",
+            "traductor markdown",
+            "markdown converter",
+            "editor markdown online",
+            "preview markdown",
+            "transformar markdown html"
+          ],
+          "_category": "Texto y Documentos",
+          "casos_de_uso": [
+            "¿Cómo convierto markdown a HTML rápido?",
+            "Necesito pasar mis apuntes en markdown a HTML, ¿qué herramienta uso?",
+            "Quiero ver en tiempo real cómo queda mi markdown convertido a HTML",
+            "¿Dónde puedo convertir markdown a código HTML sin instalar nada?",
+            "Tengo un documento markdown y necesito el HTML, ¿me lo conviertes al instante?"
+          ]
         }
       ]
     },
@@ -828,53 +2579,197 @@
             "Diseño de tarjetas UI",
             "Experimentar con gradientes CSS"
           ],
-          "features": ["3 tipos gradientes", "Presets", "Código CSS", "Vista previa real"],
-          "keywords": ["gradientes", "CSS", "colores", "diseño web", "background"]
+          "features": [
+            "3 tipos gradientes",
+            "Presets",
+            "Código CSS",
+            "Vista previa real"
+          ],
+          "keywords": [
+            "generador de gradientes",
+            "gradientes CSS",
+            "crear degradados",
+            "generador de colores",
+            "codigo CSS gradiente",
+            "degradado lineal radial",
+            "presets gradientes",
+            "herramienta gradientes web"
+          ],
+          "_category": "Creatividad y Diseño",
+          "casos_de_uso": [
+            "¿Cómo hago un degradado bonito para mi página web sin tener que escribir código?",
+            "Necesito crear gradientes CSS pero no me acuerdo de la sintaxis exacta",
+            "¿Dónde puedo encontrar presets de gradientes ya hechos para copiar y pegar?",
+            "Quiero un generador de colores en degradado que me dé el código listo",
+            "¿Cómo se hace un degradado cónico o radial en CSS de forma fácil?"
+          ]
         },
         {
           "name": "Creador de Paletas",
           "slug": "creador-paletas",
           "url": "https://meskeia.com/creador-paletas/",
           "description": "Genera paletas de colores armoniosas con esquemas complementarios, análogos y triádicos.",
-          "use_cases": ["Elegir colores para marca", "Diseño coherente de UI"],
-          "features": ["Múltiples esquemas", "Exportar paleta", "Códigos HEX/RGB"],
-          "keywords": ["paleta colores", "diseño", "branding", "armonía cromática"]
+          "use_cases": [
+            "Elegir colores para marca",
+            "Diseño coherente de UI"
+          ],
+          "features": [
+            "Múltiples esquemas",
+            "Exportar paleta",
+            "Códigos HEX/RGB"
+          ],
+          "keywords": [
+            "generador paletas colores",
+            "esquemas colores complementarios",
+            "colores armonicos web",
+            "paleta colores triádica",
+            "crear combinaciones colores",
+            "herramienta colores analogos",
+            "generador esquemas color",
+            "diseño paletas color online"
+          ],
+          "_category": "Creatividad y Diseño",
+          "casos_de_uso": [
+            "¿Cómo genero una paleta de colores que combine bien para mi diseño?",
+            "Necesito crear esquemas de color complementarios para mi proyecto web",
+            "¿Dónde puedo encontrar colores armonicos que vayan juntos?",
+            "Quiero hacer paletas de colores triádicas para mis diseños, ¿hay alguna herramienta?",
+            "¿Cómo sé qué colores son análogos y funcionan juntos?"
+          ]
         },
         {
           "name": "Convertidor de Colores",
           "slug": "convertidor-colores",
           "url": "https://meskeia.com/convertidor-colores/",
           "description": "Convierte entre formatos de color: HEX, RGB, HSL, CMYK con preview en tiempo real.",
-          "use_cases": ["Convertir HEX a RGB", "Adaptar colores a diferentes formatos"],
-          "features": ["HEX/RGB/HSL/CMYK", "Preview", "Copiar código"],
-          "keywords": ["colores", "HEX", "RGB", "HSL", "conversión"]
+          "use_cases": [
+            "Convertir HEX a RGB",
+            "Adaptar colores a diferentes formatos"
+          ],
+          "features": [
+            "HEX/RGB/HSL/CMYK",
+            "Preview",
+            "Copiar código"
+          ],
+          "keywords": [
+            "convertidor de colores",
+            "conversor hex rgb",
+            "convertidor hex a rgb online",
+            "pasar color hex a rgb",
+            "convertidor hsl cmyk",
+            "herramienta colores online",
+            "converter colores web",
+            "transformar formatos color"
+          ],
+          "_category": "Creatividad y Diseño",
+          "casos_de_uso": [
+            "¿Cómo convierto un color HEX a RGB para mi página web?",
+            "Necesito pasar un color de formato CMYK a HEX, ¿hay alguna herramienta online?",
+            "¿Dónde puedo convertir colores HSL a otros formatos sin descargar nada?",
+            "Quiero ver en tiempo real cómo se ve un color mientras lo convierto entre formatos",
+            "¿Cuál es el código HEX de este color RGB que tengo?"
+          ]
         },
         {
           "name": "Contraste de Colores",
           "slug": "contraste-colores",
           "url": "https://meskeia.com/contraste-colores/",
           "description": "Verifica contraste según WCAG para accesibilidad web entre texto y fondo.",
-          "use_cases": ["Cumplir estándares accesibilidad", "Legibilidad óptima"],
-          "features": ["Ratio WCAG", "AA/AAA", "Recomendaciones", "Preview"],
-          "keywords": ["contraste", "accesibilidad", "WCAG", "colores", "legibilidad"]
+          "use_cases": [
+            "Cumplir estándares accesibilidad",
+            "Legibilidad óptima"
+          ],
+          "features": [
+            "Ratio WCAG",
+            "AA/AAA",
+            "Recomendaciones",
+            "Preview"
+          ],
+          "keywords": [
+            "contraste colores",
+            "accesibilidad web",
+            "WCAG contraste",
+            "verificador contraste",
+            "accesibilidad WCAG",
+            "colores accesibles",
+            "ratio contraste",
+            "texto legible fondo"
+          ],
+          "_category": "Creatividad y Diseño",
+          "casos_de_uso": [
+            "¿Cómo verifico si mi web cumple con WCAG de accesibilidad?",
+            "Necesito comprobar el contraste entre el texto y el fondo de mi página",
+            "¿Mi combinación de colores es accesible para daltónicos?",
+            "Quiero saber si el contraste de colores de mi diseño es válido",
+            "¿Cómo me aseguro de que mi sitio web es accesible para todos?"
+          ]
         },
         {
           "name": "Generador de Sombras",
           "slug": "generador-sombras",
           "url": "https://meskeia.com/generador-sombras/",
           "description": "Crea sombras CSS (box-shadow) con control de difuminado, desplazamiento y color.",
-          "use_cases": ["Sombras para botones y cards", "Efectos de profundidad"],
-          "features": ["Ajustes visuales", "Múltiples capas", "Código CSS"],
-          "keywords": ["sombras", "box-shadow", "CSS", "diseño", "efectos"]
+          "use_cases": [
+            "Sombras para botones y cards",
+            "Efectos de profundidad"
+          ],
+          "features": [
+            "Ajustes visuales",
+            "Múltiples capas",
+            "Código CSS"
+          ],
+          "keywords": [
+            "generador sombras CSS",
+            "box-shadow generator",
+            "crear sombras CSS online",
+            "herramienta sombras web",
+            "box-shadow editor",
+            "efectos sombra CSS",
+            "generador efectos sombra",
+            "sombras difuminadas CSS"
+          ],
+          "_category": "Creatividad y Diseño",
+          "casos_de_uso": [
+            "¿Como hago sombras en CSS sin complicarme la vida?",
+            "Necesito crear efectos de sombra para mis botones, ¿hay algo rapido?",
+            "Quiero generar box-shadow con preview en tiempo real, ¿donde lo hago?",
+            "¿Como se configura el blur y el offset de una sombra en CSS?",
+            "Busco una herramienta para hacer sombras personalizadas sin escribir codigo"
+          ]
         },
         {
           "name": "Generador de Tipografías",
           "slug": "generador-tipografias",
           "url": "https://meskeia.com/generador-tipografias/",
           "description": "Prueba combinaciones de Google Fonts con preview en tiempo real y pairings recomendados.",
-          "use_cases": ["Elegir fuentes para web", "Combinar tipografías armónicamente"],
-          "features": ["Google Fonts", "Pairings", "Preview", "Código"],
-          "keywords": ["tipografía", "fuentes", "Google Fonts", "diseño", "texto"]
+          "use_cases": [
+            "Elegir fuentes para web",
+            "Combinar tipografías armónicamente"
+          ],
+          "features": [
+            "Google Fonts",
+            "Pairings",
+            "Preview",
+            "Código"
+          ],
+          "keywords": [
+            "combinador tipografias",
+            "pairing fuentes google fonts",
+            "generador letras web",
+            "preview tipografias online",
+            "herramienta fonts gratis",
+            "combinar fuentes diseño",
+            "google fonts parejas",
+            "selector tipografias web"
+          ],
+          "_category": "Creatividad y Diseño",
+          "casos_de_uso": [
+            "¿Dónde puedo probar combinaciones de tipografías gratis?",
+            "Necesito encontrar dos fuentes que combinen bien para mi web",
+            "¿Cómo veo en tiempo real cómo quedan las letras juntas?",
+            "Quiero recomendaciones de parejas de fuentes para mi diseño",
+            "¿Hay alguna herramienta para testear Google Fonts sin programar?"
+          ]
         },
         {
           "name": "Calculadora de Aspectos de Imagen",
@@ -886,8 +2781,29 @@
             "Miniaturas YouTube 16:9",
             "Diseño responsive sin distorsión"
           ],
-          "features": ["Ratios predefinidos", "Cálculo bidireccional", "Presets plataformas"],
-          "keywords": ["aspect ratio", "imagen", "dimensiones", "redimensionar", "proporciones"]
+          "features": [
+            "Ratios predefinidos",
+            "Cálculo bidireccional",
+            "Presets plataformas"
+          ],
+          "keywords": [
+            "redimensionar imagen proporcional",
+            "aspect ratio calculadora",
+            "cambiar tamaño imagen sin deformar",
+            "proporciones imagen",
+            "calculadora dimensiones foto",
+            "relacion de aspecto imagen",
+            "resize imagen manteniendo proporcion",
+            "calculo proporcional imagenes"
+          ],
+          "_category": "Creatividad y Diseño",
+          "casos_de_uso": [
+            "¿Cómo redimensiono una imagen sin que se deforme?",
+            "Necesito cambiar el tamaño de una foto manteniendo las proporciones",
+            "¿Cuál es la medida correcta para redimensionar mi imagen?",
+            "Quiero saber las dimensiones proporcionales de mi foto para subirla a redes",
+            "¿Cómo calculo el aspect ratio de una imagen?"
+          ]
         }
       ]
     },
@@ -901,54 +2817,210 @@
           "slug": "calculadora-tarifa-freelance",
           "url": "https://meskeia.com/calculadora-tarifa-freelance/",
           "description": "Calcula tarifa por hora como freelance según gastos, objetivos y tiempo disponible.",
-          "use_cases": ["Establecer tarifa competitiva considerando gastos", "Evitar cobrar de menos como autónomo"],
-          "features": ["Tarifa por hora", "Gastos operativos", "Objetivos de ingresos", "Vacaciones incluidas"],
-          "keywords": ["freelance", "tarifa", "autónomo", "precio hora", "cotización"]
+          "use_cases": [
+            "Establecer tarifa competitiva considerando gastos",
+            "Evitar cobrar de menos como autónomo"
+          ],
+          "features": [
+            "Tarifa por hora",
+            "Gastos operativos",
+            "Objetivos de ingresos",
+            "Vacaciones incluidas"
+          ],
+          "keywords": [
+            "tarifa freelance",
+            "precio por hora freelancer",
+            "calculadora tarifa autónomo",
+            "cuanto cobrar freelance",
+            "calculadora sueldo freelancer",
+            "tarifa horaria freelance",
+            "presupuesto freelancer",
+            "como fijar precio freelance"
+          ],
+          "_category": "Emprendimiento y Negocios",
+          "casos_de_uso": [
+            "¿Cuánto tengo que cobrar por hora como freelancer para vivir?",
+            "Necesito saber qué tarifa ponerme en mis proyectos como autónomo",
+            "¿Cómo calculo mi precio por hora siendo freelance?",
+            "Quiero saber cuánto debo facturar al mes para cubrir mis gastos",
+            "¿Cuál es la tarifa mínima que debería cobrar como freelancer?"
+          ]
         },
         {
           "name": "Margen de Equilibrio (Break-Even)",
           "slug": "margen-equilibrio",
           "url": "https://meskeia.com/margen-equilibrio/",
           "description": "Calcula punto de equilibrio empresarial entre costos fijos, variables y ventas.",
-          "use_cases": ["Determinar unidades mínimas a vender", "Analizar viabilidad de negocio", "Fijar precios estratégicos"],
-          "features": ["Punto de equilibrio", "Costos fijos/variables", "Margen de contribución", "Gráficos"],
-          "keywords": ["punto de equilibrio", "break-even", "costos", "ventas", "rentabilidad"]
+          "use_cases": [
+            "Determinar unidades mínimas a vender",
+            "Analizar viabilidad de negocio",
+            "Fijar precios estratégicos"
+          ],
+          "features": [
+            "Punto de equilibrio",
+            "Costos fijos/variables",
+            "Margen de contribución",
+            "Gráficos"
+          ],
+          "keywords": [
+            "punto de equilibrio",
+            "break even",
+            "calculo margen equilibrio",
+            "costos fijos y variables",
+            "umbral de rentabilidad",
+            "analisis break-even",
+            "punto rentabilidad empresa",
+            "cuantas ventas necesito"
+          ],
+          "_category": "Emprendimiento y Negocios",
+          "casos_de_uso": [
+            "¿A partir de cuántas ventas empiezo a ganar dinero con mi negocio?",
+            "Necesito saber cuál es mi punto de equilibrio para mi tienda online",
+            "¿Cómo calculo cuándo dejará de perder dinero mi empresa?",
+            "Quiero conocer el break-even de mi pequeño negocio sin líos",
+            "¿Cuántas unidades tengo que vender para cubrir mis costos fijos?"
+          ]
         },
         {
           "name": "Planificador de Cash Flow",
           "slug": "planificador-cashflow",
           "url": "https://meskeia.com/planificador-cashflow/",
           "description": "Planifica flujo de caja mensual para negocios y finanzas empresariales.",
-          "use_cases": ["Proyectar ingresos y gastos mensuales", "Evitar problemas de liquidez", "Identificar meses críticos"],
-          "features": ["Flujo de caja mensual", "Proyecciones 12 meses", "Ingresos/egresos", "Escenarios What-If"],
-          "keywords": ["cashflow", "flujo de caja", "liquidez", "finanzas empresa", "tesorería"]
+          "use_cases": [
+            "Proyectar ingresos y gastos mensuales",
+            "Evitar problemas de liquidez",
+            "Identificar meses críticos"
+          ],
+          "features": [
+            "Flujo de caja mensual",
+            "Proyecciones 12 meses",
+            "Ingresos/egresos",
+            "Escenarios What-If"
+          ],
+          "keywords": [
+            "planificador cash flow",
+            "flujo de caja mensual",
+            "planificacion tesoreria",
+            "control liquidez empresa",
+            "presupuesto cash flow",
+            "gestor flujo caja",
+            "planificador finanzas negocios",
+            "herramienta ingresos gastos"
+          ],
+          "_category": "Emprendimiento y Negocios",
+          "casos_de_uso": [
+            "¿Cómo puedo saber si mi negocio va a tener dinero en caja el próximo mes?",
+            "Necesito controlar mejor el flujo de caja de mi empresa, ¿qué herramienta me recomiendas?",
+            "Quiero planificar mis ingresos y gastos mensuales para no quedarme sin liquidez",
+            "¿Dónde puedo ver el cash flow de mi pequeño negocio de forma sencilla?",
+            "Tengo que presentar un presupuesto de tesorería, ¿hay alguna app que me ayude?"
+          ]
         },
         {
           "name": "Calculadora de ROI de Marketing",
           "slug": "calculadora-roi-marketing",
           "url": "https://meskeia.com/calculadora-roi-marketing/",
           "description": "Calcula Retorno de Inversión en campañas de marketing y publicidad digital.",
-          "use_cases": ["Medir efectividad de campañas publicitarias", "Optimizar inversión en Google Ads/Facebook", "Calcular CAC y CLV"],
-          "features": ["ROI por canal", "CPA", "ROAS", "Conversión", "Comparación de canales"],
-          "keywords": ["ROI", "marketing", "publicidad", "retorno inversión", "campañas", "CAC", "CLV"]
+          "use_cases": [
+            "Medir efectividad de campañas publicitarias",
+            "Optimizar inversión en Google Ads/Facebook",
+            "Calcular CAC y CLV"
+          ],
+          "features": [
+            "ROI por canal",
+            "CPA",
+            "ROAS",
+            "Conversión",
+            "Comparación de canales"
+          ],
+          "keywords": [
+            "calculadora ROI marketing",
+            "retorno inversion publicidad digital",
+            "ROI campanas google ads",
+            "calcular rentabilidad marketing",
+            "herramienta ROI publicidad",
+            "cuanto gano por cada euro gastado",
+            "rentabilidad campanas online",
+            "calculador retorno inversion"
+          ],
+          "_category": "Emprendimiento y Negocios",
+          "casos_de_uso": [
+            "¿Cuanto dinero me devuelve realmente una campaña de publicidad en Google Ads?",
+            "Necesito calcular el ROI de mis anuncios en Instagram, ¿cómo lo hago?",
+            "¿Cuál es el retorno de inversión de mi campaña de email marketing?",
+            "Quiero saber si mis gastos en marketing digital están siendo rentables",
+            "¿Cómo calculo cuánto gano por cada euro que gasto en publicidad?"
+          ]
         },
         {
           "name": "Generador de Nombres de Empresa",
           "slug": "generador-nombres-empresa",
           "url": "https://meskeia.com/generador-nombres-empresa/",
           "description": "Genera nombres creativos para empresas, marcas y startups con disponibilidad de dominio.",
-          "use_cases": ["Brainstorming de marca", "Ideas para startup", "Verificar dominios disponibles"],
-          "features": ["Algoritmo creativo", "Verificar disponibilidad", "Favoritos", "Por sectores"],
-          "keywords": ["nombres empresa", "marca", "branding", "startup", "dominio", "naming"]
+          "use_cases": [
+            "Brainstorming de marca",
+            "Ideas para startup",
+            "Verificar dominios disponibles"
+          ],
+          "features": [
+            "Algoritmo creativo",
+            "Verificar disponibilidad",
+            "Favoritos",
+            "Por sectores"
+          ],
+          "keywords": [
+            "generador nombres empresa",
+            "crear nombres marcas",
+            "nombres startups",
+            "ideas nombres negocios",
+            "generador nombres creativos",
+            "disponibilidad dominio",
+            "nombres empresas originales",
+            "herramienta nombres tienda online"
+          ],
+          "_category": "Emprendimiento y Negocios",
+          "casos_de_uso": [
+            "¿Cómo genero nombres originales para mi startup?",
+            "Necesito ideas de nombres para mi empresa, ¿hay alguna herramienta?",
+            "Quiero crear un nombre de marca que no esté registrado",
+            "¿Dónde puedo conseguir nombres de negocio con dominio disponible?",
+            "Me hace falta un generador de nombres creativos para mi tienda online"
+          ]
         },
         {
           "name": "Simulador de Gastos Deducibles",
           "slug": "simulador-gastos-deducibles",
           "url": "https://meskeia.com/simulador-gastos-deducibles/",
           "description": "Calcula gastos deducibles para autónomos y empresas en declaración de impuestos.",
-          "use_cases": ["Identificar gastos deducibles", "Optimizar declaración fiscal", "Calcular ahorro en IRPF e IVA"],
-          "features": ["Categorías deducibles", "Porcentajes (100%, 50%, 30%)", "Ahorro fiscal", "IRPF + IVA"],
-          "keywords": ["gastos deducibles", "autónomo", "impuestos", "fiscalidad", "IRPF", "IVA"]
+          "use_cases": [
+            "Identificar gastos deducibles",
+            "Optimizar declaración fiscal",
+            "Calcular ahorro en IRPF e IVA"
+          ],
+          "features": [
+            "Categorías deducibles",
+            "Porcentajes (100%, 50%, 30%)",
+            "Ahorro fiscal",
+            "IRPF + IVA"
+          ],
+          "keywords": [
+            "gastos deducibles autonomos",
+            "gastos deducibles empresa",
+            "calculo impuestos autonomo",
+            "desgravaciones fiscales",
+            "simulador gastos deducibles",
+            "declaracion renta gastos",
+            "que gastos son deducibles",
+            "ahorrar impuestos autonomo"
+          ],
+          "_category": "Emprendimiento y Negocios",
+          "casos_de_uso": [
+            "¿Qué gastos puedo desgravar como autonomo este año?",
+            "Necesito calcular mis gastos deducibles para la declaracion de la renta",
+            "¿Cuanto me ahorro en impuestos si deduzco todos mis gastos de empresa?",
+            "Quiero saber cuales son mis gastos deducibles antes de hacer la declaracion",
+            "¿Como funciona la deduccion de gastos para autonomos en el IRPF?"
+          ]
         }
       ]
     }
