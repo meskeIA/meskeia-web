@@ -10,6 +10,7 @@ Allow: /
 
 # Páginas específicas permitidas
 Allow: /index.html
+Allow: /acerca.html
 Allow: /Aplicaciones/
 Allow: /assets/
 

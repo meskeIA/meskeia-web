@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acerca de meskeIA - 82 Aplicaciones Web Gratuitas en Español</title>
+    <meta name="description" content="meskeIA es una plataforma gratuita con 82 aplicaciones web especializadas en finanzas, matemáticas, productividad y más. Sin registro, funcionan offline y 100% en español.">
+    <meta name="keywords" content="herramientas gratuitas, aplicaciones web, calculadoras, español, sin registro, offline">
+    <link rel="icon" type="image/png" href="icon_meskeia.png">
+
+    <!-- Schema.org para IAs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "meskeIA",
+      "description": "Plataforma con 82 aplicaciones web gratuitas en español para finanzas, matemáticas, productividad, creatividad y más. Sin registro, funciona offline.",
+      "url": "https://meskeia.com",
+      "inLanguage": "es-ES",
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Estudiantes, profesionales, inversores, creativos"
+      },
+      "keywords": "calculadoras financieras, herramientas matemáticas, productividad, generadores, utilidades web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/InStock"
+      },
+      "potentialAction": {
+        "@type": "UseAction",
+        "target": "https://meskeia.com/index.html"
+      }
+    }
+    </script>
+
+    <style>
+        :root {
+            /* Paleta oficial meskeIA */
+            --bg-primary: #FAFAFA;
+            --bg-card: #FFFFFF;
+            --primary: #2E86AB;
+            --secondary: #48A9A6;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border: #E5E5E5;
+            --hover: #F5F5F5;
+            --focus: rgba(46,134,171,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+
+        /* Logo meskeIA - Componente oficial */
+        .meskeia-logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(46, 134, 171, 0.2);
+            border-radius: 12px;
+            padding: 8px 16px;
+            box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .meskeia-logo-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+        }
+        .meskeia-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .meskeia-logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+        }
+        .meskeia-logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #2E86AB;
+            border-radius: 50%;
+            top: 13px;
+            left: 13px;
+        }
+        .meskeia-neural-network {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+        .meskeia-neural-dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+        }
+        .meskeia-neural-dot:nth-child(1) { top: 4px; left: 6px; }
+        .meskeia-neural-dot:nth-child(2) { top: 8px; right: 5px; }
+        .meskeia-neural-dot:nth-child(3) { bottom: 6px; left: 4px; }
+        .meskeia-neural-dot:nth-child(4) { bottom: 4px; right: 8px; }
+        .meskeia-logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2C3E50;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .meskeia-logo-text .meske {
+            color: #2E86AB;
+        }
+        .meskeia-logo-text .ia {
+            color: #48A9A6;
+            font-weight: 700;
+            position: relative;
+        }
+        .meskeia-logo-text .ia::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #48A9A6, #7FB3D3);
+            border-radius: 1px;
+        }
+
+        /* Contenido principal */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+        }
+
+        .intro {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .intro p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .section {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .casos-uso {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .caso {
+            background: var(--hover);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary);
+            transition: transform 0.2s;
+        }
+
+        .caso:hover {
+            transform: translateX(5px);
+        }
+
+        .caso h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .caso p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .ventajas {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ventajas li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ventajas li:last-child {
+            border-bottom: none;
+        }
+
+        .ventajas li::before {
+            content: '✓';
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .categorias {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .categoria-tag {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+        }
+
+        .categoria-tag:hover {
+            transform: scale(1.05);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(46, 134, 171, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 134, 171, 0.4);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 20px;
+            background: var(--hover);
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            position: fixed;
+            bottom: 10px;
+            right: 20px;
+            font-size: 0.9rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 8px;
+            transition: color 0.2s;
+        }
+
+        footer a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        .footer-separator {
+            color: var(--text-muted);
+            margin: 0 5px;
+        }
+
+        .copyright {
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 60px;
+            }
+
+            .meskeia-logo-container {
+                top: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                gap: 8px;
+            }
+            .meskeia-logo-icon {
+                width: 24px;
+                height: 24px;
+            }
+            .meskeia-logo-icon::before {
+                width: 9px;
+                height: 9px;
+                top: 7.5px;
+                left: 7.5px;
+            }
+            .meskeia-logo-icon::after {
+                width: 4px;
+                height: 4px;
+                top: 10px;
+                left: 10px;
+            }
+            .meskeia-logo-text {
+                font-size: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+
+            .intro, .section {
+                padding: 20px;
+            }
+
+            .casos-uso {
+                grid-template-columns: 1fr;
+            }
+
+            footer {
+                position: static;
+                margin: 40px 20px 20px 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='index.html'">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Acerca de meskeIA</h1>
+
+        <!-- Introducción -->
+        <div class="intro" itemscope itemtype="https://schema.org/WebApplication">
+            <p itemprop="description">
+                <strong>meskeIA</strong> es una plataforma gratuita que ofrece <strong>82 aplicaciones web especializadas</strong>
+                en finanzas, matemáticas, productividad, creatividad y mucho más. Todas las herramientas son
+                <strong>100% gratuitas</strong>, funcionan <strong>sin registro</strong> y están <strong>completamente en español</strong>.
+            </p>
+            <p>
+                Nuestro objetivo es democratizar el acceso a herramientas útiles y profesionales,
+                eliminando barreras como el coste, el registro obligatorio o la necesidad de conexión a internet.
+            </p>
+
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number">82</span>
+                    <span class="stat-label">Aplicaciones</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">12</span>
+                    <span class="stat-label">Categorías</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Gratuito</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Anuncios</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Casos de Uso -->
+        <h2>¿Para quién es meskeIA?</h2>
+        <div class="section">
+            <div class="casos-uso">
+                <div class="caso">
+                    <h3>💼 Inversores y Ahorradores</h3>
+                    <p>Calculadoras de hipotecas, interés compuesto, TAE, IRPF, ratios financieros y análisis de inversiones.</p>
+                </div>
+
+                <div class="caso">
+                    <h3>🎓 Estudiantes</h3>
+                    <p>Herramientas matemáticas, calculadoras científicas, conversores de unidades, generadores de estadísticas.</p>
+                </div>
+
+                <div class="caso">
+                    <h3>💻 Profesionales</h3>
+                    <p>Gestión de tiempo, temporizadores Pomodoro, generadores de texto, herramientas de productividad.</p>
+                </div>
+
+                <div class="caso">
+                    <h3>🎨 Creativos y Diseñadores</h3>
+                    <p>Generadores de paletas de colores, tipografías, gradientes, códigos QR y herramientas visuales.</p>
+                </div>
+
+                <div class="caso">
+                    <h3>🏢 Emprendedores</h3>
+                    <p>Calculadoras de ROI, punto de equilibrio, modelos de negocio y análisis de viabilidad.</p>
+                </div>
+
+                <div class="caso">
+                    <h3>🏥 Salud y Bienestar</h3>
+                    <p>Calculadoras de IMC, calorías, macronutrientes y herramientas de seguimiento personal.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ventajas -->
+        <h2>¿Por qué elegir meskeIA?</h2>
+        <div class="section">
+            <ul class="ventajas">
+                <li><strong>100% Gratuito:</strong> Sin costes ocultos, sin suscripciones, sin anuncios molestos.</li>
+                <li><strong>Sin Registro:</strong> Accede directamente a cualquier herramienta sin crear cuenta ni proporcionar datos personales.</li>
+                <li><strong>Funciona Offline:</strong> Muchas aplicaciones son PWA (Progressive Web Apps) y funcionan sin conexión a internet.</li>
+                <li><strong>Optimizado para Móvil:</strong> Todas las aplicaciones están diseñadas para funcionar perfectamente en smartphones y tablets.</li>
+                <li><strong>Todo en Español:</strong> Interfaz, textos y ayuda completamente en español de España.</li>
+                <li><strong>Privacidad Total:</strong> No recopilamos datos personales. Todo se procesa localmente en tu navegador.</li>
+                <li><strong>Código Abierto:</strong> Disponible en GitHub para transparencia y colaboración.</li>
+                <li><strong>Actualizaciones Continuas:</strong> Añadimos nuevas aplicaciones y mejoras regularmente.</li>
+            </ul>
+        </div>
+
+        <!-- Categorías -->
+        <h2>Catálogo de Aplicaciones</h2>
+        <div class="section">
+            <p>Explora nuestras <strong>82 aplicaciones</strong> organizadas en <strong>12 categorías</strong>:</p>
+
+            <div class="categorias">
+                <span class="categoria-tag">💰 Finanzas y Fiscalidad</span>
+                <span class="categoria-tag">🧮 Calculadoras y Utilidades</span>
+                <span class="categoria-tag">📊 Matemáticas y Estadística</span>
+                <span class="categoria-tag">⚗️ Física y Química</span>
+                <span class="categoria-tag">⏱️ Herramientas de Productividad</span>
+                <span class="categoria-tag">🎨 Creatividad y Diseño</span>
+                <span class="categoria-tag">🎮 Juegos y Entretenimiento</span>
+                <span class="categoria-tag">📚 Campus Digital</span>
+                <span class="categoria-tag">🏥 Salud & Bienestar</span>
+                <span class="categoria-tag">🌐 Herramientas Web y Tecnología</span>
+                <span class="categoria-tag">📝 Texto y Documentos</span>
+                <span class="categoria-tag">🚀 Emprendimiento y Negocios</span>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="index.html" class="cta-button">Ver Catálogo Completo</a>
+            </div>
+        </div>
+
+        <!-- Filosofía -->
+        <h2>Nuestra Filosofía</h2>
+        <div class="section">
+            <p>
+                En meskeIA creemos que <strong>el acceso a herramientas útiles debe ser universal</strong>.
+                Por eso, todas nuestras aplicaciones son:
+            </p>
+            <ul class="ventajas">
+                <li><strong>Gratuitas para siempre:</strong> Sin freemium, sin versiones "pro", sin trucos.</li>
+                <li><strong>Respetuosas con tu privacidad:</strong> Sin cookies de terceros, sin tracking, sin recopilación de datos.</li>
+                <li><strong>Simples y efectivas:</strong> Diseñadas para resolver problemas concretos sin complicaciones innecesarias.</li>
+                <li><strong>Accesibles desde cualquier dispositivo:</strong> PC, tablet, smartphone... donde tú estés.</li>
+            </ul>
+            <p style="margin-top: 20px; font-style: italic; color: var(--text-secondary);">
+                "La tecnología debe estar al servicio de las personas, no al revés."
+            </p>
+        </div>
+
+        <!-- Preguntas Frecuentes -->
+        <h2>Preguntas Frecuentes</h2>
+        <div class="section" itemscope itemtype="https://schema.org/FAQPage">
+            <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom: 20px;">
+                <h3 itemprop="name" style="color: var(--primary); font-size: 1.1rem;">¿Realmente es todo gratuito?</h3>
+                <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <p itemprop="text" style="color: var(--text-secondary);">
+                        Sí, todas las 82 aplicaciones son 100% gratuitas y lo serán siempre.
+                        No hay costes ocultos, versiones premium ni suscripciones.
+                    </p>
+                </div>
+            </div>
+
+            <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom: 20px;">
+                <h3 itemprop="name" style="color: var(--primary); font-size: 1.1rem;">¿Necesito registrarme?</h3>
+                <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <p itemprop="text" style="color: var(--text-secondary);">
+                        No, ninguna aplicación requiere registro. Simplemente accedes y empiezas a usarlas inmediatamente.
+                    </p>
+                </div>
+            </div>
+
+            <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom: 20px;">
+                <h3 itemprop="name" style="color: var(--primary); font-size: 1.1rem;">¿Funcionan sin internet?</h3>
+                <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <p itemprop="text" style="color: var(--text-secondary);">
+                        Muchas aplicaciones son PWA (Progressive Web Apps) y funcionan offline una vez cargadas.
+                        Puedes usarlas en el avión, en el metro o en cualquier lugar sin conexión.
+                    </p>
+                </div>
+            </div>
+
+            <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom: 20px;">
+                <h3 itemprop="name" style="color: var(--primary); font-size: 1.1rem;">¿Recopilan mis datos personales?</h3>
+                <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <p itemprop="text" style="color: var(--text-secondary);">
+                        No. Todas las aplicaciones procesan la información localmente en tu navegador.
+                        No enviamos ni guardamos tus datos en ningún servidor.
+                    </p>
+                </div>
+            </div>
+
+            <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <h3 itemprop="name" style="color: var(--primary); font-size: 1.1rem;">¿Puedo usar meskeIA en mi móvil?</h3>
+                <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <p itemprop="text" style="color: var(--text-secondary);">
+                        Sí, todas las aplicaciones están optimizadas para dispositivos móviles y tablets.
+                        El diseño responsive se adapta automáticamente a cualquier tamaño de pantalla.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacto y GitHub -->
+        <h2>Código Abierto</h2>
+        <div class="section">
+            <p>
+                meskeIA es un proyecto de código abierto disponible en GitHub.
+                Puedes revisar el código, reportar errores o contribuir con mejoras.
+            </p>
+            <p style="margin-top: 15px;">
+                <strong>Repositorio:</strong>
+                <a href="https://github.com/meskeIA/meskeia-web" target="_blank" style="color: var(--primary);">
+                    github.com/meskeIA/meskeia-web
+                </a>
+            </p>
+        </div>
+
+        <div style="text-align: center; margin: 50px 0;">
+            <a href="index.html" class="cta-button">Explorar Aplicaciones</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <a href="index.html">Inicio</a>
+        <span class="footer-separator">|</span>
+        <a href="herramientas.html">Herramientas</a>
+        <span class="footer-separator">|</span>
+        <a href="acerca.html">Acerca de</a>
+        <span class="copyright">© 2025 meskeIA</span>
+    </footer>
+</body>
+</html>
