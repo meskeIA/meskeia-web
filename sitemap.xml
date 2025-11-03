@@ -615,7 +615,19 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/campus-digital/curso-emprendimiento-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/campus-digital/generador-horarios-estudio-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/creatividad-y-diseño/calculadora-aspectos-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
@@ -753,6 +765,12 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/física-y-química/calculadora-movimiento-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/física-y-química/formulas-quimicas-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
@@ -796,6 +814,12 @@
   </url>
   <url>
     <loc>https://meskeia.com/guias/herramientas-de-productividad/generador-texto-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/herramientas-de-productividad/horario-mundial-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
@@ -927,7 +951,19 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/grafico-funciones-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/matemáticas-y-estadística/investigacion-operativa-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/matriz-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
