@@ -332,6 +332,38 @@
             padding: 0 var(--spacing-md);
         }
 
+        /* Enlace a Guías Educativas */
+        .guides-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(46, 134, 171, 0.2);
+            white-space: nowrap;
+        }
+
+        .guides-link:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+        }
+
+        .guides-icon {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .guides-text {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         /* Buscador Minimalista */
         .search-wrapper {
             position: relative;
@@ -860,8 +892,23 @@
                 padding: var(--spacing-xs) 0;
             }
 
+            .guides-link {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+                order: 1;
+            }
+
+            .guides-text {
+                display: none;
+            }
+
+            .guides-icon {
+                font-size: 1.4rem;
+            }
+
             .search-wrapper {
                 flex: 0 0 auto;
+                order: 3;
             }
 
             .search-container {
@@ -957,6 +1004,12 @@
                 </div>
             </div>
             <h2 class="header-title">Biblioteca de Aplicaciones</h2>
+
+            <!-- Enlace a Guías Educativas -->
+            <a href="guias/" class="guides-link" title="Accede a 86 guías educativas completas" aria-label="Ir a Guías Educativas">
+                <span class="guides-icon">📚</span>
+                <span class="guides-text">Guías</span>
+            </a>
 
             <!-- Buscador Minimalista -->
             <div class="search-wrapper">
