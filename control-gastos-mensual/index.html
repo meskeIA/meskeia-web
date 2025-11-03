@@ -112,7 +112,8 @@
             }
         }]
     }
-    </script>
+    </script>        </div>
+    </div>
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPGLJBQ4Z"></script>
@@ -444,5 +445,40 @@
             }
         })();
     </script>
+
+
+    <!-- FAQs visibles extraídas de Schema.org -->
+    <div style="max-width: 900px; margin: 2rem auto 2rem; padding: 0 20px;">
+        <div style="background: var(--bg-card); border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); margin-bottom: 2rem;">
+            <h2 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">❓ Preguntas Frecuentes</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Mis datos son privados?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Sí, completamente. Todos tus datos se guardan únicamente en tu navegador usando localStorage. No se envía ninguna información a servidores externos. Tienes control total de tu información financiera.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Puedo usar la app sin conexión a internet?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Sí, funciona 100% offline. No requiere conexión a internet para registrar gastos, ver tu balance o consultar el historial.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cómo categorizo mis gastos?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Al añadir un gasto, seleccionas una categoría de la lista predefinida: Vivienda, Alimentación, Transporte, Salud, Ocio, Ropa, Suscripciones u Otros. Esto te permite analizar en qué gastas más.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Puedo exportar mis datos?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Sí, tienes 2 opciones: (1) Exportar el mes actual a CSV para Excel/Google Sheets, (2) Exportar TODO a JSON para backup completo de todos los meses. También puedes importar backups JSON para restaurar tus datos.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cómo hago backup de mis datos?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Usa el botón 'Exportar TODO a JSON' para descargar un backup completo con todos los meses y transacciones. Guarda este archivo en tu nube (Google Drive, Dropbox) y podrás restaurarlo con 'Importar desde JSON'.</p>
+                </details>
+                
+            </div>
+
 </body>
 </html>
