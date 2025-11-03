@@ -537,6 +537,12 @@
 
   <!-- Guías educativas -->
   <url>
+    <loc>https://meskeia.com/guias/calculadoras-y-utilidades/calculadora-cocina-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/calculadoras-y-utilidades/calculadora-fechas-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
@@ -561,6 +567,18 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/calculadoras-y-utilidades/conversor-divisas-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/calculadoras-y-utilidades/conversor-tallas-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/calculadoras-y-utilidades/conversor-unidades-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
@@ -579,7 +597,25 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/campus-digital/calculadora-notas-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/campus-digital/generador-horarios-estudio-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/creatividad-y-diseño/contraste-colores-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/creatividad-y-diseño/convertidor-colores-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
@@ -639,6 +675,12 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/emprendimiento-y-negocios/simulador-gastos-deducibles-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/finanzas-y-fiscalidad/calculadora-inversiones-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
@@ -646,6 +688,18 @@
   </url>
   <url>
     <loc>https://meskeia.com/guias/finanzas-y-fiscalidad/calculadora-jubilacion-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/finanzas-y-fiscalidad/control-gastos-mensual-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/finanzas-y-fiscalidad/impuesto-donaciones-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
@@ -676,6 +730,12 @@
   </url>
   <url>
     <loc>https://meskeia.com/guias/finanzas-y-fiscalidad/tir-van-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/física-y-química/calculadora-electricidad-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
@@ -717,6 +777,12 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/herramientas-web-y-tecnología/conversor-imagenes-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/herramientas-web-y-tecnología/generador-hash-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
@@ -724,6 +790,36 @@
   </url>
   <url>
     <loc>https://meskeia.com/guias/herramientas-web-y-tecnología/validador-json-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/herramientas-web-y-tecnología/validador-regex-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/juegos-y-entretenimiento/juego-2048-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/juegos-y-entretenimiento/juego-memoria-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/juegos-y-entretenimiento/tres-en-raya-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/calculadora-estadistica-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
@@ -771,7 +867,31 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/texto-y-documentos/comparador-textos-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/texto-y-documentos/contador-palabras-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/texto-y-documentos/conversor-texto-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/texto-y-documentos/convertidor-markdown-html-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/texto-y-documentos/limpiador-texto-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
