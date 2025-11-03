@@ -13,6 +13,7 @@ Allow: /index.html
 Allow: /acerca/
 Allow: /Aplicaciones/
 Allow: /assets/
+Allow: /guias/
 
 # Archivos que no necesitan indexar
 Disallow: /offline.html
@@ -85,4 +86,5 @@ AI-Index: https://meskeia.com/ai-index.json
 # Categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios
 # Idioma principal: Español (ES)
 # País objetivo: España
-# Última actualización: 2025-01-12
+# Guías educativas: https://meskeia.com/guias/ - Tutoriales completos de 1800-2500 palabras optimizados para citación por IAs
+# Última actualización: 2025-11-03

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guías Educativas | meskeIA - Aprende con Inteligencia Artificial</title>
+    <meta name="description" content="Guías educativas completas para todas las herramientas de meskeIA. Tutoriales paso a paso, ejemplos prácticos y mejores prácticas.">
+    <link rel="icon" type="image/png" href="../icon_meskeia.png">
+
+    <!-- Open Graph para redes sociales -->
+    <meta property="og:title" content="Guías Educativas meskeIA">
+    <meta property="og:description" content="Tutoriales completos y guías paso a paso para todas las herramientas de meskeIA">
+    <meta property="og:type" content="website">
+
+    <!-- Schema.org para SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Guías Educativas meskeIA",
+        "description": "Guías completas sobre herramientas de productividad, finanzas, salud y más",
+        "url": "https://meskeia.com/guias/",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "meskeIA",
+            "url": "https://meskeia.com"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            /* Paleta oficial meskeIA */
+            --bg-primary: #FAFAFA;
+            --bg-card: #FFFFFF;
+            --primary: #2E86AB;
+            --secondary: #48A9A6;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border: #E5E5E5;
+            --hover: #F5F5F5;
+            --focus: rgba(46,134,171,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+
+        /* Logo meskeIA - Componente oficial */
+        .meskeia-logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(46, 134, 171, 0.2);
+            border-radius: 12px;
+            padding: 8px 16px;
+            box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+            transition: all 0.3s ease;
+        }
+        .meskeia-logo-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+        }
+        .meskeia-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .meskeia-logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+        }
+        .meskeia-logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #2E86AB;
+            border-radius: 50%;
+            top: 13px;
+            left: 13px;
+        }
+        .meskeia-neural-network {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+        .meskeia-neural-dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+        }
+        .meskeia-neural-dot:nth-child(1) { top: 4px; left: 6px; }
+        .meskeia-neural-dot:nth-child(2) { top: 8px; right: 5px; }
+        .meskeia-neural-dot:nth-child(3) { bottom: 6px; left: 4px; }
+        .meskeia-neural-dot:nth-child(4) { bottom: 4px; right: 8px; }
+        .meskeia-logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2C3E50;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .meskeia-logo-text .meske {
+            color: #2E86AB;
+        }
+        .meskeia-logo-text .ia {
+            color: #48A9A6;
+            font-weight: 700;
+            position: relative;
+        }
+        .meskeia-logo-text .ia::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #48A9A6, #7FB3D3);
+            border-radius: 1px;
+        }
+
+        /* Header */
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Buscador y filtros */
+        .controls {
+            max-width: 1200px;
+            margin: 0 auto 2rem;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.5rem;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--focus);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.3rem;
+        }
+
+        /* Filtros de categoría */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: var(--hover);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Grid de guías */
+        .guides-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .category-section {
+            margin-bottom: 3rem;
+        }
+
+        .category-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--border);
+            font-weight: 600;
+        }
+
+        .guides-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .guide-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .guide-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(46, 134, 171, 0.15);
+            border-color: var(--primary);
+        }
+
+        .guide-card h3 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .guide-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .guide-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .guide-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Estado vacío */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .meskeia-logo-container {
+                top: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                gap: 8px;
+            }
+            .meskeia-logo-icon {
+                width: 24px;
+                height: 24px;
+            }
+            .meskeia-logo-icon::before {
+                width: 9px;
+                height: 9px;
+                top: 7.5px;
+                left: 7.5px;
+            }
+            .meskeia-logo-icon::after {
+                width: 4px;
+                height: 4px;
+                top: 10px;
+                left: 10px;
+            }
+            .meskeia-logo-text {
+                font-size: 1rem;
+            }
+
+            body {
+                padding-top: 60px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .guides-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>📚 Guías Educativas meskeIA</h1>
+        <p>Aprende a usar todas las herramientas de meskeIA con tutoriales completos, ejemplos prácticos y mejores prácticas</p>
+    </div>
+
+    <!-- Controles de búsqueda y filtros -->
+    <div class="controls">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Buscar guías por nombre o categoría..." autocomplete="off">
+            <span class="search-icon">🔍</span>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" data-category="todas">Todas</button>
+            <button class="filter-btn" data-category="finanzas">Finanzas</button>
+            <button class="filter-btn" data-category="calculadoras">Calculadoras</button>
+            <button class="filter-btn" data-category="salud">Salud & Bienestar</button>
+            <button class="filter-btn" data-category="productividad">Productividad</button>
+            <button class="filter-btn" data-category="emprendimiento">Emprendimiento</button>
+            <button class="filter-btn" data-category="web">Herramientas Web</button>
+            <button class="filter-btn" data-category="creatividad">Creatividad</button>
+        </div>
+    </div>
+
+    <!-- Contenedor de guías (se generará dinámicamente) -->
+    <div class="guides-container" id="guidesContainer">
+        <!-- Se cargará con JavaScript -->
+    </div>
+
+    <!-- Footer meskeIA -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        © 2025 meskeIA
+    </footer>
+
+    <script>
+        // Base de datos de guías (se actualizará automáticamente)
+        const guiasDB = [
+            {
+                slug: "simulador-hipoteca",
+                nombre: "Simulador de Hipoteca",
+                categoria: "finanzas",
+                categoriaDisplay: "Finanzas y Fiscalidad",
+                descripcion: "Calcula y simula tu hipoteca con diferentes escenarios de tipos de interés y plazos",
+                path: "finanzas-y-fiscalidad/simulador-hipoteca-guia.html"
+            },
+            {
+                slug: "calculadora-inversiones",
+                nombre: "Calculadora de Inversiones",
+                categoria: "finanzas",
+                categoriaDisplay: "Finanzas y Fiscalidad",
+                descripcion: "Simula el crecimiento de tus inversiones con interés compuesto y aportaciones periódicas",
+                path: "finanzas-y-fiscalidad/calculadora-inversiones-guia.html"
+            },
+            {
+                slug: "calculadora-jubilacion",
+                nombre: "Calculadora de Jubilación",
+                categoria: "finanzas",
+                categoriaDisplay: "Finanzas y Fiscalidad",
+                descripcion: "Planifica tu jubilación y estima el ahorro necesario para tu retiro",
+                path: "finanzas-y-fiscalidad/calculadora-jubilacion-guia.html"
+            },
+            {
+                slug: "interes-compuesto",
+                nombre: "Interés Compuesto",
+                categoria: "finanzas",
+                categoriaDisplay: "Finanzas y Fiscalidad",
+                descripcion: "Entiende y calcula el poder del interés compuesto en tus inversiones",
+                path: "finanzas-y-fiscalidad/interes-compuesto-guia.html"
+            },
+            {
+                slug: "calculadora-porcentajes",
+                nombre: "Calculadora de Porcentajes",
+                categoria: "calculadoras",
+                categoriaDisplay: "Calculadoras y Utilidades",
+                descripcion: "Calcula porcentajes, descuentos, incrementos y variaciones porcentuales",
+                path: "calculadoras-y-utilidades/calculadora-porcentajes-guia.html"
+            },
+            {
+                slug: "regla-de-tres",
+                nombre: "Regla de Tres",
+                categoria: "calculadoras",
+                categoriaDisplay: "Calculadoras y Utilidades",
+                descripcion: "Resuelve problemas de proporcionalidad directa e inversa de forma rápida",
+                path: "calculadoras-y-utilidades/regla-de-tres-guia.html"
+            },
+            {
+                slug: "conversor-unidades",
+                nombre: "Conversor de Unidades",
+                categoria: "calculadoras",
+                categoriaDisplay: "Calculadoras y Utilidades",
+                descripcion: "Convierte entre diferentes unidades de medida (longitud, masa, temperatura, etc.)",
+                path: "calculadoras-y-utilidades/conversor-unidades-guia.html"
+            },
+            {
+                slug: "calculadora-fechas",
+                nombre: "Calculadora de Fechas",
+                categoria: "calculadoras",
+                categoriaDisplay: "Calculadoras y Utilidades",
+                descripcion: "Calcula diferencias entre fechas, añade o resta días, semanas o meses",
+                path: "calculadoras-y-utilidades/calculadora-fechas-guia.html"
+            },
+            {
+                slug: "calculadora-calorias-ejercicio",
+                nombre: "Calculadora de Calorías por Ejercicio",
+                categoria: "salud",
+                categoriaDisplay: "Salud & Bienestar",
+                descripcion: "Estima las calorías quemadas en diferentes actividades físicas",
+                path: "salud-y-bienestar/calculadora-calorias-ejercicio-guia.html"
+            },
+            {
+                slug: "indice-masa-corporal",
+                nombre: "Índice de Masa Corporal (IMC)",
+                categoria: "salud",
+                categoriaDisplay: "Salud & Bienestar",
+                descripcion: "Calcula tu IMC y descubre si estás en tu peso ideal",
+                path: "salud-y-bienestar/indice-masa-corporal-guia.html"
+            },
+            {
+                slug: "calculadora-hidratacion",
+                nombre: "Calculadora de Hidratación",
+                categoria: "salud",
+                categoriaDisplay: "Salud & Bienestar",
+                descripcion: "Descubre cuánta agua necesitas beber diariamente según tu actividad",
+                path: "salud-y-bienestar/calculadora-hidratacion-guia.html"
+            },
+            {
+                slug: "cronometro-temporizador",
+                nombre: "Cronómetro y Temporizador",
+                categoria: "productividad",
+                categoriaDisplay: "Herramientas de Productividad",
+                descripcion: "Mide el tiempo con cronómetro o establece temporizadores para tus tareas",
+                path: "herramientas-de-productividad/cronometro-temporizador-guia.html"
+            },
+            {
+                slug: "lista-tareas",
+                nombre: "Gestor de Tareas",
+                categoria: "productividad",
+                categoriaDisplay: "Herramientas de Productividad",
+                descripcion: "Organiza tus tareas diarias y mantén el control de tus pendientes",
+                path: "herramientas-de-productividad/lista-tareas-guia.html"
+            },
+            {
+                slug: "informacion-tiempo",
+                nombre: "Información del Tiempo",
+                categoria: "productividad",
+                categoriaDisplay: "Herramientas de Productividad",
+                descripcion: "Consulta el pronóstico del tiempo actualizado de cualquier ciudad",
+                path: "herramientas-de-productividad/informacion-tiempo-guia.html"
+            },
+            {
+                slug: "calculadora-tarifa-freelance",
+                nombre: "Calculadora de Tarifa Freelance",
+                categoria: "emprendimiento",
+                categoriaDisplay: "Emprendimiento y Negocios",
+                descripcion: "Calcula tu tarifa por hora como freelance considerando todos los gastos",
+                path: "emprendimiento-y-negocios/calculadora-tarifa-freelance-guia.html"
+            },
+            {
+                slug: "margen-equilibrio",
+                nombre: "Margen de Equilibrio (Break-Even)",
+                categoria: "emprendimiento",
+                categoriaDisplay: "Emprendimiento y Negocios",
+                descripcion: "Descubre cuántas ventas necesitas para cubrir tus costes fijos",
+                path: "emprendimiento-y-negocios/margen-equilibrio-guia.html"
+            },
+            {
+                slug: "validador-json",
+                nombre: "Validador JSON",
+                categoria: "web",
+                categoriaDisplay: "Herramientas Web y Tecnología",
+                descripcion: "Valida y formatea código JSON de forma rápida y visual",
+                path: "herramientas-web-y-tecnologia/validador-json-guia.html"
+            },
+            {
+                slug: "generador-hash",
+                nombre: "Generador de Hash",
+                categoria: "web",
+                categoriaDisplay: "Herramientas Web y Tecnología",
+                descripcion: "Genera hashes MD5, SHA-1, SHA-256 y más de forma segura",
+                path: "herramientas-web-y-tecnologia/generador-hash-guia.html"
+            },
+            {
+                slug: "generador-gradientes",
+                nombre: "Generador de Gradientes",
+                categoria: "creatividad",
+                categoriaDisplay: "Creatividad y Diseño",
+                descripcion: "Crea gradientes CSS personalizados con vista previa en tiempo real",
+                path: "creatividad-y-diseno/generador-gradientes-guia.html"
+            },
+            {
+                slug: "creador-paletas",
+                nombre: "Creador de Paletas",
+                categoria: "creatividad",
+                categoriaDisplay: "Creatividad y Diseño",
+                descripcion: "Genera paletas de colores armoniosas para tus diseños",
+                path: "creatividad-y-diseno/creador-paletas-guia.html"
+            }
+        ];
+
+        // Agrupar guías por categoría
+        function agruparPorCategoria(guias) {
+            const grupos = {};
+            guias.forEach(guia => {
+                const cat = guia.categoriaDisplay;
+                if (!grupos[cat]) {
+                    grupos[cat] = [];
+                }
+                grupos[cat].push(guia);
+            });
+            return grupos;
+        }
+
+        // Renderizar guías
+        function renderizarGuias(guias) {
+            const container = document.getElementById('guidesContainer');
+
+            if (guias.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>😕 No se encontraron guías</h3>
+                        <p>Intenta buscar con otros términos o selecciona otra categoría</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const grupos = agruparPorCategoria(guias);
+
+            let html = '';
+            for (const [categoria, guiasCategoria] of Object.entries(grupos)) {
+                html += `
+                    <div class="category-section">
+                        <h2 class="category-title">${categoria}</h2>
+                        <div class="guides-grid">
+                `;
+
+                guiasCategoria.forEach(guia => {
+                    html += `
+                        <a href="${guia.path}" class="guide-card">
+                            <h3>${guia.nombre}</h3>
+                            <p>${guia.descripcion}</p>
+                            <div class="guide-meta">
+                                <span class="guide-badge">Guía completa</span>
+                                <span>→ Leer más</span>
+                            </div>
+                        </a>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Filtrar guías
+        function filtrarGuias() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoriaActiva = document.querySelector('.filter-btn.active').dataset.category;
+
+            let guiasFiltradas = guiasDB;
+
+            // Filtrar por categoría
+            if (categoriaActiva !== 'todas') {
+                guiasFiltradas = guiasFiltradas.filter(g => g.categoria === categoriaActiva);
+            }
+
+            // Filtrar por búsqueda
+            if (searchTerm) {
+                guiasFiltradas = guiasFiltradas.filter(g =>
+                    g.nombre.toLowerCase().includes(searchTerm) ||
+                    g.descripcion.toLowerCase().includes(searchTerm) ||
+                    g.categoriaDisplay.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            renderizarGuias(guiasFiltradas);
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', filtrarGuias);
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                filtrarGuias();
+            });
+        });
+
+        // Renderizar inicial
+        renderizarGuias(guiasDB);
+    </script>
+</body>
+</html>

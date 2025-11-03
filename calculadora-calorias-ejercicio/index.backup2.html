@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Meta básicas -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="meskeIA">
+    <meta name="theme-color" content="#2E86AB">
+
+    <!-- SEO Principal -->
+    <title>Calculadora de Calorías por Ejercicio | Contador de Pasos y Actividad Física - meskeIA</title>
+    <meta name="description" content="¿Cuántas calorías quemas al caminar o hacer ejercicio? Calculadora con contador de pasos, MET de actividades y conversión a kilómetros. Ideal para fitness y pérdida de peso.">
+    <meta name="keywords" content="calculadora calorias ejercicio, contador pasos calorias, cuantas calorias quemo caminando, calcular calorias quemadas corriendo, MET ejercicio, equivalencia pasos kilometros, calorias actividad fisica, contador calorias deporte, calculadora ejercicio">
+
+    <link rel="canonical" href="https://meskeia.com/calculadora-calorias-ejercicio/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../icon_meskeia.png">
+    <link rel="apple-touch-icon" href="../icon_meskeia.png">
+
+    <!-- FAQs visibles extraídas de Schema.org -->
+    <div style="max-width: 900px; margin: 2rem auto 2rem; padding: 0 20px;">
+        <div style="background: var(--bg-card); border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); margin-bottom: 2rem;">
+            <h2 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">❓ Preguntas Frecuentes</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cuántas calorías quemo al caminar 10.000 pasos?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Depende de tu peso y velocidad. En promedio, una persona de 70 kg quema entre 300-500 calorías al caminar 10.000 pasos (aproximadamente 7-8 km).</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Qué es el MET en ejercicio?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">MET (Metabolic Equivalent of Task) es una unidad que mide la intensidad de una actividad física. 1 MET = energía en reposo. Caminar rápido = 4.5 MET, correr = 8-11 MET.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cómo se calculan las calorías quemadas?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Usamos la fórmula: Calorías = MET × Peso (kg) × Tiempo (horas). El MET varía según el tipo e intensidad del ejercicio.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cuántos kilómetros son 10.000 pasos?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Aproximadamente 7-8 km, dependiendo de tu zancada. La zancada promedio es de 70-78 cm (varía según altura y sexo).</p>
+                </details>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPGLJBQ4Z"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SPPGLJBQ4Z');
+    </script>
+
+    <!-- Open Graph para redes sociales -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Calculadora de Calorías por Ejercicio | meskeIA">
+    <meta property="og:description" content="Calcula calorías quemadas por pasos, tiempo y tipo de ejercicio. Conversión pasos a km. Gratis y sin registro.">
+    <meta property="og:url" content="https://meskeia.com/calculadora-calorias-ejercicio/">
+    <meta property="og:site_name" content="meskeIA">
+    <meta property="og:locale" content="es_ES">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Calculadora de Calorías por Ejercicio | meskeIA">
+    <meta name="twitter:description" content="Calcula calorías quemadas según tu actividad física. Incluye pasos, distancia y equivalencias de alimentos.">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Calculadora de Calorías por Ejercicio",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Calculadora de calorías quemadas por ejercicio físico. Incluye contador de pasos, conversión a kilómetros, MET por actividad y equivalencias de alimentos.",
+        "url": "https://meskeia.com/calculadora-calorias-ejercicio/",
+        "author": {
+            "@type": "Organization",
+            "name": "meskeIA",
+            "email": "meskeia24@gmail.com",
+            "url": "https://meskeia.com"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock"
+        },
+        "featureList": [
+            "Cálculo de calorías quemadas por actividad",
+            "Contador de pasos con conversión a kilómetros",
+            "10+ tipos de ejercicio (caminar, correr, ciclismo, natación)",
+            "Fórmulas MET (Metabolic Equivalent)",
+            "Equivalencias de alimentos quemados",
+            "Progreso hacia meta de 10.000 pasos",
+            "Historial de actividades",
+            "Perfil personalizado por peso, altura, edad",
+            "Estimaciones para hombres y mujeres",
+            "Almacenamiento local privado"
+        ],
+        "inLanguage": "es-ES"
+    }
+    </script>
+
+    <!-- Breadcrumbs Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Inicio",
+                "item": "https://meskeia.com"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Salud & Bienestar",
+                "item": "https://meskeia.com/#salud"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Calculadora de Calorías por Ejercicio",
+                "item": "https://meskeia.com/calculadora-calorias-ejercicio/"
+            }
+        ]
+    }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "¿Cuántas calorías quemo al caminar 10.000 pasos?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Depende de tu peso y velocidad. En promedio, una persona de 70 kg quema entre 300-500 calorías al caminar 10.000 pasos (aproximadamente 7-8 km)."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "¿Qué es el MET en ejercicio?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "MET (Metabolic Equivalent of Task) es una unidad que mide la intensidad de una actividad física. 1 MET = energía en reposo. Caminar rápido = 4.5 MET, correr = 8-11 MET."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "¿Cómo se calculan las calorías quemadas?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Usamos la fórmula: Calorías = MET × Peso (kg) × Tiempo (horas). El MET varía según el tipo e intensidad del ejercicio."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "¿Cuántos kilómetros son 10.000 pasos?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Aproximadamente 7-8 km, dependiendo de tu zancada. La zancada promedio es de 70-78 cm (varía según altura y sexo)."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Calculadora de Calorías por Ejercicio</h1>
+            <p class="subtitle">Calcula las calorías quemadas según tus pasos, tiempo y tipo de actividad física</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Panel de Configuración -->
+            <div class="left-panel">
+                <!-- Perfil Personal -->
+                <div class="card profile-card">
+                    <div class="card-header" onclick="toggleProfile()">
+                        <h2>
+                            <span class="icon">👤</span>
+                            Tu Perfil
+                        </h2>
+                        <button class="toggle-btn" id="profile-toggle">▼</button>
+                    </div>
+                    <div class="card-content" id="profile-content">
+                        <div class="form-group">
+                            <label for="weight">Peso (kg) *</label>
+                            <input type="number" id="weight" placeholder="70" min="30" max="300" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="height">Altura (cm) *</label>
+                            <input type="number" id="height" placeholder="170" min="100" max="250">
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Edad (años) *</label>
+                            <input type="number" id="age" placeholder="30" min="10" max="120">
+                        </div>
+                        <div class="form-group">
+                            <label>Sexo biológico *</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sex" value="male" checked>
+                                    <span>Hombre</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sex" value="female">
+                                    <span>Mujer</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button class="save-profile-btn" onclick="saveProfile()">
+                            <span class="icon">💾</span>
+                            Guardar Perfil
+                        </button>
+                        <div class="profile-saved" id="profile-saved" style="display: none;">
+                            ✓ Perfil guardado correctamente
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actividad -->
+                <div class="card">
+                    <h2>
+                        <span class="icon">🏃</span>
+                        Tu Actividad
+                    </h2>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label for="activity">Tipo de ejercicio *</label>
+                            <select id="activity">
+                                <option value="walking-slow">🚶 Caminar lento (3 km/h)</option>
+                                <option value="walking-normal">🚶 Caminar normal (4 km/h)</option>
+                                <option value="walking-fast" selected>🚶‍♂️ Caminar rápido (5-6 km/h)</option>
+                                <option value="jogging">🏃 Trotar (7 km/h)</option>
+                                <option value="running">🏃‍♂️ Correr (8-9 km/h)</option>
+                                <option value="running-fast">🏃‍♂️ Correr rápido (10+ km/h)</option>
+                                <option value="cycling-moderate">🚴 Ciclismo moderado</option>
+                                <option value="cycling-intense">🚴‍♂️ Ciclismo intenso</option>
+                                <option value="swimming">🏊 Natación moderada</option>
+                                <option value="stairs">🪜 Subir escaleras</option>
+                                <option value="hiking">⛰️ Senderismo</option>
+                                <option value="dancing">💃 Bailar</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="steps">Pasos realizados (opcional)</label>
+                            <input type="number" id="steps" placeholder="10000" min="0" max="100000">
+                            <small class="help-text">Si introduces pasos, se calculará también la distancia</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="duration">Duración del ejercicio (minutos) *</label>
+                            <input type="number" id="duration" placeholder="30" min="1" max="600">
+                        </div>
+
+                        <button class="calculate-btn" onclick="calculateCalories()">
+                            <span class="icon">🔥</span>
+                            Calcular Calorías
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Resultados -->
+            <div class="right-panel">
+                <!-- Resultados -->
+                <div class="card results-card" id="results-card" style="display: none;">
+                    <h2>
+                        <span class="icon">🎯</span>
+                        Resultados
+                    </h2>
+                    <div class="card-content">
+                        <div class="result-main">
+                            <div class="result-big">
+                                <span class="result-icon">🔥</span>
+                                <span class="result-value" id="calories-result">0</span>
+                                <span class="result-unit">kcal</span>
+                            </div>
+                            <div class="result-label">Calorías quemadas</div>
+                        </div>
+
+                        <div class="results-grid">
+                            <div class="result-item" id="distance-result-container" style="display: none;">
+                                <span class="result-icon-small">📏</span>
+                                <div class="result-content">
+                                    <div class="result-value-small" id="distance-result">0</div>
+                                    <div class="result-label-small">kilómetros</div>
+                                </div>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-icon-small">⚡</span>
+                                <div class="result-content">
+                                    <div class="result-value-small" id="met-result">0</div>
+                                    <div class="result-label-small">MET</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="equivalences">
+                            <h3>Equivalencias de alimentos quemados</h3>
+                            <div class="equivalences-list" id="equivalences-list">
+                                <!-- Se llena dinámicamente -->
+                            </div>
+                        </div>
+
+                        <div class="progress-section" id="progress-section" style="display: none;">
+                            <h3>Progreso hacia tu meta diaria</h3>
+                            <div class="progress-info">
+                                <span id="steps-progress-text">0 / 10.000 pasos</span>
+                                <span id="steps-progress-percent">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="result-actions">
+                            <button class="action-btn primary" onclick="saveActivity()">
+                                <span class="icon">💾</span>
+                                Guardar en Historial
+                            </button>
+                            <button class="action-btn secondary" onclick="clearResults()">
+                                <span class="icon">🗑️</span>
+                                Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial -->
+                <div class="card">
+                    <h2>
+                        <span class="icon">📊</span>
+                        Historial de Actividades
+                    </h2>
+                    <div class="card-content">
+                        <div class="history-container" id="history-container">
+                            <div class="empty-state">
+                                <span class="empty-icon">📋</span>
+                                <p>Aún no hay actividades registradas</p>
+                                <small>Calcula y guarda tus actividades para ver un historial</small>
+                            </div>
+                        </div>
+                        <button class="clear-history-btn" id="clear-history-btn" onclick="clearHistory()" style="display: none;">
+                            Limpiar Historial
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <p>⚠️ <strong>Nota importante:</strong> Los cálculos son estimaciones basadas en fórmulas estándar (MET). Los valores reales pueden variar según tu metabolismo, condición física y otros factores. Consulta a un profesional de la salud para planes de ejercicio personalizados.</p>
+        </div>
+    </div>
+
+    <!-- Secciones Educativas meskeIA -->
+    <style>
+        .meskeia-edu-section {
+            max-width: 800px;
+            margin: 3rem auto 2rem;
+            padding: 2rem;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(46, 134, 171, 0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+        .meskeia-edu-section h2 {
+            color: #2E86AB;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #48A9A6;
+            padding-bottom: 0.5rem;
+        }
+        .meskeia-edu-section p {
+            color: #1A1A1A;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .meskeia-edu-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .meskeia-edu-section li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #1A1A1A;
+        }
+        .meskeia-edu-section li:before {
+            content: "→";
+            color: #48A9A6;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .meskeia-edu-section strong {
+            color: #2E86AB;
+        }
+        @media (max-width: 768px) {
+            .meskeia-edu-section {
+                margin: 2rem 1rem 1.5rem;
+                padding: 1.5rem;
+            }
+            .meskeia-edu-section h2 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+
+    <div class="meskeia-edu-section">
+        <h2>¿Cómo funciona esta calculadora de calorías por ejercicio?</h2>
+        <p>Estima las calorías quemadas según tipo de ejercicio, duración, peso corporal e intensidad. Basada en equivalentes metabólicos (METs) validados científicamente.</p>
+        <ul>
+            <li><strong>Múltiples actividades</strong>: Correr, caminar, natación, ciclismo, pesas, yoga y más de 50 ejercicios</li>
+            <li><strong>Cálculo por METs</strong>: Usa equivalentes metabólicos estándar para precisión científica</li>
+            <li><strong>Personalización</strong>: Ajusta según tu peso, edad, sexo e intensidad del ejercicio</li>
+            <li><strong>Comparación de actividades</strong>: Descubre qué ejercicio quema más calorías en el mismo tiempo</li>
+            <li><strong>Objetivos diarios</strong>: Planifica cuánto ejercicio necesitas para quemar X calorías</li>
+        </ul>
+    </div>
+
+    <div class="meskeia-edu-section">
+        <h2>Casos de uso prácticos</h2>
+        <ul>
+            <li><strong>Pérdida de peso</strong>: ¿Cuánto correr para quemar 500 calorías? Con peso 75kg, duración 45min = resultado</li>
+            <li><strong>Comparar ejercicios</strong>: ¿Qué quema más: 30min de natación o 45min de caminata rápida?</li>
+            <li><strong>Planificar rutinas</strong>: Objetivo: quemar 2000 cal/semana. Distribuye entre cardio, pesas y yoga</li>
+            <li><strong>Dieta + ejercicio</strong>: Déficit calórico 500 cal/día: comes 1800, quemas 2300. ¿Cuánto ejercicio falta?</li>
+            <li><strong>Tracking fitness</strong>: Registra calorías quemadas por sesión para llevar control mensual de actividad</li>
+        </ul>
+    </div>
+
+    <!-- Footer meskeIA -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        © 2025 meskeIA
+    </footer>
+
+    <script src="script.js"></script>
+
+    <!-- meskeIA Analytics - Tracking de uso -->
+    <script>
+        (async function() {
+            const nombreApp = 'calculadora-calorias-ejercicio';
+
+            const datos = {
+                aplicacion: nombreApp,
+                navegador: navigator.userAgent,
+                sistema_operativo: navigator.platform,
+                resolucion: `${window.screen.width}x${window.screen.height}`
+            };
+
+            try {
+                await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                console.log('✅ Uso registrado en meskeIA Analytics');
+            } catch (error) {
+                // Silencioso: no mostrar errores al usuario
+                console.error('Error al registrar uso:', error);
+            }
+        })();
+    </script>
+</body>
+</html>

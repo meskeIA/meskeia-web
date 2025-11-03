@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="¿Necesitas organizar tu tiempo de estudio? Crea horarios personalizados con técnica Pomodoro y distribución inteligente. Perfecto para estudiantes y opositores.">
+    <meta name="keywords" content="generador horarios estudio, planificador estudio, calendario estudio, organizador asignaturas, horario semanal estudiantes, técnica pomodoro, planificación estudio, horario universitario, horario oposiciones, distribuir tiempo estudio">
+    <meta name="author" content="meskeIA">
+    <meta name="robots" content="index, follow">
+
+    <title>Generador de Horarios de Estudio | Planificador Semanal Personalizado - meskeIA</title>
+
+    <link rel="canonical" href="https://meskeia.com/generador-horarios-estudio/">
+    <link rel="icon" type="image/png" href="../icon_meskeia.png">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Generador de Horarios de Estudio - meskeIA">
+    <meta property="og:description" content="Crea horarios de estudio personalizados con distribución inteligente. Técnica Pomodoro, gestión de prioridades y calendario visual.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://meskeia.com/generador-horarios-estudio/">
+    <meta property="og:image" content="https://meskeia.com/icon_meskeia.png">
+
+    <!-- Schema.org para SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Generador de Horarios de Estudio",
+        "description": "Herramienta gratuita para crear horarios de estudio personalizados con distribución inteligente de tiempo",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "meskeIA"
+        }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://meskeia.com/"
+        }, {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Generador de Horarios de Estudio",
+            "item": "https://meskeia.com/generador-horarios-estudio/"
+        }]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "¿Cómo funciona el generador de horarios?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Añade tus asignaturas con horas semanales deseadas, selecciona tu disponibilidad horaria y el algoritmo distribuye automáticamente las sesiones de estudio de forma equilibrada."
+            }
+        }, {
+            "@type": "Question",
+            "name": "¿Se guarda mi horario?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, el horario se guarda automáticamente en tu navegador (localStorage). Puedes editarlo y exportarlo como imagen PNG."
+            }
+        }, {
+            "@type": "Question",
+            "name": "¿Qué es la técnica Pomodoro?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Es una técnica de gestión del tiempo que alterna 25 minutos de estudio concentrado con 5 minutos de descanso. Mejora la productividad y reduce la fatiga mental."
+            }
+        }]
+    }
+    </script>
+
+    <!-- FAQs visibles extraídas de Schema.org -->
+    <div style="max-width: 900px; margin: 2rem auto 2rem; padding: 0 20px;">
+        <div style="background: var(--bg-card); border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); margin-bottom: 2rem;">
+            <h2 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">❓ Preguntas Frecuentes</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cómo funciona el generador de horarios?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Añade tus asignaturas con horas semanales deseadas, selecciona tu disponibilidad horaria y el algoritmo distribuye automáticamente las sesiones de estudio de forma equilibrada.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Se guarda mi horario?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Sí, el horario se guarda automáticamente en tu navegador (localStorage). Puedes editarlo y exportarlo como imagen PNG.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Qué es la técnica Pomodoro?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Es una técnica de gestión del tiempo que alterna 25 minutos de estudio concentrado con 5 minutos de descanso. Mejora la productividad y reduce la fatiga mental.</p>
+                </details>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPGLJBQ4Z"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-SPPGLJBQ4Z');
+    </script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <h1>📅 Generador de Horarios de Estudio</h1>
+        <p>Crea tu calendario semanal optimizado y alcanza tus objetivos académicos</p>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Vista de Configuración -->
+        <div id="config-view" class="view active">
+            <div class="config-card">
+                <h2>⚙️ Configuración del Horario</h2>
+
+                <!-- Sección Asignaturas -->
+                <div class="section">
+                    <h3>📚 Mis Asignaturas</h3>
+                    <div id="subjects-list" class="subjects-list">
+                        <!-- Las asignaturas se añaden dinámicamente aquí -->
+                    </div>
+
+                    <div class="add-subject-form">
+                        <input type="text" id="subject-name" placeholder="Nombre de la asignatura" maxlength="30">
+                        <input type="number" id="subject-hours" placeholder="Horas/semana" min="1" max="40" value="3">
+                        <select id="subject-priority">
+                            <option value="1">⭐ Prioridad Baja</option>
+                            <option value="2">⭐⭐ Media</option>
+                            <option value="3" selected>⭐⭐⭐ Alta</option>
+                            <option value="4">⭐⭐⭐⭐ Muy Alta</option>
+                            <option value="5">🔥 Urgente</option>
+                        </select>
+                        <button id="add-subject-btn" class="btn btn-primary">➕ Añadir</button>
+                    </div>
+                </div>
+
+                <!-- Sección Disponibilidad -->
+                <div class="section">
+                    <h3>🕐 Disponibilidad Horaria</h3>
+                    <div class="availability-grid">
+                        <div class="availability-row">
+                            <span class="day-label">Lunes</span>
+                            <label><input type="checkbox" class="day-checkbox" data-day="lunes" data-slot="mañana" checked> Mañana</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="lunes" data-slot="tarde" checked> Tarde</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="lunes" data-slot="noche"> Noche</label>
+                        </div>
+                        <div class="availability-row">
+                            <span class="day-label">Martes</span>
+                            <label><input type="checkbox" class="day-checkbox" data-day="martes" data-slot="mañana" checked> Mañana</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="martes" data-slot="tarde" checked> Tarde</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="martes" data-slot="noche"> Noche</label>
+                        </div>
+                        <div class="availability-row">
+                            <span class="day-label">Miércoles</span>
+                            <label><input type="checkbox" class="day-checkbox" data-day="miércoles" data-slot="mañana" checked> Mañana</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="miércoles" data-slot="tarde" checked> Tarde</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="miércoles" data-slot="noche"> Noche</label>
+                        </div>
+                        <div class="availability-row">
+                            <span class="day-label">Jueves</span>
+                            <label><input type="checkbox" class="day-checkbox" data-day="jueves" data-slot="mañana" checked> Mañana</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="jueves" data-slot="tarde" checked> Tarde</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="jueves" data-slot="noche"> Noche</label>
+                        </div>
+                        <div class="availability-row">
+                            <span class="day-label">Viernes</span>
+                            <label><input type="checkbox" class="day-checkbox" data-day="viernes" data-slot="mañana" checked> Mañana</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="viernes" data-slot="tarde" checked> Tarde</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="viernes" data-slot="noche"> Noche</label>
+                        </div>
+                        <div class="availability-row">
+                            <span class="day-label">Sábado</span>
+                            <label><input type="checkbox" class="day-checkbox" data-day="sábado" data-slot="mañana"> Mañana</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="sábado" data-slot="tarde"> Tarde</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="sábado" data-slot="noche"> Noche</label>
+                        </div>
+                        <div class="availability-row">
+                            <span class="day-label">Domingo</span>
+                            <label><input type="checkbox" class="day-checkbox" data-day="domingo" data-slot="mañana"> Mañana</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="domingo" data-slot="tarde"> Tarde</label>
+                            <label><input type="checkbox" class="day-checkbox" data-day="domingo" data-slot="noche"> Noche</label>
+                        </div>
+                    </div>
+                    <p class="help-text">
+                        <strong>💡 Franjas horarias:</strong> Mañana (9:00-14:00), Tarde (15:00-20:00), Noche (21:00-23:00)
+                    </p>
+                </div>
+
+                <!-- Sección Preferencias -->
+                <div class="section">
+                    <h3>⚙️ Preferencias de Estudio</h3>
+                    <div class="preferences-grid">
+                        <div class="preference-item">
+                            <label for="session-duration">⏱️ Duración de sesiones:</label>
+                            <select id="session-duration">
+                                <option value="25">25 min (Pomodoro)</option>
+                                <option value="50" selected>50 min (Clase estándar)</option>
+                                <option value="90">90 min (Sesión larga)</option>
+                            </select>
+                        </div>
+                        <div class="preference-item">
+                            <label for="break-duration">☕ Descansos entre sesiones:</label>
+                            <select id="break-duration">
+                                <option value="5" selected>5 min</option>
+                                <option value="10">10 min</option>
+                                <option value="15">15 min</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="generate-schedule-btn" class="btn btn-success btn-large">
+                        🎯 Generar Horario
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Horario Generado -->
+        <div id="schedule-view" class="view">
+            <div class="schedule-header">
+                <button id="back-to-config-btn" class="btn btn-secondary">⬅️ Volver a Configuración</button>
+                <div class="schedule-actions">
+                    <button id="export-png-btn" class="btn btn-primary">📸 Exportar PNG</button>
+                    <button id="clear-schedule-btn" class="btn btn-danger">🗑️ Limpiar Todo</button>
+                </div>
+            </div>
+
+            <div id="schedule-container" class="schedule-container">
+                <h2>📅 Mi Horario Semanal</h2>
+                <div id="weekly-calendar" class="weekly-calendar">
+                    <!-- El calendario se genera dinámicamente -->
+                </div>
+            </div>
+
+            <div class="schedule-info">
+                <div class="info-card">
+                    <h3>📊 Resumen del Horario</h3>
+                    <div id="schedule-summary">
+                        <!-- Se genera dinámicamente -->
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h3>💡 Consejos de Estudio</h3>
+                    <ul>
+                        <li>🎯 Respeta los descansos para mantener la concentración</li>
+                        <li>📱 Elimina distracciones durante las sesiones de estudio</li>
+                        <li>🔄 Alterna entre asignaturas para evitar la monotonía</li>
+                        <li>💧 Mantente hidratado y come snacks saludables</li>
+                        <li>😴 Respeta tus horas de sueño (7-9 horas diarias)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Secciones Educativas meskeIA -->
+    <style>
+        .meskeia-edu-section {
+            max-width: 800px;
+            margin: 3rem auto 2rem;
+            padding: 2rem;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(46, 134, 171, 0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+        .meskeia-edu-section h2 {
+            color: #2E86AB;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #48A9A6;
+            padding-bottom: 0.5rem;
+        }
+        .meskeia-edu-section p {
+            color: #1A1A1A;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .meskeia-edu-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .meskeia-edu-section li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #1A1A1A;
+        }
+        .meskeia-edu-section li:before {
+            content: "→";
+            color: #48A9A6;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .meskeia-edu-section strong {
+            color: #2E86AB;
+        }
+        @media (max-width: 768px) {
+            .meskeia-edu-section {
+                margin: 2rem 1rem 1.5rem;
+                padding: 1.5rem;
+            }
+            .meskeia-edu-section h2 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+
+    <div class="meskeia-edu-section">
+        <h2>¿Cómo funciona esta generador horarios estudio?</h2>
+        <p>Herramienta especializada en generador horarios estudio. Proporciona cálculos y análisis precisos para facilitar tu trabajo.</p>
+        <ul>
+            <li><strong>Función principal</strong>: Realiza cálculos especializados de forma rápida</li>
+            <li><strong>Interfaz intuitiva</strong>: Diseño simple y fácil de usar sin curva de aprendizaje</li>
+            <li><strong>Resultados instantáneos</strong>: Obtén respuestas al momento sin esperas</li>
+            <li><strong>100% gratuito</strong>: Sin registro, sin límites, sin costos ocultos</li>
+        </ul>
+    </div>
+
+    <div class="meskeia-edu-section">
+        <h2>Casos de uso prácticos</h2>
+        <ul>
+            <li><strong>Uso profesional</strong>: Aplica en tu trabajo diario para ahorrar tiempo</li>
+            <li><strong>Estudios</strong>: Ayuda en tareas académicas y proyectos</li>
+            <li><strong>Vida cotidiana</strong>: Resuelve situaciones comunes del día a día</li>
+            <li><strong>Toma de decisiones</strong>: Obtén datos precisos para decidir mejor</li>
+        </ul>
+    </div>
+
+    <!-- Footer meskeIA -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        © 2025 meskeIA
+    </footer>
+
+    <!-- Librerías externas para export PNG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script src="script.js"></script>
+
+    <!-- meskeIA Analytics - Tracking de uso -->
+    <script>
+        (async function() {
+            const nombreApp = 'generador-horarios-estudio';
+
+            const datos = {
+                aplicacion: nombreApp,
+                navegador: navigator.userAgent,
+                sistema_operativo: navigator.platform,
+                resolucion: `${window.screen.width}x${window.screen.height}`
+            };
+
+            try {
+                await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                console.log('✅ Uso registrado en meskeIA Analytics');
+            } catch (error) {
+                // Silencioso: no mostrar errores al usuario
+                console.error('Error al registrar uso:', error);
+            }
+        })();
+    </script>
+</body>
+</html>

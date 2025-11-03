@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Sueño y Ciclos | A Qué Hora Dormir para Despertar Descansado - meskeIA</title>
+    <meta name="description" content="¿A qué hora acostarte para despertar descansado? Calculadora de ciclos de sueño REM (90 min). Incluye alarmas recomendadas y tracker. Ideal para optimizar tu descanso.">
+    <meta name="keywords" content="calculadora sueño, ciclos de sueño, a que hora dormir, calculadora REM, despertar descansado, ciclos REM, horas de sueño, cuando acostarme, alarma optima, calidad sueño">
+    <meta name="author" content="meskeIA">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/png" href="../icon_meskeia.png">
+    <link rel="canonical" href="https://meskeia.com/calculadora-sueno/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Calculadora de Sueño y Ciclos | A Qué Hora Dormir - meskeIA">
+    <meta property="og:description" content="Calcula tus ciclos de sueño ideales basados en ciclos REM de 90 minutos para despertar descansado.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://meskeia.com/calculadora-sueno/">
+    <meta property="og:image" content="https://meskeia.com/icon_meskeia.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Calculadora de Sueño y Ciclos - meskeIA">
+    <meta name="twitter:description" content="Descubre a qué hora dormir para despertar descansado según tus ciclos REM.">
+
+    <!-- Schema.org WebApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Calculadora de Sueño y Ciclos",
+        "description": "Calculadora para determinar las mejores horas de sueño basada en ciclos REM de 90 minutos",
+        "url": "https://meskeia.com/calculadora-sueno/",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "meskeIA",
+            "url": "https://meskeia.com"
+        }
+    }
+    </script>
+
+    <!-- Schema.org BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://meskeia.com/"
+        },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Salud & Bienestar",
+            "item": "https://meskeia.com/#salud-bienestar"
+        },{
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Calculadora de Sueño",
+            "item": "https://meskeia.com/calculadora-sueno/"
+        }]
+    }
+    </script>
+
+    <!-- Schema.org FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "¿Cuántas horas debo dormir?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Los adultos necesitan 7-9 horas de sueño (4-6 ciclos completos). Adolescentes 8-10 horas (5-6 ciclos), y adultos mayores 7-8 horas (4-5 ciclos). Cada ciclo dura aproximadamente 90 minutos."
+            }
+        },{
+            "@type": "Question",
+            "name": "¿Qué son los ciclos de sueño?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Un ciclo de sueño completo dura aproximadamente 90 minutos y pasa por 4 fases: sueño ligero, sueño profundo, sueño profundo avanzado y REM. Es mejor despertar al final de un ciclo completo para sentirse descansado."
+            }
+        },{
+            "@type": "Question",
+            "name": "¿Por qué despertar entre ciclos es importante?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Despertar en medio de un ciclo, especialmente durante el sueño profundo, causa sensación de cansancio y aturdimiento. Despertar al final de un ciclo, durante la fase REM ligera, permite un despertar más natural y descansado."
+            }
+        },{
+            "@type": "Question",
+            "name": "¿Cuánto tiempo tarda en dormirse una persona?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "En promedio, una persona tarda entre 10-20 minutos en dormirse. Nuestra calculadora considera 14 minutos por defecto, pero puedes ajustarlo según tu experiencia personal."
+            }
+        }]
+    }
+    </script>
+
+    <!-- FAQs visibles extraídas de Schema.org -->
+    <div style="max-width: 900px; margin: 2rem auto 2rem; padding: 0 20px;">
+        <div style="background: var(--bg-card); border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); margin-bottom: 2rem;">
+            <h2 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">❓ Preguntas Frecuentes</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cuántas horas debo dormir?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Los adultos necesitan 7-9 horas de sueño (4-6 ciclos completos). Adolescentes 8-10 horas (5-6 ciclos), y adultos mayores 7-8 horas (4-5 ciclos). Cada ciclo dura aproximadamente 90 minutos.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Qué son los ciclos de sueño?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Un ciclo de sueño completo dura aproximadamente 90 minutos y pasa por 4 fases: sueño ligero, sueño profundo, sueño profundo avanzado y REM. Es mejor despertar al final de un ciclo completo para sentirse descansado.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Por qué despertar entre ciclos es importante?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Despertar en medio de un ciclo, especialmente durante el sueño profundo, causa sensación de cansancio y aturdimiento. Despertar al final de un ciclo, durante la fase REM ligera, permite un despertar más natural y descansado.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cuánto tiempo tarda en dormirse una persona?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">En promedio, una persona tarda entre 10-20 minutos en dormirse. Nuestra calculadora considera 14 minutos por defecto, pero puedes ajustarlo según tu experiencia personal.</p>
+                </details>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPGLJBQ4Z"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-SPPGLJBQ4Z');
+    </script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>😴 Calculadora de Sueño y Ciclos</h1>
+            <p class="subtitle">Descubre a qué hora acostarte para despertar descansado según tus ciclos REM</p>
+        </header>
+
+        <main>
+            <!-- Selector de Modo -->
+            <section class="card mode-selector">
+                <h2>🎯 ¿Qué quieres calcular?</h2>
+                <div class="mode-buttons">
+                    <button class="mode-btn active" onclick="setMode('wakeup')" id="btn-wakeup">
+                        ⏰ Sé mi hora de despertar
+                    </button>
+                    <button class="mode-btn" onclick="setMode('sleep')" id="btn-sleep">
+                        🛏️ Sé mi hora de acostarme
+                    </button>
+                </div>
+            </section>
+
+            <!-- Modo: Hora de Despertar -->
+            <section class="card" id="wakeup-mode">
+                <h2>⏰ Quiero despertar a las...</h2>
+                <div class="time-input-container">
+                    <input type="time" id="wakeup-time" value="07:00">
+                    <p class="help-text">¿A qué hora necesitas despertar?</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="fall-asleep-time-wakeup">⏱️ Tiempo que tardas en dormirte (minutos)</label>
+                    <input type="number" id="fall-asleep-time-wakeup" min="5" max="60" value="14" placeholder="14">
+                    <small class="info-text">La mayoría de personas tardan 10-20 minutos</small>
+                </div>
+
+                <button onclick="calculateBedtimes()" class="btn btn-primary">🌙 Calcular Horarios para Acostarme</button>
+
+                <div id="wakeup-results" style="display: none;">
+                    <h3>🛏️ Deberías acostarte a una de estas horas:</h3>
+                    <div id="bedtime-options" class="time-options"></div>
+                    <div class="recommendation">
+                        <p class="recommendation-text">
+                            <strong>💡 Recomendación:</strong> Para un adulto, lo ideal son <strong>6 ciclos (9 horas)</strong>
+                            o <strong>5 ciclos (7.5 horas)</strong>. Elige la opción que mejor se adapte a tu rutina.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Modo: Hora de Acostarme -->
+            <section class="card" id="sleep-mode" style="display: none;">
+                <h2>🛏️ Me voy a acostar a las...</h2>
+                <div class="time-input-container">
+                    <input type="time" id="sleep-time" value="23:00">
+                    <p class="help-text">¿A qué hora te vas a la cama?</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="fall-asleep-time-sleep">⏱️ Tiempo que tardas en dormirte (minutos)</label>
+                    <input type="number" id="fall-asleep-time-sleep" min="5" max="60" value="14" placeholder="14">
+                    <small class="info-text">La mayoría de personas tardan 10-20 minutos</small>
+                </div>
+
+                <button onclick="calculateWakeupTimes()" class="btn btn-primary">☀️ Calcular Horarios para Despertar</button>
+
+                <div id="sleep-results" style="display: none;">
+                    <h3>⏰ Deberías despertar a una de estas horas:</h3>
+                    <div id="wakeup-options" class="time-options"></div>
+                    <div class="recommendation">
+                        <p class="recommendation-text">
+                            <strong>💡 Recomendación:</strong> Para un adulto, lo ideal son <strong>6 ciclos (9 horas)</strong>
+                            o <strong>5 ciclos (7.5 horas)</strong>. Elige la alarma que te permita cumplir estos ciclos.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tracker de Sueño -->
+            <section class="card">
+                <h2>📊 Tracker de Sueño Semanal</h2>
+
+                <div class="tracker-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="avg-hours">0</span>
+                        <span class="stat-unit">horas promedio</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="avg-cycles">0</span>
+                        <span class="stat-unit">ciclos promedio</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="nights-tracked">0</span>
+                        <span class="stat-unit">noches registradas</span>
+                    </div>
+                </div>
+
+                <div class="sleep-entry">
+                    <h3>➕ Registrar Noche de Sueño</h3>
+                    <div class="form-grid-two">
+                        <div class="form-group">
+                            <label for="slept-at">🛏️ Me acosté a las:</label>
+                            <input type="time" id="slept-at" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="woke-at">⏰ Me desperté a las:</label>
+                            <input type="time" id="woke-at" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sleep-quality">😴 Calidad del sueño:</label>
+                        <select id="sleep-quality">
+                            <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                            <option value="4">⭐⭐⭐⭐ Buena</option>
+                            <option value="3" selected>⭐⭐⭐ Regular</option>
+                            <option value="2">⭐⭐ Mala</option>
+                            <option value="1">⭐ Muy mala</option>
+                        </select>
+                    </div>
+                    <button onclick="saveSleepEntry()" class="btn btn-secondary">💾 Guardar Registro</button>
+                </div>
+
+                <div id="sleep-history">
+                    <h3>📜 Historial (últimos 7 días)</h3>
+                    <div id="history-container">
+                        <p class="empty-state">No hay registros aún. Comienza a trackear tu sueño.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Información sobre Ciclos -->
+            <section class="card info-section">
+                <h2>📚 Entendiendo los Ciclos de Sueño</h2>
+
+                <div class="cycle-explanation">
+                    <div class="cycle-phase">
+                        <span class="phase-icon">🌙</span>
+                        <div class="phase-info">
+                            <h3>Fase 1: Sueño Ligero (5-10 min)</h3>
+                            <p>Transición entre vigilia y sueño. Fácil despertar. Relajación muscular progresiva.</p>
+                        </div>
+                    </div>
+
+                    <div class="cycle-phase">
+                        <span class="phase-icon">💤</span>
+                        <div class="phase-info">
+                            <h3>Fase 2: Sueño Profundo Inicial (20 min)</h3>
+                            <p>Disminuye la temperatura corporal. Ritmo cardíaco se ralentiza. 50% del tiempo total.</p>
+                        </div>
+                    </div>
+
+                    <div class="cycle-phase">
+                        <span class="phase-icon">😴</span>
+                        <div class="phase-info">
+                            <h3>Fase 3-4: Sueño Profundo (30 min)</h3>
+                            <p>Fase reparadora. Regeneración celular. Consolidación de memoria. Difícil despertar.</p>
+                        </div>
+                    </div>
+
+                    <div class="cycle-phase">
+                        <span class="phase-icon">🌟</span>
+                        <div class="phase-info">
+                            <h3>Fase REM (20-25 min)</h3>
+                            <p>Movimientos oculares rápidos. Sueños vívidos. Consolidación de aprendizaje y memoria.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cycle-duration">
+                    <p><strong>⏱️ Duración total de un ciclo:</strong> ~90 minutos (1.5 horas)</p>
+                    <p><strong>🔄 Ciclos por noche:</strong> Adultos necesitan 4-6 ciclos completos</p>
+                </div>
+            </section>
+
+            <!-- Recomendaciones por Edad -->
+            <section class="card recommendations-section">
+                <h2>👥 Horas Recomendadas por Edad</h2>
+
+                <div class="age-recommendations">
+                    <div class="age-group">
+                        <span class="age-icon">👶</span>
+                        <div class="age-info">
+                            <h3>Bebés (4-12 meses)</h3>
+                            <p><strong>12-16 horas</strong> incluyendo siestas</p>
+                        </div>
+                    </div>
+
+                    <div class="age-group">
+                        <span class="age-icon">🧒</span>
+                        <div class="age-info">
+                            <h3>Niños (1-5 años)</h3>
+                            <p><strong>10-14 horas</strong> incluyendo siestas</p>
+                        </div>
+                    </div>
+
+                    <div class="age-group">
+                        <span class="age-icon">👦</span>
+                        <div class="age-info">
+                            <h3>Escolares (6-12 años)</h3>
+                            <p><strong>9-12 horas</strong> (6-8 ciclos)</p>
+                        </div>
+                    </div>
+
+                    <div class="age-group">
+                        <span class="age-icon">👨‍🎓</span>
+                        <div class="age-info">
+                            <h3>Adolescentes (13-18 años)</h3>
+                            <p><strong>8-10 horas</strong> (5-6 ciclos)</p>
+                        </div>
+                    </div>
+
+                    <div class="age-group">
+                        <span class="age-icon">👨</span>
+                        <div class="age-info">
+                            <h3>Adultos (18-64 años)</h3>
+                            <p><strong>7-9 horas</strong> (4-6 ciclos)</p>
+                        </div>
+                    </div>
+
+                    <div class="age-group">
+                        <span class="age-icon">👴</span>
+                        <div class="age-info">
+                            <h3>Adultos mayores (65+ años)</h3>
+                            <p><strong>7-8 horas</strong> (4-5 ciclos)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Consejos de Higiene del Sueño -->
+            <section class="card tips-section">
+                <h2>💡 Consejos para Mejor Sueño</h2>
+                <div class="tips-grid">
+                    <div class="tip">
+                        <span class="tip-icon">🌅</span>
+                        <h3>Rutina constante</h3>
+                        <p>Acuéstate y despierta a la misma hora todos los días, incluso fines de semana</p>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">🌡️</span>
+                        <h3>Temperatura ideal</h3>
+                        <p>Mantén tu habitación fresca (15-19°C) para un sueño profundo óptimo</p>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">🌑</span>
+                        <h3>Oscuridad total</h3>
+                        <p>Usa cortinas opacas o antifaz. La luz inhibe la producción de melatonina</p>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">📱</span>
+                        <h3>Sin pantallas</h3>
+                        <p>Evita móviles, tablets y TV 1 hora antes de dormir. La luz azul altera el ritmo circadiano</p>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">☕</span>
+                        <h3>Evita estimulantes</h3>
+                        <p>No consumas cafeína 6 horas antes de dormir. Evita alcohol y comidas pesadas</p>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">🏃‍♂️</span>
+                        <h3>Ejercicio regular</h3>
+                        <p>Haz ejercicio durante el día, pero no 3 horas antes de dormir</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Secciones Educativas meskeIA -->
+    <style>
+        .meskeia-edu-section {
+            max-width: 800px;
+            margin: 3rem auto 2rem;
+            padding: 2rem;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(46, 134, 171, 0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+        .meskeia-edu-section h2 {
+            color: #2E86AB;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #48A9A6;
+            padding-bottom: 0.5rem;
+        }
+        .meskeia-edu-section p {
+            color: #1A1A1A;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .meskeia-edu-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .meskeia-edu-section li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #1A1A1A;
+        }
+        .meskeia-edu-section li:before {
+            content: "→";
+            color: #48A9A6;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .meskeia-edu-section strong {
+            color: #2E86AB;
+        }
+        @media (max-width: 768px) {
+            .meskeia-edu-section {
+                margin: 2rem 1rem 1.5rem;
+                padding: 1.5rem;
+            }
+            .meskeia-edu-section h2 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+
+    <div class="meskeia-edu-section">
+        <h2>¿Cómo funciona esta herramienta sueno?</h2>
+        <p>Herramienta especializada en herramienta sueno. Proporciona cálculos y análisis precisos para facilitar tu trabajo.</p>
+        <ul>
+            <li><strong>Función principal</strong>: Realiza cálculos especializados de forma rápida</li>
+            <li><strong>Interfaz intuitiva</strong>: Diseño simple y fácil de usar sin curva de aprendizaje</li>
+            <li><strong>Resultados instantáneos</strong>: Obtén respuestas al momento sin esperas</li>
+            <li><strong>100% gratuito</strong>: Sin registro, sin límites, sin costos ocultos</li>
+        </ul>
+    </div>
+
+    <div class="meskeia-edu-section">
+        <h2>Casos de uso prácticos</h2>
+        <ul>
+            <li><strong>Uso profesional</strong>: Aplica en tu trabajo diario para ahorrar tiempo</li>
+            <li><strong>Estudios</strong>: Ayuda en tareas académicas y proyectos</li>
+            <li><strong>Vida cotidiana</strong>: Resuelve situaciones comunes del día a día</li>
+            <li><strong>Toma de decisiones</strong>: Obtén datos precisos para decidir mejor</li>
+        </ul>
+    </div>
+
+    <!-- Footer meskeIA -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        © 2025 meskeIA
+    </footer>
+
+    <script src="script.js"></script>
+
+    <!-- meskeIA Analytics - Tracking de uso -->
+    <script>
+        (async function() {
+            const nombreApp = 'calculadora-sueno';
+
+            const datos = {
+                aplicacion: nombreApp,
+                navegador: navigator.userAgent,
+                sistema_operativo: navigator.platform,
+                resolucion: `${window.screen.width}x${window.screen.height}`
+            };
+
+            try {
+                await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                console.log('✅ Uso registrado en meskeIA Analytics');
+            } catch (error) {
+                // Silencioso: no mostrar errores al usuario
+                console.error('Error al registrar uso:', error);
+            }
+        })();
+    </script>
+</body>
+</html>

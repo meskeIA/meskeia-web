@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creador de Flashcards | Tarjetas de Estudio para Memorizar - meskeIA</title>
+    <meta name="description" content="¿Necesitas memorizar para exámenes u oposiciones? Crea flashcards personalizadas con flip interactivo, gestiona mazos e importa/exporta. Perfecta para idiomas, medicina y oposiciones.">
+    <meta name="keywords" content="flashcards, tarjetas estudio, memorizar, anki alternativa, repaso espaciado, fichas estudio, crear tarjetas, app estudio, oposiciones, idiomas, medicina, estudiantes">
+    <meta name="author" content="meskeIA">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/png" href="../icon_meskeia.png">
+    <link rel="canonical" href="https://meskeia.com/creador-flashcards/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Creador de Flashcards | Tarjetas de Estudio - meskeIA">
+    <meta property="og:description" content="Crea y estudia con flashcards personalizadas. Modo estudio interactivo, gestión de mazos, importa/exporta tarjetas. 100% gratis y privado.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://meskeia.com/creador-flashcards/">
+    <meta property="og:image" content="https://meskeia.com/icon_meskeia.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Creador de Flashcards - meskeIA">
+    <meta name="twitter:description" content="Crea y estudia con flashcards. Ideal para estudiantes, oposiciones e idiomas.">
+
+    <!-- Schema.org WebApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Creador de Flashcards",
+        "description": "Aplicación para crear y estudiar con tarjetas de memoria (flashcards), con gestión de mazos, modo estudio interactivo e importación/exportación",
+        "url": "https://meskeia.com/creador-flashcards/",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "meskeIA",
+            "url": "https://meskeia.com"
+        }
+    }
+    </script>
+
+    <!-- Schema.org BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://meskeia.com/"
+        },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Cursos Educativos",
+            "item": "https://meskeia.com/#cursos-educativos"
+        },{
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Creador de Flashcards",
+            "item": "https://meskeia.com/creador-flashcards/"
+        }]
+    }
+    </script>
+
+    <!-- Schema.org FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "¿Qué son las flashcards?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Las flashcards (tarjetas de estudio) son una herramienta de aprendizaje con pregunta en un lado y respuesta en el otro. Se usan para memorizar vocabulario, conceptos, fórmulas y cualquier información mediante repaso activo."
+            }
+        },{
+            "@type": "Question",
+            "name": "¿Mis tarjetas son privadas?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, completamente. Todas tus flashcards se guardan solo en tu navegador usando localStorage. No se envía ninguna información a servidores externos. Control total de tus datos."
+            }
+        },{
+            "@type": "Question",
+            "name": "¿Puedo usar flashcards sin internet?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, la aplicación funciona 100% offline. No requiere conexión para crear, editar o estudiar tus tarjetas. Ideal para estudiar en cualquier lugar."
+            }
+        },{
+            "@type": "Question",
+            "name": "¿Puedo exportar mis mazos?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, puedes exportar tus mazos a formato JSON para hacer backup completo, o a CSV para abrir en Excel. También puedes importar mazos previamente exportados para compartir con compañeros o migrar entre dispositivos."
+            }
+        },{
+            "@type": "Question",
+            "name": "¿Para qué sirve el modo estudio?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "El modo estudio te permite repasar tus flashcards de forma interactiva: ves la pregunta, intentas recordar la respuesta, haces clic para voltear la tarjeta y verificar. Incluye barajado aleatorio para evitar patrones de memorización."
+            }
+        }]
+    }
+    </script>
+
+    <!-- FAQs visibles extraídas de Schema.org -->
+    <div style="max-width: 900px; margin: 2rem auto 2rem; padding: 0 20px;">
+        <div style="background: var(--bg-card); border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); margin-bottom: 2rem;">
+            <h2 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">❓ Preguntas Frecuentes</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Qué son las flashcards?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Las flashcards (tarjetas de estudio) son una herramienta de aprendizaje con pregunta en un lado y respuesta en el otro. Se usan para memorizar vocabulario, conceptos, fórmulas y cualquier información mediante repaso activo.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Mis tarjetas son privadas?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Sí, completamente. Todas tus flashcards se guardan solo en tu navegador usando localStorage. No se envía ninguna información a servidores externos. Control total de tus datos.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Puedo usar flashcards sin internet?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Sí, la aplicación funciona 100% offline. No requiere conexión para crear, editar o estudiar tus tarjetas. Ideal para estudiar en cualquier lugar.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Puedo exportar mis mazos?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Sí, puedes exportar tus mazos a formato JSON para hacer backup completo, o a CSV para abrir en Excel. También puedes importar mazos previamente exportados para compartir con compañeros o migrar entre dispositivos.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Para qué sirve el modo estudio?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">El modo estudio te permite repasar tus flashcards de forma interactiva: ves la pregunta, intentas recordar la respuesta, haces clic para voltear la tarjeta y verificar. Incluye barajado aleatorio para evitar patrones de memorización.</p>
+                </details>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPGLJBQ4Z"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-SPPGLJBQ4Z');
+    </script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>📚 Creador de Flashcards</h1>
+            <p class="subtitle">Crea y estudia con tarjetas de memoria para dominar cualquier tema</p>
+        </header>
+
+        <main>
+            <!-- Vista Dashboard: Lista de Mazos -->
+            <div id="dashboard-view" class="view">
+                <section class="card">
+                    <div class="section-header">
+                        <h2>Mis Mazos de Estudio</h2>
+                        <button onclick="showCreateDeckModal()" class="btn btn-primary">
+                            ➕ Crear Nuevo Mazo
+                        </button>
+                    </div>
+
+                    <div id="decks-container" class="decks-grid">
+                        <p class="empty-state">No tienes mazos todavía. Crea tu primer mazo para empezar a estudiar.</p>
+                    </div>
+                </section>
+
+                <!-- Backup y Restauración -->
+                <section class="card">
+                    <h2>💾 Backup y Restauración</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Exporta todos tus mazos para hacer backup o importa desde un archivo JSON.</p>
+
+                    <div class="backup-actions">
+                        <button onclick="exportAllToJSON()" class="btn btn-primary">
+                            📦 Exportar TODO a JSON
+                        </button>
+
+                        <div class="import-section">
+                            <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importFromJSON(event)">
+                            <button onclick="document.getElementById('import-file').click()" class="btn btn-secondary">
+                                📥 Importar desde JSON
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="backup-info">
+                        <p><strong>💡 Exportar TODO:</strong> Descarga todos tus mazos con todas las tarjetas. Guárdalo en tu nube.</p>
+                        <p><strong>💡 Importar JSON:</strong> Restaura un backup previo o importa mazos de compañeros.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Vista Gestión de Mazo: Lista de Tarjetas -->
+            <div id="deck-view" class="view" style="display: none;">
+                <section class="card">
+                    <div class="deck-header">
+                        <button onclick="showDashboard()" class="btn btn-outline">← Volver a Mazos</button>
+                        <div class="deck-info">
+                            <h2 id="deck-title">Nombre del Mazo</h2>
+                            <span id="deck-stats" class="deck-stats">0 tarjetas</span>
+                        </div>
+                        <div class="deck-actions">
+                            <button onclick="exportDeckToCSV()" class="btn btn-secondary" id="export-deck-btn">
+                                📥 Exportar CSV
+                            </button>
+                            <button onclick="startStudyMode()" class="btn btn-primary" id="study-deck-btn">
+                                📖 Estudiar
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="section-header">
+                        <h3>Tarjetas del Mazo</h3>
+                        <button onclick="showAddCardModal()" class="btn btn-primary">
+                            ➕ Añadir Tarjeta
+                        </button>
+                    </div>
+
+                    <div id="cards-container">
+                        <p class="empty-state">No hay tarjetas en este mazo. Añade tu primera tarjeta.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Vista Modo Estudio -->
+            <div id="study-view" class="view" style="display: none;">
+                <section class="card study-card">
+                    <div class="study-header">
+                        <button onclick="exitStudyMode()" class="btn btn-outline">← Salir</button>
+                        <div class="study-progress">
+                            <span id="study-counter">1/10</span>
+                            <button onclick="shuffleCards()" class="btn btn-outline" title="Barajar tarjetas">
+                                🔀 Barajar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flashcard-container">
+                        <div class="flashcard" id="flashcard" onclick="flipCard()">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="card-label">Pregunta</div>
+                                    <div class="card-content" id="card-front">
+                                        ¿Qué es una flashcard?
+                                    </div>
+                                    <div class="flip-hint">Clic para voltear →</div>
+                                </div>
+                                <div class="flashcard-back">
+                                    <div class="card-label">Respuesta</div>
+                                    <div class="card-content" id="card-back">
+                                        Una tarjeta de estudio con pregunta y respuesta para memorizar.
+                                    </div>
+                                    <div class="flip-hint">← Clic para voltear</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="study-navigation">
+                        <button onclick="previousCard()" class="btn btn-secondary" id="prev-btn">
+                            ◀ Anterior
+                        </button>
+                        <button onclick="nextCard()" class="btn btn-secondary" id="next-btn">
+                            Siguiente ▶
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: Crear/Editar Mazo -->
+    <div id="deck-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="deck-modal-title">Crear Nuevo Mazo</h3>
+                <button onclick="closeDeckModal()" class="close-btn">✕</button>
+            </div>
+            <form id="deck-form" onsubmit="saveDeck(event)">
+                <div class="form-group">
+                    <label for="deck-name">📚 Nombre del Mazo</label>
+                    <input type="text" id="deck-name" placeholder="Ej: Vocabulario Inglés B2" required>
+                </div>
+                <div class="form-group">
+                    <label for="deck-category">🏷️ Categoría</label>
+                    <select id="deck-category">
+                        <option value="Idiomas">🌍 Idiomas</option>
+                        <option value="Medicina">🩺 Medicina</option>
+                        <option value="Derecho">⚖️ Derecho</option>
+                        <option value="Programación">💻 Programación</option>
+                        <option value="Historia">📜 Historia</option>
+                        <option value="Ciencias">🔬 Ciencias</option>
+                        <option value="Matemáticas">🔢 Matemáticas</option>
+                        <option value="Otros">📌 Otros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="deck-color">🎨 Color del Mazo</label>
+                    <div class="color-picker">
+                        <input type="radio" name="deck-color" value="#2E86AB" id="color-1" checked>
+                        <label for="color-1" style="background: #2E86AB;"></label>
+
+                        <input type="radio" name="deck-color" value="#48A9A6" id="color-2">
+                        <label for="color-2" style="background: #48A9A6;"></label>
+
+                        <input type="radio" name="deck-color" value="#E76F51" id="color-3">
+                        <label for="color-3" style="background: #E76F51;"></label>
+
+                        <input type="radio" name="deck-color" value="#F4A261" id="color-4">
+                        <label for="color-4" style="background: #F4A261;"></label>
+
+                        <input type="radio" name="deck-color" value="#2A9D8F" id="color-5">
+                        <label for="color-5" style="background: #2A9D8F;"></label>
+
+                        <input type="radio" name="deck-color" value="#264653" id="color-6">
+                        <label for="color-6" style="background: #264653;"></label>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" onclick="closeDeckModal()" class="btn btn-outline">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Mazo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Añadir/Editar Tarjeta -->
+    <div id="card-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="card-modal-title">Añadir Nueva Tarjeta</h3>
+                <button onclick="closeCardModal()" class="close-btn">✕</button>
+            </div>
+            <form id="card-form" onsubmit="saveCard(event)">
+                <div class="form-group">
+                    <label for="card-front">❓ Pregunta (Frente de la Tarjeta)</label>
+                    <textarea id="card-front-input" rows="4" placeholder="Ej: ¿Qué es la fotosíntesis?" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="card-back">✅ Respuesta (Reverso de la Tarjeta)</label>
+                    <textarea id="card-back-input" rows="4" placeholder="Ej: Proceso por el cual las plantas convierten luz solar en energía química..." required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" onclick="closeCardModal()" class="btn btn-outline">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Tarjeta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Secciones Educativas meskeIA -->
+    <style>
+        .meskeia-edu-section {
+            max-width: 800px;
+            margin: 3rem auto 2rem;
+            padding: 2rem;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(46, 134, 171, 0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+        .meskeia-edu-section h2 {
+            color: #2E86AB;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #48A9A6;
+            padding-bottom: 0.5rem;
+        }
+        .meskeia-edu-section p {
+            color: #1A1A1A;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .meskeia-edu-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .meskeia-edu-section li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #1A1A1A;
+        }
+        .meskeia-edu-section li:before {
+            content: "→";
+            color: #48A9A6;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .meskeia-edu-section strong {
+            color: #2E86AB;
+        }
+        @media (max-width: 768px) {
+            .meskeia-edu-section {
+                margin: 2rem 1rem 1.5rem;
+                padding: 1.5rem;
+            }
+            .meskeia-edu-section h2 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+
+    <div class="meskeia-edu-section">
+        <h2>¿Cómo funciona esta creador flashcards?</h2>
+        <p>Herramienta especializada en creador flashcards. Proporciona cálculos y análisis precisos para facilitar tu trabajo.</p>
+        <ul>
+            <li><strong>Función principal</strong>: Realiza cálculos especializados de forma rápida</li>
+            <li><strong>Interfaz intuitiva</strong>: Diseño simple y fácil de usar sin curva de aprendizaje</li>
+            <li><strong>Resultados instantáneos</strong>: Obtén respuestas al momento sin esperas</li>
+            <li><strong>100% gratuito</strong>: Sin registro, sin límites, sin costos ocultos</li>
+        </ul>
+    </div>
+
+    <div class="meskeia-edu-section">
+        <h2>Casos de uso prácticos</h2>
+        <ul>
+            <li><strong>Uso profesional</strong>: Aplica en tu trabajo diario para ahorrar tiempo</li>
+            <li><strong>Estudios</strong>: Ayuda en tareas académicas y proyectos</li>
+            <li><strong>Vida cotidiana</strong>: Resuelve situaciones comunes del día a día</li>
+            <li><strong>Toma de decisiones</strong>: Obtén datos precisos para decidir mejor</li>
+        </ul>
+    </div>
+
+    <!-- Footer meskeIA -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        © 2025 meskeIA
+    </footer>
+
+    <script src="script.js"></script>
+
+    <!-- meskeIA Analytics - Tracking de uso -->
+    <script>
+        (async function() {
+            const nombreApp = 'creador-flashcards';
+
+            const datos = {
+                aplicacion: nombreApp,
+                navegador: navigator.userAgent,
+                sistema_operativo: navigator.platform,
+                resolucion: `${window.screen.width}x${window.screen.height}`
+            };
+
+            try {
+                await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                console.log('✅ Uso registrado en meskeIA Analytics');
+            } catch (error) {
+                // Silencioso: no mostrar errores al usuario
+                console.error('Error al registrar uso:', error);
+            }
+        })();
+    </script>
+</body>
+</html>

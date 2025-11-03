@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Hidratación Diaria | Cuánta Agua Debo Tomar - meskeIA</title>
+    <meta name="description" content="¿Cuánta agua debes beber al día? Calculadora personalizada según peso, actividad y clima. Incluye tracker de progreso y equivalencias en vasos. Ideal para hidratación saludable.">
+    <meta name="keywords" content="calculadora hidratacion, cuanta agua tomar, litros agua diarios, hidratacion por peso, calculadora agua diaria, cuantos vasos agua, hidratacion ejercicio, agua necesaria">
+    <meta name="author" content="meskeIA">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/png" href="../icon_meskeia.png">
+    <link rel="canonical" href="https://meskeia.com/calculadora-hidratacion/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Calculadora de Hidratación Diaria | Cuánta Agua Debo Tomar - meskeIA">
+    <meta property="og:description" content="Calcula la cantidad exacta de agua que necesitas beber diariamente según tu peso, actividad física y clima.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://meskeia.com/calculadora-hidratacion/">
+    <meta property="og:image" content="https://meskeia.com/icon_meskeia.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Calculadora de Hidratación Diaria - meskeIA">
+    <meta name="twitter:description" content="Calcula cuánta agua necesitas beber según tu peso, actividad y clima.">
+
+    <!-- Schema.org WebApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Calculadora de Hidratación Diaria",
+        "description": "Calculadora para determinar la cantidad diaria de agua necesaria según peso, actividad física, clima y edad",
+        "url": "https://meskeia.com/calculadora-hidratacion/",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "meskeIA",
+            "url": "https://meskeia.com"
+        }
+    }
+    </script>
+
+    <!-- Schema.org BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://meskeia.com/"
+        },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Salud & Bienestar",
+            "item": "https://meskeia.com/#salud-bienestar"
+        },{
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Calculadora de Hidratación",
+            "item": "https://meskeia.com/calculadora-hidratacion/"
+        }]
+    }
+    </script>
+
+    <!-- Schema.org FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "¿Cuánta agua debo beber al día?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "La cantidad recomendada es de 30-35 ml por kg de peso corporal. Para una persona de 70 kg, serían aproximadamente 2.1-2.5 litros al día. Esta cantidad debe ajustarse según la actividad física, el clima y la edad."
+            }
+        },{
+            "@type": "Question",
+            "name": "¿Cómo afecta el ejercicio a mi necesidad de hidratación?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Durante el ejercicio se recomienda beber 400-800 ml adicionales por hora de actividad física intensa. La sudoración aumenta la pérdida de líquidos, por lo que es fundamental compensar estas pérdidas."
+            }
+        },{
+            "@type": "Question",
+            "name": "¿El clima influye en la cantidad de agua que necesito?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, en climas cálidos o secos se recomienda aumentar la ingesta en un 20-30% debido a la mayor pérdida por sudoración. En clima frío, aunque la sensación de sed disminuye, la hidratación sigue siendo importante."
+            }
+        },{
+            "@type": "Question",
+            "name": "¿Cómo sé si estoy bien hidratado?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Los indicadores de buena hidratación incluyen: orina de color amarillo claro, ausencia de sed constante, piel elástica y mucosas húmedas. La orina muy oscura indica deshidratación."
+            }
+        }]
+    }
+    </script>
+
+    <!-- FAQs visibles extraídas de Schema.org -->
+    <div style="max-width: 900px; margin: 2rem auto 2rem; padding: 0 20px;">
+        <div style="background: var(--bg-card); border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); margin-bottom: 2rem;">
+            <h2 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">❓ Preguntas Frecuentes</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cuánta agua debo beber al día?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">La cantidad recomendada es de 30-35 ml por kg de peso corporal. Para una persona de 70 kg, serían aproximadamente 2.1-2.5 litros al día. Esta cantidad debe ajustarse según la actividad física, el clima y la edad.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cómo afecta el ejercicio a mi necesidad de hidratación?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Durante el ejercicio se recomienda beber 400-800 ml adicionales por hora de actividad física intensa. La sudoración aumenta la pérdida de líquidos, por lo que es fundamental compensar estas pérdidas.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿El clima influye en la cantidad de agua que necesito?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Sí, en climas cálidos o secos se recomienda aumentar la ingesta en un 20-30% debido a la mayor pérdida por sudoración. En clima frío, aunque la sensación de sed disminuye, la hidratación sigue siendo importante.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Cómo sé si estoy bien hidratado?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Los indicadores de buena hidratación incluyen: orina de color amarillo claro, ausencia de sed constante, piel elástica y mucosas húmedas. La orina muy oscura indica deshidratación.</p>
+                </details>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPGLJBQ4Z"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-SPPGLJBQ4Z');
+    </script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>💧 Calculadora de Hidratación Diaria</h1>
+            <p class="subtitle">Descubre cuánta agua necesitas beber según tu peso, actividad física y estilo de vida</p>
+        </header>
+
+        <main>
+            <!-- Sección de Perfil -->
+            <section class="card" id="profile-section">
+                <h2>📋 Tu Perfil</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="weight">Peso (kg)</label>
+                        <input type="number" id="weight" min="30" max="200" placeholder="Ej: 70" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Edad</label>
+                        <input type="number" id="age" min="10" max="100" placeholder="Ej: 30" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sex">Sexo</label>
+                        <select id="sex" required>
+                            <option value="">Seleccionar</option>
+                            <option value="male">Masculino</option>
+                            <option value="female">Femenino</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="saveProfile()" class="btn btn-primary">💾 Guardar Perfil</button>
+            </section>
+
+            <!-- Sección de Factores -->
+            <section class="card" id="factors-section">
+                <h2>⚙️ Factores de Ajuste</h2>
+
+                <div class="form-group">
+                    <label for="activity">Nivel de Actividad Física</label>
+                    <select id="activity" onchange="updateActivityInfo()">
+                        <option value="sedentary">🛋️ Sedentario (sin ejercicio)</option>
+                        <option value="light" selected>🚶 Ligero (1-3 días/semana)</option>
+                        <option value="moderate">🏃 Moderado (3-5 días/semana)</option>
+                        <option value="intense">💪 Intenso (6-7 días/semana)</option>
+                        <option value="athlete">🏅 Atleta (2+ entrenamientos/día)</option>
+                    </select>
+                    <small id="activity-info" class="info-text"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="climate">Clima/Temperatura</label>
+                    <select id="climate" onchange="updateClimateInfo()">
+                        <option value="cold">❄️ Frío (< 15°C)</option>
+                        <option value="temperate" selected>🌤️ Templado (15-25°C)</option>
+                        <option value="hot">☀️ Cálido (25-35°C)</option>
+                        <option value="very-hot">🔥 Muy caluroso (> 35°C)</option>
+                    </select>
+                    <small id="climate-info" class="info-text"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="exercise-time">Tiempo de Ejercicio Hoy (minutos)</label>
+                    <input type="number" id="exercise-time" min="0" max="480" value="0" placeholder="Ej: 60">
+                    <small class="info-text">Adicional a tu nivel de actividad base</small>
+                </div>
+
+                <button onclick="calculateHydration()" class="btn btn-primary">💧 Calcular Hidratación</button>
+            </section>
+
+            <!-- Sección de Resultados -->
+            <section class="card" id="results-section" style="display: none;">
+                <h2>📊 Tu Hidratación Diaria</h2>
+
+                <div class="result-main">
+                    <div class="result-highlight">
+                        <span class="result-value" id="total-water">0</span>
+                        <span class="result-unit">litros/día</span>
+                    </div>
+                    <p class="result-description">Cantidad total de agua recomendada</p>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="result-icon">🥤</span>
+                        <div>
+                            <strong id="glasses-count">0</strong> vasos
+                            <small>(250 ml cada uno)</small>
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-icon">🍾</span>
+                        <div>
+                            <strong id="bottles-500">0</strong> botellas
+                            <small>(500 ml)</small>
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-icon">💧</span>
+                        <div>
+                            <strong id="bottles-1500">0</strong> botellas grandes
+                            <small>(1.5 L)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breakdown">
+                    <h3>Desglose del Cálculo</h3>
+                    <div class="breakdown-item">
+                        <span>Base por peso corporal:</span>
+                        <strong id="base-water">0 L</strong>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Ajuste por actividad física:</span>
+                        <strong id="activity-adjustment">+0 L</strong>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Ajuste por clima:</span>
+                        <strong id="climate-adjustment">+0 L</strong>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Ajuste por edad:</span>
+                        <strong id="age-adjustment">+0 L</strong>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Ejercicio adicional hoy:</span>
+                        <strong id="exercise-adjustment">+0 L</strong>
+                    </div>
+                </div>
+
+                <div class="schedule">
+                    <h3>⏰ Horario de Hidratación Recomendado</h3>
+                    <div id="schedule-container"></div>
+                    <small class="info-text">Distribuye tu consumo de agua a lo largo del día para mejor absorción</small>
+                </div>
+
+                <button onclick="saveToHistory()" class="btn btn-secondary">💾 Guardar en Historial</button>
+            </section>
+
+            <!-- Sección de Tracker -->
+            <section class="card" id="tracker-section" style="display: none;">
+                <h2>📈 Tracker de Hidratación Hoy</h2>
+
+                <div class="tracker-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="consumed-water">0</span>
+                        <span class="stat-unit">L consumidos</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="remaining-water">0</span>
+                        <span class="stat-unit">L restantes</span>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                    <span class="progress-text" id="progress-text">0%</span>
+                </div>
+
+                <div class="tracker-actions">
+                    <button onclick="addWater(250)" class="btn btn-small">+250ml (1 vaso)</button>
+                    <button onclick="addWater(500)" class="btn btn-small">+500ml (1 botella)</button>
+                    <button onclick="addWater(1000)" class="btn btn-small">+1L</button>
+                    <button onclick="resetTracker()" class="btn btn-outline">🔄 Reiniciar</button>
+                </div>
+            </section>
+
+            <!-- Sección de Historial -->
+            <section class="card">
+                <h2>📜 Historial de Cálculos</h2>
+                <div id="history-container">
+                    <p class="empty-state">No hay cálculos guardados aún. Realiza tu primer cálculo para comenzar.</p>
+                </div>
+            </section>
+
+            <!-- Sección de Consejos -->
+            <section class="card tips-section">
+                <h2>💡 Consejos de Hidratación</h2>
+                <div class="tips-grid">
+                    <div class="tip">
+                        <span class="tip-icon">🌅</span>
+                        <h3>Empieza el día hidratado</h3>
+                        <p>Bebe 1-2 vasos de agua al despertar para activar tu metabolismo</p>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">🏃‍♂️</span>
+                        <h3>Antes, durante y después</h3>
+                        <p>Hidrátate 30 min antes del ejercicio, cada 15-20 min durante, y después para recuperar</p>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">🍽️</span>
+                        <h3>Acompaña tus comidas</h3>
+                        <p>Bebe un vaso de agua con cada comida para mejorar la digestión</p>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">🎨</span>
+                        <h3>Observa el color</h3>
+                        <p>Orina amarillo claro = buena hidratación. Oscuro = necesitas más agua</p>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">⏰</span>
+                        <h3>Establece recordatorios</h3>
+                        <p>Usa alarmas cada 1-2 horas para recordar beber agua regularmente</p>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">🥤</span>
+                        <h3>Ten agua siempre cerca</h3>
+                        <p>Lleva una botella reutilizable contigo para facilitar el consumo constante</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Secciones Educativas meskeIA -->
+    <style>
+        .meskeia-edu-section {
+            max-width: 800px;
+            margin: 3rem auto 2rem;
+            padding: 2rem;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(46, 134, 171, 0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+        .meskeia-edu-section h2 {
+            color: #2E86AB;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #48A9A6;
+            padding-bottom: 0.5rem;
+        }
+        .meskeia-edu-section p {
+            color: #1A1A1A;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .meskeia-edu-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .meskeia-edu-section li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #1A1A1A;
+        }
+        .meskeia-edu-section li:before {
+            content: "→";
+            color: #48A9A6;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .meskeia-edu-section strong {
+            color: #2E86AB;
+        }
+        @media (max-width: 768px) {
+            .meskeia-edu-section {
+                margin: 2rem 1rem 1.5rem;
+                padding: 1.5rem;
+            }
+            .meskeia-edu-section h2 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+
+    <div class="meskeia-edu-section">
+        <h2>¿Cómo funciona esta calculadora de hidratación?</h2>
+        <p>Estima tu necesidad diaria de agua según peso, actividad física, clima y condiciones personales. Ayuda a mantener hidratación óptima para salud y rendimiento.</p>
+        <ul>
+            <li><strong>Cálculo personalizado</strong>: Basado en peso corporal, edad, sexo y nivel de actividad</li>
+            <li><strong>Ajuste por clima</strong>: Aumenta requerimientos en climas cálidos o secos</li>
+            <li><strong>Actividad física</strong>: Suma agua extra según duración e intensidad del ejercicio</li>
+            <li><strong>Condiciones especiales</strong>: Ajustes para embarazo, lactancia, enfermedad</li>
+            <li><strong>Recordatorios</strong>: Sugiere distribución por horas (mañana, tarde, noche)</li>
+        </ul>
+    </div>
+
+    <div class="meskeia-edu-section">
+        <h2>Casos de uso prácticos</h2>
+        <ul>
+            <li><strong>Fitness</strong>: Pesas 70kg, entrenas 1h diaria. Necesitas ~3 litros/día (2.5L base + 500ml ejercicio)</li>
+            <li><strong>Pérdida de peso</strong>: Beber agua suficiente ayuda a metabolismo. Calcula tu objetivo diario</li>
+            <li><strong>Clima cálido</strong>: Vives en zona tropical 35°C. Incrementa +20% sobre base = 3.2L en vez de 2.5L</li>
+            <li><strong>Rendimiento deportivo</strong>: Maratón próximo: planifica hidratación antes, durante y después según peso</li>
+            <li><strong>Salud general</strong>: Evita deshidratación: distribuye 2.5L en 8 vasos de 310ml cada 2 horas</li>
+        </ul>
+    </div>
+
+    <!-- Footer meskeIA -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        © 2025 meskeIA
+    </footer>
+
+    <script src="script.js"></script>
+
+    <!-- meskeIA Analytics - Tracking de uso -->
+    <script>
+        (async function() {
+            const nombreApp = 'calculadora-hidratacion';
+
+            const datos = {
+                aplicacion: nombreApp,
+                navegador: navigator.userAgent,
+                sistema_operativo: navigator.platform,
+                resolucion: `${window.screen.width}x${window.screen.height}`
+            };
+
+            try {
+                await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                console.log('✅ Uso registrado en meskeIA Analytics');
+            } catch (error) {
+                // Silencioso: no mostrar errores al usuario
+                console.error('Error al registrar uso:', error);
+            }
+        })();
+    </script>
+</body>
+</html>

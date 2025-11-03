@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriSalud - Nutrición Avanzada Basada en Ciencia | meskeIA</title>
+    
+    <!-- Meta SEO -->
+    <meta name="description" content="¿Sabes la diferencia entre comer y nutrirse? Aprende nutrición avanzada basada en ciencia: macronutrientes, biodisponibilidad e interacciones alimentarias.">
+    <meta name="keywords" content="nutrición avanzada, alimentación saludable, macronutrientes, micronutrientes, biodisponibilidad, interacciones alimentarias, nutrición científica, educación nutricional">
+    <meta name="author" content="meskeIA">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="es">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="NutriSalud - Nutrición Avanzada Basada en Ciencia">
+    <meta property="og:description" content="Descubre la diferencia entre comer y nutrirse con conocimiento nutricional avanzado. Fundamentos esenciales, interacciones alimentarias y aplicación práctica basada en ciencia.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://meskeia.com/Aplicaciones/NutriSalud/nutrisalud.html">
+    <meta property="og:site_name" content="meskeIA">
+    <meta property="og:locale" content="es_ES">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NutriSalud - Nutrición Avanzada Basada en Ciencia">
+    <meta name="twitter:description" content="Conocimiento nutricional avanzado basado en ciencia. Más allá de los consejos básicos que ya conoces.">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://meskeia.com/Aplicaciones/NutriSalud/nutrisalud.html">
+    
+    <!-- Preconnect para mejorar velocidad -->
+    <link rel="preconnect" href="https://meskeia.com">
+    
+    <!-- Hreflang para idioma -->
+    <link rel="alternate" hreflang="es" href="https://meskeia.com/Aplicaciones/NutriSalud/nutrisalud.html">
+    <link rel="alternate" hreflang="x-default" href="https://meskeia.com/Aplicaciones/NutriSalud/nutrisalud.html">
+    
+    <!-- Structured Data - WebApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "NutriSalud",
+        "description": "Aplicación web educativa para el aprendizaje de nutrición avanzada basada en evidencia científica",
+        "url": "https://meskeia.com/Aplicaciones/NutriSalud/nutrisalud.html",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+        },
+        "provider": {
+            "@type": "Organization",
+            "name": "meskeIA",
+            "url": "https://meskeia.com"
+        },
+        "audience": {
+            "@type": "Audience",
+            "audienceType": "adults interested in nutrition science"
+        },
+        "educationalLevel": "intermediate to advanced",
+        "inLanguage": "es"
+    }
+    </script>
+    
+    <!-- Structured Data - FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "¿Qué es NutriSalud?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "NutriSalud es una herramienta educativa que proporciona conocimiento nutricional avanzado basado en ciencia, yendo más allá de los consejos básicos para entender cómo funcionan realmente los nutrientes en el organismo."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "¿Es información médica?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No, NutriSalud es únicamente información educativa e informativa. No sustituye el consejo médico profesional y siempre se debe consultar con profesionales de la salud para decisiones médicas."
+                }
+            }
+        ]
+    }
+    </script>
+    <style>
+        :root {
+            --primary: #2E86AB;
+            --secondary: #A23B72;
+            --accent: #F18F01;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --bg-card: #FFFFFF;
+            --text-primary: #2D3748;
+            --text-secondary: #4A5568;
+            --text-muted: #718096;
+            --border: #E2E8F0;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --focus: rgba(46, 134, 171, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Logo meskeIA */
+        .meskeia-logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .meskeia-logo-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .meskeia-logo-icon {
+            position: relative;
+            width: 32px;
+            height: 32px;
+        }
+
+        .meskeia-neural-network {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 4px;
+        }
+
+        .meskeia-neural-dot {
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #2E86AB, #A23B72);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .meskeia-neural-dot:nth-child(2) { animation-delay: 0.5s; }
+        .meskeia-neural-dot:nth-child(3) { animation-delay: 1s; }
+        .meskeia-neural-dot:nth-child(4) { animation-delay: 1.5s; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .meskeia-logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .meske {
+            background: linear-gradient(135deg, #2E86AB, #A23B72);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ia {
+            color: #F18F01;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-primary);
+            padding: 100px 0 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(46, 134, 171, 0.05), rgba(162, 59, 114, 0.05));
+            z-index: 1;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .category-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(46, 134, 171, 0.15);
+        }
+
+        .category-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .category-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .subcategories {
+            text-align: left;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .subcategories ul {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .subcategories li {
+            padding: 3px 0;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .subcategories li::before {
+            content: '•';
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+        }
+
+        .subcategories a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .subcategories a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        /* Secciones informativas */
+        .info-section {
+            background: var(--bg-card);
+            padding: 80px 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .info-card {
+            padding: 40px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            background: var(--bg-primary);
+        }
+
+        .info-card h3 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 60px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+
+        /* Modal de Consentimiento */
+        .consent-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .consent-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.4s ease-out;
+            border: 2px solid var(--primary);
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .consent-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 14px 14px 0 0;
+        }
+
+        .medical-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        .consent-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .consent-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .consent-body {
+            padding: 30px;
+        }
+
+        .important-notice {
+            background: linear-gradient(135deg, #FFF8E1, #FFF3C4);
+            border: 2px solid #F9A825;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .important-notice h3 {
+            color: #E65100;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .important-notice p {
+            color: #5D4037;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .consent-requirements h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .consent-checkboxes {
+            margin-bottom: 25px;
+        }
+
+        .consent-checkbox {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .consent-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkmark {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 4px;
+            margin-right: 12px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .consent-checkbox input[type="checkbox"]:checked + .checkmark {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .consent-checkbox input[type="checkbox"]:checked + .checkmark::after {
+            content: '✓';
+            position: absolute;
+            top: -2px;
+            left: 4px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .consent-checkbox:hover .checkmark {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(46, 134, 171, 0.1);
+        }
+
+        .emergency-notice {
+            background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+            border: 2px solid #E57373;
+            border-radius: 12px;
+            padding: 15px;
+            color: #C62828;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-top: 20px;
+        }
+
+        .legal-references {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .legal-links {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .legal-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .legal-links a:hover {
+            text-decoration: underline;
+            color: var(--secondary);
+        }
+
+        .consent-footer {
+            padding: 20px 30px;
+            background: var(--bg-secondary);
+            border-radius: 0 0 14px 14px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .btn-decline, .btn-accept {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-decline {
+            background: var(--text-muted);
+            color: white;
+        }
+
+        .btn-decline:hover {
+            background: var(--text-secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-accept {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            opacity: 0.6;
+        }
+
+        .btn-accept:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 134, 171, 0.3);
+        }
+
+        .btn-accept:disabled {
+            cursor: not-allowed;
+        }
+
+        /* Disclaimers permanentes */
+        .medical-disclaimer-header {
+            background: linear-gradient(135deg, #E8F5E8, #F1F8E9);
+            border-bottom: 3px solid #4CAF50;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .medical-disclaimer-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #2E7D32;
+            text-align: center;
+        }
+
+        .medical-disclaimer-icon {
+            font-size: 1.2rem;
+            animation: pulse 2s infinite;
+        }
+
+        .medical-disclaimer-footer {
+            background: linear-gradient(135deg, #FFF8E1, #FFF3C4);
+            border-top: 2px solid #FF9800;
+            padding: 12px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 998;
+        }
+
+        .medical-disclaimer-footer .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #E65100;
+            text-align: center;
+        }
+
+        .medical-disclaimer-footer .medical-icon {
+            font-size: 1rem;
+        }
+
+        /* Modal informativo */
+        .info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .info-modal-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.4s ease-out;
+            border: 2px solid var(--accent);
+        }
+
+        .info-modal-header {
+            background: linear-gradient(135deg, var(--accent), #FF6B35);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-radius: 14px 14px 0 0;
+        }
+
+        .info-modal-header .info-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .info-modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .info-modal-body {
+            padding: 25px;
+        }
+
+        .info-modal-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .info-modal-footer {
+            padding: 15px 25px;
+            background: var(--bg-secondary);
+            border-radius: 0 0 14px 14px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-info-continue {
+            background: linear-gradient(135deg, var(--accent), #FF6B35);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-info-continue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(241, 143, 1, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .consent-content {
+                width: 95%;
+                margin: 20px;
+            }
+
+            .consent-header {
+                padding: 20px;
+            }
+
+            .consent-body {
+                padding: 20px;
+            }
+
+            .consent-footer {
+                padding: 15px 20px;
+                flex-direction: column;
+            }
+
+            .btn-decline, .btn-accept {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .medical-disclaimer-content {
+                flex-direction: column;
+                gap: 8px;
+                padding: 0 15px;
+            }
+
+            .medical-disclaimer-footer .container {
+                flex-direction: column;
+                gap: 5px;
+                padding: 0 15px;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .header p {
+                font-size: 1.1rem;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .category-card {
+                padding: 30px 20px;
+            }
+
+            .meskeia-logo-container {
+                top: 10px;
+                left: 10px;
+                padding: 8px 15px;
+            }
+
+            .meskeia-logo-text {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal de Consentimiento Médico -->
+    <div id="consentModal" class="consent-modal">
+        <div class="consent-content">
+            <div class="consent-header">
+                <div class="medical-icon">⚕️</div>
+                <h2>Acceso a NutriSalud</h2>
+                <p class="consent-subtitle">Información Nutricional Educativa</p>
+            </div>
+            
+            <div class="consent-body">
+                <div class="important-notice">
+                    <h3>📋 Aviso Importante</h3>
+                    <p><strong>NutriSalud es una herramienta educativa e informativa</strong> que proporciona conocimiento nutricional basado en literatura científica. <strong>NO sustituye el consejo médico profesional.</strong></p>
+                </div>
+                
+                <div class="consent-requirements">
+                    <h3>✅ Requisitos de Acceso</h3>
+                    <div class="consent-checkboxes">
+                        <label class="consent-checkbox">
+                            <input type="checkbox" id="consent-age" required>
+                            <span class="checkmark"></span>
+                            <span>Confirmo tener <strong>18 años o más</strong></span>
+                        </label>
+                        
+                        <label class="consent-checkbox">
+                            <input type="checkbox" id="consent-educational" required>
+                            <span class="checkmark"></span>
+                            <span>Entiendo que es <strong>solo información educativa</strong></span>
+                        </label>
+                        
+                        <label class="consent-checkbox">
+                            <input type="checkbox" id="consent-medical" required>
+                            <span class="checkmark"></span>
+                            <span>Consultaré con <strong>profesionales médicos</strong> para decisiones de salud</span>
+                        </label>
+                        
+                        <label class="consent-checkbox">
+                            <input type="checkbox" id="consent-diagnosis" required>
+                            <span class="checkmark"></span>
+                            <span><strong>No busco diagnósticos</strong> ni tratamientos médicos</span>
+                        </label>
+                        
+                        <label class="consent-checkbox">
+                            <input type="checkbox" id="consent-responsibility" required>
+                            <span class="checkmark"></span>
+                            <span>Acepto la <strong>responsabilidad personal</strong> de su uso</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="emergency-notice">
+                    <strong>🚨 Emergencias Médicas:</strong> En caso de síntomas graves o emergencias, contacte inmediatamente con servicios de emergencia (112) o acuda al centro médico más cercano.
+                </div>
+                
+                <div class="legal-references">
+                    <p class="legal-links">Al acceder acepta nuestros 
+                        <a href="https://meskeia.com/terminos.html" target="_blank">Términos de Uso</a> y 
+                        <a href="https://meskeia.com/privacidad.html" target="_blank">Política de Privacidad</a>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="consent-footer">
+                <button type="button" class="btn-decline" onclick="declineAccess()">Volver a meskeIA</button>
+                <button type="button" class="btn-accept" id="acceptBtn" onclick="acceptConsent()" disabled>Acceder a NutriSalud</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal informativo para secciones críticas -->
+    <div id="infoModal" class="info-modal">
+        <div class="info-modal-content">
+            <div class="info-modal-header">
+                <div class="info-icon">📚</div>
+                <h3 id="infoModalTitle">Información Importante</h3>
+            </div>
+            <div class="info-modal-body">
+                <p class="info-modal-text" id="infoModalText">
+                    Esta sección contiene información nutricional avanzada. Recuerda que es contenido educativo y no debe usarse como sustituto del consejo médico profesional.
+                </p>
+            </div>
+            <div class="info-modal-footer">
+                <button type="button" class="btn-info-continue" onclick="closeInfoModal()">Entendido, continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal (inicialmente oculto) -->
+    <div id="mainContent" style="display: none;">
+        
+    <!-- Disclaimer médico permanente superior -->
+    <div class="medical-disclaimer-header">
+        <div class="container">
+            <div class="medical-disclaimer-content">
+                <div class="medical-disclaimer-icon">⚕️</div>
+                <div><strong>NutriSalud es información educativa.</strong> Consulta siempre con profesionales médicos para decisiones de salud.</div>
+            </div>
+        </div>
+    </div>
+        
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='https://meskeia.com'" style="cursor: pointer;">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1>NutriSalud: Nutrición Avanzada Basada en Ciencia</h1>
+                <p>
+                    Descubre la diferencia entre "comer" y "nutrirse" a través de conocimiento nutricional 
+                    avanzado basado en ciencia. Más allá de los consejos básicos que ya conoces.
+                </p>
+        </div>
+    </header>
+
+    <!-- Categorías principales -->
+    <section class="categories-section">
+        <div class="container">
+            <h2 class="section-title">Explora el Conocimiento Nutricional Avanzado</h2>
+            <p class="section-subtitle">
+                Cuatro pilares fundamentales para entender cómo funciona realmente la nutrición en tu organismo
+            </p>
+
+            <div class="categories-grid">
+                <!-- Fundamentos Esenciales -->
+                <div class="category-card" onclick="navigateToCategory('fundamentos')" itemscope itemtype="https://schema.org/Course">
+                    <div class="category-icon" role="img" aria-label="Icono de ADN representando fundamentos científicos">🧬</div>
+                    <h3 class="category-title" itemprop="name">Fundamentos Esenciales de la Nutrición</h3>
+                    <p class="category-description" itemprop="description">
+                        Comprende las bases científicas de la nutrición más allá de los conceptos básicos que ya conoces.
+                    </p>
+                    <div class="subcategories">
+                        <strong>Incluye:</strong>
+                        <ul>
+                            <li><a href="fundamentos/diferencia-comer-nutrirse.html">Diferencia entre comer y nutrirse</a></li>
+                            <li><a href="fundamentos/macronutrientes-profundidad.html">Macronutrientes en profundidad</a></li>
+                            <li><a href="fundamentos/micronutrientes-biodisponibilidad.html">Micronutrientes y biodisponibilidad</a></li>
+                            <li><a href="fundamentos/sistema-digestivo-laboratorio.html">Tu sistema digestivo como laboratorio</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Interacciones y Sinergias -->
+                <div class="category-card" onclick="navigateToCategory('interacciones')" itemscope itemtype="https://schema.org/Course">
+                    <div class="category-icon" role="img" aria-label="Icono de rayo representando interacciones energéticas">⚡</div>
+                    <h3 class="category-title" itemprop="name">Interacciones y Sinergias Nutricionales</h3>
+                    <p class="category-description" itemprop="description">
+                        Descubre cómo los alimentos se potencian o se inhiben mutuamente en tu organismo.
+                    </p>
+                    <div class="subcategories">
+                        <strong>Incluye:</strong>
+                        <ul>
+                            <li><a href="interacciones/combinaciones-potencian.html">Combinaciones que potencian absorción</a></li>
+                            <li><a href="interacciones/combinaciones-inhiben.html">Combinaciones que la inhiben</a></li>
+                            <li><a href="interacciones/timing-nutricional.html">Timing nutricional óptimo</a></li>
+                            <li><a href="interacciones/matriz-alimentaria.html">La matriz alimentaria importa</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Efectos en Órganos -->
+                <div class="category-card" onclick="navigateToCategory('organos')" itemscope itemtype="https://schema.org/Course">
+                    <div class="category-icon" role="img" aria-label="Icono de corazón representando salud de órganos">❤️</div>
+                    <h3 class="category-title" itemprop="name">Efectos en Órganos y Sistemas</h3>
+                    <p class="category-description" itemprop="description">
+                        Entiende cómo diferentes alimentos afectan específicamente a cada sistema de tu cuerpo.
+                    </p>
+                    <div class="subcategories">
+                        <strong>Incluye:</strong>
+                        <ul>
+                            <li><a href="organos/higado-metabolismo.html">Hígado y metabolismo</a></li>
+                            <li><a href="organos/intestino-microbiota.html">Intestino y microbiota</a></li>
+                            <li><a href="organos/sistema-cardiovascular.html">Sistema cardiovascular</a></li>
+                            <li><a href="organos/cerebro-neurotransmisores.html">Cerebro y neurotransmisores</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Aplicación Práctica -->
+                <div class="category-card" onclick="navigateToCategory('aplicacion')" itemscope itemtype="https://schema.org/Course">
+                    <div class="category-icon" role="img" aria-label="Icono de diana representando aplicación práctica">🎯</div>
+                    <h3 class="category-title" itemprop="name">Aplicación Práctica de la Nutrición</h3>
+                    <p class="category-description" itemprop="description">
+                        Herramientas y conocimientos para aplicar toda esta información en tu día a día.
+                    </p>
+                    <div class="subcategories">
+                        <strong>Incluye:</strong>
+                        <ul>
+                            <li><a href="aplicacion/calculadora-nutricional-inteligente.html">Calculadora nutricional inteligente</a></li>
+                            <li><a href="aplicacion/lectura-critica-etiquetas.html">Lectura crítica de etiquetas</a></li>
+                            <li><a href="aplicacion/mitos-nutricionales-desmontados.html">Mitos nutricionales desmontados</a></li>
+                            <li><a href="aplicacion/planificacion-personalizada.html">Planificación personalizada</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Breadcrumbs -->
+    <nav aria-label="Navegación por migas de pan" style="background: var(--bg-secondary); padding: 15px 0;">
+        <div class="container">
+            <ol itemscope itemtype="https://schema.org/BreadcrumbList" style="margin: 0; padding: 0; list-style: none; display: flex; gap: 8px; font-size: 0.9rem; color: var(--text-secondary);">
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                    <a itemprop="item" href="https://meskeia.com" style="color: var(--primary); text-decoration: none;">
+                        <span itemprop="name">meskeIA</span>
+                    </a>
+                    <meta itemprop="position" content="1" />
+                    <span style="margin-left: 8px;">></span>
+                </li>
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" style="margin-left: 8px;">
+                    <span itemprop="name" style="color: var(--text-primary); font-weight: 500;">NutriSalud</span>
+                    <meta itemprop="position" content="2" />
+                </li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Secciones informativas -->
+    <section class="info-section" itemscope itemtype="https://schema.org/AboutPage">
+        <div class="container">
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>¿Por qué va más allá de lo básico?</h3>
+                    <p>
+                        La mayoría de información nutricional se queda en "come verduras" o "evita azúcares". 
+                        Aquí entenderás <strong>por qué</strong> ciertos alimentos funcionan, <strong>cómo</strong> 
+                        interactúan entre sí, y <strong>cuándo</strong> es mejor consumirlos para maximizar sus beneficios.
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Enfoque científico, lenguaje accesible</h3>
+                    <p>
+                        Cada concepto está respaldado por investigación científica actual, pero explicado de manera 
+                        que puedas entenderlo y aplicarlo sin necesidad de ser un experto en nutrición. 
+                        <strong>Conocimiento profundo, aplicación práctica.</strong>
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Tu cuerpo es único</h3>
+                    <p>
+                        No existe una dieta universal perfecta. Entender cómo funcionan los nutrientes te permite 
+                        <strong>personalizar tu alimentación</strong> según tus necesidades específicas, objetivos 
+                        de salud, y características individuales. El conocimiento te da la libertad de tomar decisiones informadas.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disclaimer médico permanente inferior -->
+    <div class="medical-disclaimer-footer">
+        <div class="container">
+            <div class="medical-icon">⚠️</div>
+            <div><strong>Importante:</strong> NutriSalud es solo información educativa. No sustituye el consejo médico profesional.</div>
+        </div>
+    </div>
+
+    <!-- Secciones Educativas meskeIA -->
+    <style>
+        .meskeia-edu-section {
+            max-width: 800px;
+            margin: 3rem auto 2rem;
+            padding: 2rem;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(46, 134, 171, 0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+        .meskeia-edu-section h2 {
+            color: #2E86AB;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #48A9A6;
+            padding-bottom: 0.5rem;
+        }
+        .meskeia-edu-section p {
+            color: #1A1A1A;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .meskeia-edu-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .meskeia-edu-section li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #1A1A1A;
+        }
+        .meskeia-edu-section li:before {
+            content: "→";
+            color: #48A9A6;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .meskeia-edu-section strong {
+            color: #2E86AB;
+        }
+        @media (max-width: 768px) {
+            .meskeia-edu-section {
+                margin: 2rem 1rem 1.5rem;
+                padding: 1.5rem;
+            }
+            .meskeia-edu-section h2 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+
+    <div class="meskeia-edu-section">
+        <h2>¿Cómo funciona esta nutrisalud?</h2>
+        <p>Herramienta especializada en nutrisalud. Proporciona cálculos y análisis precisos para facilitar tu trabajo.</p>
+        <ul>
+            <li><strong>Función principal</strong>: Realiza cálculos especializados de forma rápida</li>
+            <li><strong>Interfaz intuitiva</strong>: Diseño simple y fácil de usar sin curva de aprendizaje</li>
+            <li><strong>Resultados instantáneos</strong>: Obtén respuestas al momento sin esperas</li>
+            <li><strong>100% gratuito</strong>: Sin registro, sin límites, sin costos ocultos</li>
+        </ul>
+    </div>
+
+    <div class="meskeia-edu-section">
+        <h2>Casos de uso prácticos</h2>
+        <ul>
+            <li><strong>Uso profesional</strong>: Aplica en tu trabajo diario para ahorrar tiempo</li>
+            <li><strong>Estudios</strong>: Ayuda en tareas académicas y proyectos</li>
+            <li><strong>Vida cotidiana</strong>: Resuelve situaciones comunes del día a día</li>
+            <li><strong>Toma de decisiones</strong>: Obtén datos precisos para decidir mejor</li>
+        </ul>
+    </div>
+
+    <!-- Footer meskeIA -->
+    <footer style="position: fixed; bottom: 55px; right: 20px; color: #2d3748; font-size: 0.8rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.95); padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
+        <div>© 2025 meskeIA</div>
+        <div style="margin-top: 4px;">
+            <a href="https://meskeia.com/terminos.html" target="_blank" style="color: #2E86AB; text-decoration: none; font-size: 0.75rem;">Términos</a> | 
+            <a href="https://meskeia.com/privacidad.html" target="_blank" style="color: #2E86AB; text-decoration: none; font-size: 0.75rem;">Privacidad</a>
+        </div>
+    </footer>
+
+    <script>
+        // Navegación a categorías
+        function navigateToCategory(category) {
+            const categoryInfo = {
+                'fundamentos': {
+                    url: 'fundamentos/diferencia-comer-nutrirse.html',
+                    title: 'Fundamentos Esenciales',
+                    description: 'Vas a acceder a información nutricional avanzada sobre los fundamentos de la nutrición. Esta sección incluye conceptos científicos que complementan tus conocimientos básicos.'
+                },
+                'interacciones': {
+                    url: 'interacciones/combinaciones-potencian.html',
+                    title: 'Interacciones y Sinergias',
+                    description: 'Esta sección contiene información sobre cómo los alimentos interactúan entre sí en tu organismo. Es información compleja que requiere comprensión del contexto nutricional.'
+                },
+                'organos': {
+                    url: 'organos/higado-metabolismo.html',
+                    title: 'Efectos en Órganos',
+                    description: 'Vas a acceder a información sobre cómo los alimentos afectan específicamente a diferentes órganos y sistemas corporales. Este contenido es puramente educativo.'
+                },
+                'aplicacion': {
+                    url: 'aplicacion/mitos-nutricionales-desmontados.html',
+                    title: 'Aplicación Práctica',
+                    description: 'Esta sección incluye herramientas prácticas y análisis de mitos nutricionales basados en evidencia científica. Recuerda que es información educativa.'
+                }
+            };
+            
+            if (categoryInfo[category]) {
+                showInfoModal(categoryInfo[category].title, categoryInfo[category].description, categoryInfo[category].url);
+            } else {
+                alert(`Navegando a: ${category}\n\nEsta sección se desarrollará en las siguientes fases del proyecto.`);
+            }
+        }
+
+        // Efectos visuales adicionales
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animación suave de aparición para las cards
+            const cards = document.querySelectorAll('.category-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+        });
+
+        // Sistema de Consentimiento
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar consentimiento previo
+            if (!checkExistingConsent()) {
+                showConsentModal();
+            }
+            
+            // Verificar checkboxes para habilitar botón
+            const checkboxes = document.querySelectorAll('.consent-checkboxes input[type="checkbox"]');
+            const acceptBtn = document.getElementById('acceptBtn');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                    acceptBtn.disabled = !allChecked;
+                    acceptBtn.style.opacity = allChecked ? '1' : '0.6';
+                });
+            });
+        });
+
+        function showConsentModal() {
+            document.getElementById('consentModal').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'none';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function acceptConsent() {
+            // Guardar consentimiento en localStorage (válido por 24h)
+            const consentData = {
+                timestamp: Date.now(),
+                version: '1.0'
+            };
+            localStorage.setItem('nutrisalud_consent', JSON.stringify(consentData));
+            
+            // Mostrar contenido principal
+            document.getElementById('consentModal').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.body.style.overflow = 'auto';
+            
+            // Animación de las cards
+            const cards = document.querySelectorAll('.category-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+        }
+
+        function declineAccess() {
+            // Redirigir a meskeIA.com
+            window.location.href = 'https://meskeia.com';
+        }
+
+        // Verificar consentimiento previo
+        function checkExistingConsent() {
+            const consent = localStorage.getItem('nutrisalud_consent');
+            if (consent) {
+                const data = JSON.parse(consent);
+                const now = Date.now();
+                const oneDay = 24 * 60 * 60 * 1000; // 24 horas
+                
+                // Si el consentimiento es válido (menos de 24h)
+                if (now - data.timestamp < oneDay) {
+                    document.getElementById('consentModal').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Modal informativo para secciones críticas
+        let pendingNavigation = null;
+
+        function showInfoModal(title, description, url) {
+            document.getElementById('infoModalTitle').textContent = title;
+            document.getElementById('infoModalText').textContent = description;
+            pendingNavigation = url;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').style.display = 'none';
+            if (pendingNavigation) {
+                window.location.href = pendingNavigation;
+                pendingNavigation = null;
+            }
+        }
+    </script>
+    
+    <!-- Cerrar contenido principal -->
+    </div>
+
+
+    <!-- meskeIA Analytics - Tracking de uso -->
+    <script>
+        (async function() {
+            const nombreApp = 'nutrisalud';
+
+            const datos = {
+                aplicacion: nombreApp,
+                navegador: navigator.userAgent,
+                sistema_operativo: navigator.platform,
+                resolucion: `${window.screen.width}x${window.screen.height}`
+            };
+
+            try {
+                await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                console.log('✅ Uso registrado en meskeIA Analytics');
+            } catch (error) {
+                // Silencioso: no mostrar errores al usuario
+                console.error('Error al registrar uso:', error);
+            }
+        })();
+    </script>
+    <!-- FAQs visibles extraídas de Schema.org -->
+    <div style="max-width: 900px; margin: 2rem auto 2rem; padding: 0 20px;">
+        <div style="background: var(--bg-card); border-radius: 20px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); margin-bottom: 2rem;">
+            <h2 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">❓ Preguntas Frecuentes</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Qué es NutriSalud?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">NutriSalud es una herramienta educativa que proporciona conocimiento nutricional avanzado basado en ciencia, yendo más allá de los consejos básicos para entender cómo funcionan realmente los nutrientes en el organismo.</p>
+                </details>
+                
+                <details style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--hover);">
+                    <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer; margin-bottom: 0.5rem;">¿Es información médica?</summary>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">No, NutriSalud es únicamente información educativa e informativa. No sustituye el consejo médico profesional y siempre se debe consultar con profesionales de la salud para decisiones médicas.</p>
+                </details>
+                
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
