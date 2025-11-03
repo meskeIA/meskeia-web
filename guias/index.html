@@ -74,6 +74,7 @@
             padding: 8px 16px;
             box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
         .meskeia-logo-container:hover {
             transform: scale(1.02);
@@ -152,103 +153,69 @@
             border-radius: 1px;
         }
 
-        /* Header */
-        .header {
+        .container {
             max-width: 1200px;
-            margin: 0 auto 3rem;
-            padding: 0 20px;
-            text-align: center;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
-        .header h1 {
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
             font-size: 2.5rem;
             color: var(--primary);
             margin-bottom: 1rem;
-            font-weight: 700;
         }
 
-        .header p {
-            font-size: 1.1rem;
+        .subtitle {
+            font-size: 1.2rem;
             color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto;
+            margin-bottom: 2rem;
         }
 
-        /* Buscador y filtros */
-        .controls {
-            max-width: 1200px;
-            margin: 0 auto 2rem;
-            padding: 0 20px;
-        }
-
-        .search-box {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 1rem 3rem 1rem 1.5rem;
-            font-size: 1rem;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: var(--focus);
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1.3rem;
-        }
-
-        /* Filtros de categoría */
-        .filters {
+        .stats {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
             justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
 
-        .filter-btn {
-            padding: 0.6rem 1.2rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .stat {
+            text-align: center;
         }
 
-        .filter-btn:hover {
-            background: var(--hover);
-            border-color: var(--primary);
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
             color: var(--primary);
         }
 
-        .filter-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
         }
 
-        /* Grid de guías */
-        .guides-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--focus);
         }
 
         .category-section {
@@ -256,84 +223,54 @@
         }
 
         .category-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: var(--primary);
             margin-bottom: 1.5rem;
             padding-bottom: 0.5rem;
-            border-bottom: 3px solid var(--border);
-            font-weight: 600;
+            border-bottom: 2px solid var(--border);
         }
 
         .guides-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1.5rem;
         }
 
         .guide-card {
             background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
             padding: 1.5rem;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            border: 1px solid var(--border);
             text-decoration: none;
             color: var(--text-primary);
-            display: flex;
-            flex-direction: column;
+            transition: all 0.3s ease;
+            display: block;
         }
 
         .guide-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(46, 134, 171, 0.15);
+            box-shadow: 0 8px 20px rgba(46, 134, 171, 0.15);
             border-color: var(--primary);
         }
 
-        .guide-card h3 {
-            font-size: 1.25rem;
-            color: var(--primary);
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-        }
-
-        .guide-card p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
+        .guide-icon {
+            font-size: 2.5rem;
             margin-bottom: 1rem;
-            flex-grow: 1;
         }
 
-        .guide-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .guide-badge {
-            background: var(--secondary);
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
+        .guide-title {
+            font-size: 1.1rem;
             font-weight: 600;
-        }
-
-        /* Estado vacío */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-muted);
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
             margin-bottom: 0.5rem;
+            color: var(--text-primary);
         }
 
-        /* Responsive */
+        .guide-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
         @media (max-width: 768px) {
             .meskeia-logo-container {
                 top: 10px;
@@ -341,51 +278,25 @@
                 padding: 6px 12px;
                 gap: 8px;
             }
-            .meskeia-logo-icon {
-                width: 24px;
-                height: 24px;
-            }
-            .meskeia-logo-icon::before {
-                width: 9px;
-                height: 9px;
-                top: 7.5px;
-                left: 7.5px;
-            }
-            .meskeia-logo-icon::after {
-                width: 4px;
-                height: 4px;
-                top: 10px;
-                left: 10px;
-            }
-            .meskeia-logo-text {
-                font-size: 1rem;
-            }
 
-            body {
-                padding-top: 60px;
-            }
-
-            .header h1 {
+            h1 {
                 font-size: 1.8rem;
             }
 
-            .header p {
-                font-size: 1rem;
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
             }
 
             .guides-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .category-title {
-                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
     <!-- Logo meskeIA -->
-    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'">
         <div class="meskeia-logo-icon">
             <div class="meskeia-neural-network">
                 <div class="meskeia-neural-dot"></div>
@@ -399,302 +310,570 @@
         </div>
     </div>
 
-    <!-- Header -->
-    <div class="header">
-        <h1>📚 Guías Educativas meskeIA</h1>
-        <p>Aprende a usar todas las herramientas de meskeIA con tutoriales completos, ejemplos prácticos y mejores prácticas</p>
+    <div class="container">
+        <header class="header">
+            <h1>📚 Guías Educativas meskeIA</h1>
+            <p class="subtitle">Tutoriales completos para dominar todas nuestras herramientas</p>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">86</div>
+                    <div class="stat-label">Guías Disponibles</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Categorías</div>
+                </div>
+            </div>
+
+            <div class="search-box">
+                <input
+                    type="text"
+                    class="search-input"
+                    id="searchInput"
+                    placeholder="Buscar guías... (Ej: calculadora, finanzas)"
+                    onkeyup="filterGuides()"
+                >
+            </div>
+        </header>
+
+        <main id="guidesContainer">
+
+            <div class="category-section">
+                <h2 class="category-title">Calculadoras y Utilidades</h2>
+                <div class="guides-grid">
+                    <a href="calculadoras-y-utilidades/calculadora-simple-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora Simple</h3>
+                        <p class="guide-description">Calculadora básica con operaciones aritméticas, porcentajes y funciones científicas....</p>
+                    </a>
+                    <a href="calculadoras-y-utilidades/calculadora-fechas-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Fechas</h3>
+                        <p class="guide-description">Calcula diferencias entre fechas, suma/resta tiempo y encuentra fechas futuras/pasadas....</p>
+                    </a>
+                    <a href="calculadoras-y-utilidades/calculadora-porcentajes-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Porcentajes</h3>
+                        <p class="guide-description">Calcula porcentajes, aumentos, descuentos y variación porcentual....</p>
+                    </a>
+                    <a href="calculadoras-y-utilidades/calculadora-propinas-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Propinas</h3>
+                        <p class="guide-description">Calcula propinas según porcentaje y divide cuenta entre comensales....</p>
+                    </a>
+                    <a href="calculadoras-y-utilidades/calculadora-cocina-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Conversor de Cocina</h3>
+                        <p class="guide-description">Convierte medidas culinarias: gramos a tazas, ml a cucharadas según ingrediente....</p>
+                    </a>
+                    <a href="calculadoras-y-utilidades/conversor-divisas-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Conversor de Divisas</h3>
+                        <p class="guide-description">Convierte entre monedas internacionales con tipos de cambio actualizados....</p>
+                    </a>
+                    <a href="calculadoras-y-utilidades/conversor-tallas-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Conversor de Tallas</h3>
+                        <p class="guide-description">Convierte tallas de ropa y calzado entre sistemas (US, EU, UK, Asia)....</p>
+                    </a>
+                    <a href="calculadoras-y-utilidades/conversor-unidades-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Conversor de Unidades</h3>
+                        <p class="guide-description">Convierte unidades de longitud, peso, temperatura, volumen, velocidad y más....</p>
+                    </a>
+                    <a href="calculadoras-y-utilidades/lista-compras-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Lista de Compras</h3>
+                        <p class="guide-description">Lista de compras interactiva con categorías, cantidades y marcar comprados....</p>
+                    </a>
+                    <a href="calculadoras-y-utilidades/regla-de-tres-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Regla de Tres</h3>
+                        <p class="guide-description">Resuelve regla de tres simple directa e inversa con explicación paso a paso....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Campus Digital</h2>
+                <div class="guides-grid">
+                    <a href="campus-digital/calculadora-notas-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Notas</h3>
+                        <p class="guide-description">Calcula promedio ponderado de calificaciones con pesos y créditos....</p>
+                    </a>
+                    <a href="campus-digital/creador-flashcards-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Creador de Flashcards</h3>
+                        <p class="guide-description">Crea tarjetas de estudio (flashcards) para memorización con sistema de repaso....</p>
+                    </a>
+                    <a href="campus-digital/curso-decisiones-inversion-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Curso Decisiones de Inversión</h3>
+                        <p class="guide-description">Curso interactivo sobre toma de decisiones de inversión y análisis financiero....</p>
+                    </a>
+                    <a href="campus-digital/curso-emprendimiento-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Curso de Emprendimiento</h3>
+                        <p class="guide-description">Curso paso a paso para emprendedores: desde la idea hasta la ejecución del negocio....</p>
+                    </a>
+                    <a href="campus-digital/generador-horarios-estudio-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Generador de Horarios de Estudio</h3>
+                        <p class="guide-description">Planifica horarios de estudio distribuyendo materias según prioridad y tiempo disponible....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Creatividad y Diseño</h2>
+                <div class="guides-grid">
+                    <a href="creatividad-y-diseño/calculadora-aspectos-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Aspectos de Imagen</h3>
+                        <p class="guide-description">Calcula dimensiones proporcionales para redimensionar imágenes sin deformar (aspect ratio)....</p>
+                    </a>
+                    <a href="creatividad-y-diseño/contraste-colores-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Contraste de Colores</h3>
+                        <p class="guide-description">Verifica contraste según WCAG para accesibilidad web entre texto y fondo....</p>
+                    </a>
+                    <a href="creatividad-y-diseño/convertidor-colores-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Convertidor de Colores</h3>
+                        <p class="guide-description">Convierte entre formatos de color: HEX, RGB, HSL, CMYK con preview en tiempo real....</p>
+                    </a>
+                    <a href="creatividad-y-diseño/creador-paletas-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Creador de Paletas</h3>
+                        <p class="guide-description">Genera paletas de colores armoniosas con esquemas complementarios, análogos y triádicos....</p>
+                    </a>
+                    <a href="creatividad-y-diseño/generador-gradientes-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Generador de Gradientes</h3>
+                        <p class="guide-description">Crea gradientes CSS lineales, radiales y cónicos con presets y código listo para copiar....</p>
+                    </a>
+                    <a href="creatividad-y-diseño/generador-sombras-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Generador de Sombras</h3>
+                        <p class="guide-description">Crea sombras CSS (box-shadow) con control de difuminado, desplazamiento y color....</p>
+                    </a>
+                    <a href="creatividad-y-diseño/generador-tipografias-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Generador de Tipografías</h3>
+                        <p class="guide-description">Prueba combinaciones de Google Fonts con preview en tiempo real y pairings recomendados....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Emprendimiento y Negocios</h2>
+                <div class="guides-grid">
+                    <a href="emprendimiento-y-negocios/calculadora-roi-marketing-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de ROI de Marketing</h3>
+                        <p class="guide-description">Calcula Retorno de Inversión en campañas de marketing y publicidad digital....</p>
+                    </a>
+                    <a href="emprendimiento-y-negocios/calculadora-tarifa-freelance-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Tarifa Freelance</h3>
+                        <p class="guide-description">Calcula tarifa por hora como freelance según gastos, objetivos y tiempo disponible....</p>
+                    </a>
+                    <a href="emprendimiento-y-negocios/generador-nombres-empresa-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Generador de Nombres de Empresa</h3>
+                        <p class="guide-description">Genera nombres creativos para empresas, marcas y startups con disponibilidad de dominio....</p>
+                    </a>
+                    <a href="emprendimiento-y-negocios/margen-equilibrio-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Margen de Equilibrio (Break-Even)</h3>
+                        <p class="guide-description">Calcula punto de equilibrio empresarial entre costos fijos, variables y ventas....</p>
+                    </a>
+                    <a href="emprendimiento-y-negocios/planificador-cashflow-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Planificador de Cash Flow</h3>
+                        <p class="guide-description">Planifica flujo de caja mensual para negocios y finanzas empresariales....</p>
+                    </a>
+                    <a href="emprendimiento-y-negocios/simulador-gastos-deducibles-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Simulador de Gastos Deducibles</h3>
+                        <p class="guide-description">Calcula gastos deducibles para autónomos y empresas en declaración de impuestos....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Finanzas y Fiscalidad</h2>
+                <div class="guides-grid">
+                    <a href="finanzas-y-fiscalidad/calculadora-inversiones-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Inversiones</h3>
+                        <p class="guide-description">Simula rendimiento con interés compuesto, aportaciones periódicas y múltiples escenarios de inversió...</p>
+                    </a>
+                    <a href="finanzas-y-fiscalidad/calculadora-jubilacion-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Jubilación</h3>
+                        <p class="guide-description">Estima pensión futura, gap de ingresos y ahorro necesario para mantener nivel de vida en la jubilaci...</p>
+                    </a>
+                    <a href="finanzas-y-fiscalidad/control-gastos-mensual-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Control de Gastos Mensual</h3>
+                        <p class="guide-description">Registra y categoriza gastos mensuales para control presupuestario personal....</p>
+                    </a>
+                    <a href="finanzas-y-fiscalidad/impuesto-donaciones-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Impuesto de Donaciones</h3>
+                        <p class="guide-description">Calcula impuesto sobre donaciones según comunidad autónoma en España....</p>
+                    </a>
+                    <a href="finanzas-y-fiscalidad/impuesto-sucesiones-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Impuesto de Sucesiones</h3>
+                        <p class="guide-description">Calcula impuesto de sucesiones y herencias por comunidad autónoma....</p>
+                    </a>
+                    <a href="finanzas-y-fiscalidad/interes-compuesto-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Interés Compuesto</h3>
+                        <p class="guide-description">Calcula crecimiento de capital con interés compuesto, capitalización y rendimientos acumulados....</p>
+                    </a>
+                    <a href="finanzas-y-fiscalidad/simulador-irpf-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Simulador IRPF</h3>
+                        <p class="guide-description">Simula retenciones de IRPF según tramos e ingresos en España....</p>
+                    </a>
+                    <a href="finanzas-y-fiscalidad/simulador-hipoteca-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Simulador de Hipoteca</h3>
+                        <p class="guide-description">Calcula cuotas mensuales, intereses totales y tabla de amortización con sistema francés. Genera repo...</p>
+                    </a>
+                    <a href="finanzas-y-fiscalidad/tir-van-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">TIR y VAN</h3>
+                        <p class="guide-description">Calcula Tasa Interna de Retorno y Valor Actual Neto para evaluación de proyectos de inversión....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Física y Química</h2>
+                <div class="guides-grid">
+                    <a href="física-y-química/calculadora-electricidad-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora Eléctrica</h3>
+                        <p class="guide-description">Calcula Ley de Ohm (V, I, R, P), consumo eléctrico y costos energéticos....</p>
+                    </a>
+                    <a href="física-y-química/calculadora-movimiento-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Movimiento</h3>
+                        <p class="guide-description">Calcula velocidad, distancia, tiempo en física cinemática con múltiples unidades....</p>
+                    </a>
+                    <a href="física-y-química/formulas-quimicas-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Fórmulas Químicas</h3>
+                        <p class="guide-description">Balanceador de ecuaciones químicas y calculadora de masa molar automática....</p>
+                    </a>
+                    <a href="física-y-química/glosario-fisica-quimica-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Glosario de Física y Química</h3>
+                        <p class="guide-description">Diccionario de términos, fórmulas y conceptos de física y química....</p>
+                    </a>
+                    <a href="física-y-química/tabla-periodica-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Tabla Periódica Interactiva</h3>
+                        <p class="guide-description">Tabla periódica interactiva con información detallada de cada elemento químico....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Herramientas Web y Tecnología</h2>
+                <div class="guides-grid">
+                    <a href="herramientas-web-y-tecnología/acortador-url-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Acortador de URLs</h3>
+                        <p class="guide-description">Acorta URLs con almacenamiento local, trackeo de clics y generación de códigos QR....</p>
+                    </a>
+                    <a href="herramientas-web-y-tecnología/conversor-base64-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Conversor Base64</h3>
+                        <p class="guide-description">Codifica y decodifica texto en Base64 para transmisión segura de datos....</p>
+                    </a>
+                    <a href="herramientas-web-y-tecnología/conversor-imagenes-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Conversor de Imágenes</h3>
+                        <p class="guide-description">Convierte formatos de imagen: JPG, PNG, WebP, GIF. Redimensiona y optimiza localmente....</p>
+                    </a>
+                    <a href="herramientas-web-y-tecnología/generador-hash-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Generador de Hash</h3>
+                        <p class="guide-description">Genera hashes MD5, SHA-1, SHA-256, SHA-512 para texto o archivos localmente....</p>
+                    </a>
+                    <a href="herramientas-web-y-tecnología/validador-json-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Validador JSON</h3>
+                        <p class="guide-description">Valida sintaxis JSON, formatea con indentación y muestra errores con línea exacta....</p>
+                    </a>
+                    <a href="herramientas-web-y-tecnología/validador-regex-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Validador de Regex</h3>
+                        <p class="guide-description">Prueba expresiones regulares con texto de ejemplo y resalta coincidencias....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Herramientas de Productividad</h2>
+                <div class="guides-grid">
+                    <a href="herramientas-de-productividad/cronometro-temporizador-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Cronómetro y Temporizador</h3>
+                        <p class="guide-description">Cronómetro preciso y temporizador con alarma para técnicas como Pomodoro....</p>
+                    </a>
+                    <a href="herramientas-de-productividad/cuaderno-digital-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Cuaderno Digital</h3>
+                        <p class="guide-description">Toma notas rápidas con formato Markdown, almacenamiento local y búsqueda....</p>
+                    </a>
+                    <a href="herramientas-de-productividad/generador-contrasenas-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Generador de Contraseñas</h3>
+                        <p class="guide-description">Genera contraseñas seguras con longitud personalizable, símbolos y nivel de seguridad....</p>
+                    </a>
+                    <a href="herramientas-de-productividad/generador-codigos-qr-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Generador de Códigos QR</h3>
+                        <p class="guide-description">Genera códigos QR para URLs, texto, WiFi, vCard. Descarga en PNG de alta resolución....</p>
+                    </a>
+                    <a href="herramientas-de-productividad/generador-texto-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Generador de Texto</h3>
+                        <p class="guide-description">Genera texto Lorem Ipsum o aleatorio para prototipos y diseño....</p>
+                    </a>
+                    <a href="herramientas-de-productividad/lista-tareas-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Gestor de Tareas</h3>
+                        <p class="guide-description">Lista de tareas (to-do list) con prioridades, fechas límite y categorías....</p>
+                    </a>
+                    <a href="herramientas-de-productividad/horario-mundial-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Horario Mundial</h3>
+                        <p class="guide-description">Consulta hora actual en diferentes zonas horarias y convierte entre husos....</p>
+                    </a>
+                    <a href="herramientas-de-productividad/informacion-tiempo-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Información del Tiempo</h3>
+                        <p class="guide-description">Consulta clima actual y pronóstico de múltiples ciudades del mundo....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Juegos y Entretenimiento</h2>
+                <div class="guides-grid">
+                    <a href="juegos-y-entretenimiento/juego-2048-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Juego 2048</h3>
+                        <p class="guide-description">Puzzle matemático: combina números hasta llegar a 2048 deslizando fichas....</p>
+                    </a>
+                    <a href="juegos-y-entretenimiento/juego-memoria-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Juego de Memoria</h3>
+                        <p class="guide-description">Juego de memoria con cartas: encuentra las parejas volteando cartas....</p>
+                    </a>
+                    <a href="juegos-y-entretenimiento/piedra-papel-tijera-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Piedra Papel Tijera</h3>
+                        <p class="guide-description">Juego clásico de piedra, papel o tijera contra la computadora con contador de victorias....</p>
+                    </a>
+                    <a href="juegos-y-entretenimiento/puzzle-matematico-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Puzzle Matemático</h3>
+                        <p class="guide-description">Rompecabezas matemático con operaciones y lógica numérica para resolver....</p>
+                    </a>
+                    <a href="juegos-y-entretenimiento/sudoku-clasico-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Sudoku Clásico</h3>
+                        <p class="guide-description">Sudoku clásico 9x9 con diferentes niveles de dificultad y validación automática....</p>
+                    </a>
+                    <a href="juegos-y-entretenimiento/tres-en-raya-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Tres en Raya</h3>
+                        <p class="guide-description">Juego clásico de tres en raya (tic-tac-toe) contra IA o modo 2 jugadores....</p>
+                    </a>
+                    <a href="juegos-y-entretenimiento/wordle-espanol-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Wordle Español</h3>
+                        <p class="guide-description">Juego de palabras diario: adivina la palabra de 5 letras en 6 intentos con pistas de colores....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Matemáticas y Estadística</h2>
+                <div class="guides-grid">
+                    <a href="matemáticas-y-estadística/calculadora-matematica-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora Matemática</h3>
+                        <p class="guide-description">Calculadora matemática avanzada con funciones trigonométricas, logaritmos y exponenciales....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/calculadora-estadistica-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Estadística</h3>
+                        <p class="guide-description">Media, mediana, moda, desviación estándar, varianza y distribuciones estadísticas....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/algebra-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Álgebra</h3>
+                        <p class="guide-description">Resuelve ecuaciones lineales, sistemas 2x2 y factorización con pasos detallados....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/calculo-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Cálculo Diferencial e Integral</h3>
+                        <p class="guide-description">Resuelve derivadas, integrales y límites con procedimiento paso a paso....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/geometria-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Geometría</h3>
+                        <p class="guide-description">Calcula áreas, perímetros, volúmenes y propiedades de figuras geométricas....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/grafico-funciones-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Gráfico de Funciones</h3>
+                        <p class="guide-description">Grafica funciones matemáticas (polinómicas, trigonométricas, exponenciales) en plano cartesiano....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/investigacion-operativa-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Investigación Operativa</h3>
+                        <p class="guide-description">Optimización lineal, método simplex y teoría de grafos para investigación de operaciones....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/matriz-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Matriz</h3>
+                        <p class="guide-description">Operaciones con matrices: suma, multiplicación, determinante, inversa, transpuesta....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/probabilidad-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Probabilidad</h3>
+                        <p class="guide-description">Calcula probabilidades, combinaciones, permutaciones y distribuciones....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/teoria-numeros-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Teoría de Números</h3>
+                        <p class="guide-description">Números primos, MCD, MCM, factorización y propiedades de teoría de números....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/trigonometria-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Trigonometría</h3>
+                        <p class="guide-description">Calcula funciones trigonométricas, identidades y resuelve triángulos....</p>
+                    </a>
+                    <a href="matemáticas-y-estadística/algebra-abstracta-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Álgebra Abstracta</h3>
+                        <p class="guide-description">Teoría de grupos, anillos y estructuras algebraicas avanzadas para matemáticas universitarias....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Salud & Bienestar</h2>
+                <div class="guides-grid">
+                    <a href="salud-y-bienestar/calculadora-calorias-ejercicio-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Calorías por Ejercicio</h3>
+                        <p class="guide-description">Estima calorías quemadas según ejercicio, duración, peso e intensidad (METs)....</p>
+                    </a>
+                    <a href="salud-y-bienestar/calculadora-hidratacion-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Hidratación</h3>
+                        <p class="guide-description">Calcula necesidad diaria de agua según peso, actividad y clima....</p>
+                    </a>
+                    <a href="salud-y-bienestar/calculadora-sueno-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Calculadora de Sueño</h3>
+                        <p class="guide-description">Calcula mejor hora para despertar según ciclos de sueño de 90 minutos....</p>
+                    </a>
+                    <a href="salud-y-bienestar/evaluador-salud-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Evaluador de Salud</h3>
+                        <p class="guide-description">Cuestionario de hábitos de salud con puntuación y recomendaciones personalizadas....</p>
+                    </a>
+                    <a href="salud-y-bienestar/nutrisalud-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">NutriSalud</h3>
+                        <p class="guide-description">Calculadora nutricional y planificador de dietas con macros y micronutrientes....</p>
+                    </a>
+                    <a href="salud-y-bienestar/indice-masa-corporal-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Índice de Masa Corporal (IMC)</h3>
+                        <p class="guide-description">Calcula IMC y clasifica según OMS: bajo peso, normal, sobrepeso, obesidad....</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2 class="category-title">Texto y Documentos</h2>
+                <div class="guides-grid">
+                    <a href="texto-y-documentos/comparador-textos-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Comparador de Textos</h3>
+                        <p class="guide-description">Compara dos textos y resalta diferencias palabra por palabra (diff)....</p>
+                    </a>
+                    <a href="texto-y-documentos/contador-palabras-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Contador de Palabras</h3>
+                        <p class="guide-description">Cuenta palabras, caracteres, párrafos y estima tiempo de lectura en tiempo real....</p>
+                    </a>
+                    <a href="texto-y-documentos/conversor-texto-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Conversor de Texto</h3>
+                        <p class="guide-description">Transforma texto: mayúsculas, minúsculas, capitalizar, invertir, limpiar formato....</p>
+                    </a>
+                    <a href="texto-y-documentos/limpiador-texto-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Limpiador de Texto</h3>
+                        <p class="guide-description">Limpia espacios duplicados, saltos de línea y caracteres especiales en texto....</p>
+                    </a>
+                    <a href="texto-y-documentos/convertidor-markdown-html-guia.html" class="guide-card">
+                        <div class="guide-icon">📝</div>
+                        <h3 class="guide-title">Markdown a HTML</h3>
+                        <p class="guide-description">Convierte Markdown a HTML con preview en tiempo real y código copiable....</p>
+                    </a>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <!-- Controles de búsqueda y filtros -->
-    <div class="controls">
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar guías por nombre o categoría..." autocomplete="off">
-            <span class="search-icon">🔍</span>
-        </div>
-
-        <div class="filters">
-            <button class="filter-btn active" data-category="todas">Todas</button>
-            <button class="filter-btn" data-category="finanzas">Finanzas</button>
-            <button class="filter-btn" data-category="calculadoras">Calculadoras</button>
-            <button class="filter-btn" data-category="salud">Salud & Bienestar</button>
-            <button class="filter-btn" data-category="productividad">Productividad</button>
-            <button class="filter-btn" data-category="emprendimiento">Emprendimiento</button>
-            <button class="filter-btn" data-category="web">Herramientas Web</button>
-            <button class="filter-btn" data-category="creatividad">Creatividad</button>
-        </div>
-    </div>
-
-    <!-- Contenedor de guías (se generará dinámicamente) -->
-    <div class="guides-container" id="guidesContainer">
-        <!-- Se cargará con JavaScript -->
-    </div>
-
-    <!-- Footer meskeIA -->
-    <footer style="position: fixed; bottom: 10px; right: 20px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <footer style="position: fixed; bottom: 10px; right: 20px; color: #2d3748; font-size: 0.9rem; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
         © 2025 meskeIA
     </footer>
 
     <script>
-        // Base de datos de guías (se actualizará automáticamente)
-        const guiasDB = [
-            {
-                slug: "simulador-hipoteca",
-                nombre: "Simulador de Hipoteca",
-                categoria: "finanzas",
-                categoriaDisplay: "Finanzas y Fiscalidad",
-                descripcion: "Calcula y simula tu hipoteca con diferentes escenarios de tipos de interés y plazos",
-                path: "finanzas-y-fiscalidad/simulador-hipoteca-guia.html"
-            },
-            {
-                slug: "calculadora-inversiones",
-                nombre: "Calculadora de Inversiones",
-                categoria: "finanzas",
-                categoriaDisplay: "Finanzas y Fiscalidad",
-                descripcion: "Simula el crecimiento de tus inversiones con interés compuesto y aportaciones periódicas",
-                path: "finanzas-y-fiscalidad/calculadora-inversiones-guia.html"
-            },
-            {
-                slug: "calculadora-jubilacion",
-                nombre: "Calculadora de Jubilación",
-                categoria: "finanzas",
-                categoriaDisplay: "Finanzas y Fiscalidad",
-                descripcion: "Planifica tu jubilación y estima el ahorro necesario para tu retiro",
-                path: "finanzas-y-fiscalidad/calculadora-jubilacion-guia.html"
-            },
-            {
-                slug: "interes-compuesto",
-                nombre: "Interés Compuesto",
-                categoria: "finanzas",
-                categoriaDisplay: "Finanzas y Fiscalidad",
-                descripcion: "Entiende y calcula el poder del interés compuesto en tus inversiones",
-                path: "finanzas-y-fiscalidad/interes-compuesto-guia.html"
-            },
-            {
-                slug: "calculadora-porcentajes",
-                nombre: "Calculadora de Porcentajes",
-                categoria: "calculadoras",
-                categoriaDisplay: "Calculadoras y Utilidades",
-                descripcion: "Calcula porcentajes, descuentos, incrementos y variaciones porcentuales",
-                path: "calculadoras-y-utilidades/calculadora-porcentajes-guia.html"
-            },
-            {
-                slug: "regla-de-tres",
-                nombre: "Regla de Tres",
-                categoria: "calculadoras",
-                categoriaDisplay: "Calculadoras y Utilidades",
-                descripcion: "Resuelve problemas de proporcionalidad directa e inversa de forma rápida",
-                path: "calculadoras-y-utilidades/regla-de-tres-guia.html"
-            },
-            {
-                slug: "conversor-unidades",
-                nombre: "Conversor de Unidades",
-                categoria: "calculadoras",
-                categoriaDisplay: "Calculadoras y Utilidades",
-                descripcion: "Convierte entre diferentes unidades de medida (longitud, masa, temperatura, etc.)",
-                path: "calculadoras-y-utilidades/conversor-unidades-guia.html"
-            },
-            {
-                slug: "calculadora-fechas",
-                nombre: "Calculadora de Fechas",
-                categoria: "calculadoras",
-                categoriaDisplay: "Calculadoras y Utilidades",
-                descripcion: "Calcula diferencias entre fechas, añade o resta días, semanas o meses",
-                path: "calculadoras-y-utilidades/calculadora-fechas-guia.html"
-            },
-            {
-                slug: "calculadora-calorias-ejercicio",
-                nombre: "Calculadora de Calorías por Ejercicio",
-                categoria: "salud",
-                categoriaDisplay: "Salud & Bienestar",
-                descripcion: "Estima las calorías quemadas en diferentes actividades físicas",
-                path: "salud-y-bienestar/calculadora-calorias-ejercicio-guia.html"
-            },
-            {
-                slug: "indice-masa-corporal",
-                nombre: "Índice de Masa Corporal (IMC)",
-                categoria: "salud",
-                categoriaDisplay: "Salud & Bienestar",
-                descripcion: "Calcula tu IMC y descubre si estás en tu peso ideal",
-                path: "salud-y-bienestar/indice-masa-corporal-guia.html"
-            },
-            {
-                slug: "calculadora-hidratacion",
-                nombre: "Calculadora de Hidratación",
-                categoria: "salud",
-                categoriaDisplay: "Salud & Bienestar",
-                descripcion: "Descubre cuánta agua necesitas beber diariamente según tu actividad",
-                path: "salud-y-bienestar/calculadora-hidratacion-guia.html"
-            },
-            {
-                slug: "cronometro-temporizador",
-                nombre: "Cronómetro y Temporizador",
-                categoria: "productividad",
-                categoriaDisplay: "Herramientas de Productividad",
-                descripcion: "Mide el tiempo con cronómetro o establece temporizadores para tus tareas",
-                path: "herramientas-de-productividad/cronometro-temporizador-guia.html"
-            },
-            {
-                slug: "lista-tareas",
-                nombre: "Gestor de Tareas",
-                categoria: "productividad",
-                categoriaDisplay: "Herramientas de Productividad",
-                descripcion: "Organiza tus tareas diarias y mantén el control de tus pendientes",
-                path: "herramientas-de-productividad/lista-tareas-guia.html"
-            },
-            {
-                slug: "informacion-tiempo",
-                nombre: "Información del Tiempo",
-                categoria: "productividad",
-                categoriaDisplay: "Herramientas de Productividad",
-                descripcion: "Consulta el pronóstico del tiempo actualizado de cualquier ciudad",
-                path: "herramientas-de-productividad/informacion-tiempo-guia.html"
-            },
-            {
-                slug: "calculadora-tarifa-freelance",
-                nombre: "Calculadora de Tarifa Freelance",
-                categoria: "emprendimiento",
-                categoriaDisplay: "Emprendimiento y Negocios",
-                descripcion: "Calcula tu tarifa por hora como freelance considerando todos los gastos",
-                path: "emprendimiento-y-negocios/calculadora-tarifa-freelance-guia.html"
-            },
-            {
-                slug: "margen-equilibrio",
-                nombre: "Margen de Equilibrio (Break-Even)",
-                categoria: "emprendimiento",
-                categoriaDisplay: "Emprendimiento y Negocios",
-                descripcion: "Descubre cuántas ventas necesitas para cubrir tus costes fijos",
-                path: "emprendimiento-y-negocios/margen-equilibrio-guia.html"
-            },
-            {
-                slug: "validador-json",
-                nombre: "Validador JSON",
-                categoria: "web",
-                categoriaDisplay: "Herramientas Web y Tecnología",
-                descripcion: "Valida y formatea código JSON de forma rápida y visual",
-                path: "herramientas-web-y-tecnologia/validador-json-guia.html"
-            },
-            {
-                slug: "generador-hash",
-                nombre: "Generador de Hash",
-                categoria: "web",
-                categoriaDisplay: "Herramientas Web y Tecnología",
-                descripcion: "Genera hashes MD5, SHA-1, SHA-256 y más de forma segura",
-                path: "herramientas-web-y-tecnologia/generador-hash-guia.html"
-            },
-            {
-                slug: "generador-gradientes",
-                nombre: "Generador de Gradientes",
-                categoria: "creatividad",
-                categoriaDisplay: "Creatividad y Diseño",
-                descripcion: "Crea gradientes CSS personalizados con vista previa en tiempo real",
-                path: "creatividad-y-diseno/generador-gradientes-guia.html"
-            },
-            {
-                slug: "creador-paletas",
-                nombre: "Creador de Paletas",
-                categoria: "creatividad",
-                categoriaDisplay: "Creatividad y Diseño",
-                descripcion: "Genera paletas de colores armoniosas para tus diseños",
-                path: "creatividad-y-diseno/creador-paletas-guia.html"
-            }
-        ];
-
-        // Agrupar guías por categoría
-        function agruparPorCategoria(guias) {
-            const grupos = {};
-            guias.forEach(guia => {
-                const cat = guia.categoriaDisplay;
-                if (!grupos[cat]) {
-                    grupos[cat] = [];
-                }
-                grupos[cat].push(guia);
-            });
-            return grupos;
-        }
-
-        // Renderizar guías
-        function renderizarGuias(guias) {
-            const container = document.getElementById('guidesContainer');
-
-            if (guias.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <h3>😕 No se encontraron guías</h3>
-                        <p>Intenta buscar con otros términos o selecciona otra categoría</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const grupos = agruparPorCategoria(guias);
-
-            let html = '';
-            for (const [categoria, guiasCategoria] of Object.entries(grupos)) {
-                html += `
-                    <div class="category-section">
-                        <h2 class="category-title">${categoria}</h2>
-                        <div class="guides-grid">
-                `;
-
-                guiasCategoria.forEach(guia => {
-                    html += `
-                        <a href="${guia.path}" class="guide-card">
-                            <h3>${guia.nombre}</h3>
-                            <p>${guia.descripcion}</p>
-                            <div class="guide-meta">
-                                <span class="guide-badge">Guía completa</span>
-                                <span>→ Leer más</span>
-                            </div>
-                        </a>
-                    `;
-                });
-
-                html += `
-                        </div>
-                    </div>
-                `;
-            }
-
-            container.innerHTML = html;
-        }
-
-        // Filtrar guías
-        function filtrarGuias() {
+        function filterGuides() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const categoriaActiva = document.querySelector('.filter-btn.active').dataset.category;
+            const guideCards = document.querySelectorAll('.guide-card');
+            const categorySections = document.querySelectorAll('.category-section');
 
-            let guiasFiltradas = guiasDB;
+            guideCards.forEach(card => {
+                const title = card.querySelector('.guide-title').textContent.toLowerCase();
+                const description = card.querySelector('.guide-description').textContent.toLowerCase();
 
-            // Filtrar por categoría
-            if (categoriaActiva !== 'todas') {
-                guiasFiltradas = guiasFiltradas.filter(g => g.categoria === categoriaActiva);
-            }
-
-            // Filtrar por búsqueda
-            if (searchTerm) {
-                guiasFiltradas = guiasFiltradas.filter(g =>
-                    g.nombre.toLowerCase().includes(searchTerm) ||
-                    g.descripcion.toLowerCase().includes(searchTerm) ||
-                    g.categoriaDisplay.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            renderizarGuias(guiasFiltradas);
-        }
-
-        // Event listeners
-        document.getElementById('searchInput').addEventListener('input', filtrarGuias);
-
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                filtrarGuias();
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
             });
-        });
 
-        // Renderizar inicial
-        renderizarGuias(guiasDB);
+            // Ocultar categorías vacías
+            categorySections.forEach(section => {
+                const visibleCards = section.querySelectorAll('.guide-card[style="display: block;"], .guide-card:not([style*="display"])');
+                if (searchTerm && visibleCards.length === 0) {
+                    section.style.display = 'none';
+                } else {
+                    section.style.display = 'block';
+                }
+            });
+        }
     </script>
 </body>
 </html>
