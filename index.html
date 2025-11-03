@@ -892,10 +892,15 @@
                 padding: var(--spacing-xs) 0;
             }
 
+            .search-wrapper {
+                flex: 0 0 auto;
+                order: 1;
+            }
+
             .guides-link {
                 padding: 8px 16px;
                 font-size: 0.9rem;
-                order: 1;
+                order: 3;
             }
 
             .guides-text {
@@ -904,11 +909,6 @@
 
             .guides-icon {
                 font-size: 1.4rem;
-            }
-
-            .search-wrapper {
-                flex: 0 0 auto;
-                order: 3;
             }
 
             .search-container {
@@ -1005,12 +1005,6 @@
             </div>
             <h2 class="header-title">Biblioteca de Aplicaciones</h2>
 
-            <!-- Enlace a Guías Educativas -->
-            <a href="guias/" class="guides-link" title="Accede a 86 guías educativas completas" aria-label="Ir a Guías Educativas">
-                <span class="guides-icon">📚</span>
-                <span class="guides-text">Guías</span>
-            </a>
-
             <!-- Buscador Minimalista -->
             <div class="search-wrapper">
                 <button class="search-toggle" id="searchToggle" aria-label="Abrir búsqueda" title="Buscar aplicaciones (Ctrl+K)">
@@ -1030,6 +1024,12 @@
                 </div>
                 <div class="search-results" id="searchResults"></div>
             </div>
+
+            <!-- Enlace a Guías Educativas -->
+            <a href="guias/" class="guides-link" title="Accede a 86 guías educativas completas" aria-label="Ir a Guías Educativas">
+                <span class="guides-icon">📚</span>
+                <span class="guides-text">Guías</span>
+            </a>
         </div>
     </header>
 
