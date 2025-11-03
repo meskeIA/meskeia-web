@@ -603,6 +603,18 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/campus-digital/creador-flashcards-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/campus-digital/curso-decisiones-inversion-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/campus-digital/generador-horarios-estudio-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
@@ -741,6 +753,24 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/física-y-química/formulas-quimicas-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/física-y-química/glosario-fisica-quimica-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/física-y-química/tabla-periodica-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/herramientas-de-productividad/cronometro-temporizador-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
@@ -759,6 +789,18 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/herramientas-de-productividad/generador-contrasenas-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/herramientas-de-productividad/generador-texto-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/herramientas-de-productividad/informacion-tiempo-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
@@ -766,6 +808,12 @@
   </url>
   <url>
     <loc>https://meskeia.com/guias/herramientas-de-productividad/lista-tareas-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/herramientas-web-y-tecnología/acortador-url-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
@@ -813,7 +861,43 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/guias/juegos-y-entretenimiento/piedra-papel-tijera-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/juegos-y-entretenimiento/puzzle-matematico-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/juegos-y-entretenimiento/sudoku-clasico-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/guias/juegos-y-entretenimiento/tres-en-raya-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/juegos-y-entretenimiento/wordle-espanol-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/algebra-abstracta-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/algebra-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
@@ -826,6 +910,42 @@
   </url>
   <url>
     <loc>https://meskeia.com/guias/matemáticas-y-estadística/calculadora-matematica-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/calculo-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/geometria-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/investigacion-operativa-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/probabilidad-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/teoria-numeros-guia.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/matemáticas-y-estadística/trigonometria-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
