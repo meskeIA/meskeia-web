@@ -6,7 +6,7 @@
 
 ## 🎯 Descripción
 
-Dashboard interactivo que muestra estadísticas en tiempo real del uso de las 82 aplicaciones web de meskeIA, consumiendo datos de la API REST v1.0.
+Dashboard interactivo que muestra estadísticas en tiempo real del uso de las aplicaciones web de meskeIA, consumiendo datos de la API REST v1.1 con **Geolocalización por IP** 🌍.
 
 ---
 
@@ -39,6 +39,7 @@ dashboard-analytics/
 ### 📈 Estadísticas Generales
 - **Total de Usos**: Suma de todos los registros
 - **Aplicaciones Registradas**: Cantidad de apps con al menos 1 uso
+- **🌍 Países Alcanzados**: Número de países únicos que han visitado las aplicaciones
 - **Primer Uso**: Fecha del primer registro en la base de datos
 - **Último Uso**: Fecha del último registro
 
@@ -52,21 +53,26 @@ dashboard-analytics/
    - Gráfico de línea mostrando usos diarios
    - Permite identificar tendencias temporales
 
-3. **Distribución por Navegador**
+3. **🌍 Top 10 Países con Más Visitas** ✨ NUEVO
+   - Gráfico de barras horizontales con países más activos
+   - Muestra número de visitas y aplicaciones usadas por país
+   - Basado en geolocalización automática por IP
+
+4. **Distribución por Navegador**
    - Gráfico de dona (doughnut) con top 5 navegadores
    - Detecta: Chrome, Firefox, Safari, Edge, Opera
 
-4. **Distribución por Sistema Operativo**
+5. **Distribución por Sistema Operativo**
    - Gráfico circular (pie) con top 5 sistemas
    - Detecta: Windows, macOS, Linux, Android, iOS
 
-5. **Distribución por Resolución de Pantalla**
+6. **Distribución por Resolución de Pantalla**
    - Gráfico de barras con top 5 resoluciones
    - Útil para optimizar diseño responsive
 
 ### 📋 Tabla de Datos
 - **Últimos 50 Registros**: Tabla detallada con información completa
-- Campos: ID, Aplicación, Fecha/Hora, Navegador, SO, Resolución
+- Campos: ID, Aplicación, Fecha/Hora, **🌍 País**, **📍 Ciudad**, Navegador, SO, Resolución
 
 ---
 
@@ -211,6 +217,33 @@ Los datos se reciben en formato JSON desde la API:
 
 ---
 
+## 🌍 Características de Geolocalización (v1.1)
+
+El dashboard ahora consume y visualiza datos de geolocalización automática:
+
+### ✨ Nuevas Funcionalidades
+
+- **Tarjeta de Países Alcanzados**: Muestra cuántos países diferentes han visitado tus aplicaciones
+- **Gráfico de Top Países**: Visualización horizontal de los 10 países con más visitas
+- **Columnas Geográficas en Tabla**: Cada registro muestra país (🌍) y ciudad (📍) del visitante
+- **Tooltip Mejorado**: El gráfico de países muestra aplicaciones usadas por país al pasar el mouse
+
+### 📡 Integración con API v1.1
+
+El dashboard consume automáticamente:
+- Campo `top_paises` del endpoint `/aplicaciones.php`
+- Campos `pais` y `ciudad` del endpoint `/estadisticas.php`
+- Detección automática de IPs locales (muestra "Local" en lugar de geolocalización)
+
+### 🎯 Casos de Uso
+
+- **Análisis de Mercados**: Identifica tus principales mercados geográficos
+- **Expansión Internacional**: Descubre países con potencial de crecimiento
+- **Localización**: Prioriza traducción de contenido según países más activos
+- **Reportes Ejecutivos**: Datos geográficos para presentaciones y toma de decisiones
+
+---
+
 ## 📈 Próximas Mejoras (Opcionales)
 
 - [ ] Exportar datos a CSV/Excel
@@ -231,4 +264,4 @@ Para dudas o problemas:
 
 ---
 
-**© 2025 meskeIA - Dashboard Analytics v1.0**
+**© 2025 meskeIA - Dashboard Analytics v1.1 (con Geolocalización 🌍)**

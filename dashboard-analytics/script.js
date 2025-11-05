@@ -5,6 +5,7 @@ const API_BASE_URL = 'https://meskeia.com/api/v1';
 // Variables globales para los gráficos
 let chartTopAplicaciones = null;
 let chartTendenciaTemporal = null;
+let chartTopPaises = null;
 let chartNavegadores = null;
 let chartSistemasOperativos = null;
 let chartResoluciones = null;
@@ -28,11 +29,12 @@ async function cargarDatos() {
             .then(res => res.json());
 
         // Actualizar estadísticas generales
-        actualizarEstadisticasGenerales(aplicaciones);
+        actualizarEstadisticasGenerales(aplicaciones, estadisticas);
 
         // Generar gráficos
         generarGraficoTopAplicaciones(aplicaciones.data);
         generarGraficoTendenciaTemporal(estadisticas.data);
+        generarGraficoTopPaises(aplicaciones.top_paises || []);
         generarGraficoNavegadores(estadisticas.data);
         generarGraficoSistemasOperativos(estadisticas.data);
         generarGraficoResoluciones(estadisticas.data);
@@ -53,14 +55,23 @@ async function cargarDatos() {
 }
 
 // Actualizar estadísticas generales
-function actualizarEstadisticasGenerales(datos) {
-    document.getElementById('total-usos').textContent = datos.resumen.total_usos_global.toLocaleString('es-ES');
-    document.getElementById('total-aplicaciones').textContent = datos.resumen.total_aplicaciones.toLocaleString('es-ES');
+function actualizarEstadisticasGenerales(aplicaciones, estadisticas) {
+    document.getElementById('total-usos').textContent = aplicaciones.resumen.total_usos_global.toLocaleString('es-ES');
+    document.getElementById('total-aplicaciones').textContent = aplicaciones.resumen.total_aplicaciones.toLocaleString('es-ES');
+
+    // Calcular países únicos desde los datos de estadísticas
+    const paisesUnicos = new Set();
+    estadisticas.data.forEach(registro => {
+        if (registro.pais && registro.pais !== '' && registro.pais !== 'Local') {
+            paisesUnicos.add(registro.pais);
+        }
+    });
+    document.getElementById('total-paises').textContent = paisesUnicos.size.toLocaleString('es-ES');
 
     // Calcular primer y último uso de todos los datos
-    if (datos.data.length > 0) {
-        const primerosUsos = datos.data.map(app => app.primer_uso).filter(Boolean);
-        const ultimosUsos = datos.data.map(app => app.ultimo_uso).filter(Boolean);
+    if (aplicaciones.data.length > 0) {
+        const primerosUsos = aplicaciones.data.map(app => app.primer_uso).filter(Boolean);
+        const ultimosUsos = aplicaciones.data.map(app => app.ultimo_uso).filter(Boolean);
 
         if (primerosUsos.length > 0) {
             const primerUsoGlobal = primerosUsos.sort()[0];
@@ -175,6 +186,65 @@ function generarGraficoTendenciaTemporal(datos) {
             },
             scales: {
                 y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Generar gráfico de Top 10 Países
+function generarGraficoTopPaises(topPaises) {
+    if (!topPaises || topPaises.length === 0) {
+        console.warn('No hay datos de países para mostrar');
+        return;
+    }
+
+    const top10 = topPaises.slice(0, 10);
+    const labels = top10.map(pais => pais.pais || 'Desconocido');
+    const valores = top10.map(pais => pais.total_visitas || 0);
+
+    const ctx = document.getElementById('chartTopPaises').getContext('2d');
+
+    if (chartTopPaises) {
+        chartTopPaises.destroy();
+    }
+
+    chartTopPaises = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Número de Visitas',
+                data: valores,
+                backgroundColor: 'rgba(72, 169, 166, 0.7)',
+                borderColor: '#48A9A6',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y', // Barras horizontales
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const index = context.dataIndex;
+                            const apps = top10[index].aplicaciones_usadas || 0;
+                            return `Apps usadas: ${apps}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
                     beginAtZero: true,
                     ticks: {
                         precision: 0
@@ -345,16 +415,25 @@ function actualizarTablaUltimosUsos(datos) {
     tbody.innerHTML = '';
 
     if (datos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="loading">No hay registros disponibles</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="loading">No hay registros disponibles</td></tr>';
         return;
     }
 
     datos.forEach(registro => {
         const fila = document.createElement('tr');
+
+        // Formatear país y ciudad con banderas
+        const pais = registro.pais || '-';
+        const ciudad = registro.ciudad || '-';
+        const paisFormateado = pais !== '-' ? `🌍 ${pais}` : '-';
+        const ciudadFormateada = ciudad !== '-' ? `📍 ${ciudad}` : '-';
+
         fila.innerHTML = `
             <td>${registro.id}</td>
             <td><strong>${registro.aplicacion}</strong></td>
             <td>${registro.timestamp}</td>
+            <td>${paisFormateado}</td>
+            <td>${ciudadFormateada}</td>
             <td>${extraerNavegador(registro.navegador || '-')}</td>
             <td>${extraerSistemaOperativo(registro.sistema_operativo || '-')}</td>
             <td>${registro.resolucion || '-'}</td>

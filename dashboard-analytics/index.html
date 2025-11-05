@@ -30,7 +30,7 @@
         <!-- Header del Dashboard -->
         <header class="dashboard-header">
             <h1>Dashboard meskeIA Analytics</h1>
-            <p class="subtitle">Sistema de métricas de uso de aplicaciones web</p>
+            <p class="subtitle">Sistema de métricas de uso de aplicaciones web · v1.1 con Geolocalización 🌍</p>
             <button class="btn-refresh" onclick="cargarDatos()">
                 <span class="refresh-icon">↻</span> Actualizar Datos
             </button>
@@ -50,6 +50,13 @@
                 <div class="stat-content">
                     <h3 id="total-aplicaciones">-</h3>
                     <p>Aplicaciones Registradas</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🌍</div>
+                <div class="stat-content">
+                    <h3 id="total-paises">-</h3>
+                    <p>Países Alcanzados</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -82,6 +89,12 @@
                 <canvas id="chartTendenciaTemporal"></canvas>
             </div>
 
+            <!-- Top 10 Países -->
+            <div class="chart-container">
+                <h2>🌍 Top 10 Países con Más Visitas</h2>
+                <canvas id="chartTopPaises"></canvas>
+            </div>
+
             <!-- Navegadores -->
             <div class="chart-container chart-small">
                 <h2>🌐 Distribución por Navegador</h2>
@@ -111,6 +124,8 @@
                             <th>ID</th>
                             <th>Aplicación</th>
                             <th>Fecha/Hora</th>
+                            <th>País</th>
+                            <th>Ciudad</th>
                             <th>Navegador</th>
                             <th>Sistema Operativo</th>
                             <th>Resolución</th>
@@ -118,7 +133,7 @@
                     </thead>
                     <tbody id="tablaBody">
                         <tr>
-                            <td colspan="6" class="loading">Cargando datos...</td>
+                            <td colspan="8" class="loading">Cargando datos...</td>
                         </tr>
                     </tbody>
                 </table>
