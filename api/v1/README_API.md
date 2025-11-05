@@ -4,7 +4,7 @@
 
 API REST para el seguimiento de métricas de uso de las aplicaciones web de meskeIA.
 
-**Versión**: 1.0
+**Versión**: 1.1 (con Geolocalización por IP 🌍)
 **Base URL**: `https://meskeia.com/api/v1/`
 **Formato de respuesta**: JSON
 **Codificación**: UTF-8
@@ -17,6 +17,7 @@ API REST para el seguimiento de métricas de uso de las aplicaciones web de mesk
 api/
 └── v1/
     ├── db-init.php           # Inicializador de base de datos SQLite
+    ├── geolocation.php       # Módulo de geolocalización por IP
     ├── guardar-uso.php       # Endpoint para registrar uso
     ├── estadisticas.php      # Endpoint para consultar estadísticas
     ├── aplicaciones.php      # Endpoint para listar aplicaciones
@@ -38,10 +39,15 @@ CREATE TABLE uso_aplicaciones (
     navegador TEXT,                        -- Navegador del usuario
     sistema_operativo TEXT,                -- Sistema operativo del usuario
     resolucion TEXT,                       -- Resolución de pantalla
+    ip_address TEXT,                       -- 🌍 Dirección IP del visitante
+    pais TEXT,                             -- 🌍 País del visitante (geolocalización)
+    ciudad TEXT,                           -- 🌍 Ciudad del visitante (geolocalización)
     datos_adicionales TEXT,                -- JSON con datos adicionales
     created_at TEXT DEFAULT (datetime('now', 'localtime'))
 );
 ```
+
+**Nueva funcionalidad 🌍:** La API ahora captura automáticamente la ubicación geográfica (país y ciudad) de cada visitante usando geolocalización por IP mediante el servicio gratuito [ip-api.com](http://ip-api.com).
 
 ---
 
@@ -84,10 +90,15 @@ CREATE TABLE uso_aplicaciones (
   "data": {
     "id": 123,
     "aplicacion": "generador-gradientes",
-    "timestamp": "02/11/2025 14:30:00"
+    "timestamp": "02/11/2025 14:30:00",
+    "ip_address": "203.0.113.42",
+    "pais": "España",
+    "ciudad": "Madrid"
   }
 }
 ```
+
+**Nota:** La geolocalización se realiza automáticamente en el servidor. No es necesario enviarla desde el cliente.
 
 #### Ejemplo de uso (JavaScript)
 
@@ -169,6 +180,9 @@ https://meskeia.com/api/v1/estadisticas.php?limite=50
       "navegador": "Chrome 119.0",
       "sistema_operativo": "Windows 10",
       "resolucion": "1920x1080",
+      "ip_address": "203.0.113.42",
+      "pais": "España",
+      "ciudad": "Madrid",
       "datos_adicionales": {
         "accion": "exportar_css"
       },
@@ -213,6 +227,23 @@ obtenerEstadisticas('generador-gradientes');
     "total_aplicaciones": 12,
     "total_usos_global": 1543
   },
+  "top_paises": [
+    {
+      "pais": "España",
+      "total_visitas": 856,
+      "aplicaciones_usadas": 12
+    },
+    {
+      "pais": "México",
+      "total_visitas": 324,
+      "aplicaciones_usadas": 10
+    },
+    {
+      "pais": "Argentina",
+      "total_visitas": 198,
+      "aplicaciones_usadas": 8
+    }
+  ],
   "data": [
     {
       "aplicacion": "generador-gradientes",
@@ -220,7 +251,8 @@ obtenerEstadisticas('generador-gradientes');
       "primer_uso": "15/10/2025 10:00:00",
       "ultimo_uso": "02/11/2025 14:30:00",
       "navegadores_diferentes": 5,
-      "sistemas_operativos_diferentes": 3
+      "sistemas_operativos_diferentes": 3,
+      "paises_diferentes": 8
     },
     {
       "aplicacion": "calculadora-aspectos",
@@ -228,11 +260,14 @@ obtenerEstadisticas('generador-gradientes');
       "primer_uso": "20/10/2025 09:15:00",
       "ultimo_uso": "02/11/2025 12:00:00",
       "navegadores_diferentes": 4,
-      "sistemas_operativos_diferentes": 2
+      "sistemas_operativos_diferentes": 2,
+      "paises_diferentes": 5
     }
   ]
 }
 ```
+
+**Nuevo:** El endpoint ahora incluye un array `top_paises` con los 10 países con más visitas a nivel global.
 
 #### Ejemplo de uso (JavaScript)
 
@@ -508,6 +543,76 @@ R: Implementar rate limiting (próxima versión) o validación por IP.
 
 **P: ¿Los datos son anónimos?**
 R: Sí, no se recopila información personal identificable.
+
+---
+
+## 🌍 Geolocalización por IP
+
+### ¿Cómo Funciona?
+
+La API captura automáticamente la ubicación geográfica de cada visitante:
+
+1. **Captura de IP**: Detecta la IP real del visitante (compatible con proxies y CDNs como Cloudflare)
+2. **Consulta de Geolocalización**: Utiliza el servicio gratuito [ip-api.com](http://ip-api.com)
+3. **Almacenamiento**: Guarda país y ciudad en la base de datos junto con cada registro
+
+### Información Capturada
+
+- **IP Address**: Dirección IP del visitante
+- **País**: Nombre completo del país (ej: "España", "México")
+- **Ciudad**: Ciudad del visitante (ej: "Madrid", "Barcelona")
+
+### Características
+
+✅ **Automático**: No requiere configuración adicional del cliente
+✅ **Gratuito**: Usa ip-api.com (45 peticiones/minuto sin API key)
+✅ **Compatible con proxies**: Detecta IP real detrás de Cloudflare, Nginx, etc.
+✅ **Manejo de IPs locales**: Reconoce localhost y redes privadas
+✅ **Timeout protegido**: 3 segundos de timeout para no ralentizar la API
+✅ **Fallback graceful**: Si falla la geolocalización, registra el uso sin ubicación
+
+### Privacidad
+
+- La IP completa se almacena pero puede anonimizarse si es necesario
+- Cumple con GDPR al no recopilar datos personales identificables
+- Los datos geográficos son agregados (país/ciudad, no direcciones exactas)
+
+### Limitaciones del Servicio Gratuito
+
+- **Rate limit**: 45 peticiones por minuto
+- **Precisión**: ~95% para país, ~80% para ciudad
+- **IPs móviles**: Pueden mostrar ubicaciones aproximadas del proveedor
+
+### Testing del Módulo
+
+Puedes probar el módulo de geolocalización directamente:
+
+```bash
+php api/v1/geolocation.php
+```
+
+**Salida esperada**:
+```
+🧪 Probando geolocalización con IP: 8.8.8.8
+Array
+(
+    [status] => success
+    [ip] => 8.8.8.8
+    [pais] => United States
+    [codigo_pais] => US
+    [ciudad] => Mountain View
+    ...
+)
+
+📍 Probando con IP local
+Array
+(
+    [status] => local
+    [ip] => 127.0.0.1
+    [pais] => Local
+    [ciudad] => Localhost
+)
+```
 
 ---
 

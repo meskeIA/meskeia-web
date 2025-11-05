@@ -33,16 +33,40 @@ function inicializarBaseDatos() {
             navegador TEXT,
             sistema_operativo TEXT,
             resolucion TEXT,
+            ip_address TEXT,
+            pais TEXT,
+            ciudad TEXT,
             datos_adicionales TEXT,
             created_at TEXT DEFAULT (datetime('now', 'localtime'))
         )";
 
         $pdo->exec($sql_uso);
 
+        // Migración: Agregar columnas de geolocalización si no existen (para BDs existentes)
+        try {
+            $pdo->exec("ALTER TABLE uso_aplicaciones ADD COLUMN ip_address TEXT");
+        } catch (PDOException $e) {
+            // La columna ya existe, ignorar error
+        }
+
+        try {
+            $pdo->exec("ALTER TABLE uso_aplicaciones ADD COLUMN pais TEXT");
+        } catch (PDOException $e) {
+            // La columna ya existe, ignorar error
+        }
+
+        try {
+            $pdo->exec("ALTER TABLE uso_aplicaciones ADD COLUMN ciudad TEXT");
+        } catch (PDOException $e) {
+            // La columna ya existe, ignorar error
+        }
+
         // Crear índices para mejorar rendimiento de consultas
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_aplicacion ON uso_aplicaciones(aplicacion)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_timestamp ON uso_aplicaciones(timestamp)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_created_at ON uso_aplicaciones(created_at)");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_pais ON uso_aplicaciones(pais)");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_ip_address ON uso_aplicaciones(ip_address)");
 
         return $pdo;
 

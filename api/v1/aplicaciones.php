@@ -47,7 +47,8 @@ try {
                 MIN(timestamp) as primer_uso,
                 MAX(timestamp) as ultimo_uso,
                 COUNT(DISTINCT navegador) as navegadores_diferentes,
-                COUNT(DISTINCT sistema_operativo) as sistemas_operativos_diferentes
+                COUNT(DISTINCT sistema_operativo) as sistemas_operativos_diferentes,
+                COUNT(DISTINCT pais) as paises_diferentes
             FROM uso_aplicaciones
             GROUP BY aplicacion
             ORDER BY total_usos DESC";
@@ -60,11 +61,31 @@ try {
         $app['total_usos'] = (int)$app['total_usos'];
         $app['navegadores_diferentes'] = (int)$app['navegadores_diferentes'];
         $app['sistemas_operativos_diferentes'] = (int)$app['sistemas_operativos_diferentes'];
+        $app['paises_diferentes'] = (int)$app['paises_diferentes'];
     }
 
     // Obtener total de usos en toda la plataforma
     $sql_total = "SELECT COUNT(*) as total FROM uso_aplicaciones";
     $total_global = $pdo->query($sql_total)->fetch(PDO::FETCH_ASSOC)['total'];
+
+    // Obtener top de países
+    $sql_paises = "SELECT
+                        pais,
+                        COUNT(*) as total_visitas,
+                        COUNT(DISTINCT aplicacion) as aplicaciones_usadas
+                   FROM uso_aplicaciones
+                   WHERE pais IS NOT NULL AND pais != ''
+                   GROUP BY pais
+                   ORDER BY total_visitas DESC
+                   LIMIT 10";
+    $stmt_paises = $pdo->query($sql_paises);
+    $top_paises = $stmt_paises->fetchAll(PDO::FETCH_ASSOC);
+
+    // Convertir valores numéricos
+    foreach ($top_paises as &$pais_data) {
+        $pais_data['total_visitas'] = (int)$pais_data['total_visitas'];
+        $pais_data['aplicaciones_usadas'] = (int)$pais_data['aplicaciones_usadas'];
+    }
 
     // Respuesta exitosa
     http_response_code(200);
@@ -74,6 +95,7 @@ try {
             'total_aplicaciones' => count($aplicaciones),
             'total_usos_global' => (int)$total_global
         ],
+        'top_paises' => $top_paises,
         'data' => $aplicaciones
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 

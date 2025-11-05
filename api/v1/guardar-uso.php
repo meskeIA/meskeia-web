@@ -41,6 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Incluir inicializador de base de datos
 require_once __DIR__ . '/db-init.php';
 
+// Incluir módulo de geolocalización
+require_once __DIR__ . '/geolocation.php';
+
 try {
     // Obtener datos del POST
     $input = file_get_contents('php://input');
@@ -59,12 +62,18 @@ try {
     // Obtener conexión a la base de datos
     $pdo = obtenerConexion();
 
+    // Obtener geolocalización
+    $geolocalizacion = obtenerDatosGeolocalizacion();
+
     // Preparar datos para insertar
     $aplicacion = $datos['aplicacion'];
     $timestamp = date('d/m/Y H:i:s'); // Formato español
     $navegador = $datos['navegador'] ?? null;
     $sistema_operativo = $datos['sistema_operativo'] ?? null;
     $resolucion = $datos['resolucion'] ?? null;
+    $ip_address = $geolocalizacion['ip'];
+    $pais = $geolocalizacion['pais'];
+    $ciudad = $geolocalizacion['ciudad'];
 
     // Convertir datos adicionales a JSON si existen
     $datos_adicionales = null;
@@ -74,8 +83,8 @@ try {
 
     // Insertar registro en la base de datos
     $sql = "INSERT INTO uso_aplicaciones
-            (aplicacion, timestamp, navegador, sistema_operativo, resolucion, datos_adicionales)
-            VALUES (:aplicacion, :timestamp, :navegador, :sistema_operativo, :resolucion, :datos_adicionales)";
+            (aplicacion, timestamp, navegador, sistema_operativo, resolucion, ip_address, pais, ciudad, datos_adicionales)
+            VALUES (:aplicacion, :timestamp, :navegador, :sistema_operativo, :resolucion, :ip_address, :pais, :ciudad, :datos_adicionales)";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
@@ -84,6 +93,9 @@ try {
         ':navegador' => $navegador,
         ':sistema_operativo' => $sistema_operativo,
         ':resolucion' => $resolucion,
+        ':ip_address' => $ip_address,
+        ':pais' => $pais,
+        ':ciudad' => $ciudad,
         ':datos_adicionales' => $datos_adicionales
     ]);
 
@@ -98,7 +110,10 @@ try {
         'data' => [
             'id' => $id_insertado,
             'aplicacion' => $aplicacion,
-            'timestamp' => $timestamp
+            'timestamp' => $timestamp,
+            'ip_address' => $ip_address,
+            'pais' => $pais,
+            'ciudad' => $ciudad
         ]
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
