@@ -14,12 +14,15 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <title>Radio meskeIA - Emisoras de Todo el Mundo v2.1</title>
+    <title>Radio meskeIA - Emisoras de Todo el Mundo v3.1</title>
+
+    <!-- hls.js para soporte de streams HLS (.m3u8) -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"></script>
 
     <!-- Script de limpieza de caché forzada -->
     <script>
         // Forzar recarga si hay versión antigua en cache
-        const RADIO_VERSION = '2.1';
+        const RADIO_VERSION = '3.1';
         const cachedVersion = localStorage.getItem('radio_meskeia_version');
 
         if (cachedVersion !== RADIO_VERSION) {
@@ -685,36 +688,64 @@
         let isPlaying = false;
         let isMuted = false;
         let currentTab = 'popular';
+        let isShowingError = false; // Flag para evitar notificaciones múltiples
 
         const radioPlayer = document.getElementById('radioPlayer');
         const playBtn = document.getElementById('playBtn');
 
-        // Emisoras populares españolas (URLs verificadas)
-        const popularSpanishStations = [
-            { name: 'Los 40 Principales', country: 'España', tags: ['Pop', 'Top Hits'], url: 'http://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3' },
-            { name: 'Cadena SER', country: 'España', tags: ['Noticias', 'Actualidad'], url: 'http://playerservices.streamtheworld.com/api/livestream-redirect/CADENASER.mp3' },
-            { name: 'Radio Nacional', country: 'España', tags: ['Noticias', 'Cultura'], url: 'https://rtvelivestream.akamaized.net/rne/rne_r1_main.m3u8' },
-            { name: 'Cadena 100', country: 'España', tags: ['Pop', 'Música'], url: 'http://playerservices.streamtheworld.com/api/livestream-redirect/CADENA100.mp3' },
-            { name: 'COPE', country: 'España', tags: ['Noticias', 'Deportes'], url: 'https://flucast-b02-06.flumotion.com/cope/net1.mp3' },
-            { name: 'Europa FM', country: 'España', tags: ['Dance', 'Electrónica'], url: 'http://playerservices.streamtheworld.com/api/livestream-redirect/EUROPAFM.mp3' },
-            { name: 'Onda Cero', country: 'España', tags: ['Noticias', 'Actualidad'], url: 'https://livefastcast-ams.akamaized.net/oniv/ondacero.mp3' },
-            { name: 'Radio 3', country: 'España', tags: ['Indie', 'Rock'], url: 'https://rtvelivestream.akamaized.net/rne/rne_r3_main.m3u8' }
-        ];
+        // Emisoras populares españolas (se cargan dinámicamente desde Radio Browser API)
+        let popularSpanishStations = [];
 
         // Inicialización
         window.onload = function() {
-            console.log('📻 Radio meskeIA v2.1 - Sistema de notificaciones sin alert()');
+            console.log('📻 Radio meskeIA v3.1 - Emisoras dinámicas desde API');
             console.log('✅ Función mostrarNotificacion:', typeof mostrarNotificacion === 'function');
-            console.log('❌ alert() NO está en el código - Si ves un alert, limpia la caché con Ctrl+Shift+R');
+            console.log('✅ hls.js cargado:', window.Hls ? 'Sí' : 'No');
+            console.log('✅ Soporte HLS nativo:', radioPlayer.canPlayType('application/vnd.apple.mpegurl') ? 'Sí' : 'No');
+            console.log('🔧 Notificaciones centelleantes: CORREGIDO');
+            console.log('🌐 Cargando emisoras desde Radio Browser API...');
             loadPopularStations();
             loadCountries();
             loadGenres();
             initializePlayer();
         };
 
-        // Cargar emisoras populares
-        function loadPopularStations() {
-            displayStations(popularSpanishStations);
+        // Cargar emisoras populares desde Radio Browser API
+        async function loadPopularStations() {
+            showLoading();
+            try {
+                // Buscar emisoras españolas más populares
+                const response = await fetch('https://de1.api.radio-browser.info/json/stations/search?country=Spain&limit=30&hidebroken=true&order=votes&reverse=true&has_extended_info=true');
+                const stations = await response.json();
+
+                // Filtrar emisoras que tengan URL válida
+                popularSpanishStations = stations
+                    .filter(station => station.url_resolved && station.url_resolved.trim() !== '')
+                    .slice(0, 20)
+                    .map(station => ({
+                        name: station.name,
+                        country: station.country,
+                        tags: station.tags ? station.tags.split(',').filter(t => t.trim()).slice(0, 3) : ['Radio'],
+                        url: station.url_resolved || station.url,
+                        favicon: station.favicon
+                    }));
+
+                console.log(`✅ Cargadas ${popularSpanishStations.length} emisoras populares españolas`);
+                displayStations(popularSpanishStations);
+            } catch (error) {
+                console.error('Error al cargar emisoras populares:', error);
+
+                // Fallback: Emisoras hardcodeadas verificadas
+                popularSpanishStations = [
+                    { name: 'Los 40 Principales', country: 'España', tags: ['Pop', 'Top Hits'], url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3' },
+                    { name: 'Cadena SER', country: 'España', tags: ['Noticias', 'Actualidad'], url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/CADENASER.mp3' },
+                    { name: 'Cadena 100', country: 'España', tags: ['Pop', 'Música'], url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/CADENA100.mp3' },
+                    { name: 'Europa FM', country: 'España', tags: ['Dance', 'Electrónica'], url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/EUROPAFM.mp3' }
+                ];
+
+                console.log('⚠️ Usando emisoras de respaldo');
+                displayStations(popularSpanishStations);
+            }
         }
 
         // Inicializar reproductor
@@ -724,6 +755,7 @@
             radioPlayer.addEventListener('play', () => {
                 isPlaying = true;
                 playBtn.textContent = '⏸️';
+                isShowingError = false; // Reset del flag cuando empieza reproducción
             });
 
             radioPlayer.addEventListener('pause', () => {
@@ -731,11 +763,8 @@
                 playBtn.textContent = '▶️';
             });
 
-            radioPlayer.addEventListener('error', (e) => {
-                console.error('Error al reproducir:', e);
-                mostrarNotificacion('❌ No se pudo reproducir esta emisora. Intenta con otra.');
-                stopRadio();
-            });
+            // ELIMINADO: Event listener de error duplicado que causaba notificaciones centelleantes
+            // El manejo de errores se hace ahora SOLO en el .catch() de playStation()
         }
 
         // Buscar emisoras usando Radio Browser API
@@ -884,14 +913,40 @@
             document.getElementById('playerStationName').textContent = station.name;
             document.getElementById('playerStationInfo').textContent = `${station.country} • ${station.tags.join(', ')}`;
 
-            radioPlayer.src = station.url;
-            radioPlayer.play().catch(e => {
-                console.error('Error al reproducir:', e);
-                mostrarNotificacion('❌ No se pudo reproducir esta emisora. Intenta con otra.');
+            // Detectar si es un stream HLS (.m3u8)
+            const isHLS = station.url.includes('.m3u8');
 
-                // Restaurar estado
+            if (isHLS && window.Hls && Hls.isSupported()) {
+                // Usar hls.js para streams HLS
+                if (window.hlsPlayer) {
+                    window.hlsPlayer.destroy();
+                }
+                window.hlsPlayer = new Hls();
+                window.hlsPlayer.loadSource(station.url);
+                window.hlsPlayer.attachMedia(radioPlayer);
+                window.hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                    radioPlayer.play().catch(handlePlayError);
+                });
+                window.hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        console.error('Error HLS fatal:', data);
+                        handlePlayError(new Error('Error al cargar stream HLS'));
+                    }
+                });
+            } else if (isHLS && !window.Hls) {
+                // HLS no soportado y hls.js no está cargado
+                if (!isShowingError) {
+                    isShowingError = true;
+                    mostrarNotificacion('⚠️ Esta emisora usa formato HLS no soportado por tu navegador. Prueba con otra.', 'info');
+                    setTimeout(() => { isShowingError = false; }, 3500);
+                }
                 stopRadio();
-            });
+                return;
+            } else {
+                // Stream normal (MP3, AAC, etc.)
+                radioPlayer.src = station.url;
+                radioPlayer.play().catch(handlePlayError);
+            }
 
             // Actualizar cards
             document.querySelectorAll('.station-card').forEach(card => {
@@ -903,6 +958,25 @@
 
             // Actualizar botón de favorito del player
             updatePlayerFavoriteButton();
+        }
+
+        // Manejar errores de reproducción (evita notificaciones múltiples)
+        function handlePlayError(e) {
+            console.error('Error al reproducir:', e);
+
+            // Solo mostrar notificación si no hay una activa
+            if (!isShowingError) {
+                isShowingError = true;
+                mostrarNotificacion('❌ No se pudo reproducir esta emisora. Intenta con otra.');
+
+                // Reset del flag después de 3.5 segundos
+                setTimeout(() => {
+                    isShowingError = false;
+                }, 3500);
+            }
+
+            // Restaurar estado
+            stopRadio();
         }
 
         // Controles del reproductor
@@ -922,6 +996,13 @@
         function stopRadio() {
             radioPlayer.pause();
             radioPlayer.src = '';
+
+            // Limpiar reproductor HLS si existe
+            if (window.hlsPlayer) {
+                window.hlsPlayer.destroy();
+                window.hlsPlayer = null;
+            }
+
             currentStation = null;
             isPlaying = false;
             playBtn.textContent = '▶️';
@@ -1139,7 +1220,7 @@
                 aplicacion: nombreApp,
                 navegador: navigator.userAgent,
                 sistema_operativo: navigator.platform,
-                resolucion: `${{window.screen.width}}x${{window.screen.height}}`,
+                resolucion: `${window.screen.width}x${window.screen.height}`,
                 tipo_dispositivo: tipoDispositivo,
                 es_recurrente: esRecurrente
             };
