@@ -9,12 +9,36 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Cache busting - Versión 2.0 - Notificaciones sin bloqueo -->
+    <!-- Cache busting - Versión 2.1 - Fix alert bloqueante -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <title>Radio meskeIA - Emisoras de Todo el Mundo</title>
+    <title>Radio meskeIA - Emisoras de Todo el Mundo v2.1</title>
+
+    <!-- Script de limpieza de caché forzada -->
+    <script>
+        // Forzar recarga si hay versión antigua en cache
+        const RADIO_VERSION = '2.1';
+        const cachedVersion = localStorage.getItem('radio_meskeia_version');
+
+        if (cachedVersion !== RADIO_VERSION) {
+            console.log('🔄 Nueva versión detectada. Limpiando caché...');
+            localStorage.setItem('radio_meskeia_version', RADIO_VERSION);
+
+            // Limpiar service workers si existen
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    registrations.forEach(reg => reg.unregister());
+                });
+            }
+
+            // Si no es la primera carga, recargar sin caché
+            if (cachedVersion) {
+                window.location.reload(true);
+            }
+        }
+    </script>
     <meta name="description" content="Escucha emisoras de radio de todo el mundo en vivo. Miles de estaciones de música, noticias y podcasts disponibles gratis.">
     <link rel="icon" type="image/png" href="icon_meskeia.png">
 
@@ -679,8 +703,9 @@
 
         // Inicialización
         window.onload = function() {
-            console.log('📻 Radio meskeIA v2.0 - Notificaciones sin bloqueo cargadas');
-            console.log('✅ Función mostrarNotificacion disponible:', typeof mostrarNotificacion === 'function');
+            console.log('📻 Radio meskeIA v2.1 - Sistema de notificaciones sin alert()');
+            console.log('✅ Función mostrarNotificacion:', typeof mostrarNotificacion === 'function');
+            console.log('❌ alert() NO está en el código - Si ves un alert, limpia la caché con Ctrl+Shift+R');
             loadPopularStations();
             loadCountries();
             loadGenres();
