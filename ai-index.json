@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 82 aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 84 aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 82,
-  "updated": "2025-01-12",
+  "total_tools": 84,
+  "updated": "2025-01-16",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -1786,6 +1786,49 @@
             "¿Cómo puedo mejorar en cálculo mental con ejercicios divertidos?",
             "Necesito rompecabezas matemáticos para pasar el tiempo",
             "¿Hay alguna app con desafíos de matemáticas y operaciones?"
+          ]
+        },
+        {
+          "name": "Radio meskeIA",
+          "slug": "radio-meskeia",
+          "url": "https://meskeia.com/radio-meskeia/",
+          "description": "Reproductor de radio online con acceso a miles de emisoras de todo el mundo. Incluye emisoras españolas populares, búsqueda por país y género, sistema de favoritos y soporte HLS.",
+          "use_cases": [
+            "Escuchar música mientras trabajas",
+            "Mantenerse informado con emisoras de noticias",
+            "Descubrir emisoras de otros países",
+            "Escuchar radio sin publicidad intrusiva"
+          ],
+          "features": [
+            "20+ emisoras españolas",
+            "Búsqueda 30.000+ emisoras",
+            "Sistema favoritos",
+            "Soporte HLS",
+            "Sin registro"
+          ],
+          "keywords": [
+            "radio online",
+            "radio en vivo",
+            "emisoras españa",
+            "escuchar radio gratis",
+            "radio por internet",
+            "los 40 principales online",
+            "cadena ser online",
+            "radio streaming",
+            "radio en directo",
+            "radio españa online",
+            "emisoras de radio",
+            "escuchar radio en linea"
+          ],
+          "_category": "Juegos y Entretenimiento",
+          "casos_de_uso": [
+            "¿Dónde puedo escuchar la radio online gratis?",
+            "Quiero escuchar Los 40 Principales o Cadena SER por internet",
+            "¿Cómo puedo oír emisoras de radio españolas desde el navegador?",
+            "Necesito un reproductor de radio online que funcione sin registrarme",
+            "¿Hay alguna app para escuchar emisoras de radio de otros países?",
+            "¿Dónde puedo buscar y escuchar miles de emisoras de radio en vivo?",
+            "Quiero escuchar radio mientras trabajo sin descargar nada"
           ]
         }
       ]

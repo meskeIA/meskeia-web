@@ -540,6 +540,12 @@
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
+  <url>
+    <loc>https://meskeia.com/radio-meskeia/</loc>
+    <lastmod>2025-11-16</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
 
   <!-- Guías educativas -->
   <url>
