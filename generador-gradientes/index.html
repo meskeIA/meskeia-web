@@ -1090,29 +1090,68 @@
     }
     </script>
 
-    <!-- meskeIA Analytics - Tracking de uso -->
+        <!-- meskeIA Analytics v2.0 - Tracking con duración y dispositivo -->
     <script>
         (async function() {
             const nombreApp = 'generador-gradientes';
 
-            const datos = {
+            // Detección de visita recurrente usando localStorage
+            const claveStorage = 'meskeia_' + nombreApp;
+            const esRecurrente = localStorage.getItem(claveStorage) !== null;
+
+            // Marcar primera visita
+            if (!esRecurrente) {
+                localStorage.setItem(claveStorage, new Date().toISOString());
+            }
+
+            // Detección de tipo de dispositivo
+            const esMovil = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const tipoDispositivo = esMovil ? 'movil' : 'escritorio';
+
+            // Iniciar contador de duración
+            const tiempoInicio = Date.now();
+
+            // Datos de entrada (registro inicial)
+            const datosEntrada = {
                 aplicacion: nombreApp,
                 navegador: navigator.userAgent,
                 sistema_operativo: navigator.platform,
-                resolucion: `${window.screen.width}x${window.screen.height}`
+                resolucion: `${{window.screen.width}}x${{window.screen.height}}`,
+                tipo_dispositivo: tipoDispositivo,
+                es_recurrente: esRecurrente
             };
 
+            // Registrar entrada
             try {
                 await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(datos)
+                    body: JSON.stringify(datosEntrada),
+                    keepalive: true
                 });
-                console.log('✅ Uso registrado en meskeIA Analytics');
+                console.log('✅ Uso registrado en meskeIA Analytics v2.0');
             } catch (error) {
-                // Silencioso: no mostrar errores al usuario
                 console.error('Error al registrar uso:', error);
             }
+
+            // Registrar duración al salir
+            window.addEventListener('beforeunload', () => {
+                const duracionSegundos = Math.floor((Date.now() - tiempoInicio) / 1000);
+
+                // Solo registrar si la duración es mayor a 2 segundos (evita clics accidentales)
+                if (duracionSegundos > 2) {
+                    fetch('https://meskeia.com/api/v1/guardar-duracion.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            aplicacion: nombreApp,
+                            duracion_segundos: duracionSegundos,
+                            tipo_dispositivo: tipoDispositivo
+                        }),
+                        keepalive: true
+                    });
+                }
+            });
         })();
     </script>
 </body>
