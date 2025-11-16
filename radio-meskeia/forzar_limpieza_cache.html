@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Caché - Radio meskeIA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #FAFAFA;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2E86AB;
+            margin-bottom: 20px;
+        }
+        .step {
+            background: #F5F5F5;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #2E86AB;
+        }
+        button {
+            background: #2E86AB;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+        }
+        button:hover {
+            background: #48A9A6;
+        }
+        .success {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        .info {
+            background: #FFF3CD;
+            border: 1px solid #FFE69C;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Limpieza de Caché - Radio meskeIA</h1>
+
+        <div class="info">
+            <strong>⚠️ Problema:</strong> Tu navegador tiene la versión antigua de Radio meskeIA en caché,
+            por eso ves alerts bloqueantes en lugar de notificaciones elegantes.
+        </div>
+
+        <div class="step">
+            <strong>Paso 1:</strong> Haz clic en el botón para limpiar la caché
+        </div>
+
+        <button onclick="limpiarCache()">🗑️ Limpiar Caché Completamente</button>
+
+        <div class="success" id="success">
+            ✅ ¡Caché limpiada! Ahora serás redirigido a Radio meskeIA con la versión correcta...
+        </div>
+
+        <div class="step">
+            <strong>Paso 2 (Manual):</strong> Si el botón no funciona:
+            <ul>
+                <li><strong>Windows:</strong> Presiona <code>Ctrl + Shift + Delete</code></li>
+                <li><strong>Mac:</strong> Presiona <code>Cmd + Shift + Delete</code></li>
+                <li>Selecciona "Imágenes y archivos en caché"</li>
+                <li>Presiona "Borrar datos"</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <strong>Paso 3:</strong> Después de limpiar, cierra TODAS las pestañas y ventanas del navegador
+        </div>
+
+        <div class="step">
+            <strong>Paso 4:</strong> Abre el navegador de nuevo y carga Radio meskeIA
+        </div>
+
+        <button onclick="abrirRadio()">📻 Abrir Radio meskeIA (después de limpiar)</button>
+
+        <div class="info" style="margin-top: 30px;">
+            <strong>ℹ️ Verificación:</strong> Cuando abras Radio meskeIA, presiona F12 y verifica que en la consola aparezca:
+            <br><br>
+            <code>📻 Radio meskeIA v2.1 - Sistema de notificaciones sin alert()</code>
+            <br>
+            <code>✅ Función mostrarNotificacion: true</code>
+        </div>
+    </div>
+
+    <script>
+        async function limpiarCache() {
+            try {
+                // Limpiar localStorage
+                localStorage.clear();
+                console.log('✅ localStorage limpiado');
+
+                // Limpiar sessionStorage
+                sessionStorage.clear();
+                console.log('✅ sessionStorage limpiado');
+
+                // Limpiar indexedDB
+                if ('indexedDB' in window) {
+                    const databases = await indexedDB.databases();
+                    databases.forEach(db => {
+                        indexedDB.deleteDatabase(db.name);
+                    });
+                    console.log('✅ IndexedDB limpiado');
+                }
+
+                // Limpiar Service Workers
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                    }
+                    console.log('✅ Service Workers desregistrados');
+                }
+
+                // Limpiar caché de la API de Cache
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(
+                        cacheNames.map(cacheName => caches.delete(cacheName))
+                    );
+                    console.log('✅ Cache API limpiada');
+                }
+
+                // Mostrar mensaje de éxito
+                document.getElementById('success').style.display = 'block';
+
+                // Redirigir después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = 'index.html?v=' + Date.now();
+                }, 2000);
+
+            } catch (error) {
+                alert('Hubo un error al limpiar la caché: ' + error.message + '\n\nPor favor, usa la opción manual (Ctrl+Shift+Delete)');
+            }
+        }
+
+        function abrirRadio() {
+            // Añadir parámetro de tiempo para evitar caché
+            window.location.href = 'index.html?v=' + Date.now();
+        }
+    </script>
+</body>
+</html>
