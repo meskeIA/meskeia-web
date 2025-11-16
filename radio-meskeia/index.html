@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="es" translate="yes">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Meta tags para traducción automática del navegador -->
+    <meta name="google" content="translate">
+    <meta http-equiv="content-language" content="es">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Cache busting - Versión 2.0 - Notificaciones sin bloqueo -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>Radio meskeIA - Emisoras de Todo el Mundo</title>
+    <meta name="description" content="Escucha emisoras de radio de todo el mundo en vivo. Miles de estaciones de música, noticias y podcasts disponibles gratis.">
+    <link rel="icon" type="image/png" href="icon_meskeia.png">
+
+    <style>
+        /* Variables CSS - Paleta oficial meskeIA */
+        :root {
+            /* Backgrounds - Inspirados en Claude */
+            --bg-primary: #FAFAFA;
+            --bg-card: #FFFFFF;
+
+            /* Identidad de marca meskeIA */
+            --primary: #2E86AB;
+            --secondary: #48A9A6;
+
+            /* Textos minimalistas */
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+
+            /* Elementos estructurales */
+            --border: #E5E5E5;
+            --hover: #F5F5F5;
+            --focus: rgba(46,134,171,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            padding-top: 80px;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Controles principales */
+        .controls {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .search-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-section input,
+        .search-section select,
+        .search-section button {
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .search-section input:focus,
+        .search-section select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--focus);
+        }
+
+        .search-section button {
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            border: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .search-section button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46,134,171,0.3);
+        }
+
+        /* Reproductor de audio */
+        .player {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            padding: 25px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(46,134,171,0.2);
+        }
+
+        .player-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .player-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .player-info p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .player-controls button {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-controls button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .player-controls .play-btn {
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .volume-control input[type="range"] {
+            width: 200px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.3);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+        }
+
+        .volume-control input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        /* Lista de emisoras */
+        .stations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .station-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .station-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(46,134,171,0.15);
+            border-color: var(--primary);
+        }
+
+        .station-card.playing {
+            border-color: var(--primary);
+            background: var(--focus);
+        }
+
+        .station-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .station-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .station-country {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .station-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .station-tag {
+            background: var(--hover);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .favorite-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .favorite-btn.active {
+            color: #FF6B6B;
+        }
+
+        /* Loading spinner */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mensaje vacío */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-top: 70px;
+                padding-bottom: 80px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .search-section {
+                grid-template-columns: 1fr;
+            }
+
+            .player-info h2 {
+                font-size: 1.3rem;
+            }
+
+            .stations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .tab {
+                white-space: nowrap;
+            }
+        }
+
+        /* Animaciones para mensaje de compartir */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+        /* Logo meskeIA - Componente oficial */
+        .meskeia-logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(46, 134, 171, 0.2);
+            border-radius: 12px;
+            padding: 8px 16px;
+            box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+            transition: all 0.3s ease;
+        }
+        .meskeia-logo-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+        }
+        .meskeia-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .meskeia-logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+        }
+        .meskeia-logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #2E86AB;
+            border-radius: 50%;
+            top: 13px;
+            left: 13px;
+        }
+        .meskeia-neural-network {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+        .meskeia-neural-dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+        }
+        .meskeia-neural-dot:nth-child(1) { top: 4px; left: 6px; }
+        .meskeia-neural-dot:nth-child(2) { top: 8px; right: 5px; }
+        .meskeia-neural-dot:nth-child(3) { bottom: 6px; left: 4px; }
+        .meskeia-neural-dot:nth-child(4) { bottom: 4px; right: 8px; }
+        .meskeia-logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2C3E50;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .meskeia-logo-text .meske {
+            color: #2E86AB;
+        }
+        .meskeia-logo-text .ia {
+            color: #48A9A6;
+            font-weight: 700;
+            position: relative;
+        }
+        .meskeia-logo-text .ia::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #48A9A6, #7FB3D3);
+            border-radius: 1px;
+        }
+        @media (max-width: 768px) {
+            .meskeia-logo-container {
+                top: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                gap: 8px;
+            }
+            .meskeia-logo-icon {
+                width: 24px;
+                height: 24px;
+            }
+            .meskeia-logo-icon::before {
+                width: 9px;
+                height: 9px;
+                top: 7.5px;
+                left: 7.5px;
+            }
+            .meskeia-logo-icon::after {
+                width: 4px;
+                height: 4px;
+                top: 10px;
+                left: 10px;
+            }
+            .meskeia-logo-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📻 Radio meskeIA</h1>
+            <p>Miles de emisoras de radio de todo el mundo en vivo</p>
+        </div>
+
+        <!-- Controles de búsqueda -->
+        <div class="controls">
+            <div class="search-section">
+                <input type="text" id="searchInput" placeholder="Buscar emisora...">
+                <select id="countryFilter">
+                    <option value="">Todos los países</option>
+                </select>
+                <select id="genreFilter">
+                    <option value="">Todos los géneros</option>
+                </select>
+                <button onclick="searchStations()">🔍 Buscar</button>
+            </div>
+        </div>
+
+        <!-- Reproductor de audio -->
+        <div class="player">
+            <div class="player-info">
+                <h2 id="playerStationName">Selecciona una emisora</h2>
+                <p id="playerStationInfo">Busca y elige tu emisora favorita</p>
+            </div>
+            <div class="player-controls">
+                <button onclick="stopRadio()" title="Detener">⏹️</button>
+                <button class="play-btn" id="playBtn" onclick="togglePlay()" title="Reproducir">▶️</button>
+                <button onclick="toggleFavoritePlayer()" id="favBtnPlayer" title="Añadir a favoritos">⭐</button>
+            </div>
+            <div class="volume-control">
+                <span>🔈</span>
+                <input type="range" id="volumeSlider" min="0" max="100" value="70" oninput="changeVolume(this.value)">
+                <span>🔊</span>
+                <button onclick="toggleMute()" id="muteBtn" style="background: rgba(255,255,255,0.2); border: 2px solid white; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 1rem;">🔊</button>
+            </div>
+        </div>
+
+        <!-- Tabs de navegación -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('popular')">🔥 Populares</button>
+            <button class="tab" onclick="switchTab('spain')">🇪🇸 España</button>
+            <button class="tab" onclick="switchTab('favorites')">⭐ Favoritos</button>
+            <button class="tab" onclick="switchTab('search')">🔍 Resultados</button>
+        </div>
+
+        <!-- Contenedor de emisoras -->
+        <div id="stationsContainer">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Cargando emisoras...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio element (oculto) -->
+    <audio id="radioPlayer" preload="none"></audio>
+
+    <!-- Footer meskeIA -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; display: flex; align-items: center; gap: 10px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <span>© 2025 meskeIA</span>
+        <span style="color: #E5E5E5; user-select: none;">|</span>
+        <button type="button"
+                onclick="compartirApp()"
+                style="background: none; border: none; color: #2E86AB; cursor: pointer; font-size: 0.9rem; padding: 0; display: flex; align-items: center; gap: 4px; font-family: inherit; transition: opacity 0.2s;"
+                onmouseover="this.style.opacity='0.7'"
+                onmouseout="this.style.opacity='1'"
+                title="Compartir esta herramienta">
+            🔗 <span style="text-decoration: underline;">Compartir</span>
+        </button>
+    </footer>
+
+    <script>
+        // Mostrar notificación personalizada (sin bloqueo) - DEBE ESTAR AL INICIO
+        function mostrarNotificacion(mensaje, tipo = 'error') {
+            const notif = document.createElement('div');
+            notif.textContent = mensaje;
+            notif.style.cssText = `
+                position: fixed;
+                top: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${tipo === 'error' ? '#FF6B6B' : '#2E86AB'};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                font-size: 1rem;
+                font-family: inherit;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: fadeIn 0.3s;
+                max-width: 90%;
+                text-align: center;
+            `;
+            document.body.appendChild(notif);
+
+            setTimeout(() => {
+                notif.style.animation = 'fadeOut 0.3s';
+                setTimeout(() => notif.remove(), 300);
+            }, 3000);
+        }
+
+        // Estado global de la aplicación
+        let currentStation = null;
+        let allStations = [];
+        let favorites = JSON.parse(localStorage.getItem('radioFavorites')) || [];
+        let isPlaying = false;
+        let isMuted = false;
+        let currentTab = 'popular';
+
+        const radioPlayer = document.getElementById('radioPlayer');
+        const playBtn = document.getElementById('playBtn');
+
+        // Emisoras populares españolas (URLs verificadas)
+        const popularSpanishStations = [
+            { name: 'Los 40 Principales', country: 'España', tags: ['Pop', 'Top Hits'], url: 'http://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3' },
+            { name: 'Cadena SER', country: 'España', tags: ['Noticias', 'Actualidad'], url: 'http://playerservices.streamtheworld.com/api/livestream-redirect/CADENASER.mp3' },
+            { name: 'Radio Nacional', country: 'España', tags: ['Noticias', 'Cultura'], url: 'https://rtvelivestream.akamaized.net/rne/rne_r1_main.m3u8' },
+            { name: 'Cadena 100', country: 'España', tags: ['Pop', 'Música'], url: 'http://playerservices.streamtheworld.com/api/livestream-redirect/CADENA100.mp3' },
+            { name: 'COPE', country: 'España', tags: ['Noticias', 'Deportes'], url: 'https://flucast-b02-06.flumotion.com/cope/net1.mp3' },
+            { name: 'Europa FM', country: 'España', tags: ['Dance', 'Electrónica'], url: 'http://playerservices.streamtheworld.com/api/livestream-redirect/EUROPAFM.mp3' },
+            { name: 'Onda Cero', country: 'España', tags: ['Noticias', 'Actualidad'], url: 'https://livefastcast-ams.akamaized.net/oniv/ondacero.mp3' },
+            { name: 'Radio 3', country: 'España', tags: ['Indie', 'Rock'], url: 'https://rtvelivestream.akamaized.net/rne/rne_r3_main.m3u8' }
+        ];
+
+        // Inicialización
+        window.onload = function() {
+            console.log('📻 Radio meskeIA v2.0 - Notificaciones sin bloqueo cargadas');
+            console.log('✅ Función mostrarNotificacion disponible:', typeof mostrarNotificacion === 'function');
+            loadPopularStations();
+            loadCountries();
+            loadGenres();
+            initializePlayer();
+        };
+
+        // Cargar emisoras populares
+        function loadPopularStations() {
+            displayStations(popularSpanishStations);
+        }
+
+        // Inicializar reproductor
+        function initializePlayer() {
+            radioPlayer.volume = 0.7;
+
+            radioPlayer.addEventListener('play', () => {
+                isPlaying = true;
+                playBtn.textContent = '⏸️';
+            });
+
+            radioPlayer.addEventListener('pause', () => {
+                isPlaying = false;
+                playBtn.textContent = '▶️';
+            });
+
+            radioPlayer.addEventListener('error', (e) => {
+                console.error('Error al reproducir:', e);
+                mostrarNotificacion('❌ No se pudo reproducir esta emisora. Intenta con otra.');
+                stopRadio();
+            });
+        }
+
+        // Buscar emisoras usando Radio Browser API
+        async function searchStations() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const country = document.getElementById('countryFilter').value;
+            const genre = document.getElementById('genreFilter').value;
+
+            if (!searchTerm && !country && !genre) {
+                mostrarNotificacion('⚠️ Por favor, introduce un término de búsqueda o selecciona un filtro', 'info');
+                return;
+            }
+
+            showLoading();
+            switchTab('search');
+
+            try {
+                let url = 'https://de1.api.radio-browser.info/json/stations/search?';
+                const params = new URLSearchParams();
+
+                if (searchTerm) params.append('name', searchTerm);
+                if (country) params.append('country', country);
+                if (genre) params.append('tag', genre);
+                params.append('limit', '50');
+                params.append('hidebroken', 'true');
+                params.append('order', 'votes');
+                params.append('reverse', 'true');
+
+                const response = await fetch(url + params.toString());
+                const stations = await response.json();
+
+                allStations = stations.map(station => ({
+                    name: station.name,
+                    country: station.country,
+                    tags: station.tags ? station.tags.split(',').slice(0, 3) : [],
+                    url: station.url_resolved || station.url,
+                    favicon: station.favicon
+                }));
+
+                displayStations(allStations);
+            } catch (error) {
+                console.error('Error al buscar emisoras:', error);
+                showEmptyState('Error al buscar emisoras. Intenta de nuevo.');
+            }
+        }
+
+        // Cargar países disponibles
+        async function loadCountries() {
+            try {
+                const response = await fetch('https://de1.api.radio-browser.info/json/countries');
+                const countries = await response.json();
+
+                const select = document.getElementById('countryFilter');
+                countries
+                    .sort((a, b) => b.stationcount - a.stationcount)
+                    .slice(0, 50)
+                    .forEach(country => {
+                        if (country.name) {
+                            const option = document.createElement('option');
+                            option.value = country.name;
+                            option.textContent = `${country.name} (${country.stationcount.toLocaleString('es-ES')})`;
+                            select.appendChild(option);
+                        }
+                    });
+            } catch (error) {
+                console.error('Error al cargar países:', error);
+            }
+        }
+
+        // Cargar géneros disponibles
+        async function loadGenres() {
+            try {
+                const response = await fetch('https://de1.api.radio-browser.info/json/tags?limit=100&order=stationcount&reverse=true');
+                const tags = await response.json();
+
+                const select = document.getElementById('genreFilter');
+                tags.slice(0, 50).forEach(tag => {
+                    if (tag.name) {
+                        const option = document.createElement('option');
+                        option.value = tag.name;
+                        option.textContent = `${tag.name} (${tag.stationcount.toLocaleString('es-ES')})`;
+                        select.appendChild(option);
+                    }
+                });
+            } catch (error) {
+                console.error('Error al cargar géneros:', error);
+            }
+        }
+
+        // Mostrar emisoras en el grid
+        function displayStations(stations) {
+            const container = document.getElementById('stationsContainer');
+
+            if (stations.length === 0) {
+                showEmptyState('No se encontraron emisoras');
+                return;
+            }
+
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'stations-grid';
+
+            stations.forEach((station, index) => {
+                const isFav = favorites.some(f => f.url === station.url);
+
+                const card = document.createElement('div');
+                card.className = 'station-card';
+                card.dataset.index = index;
+
+                card.innerHTML = `
+                    <div class="station-header">
+                        <div>
+                            <div class="station-name">${escapeHtml(station.name)}</div>
+                            <div class="station-country">📍 ${escapeHtml(station.country)}</div>
+                        </div>
+                        <button class="favorite-btn ${isFav ? 'active' : ''}" data-action="favorite">
+                            ${isFav ? '❤️' : '🤍'}
+                        </button>
+                    </div>
+                    <div class="station-tags">
+                        ${station.tags.map(tag => `<span class="station-tag">${escapeHtml(tag)}</span>`).join('')}
+                    </div>
+                `;
+
+                // Event listener para la tarjeta completa
+                card.addEventListener('click', function(e) {
+                    // Si hicieron clic en el botón de favorito, no reproducir
+                    if (e.target.closest('[data-action="favorite"]')) {
+                        e.stopPropagation();
+                        toggleFavorite(station);
+                        return;
+                    }
+                    playStation(station, this);
+                });
+
+                gridDiv.appendChild(card);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(gridDiv);
+        }
+
+        // Reproducir emisora
+        function playStation(station, cardElement) {
+            currentStation = station;
+
+            document.getElementById('playerStationName').textContent = station.name;
+            document.getElementById('playerStationInfo').textContent = `${station.country} • ${station.tags.join(', ')}`;
+
+            radioPlayer.src = station.url;
+            radioPlayer.play().catch(e => {
+                console.error('Error al reproducir:', e);
+                mostrarNotificacion('❌ No se pudo reproducir esta emisora. Intenta con otra.');
+
+                // Restaurar estado
+                stopRadio();
+            });
+
+            // Actualizar cards
+            document.querySelectorAll('.station-card').forEach(card => {
+                card.classList.remove('playing');
+            });
+            if (cardElement) {
+                cardElement.classList.add('playing');
+            }
+
+            // Actualizar botón de favorito del player
+            updatePlayerFavoriteButton();
+        }
+
+        // Controles del reproductor
+        function togglePlay() {
+            if (!currentStation) {
+                mostrarNotificacion('⚠️ Selecciona una emisora primero', 'info');
+                return;
+            }
+
+            if (isPlaying) {
+                radioPlayer.pause();
+            } else {
+                radioPlayer.play();
+            }
+        }
+
+        function stopRadio() {
+            radioPlayer.pause();
+            radioPlayer.src = '';
+            currentStation = null;
+            isPlaying = false;
+            playBtn.textContent = '▶️';
+
+            document.getElementById('playerStationName').textContent = 'Selecciona una emisora';
+            document.getElementById('playerStationInfo').textContent = 'Busca y elige tu emisora favorita';
+
+            document.querySelectorAll('.station-card').forEach(card => {
+                card.classList.remove('playing');
+            });
+        }
+
+        function changeVolume(value) {
+            radioPlayer.volume = value / 100;
+
+            if (isMuted && value > 0) {
+                isMuted = false;
+                document.getElementById('muteBtn').textContent = '🔊';
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            radioPlayer.muted = isMuted;
+            document.getElementById('muteBtn').textContent = isMuted ? '🔇' : '🔊';
+        }
+
+        // Favoritos
+        function toggleFavorite(station) {
+            const index = favorites.findIndex(f => f.url === station.url);
+
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(station);
+            }
+
+            localStorage.setItem('radioFavorites', JSON.stringify(favorites));
+
+            // Recargar vista actual sin perder el scroll
+            const scrollPos = window.scrollY;
+
+            switch(currentTab) {
+                case 'popular':
+                    displayStations(popularSpanishStations);
+                    break;
+                case 'spain':
+                    // No recargar desde API, usar los datos actuales
+                    if (allStations.length > 0) {
+                        displayStations(allStations);
+                    }
+                    break;
+                case 'favorites':
+                    displayStations(favorites);
+                    break;
+                case 'search':
+                    displayStations(allStations);
+                    break;
+            }
+
+            // Restaurar posición del scroll
+            setTimeout(() => window.scrollTo(0, scrollPos), 0);
+        }
+
+        function toggleFavoritePlayer() {
+            if (!currentStation) {
+                mostrarNotificacion('⚠️ Selecciona una emisora primero', 'info');
+                return;
+            }
+            toggleFavorite(currentStation);
+            updatePlayerFavoriteButton();
+        }
+
+        function updatePlayerFavoriteButton() {
+            const btn = document.getElementById('favBtnPlayer');
+            const isFav = currentStation && favorites.some(f => f.url === currentStation.url);
+            btn.textContent = isFav ? '❤️' : '⭐';
+        }
+
+        // Cambiar tabs
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // Actualizar botones
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.remove('active');
+            });
+
+            // Encontrar y activar el botón correspondiente
+            const buttons = document.querySelectorAll('.tab');
+            const tabNames = ['popular', 'spain', 'favorites', 'search'];
+            const index = tabNames.indexOf(tab);
+            if (index >= 0 && buttons[index]) {
+                buttons[index].classList.add('active');
+            }
+
+            // Cargar contenido
+            switch(tab) {
+                case 'popular':
+                    displayStations(popularSpanishStations);
+                    break;
+                case 'spain':
+                    searchSpanishStations();
+                    break;
+                case 'favorites':
+                    displayStations(favorites);
+                    break;
+                case 'search':
+                    displayStations(allStations);
+                    break;
+            }
+        }
+
+        // Buscar emisoras españolas
+        async function searchSpanishStations() {
+            showLoading();
+            try {
+                const response = await fetch('https://de1.api.radio-browser.info/json/stations/search?country=Spain&limit=100&hidebroken=true&order=votes&reverse=true');
+                const stations = await response.json();
+
+                allStations = stations.map(station => ({
+                    name: station.name,
+                    country: station.country,
+                    tags: station.tags ? station.tags.split(',').slice(0, 3) : [],
+                    url: station.url_resolved || station.url,
+                    favicon: station.favicon
+                }));
+
+                displayStations(allStations);
+            } catch (error) {
+                console.error('Error al cargar emisoras españolas:', error);
+                showEmptyState('Error al cargar emisoras');
+            }
+        }
+
+        // Utilidades
+        function showLoading() {
+            document.getElementById('stationsContainer').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Cargando emisoras...</p>
+                </div>
+            `;
+        }
+
+        function showEmptyState(message) {
+            document.getElementById('stationsContainer').innerHTML = `
+                <div class="empty-state">
+                    <h3>😕 ${message}</h3>
+                    <p>Intenta con otros términos de búsqueda</p>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Función para compartir la aplicación
+        async function compartirApp() {
+            const titulo = document.title;
+            const url = window.location.href;
+            const texto = '¡Mira esta herramienta útil de meskeIA!';
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: titulo, text: texto, url: url });
+                    console.log('✅ Compartido exitosamente');
+                } catch (err) {
+                    if (err.name !== 'AbortError') console.error('Error al compartir:', err);
+                }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(url);
+                    const mensaje = document.createElement('div');
+                    mensaje.textContent = '✅ Enlace copiado al portapapeles';
+                    mensaje.style.cssText = 'position: fixed; bottom: 60px; right: 20px; background: #2E86AB; color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; font-family: inherit; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; animation: fadeIn 0.3s;';
+                    document.body.appendChild(mensaje);
+                    setTimeout(() => {
+                        mensaje.style.animation = 'fadeOut 0.3s';
+                        setTimeout(() => mensaje.remove(), 300);
+                    }, 3000);
+                } catch (err) {
+                    prompt('Copia este enlace para compartir:', url);
+                }
+            }
+        }
+    </script>
+
+        <!-- meskeIA Analytics v2.0 - Tracking con duración y dispositivo -->
+    <script>
+        (async function() {
+            const nombreApp = 'radio-meskeia';
+
+            // Detección de visita recurrente usando localStorage
+            const claveStorage = 'meskeia_' + nombreApp;
+            const esRecurrente = localStorage.getItem(claveStorage) !== null;
+
+            // Marcar primera visita
+            if (!esRecurrente) {
+                localStorage.setItem(claveStorage, new Date().toISOString());
+            }
+
+            // Detección de tipo de dispositivo
+            const esMovil = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const tipoDispositivo = esMovil ? 'movil' : 'escritorio';
+
+            // Iniciar contador de duración
+            const tiempoInicio = Date.now();
+
+            // Datos de entrada (registro inicial)
+            const datosEntrada = {
+                aplicacion: nombreApp,
+                navegador: navigator.userAgent,
+                sistema_operativo: navigator.platform,
+                resolucion: `${{window.screen.width}}x${{window.screen.height}}`,
+                tipo_dispositivo: tipoDispositivo,
+                es_recurrente: esRecurrente
+            };
+
+            // Registrar entrada
+            try {
+                await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosEntrada),
+                    keepalive: true
+                });
+                console.log('✅ Uso registrado en meskeIA Analytics v2.0');
+            } catch (error) {
+                console.error('Error al registrar uso:', error);
+            }
+
+            // Registrar duración al salir
+            window.addEventListener('beforeunload', () => {
+                const duracionSegundos = Math.floor((Date.now() - tiempoInicio) / 1000);
+
+                // Solo registrar si la duración es mayor a 2 segundos (evita clics accidentales)
+                if (duracionSegundos > 2) {
+                    fetch('https://meskeia.com/api/v1/guardar-duracion.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            aplicacion: nombreApp,
+                            duracion_segundos: duracionSegundos,
+                            tipo_dispositivo: tipoDispositivo
+                        }),
+                        keepalive: true
+                    });
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1195,6 +1195,7 @@
                     Juegos clásicos y rompecabezas para momentos de diversión y relajación mental.
                 </p>
                 <ul class="category-tools" id="entretenimiento-tools" style="display: none;" onclick="event.stopPropagation()">
+                    <li><a href="radio-meskeia/" onclick="event.stopPropagation()" title="Escucha miles de emisoras de radio de todo el mundo en vivo">Radio meskeIA</a></li>
                     <li><a href="wordle-espanol/" onclick="event.stopPropagation()" title="Adivina la palabra del día en español con 6 intentos">Wordle en Español</a></li>
                     <li><a href="sudoku-clasico/" onclick="event.stopPropagation()" title="Resuelve puzzles Sudoku con diferentes niveles de dificultad">Sudoku Clásico</a></li>
                     <li><a href="tres-en-raya/" onclick="event.stopPropagation()" title="Juega al clásico tres en raya contra la computadora">Tres en Raya</a></li>
@@ -1474,7 +1475,8 @@
             { name: "Información del Tiempo", category: "Herramientas de Productividad", icon: "⚡", description: "Consulta el pronóstico del tiempo para cualquier ciudad del mundo", url: "informacion-tiempo/", keywords: ["clima", "tiempo", "meteorologia", "pronostico", "temperatura"] },
             { name: "Generador de Contraseñas", category: "Herramientas de Productividad", icon: "⚡", description: "Crea contraseñas seguras y personalizadas con diferentes niveles de complejidad", url: "generador-contrasenas/", keywords: ["password", "seguridad", "contrasena", "generar", "segura"] },
             { name: "Generador de Códigos QR", category: "Herramientas de Productividad", icon: "⚡", description: "Crea códigos QR personalizados para URLs, WiFi, contactos, eventos y más", url: "generador-codigos-qr/index.html", keywords: ["qr", "codigo", "generar", "escanear", "wifi"] },
-            // Juegos y Entretenimiento (7)
+            // Juegos y Entretenimiento (8)
+            { name: "Radio meskeIA", category: "Juegos y Entretenimiento", icon: "📻", description: "Escucha miles de emisoras de radio de todo el mundo en vivo", url: "radio-meskeia/", keywords: ["radio", "musica", "emisoras", "streaming", "noticias", "podcasts", "online"] },
             { name: "Wordle en Español", category: "Juegos y Entretenimiento", icon: "🎮", description: "Adivina la palabra del día en español con 6 intentos", url: "wordle-espanol/", keywords: ["wordle", "palabra", "juego", "adivinar", "español"] },
             { name: "Sudoku Clásico", category: "Juegos y Entretenimiento", icon: "🎮", description: "Resuelve puzzles Sudoku con diferentes niveles de dificultad", url: "sudoku-clasico/", keywords: ["sudoku", "puzzle", "numeros", "logica", "juego"] },
             { name: "Tres en Raya", category: "Juegos y Entretenimiento", icon: "🎮", description: "Juega al clásico tres en raya contra la computadora", url: "tres-en-raya/", keywords: ["tres en raya", "tic tac toe", "juego", "clasico"] },
@@ -1754,6 +1756,71 @@
                 }
             }
         }
+    </script>
+
+    <!-- meskeIA Analytics v2.0 - Tracking con duración y dispositivo -->
+    <script>
+        (async function() {
+            const nombreApp = 'index-principal';
+
+            // Detección de visita recurrente usando localStorage
+            const claveStorage = 'meskeia_' + nombreApp;
+            const esRecurrente = localStorage.getItem(claveStorage) !== null;
+
+            // Marcar primera visita
+            if (!esRecurrente) {
+                localStorage.setItem(claveStorage, new Date().toISOString());
+            }
+
+            // Detección de tipo de dispositivo
+            const esMovil = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const tipoDispositivo = esMovil ? 'movil' : 'escritorio';
+
+            // Iniciar contador de duración
+            const tiempoInicio = Date.now();
+
+            // Datos de entrada (registro inicial)
+            const datosEntrada = {
+                aplicacion: nombreApp,
+                navegador: navigator.userAgent,
+                sistema_operativo: navigator.platform,
+                resolucion: `${window.screen.width}x${window.screen.height}`,
+                tipo_dispositivo: tipoDispositivo,
+                es_recurrente: esRecurrente
+            };
+
+            // Registrar entrada
+            try {
+                await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosEntrada),
+                    keepalive: true
+                });
+                console.log('✅ Uso registrado en meskeIA Analytics v2.0');
+            } catch (error) {
+                console.error('Error al registrar uso:', error);
+            }
+
+            // Registrar duración al salir
+            window.addEventListener('beforeunload', () => {
+                const duracionSegundos = Math.floor((Date.now() - tiempoInicio) / 1000);
+
+                // Solo registrar si la duración es mayor a 2 segundos (evita clics accidentales)
+                if (duracionSegundos > 2) {
+                    fetch('https://meskeia.com/api/v1/guardar-duracion.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            aplicacion: nombreApp,
+                            duracion_segundos: duracionSegundos,
+                            tipo_dispositivo: tipoDispositivo
+                        }),
+                        keepalive: true
+                    });
+                }
+            });
+        })();
     </script>
 </body>
 </html>
