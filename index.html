@@ -1760,7 +1760,11 @@
         }
     </script>
 
-    <!-- meskeIA Analytics v2.0 - Tracking con duración y dispositivo -->
+    <!-- meskeIA Analytics v2.0 - DESACTIVADO en index principal -->
+    <!--
+    Razón: Evita registros duplicados (index + app)
+    Solo se registran las aplicaciones específicas para estadísticas limpias
+
     <script>
         (async function() {
             const nombreApp = 'index-principal';
@@ -1824,5 +1828,6 @@
             });
         })();
     </script>
+    -->
 </body>
 </html>
