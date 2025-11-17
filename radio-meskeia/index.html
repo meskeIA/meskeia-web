@@ -392,10 +392,24 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            html, body {
+                overflow-x: hidden;
+                max-width: 100vw;
+            }
+
             body {
                 padding: 10px;
                 padding-top: 70px;
                 padding-bottom: 80px;
+            }
+
+            .container {
+                padding: 15px;
+                margin: 0;
+            }
+
+            .header {
+                padding: 20px;
             }
 
             .header h1 {
@@ -404,6 +418,19 @@
 
             .search-section {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .search-section input,
+            .search-section select,
+            .search-section button {
+                width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+
+            .player {
+                padding: 20px;
             }
 
             .player-info h2 {
@@ -412,15 +439,18 @@
 
             .stations-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
             }
 
             .tabs {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
+                gap: 8px;
             }
 
             .tab {
                 white-space: nowrap;
+                font-size: 0.9rem;
             }
         }
 
