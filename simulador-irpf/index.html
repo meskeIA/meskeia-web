@@ -928,6 +928,36 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
+        
+            /* Footer unificado responsive */
+            footer {
+                bottom: 5px !important;
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
+                font-size: 0.8rem !important;
+                padding: 5px 12px !important;
+                white-space: normal !important;
+                max-width: calc(100vw - 20px) !important;
+            }
+
+            footer > div:first-child {
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 4px !important;
+            }
+
+            footer > div:first-child span {
+                font-size: 0.8rem !important;
+            }
+
+            footer > div:first-child button {
+                font-size: 0.8rem !important;
+            }
+
+            footer > div:last-child {
+                font-size: 0.7rem !important;
+            }
         }
     </style>
 </head>
@@ -1476,12 +1506,394 @@
             color: #2E86AB;
         }
         @media (max-width: 768px) {
-            .meskeia-edu-section {
-                margin: 2rem 1rem 1.5rem;
-                padding: 1.5rem;
+            .meskeia-logo-container {
+                top: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                gap: 8px;
             }
-            .meskeia-edu-section h2 {
-                font-size: 1.25rem;
+            
+            .meskeia-logo-icon {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .meskeia-logo-icon::before {
+                width: 9px;
+                height: 9px;
+                top: 7.5px;
+                left: 7.5px;
+            }
+            
+            .meskeia-logo-icon::after {
+                width: 4px;
+                height: 4px;
+                top: 10px;
+                left: 10px;
+            }
+            
+            .meskeia-logo-text {
+                font-size: 1rem;
+            }
+
+            .container {
+                margin: var(--spacing-sm);
+                border-radius: var(--radius);
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+                padding: var(--spacing-lg);
+            }
+            
+            .header {
+                padding: var(--spacing-lg);
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .legal-notice {
+                padding: var(--spacing-sm);
+                font-size: 0.8rem;
+            }
+            
+            /* Tabla responsive */
+            .tramos-table {
+                font-size: 0.8rem;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .tramos-table thead,
+            .tramos-table tbody,
+            .tramos-table tr {
+                display: table;
+                width: 100%;
+                table-layout: fixed;
+            }
+            
+            .tramos-table th,
+            .tramos-table td {
+                padding: var(--spacing-xs) 2px;
+                font-size: 0.7rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .panel {
+                padding: var(--spacing-lg);
+            }
+
+            .total-base {
+                font-size: 1rem;
+                padding: var(--spacing-md);
+            }
+
+            .legal-footer {
+                padding: var(--spacing-md);
+            }
+
+            .legal-footer p {
+                font-size: 0.75rem;
+            }
+
+            .footer {
+                bottom: 10px;
+                right: 10px;
+                font-size: 0.8rem;
+                padding: 4px 8px;
+            }
+
+            .plusvalias-group {
+                padding: var(--spacing-md);
+            }
+
+            .plusvalias-group h3 {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 5px;
+            }
+
+            .main-content {
+                padding: var(--spacing-md);
+                gap: var(--spacing-md);
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .tramos-table th,
+            .tramos-table td {
+                padding: 4px 2px;
+                font-size: 0.65rem;
+            }
+
+            .panel {
+                padding: var(--spacing-md);
+            }
+        }
+
+        /* SEO Content Styles */
+        .seo-content {
+            max-width: 1200px;
+            margin: 40px auto 20px;
+            padding: 30px;
+            background: var(--bg-card);
+            border-radius: var(--radius-large);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border);
+        }
+
+        .irpf-guide h2 {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .irpf-guide > p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .feature-item {
+            background: var(--hover);
+            padding: 25px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .feature-item h4 {
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .feature-item p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .tax-brackets h3, .investment-types h3, .tax-tips h3, .faq h3 {
+            color: var(--primary);
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .brackets-grid, .types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .bracket-card, .type-item {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #f8f9fa 100%);
+            padding: 20px;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, #f8f9fa 100%);
+            padding: 20px;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--success);
+            transition: transform 0.3s ease;
+        }
+
+        .bracket-card:hover, .type-item:hover, .tip-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .bracket-card h4, .type-item h4, .tip-card h4 {
+            color: var(--primary);
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .tip-card h4 {
+            color: var(--success);
+        }
+
+        .bracket-card p, .type-item p, .tip-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 20px;
+        }
+
+        .faq-item {
+            background: var(--hover);
+            padding: 25px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .faq-item h4 {
+            color: var(--primary);
+            font-size: 16px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .faq-item p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* Accesibilidad */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* SEO Content Mobile */
+        @media (max-width: 768px) {
+            .seo-content {
+                margin: 20px 10px 10px;
+                padding: 20px 15px;
+                border-radius: var(--radius);
+            }
+            
+            .irpf-guide h2 {
+                font-size: 22px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .brackets-grid, .types-grid, .tips-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .faq-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .feature-item, .bracket-card, .type-item, .tip-card, .faq-item {
+                padding: 15px;
+            }
+        }
+
+        /* Animaciones para mensaje de compartir */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+        
+            /* Footer unificado responsive */
+            footer {
+                bottom: 5px !important;
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
+                font-size: 0.8rem !important;
+                padding: 5px 12px !important;
+                white-space: normal !important;
+                max-width: calc(100vw - 20px) !important;
+            }
+
+            footer > div:first-child {
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 4px !important;
+            }
+
+            footer > div:first-child span {
+                font-size: 0.8rem !important;
+            }
+
+            footer > div:first-child button {
+                font-size: 0.8rem !important;
+            }
+
+            footer > div:last-child {
+                font-size: 0.7rem !important;
             }
         }
     </style>
@@ -1508,23 +1920,19 @@
     </div>
 
 
-    <!-- Mensaje de recomendación (izquierda) -->
-    <div style="position: fixed; bottom: 10px; left: 20px; color: #48A9A6; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.95); padding: 5px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 280px;">
-        💡 ¿Te resultó útil? <a href="#" onclick="compartirApp(); return false;" style="color: #2E86AB; text-decoration: underline; font-weight: 500;">Compártela</a>
-    </div>
-            <!-- Footer meskeIA -->
-<footer style="position: fixed; bottom: 10px; right: 20px; display: flex; align-items: center; gap: 10px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-    <span>© 2025 meskeIA</span>
-    <span style="color: #E5E5E5; user-select: none;">|</span>
-    <button type="button"
-            onclick="compartirApp()"
-            style="background: none; border: none; color: #2E86AB; cursor: pointer; font-size: 0.9rem; padding: 0; display: flex; align-items: center; gap: 4px; font-family: inherit; transition: opacity 0.2s;"
-            onmouseover="this.style.opacity='0.7'"
-            onmouseout="this.style.opacity='1'"
-            title="Compartir esta herramienta">
-        🔗 <span style="text-decoration: underline;">Compartir</span>
-    </button>
-</footer>
+    
+                <!-- Footer meskeIA Unificado -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(46, 134, 171, 0.2); border-radius: 12px; padding: 8px 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); text-align: center; font-size: 0.9rem; z-index: 1000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; white-space: nowrap;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px;">
+            <span style="color: #2E86AB;">💡 ¿Te resultó útil?</span>
+            <button type="button" onclick="compartirApp()" style="background: none; border: none; color: #2E86AB; cursor: pointer; font-size: 0.9rem; padding: 0; display: inline-flex; align-items: center; gap: 4px; font-family: inherit; font-weight: 600; text-decoration: underline; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Compartir esta herramienta">
+                🔗 Compártela
+            </button>
+        </div>
+        <div style="color: #666; font-size: 0.85rem;">
+            © 2025 meskeIA
+        </div>
+    </footer>
 
 <script>
 

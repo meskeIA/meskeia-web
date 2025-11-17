@@ -328,6 +328,36 @@
             .meskeia-edu-section h2 {
                 font-size: 1.25rem;
             }
+        
+            /* Footer unificado responsive */
+            footer {
+                bottom: 5px !important;
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
+                font-size: 0.8rem !important;
+                padding: 5px 12px !important;
+                white-space: normal !important;
+                max-width: calc(100vw - 20px) !important;
+            }
+
+            footer > div:first-child {
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 4px !important;
+            }
+
+            footer > div:first-child span {
+                font-size: 0.8rem !important;
+            }
+
+            footer > div:first-child button {
+                font-size: 0.8rem !important;
+            }
+
+            footer > div:last-child {
+                font-size: 0.7rem !important;
+            }
         }
     </style>
 
@@ -353,23 +383,19 @@
     </div>
 
 
-    <!-- Mensaje de recomendación (izquierda) -->
-    <div style="position: fixed; bottom: 10px; left: 20px; color: #48A9A6; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.95); padding: 5px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 280px;">
-        💡 ¿Te resultó útil? <a href="#" onclick="compartirApp(); return false;" style="color: #2E86AB; text-decoration: underline; font-weight: 500;">Compártela</a>
-    </div>
-            <!-- Footer meskeIA -->
-<footer style="position: fixed; bottom: 10px; right: 20px; display: flex; align-items: center; gap: 10px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-    <span>© 2025 meskeIA</span>
-    <span style="color: #E5E5E5; user-select: none;">|</span>
-    <button type="button"
-            onclick="compartirApp()"
-            style="background: none; border: none; color: #2E86AB; cursor: pointer; font-size: 0.9rem; padding: 0; display: flex; align-items: center; gap: 4px; font-family: inherit; transition: opacity 0.2s;"
-            onmouseover="this.style.opacity='0.7'"
-            onmouseout="this.style.opacity='1'"
-            title="Compartir esta herramienta">
-        🔗 <span style="text-decoration: underline;">Compartir</span>
-    </button>
-</footer>
+    
+                <!-- Footer meskeIA Unificado -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(46, 134, 171, 0.2); border-radius: 12px; padding: 8px 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); text-align: center; font-size: 0.9rem; z-index: 1000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; white-space: nowrap;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px;">
+            <span style="color: #2E86AB;">💡 ¿Te resultó útil?</span>
+            <button type="button" onclick="compartirApp()" style="background: none; border: none; color: #2E86AB; cursor: pointer; font-size: 0.9rem; padding: 0; display: inline-flex; align-items: center; gap: 4px; font-family: inherit; font-weight: 600; text-decoration: underline; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Compartir esta herramienta">
+                🔗 Compártela
+            </button>
+        </div>
+        <div style="color: #666; font-size: 0.85rem;">
+            © 2025 meskeIA
+        </div>
+    </footer>
 
     <!-- Librerías externas para export PNG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
