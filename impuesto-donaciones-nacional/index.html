@@ -314,6 +314,7 @@
         .tooltip .tooltiptext {
             visibility: hidden;
             width: 250px;
+            max-width: calc(100vw - 40px);
             background-color: var(--text-primary);
             color: white;
             text-align: left;
@@ -323,7 +324,7 @@
             z-index: 1;
             bottom: 125%;
             left: 50%;
-            margin-left: -125px;
+            transform: translateX(-50%);
             opacity: 0;
             transition: opacity 0.3s;
             font-size: 0.85rem;
@@ -381,11 +382,6 @@
             .radio-group {
                 flex-direction: column;
                 gap: 1rem;
-            }
-
-            .tooltiptext {
-                width: 200px;
-                margin-left: -100px;
             }
 
             .disclaimer-box {
