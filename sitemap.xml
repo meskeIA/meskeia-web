@@ -67,8 +67,20 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/impuesto-donaciones-nacional/</loc>
+    <lastmod>2025-11-17</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/impuesto-sucesiones/</loc>
     <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/impuesto-sucesiones-nacional/</loc>
+    <lastmod>2025-11-17</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>

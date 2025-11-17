@@ -262,68 +262,143 @@
           ]
         },
         {
-          "name": "Impuesto de Donaciones",
+          "name": "Impuesto de Donaciones Cataluña",
           "slug": "impuesto-donaciones",
           "url": "https://meskeia.com/impuesto-donaciones/",
-          "description": "Calcula impuesto sobre donaciones según comunidad autónoma en España.",
+          "description": "Calcula impuesto sobre donaciones en Cataluña con reducciones y bonificaciones autonómicas.",
           "use_cases": [
-            "Estimar impuesto por donación recibida",
-            "Comparar entre CCAA"
+            "Estimar impuesto por donación en Cataluña",
+            "Calcular donación de vivienda habitual",
+            "Aplicar reducciones y bonificaciones catalanas"
           ],
           "features": [
-            "Por CCAA",
-            "Reducciones",
-            "Bonificaciones"
+            "Específico Cataluña",
+            "Reducciones autonómicas",
+            "Bonificaciones por parentesco",
+            "Donación vivienda habitual"
           ],
           "keywords": [
-            "impuesto donaciones espana",
-            "calculadora impuesto donaciones",
-            "impuesto sobre donaciones comunidad autonoma",
-            "cuanto cuesta donar dinero",
-            "impuesto donaciones por regiones",
-            "tributacion donaciones espana",
-            "acto de donacion impuestos",
-            "impuesto transmisiones patrimoniales donaciones"
+            "impuesto donaciones cataluña",
+            "calculadora impuesto donaciones catalunya",
+            "impuesto sobre donaciones barcelona",
+            "cuanto cuesta donar dinero cataluña",
+            "tributacion donaciones catalunya",
+            "acto de donacion impuestos cataluña"
           ],
           "_category": "Finanzas y Fiscalidad",
           "casos_de_uso": [
-            "¿Cuánto impuesto tengo que pagar por una donación en mi comunidad?",
-            "Necesito calcular el impuesto de donaciones para mi herencia, ¿cómo funciona?",
-            "¿Qué diferencia hay en el impuesto de donaciones según la comunidad autonoma?",
-            "Quiero saber cuanto me cuesta donarle dinero a mi hijo legalmente",
-            "¿Como se calcula el impuesto sobre donaciones en España por regiones?"
+            "¿Cuánto impuesto tengo que pagar por una donación en Cataluña?",
+            "Necesito calcular el impuesto de donaciones en Barcelona",
+            "¿Qué reducciones hay en Cataluña para donaciones?",
+            "Quiero saber cuanto me cuesta donarle dinero a mi hijo en Cataluña",
+            "¿Como se calcula el impuesto sobre donaciones en Catalunya?"
           ]
         },
         {
-          "name": "Impuesto de Sucesiones",
-          "slug": "impuesto-sucesiones",
-          "url": "https://meskeia.com/impuesto-sucesiones/",
-          "description": "Calcula impuesto de sucesiones y herencias por comunidad autónoma.",
+          "name": "Impuesto de Donaciones Nacional (Régimen Común)",
+          "slug": "impuesto-donaciones-nacional",
+          "url": "https://meskeia.com/impuesto-donaciones-nacional/",
+          "description": "Calcula impuesto sobre donaciones en régimen común (14 CCAA): Madrid, Andalucía, Asturias, Cantabria, Castilla-La Mancha, Castilla y León, Extremadura, Galicia, Islas Baleares, Canarias, La Rioja, Murcia, C. Valenciana.",
           "use_cases": [
-            "Estimar impuesto por herencia",
-            "Planificar sucesión familiar"
+            "Estimar impuesto por donación en régimen común",
+            "Comparar bonificaciones entre comunidades",
+            "Calcular donación con reducciones estatales"
           ],
           "features": [
-            "Por CCAA",
-            "Parentesco",
-            "Reducciones"
+            "14 CCAA régimen común",
+            "Selector de comunidad",
+            "Bonificaciones autonómicas (0% a 99%)",
+            "Reducciones estatales por parentesco",
+            "Reducciones por edad y discapacidad"
           ],
           "keywords": [
-            "impuesto sucesiones",
-            "calculo herencias",
-            "impuesto herencias comunidades",
-            "heredar sin pagar tanto",
-            "sucesiones por autonomia",
-            "cuanto pagar herencia",
-            "derechos sucesion",
+            "impuesto donaciones madrid",
+            "impuesto donaciones andalucia",
+            "impuesto donaciones asturias",
+            "impuesto donaciones castilla leon",
+            "calculadora impuesto donaciones regimen común",
+            "bonificacion 99% madrid donaciones",
+            "impuesto donaciones comunidad valenciana",
+            "impuesto donaciones murcia",
+            "tributacion donaciones españa regimen común"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cuánto impuesto pago por una donación en Madrid?",
+            "Necesito calcular una donación en Andalucía con bonificación",
+            "¿Qué comunidad tiene menos impuesto de donaciones?",
+            "Quiero comparar el impuesto de donaciones entre Madrid y Asturias",
+            "¿Cómo funciona la bonificación del 99% en Madrid para donaciones?"
+          ]
+        },
+        {
+          "name": "Impuesto de Sucesiones Cataluña",
+          "slug": "impuesto-sucesiones",
+          "url": "https://meskeia.com/impuesto-sucesiones/",
+          "description": "Calcula impuesto de sucesiones y herencias en Cataluña con reducciones autonómicas.",
+          "use_cases": [
+            "Estimar impuesto por herencia en Cataluña",
+            "Planificar sucesión familiar en Catalunya",
+            "Aplicar reducciones catalanas"
+          ],
+          "features": [
+            "Específico Cataluña",
+            "Parentesco",
+            "Reducciones autonómicas"
+          ],
+          "keywords": [
+            "impuesto sucesiones cataluña",
+            "calculo herencias catalunya",
+            "impuesto herencias barcelona"
+          ],
+          "_category": "Finanzas y Fiscalidad",
+          "casos_de_uso": [
+            "¿Cuanto tengo que pagar de impuesto de sucesiones en Cataluña?",
+            "Necesito calcular cuanto me cuesta heredar en Barcelona",
+            "¿Como funciona el impuesto de herencias en Cataluña?",
+            "Quiero saber que me toca pagar de impuestos por herencia en Catalunya"
+          ]
+        },
+        {
+          "name": "Impuesto de Sucesiones Nacional (Régimen Común)",
+          "slug": "impuesto-sucesiones-nacional",
+          "url": "https://meskeia.com/impuesto-sucesiones-nacional/",
+          "description": "Calcula impuesto de sucesiones y herencias en régimen común (14 CCAA): Madrid, Andalucía, Asturias, Cantabria, Castilla-La Mancha, Castilla y León, Extremadura, Galicia, Islas Baleares, Canarias, La Rioja, Murcia, C. Valenciana.",
+          "use_cases": [
+            "Estimar impuesto por herencia en régimen común",
+            "Comparar bonificaciones entre comunidades",
+            "Planificar sucesión familiar según CCAA"
+          ],
+          "features": [
+            "14 CCAA régimen común",
+            "Selector de comunidad",
+            "Bonificaciones autonómicas (0% a 99%)",
+            "Reducciones estatales por parentesco",
+            "Reducciones por discapacidad y seguros de vida",
+            "Vivienda habitual (95% reducción)"
+          ],
+          "keywords": [
+            "impuesto sucesiones madrid",
+            "impuesto sucesiones andalucia",
+            "impuesto sucesiones asturias",
+            "impuesto herencias castilla leon",
+            "calculadora impuesto sucesiones regimen común",
+            "bonificacion 99% madrid herencias",
+            "impuesto herencias comunidad valenciana",
+            "impuesto sucesiones murcia",
+            "heredar sin pagar tanto madrid",
+            "sucesiones por autonomia regimen común",
+            "cuanto pagar herencia madrid",
+            "derechos sucesion españa",
             "impuestos transmisiones mortis causa"
           ],
           "_category": "Finanzas y Fiscalidad",
           "casos_de_uso": [
-            "¿Cuanto tengo que pagar de impuesto de sucesiones en mi comunidad?",
-            "Necesito calcular cuanto me cuesta heredar la casa de mi padre",
-            "¿Como funciona el impuesto de herencias en Cataluna?",
-            "Quiero saber que me toca pagar de impuestos por la herencia de mi abuelo",
+            "¿Cuanto tengo que pagar de impuesto de sucesiones en Madrid?",
+            "Necesito calcular cuanto me cuesta heredar la casa de mi padre en Andalucía",
+            "¿Que comunidad tiene menos impuesto de sucesiones?",
+            "Quiero comparar el impuesto de herencias entre Madrid y Asturias",
+            "¿Cómo funciona la bonificación del 99% en Madrid para herencias?",
             "¿Que diferencia hay en sucesiones entre comunidades autonomas?"
           ]
         }
