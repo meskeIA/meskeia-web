@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="es" translate="yes">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Meta tags para traducción automática del navegador -->
+    <meta name="google" content="translate">
+    <meta http-equiv="content-language" content="es">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Impuesto de Donaciones - Régimen Común España | meskeIA</title>
+    <link rel="icon" type="image/png" href="icon_meskeia.png">
+    <meta name="description" content="Calculadora gratuita del Impuesto de Donaciones para régimen común de España. Calcula el impuesto aplicable en 14 comunidades autónomas con bonificaciones actualizadas 2025.">
+    <meta name="keywords" content="impuesto donaciones, donaciones España, calculadora donaciones, régimen común, bonificaciones autonómicas, meskeIA">
+
+    <style>
+        :root {
+            /* Backgrounds - Inspirados en Claude */
+            --bg-primary: #FAFAFA;
+            --bg-card: #FFFFFF;
+
+            /* Identidad de marca meskeIA */
+            --primary: #2E86AB;
+            --secondary: #48A9A6;
+
+            /* Textos minimalistas */
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+
+            /* Elementos estructurales */
+            --border: #E5E5E5;
+            --hover: #F5F5F5;
+            --focus: rgba(46,134,171,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            padding-top: 100px;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .warning-box {
+            background: #FFF9E6;
+            border: 2px solid #FFC107;
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            color: #856404;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
+        }
+
+        .warning-box strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .disclaimer-box {
+            background: #FFF3E0;
+            border: 3px solid #FF6F00;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            color: #E65100;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(255, 111, 0, 0.15);
+        }
+
+        .disclaimer-box h3 {
+            color: #E65100;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .disclaimer-box p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .disclaimer-box ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .disclaimer-box li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .disclaimer-box strong {
+            color: #BF360C;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: var(--bg-card);
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--focus);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radio-option:hover {
+            background: var(--hover);
+            border-color: var(--primary);
+        }
+
+        .radio-option input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 1rem;
+            box-shadow: 0 4px 12px rgba(46, 134, 171, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(46, 134, 171, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-muted) 100%);
+        }
+
+        .total-box {
+            background: linear-gradient(135deg, #E3F2FD 0%, #E8F5E9 100%);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 2px solid var(--primary);
+        }
+
+        .total-box strong {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .result-card {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .result-summary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-summary h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.95;
+        }
+
+        .result-summary .amount {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .result-details {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .result-details h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: var(--text-secondary);
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 0.3rem;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: var(--text-primary);
+            color: white;
+            text-align: left;
+            border-radius: 8px;
+            padding: 0.8rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .ccaa-selector-info {
+            background: linear-gradient(135deg, #E3F2FD 0%, #F3E5F5 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .ccaa-selector-info h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .ccaa-selector-info p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+                padding-top: 80px;
+                padding-bottom: 80px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.95rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .result-summary .amount {
+                font-size: 2rem;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .tooltiptext {
+                width: 200px;
+                margin-left: -100px;
+            }
+
+            .disclaimer-box {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .disclaimer-box h3 {
+                font-size: 1rem;
+            }
+        }
+
+        /* Logo meskeIA - Componente oficial */
+        .meskeia-logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(46, 134, 171, 0.2);
+            border-radius: 12px;
+            padding: 8px 16px;
+            box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+            transition: all 0.3s ease;
+        }
+        .meskeia-logo-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+        }
+        .meskeia-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .meskeia-logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+        }
+        .meskeia-logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #2E86AB;
+            border-radius: 50%;
+            top: 13px;
+            left: 13px;
+        }
+        .meskeia-neural-network {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+        .meskeia-neural-dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+        }
+        .meskeia-neural-dot:nth-child(1) { top: 4px; left: 6px; }
+        .meskeia-neural-dot:nth-child(2) { top: 8px; right: 5px; }
+        .meskeia-neural-dot:nth-child(3) { bottom: 6px; left: 4px; }
+        .meskeia-neural-dot:nth-child(4) { bottom: 4px; right: 8px; }
+        .meskeia-logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2C3E50;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .meskeia-logo-text .meske {
+            color: #2E86AB;
+        }
+        .meskeia-logo-text .ia {
+            color: #48A9A6;
+            font-weight: 700;
+            position: relative;
+        }
+        .meskeia-logo-text .ia::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #48A9A6, #7FB3D3);
+            border-radius: 1px;
+        }
+        @media (max-width: 768px) {
+            .meskeia-logo-container {
+                top: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                gap: 8px;
+            }
+            .meskeia-logo-icon {
+                width: 24px;
+                height: 24px;
+            }
+            .meskeia-logo-icon::before {
+                width: 9px;
+                height: 9px;
+                top: 7.5px;
+                left: 7.5px;
+            }
+            .meskeia-logo-icon::after {
+                width: 4px;
+                height: 4px;
+                top: 10px;
+                left: 10px;
+            }
+            .meskeia-logo-text {
+                font-size: 1rem;
+            }
+        }
+
+        /* Animaciones para mensaje de compartir */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Logo meskeIA -->
+<div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+    <div class="meskeia-logo-icon">
+        <div class="meskeia-neural-network">
+            <div class="meskeia-neural-dot"></div>
+            <div class="meskeia-neural-dot"></div>
+            <div class="meskeia-neural-dot"></div>
+            <div class="meskeia-neural-dot"></div>
+        </div>
+    </div>
+    <div class="meskeia-logo-text">
+        <span class="meske">meske</span><span class="ia">IA</span>
+    </div>
+</div>
+
+<div class="container">
+    <h1>🎁 Calculadora Impuesto de Donaciones</h1>
+    <p class="subtitle">Régimen Común - España (14 Comunidades Autónomas)</p>
+
+    <div class="warning-box">
+        <strong>⚠️ Importante: Ámbito de Aplicación</strong><br>
+        Esta calculadora aplica la normativa de <strong>régimen común</strong> para 14 comunidades autónomas: Madrid, Andalucía, Galicia, Asturias, Cantabria, La Rioja, Aragón, Castilla y León, Castilla-La Mancha, Extremadura, Comunidad Valenciana, Región de Murcia, Islas Baleares y Canarias.<br>
+        <strong>NO es válida para:</strong> Cataluña, País Vasco y Navarra (régimen foral propio).
+    </div>
+
+    <div class="disclaimer-box">
+        <h3>⚠️ IMPORTANTE - AVISO LEGAL</h3>
+        <p><strong>Esta calculadora es únicamente una herramienta informativa y orientativa.</strong></p>
+
+        <p>Los resultados obtenidos son estimaciones basadas en la normativa vigente del Impuesto sobre Sucesiones y Donaciones de <strong>régimen común en España</strong> y las bonificaciones autonómicas actualizadas a 2025, pero <strong>NO sustituyen el asesoramiento profesional</strong>.</p>
+
+        <p>Cada situación fiscal es única y puede estar sujeta a particularidades no contempladas en esta herramienta.</p>
+
+        <p><strong>⚠️ Casos especiales NO incluidos:</strong></p>
+        <ul>
+            <li><strong>Empresas familiares o negocios profesionales</strong></li>
+            <li>Explotaciones agrarias</li>
+            <li>Bienes del patrimonio cultural</li>
+            <li>Participaciones societarias complejas</li>
+        </ul>
+        <p>Para estos casos, <strong>consulte con un asesor fiscal especializado</strong>.</p>
+
+        <p><strong>Recomendamos encarecidamente:</strong></p>
+        <ul>
+            <li>Consultar con un <strong>Asesor Fiscal profesional</strong> antes de tomar decisiones</li>
+            <li>Verificar los requisitos específicos de cada reducción con la <strong>Agencia Tributaria de su Comunidad Autónoma</strong></li>
+            <li>Confirmar que cumple todos los requisitos legales para las reducciones y bonificaciones aplicables</li>
+            <li>Comprobar posibles actualizaciones normativas recientes de su comunidad autónoma</li>
+        </ul>
+
+        <p><strong>meskeIA no se responsabiliza de las decisiones tomadas basándose en estos cálculos.</strong> El uso de esta herramienta implica la aceptación de estas condiciones.</p>
+    </div>
+
+    <div class="card">
+        <div class="ccaa-selector-info">
+            <h3>🏛️ Selecciona tu Comunidad Autónoma</h3>
+            <p><strong>¿Por qué es importante?</strong> Aunque la base de cálculo es estatal, cada comunidad autónoma aplica bonificaciones diferentes sobre el impuesto final, lo que puede variar significativamente el resultado.</p>
+        </div>
+
+        <form id="donacionesForm">
+            <div class="form-section">
+                <h2>🏛️ Comunidad Autónoma</h2>
+
+                <div class="form-group">
+                    <label for="comunidadAutonoma">
+                        Comunidad Autónoma donde reside el donatario (quien recibe)
+                        <span class="tooltip">ℹ️
+                            <span class="tooltiptext">La comunidad autónoma competente es donde el donatario (quien recibe la donación) tiene su residencia habitual.</span>
+                        </span>
+                    </label>
+                    <select id="comunidadAutonoma" required>
+                        <option value="">-- Selecciona tu comunidad --</option>
+                        <option value="madrid">Madrid</option>
+                        <option value="andalucia">Andalucía</option>
+                        <option value="galicia">Galicia</option>
+                        <option value="murcia">Región de Murcia</option>
+                        <option value="valencia">Comunidad Valenciana</option>
+                        <option value="extremadura">Extremadura</option>
+                        <option value="canarias">Canarias</option>
+                        <option value="castillaleon">Castilla y León</option>
+                        <option value="larioja">La Rioja</option>
+                        <option value="castillamancha">Castilla-La Mancha (⚠️ Requiere escritura pública)</option>
+                        <option value="cantabria">Cantabria</option>
+                        <option value="aragon">Aragón</option>
+                        <option value="baleares">Islas Baleares</option>
+                        <option value="asturias">Asturias</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>💰 Valor de la Donación</h2>
+
+                <div class="form-group">
+                    <label for="valorDonacion">
+                        Valor real de los bienes donados (€)
+                        <span class="tooltip">ℹ️
+                            <span class="tooltiptext">Valor real de mercado de los bienes donados (dinero, inmuebles, acciones, etc.). Para inmuebles, puede ser el valor de referencia catastral.</span>
+                        </span>
+                    </label>
+                    <input type="number" id="valorDonacion" min="0" step="0.01" value="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cargas">Cargas y deudas asociadas a la donación (€)</label>
+                    <input type="number" id="cargas" min="0" step="0.01" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        ¿Se formalizará en escritura pública?
+                        <span class="tooltip">ℹ️
+                            <span class="tooltiptext">Obligatorio para inmuebles (viviendas, locales, etc.). Para donaciones de dinero es opcional pero recomendado. En Castilla-La Mancha es NECESARIA escritura pública para aplicar la bonificación autonómica.</span>
+                        </span>
+                    </label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="escritura_si" name="escrituraPublica" value="si" checked>
+                            <label for="escritura_si">Sí</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="escritura_no" name="escrituraPublica" value="no">
+                            <label for="escritura_no">No</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>👤 Datos del Donatario (Quien Recibe)</h2>
+
+                <div class="form-group">
+                    <label for="parentesco">
+                        Grado de parentesco con el donante
+                        <span class="tooltip">ℹ️
+                            <span class="tooltiptext">Grupos: I (cónyuge, descendientes <21 años), II (descendientes ≥21, ascendientes), III (colaterales 2º-3º grado: hermanos, tíos, sobrinos), IV (colaterales 4º grado o más lejanos)</span>
+                        </span>
+                    </label>
+                    <select id="parentesco" required>
+                        <option value="">-- Selecciona --</option>
+                        <option value="I-conyuge">Cónyuge</option>
+                        <option value="I-descendiente">Descendiente menor de 21 años</option>
+                        <option value="II">Descendiente de 21 años o más</option>
+                        <option value="II-ascendiente">Ascendiente (padre, madre, abuelo, abuela)</option>
+                        <option value="III">Hermano, tío, sobrino (colaterales 2º-3º grado)</option>
+                        <option value="IV">Primos o más lejanos (colaterales 4º grado o sin parentesco)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="patrimonioPreexistente">
+                        Patrimonio preexistente del donatario
+                        <span class="tooltip">ℹ️
+                            <span class="tooltiptext">Patrimonio total del donatario antes de recibir la donación. Afecta al coeficiente multiplicador de la cuota.</span>
+                        </span>
+                    </label>
+                    <select id="patrimonioPreexistente" required>
+                        <option value="1.0">Menos de 402.678,11 €</option>
+                        <option value="1.05">Entre 402.678,11 € y 2.007.380,43 €</option>
+                        <option value="1.1">Entre 2.007.380,43 € y 4.020.770,98 €</option>
+                        <option value="1.2">Más de 4.020.770,98 €</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>¿El donatario tiene discapacidad reconocida?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="disc_no" name="discapacidad" value="no" checked>
+                            <label for="disc_no">No</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="disc_33" name="discapacidad" value="33">
+                            <label for="disc_33">Sí, 33-64%</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="disc_65" name="discapacidad" value="65">
+                            <label for="disc_65">Sí, ≥65%</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn" onclick="calcularDonaciones()">Calcular Impuesto</button>
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">Limpiar Formulario</button>
+        </form>
+    </div>
+
+    <!-- Resultados -->
+    <div class="card result-card" id="resultCard">
+        <div class="result-summary">
+            <h3>Impuesto de Donaciones a Pagar</h3>
+            <div class="amount" id="cuotaFinal">0,00 €</div>
+            <p id="ccaaAplicada" style="opacity: 0.9; margin-top: 0.5rem;"></p>
+        </div>
+
+        <div class="result-details" id="resultDetails"></div>
+
+        <button type="button" class="btn" onclick="imprimirResultado()">🖨️ Imprimir / Guardar PDF</button>
+        <button type="button" class="btn btn-secondary" onclick="resetForm()">🔄 Nueva Consulta</button>
+    </div>
+</div>
+
+<!-- Mensaje de recomendación (izquierda) -->
+<div style="position: fixed; bottom: 10px; left: 20px; color: #48A9A6; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.95); padding: 5px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 280px;">
+    💡 ¿Te resultó útil? <a href="#" onclick="compartirApp(); return false;" style="color: #2E86AB; text-decoration: underline; font-weight: 500;">Compártela</a>
+</div>
+
+<!-- Footer meskeIA -->
+<footer style="position: fixed; bottom: 10px; right: 20px; display: flex; align-items: center; gap: 10px; color: #2d3748; font-size: 0.9rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: rgba(255, 255, 255, 0.9); padding: 5px 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <span>© 2025 meskeIA</span>
+    <span style="color: #E5E5E5; user-select: none;">|</span>
+    <button type="button"
+            onclick="compartirApp()"
+            style="background: none; border: none; color: #2E86AB; cursor: pointer; font-size: 0.9rem; padding: 0; display: flex; align-items: center; gap: 4px; font-family: inherit; transition: opacity 0.2s;"
+            onmouseover="this.style.opacity='0.7'"
+            onmouseout="this.style.opacity='1'"
+            title="Compartir esta herramienta">
+        🔗 <span style="text-decoration: underline;">Compartir</span>
+    </button>
+</footer>
+
+<script>
+// Configuración de bonificaciones por CCAA para DONACIONES
+const BONIFICACIONES_DONACIONES_CCAA = {
+    'madrid': {
+        nombre: 'Comunidad de Madrid',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.99, limite: null },
+            'I-descendiente': { porcentaje: 0.99, limite: null },
+            'II': { porcentaje: 0.99, limite: null },
+            'II-ascendiente': { porcentaje: 0.99, limite: null },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 99% para Grupos I y II. No requiere escritura pública para donaciones hasta 10.000€ (2025).'
+    },
+    'andalucia': {
+        nombre: 'Andalucía',
+        bonificaciones: {
+            'I-conyuge': { exencion: 1000000, porcentaje: 0.99 },
+            'I-descendiente': { exencion: 1000000, porcentaje: 0.99 },
+            'II': { exencion: 1000000, porcentaje: 0.99 },
+            'II-ascendiente': { exencion: 1000000, porcentaje: 0.99 },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Exención total si base liquidable < 1.000.000€ para Grupos I y II. Bonificación 99% para importes superiores.'
+    },
+    'galicia': {
+        nombre: 'Galicia',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.99, limite: null },
+            'I-descendiente': { porcentaje: 0.99, limite: null },
+            'II': { porcentaje: 0.99, limite: null },
+            'II-ascendiente': { porcentaje: 0.99, limite: null },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 99% para cónyuges, descendientes y ascendientes.'
+    },
+    'murcia': {
+        nombre: 'Región de Murcia',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.99, limite: null },
+            'I-descendiente': { porcentaje: 0.99, limite: null },
+            'II': { porcentaje: 0.99, limite: null },
+            'II-ascendiente': { porcentaje: 0.99, limite: null },
+            'III': { porcentaje: 0.50, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 99% Grupos I y II, 50% Grupo III (hermanos, tíos, sobrinos).'
+    },
+    'valencia': {
+        nombre: 'Comunidad Valenciana',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.75, limite: null },
+            'I-descendiente': { porcentaje: 0.75, limite: null },
+            'II': { porcentaje: 0.75, limite: null },
+            'II-ascendiente': { porcentaje: 0.75, limite: null },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 75% para Grupos I y II en donaciones.'
+    },
+    'extremadura': {
+        nombre: 'Extremadura',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.99, limite: null },
+            'I-descendiente': { porcentaje: 0.99, limite: null },
+            'II': { porcentaje: 0.99, limite: null },
+            'II-ascendiente': { porcentaje: 0.99, limite: null },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 99% para Grupos I y II.'
+    },
+    'canarias': {
+        nombre: 'Canarias',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.999, limite: null },
+            'I-descendiente': { porcentaje: 0.999, limite: null },
+            'II': { porcentaje: 0.999, limite: null },
+            'II-ascendiente': { porcentaje: 0.999, limite: null },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 99,9% para Grupos I y II (prácticamente exención total).'
+    },
+    'castillaleon': {
+        nombre: 'Castilla y León',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.99, limite: null },
+            'I-descendiente': { porcentaje: 0.99, limite: null },
+            'II': { porcentaje: 0.99, limite: null },
+            'II-ascendiente': { porcentaje: 0.99, limite: null },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 99% para Grupos I y II.'
+    },
+    'larioja': {
+        nombre: 'La Rioja',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.99, limite: null },
+            'I-descendiente': { porcentaje: 0.99, limite: null },
+            'II': { porcentaje: 0.99, limite: null },
+            'II-ascendiente': { porcentaje: 0.99, limite: null },
+            'III': { porcentaje: 0.99, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 99% para Grupos I, II y III.'
+    },
+    'castillamancha': {
+        nombre: 'Castilla-La Mancha',
+        bonificaciones: {
+            'I-conyuge': { escalonado: [
+                { hasta: 175000, porcentaje: 1.00 },
+                { hasta: 225000, porcentaje: 0.95 },
+                { hasta: 275000, porcentaje: 0.90 },
+                { hasta: 325000, porcentaje: 0.85 },
+                { desde: 325000, porcentaje: 0.80 }
+            ]},
+            'I-descendiente': { escalonado: [
+                { hasta: 175000, porcentaje: 1.00 },
+                { hasta: 225000, porcentaje: 0.95 },
+                { hasta: 275000, porcentaje: 0.90 },
+                { hasta: 325000, porcentaje: 0.85 },
+                { desde: 325000, porcentaje: 0.80 }
+            ]},
+            'II': { escalonado: [
+                { hasta: 175000, porcentaje: 1.00 },
+                { hasta: 225000, porcentaje: 0.95 },
+                { hasta: 275000, porcentaje: 0.90 },
+                { hasta: 325000, porcentaje: 0.85 },
+                { desde: 325000, porcentaje: 0.80 }
+            ]},
+            'II-ascendiente': { escalonado: [
+                { hasta: 175000, porcentaje: 1.00 },
+                { hasta: 225000, porcentaje: 0.95 },
+                { hasta: 275000, porcentaje: 0.90 },
+                { hasta: 325000, porcentaje: 0.85 },
+                { desde: 325000, porcentaje: 0.80 }
+            ]},
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: '⚠️ REQUIERE ESCRITURA PÚBLICA. Bonificación escalonada: 100% hasta 175k€, luego 95%, 90%, 85%, 80% según tramos.'
+    },
+    'cantabria': {
+        nombre: 'Cantabria',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.99, limite: null },
+            'I-descendiente': { porcentaje: 0.99, limite: null },
+            'II': { porcentaje: 0.99, limite: null },
+            'II-ascendiente': { porcentaje: 0.99, limite: null },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 99% para Grupos I y II.'
+    },
+    'aragon': {
+        nombre: 'Aragón',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.65, limite: null },
+            'I-descendiente': { porcentaje: 0.65, limite: null },
+            'II': { porcentaje: 0.65, limite: null },
+            'II-ascendiente': { porcentaje: 0.65, limite: null },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 65% para Grupos I y II.'
+    },
+    'baleares': {
+        nombre: 'Islas Baleares',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0.99, limite: null },
+            'I-descendiente': { porcentaje: 0.99, limite: null },
+            'II': { porcentaje: 0.99, limite: null },
+            'II-ascendiente': { porcentaje: 0.99, limite: null },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Bonificación 99% para Grupos I y II.'
+    },
+    'asturias': {
+        nombre: 'Principado de Asturias',
+        bonificaciones: {
+            'I-conyuge': { porcentaje: 0, reduccionBase: 300000 },
+            'I-descendiente': { porcentaje: 0, reduccionBase: 300000 },
+            'II': { porcentaje: 0, reduccionBase: 300000 },
+            'II-ascendiente': { porcentaje: 0, reduccionBase: 300000 },
+            'III': { porcentaje: 0, limite: null },
+            'IV': { porcentaje: 0, limite: null }
+        },
+        notas: 'Sin bonificación autonómica. Reducción de 300.000€ en base imponible para Grupos I y II.'
+    }
+};
+
+// Reducciones estatales específicas para DONACIONES
+const REDUCCIONES_DONACIONES = {
+    parentesco: {
+        'I-conyuge': 15956.87,
+        'I-descendiente': 15956.87,
+        'II': 15956.87,
+        'II-ascendiente': 15956.87,
+        'III': 7993.46,
+        'IV': 0
+    },
+    discapacidad: {
+        33: 47858.59,
+        65: 150253.03
+    }
+};
+
+// Edad adicional (solo si descendiente menor 21 años en Grupo I)
+const REDUCCION_EDAD_DONACION = 3990.72;
+
+// Tarifa estatal (igual que sucesiones)
+const TARIFA_ESTATAL = [
+    { desde: 0, hasta: 7993.46, tipo: 0.0765, cuotaBase: 0 },
+    { desde: 7993.46, hasta: 31956.87, tipo: 0.0850, cuotaBase: 611.50 },
+    { desde: 31956.87, hasta: 79893.43, tipo: 0.0935, cuotaBase: 2648.40 },
+    { desde: 79893.43, hasta: 239389.19, tipo: 0.1035, cuotaBase: 7130.52 },
+    { desde: 239389.19, hasta: 398981.96, tipo: 0.1135, cuotaBase: 23643.20 },
+    { desde: 398981.96, hasta: 797555.08, tipo: 0.1585, cuotaBase: 41765.48 },
+    { desde: 797555.08, hasta: Infinity, tipo: 0.1935, cuotaBase: 104983.30 }
+];
+
+// Coeficientes multiplicadores por patrimonio (igual que sucesiones)
+const COEFICIENTES_MULTIPLICADORES = {
+    'I-conyuge': [1.0000, 1.0500, 1.1000, 1.2000],
+    'I-descendiente': [1.0000, 1.0500, 1.1000, 1.2000],
+    'II': [1.0000, 1.0500, 1.1000, 1.2000],
+    'II-ascendiente': [1.0000, 1.0500, 1.1000, 1.2000],
+    'III': [1.5882, 1.6676, 1.7471, 1.9059],
+    'IV': [2.0000, 2.1000, 2.2000, 2.4000]
+};
+
+function formatearMoneda(numero) {
+    return numero.toLocaleString('es-ES', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function calcularDonaciones() {
+    // Obtener valores del formulario
+    const ccaa = document.getElementById('comunidadAutonoma').value;
+    const valorDonacion = parseFloat(document.getElementById('valorDonacion').value) || 0;
+    const cargas = parseFloat(document.getElementById('cargas').value) || 0;
+    const parentesco = document.getElementById('parentesco').value;
+    const patrimonioPreexistente = parseFloat(document.getElementById('patrimonioPreexistente').value);
+    const discapacidad = document.querySelector('input[name="discapacidad"]:checked').value;
+
+    // Validaciones
+    if (!ccaa || !parentesco) {
+        alert('Por favor, completa todos los campos obligatorios (Comunidad Autónoma y Parentesco).');
+        return;
+    }
+
+    if (valorDonacion <= 0) {
+        alert('Por favor, introduce un valor de donación válido.');
+        return;
+    }
+
+    // 1. Calcular Base Imponible
+    const baseImponible = valorDonacion - cargas;
+
+    // 2. Calcular Reducciones Estatales
+    let reduccionParentesco = REDUCCIONES_DONACIONES.parentesco[parentesco] || 0;
+
+    // Reducción por edad (solo descendientes menores 21 años)
+    let reduccionEdad = 0;
+    if (parentesco === 'I-descendiente') {
+        reduccionEdad = REDUCCION_EDAD_DONACION;
+    }
+
+    // Reducción por discapacidad
+    let reduccionDiscapacidad = 0;
+    if (discapacidad === '33') {
+        reduccionDiscapacidad = REDUCCIONES_DONACIONES.discapacidad[33];
+    } else if (discapacidad === '65') {
+        reduccionDiscapacidad = REDUCCIONES_DONACIONES.discapacidad[65];
+    }
+
+    // Reducción adicional base Asturias
+    let reduccionBaseAsturias = 0;
+    const configCCAA = BONIFICACIONES_DONACIONES_CCAA[ccaa];
+    if (configCCAA.bonificaciones[parentesco]?.reduccionBase) {
+        reduccionBaseAsturias = configCCAA.bonificaciones[parentesco].reduccionBase;
+    }
+
+    const totalReducciones = reduccionParentesco + reduccionEdad + reduccionDiscapacidad + reduccionBaseAsturias;
+
+    // 3. Base Liquidable
+    const baseLiquidable = Math.max(0, baseImponible - totalReducciones);
+
+    // 4. Cuota íntegra (aplicar tarifa estatal)
+    let cuotaIntegra = 0;
+    for (let i = 0; i < TARIFA_ESTATAL.length; i++) {
+        const tramo = TARIFA_ESTATAL[i];
+        if (baseLiquidable > tramo.desde) {
+            const baseTramo = Math.min(baseLiquidable, tramo.hasta) - tramo.desde;
+            cuotaIntegra = tramo.cuotaBase + (baseTramo * tramo.tipo);
+        }
+    }
+
+    // 5. Aplicar coeficiente multiplicador según patrimonio
+    const indicePatrimonio = Math.floor(Math.log10(patrimonioPreexistente * 2.478 + 1));
+    const coeficiente = COEFICIENTES_MULTIPLICADORES[parentesco][Math.min(indicePatrimonio, 3)];
+    const cuotaTributaria = cuotaIntegra * coeficiente;
+
+    // 6. Aplicar bonificación autonómica
+    const bonificacionResultado = aplicarBonificacionDonaciones(cuotaTributaria, baseLiquidable, ccaa, parentesco);
+
+    // 7. Cuota final a pagar
+    const cuotaFinal = Math.max(0, cuotaTributaria - bonificacionResultado.bonificacion);
+
+    // Mostrar resultados
+    mostrarResultados({
+        baseImponible,
+        totalReducciones,
+        reduccionParentesco,
+        reduccionEdad,
+        reduccionDiscapacidad,
+        reduccionBaseAsturias,
+        baseLiquidable,
+        cuotaIntegra,
+        coeficiente,
+        cuotaTributaria,
+        bonificacionCCAA: bonificacionResultado,
+        cuotaFinal,
+        ccaa: configCCAA.nombre,
+        notas: configCCAA.notas
+    });
+}
+
+function aplicarBonificacionDonaciones(cuotaTributaria, baseLiquidable, ccaa, grupoParentesco) {
+    const config = BONIFICACIONES_DONACIONES_CCAA[ccaa];
+    const bonifGrupo = config.bonificaciones[grupoParentesco];
+
+    // Caso 1: Exención total (Andalucía <1M€)
+    if (bonifGrupo.exencion && baseLiquidable < bonifGrupo.exencion) {
+        return {
+            bonificacion: cuotaTributaria,
+            porcentaje: 100,
+            detalle: `Exención total (base < ${formatearMoneda(bonifGrupo.exencion)})`
+        };
+    }
+
+    // Caso 2: Bonificación escalonada (Castilla-La Mancha)
+    if (bonifGrupo.escalonado && Array.isArray(bonifGrupo.escalonado)) {
+        for (const tramo of bonifGrupo.escalonado) {
+            if (tramo.hasta && baseLiquidable <= tramo.hasta) {
+                const bonif = cuotaTributaria * tramo.porcentaje;
+                return {
+                    bonificacion: bonif,
+                    porcentaje: tramo.porcentaje * 100,
+                    detalle: `Bonificación ${(tramo.porcentaje * 100).toFixed(0)}% (base ≤ ${formatearMoneda(tramo.hasta)})`
+                };
+            } else if (tramo.desde && baseLiquidable > tramo.desde) {
+                const bonif = cuotaTributaria * tramo.porcentaje;
+                return {
+                    bonificacion: bonif,
+                    porcentaje: tramo.porcentaje * 100,
+                    detalle: `Bonificación ${(tramo.porcentaje * 100).toFixed(0)}% (base > ${formatearMoneda(tramo.desde)})`
+                };
+            }
+        }
+    }
+
+    // Caso 3: Porcentaje fijo (Madrid, Murcia, etc.)
+    if (typeof bonifGrupo.porcentaje === 'number' && bonifGrupo.porcentaje > 0) {
+        const bonif = cuotaTributaria * bonifGrupo.porcentaje;
+        return {
+            bonificacion: bonif,
+            porcentaje: bonifGrupo.porcentaje * 100,
+            detalle: `Bonificación autonómica ${(bonifGrupo.porcentaje * 100).toFixed(1)}%`
+        };
+    }
+
+    // Caso 4: Sin bonificación (Asturias)
+    return {
+        bonificacion: 0,
+        porcentaje: 0,
+        detalle: 'Sin bonificación autonómica'
+    };
+}
+
+function mostrarResultados(resultado) {
+    // Mostrar cuota final
+    document.getElementById('cuotaFinal').textContent = formatearMoneda(resultado.cuotaFinal);
+    document.getElementById('ccaaAplicada').textContent = `Comunidad: ${resultado.ccaa}`;
+
+    // Generar detalles
+    let detallesHTML = `
+        <h4>📋 Desglose del Cálculo</h4>
+
+        <div class="result-row">
+            <span class="result-label">Base imponible (valor donación - cargas):</span>
+            <span class="result-value">${formatearMoneda(resultado.baseImponible)}</span>
+        </div>
+
+        <h4 style="margin-top: 1.5rem;">📉 Reducciones Estatales</h4>
+    `;
+
+    if (resultado.reduccionParentesco > 0) {
+        detallesHTML += `
+        <div class="result-row">
+            <span class="result-label">• Reducción por parentesco:</span>
+            <span class="result-value">-${formatearMoneda(resultado.reduccionParentesco)}</span>
+        </div>`;
+    }
+
+    if (resultado.reduccionEdad > 0) {
+        detallesHTML += `
+        <div class="result-row">
+            <span class="result-label">• Reducción por edad (menor 21 años):</span>
+            <span class="result-value">-${formatearMoneda(resultado.reduccionEdad)}</span>
+        </div>`;
+    }
+
+    if (resultado.reduccionDiscapacidad > 0) {
+        detallesHTML += `
+        <div class="result-row">
+            <span class="result-label">• Reducción por discapacidad:</span>
+            <span class="result-value">-${formatearMoneda(resultado.reduccionDiscapacidad)}</span>
+        </div>`;
+    }
+
+    if (resultado.reduccionBaseAsturias > 0) {
+        detallesHTML += `
+        <div class="result-row">
+            <span class="result-label">• Reducción base Asturias:</span>
+            <span class="result-value">-${formatearMoneda(resultado.reduccionBaseAsturias)}</span>
+        </div>`;
+    }
+
+    detallesHTML += `
+        <div class="result-row" style="border-top: 2px solid var(--primary); margin-top: 0.5rem; padding-top: 0.5rem;">
+            <span class="result-label"><strong>Total reducciones:</strong></span>
+            <span class="result-value"><strong>-${formatearMoneda(resultado.totalReducciones)}</strong></span>
+        </div>
+
+        <div class="result-row">
+            <span class="result-label"><strong>Base liquidable:</strong></span>
+            <span class="result-value"><strong>${formatearMoneda(resultado.baseLiquidable)}</strong></span>
+        </div>
+
+        <h4 style="margin-top: 1.5rem;">💰 Cálculo del Impuesto</h4>
+        <div class="result-row">
+            <span class="result-label">Cuota íntegra (tarifa estatal):</span>
+            <span class="result-value">${formatearMoneda(resultado.cuotaIntegra)}</span>
+        </div>
+
+        <div class="result-row">
+            <span class="result-label">× Coeficiente multiplicador (patrimonio):</span>
+            <span class="result-value">×${resultado.coeficiente.toFixed(4)}</span>
+        </div>
+
+        <div class="result-row">
+            <span class="result-label"><strong>Cuota tributaria:</strong></span>
+            <span class="result-value"><strong>${formatearMoneda(resultado.cuotaTributaria)}</strong></span>
+        </div>
+    `;
+
+    if (resultado.bonificacionCCAA.bonificacion > 0) {
+        detallesHTML += `
+        <h4 style="margin-top: 1.5rem;">🏛️ Bonificación Autonómica</h4>
+        <div class="result-row">
+            <span class="result-label">${resultado.bonificacionCCAA.detalle}:</span>
+            <span class="result-value" style="color: #28a745;">-${formatearMoneda(resultado.bonificacionCCAA.bonificacion)}</span>
+        </div>`;
+    }
+
+    detallesHTML += `
+        <div class="result-row" style="border-top: 3px solid var(--primary); margin-top: 1rem; padding-top: 1rem; background: var(--focus);">
+            <span class="result-label"><strong style="font-size: 1.1rem;">💶 IMPUESTO A PAGAR:</strong></span>
+            <span class="result-value"><strong style="font-size: 1.2rem; color: var(--primary);">${formatearMoneda(resultado.cuotaFinal)}</strong></span>
+        </div>
+    `;
+
+    if (resultado.notas) {
+        detallesHTML += `
+        <div style="background: #E3F2FD; padding: 1rem; border-radius: 8px; margin-top: 1.5rem; font-size: 0.9rem;">
+            <strong>📌 Notas sobre ${resultado.ccaa}:</strong><br>
+            ${resultado.notas}
+        </div>`;
+    }
+
+    document.getElementById('resultDetails').innerHTML = detallesHTML;
+    document.getElementById('resultCard').style.display = 'block';
+    document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function resetForm() {
+    document.getElementById('donacionesForm').reset();
+    document.getElementById('resultCard').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function imprimirResultado() {
+    const resultado = {
+        cuotaFinal: document.getElementById('cuotaFinal').textContent,
+        ccaa: document.getElementById('ccaaAplicada').textContent,
+        detalles: document.getElementById('resultDetails').innerHTML
+    };
+
+    const ventanaImpresion = window.open('', '', 'width=800,height=600');
+    ventanaImpresion.document.write(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Resultado Cálculo Impuesto Donaciones - meskeIA</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 20px;
+                    max-width: 800px;
+                    margin: 0 auto;
+                }
+                h1 {
+                    color: #2E86AB;
+                    border-bottom: 3px solid #48A9A6;
+                    padding-bottom: 10px;
+                }
+                .resultado-final {
+                    background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 12px;
+                    text-align: center;
+                    margin: 20px 0;
+                }
+                .resultado-final h2 {
+                    margin: 0;
+                    font-size: 1.2rem;
+                }
+                .resultado-final .monto {
+                    font-size: 2.5rem;
+                    font-weight: bold;
+                    margin: 10px 0;
+                }
+                .detalles {
+                    margin-top: 20px;
+                }
+                .result-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 10px 0;
+                    border-bottom: 1px solid #E5E5E5;
+                }
+                h4 {
+                    color: #2E86AB;
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                }
+                .fila {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 8px 0;
+                    border-bottom: 1px solid #E5E5E5;
+                }
+                .label {
+                    color: #666;
+                }
+                .valor {
+                    font-weight: 600;
+                }
+                .info {
+                    background: #FFF3E0;
+                    border: 2px solid #FF6F00;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-top: 30px;
+                    color: #E65100;
+                }
+                .footer {
+                    margin-top: 30px;
+                    padding-top: 20px;
+                    border-top: 2px solid #E5E5E5;
+                    text-align: center;
+                    color: #666;
+                    font-size: 0.9rem;
+                }
+                @media print {
+                    body { padding: 10px; }
+                }
+            </style>
+        </head>
+        <body>
+            <h1>🎁 Cálculo Impuesto de Donaciones - Régimen Común</h1>
+
+            <div class="resultado-final">
+                <h2>Impuesto de Donaciones a Pagar</h2>
+                <div class="monto">${resultado.cuotaFinal}</div>
+                <p style="opacity: 0.9; margin: 0;">${resultado.ccaa}</p>
+            </div>
+
+            <div class="detalles">
+                ${resultado.detalles}
+            </div>
+
+            <div class="info">
+                <strong>⚠️ IMPORTANTE - AVISO LEGAL:</strong><br><br>
+                Esta calculadora es únicamente una herramienta informativa y orientativa. Los resultados obtenidos son estimaciones basadas en la normativa vigente del Impuesto sobre Donaciones de régimen común en España y las bonificaciones autonómicas actualizadas a 2025, pero <strong>NO sustituyen el asesoramiento profesional</strong>.<br><br>
+                <strong>Recomendamos encarecidamente:</strong>
+                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                    <li>Consultar con un Asesor Fiscal profesional antes de tomar decisiones</li>
+                    <li>Verificar los requisitos específicos con la Agencia Tributaria de su Comunidad Autónoma</li>
+                    <li>Confirmar que cumple todos los requisitos legales para las reducciones y bonificaciones aplicables</li>
+                </ul>
+                <strong>meskeIA no se responsabiliza de las decisiones tomadas basándose en estos cálculos.</strong> El uso de esta herramienta implica la aceptación de estas condiciones.
+            </div>
+
+            <div class="footer">
+                <p>Calculadora generada por <strong>meskeIA</strong> - https://meskeia.com</p>
+                <p>© 2025 meskeIA - Todos los derechos reservados</p>
+            </div>
+        </body>
+        </html>
+    `);
+    ventanaImpresion.document.close();
+    ventanaImpresion.print();
+}
+
+// Función para compartir la aplicación
+async function compartirApp() {
+    const titulo = document.title;
+    const url = window.location.href;
+    const texto = '¡Mira esta herramienta útil de meskeIA!';
+
+    if (navigator.share) {
+        try {
+            await navigator.share({ title: titulo, text: texto, url: url });
+            console.log('✅ Compartido exitosamente');
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error('Error al compartir:', err);
+        }
+    } else {
+        try {
+            await navigator.clipboard.writeText(url);
+            const mensaje = document.createElement('div');
+            mensaje.textContent = '✅ Enlace copiado al portapapeles';
+            mensaje.style.cssText = 'position: fixed; bottom: 60px; right: 20px; background: #2E86AB; color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; font-family: inherit; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; animation: fadeIn 0.3s;';
+            document.body.appendChild(mensaje);
+            setTimeout(() => {
+                mensaje.style.animation = 'fadeOut 0.3s';
+                setTimeout(() => mensaje.remove(), 300);
+            }, 3000);
+        } catch (err) {
+            prompt('Copia este enlace para compartir:', url);
+        }
+    }
+}
+</script>
+
+<!-- meskeIA Analytics - Tracking de uso -->
+<script>
+    (async function() {
+        const nombreApp = 'impuesto-donaciones-nacional';
+
+        const datos = {
+            aplicacion: nombreApp,
+            navegador: navigator.userAgent,
+            sistema_operativo: navigator.platform,
+            resolucion: `${window.screen.width}x${window.screen.height}`
+        };
+
+        try {
+            await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos),
+                keepalive: true
+            });
+            console.log('✅ Uso registrado en meskeIA Analytics');
+        } catch (error) {
+            console.error('Error al registrar uso:', error);
+        }
+    })();
+</script>
+
+</body>
+</html>
