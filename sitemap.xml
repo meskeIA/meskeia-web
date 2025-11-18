@@ -295,6 +295,12 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://meskeia.com/generador-codigos-barras/</loc>
+    <lastmod>2025-11-18</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://meskeia.com/wordle-espanol/</loc>
     <lastmod>2025-11-03</lastmod>
     <priority>0.8</priority>
@@ -827,6 +833,12 @@
   <url>
     <loc>https://meskeia.com/guias/herramientas-de-productividad/generador-codigos-qr-guia.html</loc>
     <lastmod>2025-11-03</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/herramientas-de-productividad/generador-codigos-barras-guia.html</loc>
+    <lastmod>2025-11-18</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>

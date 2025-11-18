@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es" translate="yes">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Meta tags para traducción automática del navegador -->
+    <meta name="google" content="translate">
+    <meta http-equiv="content-language" content="es">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Códigos de Barras - meskeIA</title>
+    <meta name="description" content="Genera códigos de barras gratis en formatos EAN-13, EAN-8, Code 128 y UPC. Herramienta online gratuita para crear códigos de barras para productos, inventarios y etiquetas.">
+    <meta name="keywords" content="generador códigos barras, crear código barras, EAN-13, EAN-8, Code 128, UPC, código barras online, generador barcode">
+    <link rel="icon" type="image/png" href="icon_meskeia.png">
+
+    <style>
+        :root {
+            /* Backgrounds - Inspirados en Claude */
+            --bg-primary: #FAFAFA;
+            --bg-card: #FFFFFF;
+
+            /* Identidad de marca meskeIA */
+            --primary: #2E86AB;
+            --secondary: #48A9A6;
+
+            /* Textos minimalistas */
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+
+            /* Elementos estructurales */
+            --border: #E5E5E5;
+            --hover: #F5F5F5;
+            --focus: rgba(46,134,171,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            padding-top: 80px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--focus);
+        }
+
+        .format-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .format-option {
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .format-option:hover {
+            background: var(--hover);
+            border-color: var(--secondary);
+        }
+
+        .format-option.active {
+            background: var(--focus);
+            border-color: var(--primary);
+        }
+
+        .format-option h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .format-option p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            background: #236B8E;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #3A8B87;
+        }
+
+        .result-container {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #barcodeCanvas {
+            max-width: 100%;
+            height: auto;
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: white;
+        }
+
+        .help-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .info-box {
+            background: var(--focus);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box ul {
+            margin-left: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .error-message {
+            background: #FEE;
+            border-left: 4px solid #C33;
+            color: #C33;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        /* Animaciones para mensaje de compartir */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+        /* Logo meskeIA - Componente oficial */
+        .meskeia-logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(46, 134, 171, 0.2);
+            border-radius: 12px;
+            padding: 8px 16px;
+            box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+            transition: all 0.3s ease;
+        }
+        .meskeia-logo-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+        }
+        .meskeia-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .meskeia-logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+        }
+        .meskeia-logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #2E86AB;
+            border-radius: 50%;
+            top: 13px;
+            left: 13px;
+        }
+        .meskeia-neural-network {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+        .meskeia-neural-dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+        }
+        .meskeia-neural-dot:nth-child(1) { top: 4px; left: 6px; }
+        .meskeia-neural-dot:nth-child(2) { top: 8px; right: 5px; }
+        .meskeia-neural-dot:nth-child(3) { bottom: 6px; left: 4px; }
+        .meskeia-neural-dot:nth-child(4) { bottom: 4px; right: 8px; }
+        .meskeia-logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2C3E50;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .meskeia-logo-text .meske {
+            color: #2E86AB;
+        }
+        .meskeia-logo-text .ia {
+            color: #48A9A6;
+            font-weight: 700;
+            position: relative;
+        }
+        .meskeia-logo-text .ia::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #48A9A6, #7FB3D3);
+            border-radius: 1px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 60px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .format-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .meskeia-logo-container {
+                top: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                gap: 8px;
+            }
+            .meskeia-logo-icon {
+                width: 24px;
+                height: 24px;
+            }
+            .meskeia-logo-icon::before {
+                width: 9px;
+                height: 9px;
+                top: 7.5px;
+                left: 7.5px;
+            }
+            .meskeia-logo-icon::after {
+                width: 4px;
+                height: 4px;
+                top: 10px;
+                left: 10px;
+            }
+            .meskeia-logo-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>📊 Generador de Códigos de Barras</h1>
+        <p class="subtitle">Crea códigos de barras en múltiples formatos de forma gratuita</p>
+
+        <div class="card">
+            <h2 style="color: var(--primary); margin-bottom: 1rem;">Selecciona el formato</h2>
+
+            <div class="format-selector">
+                <div class="format-option active" data-format="ean13">
+                    <h3>EAN-13</h3>
+                    <p>13 dígitos - Retail Europa</p>
+                </div>
+                <div class="format-option" data-format="ean8">
+                    <h3>EAN-8</h3>
+                    <p>8 dígitos - Productos pequeños</p>
+                </div>
+                <div class="format-option" data-format="code128">
+                    <h3>Code 128</h3>
+                    <p>Alfanumérico - Logística</p>
+                </div>
+                <div class="format-option" data-format="upc">
+                    <h3>UPC-A</h3>
+                    <p>12 dígitos - Retail USA</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="barcodeValue">Valor del código de barras</label>
+                <input type="text" id="barcodeValue" placeholder="Introduce el valor (ej: 1234567890123)">
+                <p class="help-text" id="formatHelp">EAN-13 requiere exactamente 13 dígitos</p>
+            </div>
+
+            <div class="form-group">
+                <label for="displayValue">Mostrar texto debajo del código</label>
+                <select id="displayValue">
+                    <option value="true">Sí</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="width">Ancho de las barras (1-4)</label>
+                <input type="number" id="width" min="1" max="4" value="2">
+            </div>
+
+            <div class="form-group">
+                <label for="height">Altura del código (px)</label>
+                <input type="number" id="height" min="30" max="200" value="100">
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <button class="btn" onclick="generarCodigoBarras()">Generar Código de Barras</button>
+        </div>
+
+        <div class="card">
+            <h2 style="color: var(--primary); margin-bottom: 1rem;">Resultado</h2>
+            <div class="result-container">
+                <canvas id="barcodeCanvas"></canvas>
+                <p id="placeholderText" style="color: var(--text-muted);">El código de barras aparecerá aquí</p>
+            </div>
+            <button class="btn btn-secondary" onclick="descargarCodigoBarras()" id="downloadBtn" style="display: none;">Descargar Código de Barras</button>
+        </div>
+
+        <div class="card info-box">
+            <h3>ℹ️ Formatos disponibles</h3>
+            <ul>
+                <li><strong>EAN-13:</strong> Estándar europeo para productos de retail (13 dígitos)</li>
+                <li><strong>EAN-8:</strong> Versión compacta para productos pequeños (8 dígitos)</li>
+                <li><strong>Code 128:</strong> Permite caracteres alfanuméricos, ideal para logística</li>
+                <li><strong>UPC-A:</strong> Estándar estadounidense para productos (12 dígitos)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer meskeIA Unificado -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(46, 134, 171, 0.2); border-radius: 12px; padding: 8px 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); text-align: center; font-size: 0.9rem; z-index: 1000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; white-space: nowrap;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px;">
+            <span style="color: #2E86AB;">💡 ¿Te resultó útil?</span>
+            <button type="button" onclick="compartirApp()" style="background: none; border: none; color: #2E86AB; cursor: pointer; font-size: 0.9rem; padding: 0; display: inline-flex; align-items: center; gap: 4px; font-family: inherit; font-weight: 600; text-decoration: underline; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Compartir esta herramienta">
+                🔗 Compártela
+            </button>
+        </div>
+        <div style="color: #666; font-size: 0.85rem;">
+            © 2025 meskeIA
+        </div>
+    </footer>
+
+    <!-- Librería JsBarcode -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+    <script>
+        // Variables globales
+        let formatoActual = 'ean13';
+        const canvas = document.getElementById('barcodeCanvas');
+        const errorMessage = document.getElementById('errorMessage');
+        const placeholderText = document.getElementById('placeholderText');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Configuración de formatos
+        const formatosConfig = {
+            ean13: {
+                nombre: 'EAN-13',
+                longitud: 13,
+                tipo: 'EAN13',
+                ejemplo: '1234567890123',
+                ayuda: 'EAN-13 requiere exactamente 13 dígitos',
+                validacion: /^\d{13}$/
+            },
+            ean8: {
+                nombre: 'EAN-8',
+                longitud: 8,
+                tipo: 'EAN8',
+                ejemplo: '12345678',
+                ayuda: 'EAN-8 requiere exactamente 8 dígitos',
+                validacion: /^\d{8}$/
+            },
+            code128: {
+                nombre: 'Code 128',
+                longitud: null,
+                tipo: 'CODE128',
+                ejemplo: 'ABC12345',
+                ayuda: 'Code 128 acepta letras, números y símbolos',
+                validacion: /^[\x00-\x7F]+$/
+            },
+            upc: {
+                nombre: 'UPC-A',
+                longitud: 12,
+                tipo: 'UPC',
+                ejemplo: '123456789012',
+                ayuda: 'UPC-A requiere exactamente 12 dígitos',
+                validacion: /^\d{12}$/
+            }
+        };
+
+        // Selección de formato
+        document.querySelectorAll('.format-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.format-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                formatoActual = this.dataset.format;
+
+                const config = formatosConfig[formatoActual];
+                document.getElementById('formatHelp').textContent = config.ayuda;
+                document.getElementById('barcodeValue').placeholder = `Ejemplo: ${config.ejemplo}`;
+                document.getElementById('barcodeValue').value = '';
+
+                // Limpiar error
+                errorMessage.style.display = 'none';
+            });
+        });
+
+        // Generar código de barras
+        function generarCodigoBarras() {
+            const valor = document.getElementById('barcodeValue').value.trim();
+            const displayValue = document.getElementById('displayValue').value === 'true';
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+
+            errorMessage.style.display = 'none';
+
+            if (!valor) {
+                mostrarError('Por favor, introduce un valor para el código de barras');
+                return;
+            }
+
+            const config = formatosConfig[formatoActual];
+
+            // Validar formato
+            if (!config.validacion.test(valor)) {
+                mostrarError(`Formato inválido. ${config.ayuda}`);
+                return;
+            }
+
+            try {
+                JsBarcode(canvas, valor, {
+                    format: config.tipo,
+                    width: width,
+                    height: height,
+                    displayValue: displayValue,
+                    fontSize: 14,
+                    margin: 10,
+                    background: '#FFFFFF'
+                });
+
+                placeholderText.style.display = 'none';
+                canvas.style.display = 'block';
+                downloadBtn.style.display = 'block';
+
+            } catch (error) {
+                mostrarError('Error al generar el código de barras: ' + error.message);
+            }
+        }
+
+        // Descargar código de barras
+        function descargarCodigoBarras() {
+            const link = document.createElement('a');
+            link.download = `codigo-barras-${formatoActual}-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Mostrar error
+        function mostrarError(mensaje) {
+            errorMessage.textContent = mensaje;
+            errorMessage.style.display = 'block';
+            placeholderText.style.display = 'block';
+            canvas.style.display = 'none';
+            downloadBtn.style.display = 'none';
+        }
+
+        // Función para compartir la aplicación
+        async function compartirApp() {
+            const titulo = document.title;
+            const url = window.location.href;
+            const texto = '¡Mira esta herramienta útil de meskeIA!';
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: titulo, text: texto, url: url });
+                    console.log('✅ Compartido exitosamente');
+                } catch (err) {
+                    if (err.name !== 'AbortError') console.error('Error al compartir:', err);
+                }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(url);
+                    const mensaje = document.createElement('div');
+                    mensaje.textContent = '✅ Enlace copiado al portapapeles';
+                    mensaje.style.cssText = 'position: fixed; bottom: 60px; right: 20px; background: #2E86AB; color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; font-family: inherit; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; animation: fadeIn 0.3s;';
+                    document.body.appendChild(mensaje);
+                    setTimeout(() => {
+                        mensaje.style.animation = 'fadeOut 0.3s';
+                        setTimeout(() => mensaje.remove(), 300);
+                    }, 3000);
+                } catch (err) {
+                    prompt('Copia este enlace para compartir:', url);
+                }
+            }
+        }
+
+        // Generar al presionar Enter
+        document.getElementById('barcodeValue').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generarCodigoBarras();
+            }
+        });
+    </script>
+
+    <!-- meskeIA Analytics v2.0 - Tracking con duración y dispositivo -->
+    <script>
+        (async function() {
+            const nombreApp = 'generador-codigos-barras';
+
+            // Detección de visita recurrente usando localStorage
+            const claveStorage = 'meskeia_' + nombreApp;
+            const esRecurrente = localStorage.getItem(claveStorage) !== null;
+
+            // Marcar primera visita
+            if (!esRecurrente) {
+                localStorage.setItem(claveStorage, new Date().toISOString());
+            }
+
+            // Detección de tipo de dispositivo
+            const esMovil = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const tipoDispositivo = esMovil ? 'movil' : 'escritorio';
+
+            // Iniciar contador de duración
+            const tiempoInicio = Date.now();
+
+            // Datos de entrada (registro inicial)
+            const datosEntrada = {
+                aplicacion: nombreApp,
+                navegador: navigator.userAgent,
+                sistema_operativo: navigator.platform,
+                resolucion: `${window.screen.width}x${window.screen.height}`,
+                tipo_dispositivo: tipoDispositivo,
+                es_recurrente: esRecurrente
+            };
+
+            // Registrar entrada
+            try {
+                await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosEntrada),
+                    keepalive: true
+                });
+                console.log('✅ Uso registrado en meskeIA Analytics v2.0');
+            } catch (error) {
+                console.error('Error al registrar uso:', error);
+            }
+
+            // Registrar duración al salir
+            window.addEventListener('beforeunload', () => {
+                const duracionSegundos = Math.floor((Date.now() - tiempoInicio) / 1000);
+
+                // Solo registrar si la duración es mayor a 2 segundos (evita clics accidentales)
+                if (duracionSegundos > 2) {
+                    fetch('https://meskeia.com/api/v1/guardar-duracion.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            aplicacion: nombreApp,
+                            duracion_segundos: duracionSegundos,
+                            tipo_dispositivo: tipoDispositivo
+                        }),
+                        keepalive: true
+                    });
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 85 aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 86 aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 85,
+  "total_tools": 86,
   "updated": "2025-11-18",
   "features": {
     "all_free": true,
@@ -1555,6 +1555,51 @@
             "Quiero meter mis datos de contacto en un código QR para dárselo a clientes",
             "¿Cómo creo un código QR de un texto o un enlace de forma rápida?"
           ]
+        },
+        {
+          "name": "Generador de Códigos de Barras",
+          "slug": "generador-codigos-barras",
+          "url": "https://meskeia.com/generador-codigos-barras/",
+          "description": "Genera códigos de barras profesionales en formatos EAN-13, EAN-8, Code 128 y UPC para productos, inventarios y etiquetas. Descarga en PNG de alta calidad.",
+          "use_cases": [
+            "Etiquetar productos para venta",
+            "Gestión de inventario interno",
+            "Organización de almacenes",
+            "Control de activos empresariales"
+          ],
+          "features": [
+            "Formato EAN-13 para retail Europa",
+            "EAN-8 para productos pequeños",
+            "Code 128 alfanumérico para logística",
+            "UPC-A para retail USA/Canadá"
+          ],
+          "keywords": [
+            "generador codigos barras",
+            "crear codigo barras online",
+            "ean 13 generador",
+            "ean 8 codigo barras",
+            "code 128 generator",
+            "upc codigo barras",
+            "barcode generator español",
+            "generar codigo barras gratis",
+            "etiquetas productos codigo barras",
+            "codigo barras inventario",
+            "crear ean13 online",
+            "generador barcode ean"
+          ],
+          "_category": "Herramientas de Productividad",
+          "casos_de_uso": [
+            "¿Cómo genero códigos de barras para mis productos artesanales?",
+            "Necesito crear códigos EAN-13 para vender en tiendas físicas",
+            "¿Dónde puedo hacer códigos de barras gratis para mi inventario?",
+            "Quiero etiquetar productos con códigos de barras para escanearlos en caja",
+            "¿Cómo genero códigos de barras Code 128 para envíos y paquetes?"
+          ],
+          "technologies": ["HTML5", "JavaScript", "CSS3", "JsBarcode"],
+          "target_audience": ["Pequeños comercios", "Emprendedores", "Gestores de inventario", "Tiendas online"],
+          "difficulty_level": "principiante",
+          "estimated_time": "1 minuto",
+          "last_updated": "2025-11-18"
         }
       ]
     },

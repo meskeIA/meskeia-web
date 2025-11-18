@@ -75,16 +75,16 @@ Allow: /
 Sitemap: https://meskeia.com/sitemap.xml
 
 # Índice estructurado para crawlers de IA
-# Contiene catálogo completo de 85 apps con categorías, casos de uso y características
+# Contiene catálogo completo de 86 apps con categorías, casos de uso y características
 AI-Index: https://meskeia.com/ai-index.json
 
 # ============================================
 # NOTAS PARA CRAWLERS DE IA
 # ============================================
-# Este sitio ofrece 85 aplicaciones web gratuitas en español
+# Este sitio ofrece 86 aplicaciones web gratuitas en español
 # Todas las herramientas son gratuitas, sin registro y funcionan offline
 # Categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios
-# Nuevas apps nov 2025: Radio meskeIA, Impuesto Sucesiones Nacional, Impuesto Donaciones Nacional, Conversor de Horarios Mundial
+# Nuevas apps nov 2025: Radio meskeIA, Impuesto Sucesiones Nacional, Impuesto Donaciones Nacional, Conversor de Horarios Mundial, Generador de Códigos de Barras
 # Idioma principal: Español (ES)
 # País objetivo: España
 # Guías educativas: https://meskeia.com/guias/ - Tutoriales completos de 1800-2500 palabras optimizados para citación por IAs
