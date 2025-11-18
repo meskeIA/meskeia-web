@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="es" translate="yes">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Meta tags para traducción automática del navegador -->
+    <meta name="google" content="translate">
+    <meta http-equiv="content-language" content="es">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Horarios Mundial - Relojes y Zonas Horarias | meskeIA</title>
+    <link rel="icon" type="image/png" href="icon_meskeia.png">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Conversor de horarios mundial gratuito. Compara zonas horarias de 25 ciudades principales con relojes en tiempo real, indicadores día/noche y convertidor entre husos horarios.">
+    <meta name="keywords" content="conversor horarios, hora mundial, zonas horarias, reloj mundial, diferencia horaria, hora en Nueva York, hora en Tokio">
+    <meta name="author" content="meskeIA">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Conversor de Horarios Mundial - Relojes y Zonas Horarias">
+    <meta property="og:description" content="Compara horarios de 25 ciudades del mundo en tiempo real con relojes analógicos e indicadores día/noche">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://meskeia.com/conversor-horarios/">
+
+    <style>
+        :root {
+            /* Backgrounds - Inspirados en Claude */
+            --bg-primary: #FAFAFA;
+            --bg-card: #FFFFFF;
+
+            /* Identidad de marca meskeIA */
+            --primary: #2E86AB;
+            --secondary: #48A9A6;
+
+            /* Textos minimalistas */
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+
+            /* Elementos estructurales */
+            --border: #E5E5E5;
+            --hover: #F5F5F5;
+            --focus: rgba(46,134,171,0.1);
+
+            /* Indicadores día/noche */
+            --day-bg: #FFE5B4;
+            --night-bg: #1A1F3A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            padding-top: 100px;
+            padding-bottom: 100px;
+        }
+
+        /* Logo meskeIA - Componente oficial */
+        .meskeia-logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(46, 134, 171, 0.2);
+            border-radius: 12px;
+            padding: 8px 16px;
+            box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .meskeia-logo-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+        }
+        .meskeia-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .meskeia-logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+        }
+        .meskeia-logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #2E86AB;
+            border-radius: 50%;
+            top: 13px;
+            left: 13px;
+        }
+        .meskeia-neural-network {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+        .meskeia-neural-dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+        }
+        .meskeia-neural-dot:nth-child(1) { top: 4px; left: 6px; }
+        .meskeia-neural-dot:nth-child(2) { top: 8px; right: 5px; }
+        .meskeia-neural-dot:nth-child(3) { bottom: 6px; left: 4px; }
+        .meskeia-neural-dot:nth-child(4) { bottom: 4px; right: 8px; }
+        .meskeia-logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2C3E50;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .meskeia-logo-text .meske {
+            color: #2E86AB;
+        }
+        .meskeia-logo-text .ia {
+            color: #48A9A6;
+            font-weight: 700;
+            position: relative;
+        }
+        .meskeia-logo-text .ia::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #48A9A6, #7FB3D3);
+            border-radius: 1px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        /* Grid de relojes */
+        .clocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .clock-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clock-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        /* Fondos día/noche eliminados - minimalismo meskeIA */
+
+        .city-selector {
+            margin-bottom: 1rem;
+        }
+
+        .city-selector select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .city-selector select:hover {
+            border-color: var(--primary);
+        }
+
+        .city-selector select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--focus);
+        }
+
+        .city-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .clock-face {
+            width: 180px;
+            height: 180px;
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto 1rem;
+            background: white;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        .clock-face::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        /* Marcas de horas */
+        .hour-mark {
+            position: absolute;
+            width: 2px;
+            height: 10px;
+            background: var(--text-secondary);
+            top: 5px;
+            left: 50%;
+            transform-origin: 50% 85px;
+        }
+
+        /* Manecillas del reloj */
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 10px;
+        }
+
+        .hour-hand {
+            width: 4px;
+            height: 50px;
+            background: var(--text-primary);
+            margin-left: -2px;
+        }
+
+        .minute-hand {
+            width: 3px;
+            height: 70px;
+            background: var(--primary);
+            margin-left: -1.5px;
+        }
+
+        .second-hand {
+            width: 2px;
+            height: 80px;
+            background: var(--secondary);
+            margin-left: -1px;
+        }
+
+        .digital-time {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .timezone-diff {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .day-night-indicator {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .day-night-indicator.day {
+            background: #FFE5B4;
+            color: #8B4000;
+        }
+
+        .day-night-indicator.night {
+            background: #1A1F3A;
+            color: #87CEEB;
+        }
+
+        /* Sección del conversor */
+        .converter-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 3rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .converter-section h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .converter-form {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1.5rem;
+            align-items: end;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-group select,
+        .form-group input {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--focus);
+        }
+
+        .converter-arrow {
+            font-size: 2rem;
+            color: var(--primary);
+            text-align: center;
+            padding-bottom: 1rem;
+        }
+
+        .converter-result {
+            background: var(--focus);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .converter-result h3 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .converter-result p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 80px;
+                padding-bottom: 80px;
+            }
+
+            .meskeia-logo-container {
+                top: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                gap: 8px;
+            }
+
+            .meskeia-logo-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .meskeia-logo-icon::before {
+                width: 9px;
+                height: 9px;
+                top: 7.5px;
+                left: 7.5px;
+            }
+
+            .meskeia-logo-icon::after {
+                width: 4px;
+                height: 4px;
+                top: 10px;
+                left: 10px;
+            }
+
+            .meskeia-logo-text {
+                font-size: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .clocks-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .clock-face {
+                width: 150px;
+                height: 150px;
+            }
+
+            .hour-mark {
+                transform-origin: 50% 70px;
+            }
+
+            .hour-hand {
+                height: 40px;
+            }
+
+            .minute-hand {
+                height: 55px;
+            }
+
+            .second-hand {
+                height: 65px;
+            }
+
+            .converter-form {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .converter-arrow {
+                transform: rotate(90deg);
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Logo meskeIA -->
+    <div class="meskeia-logo-container" onclick="window.location.href='../index.html'">
+        <div class="meskeia-logo-icon">
+            <div class="meskeia-neural-network">
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+                <div class="meskeia-neural-dot"></div>
+            </div>
+        </div>
+        <div class="meskeia-logo-text">
+            <span class="meske">meske</span><span class="ia">IA</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>⏰ Conversor de Horarios Mundial</h1>
+        <p class="subtitle">Compara zonas horarias de todo el mundo en tiempo real</p>
+
+        <!-- Grid de relojes -->
+        <div class="clocks-grid" id="clocksGrid">
+            <!-- Los relojes se generarán dinámicamente con JavaScript -->
+        </div>
+
+        <!-- Sección de conversor -->
+        <div class="converter-section">
+            <h2>🌍 Convertir Horario Entre Ciudades</h2>
+            <div class="converter-form">
+                <div class="form-group">
+                    <label for="fromCity">Ciudad de origen</label>
+                    <select id="fromCity">
+                        <!-- Opciones generadas dinámicamente -->
+                    </select>
+                </div>
+
+                <div class="converter-arrow">→</div>
+
+                <div class="form-group">
+                    <label for="toCity">Ciudad de destino</label>
+                    <select id="toCity">
+                        <!-- Opciones generadas dinámicamente -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="timeInput">Hora en ciudad de origen</label>
+                <input type="time" id="timeInput">
+            </div>
+
+            <div class="converter-result" id="converterResult">
+                <h3 id="resultTime">--:--</h3>
+                <p id="resultText">Selecciona una hora para convertir</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer meskeIA Unificado -->
+    <footer style="position: fixed; bottom: 10px; right: 20px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(46, 134, 171, 0.2); border-radius: 12px; padding: 8px 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); text-align: center; font-size: 0.9rem; z-index: 1000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; white-space: nowrap;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px;">
+            <span style="color: #2E86AB;">💡 ¿Te resultó útil?</span>
+            <button type="button" onclick="compartirApp()" style="background: none; border: none; color: #2E86AB; cursor: pointer; font-size: 0.9rem; padding: 0; display: inline-flex; align-items: center; gap: 4px; font-family: inherit; font-weight: 600; text-decoration: underline; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Compartir esta herramienta">
+                🔗 Compártela
+            </button>
+        </div>
+        <div style="color: #666; font-size: 0.85rem;">
+            © 2025 meskeIA
+        </div>
+    </footer>
+
+    <script>
+        // Base de datos de ciudades con sus zonas horarias
+        const cities = [
+            // Europa
+            { name: 'Madrid', timezone: 'Europe/Madrid', flag: '🇪🇸' },
+            { name: 'Londres', timezone: 'Europe/London', flag: '🇬🇧' },
+            { name: 'París', timezone: 'Europe/Paris', flag: '🇫🇷' },
+            { name: 'Berlín', timezone: 'Europe/Berlin', flag: '🇩🇪' },
+            { name: 'Roma', timezone: 'Europe/Rome', flag: '🇮🇹' },
+            { name: 'Moscú', timezone: 'Europe/Moscow', flag: '🇷🇺' },
+            { name: 'Atenas', timezone: 'Europe/Athens', flag: '🇬🇷' },
+            { name: 'Ámsterdam', timezone: 'Europe/Amsterdam', flag: '🇳🇱' },
+
+            // América
+            { name: 'Nueva York', timezone: 'America/New_York', flag: '🇺🇸' },
+            { name: 'Los Ángeles', timezone: 'America/Los_Angeles', flag: '🇺🇸' },
+            { name: 'Chicago', timezone: 'America/Chicago', flag: '🇺🇸' },
+            { name: 'Ciudad de México', timezone: 'America/Mexico_City', flag: '🇲🇽' },
+            { name: 'Toronto', timezone: 'America/Toronto', flag: '🇨🇦' },
+            { name: 'Buenos Aires', timezone: 'America/Argentina/Buenos_Aires', flag: '🇦🇷' },
+            { name: 'São Paulo', timezone: 'America/Sao_Paulo', flag: '🇧🇷' },
+            { name: 'Lima', timezone: 'America/Lima', flag: '🇵🇪' },
+            { name: 'Bogotá', timezone: 'America/Bogota', flag: '🇨🇴' },
+
+            // Asia
+            { name: 'Tokio', timezone: 'Asia/Tokyo', flag: '🇯🇵' },
+            { name: 'Pekín', timezone: 'Asia/Shanghai', flag: '🇨🇳' },
+            { name: 'Shanghái', timezone: 'Asia/Shanghai', flag: '🇨🇳' },
+            { name: 'Singapur', timezone: 'Asia/Singapore', flag: '🇸🇬' },
+            { name: 'Hong Kong', timezone: 'Asia/Hong_Kong', flag: '🇭🇰' },
+            { name: 'Dubái', timezone: 'Asia/Dubai', flag: '🇦🇪' },
+            { name: 'Delhi', timezone: 'Asia/Kolkata', flag: '🇮🇳' },
+            { name: 'Seúl', timezone: 'Asia/Seoul', flag: '🇰🇷' },
+            { name: 'Bangkok', timezone: 'Asia/Bangkok', flag: '🇹🇭' },
+
+            // Oceanía
+            { name: 'Sídney', timezone: 'Australia/Sydney', flag: '🇦🇺' },
+            { name: 'Auckland', timezone: 'Pacific/Auckland', flag: '🇳🇿' },
+
+            // África
+            { name: 'El Cairo', timezone: 'Africa/Cairo', flag: '🇪🇬' },
+            { name: 'Johannesburgo', timezone: 'Africa/Johannesburg', flag: '🇿🇦' }
+        ];
+
+        // Ciudades predeterminadas para los 4 relojes
+        const defaultCities = ['Madrid', 'Londres', 'Nueva York', 'Tokio'];
+
+        // Crear relojes iniciales
+        function initializeClocks() {
+            const clocksGrid = document.getElementById('clocksGrid');
+            clocksGrid.innerHTML = '';
+
+            defaultCities.forEach((cityName, index) => {
+                const city = cities.find(c => c.name === cityName);
+                const clockCard = createClockCard(city, index);
+                clocksGrid.appendChild(clockCard);
+            });
+
+            // Poblar selectores del conversor
+            populateConverterSelects();
+        }
+
+        // Crear tarjeta de reloj
+        function createClockCard(city, index) {
+            const card = document.createElement('div');
+            card.className = 'clock-card';
+            card.id = `clock-${index}`;
+
+            // Selector de ciudad
+            const selector = document.createElement('div');
+            selector.className = 'city-selector';
+            const select = document.createElement('select');
+            select.id = `city-select-${index}`;
+            select.onchange = () => changeCityForClock(index);
+
+            cities.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.name;
+                option.textContent = `${c.flag} ${c.name}`;
+                if (c.name === city.name) option.selected = true;
+                select.appendChild(option);
+            });
+
+            selector.appendChild(select);
+            card.appendChild(selector);
+
+            // Nombre de ciudad
+            const cityName = document.createElement('div');
+            cityName.className = 'city-name';
+            cityName.id = `city-name-${index}`;
+            cityName.textContent = `${city.flag} ${city.name}`;
+            card.appendChild(cityName);
+
+            // Reloj analógico
+            const clockFace = document.createElement('div');
+            clockFace.className = 'clock-face';
+            clockFace.id = `clock-face-${index}`;
+
+            // Crear marcas de horas
+            for (let i = 0; i < 12; i++) {
+                const mark = document.createElement('div');
+                mark.className = 'hour-mark';
+                mark.style.transform = `rotate(${i * 30}deg)`;
+                clockFace.appendChild(mark);
+            }
+
+            // Manecillas
+            const hourHand = document.createElement('div');
+            hourHand.className = 'hand hour-hand';
+            hourHand.id = `hour-hand-${index}`;
+
+            const minuteHand = document.createElement('div');
+            minuteHand.className = 'hand minute-hand';
+            minuteHand.id = `minute-hand-${index}`;
+
+            const secondHand = document.createElement('div');
+            secondHand.className = 'hand second-hand';
+            secondHand.id = `second-hand-${index}`;
+
+            clockFace.appendChild(hourHand);
+            clockFace.appendChild(minuteHand);
+            clockFace.appendChild(secondHand);
+            card.appendChild(clockFace);
+
+            // Hora digital
+            const digitalTime = document.createElement('div');
+            digitalTime.className = 'digital-time';
+            digitalTime.id = `digital-time-${index}`;
+            card.appendChild(digitalTime);
+
+            // Diferencia horaria
+            const timezoneDiff = document.createElement('div');
+            timezoneDiff.className = 'timezone-diff';
+            timezoneDiff.id = `timezone-diff-${index}`;
+            card.appendChild(timezoneDiff);
+
+            // Indicador día/noche
+            const dayNightIndicator = document.createElement('div');
+            dayNightIndicator.className = 'day-night-indicator';
+            dayNightIndicator.id = `day-night-${index}`;
+            card.appendChild(dayNightIndicator);
+
+            return card;
+        }
+
+        // Cambiar ciudad de un reloj
+        function changeCityForClock(index) {
+            const selectElement = document.getElementById(`city-select-${index}`);
+            const selectedCityName = selectElement.value;
+            const city = cities.find(c => c.name === selectedCityName);
+
+            const cityNameElement = document.getElementById(`city-name-${index}`);
+            cityNameElement.textContent = `${city.flag} ${city.name}`;
+
+            updateClock(index);
+        }
+
+        // Poblar selectores del conversor
+        function populateConverterSelects() {
+            const fromSelect = document.getElementById('fromCity');
+            const toSelect = document.getElementById('toCity');
+
+            cities.forEach(city => {
+                const option1 = document.createElement('option');
+                option1.value = city.name;
+                option1.textContent = `${city.flag} ${city.name}`;
+                fromSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = city.name;
+                option2.textContent = `${city.flag} ${city.name}`;
+                toSelect.appendChild(option2);
+            });
+
+            // Valores por defecto
+            fromSelect.value = 'Madrid';
+            toSelect.value = 'Nueva York';
+
+            // Event listeners
+            document.getElementById('timeInput').addEventListener('change', convertTime);
+            fromSelect.addEventListener('change', convertTime);
+            toSelect.addEventListener('change', convertTime);
+
+            // Establecer hora actual por defecto
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('timeInput').value = `${hours}:${minutes}`;
+            convertTime();
+        }
+
+        // Convertir hora entre ciudades
+        function convertTime() {
+            const fromCityName = document.getElementById('fromCity').value;
+            const toCityName = document.getElementById('toCity').value;
+            const timeInput = document.getElementById('timeInput').value;
+
+            if (!timeInput) return;
+
+            const fromCity = cities.find(c => c.name === fromCityName);
+            const toCity = cities.find(c => c.name === toCityName);
+
+            const [hours, minutes] = timeInput.split(':').map(Number);
+
+            // Crear fecha en la zona horaria de origen
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const day = now.getDate();
+
+            // Obtener offset de la ciudad de origen
+            const fromDate = new Date(year, month, day, hours, minutes);
+            const fromTimeString = fromDate.toLocaleString('en-US', { timeZone: fromCity.timezone });
+            const fromTimeObj = new Date(fromTimeString);
+
+            // Convertir a zona horaria de destino
+            const toTimeString = fromDate.toLocaleString('es-ES', {
+                timeZone: toCity.timezone,
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+
+            // Mostrar resultado
+            document.getElementById('resultTime').textContent = toTimeString;
+            document.getElementById('resultText').textContent =
+                `Cuando en ${fromCity.flag} ${fromCityName} son las ${timeInput}, en ${toCity.flag} ${toCityName} son las ${toTimeString}`;
+        }
+
+        // Actualizar todos los relojes
+        function updateAllClocks() {
+            for (let i = 0; i < 4; i++) {
+                updateClock(i);
+            }
+        }
+
+        // Actualizar un reloj específico
+        function updateClock(index) {
+            const selectElement = document.getElementById(`city-select-${index}`);
+            const cityName = selectElement.value;
+            const city = cities.find(c => c.name === cityName);
+
+            // Obtener hora actual en la zona horaria
+            const now = new Date();
+            const timeString = now.toLocaleString('es-ES', {
+                timeZone: city.timezone,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+
+            const [hours, minutes, seconds] = timeString.split(':').map(Number);
+
+            // Actualizar hora digital
+            document.getElementById(`digital-time-${index}`).textContent = timeString;
+
+            // Calcular ángulos para las manecillas
+            const secondAngle = seconds * 6; // 360 / 60
+            const minuteAngle = minutes * 6 + seconds * 0.1;
+            const hourAngle = (hours % 12) * 30 + minutes * 0.5;
+
+            // Aplicar rotación a las manecillas
+            document.getElementById(`second-hand-${index}`).style.transform = `rotate(${secondAngle}deg)`;
+            document.getElementById(`minute-hand-${index}`).style.transform = `rotate(${minuteAngle}deg)`;
+            document.getElementById(`hour-hand-${index}`).style.transform = `rotate(${hourAngle}deg)`;
+
+            // Calcular diferencia horaria con Madrid
+            const madridTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Madrid' }));
+            const cityTime = new Date(now.toLocaleString('en-US', { timeZone: city.timezone }));
+            const diff = (cityTime - madridTime) / (1000 * 60 * 60);
+            const diffText = diff >= 0 ? `+${diff}h` : `${diff}h`;
+            document.getElementById(`timezone-diff-${index}`).textContent =
+                city.name === 'Madrid' ? 'Hora local' : `${diffText} respecto a Madrid`;
+
+            // Indicador día/noche (solo badge, sin cambiar fondo de tarjeta)
+            const isDaytime = hours >= 6 && hours < 20;
+            const indicator = document.getElementById(`day-night-${index}`);
+
+            if (isDaytime) {
+                indicator.textContent = '☀️ Día';
+                indicator.className = 'day-night-indicator day';
+            } else {
+                indicator.textContent = '🌙 Noche';
+                indicator.className = 'day-night-indicator night';
+            }
+        }
+
+        // Función para compartir la aplicación
+        async function compartirApp() {
+            const titulo = document.title;
+            const url = window.location.href;
+            const texto = '¡Mira esta herramienta útil de meskeIA!';
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: titulo, text: texto, url: url });
+                    console.log('✅ Compartido exitosamente');
+                } catch (err) {
+                    if (err.name !== 'AbortError') console.error('Error al compartir:', err);
+                }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(url);
+                    const mensaje = document.createElement('div');
+                    mensaje.textContent = '✅ Enlace copiado al portapapeles';
+                    mensaje.style.cssText = 'position: fixed; bottom: 60px; right: 20px; background: #2E86AB; color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; font-family: inherit; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; animation: fadeIn 0.3s;';
+                    document.body.appendChild(mensaje);
+                    setTimeout(() => {
+                        mensaje.style.animation = 'fadeOut 0.3s';
+                        setTimeout(() => mensaje.remove(), 300);
+                    }, 3000);
+                } catch (err) {
+                    prompt('Copia este enlace para compartir:', url);
+                }
+            }
+        }
+
+        // Inicializar la aplicación
+        initializeClocks();
+        updateAllClocks();
+
+        // Actualizar cada segundo
+        setInterval(updateAllClocks, 1000);
+    </script>
+
+    <!-- meskeIA Analytics v2.0 - Tracking con duración y dispositivo -->
+    <script>
+        (async function() {
+            const nombreApp = 'conversor-horarios';
+
+            // Detección de visita recurrente usando localStorage
+            const claveStorage = 'meskeia_' + nombreApp;
+            const esRecurrente = localStorage.getItem(claveStorage) !== null;
+
+            // Marcar primera visita
+            if (!esRecurrente) {
+                localStorage.setItem(claveStorage, new Date().toISOString());
+            }
+
+            // Detección de tipo de dispositivo
+            const esMovil = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const tipoDispositivo = esMovil ? 'movil' : 'escritorio';
+
+            // Iniciar contador de duración
+            const tiempoInicio = Date.now();
+
+            // Datos de entrada (registro inicial)
+            const datosEntrada = {
+                aplicacion: nombreApp,
+                navegador: navigator.userAgent,
+                sistema_operativo: navigator.platform,
+                resolucion: `${window.screen.width}x${window.screen.height}`,
+                tipo_dispositivo: tipoDispositivo,
+                es_recurrente: esRecurrente
+            };
+
+            // Registrar entrada
+            try {
+                await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosEntrada),
+                    keepalive: true
+                });
+                console.log('✅ Uso registrado en meskeIA Analytics v2.0');
+            } catch (error) {
+                console.error('Error al registrar uso:', error);
+            }
+
+            // Registrar duración al salir
+            window.addEventListener('beforeunload', () => {
+                const duracionSegundos = Math.floor((Date.now() - tiempoInicio) / 1000);
+
+                // Solo registrar si la duración es mayor a 2 segundos (evita clics accidentales)
+                if (duracionSegundos > 2) {
+                    fetch('https://meskeia.com/api/v1/guardar-duracion.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            aplicacion: nombreApp,
+                            duracion_segundos: duracionSegundos,
+                            tipo_dispositivo: tipoDispositivo
+                        }),
+                        keepalive: true
+                    });
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>

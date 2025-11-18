@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 86 aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 85 aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 86,
+  "total_tools": 85,
   "updated": "2025-11-18",
   "features": {
     "all_free": true,
@@ -1384,6 +1384,42 @@
             "Quiero una alarma que me avise cuando termine mi entrenamiento",
             "¿Hay algun cronometro preciso para medir tiempos en entrenamientos?",
             "Busco un temporizador simple y facil de usar desde el movil"
+          ]
+        },
+        {
+          "name": "Conversor de Horarios Mundial",
+          "slug": "conversor-horarios",
+          "url": "https://meskeia.com/conversor-horarios/",
+          "description": "Compara horarios de 31 ciudades con relojes analógicos en tiempo real, indicadores día/noche y convertidor entre zonas horarias.",
+          "use_cases": [
+            "Coordinar llamadas con clientes internacionales",
+            "Planificar reuniones con equipos remotos",
+            "Verificar horarios de mercados financieros",
+            "Contactar familiares en el extranjero"
+          ],
+          "features": [
+            "31 ciudades",
+            "Relojes analógicos",
+            "Día/Noche",
+            "Conversor"
+          ],
+          "keywords": [
+            "conversor horarios mundial",
+            "hora en nueva york",
+            "zonas horarias mundiales",
+            "reloj mundial tiempo real",
+            "diferencia horaria paises",
+            "convertir hora entre paises",
+            "hora actual ciudades mundo",
+            "calculadora zonas horarias"
+          ],
+          "_category": "Herramientas de Productividad",
+          "casos_de_uso": [
+            "¿Qué hora es en Nueva York ahora mismo?",
+            "Necesito saber si mi cliente en Tokio está en horario laboral",
+            "¿Cómo calculo la diferencia horaria entre España y México?",
+            "Quiero ver la hora de varias ciudades al mismo tiempo en relojes",
+            "¿Hay alguna herramienta para convertir horarios entre zonas del mundo?"
           ]
         },
         {
