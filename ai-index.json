@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 84 aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 86 aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 84,
-  "updated": "2025-01-16",
+  "total_tools": 86,
+  "updated": "2025-11-18",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -1098,74 +1098,6 @@
             "¿Hay alguna app para investigacion operativa que me ayude con mis ejercicios de universidad?",
             "Tengo que optimizar recursos en mi empresa, ¿como puedo usar programacion lineal?"
           ]
-        },
-        {
-          "name": "Matriz",
-          "slug": "matriz",
-          "url": "https://meskeia.com/matriz/",
-          "description": "Operaciones con matrices: suma, multiplicación, determinante, inversa, transpuesta.",
-          "use_cases": [
-            "Resolver sistemas lineales",
-            "Calcular determinantes e inversas"
-          ],
-          "features": [
-            "Suma/multiplicación",
-            "Determinante",
-            "Inversa",
-            "Transpuesta"
-          ],
-          "keywords": [
-            "calculadora matrices",
-            "operaciones matrices online",
-            "determinante matriz",
-            "inversa matriz",
-            "multiplicar matrices",
-            "suma matrices",
-            "transpuesta matriz",
-            "herramienta matrices gratis"
-          ],
-          "_category": "Matemáticas y Estadística",
-          "casos_de_uso": [
-            "¿Cómo calculo el determinante de una matriz?",
-            "Necesito invertir una matriz, ¿hay alguna herramienta online?",
-            "Quiero sumar y multiplicar matrices sin hacerlo a mano",
-            "¿Dónde puedo calcular la transpuesta de una matriz rapidamente?",
-            "Tengo que resolver operaciones con matrices para mi examen, ¿me ayudas?"
-          ]
-        },
-        {
-          "name": "Gráfico de Funciones",
-          "slug": "grafico-funciones",
-          "url": "https://meskeia.com/grafico-funciones/",
-          "description": "Grafica funciones matemáticas (polinómicas, trigonométricas, exponenciales) en plano cartesiano.",
-          "use_cases": [
-            "Visualizar funciones matemáticas",
-            "Analizar comportamiento de ecuaciones"
-          ],
-          "features": [
-            "Gráficos interactivos",
-            "Múltiples funciones",
-            "Zoom",
-            "Coordenadas"
-          ],
-          "keywords": [
-            "graficar funciones",
-            "graficador de funciones",
-            "representar funciones matematicas",
-            "funciones trigonometricas grafico",
-            "plano cartesiano",
-            "herramienta graficar online",
-            "funciones polinomicas",
-            "dibujador de graficas"
-          ],
-          "_category": "Matemáticas y Estadística",
-          "casos_de_uso": [
-            "¿Cómo puedo representar gráficamente una función matemática sin usar papel?",
-            "Necesito graficar funciones trigonométricas para estudiar, ¿hay alguna herramienta online?",
-            "Quiero visualizar cómo se comportan las funciones exponenciales y polinomicas",
-            "¿Dónde puedo ver el gráfico de una función en el plano cartesiano de forma rápida?",
-            "Tengo que hacer gráficos de funciones para clase, ¿existe algo gratis y fácil?"
-          ]
         }
       ]
     },
@@ -1485,39 +1417,6 @@
             "¿Cómo está el tiempo ahora mismo en Barcelona y Londres?",
             "Quiero consultar el pronostico del tiempo para esta semana",
             "¿Dónde puedo ver el clima de diferentes ciudades en tiempo real?"
-          ]
-        },
-        {
-          "name": "Horario Mundial",
-          "slug": "horario-mundial",
-          "url": "https://meskeia.com/horario-mundial/",
-          "description": "Consulta hora actual en diferentes zonas horarias y convierte entre husos.",
-          "use_cases": [
-            "Coordinar reuniones internacionales",
-            "Llamadas con otros países"
-          ],
-          "features": [
-            "Zonas horarias",
-            "Conversión",
-            "Múltiples ciudades"
-          ],
-          "keywords": [
-            "conversor de horas",
-            "zonas horarias mundo",
-            "diferencia horaria",
-            "hora mundial",
-            "huso horario",
-            "que hora es en",
-            "convertir hora",
-            "reloj mundial"
-          ],
-          "_category": "Herramientas de Productividad",
-          "casos_de_uso": [
-            "¿Qué hora es ahora en Tokio mientras aquí es las 3 de la tarde?",
-            "Necesito saber la diferencia horaria entre Madrid y Nueva York",
-            "¿Cómo convierto una hora de Londres a horario de España?",
-            "Quiero ver qué hora es en varios países a la vez sin liarme",
-            "¿A qué hora tengo que llamar a mi amigo en Sydney para que sea por la mañana aquí?"
           ]
         },
         {
@@ -2157,39 +2056,6 @@
             "¿Cómo calculo mi ingesta diaria de agua en función del clima?",
             "Quiero saber si bebo suficiente agua al día",
             "¿Cuánta hidratacion necesito segun mi actividad fisica?"
-          ]
-        },
-        {
-          "name": "Índice de Masa Corporal (IMC)",
-          "slug": "indice-masa-corporal",
-          "url": "https://meskeia.com/indice-masa-corporal/",
-          "description": "Calcula IMC y clasifica según OMS: bajo peso, normal, sobrepeso, obesidad.",
-          "use_cases": [
-            "Evaluar peso saludable",
-            "Seguimiento pérdida peso"
-          ],
-          "features": [
-            "IMC",
-            "Clasificación OMS",
-            "Recomendaciones"
-          ],
-          "keywords": [
-            "indice masa corporal",
-            "IMC calculadora",
-            "peso ideal",
-            "calculadora IMC",
-            "sobrepeso",
-            "indice de masa corporal",
-            "obesidad",
-            "bajo peso"
-          ],
-          "_category": "Salud & Bienestar",
-          "casos_de_uso": [
-            "¿Cuál es mi índice de masa corporal?",
-            "Necesito saber si tengo sobrepeso o estoy en mi peso ideal",
-            "¿Cómo calculo el IMC y qué significa cada categoría?",
-            "Quiero comprobar si estoy obeso según la OMS",
-            "¿Tengo bajo peso? Calcula mi IMC ahora"
           ]
         },
         {
