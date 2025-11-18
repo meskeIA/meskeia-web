@@ -1077,4 +1077,24 @@
     <changefreq>monthly</changefreq>
   </url>
 
+  <!-- Nuevas guías noviembre 2025 -->
+  <url>
+    <loc>https://meskeia.com/guias/juegos-y-entretenimiento/radio-meskeia-guia.html</loc>
+    <lastmod>2025-11-18</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/finanzas-y-fiscalidad/impuesto-sucesiones-nacional-guia.html</loc>
+    <lastmod>2025-11-18</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meskeia.com/guias/finanzas-y-fiscalidad/impuesto-donaciones-nacional-guia.html</loc>
+    <lastmod>2025-11-18</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
 </urlset>
