@@ -426,10 +426,25 @@
         .timezone-table {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            margin: 0 -1rem; /* Compensar padding del contenedor */
+            padding: 0 1rem;
         }
 
         .timezone-table table {
-            min-width: 600px;
+            width: 100%;
+            min-width: 100%;
+        }
+
+        .timezone-table th,
+        .timezone-table td {
+            white-space: nowrap;
+            padding: 0.75rem;
+        }
+
+        /* Primera columna con nombre completo puede ajustarse */
+        .timezone-table td:first-child {
+            white-space: normal;
+            min-width: 150px;
         }
 
         /* Responsive */
@@ -439,13 +454,31 @@
                 padding-bottom: 80px;
             }
 
+            .timezone-table {
+                margin: 0 -0.5rem;
+                padding: 0 0.5rem;
+            }
+
             .timezone-table table {
-                font-size: 0.85rem;
+                font-size: 0.8rem;
             }
 
             .timezone-table th,
             .timezone-table td {
-                padding: 0.5rem !important;
+                padding: 0.4rem !important;
+                font-size: 0.75rem;
+            }
+
+            /* En móvil, columna de nombre más pequeña */
+            .timezone-table td:first-child {
+                min-width: 120px;
+                font-size: 0.7rem;
+            }
+
+            /* Abreviaturas más destacadas en móvil */
+            .timezone-table td:nth-child(2) {
+                font-weight: 600;
+                color: var(--primary);
             }
 
             .meskeia-logo-container {
@@ -515,6 +548,24 @@
             .converter-form {
                 grid-template-columns: 1fr;
                 gap: 1rem;
+            }
+
+            .converter-section {
+                padding: 1rem;
+                margin-top: 2rem;
+            }
+
+            .form-group {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .form-group select,
+            .form-group input {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                font-size: 0.9rem;
             }
 
             .converter-arrow {
