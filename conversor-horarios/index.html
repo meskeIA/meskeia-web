@@ -1054,6 +1054,18 @@
             document.getElementById('timezoneInput').addEventListener('change', convertTimezone);
             document.getElementById('timezoneFrom').addEventListener('change', convertTimezone);
 
+            // Event listener para detectar cambio de tamaño de ventana (responsive)
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    // Regenerar la vista solo si hay resultados
+                    if (document.getElementById('timezoneResults').innerHTML.trim() !== '') {
+                        convertTimezone();
+                    }
+                }, 250); // Esperar 250ms después del último resize
+            });
+
             // Establecer hora actual por defecto
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -1076,69 +1088,124 @@
             // Calcular hora UTC desde la zona origen
             const utcHours = hours - fromTimezone.offset;
 
-            // Crear tabla de resultados
-            let tableHTML = `
-                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead style="background: var(--primary); color: white;">
-                            <tr>
-                                <th style="padding: 1rem; text-align: left;">Zona Horaria</th>
-                                <th style="padding: 1rem; text-align: left;">Abreviatura</th>
-                                <th style="padding: 1rem; text-align: left;">Offset UTC</th>
-                                <th style="padding: 1rem; text-align: right; font-weight: 600;">Hora Local</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
+            // Detectar si es móvil
+            const isMobile = window.innerWidth <= 768;
 
-            // Generar filas para cada zona horaria
-            timezones.forEach((tz, index) => {
-                const targetHours = utcHours + tz.offset;
+            let resultsHTML = '';
 
-                // Normalizar horas (puede ser negativo o mayor a 24)
-                let normalizedHours = targetHours;
-                let dayIndicator = '';
+            if (isMobile) {
+                // VERSIÓN MÓVIL: Tarjetas (cards)
+                resultsHTML = '<div style="display: flex; flex-direction: column; gap: 0.75rem;">';
 
-                if (normalizedHours < 0) {
-                    normalizedHours += 24;
-                    dayIndicator = ' <span style="color: var(--text-muted); font-size: 0.85rem;">(día anterior)</span>';
-                } else if (normalizedHours >= 24) {
-                    normalizedHours -= 24;
-                    dayIndicator = ' <span style="color: var(--text-muted); font-size: 0.85rem;">(día siguiente)</span>';
-                }
+                timezones.forEach((tz) => {
+                    const targetHours = utcHours + tz.offset;
 
-                // Formatear hora
-                const formattedHours = String(Math.floor(normalizedHours)).padStart(2, '0');
-                const formattedMinutes = String(minutes).padStart(2, '0');
-                const timeString = `${formattedHours}:${formattedMinutes}`;
+                    // Normalizar horas
+                    let normalizedHours = targetHours;
+                    let dayIndicator = '';
 
-                const offsetString = tz.offset >= 0 ? `+${tz.offset}` : tz.offset;
-                const rowBg = index % 2 === 0 ? 'var(--bg-card)' : 'var(--hover)';
-                const isOrigin = tz.abbr === fromAbbr;
-                const highlightStyle = isOrigin ? 'background: var(--focus); border-left: 4px solid var(--primary); font-weight: 600;' : '';
+                    if (normalizedHours < 0) {
+                        normalizedHours += 24;
+                        dayIndicator = ' (día anterior)';
+                    } else if (normalizedHours >= 24) {
+                        normalizedHours -= 24;
+                        dayIndicator = ' (día siguiente)';
+                    }
 
-                tableHTML += `
-                    <tr style="background: ${rowBg}; ${highlightStyle}">
-                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);">${tz.name}</td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border); font-weight: 600; color: var(--primary);">${tz.abbr}</td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-secondary);">UTC${offsetString}</td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border); text-align: right; font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">
-                            ${timeString}${dayIndicator}
-                        </td>
-                    </tr>
+                    // Formatear hora
+                    const formattedHours = String(Math.floor(normalizedHours)).padStart(2, '0');
+                    const formattedMinutes = String(minutes).padStart(2, '0');
+                    const timeString = `${formattedHours}:${formattedMinutes}`;
+
+                    const offsetString = tz.offset >= 0 ? `+${tz.offset}` : tz.offset;
+                    const isOrigin = tz.abbr === fromAbbr;
+                    const highlightStyle = isOrigin ? 'border-left: 4px solid var(--primary); background: var(--focus);' : 'border-left: 4px solid var(--border);';
+
+                    resultsHTML += `
+                        <div style="background: var(--bg-card); border: 1px solid var(--border); ${highlightStyle} border-radius: 8px; padding: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">${tz.name}</div>
+                                    <div style="font-size: 1rem; font-weight: 600; color: var(--primary);">${tz.abbr}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 1.3rem; font-weight: 700; color: var(--text-primary);">${timeString}</div>
+                                    ${dayIndicator ? `<div style="font-size: 0.7rem; color: var(--text-muted);">${dayIndicator}</div>` : ''}
+                                </div>
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">UTC${offsetString}</div>
+                        </div>
+                    `;
+                });
+
+                resultsHTML += '</div>';
+
+            } else {
+                // VERSIÓN ESCRITORIO: Tabla
+                resultsHTML = `
+                    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead style="background: var(--primary); color: white;">
+                                <tr>
+                                    <th style="padding: 1rem; text-align: left;">Zona Horaria</th>
+                                    <th style="padding: 1rem; text-align: left;">Abreviatura</th>
+                                    <th style="padding: 1rem; text-align: left;">Offset UTC</th>
+                                    <th style="padding: 1rem; text-align: right; font-weight: 600;">Hora Local</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                 `;
-            });
 
-            tableHTML += `
-                        </tbody>
-                    </table>
-                </div>
+                timezones.forEach((tz, index) => {
+                    const targetHours = utcHours + tz.offset;
+
+                    let normalizedHours = targetHours;
+                    let dayIndicator = '';
+
+                    if (normalizedHours < 0) {
+                        normalizedHours += 24;
+                        dayIndicator = ' <span style="color: var(--text-muted); font-size: 0.85rem;">(día anterior)</span>';
+                    } else if (normalizedHours >= 24) {
+                        normalizedHours -= 24;
+                        dayIndicator = ' <span style="color: var(--text-muted); font-size: 0.85rem;">(día siguiente)</span>';
+                    }
+
+                    const formattedHours = String(Math.floor(normalizedHours)).padStart(2, '0');
+                    const formattedMinutes = String(minutes).padStart(2, '0');
+                    const timeString = `${formattedHours}:${formattedMinutes}`;
+
+                    const offsetString = tz.offset >= 0 ? `+${tz.offset}` : tz.offset;
+                    const rowBg = index % 2 === 0 ? 'var(--bg-card)' : 'var(--hover)';
+                    const isOrigin = tz.abbr === fromAbbr;
+                    const highlightStyle = isOrigin ? 'background: var(--focus); border-left: 4px solid var(--primary); font-weight: 600;' : '';
+
+                    resultsHTML += `
+                        <tr style="background: ${rowBg}; ${highlightStyle}">
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);">${tz.name}</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border); font-weight: 600; color: var(--primary);">${tz.abbr}</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-secondary);">UTC${offsetString}</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border); text-align: right; font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">
+                                ${timeString}${dayIndicator}
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                resultsHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            // Mensaje final
+            resultsHTML += `
                 <p style="text-align: center; color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">
                     📍 Cuando en <strong style="color: var(--primary);">${fromTimezone.name} (${fromAbbr})</strong> son las <strong>${timeInput}</strong>
                 </p>
             `;
 
-            document.getElementById('timezoneResults').innerHTML = tableHTML;
+            document.getElementById('timezoneResults').innerHTML = resultsHTML;
         }
 
         // Inicializar la aplicación
