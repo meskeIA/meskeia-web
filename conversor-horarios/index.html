@@ -422,11 +422,30 @@
             to { opacity: 0; transform: translateY(10px); }
         }
 
+        /* Tabla de zonas horarias */
+        .timezone-table {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .timezone-table table {
+            min-width: 600px;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             body {
                 padding-top: 80px;
                 padding-bottom: 80px;
+            }
+
+            .timezone-table table {
+                font-size: 0.85rem;
+            }
+
+            .timezone-table th,
+            .timezone-table td {
+                padding: 0.5rem !important;
             }
 
             .meskeia-logo-container {
@@ -560,6 +579,34 @@
             <div class="converter-result" id="converterResult">
                 <h3 id="resultTime">--:--</h3>
                 <p id="resultText">Selecciona una hora para convertir</p>
+            </div>
+        </div>
+
+        <!-- Sección de conversor por abreviaturas de zona horaria -->
+        <div class="converter-section" style="margin-top: 2rem; border-top: 2px solid var(--border); padding-top: 2rem;">
+            <h2>🌐 Conversor por Zona Horaria (Abreviaturas Estándar)</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                Convierte entre zonas horarias usando sus abreviaturas estándar (PST, EST, CET, GMT, etc.)
+            </p>
+
+            <div class="converter-form">
+                <div class="form-group">
+                    <label for="timezoneFrom">Zona horaria origen</label>
+                    <select id="timezoneFrom">
+                        <!-- Opciones generadas dinámicamente -->
+                    </select>
+                </div>
+
+                <div class="converter-arrow">→</div>
+
+                <div class="form-group">
+                    <label for="timezoneInput">Hora en zona origen</label>
+                    <input type="time" id="timezoneInput">
+                </div>
+            </div>
+
+            <div id="timezoneResults" style="margin-top: 2rem;">
+                <!-- Tabla de resultados generada dinámicamente -->
             </div>
         </div>
     </div>
@@ -895,9 +942,158 @@
             }
         }
 
+        // Base de datos de zonas horarias con abreviaturas
+        const timezones = [
+            // Zonas horarias de América del Norte
+            { abbr: 'PST', name: 'Pacific Standard Time', offset: -8, dstAbbr: 'PDT', dstOffset: -7 },
+            { abbr: 'PDT', name: 'Pacific Daylight Time', offset: -7, dstAbbr: null, dstOffset: null },
+            { abbr: 'MST', name: 'Mountain Standard Time', offset: -7, dstAbbr: 'MDT', dstOffset: -6 },
+            { abbr: 'MDT', name: 'Mountain Daylight Time', offset: -6, dstAbbr: null, dstOffset: null },
+            { abbr: 'CST', name: 'Central Standard Time', offset: -6, dstAbbr: 'CDT', dstOffset: -5 },
+            { abbr: 'CDT', name: 'Central Daylight Time', offset: -5, dstAbbr: null, dstOffset: null },
+            { abbr: 'EST', name: 'Eastern Standard Time', offset: -5, dstAbbr: 'EDT', dstOffset: -4 },
+            { abbr: 'EDT', name: 'Eastern Daylight Time', offset: -4, dstAbbr: null, dstOffset: null },
+            { abbr: 'AST', name: 'Atlantic Standard Time', offset: -4, dstAbbr: 'ADT', dstOffset: -3 },
+            { abbr: 'ADT', name: 'Atlantic Daylight Time', offset: -3, dstAbbr: null, dstOffset: null },
+
+            // Zonas horarias de Europa
+            { abbr: 'GMT', name: 'Greenwich Mean Time', offset: 0, dstAbbr: 'BST', dstOffset: 1 },
+            { abbr: 'UTC', name: 'Coordinated Universal Time', offset: 0, dstAbbr: null, dstOffset: null },
+            { abbr: 'BST', name: 'British Summer Time', offset: 1, dstAbbr: null, dstOffset: null },
+            { abbr: 'CET', name: 'Central European Time', offset: 1, dstAbbr: 'CEST', dstOffset: 2 },
+            { abbr: 'CEST', name: 'Central European Summer Time', offset: 2, dstAbbr: null, dstOffset: null },
+            { abbr: 'EET', name: 'Eastern European Time', offset: 2, dstAbbr: 'EEST', dstOffset: 3 },
+            { abbr: 'EEST', name: 'Eastern European Summer Time', offset: 3, dstAbbr: null, dstOffset: null },
+            { abbr: 'MSK', name: 'Moscow Standard Time', offset: 3, dstAbbr: null, dstOffset: null },
+
+            // Zonas horarias de Asia
+            { abbr: 'GST', name: 'Gulf Standard Time', offset: 4, dstAbbr: null, dstOffset: null },
+            { abbr: 'IST', name: 'India Standard Time', offset: 5.5, dstAbbr: null, dstOffset: null },
+            { abbr: 'ICT', name: 'Indochina Time', offset: 7, dstAbbr: null, dstOffset: null },
+            { abbr: 'CST (Asia)', name: 'China Standard Time', offset: 8, dstAbbr: null, dstOffset: null },
+            { abbr: 'JST', name: 'Japan Standard Time', offset: 9, dstAbbr: null, dstOffset: null },
+            { abbr: 'KST', name: 'Korea Standard Time', offset: 9, dstAbbr: null, dstOffset: null },
+
+            // Zonas horarias de Oceanía
+            { abbr: 'AEST', name: 'Australian Eastern Standard Time', offset: 10, dstAbbr: 'AEDT', dstOffset: 11 },
+            { abbr: 'AEDT', name: 'Australian Eastern Daylight Time', offset: 11, dstAbbr: null, dstOffset: null },
+            { abbr: 'ACST', name: 'Australian Central Standard Time', offset: 9.5, dstAbbr: 'ACDT', dstOffset: 10.5 },
+            { abbr: 'ACDT', name: 'Australian Central Daylight Time', offset: 10.5, dstAbbr: null, dstOffset: null },
+            { abbr: 'AWST', name: 'Australian Western Standard Time', offset: 8, dstAbbr: null, dstOffset: null },
+            { abbr: 'NZST', name: 'New Zealand Standard Time', offset: 12, dstAbbr: 'NZDT', dstOffset: 13 },
+            { abbr: 'NZDT', name: 'New Zealand Daylight Time', offset: 13, dstAbbr: null, dstOffset: null }
+        ];
+
+        // Poblar selector de zonas horarias
+        function populateTimezoneSelect() {
+            const select = document.getElementById('timezoneFrom');
+
+            timezones.forEach(tz => {
+                const option = document.createElement('option');
+                const offsetString = tz.offset >= 0 ? `+${tz.offset}` : tz.offset;
+                option.value = tz.abbr;
+                option.textContent = `${tz.abbr} - ${tz.name} (UTC${offsetString})`;
+                select.appendChild(option);
+            });
+
+            // Valor por defecto: CET (Central European Time)
+            select.value = 'CET';
+
+            // Event listener
+            document.getElementById('timezoneInput').addEventListener('change', convertTimezone);
+            document.getElementById('timezoneFrom').addEventListener('change', convertTimezone);
+
+            // Establecer hora actual por defecto
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('timezoneInput').value = `${hours}:${minutes}`;
+
+            convertTimezone();
+        }
+
+        // Convertir entre zonas horarias usando abreviaturas
+        function convertTimezone() {
+            const fromAbbr = document.getElementById('timezoneFrom').value;
+            const timeInput = document.getElementById('timezoneInput').value;
+
+            if (!timeInput) return;
+
+            const fromTimezone = timezones.find(tz => tz.abbr === fromAbbr);
+            const [hours, minutes] = timeInput.split(':').map(Number);
+
+            // Calcular hora UTC desde la zona origen
+            const utcHours = hours - fromTimezone.offset;
+
+            // Crear tabla de resultados
+            let tableHTML = `
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead style="background: var(--primary); color: white;">
+                            <tr>
+                                <th style="padding: 1rem; text-align: left;">Zona Horaria</th>
+                                <th style="padding: 1rem; text-align: left;">Abreviatura</th>
+                                <th style="padding: 1rem; text-align: left;">Offset UTC</th>
+                                <th style="padding: 1rem; text-align: right; font-weight: 600;">Hora Local</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            // Generar filas para cada zona horaria
+            timezones.forEach((tz, index) => {
+                const targetHours = utcHours + tz.offset;
+
+                // Normalizar horas (puede ser negativo o mayor a 24)
+                let normalizedHours = targetHours;
+                let dayIndicator = '';
+
+                if (normalizedHours < 0) {
+                    normalizedHours += 24;
+                    dayIndicator = ' <span style="color: var(--text-muted); font-size: 0.85rem;">(día anterior)</span>';
+                } else if (normalizedHours >= 24) {
+                    normalizedHours -= 24;
+                    dayIndicator = ' <span style="color: var(--text-muted); font-size: 0.85rem;">(día siguiente)</span>';
+                }
+
+                // Formatear hora
+                const formattedHours = String(Math.floor(normalizedHours)).padStart(2, '0');
+                const formattedMinutes = String(minutes).padStart(2, '0');
+                const timeString = `${formattedHours}:${formattedMinutes}`;
+
+                const offsetString = tz.offset >= 0 ? `+${tz.offset}` : tz.offset;
+                const rowBg = index % 2 === 0 ? 'var(--bg-card)' : 'var(--hover)';
+                const isOrigin = tz.abbr === fromAbbr;
+                const highlightStyle = isOrigin ? 'background: var(--focus); border-left: 4px solid var(--primary); font-weight: 600;' : '';
+
+                tableHTML += `
+                    <tr style="background: ${rowBg}; ${highlightStyle}">
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);">${tz.name}</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border); font-weight: 600; color: var(--primary);">${tz.abbr}</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-secondary);">UTC${offsetString}</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border); text-align: right; font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">
+                            ${timeString}${dayIndicator}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+                <p style="text-align: center; color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">
+                    📍 Cuando en <strong style="color: var(--primary);">${fromTimezone.name} (${fromAbbr})</strong> son las <strong>${timeInput}</strong>
+                </p>
+            `;
+
+            document.getElementById('timezoneResults').innerHTML = tableHTML;
+        }
+
         // Inicializar la aplicación
         initializeClocks();
         updateAllClocks();
+        populateTimezoneSelect();
 
         // Actualizar cada segundo
         setInterval(updateAllClocks, 1000);
