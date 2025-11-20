@@ -1,141 +1,231 @@
-.page {
-  --background: #fafafa;
-  --foreground: #fff;
+/* Homepage meskeIA - Next.js */
 
-  --text-primary: #000;
-  --text-secondary: #666;
-
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-  --button-secondary-border: #ebebeb;
-
-  display: flex;
-  min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-geist-sans);
-  background-color: var(--background);
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 100px 2rem 80px;
 }
 
-.main {
-  display: flex;
-  min-height: 100vh;
-  width: 100%;
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.headerContent {
   max-width: 800px;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  background-color: var(--foreground);
-  padding: 120px 60px;
+  margin: 0 auto;
 }
 
-.intro {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 24px;
-}
-
-.intro h1 {
-  max-width: 320px;
-  font-size: 40px;
-  font-weight: 600;
-  line-height: 48px;
-  letter-spacing: -2.4px;
-  text-wrap: balance;
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
   color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
-.intro p {
-  max-width: 440px;
-  font-size: 18px;
-  line-height: 32px;
-  text-wrap: balance;
+.subtitle {
+  font-size: 1.25rem;
   color: var(--text-secondary);
+  line-height: 1.6;
 }
 
-.intro a {
-  font-weight: 500;
-  color: var(--text-primary);
+/* Categorías Grid */
+.categoriesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 4rem;
 }
 
-.ctas {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  max-width: 440px;
-  gap: 16px;
-  font-size: 14px;
-}
-
-.ctas a {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 128px;
-  border: 1px solid transparent;
-  transition: 0.2s;
+.categoryCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.3s ease;
   cursor: pointer;
-  width: fit-content;
-  font-weight: 500;
 }
 
-a.primary {
-  background: var(--text-primary);
-  color: var(--background);
-  gap: 8px;
+.categoryCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--primary);
 }
 
-a.secondary {
-  border-color: var(--button-secondary-border);
+.categoryHeader {
+  padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
-    background: var(--button-primary-hover);
-    border-color: transparent;
-  }
+.categoryIcon {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
 
-  a.secondary:hover {
-    background: var(--button-secondary-hover);
-    border-color: transparent;
+.categoryTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.categoryDescription {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.categoryCount {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  background: var(--focus);
+  border-radius: 12px;
+  margin-top: 0.5rem;
+}
+
+/* Lista de herramientas */
+.categoryTools {
+  list-style: none;
+  padding: 0 1.5rem 1.5rem;
+  margin: 0;
+  border-top: 1px solid var(--border);
+  animation: fadeInDown 0.3s ease;
+}
+
+.categoryTools li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--hover);
+}
+
+.categoryTools li:last-child {
+  border-bottom: none;
+}
+
+.categoryTools a {
+  color: var(--text-primary);
+  text-decoration: none;
+  display: block;
+  transition: color 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.categoryTools a:hover {
+  color: var(--primary);
+  padding-left: 8px;
+}
+
+/* Ventajas Section */
+.advantagesSection {
+  margin-top: 6rem;
+  margin-bottom: 4rem;
+}
+
+.advantagesTitle {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 3rem;
+}
+
+.advantagesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.advantageCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.advantageCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--primary);
+}
+
+.advantageIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.advantageCard h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.advantageCard p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Animaciones */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (max-width: 600px) {
-  .main {
-    padding: 48px 24px;
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 80px 1rem 80px;
   }
 
-  .intro {
-    gap: 16px;
+  .title {
+    font-size: 2rem;
   }
 
-  .intro h1 {
-    font-size: 32px;
-    line-height: 40px;
-    letter-spacing: -1.92px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert();
+  .subtitle {
+    font-size: 1.1rem;
   }
 
-  .page {
-    --background: #000;
-    --foreground: #000;
+  .categoriesGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 
-    --text-primary: #ededed;
-    --text-secondary: #999;
+  .advantagesGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-    --button-secondary-border: #1a1a1a;
+  .categoryHeader {
+    padding: 1.25rem;
+  }
+
+  .categoryIcon {
+    font-size: 2rem;
+  }
+
+  .categoryTitle {
+    font-size: 1.1rem;
+  }
+
+  .advantageCard {
+    padding: 1.5rem;
   }
 }
