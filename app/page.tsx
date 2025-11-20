@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import SearchBar from '@/components/SearchBar';
 import { categories, applicationsDatabase } from '@/data/applications';
 import styles from './page.module.css';
 
@@ -20,6 +21,7 @@ export default function Home() {
   return (
     <>
       <MeskeiaLogo />
+      <SearchBar />
 
       <main className={styles.container}>
         {/* Header */}
