@@ -1,6 +1,6 @@
 /**
- * Base de datos de aplicaciones meskeIA
- * Total: 84 aplicaciones organizadas por categorías
+ * Base de datos completa de aplicaciones meskeIA
+ * Total: 84 aplicaciones organizadas por 13 categorías
  */
 
 export interface Application {
@@ -55,10 +55,73 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora de Electricidad", category: "Física y Química", icon: "⚡", description: "Calculadora completa de electricidad: Ley de Ohm, potencia, resistencias y análisis de circuitos eléctricos", url: "/calculadora-electricidad/", keywords: ["electricidad", "ohm", "resistencia", "voltaje", "corriente", "circuito"] },
   { name: "Conversor de Unidades Científico", category: "Física y Química", icon: "🧪", description: "Conversor científico avanzado: 13 categorías incluyendo química, presión, energía, fuerza y potencia", url: "/conversor-unidades/", keywords: ["conversion", "unidades", "medidas", "fisica", "quimica"] },
 
-  // ... (Continúa con las demás categorías)
+  // Herramientas de Productividad (8)
+  { name: "Cuaderno Digital", category: "Herramientas de Productividad", icon: "⚡", description: "Editor de texto online con guardado local automático para tus notas", url: "/cuaderno-digital/", keywords: ["notas", "texto", "editor", "escribir", "apuntes"] },
+  { name: "Lista de Tareas", category: "Herramientas de Productividad", icon: "⚡", description: "Organiza tus tareas pendientes con categorías y prioridades", url: "/lista-tareas/", keywords: ["tareas", "todo", "pendientes", "organizar", "productividad"] },
+  { name: "Cronómetro y Temporizador", category: "Herramientas de Productividad", icon: "⚡", description: "Cronómetro, temporizador y técnica Pomodoro en una sola herramienta de gestión del tiempo", url: "/cronometro-temporizador/", keywords: ["cronometro", "temporizador", "pomodoro", "stopwatch", "timer", "alarma", "tiempo", "productividad", "concentracion", "descansos"] },
+  { name: "Conversor de Horarios Mundial", category: "Herramientas de Productividad", icon: "⚡", description: "Compara horarios de 31 ciudades con relojes analógicos en tiempo real e indicadores día/noche", url: "/conversor-horarios/", keywords: ["horarios", "zonas horarias", "reloj mundial", "diferencia horaria", "hora internacional", "convertir hora", "tiempo mundial"] },
+  { name: "Información del Tiempo", category: "Herramientas de Productividad", icon: "⚡", description: "Consulta el pronóstico del tiempo para cualquier ciudad del mundo", url: "/informacion-tiempo/", keywords: ["clima", "tiempo", "meteorologia", "pronostico", "temperatura"] },
+  { name: "Generador de Contraseñas", category: "Herramientas de Productividad", icon: "⚡", description: "Crea contraseñas seguras y personalizadas con diferentes niveles de complejidad", url: "/generador-contrasenas/", keywords: ["password", "seguridad", "contrasena", "generar", "segura"] },
+  { name: "Generador de Códigos QR", category: "Herramientas de Productividad", icon: "⚡", description: "Crea códigos QR personalizados para URLs, WiFi, contactos, eventos y más", url: "/generador-codigos-qr/", keywords: ["qr", "codigo", "generar", "escanear", "wifi"] },
+  { name: "Generador de Códigos de Barras", category: "Herramientas de Productividad", icon: "⚡", description: "Genera códigos de barras en formatos EAN-13, EAN-8, Code 128 y UPC para productos e inventarios", url: "/generador-codigos-barras/", keywords: ["codigo barras", "ean13", "ean8", "code128", "upc", "barcode", "generar barras", "etiquetas productos", "inventario"] },
 
-  // NOTA: Este archivo está parcialmente generado
-  // Las demás categorías se añadirán en la siguiente versión
+  // Juegos y Entretenimiento (8)
+  { name: "Radio meskeIA", category: "Juegos y Entretenimiento", icon: "📻", description: "Escucha miles de emisoras de radio de todo el mundo en vivo", url: "/radio-meskeia/", keywords: ["radio", "musica", "emisoras", "streaming", "noticias", "podcasts", "online"] },
+  { name: "Wordle en Español", category: "Juegos y Entretenimiento", icon: "🎮", description: "Adivina la palabra del día en español con 6 intentos", url: "/wordle-espanol/", keywords: ["wordle", "palabra", "juego", "adivinar", "español"] },
+  { name: "Sudoku Clásico", category: "Juegos y Entretenimiento", icon: "🎮", description: "Resuelve puzzles Sudoku con diferentes niveles de dificultad", url: "/sudoku-clasico/", keywords: ["sudoku", "puzzle", "numeros", "logica", "juego"] },
+  { name: "Tres en Raya", category: "Juegos y Entretenimiento", icon: "🎮", description: "Juega al clásico tres en raya contra la computadora", url: "/tres-en-raya/", keywords: ["tres en raya", "tic tac toe", "juego", "clasico"] },
+  { name: "Juego de Memoria", category: "Juegos y Entretenimiento", icon: "🎮", description: "Entrena tu memoria encontrando parejas de cartas", url: "/juego-memoria/", keywords: ["memoria", "cartas", "parejas", "concentracion", "juego"] },
+  { name: "Piedra Papel Tijera", category: "Juegos y Entretenimiento", icon: "🎮", description: "Juega piedra, papel o tijera contra la computadora", url: "/piedra-papel-tijera/", keywords: ["piedra", "papel", "tijera", "juego", "clasico"] },
+  { name: "2048", category: "Juegos y Entretenimiento", icon: "🎮", description: "Desliza y combina números para llegar a 2048", url: "/juego-2048/", keywords: ["2048", "numeros", "puzzle", "juego", "estrategia"] },
+  { name: "Puzzle Matemático", category: "Juegos y Entretenimiento", icon: "🎮", description: "Resuelve puzzles matemáticos y ejercita tu mente", url: "/puzzle-matematico/", keywords: ["puzzle", "matematicas", "logica", "juego", "cerebro"] },
+
+  // Campus Digital (5)
+  { name: "Calculadora de Notas Académicas", category: "Campus Digital", icon: "📚", description: "Calcula tu media académica ponderada y nota final del curso", url: "/calculadora-notas/", keywords: ["notas", "calificaciones", "media", "universidad", "estudiante"] },
+  { name: "Generador de Horarios de Estudio", category: "Campus Digital", icon: "📚", description: "Genera horarios de estudio personalizados con distribución inteligente de tiempo. Técnica Pomodoro, gestión de prioridades y calendario visual", url: "/generador-horarios-estudio/", keywords: ["horario", "estudio", "planificar", "calendario", "pomodoro"] },
+  { name: "Creador de Flashcards", category: "Campus Digital", icon: "📚", description: "Crea y estudia con flashcards personalizadas. Modo estudio interactivo, gestión de mazos, importa/exporta tarjetas", url: "/creador-flashcards/", keywords: ["flashcards", "tarjetas", "estudio", "memorizar", "aprender"] },
+  { name: "Curso Decisiones de Inversión", category: "Campus Digital", icon: "📚", description: "Aprende a tomar decisiones de inversión inteligentes con este curso interactivo", url: "/curso-decisiones-inversion/", keywords: ["curso", "inversion", "finanzas", "aprender", "bolsa"] },
+  { name: "Curso de Emprendimiento Práctico", category: "Campus Digital", icon: "📚", description: "Guía práctica de emprendimiento: de la idea al primer cliente con ejemplos españoles", url: "/curso-emprendimiento/", keywords: ["emprendimiento", "negocio", "startup", "empresa", "curso"] },
+
+  // Salud & Bienestar (6)
+  { name: "Evaluador de Salud", category: "Salud & Bienestar", icon: "🏥", description: "Calcula tu IMC, metabolismo basal y evalúa tu estado de salud", url: "/evaluador-salud/", keywords: ["imc", "salud", "peso", "metabolismo", "calorias"] },
+  { name: "Calculadora de Calorías por Ejercicio", category: "Salud & Bienestar", icon: "🏥", description: "Calcula las calorías quemadas según tu actividad física, pasos y tiempo de ejercicio", url: "/calculadora-calorias-ejercicio/", keywords: ["calorias", "ejercicio", "deporte", "quemar", "actividad fisica"] },
+  { name: "Calculadora de Hidratación Diaria", category: "Salud & Bienestar", icon: "🏥", description: "Calcula cuánta agua necesitas beber diariamente según tu peso, actividad física y clima", url: "/calculadora-hidratacion/", keywords: ["agua", "hidratacion", "beber", "litros", "salud"] },
+  { name: "Calculadora de Sueño y Ciclos", category: "Salud & Bienestar", icon: "🏥", description: "Calcula tus ciclos de sueño ideales y descubre a qué hora acostarte para despertar descansado", url: "/calculadora-sueno/", keywords: ["sueño", "dormir", "ciclos", "descanso", "rem"] },
+  { name: "NutriSalud - Nutrición Avanzada", category: "Salud & Bienestar", icon: "🏥", description: "Información nutricional educativa basada en evidencia científica", url: "/nutrisalud/", keywords: ["nutricion", "alimentos", "dieta", "salud", "vitaminas"] },
+  { name: "Seguimiento de Hábitos", category: "Salud & Bienestar", icon: "🏥", description: "Rastrea tus hábitos saludables con visualización de rachas y estadísticas motivadoras", url: "/seguimiento-habitos/", keywords: ["habitos", "racha", "tracker", "rutina", "salud", "motivacion"] },
+
+  // Herramientas Web y Tecnología (6)
+  { name: "Validador JSON y XML", category: "Herramientas Web y Tecnología", icon: "💻", description: "Valida, formatea y minifica código JSON y XML al instante con detección de errores", url: "/validador-json/", keywords: ["json", "xml", "validar", "formatear", "codigo"] },
+  { name: "Conversor Base64", category: "Herramientas Web y Tecnología", icon: "💻", description: "Codifica y decodifica texto, imágenes y archivos en Base64. Genera data URI para desarrollo web", url: "/conversor-base64/", keywords: ["base64", "codificar", "decodificar", "encode", "decode"] },
+  { name: "Generador de Hash MD5/SHA", category: "Herramientas Web y Tecnología", icon: "💻", description: "Genera hashes MD5, SHA-1, SHA-256, SHA-384 y SHA-512 para verificar integridad de archivos y datos", url: "/generador-hash/", keywords: ["hash", "md5", "sha", "checksum", "seguridad"] },
+  { name: "Acortador de URLs", category: "Herramientas Web y Tecnología", icon: "💻", description: "Crea enlaces cortos, trackea clics y gestiona URLs con almacenamiento local privado", url: "/acortador-url/", keywords: ["url", "acortar", "link", "enlace", "short"] },
+  { name: "Validador de RegEx", category: "Herramientas Web y Tecnología", icon: "💻", description: "Testa y valida expresiones regulares con resaltado de coincidencias y ejemplos prácticos", url: "/validador-regex/", keywords: ["regex", "expresiones regulares", "validar", "patron", "programacion"] },
+  { name: "Conversor de Imágenes", category: "Herramientas Web y Tecnología", icon: "💻", description: "Convierte formatos de imagen (JPG, PNG, WebP), comprime y redimensiona con control de calidad total", url: "/conversor-imagenes/", keywords: ["imagen", "convertir", "comprimir", "redimensionar", "jpg", "png"] },
+
+  // Texto y Documentos (6)
+  { name: "Contador de Palabras", category: "Texto y Documentos", icon: "📝", description: "Cuenta palabras, caracteres, párrafos y tiempo de lectura en tiempo real. Objetivo de palabras configurable", url: "/contador-palabras/", keywords: ["contar", "palabras", "caracteres", "texto", "escritura"] },
+  { name: "Conversor de Texto", category: "Texto y Documentos", icon: "📝", description: "Convierte texto entre MAYÚSCULAS, minúsculas, Capitalizado, Título, aLtErNaDo e iNvErTiDo", url: "/conversor-texto/", keywords: ["convertir", "mayusculas", "minusculas", "texto", "formato"] },
+  { name: "Limpiador de Texto", category: "Texto y Documentos", icon: "📝", description: "Limpia texto eliminando espacios duplicados, líneas vacías extras, tabulaciones y caracteres especiales", url: "/limpiador-texto/", keywords: ["limpiar", "texto", "espacios", "formato", "eliminar"] },
+  { name: "Generador de Texto de Relleno", category: "Texto y Documentos", icon: "📝", description: "Genera texto de relleno: Lorem Ipsum, español simulado, texto profesional y técnico. Control por párrafos, palabras o caracteres", url: "/generador-texto/", keywords: ["lorem ipsum", "texto", "placeholder", "relleno", "dummy"] },
+  { name: "Comparador de Textos (Diff)", category: "Texto y Documentos", icon: "📝", description: "Compara dos textos línea por línea detectando diferencias añadidas, eliminadas y modificadas. Ideal para editores, escritores y traductores", url: "/comparador-textos/", keywords: ["comparar", "diff", "diferencias", "texto", "cambios"] },
+  { name: "Convertidor Markdown a HTML", category: "Texto y Documentos", icon: "📝", description: "Convierte Markdown a HTML limpio con vista previa en tiempo real. Soporte completo de sintaxis: títulos, listas, enlaces, código, tablas", url: "/convertidor-markdown-html/", keywords: ["markdown", "html", "convertir", "formato", "codigo"] },
+
+  // Creatividad y Diseño (7)
+  { name: "Convertidor de Colores (HEX/RGB/HSL/CMYK)", category: "Creatividad y Diseño", icon: "🎨", description: "Convierte entre HEX, RGB, HSL y CMYK con color picker visual y generación de paletas automáticas", url: "/convertidor-colores/", keywords: ["colores", "hex", "rgb", "hsl", "cmyk", "convertidor", "color picker", "paleta"] },
+  { name: "Herramienta de Contraste de Colores", category: "Creatividad y Diseño", icon: "🎨", description: "Verifica accesibilidad WCAG con ratios de contraste AA/AAA y simulación de daltonismo", url: "/contraste-colores/", keywords: ["contraste", "accesibilidad", "wcag", "daltonismo", "aa", "aaa", "diseño accesible"] },
+  { name: "Generador de Gradientes CSS", category: "Creatividad y Diseño", icon: "🎨", description: "Crea gradientes CSS lineales, radiales y cónicos con presets populares y código listo para copiar", url: "/generador-gradientes/", keywords: ["gradientes", "css", "gradient", "linear", "radial", "conic", "background"] },
+  { name: "Generador de Sombras CSS", category: "Creatividad y Diseño", icon: "🎨", description: "Genera box-shadow y text-shadow con múltiples capas, presets de neuromorfismo y material design", url: "/generador-sombras/", keywords: ["sombras", "shadow", "box-shadow", "text-shadow", "neuromorfismo", "material design"] },
+  { name: "Calculadora de Aspectos de Imagen", category: "Creatividad y Diseño", icon: "🎨", description: "Mantiene proporciones al redimensionar, presets para redes sociales (Instagram, Facebook, YouTube)", url: "/calculadora-aspectos/", keywords: ["aspectos", "ratio", "proporciones", "redimensionar", "instagram", "facebook", "16:9", "4:3"] },
+  { name: "Generador de Tipografías Web", category: "Creatividad y Diseño", icon: "🎨", description: "Combina Google Fonts con pairings armónicos predefinidos, previsualización en tiempo real y generación de código CSS", url: "/generador-tipografias/", keywords: ["tipografias", "fonts", "google fonts", "fuentes", "typography", "pairings", "css", "web fonts"] },
+  { name: "Creador de Paletas", category: "Creatividad y Diseño", icon: "🎨", description: "Diseña paletas de colores profesionales para tus proyectos web", url: "/creador-paletas/", keywords: ["colores", "paleta", "diseño", "web", "hex", "esquema colores", "armonia cromatica"] },
+
+  // Emprendimiento y Negocios (6)
+  { name: "Calculadora de Tarifa Freelance", category: "Emprendimiento y Negocios", icon: "💼", description: "Calcula tu tarifa freelance ideal considerando gastos, impuestos, vacaciones y margen de beneficio. Evita cobrar de menos", url: "/calculadora-tarifa-freelance/", keywords: ["freelance", "tarifa", "precio", "autonomo", "honorarios"] },
+  { name: "Calculadora Break-Even de Productos", category: "Emprendimiento y Negocios", icon: "💼", description: "Calcula el punto de equilibrio de tus productos. Analiza margen de contribución, rentabilidad y escenarios de costos/precios", url: "/margen-equilibrio/", keywords: ["break even", "punto equilibrio", "costos", "precio", "rentabilidad"] },
+  { name: "Planificador de Cash Flow", category: "Emprendimiento y Negocios", icon: "💼", description: "Proyecta tu flujo de caja a 12 meses. Identifica meses críticos, previene crisis de liquidez y simula escenarios What-If", url: "/planificador-cashflow/", keywords: ["cash flow", "flujo caja", "liquidez", "tesoreria", "finanzas"] },
+  { name: "Calculadora de ROI de Marketing", category: "Emprendimiento y Negocios", icon: "💼", description: "Calcula el ROI por canal de marketing (Google Ads, Facebook, email, SEO). Analiza CAC, CLV y optimiza tu inversión publicitaria", url: "/calculadora-roi-marketing/", keywords: ["roi", "marketing", "publicidad", "cac", "clv", "ads"] },
+  { name: "Generador de Nombres de Empresa", category: "Emprendimiento y Negocios", icon: "💼", description: "Genera nombres creativos para tu empresa por sectores. Enlaces directos para verificar disponibilidad y registrar dominios .com, .es", url: "/generador-nombres-empresa/", keywords: ["nombre", "empresa", "marca", "branding", "dominio", "startup"] },
+  { name: "Simulador de Gastos Deducibles", category: "Emprendimiento y Negocios", icon: "💼", description: "Calcula tu ahorro fiscal con gastos deducibles. Descubre qué gastos puedes deducir (100%, 50%, 30%) y optimiza tu declaración de IRPF e IVA", url: "/simulador-gastos-deducibles/", keywords: ["gastos deducibles", "autonomo", "irpf", "iva", "hacienda", "deduccion"] },
 ];
 
 export const categories = [
@@ -134,10 +197,4 @@ export const categories = [
     icon: '💼',
     description: 'Gestiona tu negocio como un profesional'
   },
-  {
-    id: 'radio',
-    name: 'Radio meskeIA',
-    icon: '📻',
-    description: 'Miles de emisoras de radio en vivo'
-  }
 ];
