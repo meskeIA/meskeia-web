@@ -1,0 +1,110 @@
+/* Footer meskeIA - Unificado con Glassmorphism (Nov 2025) */
+
+.footer {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 8px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: 0.9rem;
+  z-index: 1000;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  white-space: nowrap;
+}
+
+.shareSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.shareText {
+  color: var(--primary);
+}
+
+.shareButton {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.shareButton:hover {
+  opacity: 0.7;
+}
+
+.copyright {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* Toast de notificación */
+.toast {
+  position: fixed;
+  bottom: 60px;
+  right: 20px;
+  background: var(--primary);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    white-space: normal;
+  }
+
+  .shareSection {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .shareButton {
+    font-size: 0.85rem;
+  }
+
+  .toast {
+    bottom: 70px;
+    right: 10px;
+    left: 10px;
+    text-align: center;
+  }
+}

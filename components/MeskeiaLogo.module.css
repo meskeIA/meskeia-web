@@ -1,0 +1,153 @@
+/* Logo meskeIA - Estilos del componente */
+
+.logoContainer {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 8px 16px;
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.logoContainer:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+}
+
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.logoIcon::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  top: 10px;
+  left: 10px;
+}
+
+.logoIcon::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #2E86AB;
+  border-radius: 50%;
+  top: 13px;
+  left: 13px;
+}
+
+.neuralNetwork {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+}
+
+.neuralDot {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+}
+
+.neuralDot:nth-child(1) {
+  top: 4px;
+  left: 6px;
+}
+
+.neuralDot:nth-child(2) {
+  top: 8px;
+  right: 5px;
+}
+
+.neuralDot:nth-child(3) {
+  bottom: 6px;
+  left: 4px;
+}
+
+.neuralDot:nth-child(4) {
+  bottom: 4px;
+  right: 8px;
+}
+
+.logoText {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2C3E50;
+}
+
+.meske {
+  color: #2E86AB;
+}
+
+.ia {
+  color: #48A9A6;
+  font-weight: 700;
+  position: relative;
+}
+
+.ia::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #48A9A6, #7FB3D3);
+  border-radius: 1px;
+}
+
+@media (max-width: 768px) {
+  .logoContainer {
+    top: 10px;
+    left: 10px;
+    padding: 6px 12px;
+    gap: 8px;
+  }
+
+  .logoIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .logoIcon::before {
+    width: 9px;
+    height: 9px;
+    top: 7.5px;
+    left: 7.5px;
+  }
+
+  .logoIcon::after {
+    width: 4px;
+    height: 4px;
+    top: 10px;
+    left: 10px;
+  }
+
+  .logoText {
+    font-size: 1rem;
+  }
+}
