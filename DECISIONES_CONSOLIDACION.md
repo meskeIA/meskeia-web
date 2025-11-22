@@ -21,15 +21,17 @@
 - **Implementación**: Archivo `loading.tsx` (built-in Next.js)
 - **Beneficio**: Feedback visual instantáneo al usuario
 
-### 4. Keyboard Navigation Review - **ACCESIBILIDAD**
+### 4. Keyboard Navigation Review - **ACCESIBILIDAD** ✅ COMPLETADO
 - **Motivo**: Requisito WCAG básico
 - **Implementación**: Validar Tab, Enter, Escape en todos los elementos interactivos
 - **Beneficio**: Accesibilidad, mejor SEO
+- **Estado**: ✅ Testing automatizado con Playwright - **100% aprobado** (ver RESULTADOS_TESTING_PLAYWRIGHT.md)
 
-### 5. Screen Reader Support Review - **ACCESIBILIDAD**
+### 5. Screen Reader Support Review - **ACCESIBILIDAD** ✅ COMPLETADO
 - **Motivo**: Mejora accesibilidad y SEO
 - **Implementación**: Validar labels, roles ARIA, alt texts
 - **Beneficio**: Audiencia más amplia, cumplimiento WCAG
+- **Estado**: ✅ Testing automatizado con axe-core - **0 violaciones WCAG 2.1 AA** (ver RESULTADOS_TESTING_PLAYWRIGHT.md)
 
 ### 6. Offline Fallback Minimalista - **COMPLEMENTA PWA**
 - **Motivo**: Ya tenemos PWA, añadir página offline básica
