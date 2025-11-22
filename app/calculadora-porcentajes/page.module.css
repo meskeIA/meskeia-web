@@ -1,116 +1,27 @@
-/* Variables CSS globales (ya definidas en globals.css) */
+/* Contenedor principal */
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 2rem;
-  padding-top: 80px;
-  min-height: 100vh;
-}
-
-/* Logo meskeIA */
-.meskeiaLogoContainer {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(46, 134, 171, 0.2);
-  border-radius: 12px;
-  padding: 8px 16px;
-  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.meskeiaLogoContainer:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
-}
-
-.meskeiaLogoIcon {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.meskeiaLogoIcon::before {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  top: 10px;
-  left: 10px;
-}
-
-.meskeiaLogoIcon::after {
-  content: '';
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: #2E86AB;
-  border-radius: 50%;
-  top: 13px;
-  left: 13px;
-}
-
-/* Clases removidas - logo simplificado sin red neural */
-
-.meskeiaLogoText {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #2C3E50;
-}
-
-.meske {
-  color: #2E86AB;
-}
-
-.ia {
-  color: #48A9A6;
-  font-weight: 700;
-  position: relative;
-}
-
-.ia::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, #48A9A6, #7FB3D3);
-  border-radius: 1px;
+  padding: var(--spacing-lg) var(--spacing-lg);
+  padding-top: 80px; /* Espacio para el logo flotante */
 }
 
 /* Título principal */
 .pageTitle {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: var(--spacing-xl);
 }
 
 .pageTitle h1 {
   font-size: 2.5rem;
   font-weight: 600;
-  color: #1A1A1A;
-  margin-bottom: 1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
 }
 
 .pageSubtitle {
   font-size: 1.2rem;
-  color: #666666;
+  color: var(--text-secondary);
   max-width: 600px;
   margin: 0 auto;
 }
@@ -119,46 +30,51 @@
 .mainGrid {
   display: grid;
   grid-template-columns: 1fr 400px;
-  gap: 3rem;
-  margin-bottom: 3rem;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Panel de calculadoras */
 .calculatorPanel {
-  background: #FFFFFF;
-  border: 1px solid #E5E5E5;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-medium);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .calculatorTabs {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #E5E5E5;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
 }
 
 .tabBtn {
   background: none;
   border: none;
-  padding: 1rem 1.5rem;
+  padding: var(--spacing-sm) var(--spacing-md);
   cursor: pointer;
-  border-radius: 8px 8px 0 0;
+  border-radius: var(--radius) var(--radius) 0 0;
   transition: all 0.2s ease;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #666666;
+  color: var(--text-secondary);
 }
 
 .tabBtn.active {
-  background: #2E86AB;
+  background: var(--primary);
   color: white;
 }
 
 .tabBtn:hover:not(.active) {
-  background: #F5F5F5;
-  color: #2E86AB;
+  background: var(--hover);
+  color: var(--primary);
 }
 
 .tabContent {
@@ -168,60 +84,60 @@
 /* Formularios de cálculo */
 .calcForm {
   display: grid;
-  gap: 1.5rem;
+  gap: var(--spacing-md);
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--spacing-xs);
 }
 
 .inputGroup label {
   font-weight: 500;
-  color: #1A1A1A;
+  color: var(--text-primary);
   font-size: 0.9rem;
 }
 
 .inputRow {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 1rem;
+  gap: var(--spacing-sm);
   align-items: end;
 }
 
 .inputField {
-  padding: 1rem;
-  border: 1px solid #E5E5E5;
-  border-radius: 8px;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   font-size: 1rem;
   transition: border-color 0.2s ease;
-  background: #FFFFFF;
+  background: var(--bg-card);
 }
 
 .inputField:focus {
   outline: none;
-  border-color: #2E86AB;
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.1);
 }
 
 .unitLabel {
-  background: #F5F5F5;
-  padding: 1rem;
-  border: 1px solid #E5E5E5;
-  border-radius: 8px;
+  background: var(--hover);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   font-size: 0.9rem;
-  color: #666666;
+  color: var(--text-secondary);
   min-width: 50px;
   text-align: center;
 }
 
 .calcBtn {
-  background: #2E86AB;
+  background: var(--primary);
   color: white;
   border: none;
-  padding: 1.5rem;
-  border-radius: 8px;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
@@ -229,117 +145,136 @@
 }
 
 .calcBtn:hover {
-  background: #246b8a;
+  background: var(--primary-hover);
   transform: translateY(-1px);
 }
 
 .calcBtn:disabled {
-  background: #999999;
+  background: var(--text-muted);
   cursor: not-allowed;
   transform: none;
 }
 
 /* Resultado */
 .resultSection {
-  margin-top: 2rem;
-  padding: 2rem;
-  background: #F5F5F5;
-  border-radius: 8px;
-  border: 1px solid #E5E5E5;
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--hover);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
 }
 
 .resultMain {
   font-size: 1.8rem;
   font-weight: 600;
-  color: #2E86AB;
-  margin-bottom: 1rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
 }
 
 .resultExplanation {
-  color: #666666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
 /* Panel de visualización */
 .visualizationPanel {
-  background: #FFFFFF;
-  border: 1px solid #E5E5E5;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-medium);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .visualizationPanel h3 {
-  margin-bottom: 1.5rem;
-  color: #1A1A1A;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-primary);
   text-align: center;
 }
 
 .chartContainer {
   position: relative;
   height: 300px;
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.chartContainer canvas {
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
 }
 
 /* Ejemplos predefinidos */
 .examplesSection {
-  margin-top: 2rem;
+  margin-top: var(--spacing-lg);
+}
+
+.examplesSection h4 {
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
 }
 
 .examplesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
 }
 
 .exampleBtn {
-  background: #FFFFFF;
-  border: 1px solid #E5E5E5;
-  padding: 1rem;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius);
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
 }
 
 .exampleBtn:hover {
-  border-color: #2E86AB;
-  background: #F5F5F5;
+  border-color: var(--primary);
+  background: var(--hover);
 }
 
 .exampleTitle {
   font-weight: 500;
-  color: #1A1A1A;
+  color: var(--text-primary);
   font-size: 0.9rem;
 }
 
 .exampleDesc {
   font-size: 0.8rem;
-  color: #666666;
+  color: var(--text-secondary);
 }
 
 /* Historial */
 .historySection {
-  margin-top: 2rem;
+  margin-top: var(--spacing-lg);
+}
+
+.historySection h4 {
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
 }
 
 .historyList {
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid #E5E5E5;
-  border-radius: 8px;
-  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
 }
 
 .historyItem {
-  padding: 1rem;
-  border-bottom: 1px solid #E5E5E5;
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--border);
   font-size: 0.9rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .historyItem:last-child {
@@ -347,81 +282,103 @@
 }
 
 .historyItem:hover {
-  background: #F5F5F5;
+  background: var(--hover);
+}
+
+.historyCalculation {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.historyResult {
+  color: var(--primary);
+  font-weight: 600;
+  margin: 4px 0;
+}
+
+.historyItem small {
+  color: var(--text-muted);
+  font-size: 0.75rem;
 }
 
 .clearHistory {
-  background: #F44336;
+  background: var(--error);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius);
   font-size: 0.8rem;
   cursor: pointer;
-  margin-top: 1rem;
+  margin-top: var(--spacing-sm);
+  width: 100%;
 }
 
-/* Footer */
-.footer {
-  position: fixed;
-  bottom: 10px;
-  right: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(46, 134, 171, 0.2);
+.clearHistory:hover {
+  opacity: 0.9;
+}
+
+/* Secciones educativas */
+.meskeiaeduSection {
+  max-width: 800px;
+  margin: 3rem auto 2rem;
+  padding: 2rem;
+  background: var(--bg-card);
   border-radius: 12px;
-  padding: 8px 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  font-size: 0.9rem;
-  z-index: 1000;
-  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.1);
+  border: 1px solid var(--border);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
 }
 
-.footerTop {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-bottom: 4px;
-  color: #2E86AB;
+.meskeiaeduSection h2 {
+  color: var(--primary);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--secondary);
+  padding-bottom: 0.5rem;
 }
 
-.footerTop button {
-  background: none;
-  border: none;
-  color: #2E86AB;
-  cursor: pointer;
-  font-size: 0.9rem;
+.meskeiaeduSection p {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.meskeiaeduSection ul {
+  list-style: none;
   padding: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 600;
-  text-decoration: underline;
-  transition: opacity 0.2s;
+  margin: 0;
 }
 
-.footerTop button:hover {
-  opacity: 0.7;
+.meskeiaeduSection li {
+  padding: 0.75rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  color: var(--text-primary);
 }
 
-.footerBottom {
-  color: #666;
-  font-size: 0.85rem;
+.meskeiaeduSection li:before {
+  content: '→';
+  color: var(--secondary);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.meskeiaeduSection strong {
+  color: var(--primary);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .mainGrid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: var(--spacing-md);
   }
 
   .calculatorTabs {
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--spacing-xs);
   }
 
   .pageTitle h1 {
@@ -433,17 +390,22 @@
   }
 
   .container {
-    padding: 1.5rem 1rem;
+    padding: var(--spacing-md) var(--spacing-sm);
     padding-top: 70px;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .calculatorPanel,
   .visualizationPanel {
-    padding: 1.5rem;
+    padding: var(--spacing-md);
+    margin: 0;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .inputRow {
-    gap: 0.5rem;
+    gap: var(--spacing-xs);
   }
 
   .inputField {
@@ -453,127 +415,34 @@
 
   .unitLabel {
     min-width: 40px;
-    padding: 0.5rem;
+    padding: var(--spacing-xs);
   }
 
   .tabBtn {
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
     font-size: 0.8rem;
     flex: 1;
     min-width: 0;
   }
 
-  .chartContainer {
-    height: 250px;
+  .examplesGrid .exampleBtn {
+    padding: var(--spacing-xs);
   }
 
-  .historyList {
-    max-height: 150px;
+  .meskeiaeduSection {
+    padding: 1.5rem;
+    margin: 2rem auto 1rem;
   }
 
-  .meskeiaLogoContainer {
-    top: 10px;
-    left: 10px;
-    padding: 6px 12px;
-    gap: 8px;
+  .meskeiaeduSection h2 {
+    font-size: 1.3rem;
   }
 
-  .meskeiaLogoIcon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .meskeiaLogoIcon::before {
-    width: 9px;
-    height: 9px;
-    top: 7.5px;
-    left: 7.5px;
-  }
-
-  .meskeiaLogoIcon::after {
-    width: 4px;
-    height: 4px;
-    top: 10px;
-    left: 10px;
-  }
-
-  .meskeiaLogoText {
-    font-size: 1rem;
-  }
-
-  .footer {
-    bottom: 5px;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    font-size: 0.8rem;
-    padding: 5px 12px;
-    white-space: normal;
-    max-width: calc(100vw - 20px);
-  }
-
-  .footerTop {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 4px;
-  }
-
-  .footerTop span,
-  .footerTop button {
-    font-size: 0.8rem;
-  }
-
-  .footerBottom {
-    font-size: 0.7rem;
-  }
-}
-
-@media (max-width: 375px) {
-  .container {
-    padding: 1rem 0.5rem;
-  }
-
+  .container,
+  .mainGrid,
   .calculatorPanel,
   .visualizationPanel {
-    padding: 1rem;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
   }
-
-  .pageTitle h1 {
-    font-size: 1.8rem;
-  }
-
-  .pageSubtitle {
-    font-size: 1rem;
-  }
-
-  .tabBtn {
-    font-size: 0.75rem;
-    padding: 6px 4px;
-  }
-
-  .inputRow {
-    gap: 4px;
-  }
-
-  .inputField,
-  .unitLabel {
-    font-size: 0.9rem;
-  }
-}
-
-/* Animaciones */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.calculatorPanel,
-.visualizationPanel {
-  animation: fadeInUp 0.4s ease forwards;
 }

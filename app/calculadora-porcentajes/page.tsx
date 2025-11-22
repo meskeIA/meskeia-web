@@ -1,11 +1,52 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
-import { Chart, ChartConfiguration } from 'chart.js/auto'
+import { useState, useEffect, useRef } from 'react'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import { Chart } from 'react-chartjs-2'
+import MeskeiaLogo from '@/components/MeskeiaLogo'
+import Footer from '@/components/Footer'
+import AnalyticsTracker from '@/components/AnalyticsTracker'
+import { jsonLd } from './metadata'
 import styles from './page.module.css'
 
+// Registrar componentes de Chart.js
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+)
+
+// Tipo para historial
+interface CalculationHistory {
+  calculation: string
+  result: string
+  timestamp: string
+}
+
 export default function CalculadoraPorcentajes() {
-  // Estados para las calculadoras
+  // Estados
+  const [activeTab, setActiveTab] = useState('basic')
+  const [showResult, setShowResult] = useState(false)
+  const [resultMain, setResultMain] = useState('')
+  const [resultExplanation, setResultExplanation] = useState('')
+  const [history, setHistory] = useState<CalculationHistory[]>([])
+  const [chartData, setChartData] = useState<any>(null)
+  const [chartType, setChartType] = useState<'bar' | 'doughnut'>('doughnut')
+
+  // Estados para inputs de cada calculadora
   const [basicPercent, setBasicPercent] = useState('')
   const [basicTotal, setBasicTotal] = useState('')
   const [partValue, setPartValue] = useState('')
@@ -22,38 +63,28 @@ export default function CalculadoraPorcentajes() {
   const [tipType, setTipType] = useState('10')
   const [customTip, setCustomTip] = useState('')
 
-  const [activeTab, setActiveTab] = useState('basic')
-  const [resultMain, setResultMain] = useState('')
-  const [resultExplanation, setResultExplanation] = useState('')
-  const [showResult, setShowResult] = useState(false)
-  const [calculationHistory, setCalculationHistory] = useState<any[]>([])
+  const chartRef = useRef<any>(null)
 
-  const chartRef = useRef<HTMLCanvasElement>(null)
-  const chartInstance = useRef<Chart | null>(null)
-
-  // Cargar historial desde localStorage al montar
+  // Cargar historial desde localStorage
   useEffect(() => {
     const saved = localStorage.getItem('meskeia_percentage_history')
     if (saved) {
-      setCalculationHistory(JSON.parse(saved))
+      setHistory(JSON.parse(saved))
     }
-
-    // Inicializar gráfico vacío
-    updateChart('doughnut', [100], ['Esperando cálculo...'], 'Realiza un cálculo para ver la visualización')
   }, [])
 
-  // Formateo de números español
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(num)
-  }
+  // Guardar historial en localStorage
+  useEffect(() => {
+    if (history.length > 0) {
+      localStorage.setItem('meskeia_percentage_history', JSON.stringify(history))
+    }
+  }, [history])
 
+  // Funciones de formateo español
   const formatCurrency = (num: number) => {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'EUR',
     }).format(num)
   }
 
@@ -61,100 +92,52 @@ export default function CalculadoraPorcentajes() {
     return new Intl.NumberFormat('es-ES', {
       style: 'percent',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     }).format(num / 100)
   }
 
-  // Función para actualizar el gráfico
-  const updateChart = (type: string, data: number[], labels: string[], title: string) => {
-    if (!chartRef.current) return
-
-    const ctx = chartRef.current.getContext('2d')
-    if (!ctx) return
-
-    if (chartInstance.current) {
-      chartInstance.current.destroy()
+  // Añadir al historial
+  const addToHistory = (calculation: string, result: string) => {
+    const newEntry: CalculationHistory = {
+      calculation,
+      result,
+      timestamp: new Date().toLocaleString('es-ES'),
     }
+    setHistory([newEntry, ...history.slice(0, 9)]) // Mantener solo los últimos 10
+  }
 
-    const config: ChartConfiguration = {
-      type: type as any,
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
+  // Actualizar gráfico
+  const updateChart = (
+    type: 'bar' | 'doughnut',
+    data: number[],
+    labels: string[],
+    title: string
+  ) => {
+    setChartType(type)
+    setChartData({
+      labels,
+      datasets: [
+        {
+          data,
           backgroundColor: [
             '#2E86AB',
             '#48A9A6',
             '#A3C4A2',
             '#F7C59F',
-            '#FF9800'
+            '#FF9800',
           ],
           borderColor: '#FFFFFF',
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: title,
-            font: {
-              size: 16,
-              weight: 'bold'
-            },
-            color: '#1A1A1A'
-          },
-          legend: {
-            display: true,
-            position: 'bottom',
-            labels: {
-              font: {
-                size: 12
-              }
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context: any) {
-                if (type === 'doughnut') {
-                  const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
-                  const percentage = ((context.raw / total) * 100).toFixed(2)
-                  return `${context.label}: ${formatCurrency(context.raw)} (${percentage}%)`
-                }
-                return `${context.label}: ${formatCurrency(context.raw)}`
-              }
-            }
-          }
+          borderWidth: 2,
         },
-        scales: type === 'bar' ? {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function(value: any) {
-                return formatCurrency(value)
-              }
-            }
-          }
-        } : {}
-      }
-    }
-
-    chartInstance.current = new Chart(ctx, config)
+      ],
+    })
   }
 
-  // Función para añadir al historial
-  const addToHistory = (calculation: string, result: string) => {
-    const historyItem = {
-      calculation,
-      result,
-      timestamp: new Date().toLocaleString('es-ES')
-    }
-
-    const newHistory = [historyItem, ...calculationHistory].slice(0, 20)
-    setCalculationHistory(newHistory)
-    localStorage.setItem('meskeia_percentage_history', JSON.stringify(newHistory))
+  // Mostrar resultado
+  const displayResult = (main: string, explanation: string) => {
+    setResultMain(main)
+    setResultExplanation(explanation)
+    setShowResult(true)
   }
 
   // Calculadora básica
@@ -170,11 +153,17 @@ export default function CalculadoraPorcentajes() {
     const result = (percent / 100) * total
     const explanation = `Cálculo: ${formatPercent(percent)} de ${formatCurrency(total)} = ${formatCurrency(result)}`
 
-    setResultMain(formatCurrency(result))
-    setResultExplanation(explanation)
-    setShowResult(true)
-    updateChart('doughnut', [result, total - result], ['Porcentaje calculado', 'Resto'], `${formatPercent(percent)} de ${formatCurrency(total)}`)
-    addToHistory(`${formatPercent(percent)} de ${formatCurrency(total)}`, formatCurrency(result))
+    displayResult(formatCurrency(result), explanation)
+    updateChart(
+      'doughnut',
+      [result, total - result],
+      ['Porcentaje calculado', 'Resto'],
+      `${formatPercent(percent)} de ${formatCurrency(total)}`
+    )
+    addToHistory(
+      `${formatPercent(percent)} de ${formatCurrency(total)}`,
+      formatCurrency(result)
+    )
   }
 
   const calculatePart = () => {
@@ -189,11 +178,17 @@ export default function CalculadoraPorcentajes() {
     const percent = (part / total) * 100
     const explanation = `${formatCurrency(part)} representa el ${formatPercent(percent)} de ${formatCurrency(total)}`
 
-    setResultMain(formatPercent(percent))
-    setResultExplanation(explanation)
-    setShowResult(true)
-    updateChart('doughnut', [part, total - part], ['Parte calculada', 'Resto'], `${formatCurrency(part)} de ${formatCurrency(total)}`)
-    addToHistory(`${formatCurrency(part)} de ${formatCurrency(total)}`, formatPercent(percent))
+    displayResult(formatPercent(percent), explanation)
+    updateChart(
+      'doughnut',
+      [part, total - part],
+      ['Parte calculada', 'Resto'],
+      `${formatCurrency(part)} de ${formatCurrency(total)}`
+    )
+    addToHistory(
+      `${formatCurrency(part)} de ${formatCurrency(total)}`,
+      formatPercent(percent)
+    )
   }
 
   // Calculadora de cambios
@@ -211,94 +206,130 @@ export default function CalculadoraPorcentajes() {
     const changeType = change > 0 ? 'aumento' : 'reducción'
     const explanation = `Cambio de ${formatCurrency(oldVal)} a ${formatCurrency(newVal)}: ${changeType} del ${formatPercent(Math.abs(percentChange))}`
 
-    setResultMain(`${change > 0 ? '+' : ''}${formatPercent(percentChange)}`)
-    setResultExplanation(explanation)
-    setShowResult(true)
-    updateChart('bar', [oldVal, newVal], ['Valor inicial', 'Valor final'], 'Comparación de valores')
-    addToHistory(`${formatCurrency(oldVal)} → ${formatCurrency(newVal)}`, `${change > 0 ? '+' : ''}${formatPercent(percentChange)}`)
+    displayResult(
+      `${change > 0 ? '+' : ''}${formatPercent(percentChange)}`,
+      explanation
+    )
+    updateChart(
+      'bar',
+      [oldVal, newVal],
+      ['Valor inicial', 'Valor final'],
+      'Comparación de valores'
+    )
+    addToHistory(
+      `${formatCurrency(oldVal)} → ${formatCurrency(newVal)}`,
+      `${change > 0 ? '+' : ''}${formatPercent(percentChange)}`
+    )
   }
 
   const applyChange = () => {
     const base = parseFloat(baseAmount)
-    const changePer = parseFloat(changePercent)
+    const change = parseFloat(changePercent)
 
-    if (isNaN(base) || isNaN(changePer)) {
+    if (isNaN(base) || isNaN(change)) {
       alert('Por favor, introduce valores válidos')
       return
     }
 
-    const change = (changePer / 100) * base
-    const finalAmount = base + change
-    const changeType = changePer > 0 ? 'incremento' : 'descuento'
-    const explanation = `${formatCurrency(base)} con ${changeType} del ${formatPercent(Math.abs(changePer))} = ${formatCurrency(finalAmount)}`
+    const changeAmount = (change / 100) * base
+    const finalAmount = base + changeAmount
+    const changeType = change > 0 ? 'incremento' : 'descuento'
+    const explanation = `${formatCurrency(base)} con ${changeType} del ${formatPercent(Math.abs(change))} = ${formatCurrency(finalAmount)}`
 
-    setResultMain(formatCurrency(finalAmount))
-    setResultExplanation(explanation)
-    setShowResult(true)
-    updateChart('bar', [base, Math.abs(change), finalAmount], ['Base', 'Cambio', 'Final'], `${changeType} del ${formatPercent(Math.abs(changePer))}`)
-    addToHistory(`${formatCurrency(base)} ${changePer > 0 ? '+' : ''}${formatPercent(changePer)}`, formatCurrency(finalAmount))
+    displayResult(formatCurrency(finalAmount), explanation)
+    updateChart(
+      'bar',
+      [base, Math.abs(changeAmount), finalAmount],
+      ['Base', 'Cambio', 'Final'],
+      `${changeType} del ${formatPercent(Math.abs(change))}`
+    )
+    addToHistory(
+      `${formatCurrency(base)} ${change > 0 ? '+' : ''}${formatPercent(change)}`,
+      formatCurrency(finalAmount)
+    )
   }
 
   // Calculadora IVA
   const calculateIVA = () => {
     const base = parseFloat(ivaBase)
-    const ivaRate = parseFloat(ivaType)
+    const rate = parseFloat(ivaType)
 
     if (isNaN(base)) {
       alert('Por favor, introduce un valor válido')
       return
     }
 
-    const ivaAmount = (ivaRate / 100) * base
+    const ivaAmount = (rate / 100) * base
     const total = base + ivaAmount
-    const explanation = `Base: ${formatCurrency(base)} + IVA (${ivaRate}%): ${formatCurrency(ivaAmount)} = Total: ${formatCurrency(total)}`
+    const explanation = `Base: ${formatCurrency(base)} + IVA (${rate}%): ${formatCurrency(ivaAmount)} = Total: ${formatCurrency(total)}`
 
-    setResultMain(formatCurrency(total))
-    setResultExplanation(explanation)
-    setShowResult(true)
-    updateChart('doughnut', [base, ivaAmount], ['Base sin IVA', `IVA (${ivaRate}%)`], 'Desglose del precio')
-    addToHistory(`${formatCurrency(base)} + IVA ${ivaRate}%`, formatCurrency(total))
+    displayResult(formatCurrency(total), explanation)
+    updateChart(
+      'doughnut',
+      [base, ivaAmount],
+      ['Base sin IVA', `IVA (${rate}%)`],
+      'Desglose del precio'
+    )
+    addToHistory(`${formatCurrency(base)} + IVA ${rate}%`, formatCurrency(total))
   }
 
   const reverseIVA = () => {
     const total = parseFloat(ivaTotal)
-    const ivaRate = parseFloat(ivaTypeReverse)
+    const rate = parseFloat(ivaTypeReverse)
 
     if (isNaN(total)) {
       alert('Por favor, introduce un valor válido')
       return
     }
 
-    const base = total / (1 + ivaRate / 100)
+    const base = total / (1 + rate / 100)
     const ivaAmount = total - base
-    const explanation = `Total con IVA: ${formatCurrency(total)} = Base: ${formatCurrency(base)} + IVA (${ivaRate}%): ${formatCurrency(ivaAmount)}`
+    const explanation = `Total con IVA: ${formatCurrency(total)} = Base: ${formatCurrency(base)} + IVA (${rate}%): ${formatCurrency(ivaAmount)}`
 
-    setResultMain(formatCurrency(base))
-    setResultExplanation(explanation)
-    setShowResult(true)
-    updateChart('doughnut', [base, ivaAmount], ['Base sin IVA', `IVA (${ivaRate}%)`], 'Desglose del precio')
-    addToHistory(`${formatCurrency(total)} sin IVA ${ivaRate}%`, formatCurrency(base))
+    displayResult(formatCurrency(base), explanation)
+    updateChart(
+      'doughnut',
+      [base, ivaAmount],
+      ['Base sin IVA', `IVA (${rate}%)`],
+      'Desglose del precio'
+    )
+    addToHistory(
+      `${formatCurrency(total)} sin IVA ${rate}%`,
+      formatCurrency(base)
+    )
   }
 
   // Calculadora de propinas
   const calculateTip = () => {
     const bill = parseFloat(billAmount)
-    const tipPer = tipType === 'custom' ? parseFloat(customTip) : parseFloat(tipType)
+    let tipPercent: number
 
-    if (isNaN(bill) || isNaN(tipPer)) {
+    if (tipType === 'custom') {
+      tipPercent = parseFloat(customTip)
+    } else {
+      tipPercent = parseFloat(tipType)
+    }
+
+    if (isNaN(bill) || isNaN(tipPercent)) {
       alert('Por favor, introduce valores válidos')
       return
     }
 
-    const tipAmount = (tipPer / 100) * bill
+    const tipAmount = (tipPercent / 100) * bill
     const total = bill + tipAmount
-    const explanation = `Cuenta: ${formatCurrency(bill)} + Propina (${formatPercent(tipPer)}): ${formatCurrency(tipAmount)} = Total: ${formatCurrency(total)}`
+    const explanation = `Cuenta: ${formatCurrency(bill)} + Propina (${formatPercent(tipPercent)}): ${formatCurrency(tipAmount)} = Total: ${formatCurrency(total)}`
 
-    setResultMain(formatCurrency(total))
-    setResultExplanation(explanation)
-    setShowResult(true)
-    updateChart('doughnut', [bill, tipAmount], ['Cuenta', `Propina (${formatPercent(tipPer)})`], 'Desglose del total')
-    addToHistory(`${formatCurrency(bill)} + propina ${formatPercent(tipPer)}`, formatCurrency(total))
+    displayResult(formatCurrency(total), explanation)
+    updateChart(
+      'doughnut',
+      [bill, tipAmount],
+      ['Cuenta', `Propina (${formatPercent(tipPercent)})`],
+      'Desglose del total'
+    )
+    addToHistory(
+      `${formatCurrency(bill)} + propina ${formatPercent(tipPercent)}`,
+      formatCurrency(total)
+    )
   }
 
   // Ejemplos predefinidos
@@ -331,386 +362,494 @@ export default function CalculadoraPorcentajes() {
     }
   }
 
+  // Limpiar historial
   const clearHistory = () => {
     if (confirm('¿Estás seguro de que quieres limpiar el historial?')) {
-      setCalculationHistory([])
+      setHistory([])
       localStorage.removeItem('meskeia_percentage_history')
     }
   }
 
+  // Opciones del gráfico
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+        labels: {
+          font: {
+            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            size: 12,
+          },
+          padding: 15,
+        },
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        titleFont: {
+          size: 14,
+        },
+        bodyFont: {
+          size: 13,
+        },
+      },
+    },
+  }
+
   return (
-    <div className={styles.container}>
-      {/* Logo meskeIA */}
-      <div className={styles.meskeiaLogoContainer} onClick={() => window.location.href = '/'}>
-        <div className={styles.meskeiaLogoIcon}></div>
-        <div className={styles.meskeiaLogoText}>
-          <span className={styles.meske}>meske</span><span className={styles.ia}>IA</span>
+    <>
+      {/* Schema.org JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      {/* Analytics v2.1 */}
+      <AnalyticsTracker applicationName="calculadora-porcentajes" />
+
+      <MeskeiaLogo />
+
+      <div className={styles.container}>
+        {/* Título */}
+        <div className={styles.pageTitle}>
+          <h1>Calculadora de Porcentajes Avanzada</h1>
+          <p className={styles.pageSubtitle}>
+            Herramienta completa para cálculos de porcentajes con visualizaciones
+            interactivas y ejemplos españoles
+          </p>
         </div>
-      </div>
 
-      {/* Título */}
-      <div className={styles.pageTitle}>
-        <h1>Calculadora de Porcentajes Avanzada</h1>
-        <p className={styles.pageSubtitle}>
-          Herramienta completa para cálculos de porcentajes con visualizaciones interactivas y ejemplos españoles
-        </p>
-      </div>
+        {/* Grid principal */}
+        <div className={styles.mainGrid}>
+          {/* Panel de calculadoras */}
+          <div className={styles.calculatorPanel}>
+            {/* Pestañas */}
+            <div className={styles.calculatorTabs}>
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'basic' ? styles.active : ''}`}
+                onClick={() => {
+                  setActiveTab('basic')
+                  setShowResult(false)
+                }}
+              >
+                Básico
+              </button>
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'change' ? styles.active : ''}`}
+                onClick={() => {
+                  setActiveTab('change')
+                  setShowResult(false)
+                }}
+              >
+                Cambios
+              </button>
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'iva' ? styles.active : ''}`}
+                onClick={() => {
+                  setActiveTab('iva')
+                  setShowResult(false)
+                }}
+              >
+                IVA
+              </button>
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'tips' ? styles.active : ''}`}
+                onClick={() => {
+                  setActiveTab('tips')
+                  setShowResult(false)
+                }}
+              >
+                Propinas
+              </button>
+            </div>
 
-      {/* Grid principal */}
-      <div className={styles.mainGrid}>
-        {/* Panel de calculadoras */}
-        <div className={styles.calculatorPanel}>
-          {/* Pestañas */}
-          <div className={styles.calculatorTabs}>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'basic' ? styles.active : ''}`}
-              onClick={() => setActiveTab('basic')}
-            >
-              Básico
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'change' ? styles.active : ''}`}
-              onClick={() => setActiveTab('change')}
-            >
-              Cambios
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'iva' ? styles.active : ''}`}
-              onClick={() => setActiveTab('iva')}
-            >
-              IVA
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'tips' ? styles.active : ''}`}
-              onClick={() => setActiveTab('tips')}
-            >
-              Propinas
-            </button>
-          </div>
+            {/* Tab Básico */}
+            {activeTab === 'basic' && (
+              <div className={styles.tabContent}>
+                <div className={styles.calcForm}>
+                  <div className={styles.inputGroup}>
+                    <label>¿Cuánto es el X% de Y?</label>
+                    <div className={styles.inputRow}>
+                      <input
+                        type="number"
+                        className={styles.inputField}
+                        placeholder="Porcentaje"
+                        step="0.01"
+                        value={basicPercent}
+                        onChange={(e) => setBasicPercent(e.target.value)}
+                      />
+                      <span className={styles.unitLabel}>%</span>
+                    </div>
+                    <div style={{ textAlign: 'center', margin: '8px 0', color: 'var(--text-secondary)' }}>
+                      de
+                    </div>
+                    <div className={styles.inputRow}>
+                      <input
+                        type="number"
+                        className={styles.inputField}
+                        placeholder="Cantidad total"
+                        step="0.01"
+                        value={basicTotal}
+                        onChange={(e) => setBasicTotal(e.target.value)}
+                      />
+                      <span className={styles.unitLabel}>€</span>
+                    </div>
+                  </div>
+                  <button type="button" className={styles.calcBtn} onClick={calculateBasic}>
+                    Calcular
+                  </button>
+                </div>
 
-          {/* Calculadora básica */}
-          {activeTab === 'basic' && (
-            <div className={styles.tabContent}>
-              <div className={styles.calcForm}>
-                <div className={styles.inputGroup}>
-                  <label>¿Cuánto es el X% de Y?</label>
+                <div className={styles.inputGroup} style={{ marginTop: 'var(--spacing-lg)' }}>
+                  <label>¿Qué porcentaje representa X de Y?</label>
                   <div className={styles.inputRow}>
                     <input
                       type="number"
                       className={styles.inputField}
-                      placeholder="Porcentaje"
+                      placeholder="Parte"
                       step="0.01"
-                      value={basicPercent}
-                      onChange={(e) => setBasicPercent(e.target.value)}
+                      value={partValue}
+                      onChange={(e) => setPartValue(e.target.value)}
+                    />
+                    <span className={styles.unitLabel}>€</span>
+                  </div>
+                  <div style={{ textAlign: 'center', margin: '8px 0', color: 'var(--text-secondary)' }}>
+                    de
+                  </div>
+                  <div className={styles.inputRow}>
+                    <input
+                      type="number"
+                      className={styles.inputField}
+                      placeholder="Total"
+                      step="0.01"
+                      value={totalValue}
+                      onChange={(e) => setTotalValue(e.target.value)}
+                    />
+                    <span className={styles.unitLabel}>€</span>
+                  </div>
+                  <button type="button" className={styles.calcBtn} onClick={calculatePart}>
+                    Calcular Porcentaje
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Tab Cambios */}
+            {activeTab === 'change' && (
+              <div className={styles.tabContent}>
+                <div className={styles.calcForm}>
+                  <div className={styles.inputGroup}>
+                    <label>Calculadora de cambio porcentual</label>
+                    <div className={styles.inputRow}>
+                      <input
+                        type="number"
+                        className={styles.inputField}
+                        placeholder="Valor inicial"
+                        step="0.01"
+                        value={oldValue}
+                        onChange={(e) => setOldValue(e.target.value)}
+                      />
+                      <span className={styles.unitLabel}>€</span>
+                    </div>
+                    <div className={styles.inputRow}>
+                      <input
+                        type="number"
+                        className={styles.inputField}
+                        placeholder="Valor final"
+                        step="0.01"
+                        value={newValue}
+                        onChange={(e) => setNewValue(e.target.value)}
+                      />
+                      <span className={styles.unitLabel}>€</span>
+                    </div>
+                  </div>
+                  <button type="button" className={styles.calcBtn} onClick={calculateChange}>
+                    Calcular Cambio
+                  </button>
+                </div>
+
+                <div className={styles.inputGroup} style={{ marginTop: 'var(--spacing-lg)' }}>
+                  <label>Aplicar descuento/incremento</label>
+                  <div className={styles.inputRow}>
+                    <input
+                      type="number"
+                      className={styles.inputField}
+                      placeholder="Cantidad base"
+                      step="0.01"
+                      value={baseAmount}
+                      onChange={(e) => setBaseAmount(e.target.value)}
+                    />
+                    <span className={styles.unitLabel}>€</span>
+                  </div>
+                  <div className={styles.inputRow}>
+                    <input
+                      type="number"
+                      className={styles.inputField}
+                      placeholder="Porcentaje (+ o -)"
+                      step="0.01"
+                      value={changePercent}
+                      onChange={(e) => setChangePercent(e.target.value)}
                     />
                     <span className={styles.unitLabel}>%</span>
                   </div>
-                  <div style={{ textAlign: 'center', margin: '8px 0', color: '#666' }}>de</div>
-                  <div className={styles.inputRow}>
-                    <input
-                      type="number"
-                      className={styles.inputField}
-                      placeholder="Cantidad total"
-                      step="0.01"
-                      value={basicTotal}
-                      onChange={(e) => setBasicTotal(e.target.value)}
-                    />
-                    <span className={styles.unitLabel}>€</span>
+                  <button type="button" className={styles.calcBtn} onClick={applyChange}>
+                    Aplicar Cambio
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Tab IVA */}
+            {activeTab === 'iva' && (
+              <div className={styles.tabContent}>
+                <div className={styles.calcForm}>
+                  <div className={styles.inputGroup}>
+                    <label>Calcular IVA español</label>
+                    <div className={styles.inputRow}>
+                      <input
+                        type="number"
+                        className={styles.inputField}
+                        placeholder="Precio sin IVA"
+                        step="0.01"
+                        value={ivaBase}
+                        onChange={(e) => setIvaBase(e.target.value)}
+                      />
+                      <span className={styles.unitLabel}>€</span>
+                    </div>
+                    <div className={styles.inputGroup}>
+                      <label>Tipo de IVA</label>
+                      <select
+                        className={styles.inputField}
+                        value={ivaType}
+                        onChange={(e) => setIvaType(e.target.value)}
+                        aria-label="Tipo de IVA"
+                      >
+                        <option value="21">General (21%)</option>
+                        <option value="10">Reducido (10%)</option>
+                        <option value="4">Superreducido (4%)</option>
+                      </select>
+                    </div>
                   </div>
+                  <button type="button" className={styles.calcBtn} onClick={calculateIVA}>
+                    Calcular IVA
+                  </button>
                 </div>
-                <button type="button" className={styles.calcBtn} onClick={calculateBasic}>Calcular</button>
-              </div>
 
-              <div className={styles.inputGroup} style={{ marginTop: '2rem' }}>
-                <label>¿Qué porcentaje representa X de Y?</label>
-                <div className={styles.inputRow}>
-                  <input
-                    type="number"
-                    className={styles.inputField}
-                    placeholder="Parte"
-                    step="0.01"
-                    value={partValue}
-                    onChange={(e) => setPartValue(e.target.value)}
-                  />
-                  <span className={styles.unitLabel}>€</span>
-                </div>
-                <div style={{ textAlign: 'center', margin: '8px 0', color: '#666' }}>de</div>
-                <div className={styles.inputRow}>
-                  <input
-                    type="number"
-                    className={styles.inputField}
-                    placeholder="Total"
-                    step="0.01"
-                    value={totalValue}
-                    onChange={(e) => setTotalValue(e.target.value)}
-                  />
-                  <span className={styles.unitLabel}>€</span>
-                </div>
-                <button type="button" className={styles.calcBtn} onClick={calculatePart}>Calcular Porcentaje</button>
-              </div>
-            </div>
-          )}
-
-          {/* Calculadora de cambios */}
-          {activeTab === 'change' && (
-            <div className={styles.tabContent}>
-              <div className={styles.calcForm}>
-                <div className={styles.inputGroup}>
-                  <label>Calculadora de cambio porcentual</label>
+                <div className={styles.inputGroup} style={{ marginTop: 'var(--spacing-lg)' }}>
+                  <label>Calcular precio sin IVA</label>
                   <div className={styles.inputRow}>
                     <input
                       type="number"
                       className={styles.inputField}
-                      placeholder="Valor inicial"
+                      placeholder="Precio con IVA"
                       step="0.01"
-                      value={oldValue}
-                      onChange={(e) => setOldValue(e.target.value)}
-                    />
-                    <span className={styles.unitLabel}>€</span>
-                  </div>
-                  <div className={styles.inputRow}>
-                    <input
-                      type="number"
-                      className={styles.inputField}
-                      placeholder="Valor final"
-                      step="0.01"
-                      value={newValue}
-                      onChange={(e) => setNewValue(e.target.value)}
-                    />
-                    <span className={styles.unitLabel}>€</span>
-                  </div>
-                </div>
-                <button type="button" className={styles.calcBtn} onClick={calculateChange}>Calcular Cambio</button>
-              </div>
-
-              <div className={styles.inputGroup} style={{ marginTop: '2rem' }}>
-                <label>Aplicar descuento/incremento</label>
-                <div className={styles.inputRow}>
-                  <input
-                    type="number"
-                    className={styles.inputField}
-                    placeholder="Cantidad base"
-                    step="0.01"
-                    value={baseAmount}
-                    onChange={(e) => setBaseAmount(e.target.value)}
-                  />
-                  <span className={styles.unitLabel}>€</span>
-                </div>
-                <div className={styles.inputRow}>
-                  <input
-                    type="number"
-                    className={styles.inputField}
-                    placeholder="Porcentaje (+ o -)"
-                    step="0.01"
-                    value={changePercent}
-                    onChange={(e) => setChangePercent(e.target.value)}
-                  />
-                  <span className={styles.unitLabel}>%</span>
-                </div>
-                <button type="button" className={styles.calcBtn} onClick={applyChange}>Aplicar Cambio</button>
-              </div>
-            </div>
-          )}
-
-          {/* Calculadora IVA */}
-          {activeTab === 'iva' && (
-            <div className={styles.tabContent}>
-              <div className={styles.calcForm}>
-                <div className={styles.inputGroup}>
-                  <label>Calcular IVA español</label>
-                  <div className={styles.inputRow}>
-                    <input
-                      type="number"
-                      className={styles.inputField}
-                      placeholder="Precio sin IVA"
-                      step="0.01"
-                      value={ivaBase}
-                      onChange={(e) => setIvaBase(e.target.value)}
+                      value={ivaTotal}
+                      onChange={(e) => setIvaTotal(e.target.value)}
                     />
                     <span className={styles.unitLabel}>€</span>
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>Tipo de IVA</label>
+                    <label>Tipo de IVA incluido</label>
                     <select
                       className={styles.inputField}
-                      value={ivaType}
-                      onChange={(e) => setIvaType(e.target.value)}
+                      value={ivaTypeReverse}
+                      onChange={(e) => setIvaTypeReverse(e.target.value)}
+                      aria-label="Tipo de IVA incluido"
                     >
                       <option value="21">General (21%)</option>
                       <option value="10">Reducido (10%)</option>
                       <option value="4">Superreducido (4%)</option>
                     </select>
                   </div>
+                  <button type="button" className={styles.calcBtn} onClick={reverseIVA}>
+                    Calcular Sin IVA
+                  </button>
                 </div>
-                <button type="button" className={styles.calcBtn} onClick={calculateIVA}>Calcular IVA</button>
               </div>
+            )}
 
-              <div className={styles.inputGroup} style={{ marginTop: '2rem' }}>
-                <label>Calcular precio sin IVA</label>
-                <div className={styles.inputRow}>
-                  <input
-                    type="number"
-                    className={styles.inputField}
-                    placeholder="Precio con IVA"
-                    step="0.01"
-                    value={ivaTotal}
-                    onChange={(e) => setIvaTotal(e.target.value)}
-                  />
-                  <span className={styles.unitLabel}>€</span>
-                </div>
-                <div className={styles.inputGroup}>
-                  <label>Tipo de IVA incluido</label>
-                  <select
-                    className={styles.inputField}
-                    value={ivaTypeReverse}
-                    onChange={(e) => setIvaTypeReverse(e.target.value)}
-                  >
-                    <option value="21">General (21%)</option>
-                    <option value="10">Reducido (10%)</option>
-                    <option value="4">Superreducido (4%)</option>
-                  </select>
-                </div>
-                <button type="button" className={styles.calcBtn} onClick={reverseIVA}>Calcular Sin IVA</button>
-              </div>
-            </div>
-          )}
-
-          {/* Calculadora de propinas */}
-          {activeTab === 'tips' && (
-            <div className={styles.tabContent}>
-              <div className={styles.calcForm}>
-                <div className={styles.inputGroup}>
-                  <label>Calculadora de propinas</label>
-                  <div className={styles.inputRow}>
-                    <input
-                      type="number"
-                      className={styles.inputField}
-                      placeholder="Total de la cuenta"
-                      step="0.01"
-                      value={billAmount}
-                      onChange={(e) => setBillAmount(e.target.value)}
-                    />
-                    <span className={styles.unitLabel}>€</span>
-                  </div>
+            {/* Tab Propinas */}
+            {activeTab === 'tips' && (
+              <div className={styles.tabContent}>
+                <div className={styles.calcForm}>
                   <div className={styles.inputGroup}>
-                    <label>Nivel de servicio</label>
-                    <select
-                      className={styles.inputField}
-                      value={tipType}
-                      onChange={(e) => setTipType(e.target.value)}
-                    >
-                      <option value="5">Básico (5%)</option>
-                      <option value="10">Bueno (10%)</option>
-                      <option value="15">Excelente (15%)</option>
-                      <option value="custom">Personalizado</option>
-                    </select>
-                  </div>
-                  {tipType === 'custom' && (
+                    <label>Calculadora de propinas</label>
                     <div className={styles.inputRow}>
                       <input
                         type="number"
                         className={styles.inputField}
-                        placeholder="Porcentaje personalizado"
+                        placeholder="Total de la cuenta"
                         step="0.01"
-                        value={customTip}
-                        onChange={(e) => setCustomTip(e.target.value)}
+                        value={billAmount}
+                        onChange={(e) => setBillAmount(e.target.value)}
                       />
-                      <span className={styles.unitLabel}>%</span>
+                      <span className={styles.unitLabel}>€</span>
                     </div>
-                  )}
+                    <div className={styles.inputGroup}>
+                      <label>Nivel de servicio</label>
+                      <select
+                        className={styles.inputField}
+                        value={tipType}
+                        onChange={(e) => setTipType(e.target.value)}
+                        aria-label="Nivel de servicio"
+                      >
+                        <option value="5">Básico (5%)</option>
+                        <option value="10">Bueno (10%)</option>
+                        <option value="15">Excelente (15%)</option>
+                        <option value="custom">Personalizado</option>
+                      </select>
+                    </div>
+                    {tipType === 'custom' && (
+                      <div className={styles.inputRow}>
+                        <input
+                          type="number"
+                          className={styles.inputField}
+                          placeholder="Porcentaje personalizado"
+                          step="0.01"
+                          value={customTip}
+                          onChange={(e) => setCustomTip(e.target.value)}
+                        />
+                        <span className={styles.unitLabel}>%</span>
+                      </div>
+                    )}
+                  </div>
+                  <button type="button" className={styles.calcBtn} onClick={calculateTip}>
+                    Calcular Propina
+                  </button>
                 </div>
-                <button type="button" className={styles.calcBtn} onClick={calculateTip}>Calcular Propina</button>
+              </div>
+            )}
+
+            {/* Resultado */}
+            {showResult && (
+              <div className={styles.resultSection}>
+                <div className={styles.resultMain}>{resultMain}</div>
+                <div className={styles.resultExplanation}>{resultExplanation}</div>
+              </div>
+            )}
+
+            {/* Ejemplos predefinidos */}
+            <div className={styles.examplesSection}>
+              <h4>Ejemplos rápidos:</h4>
+              <div className={styles.examplesGrid}>
+                <button className={styles.exampleBtn} onClick={() => loadExample('discount20')}>
+                  <div className={styles.exampleTitle}>Descuento 20%</div>
+                  <div className={styles.exampleDesc}>Precio: 100€</div>
+                </button>
+                <button className={styles.exampleBtn} onClick={() => loadExample('iva21')}>
+                  <div className={styles.exampleTitle}>IVA 21%</div>
+                  <div className={styles.exampleDesc}>Base: 50€</div>
+                </button>
+                <button className={styles.exampleBtn} onClick={() => loadExample('tip10')}>
+                  <div className={styles.exampleTitle}>Propina 10%</div>
+                  <div className={styles.exampleDesc}>Cuenta: 35€</div>
+                </button>
+                <button className={styles.exampleBtn} onClick={() => loadExample('increase15')}>
+                  <div className={styles.exampleTitle}>Aumento 15%</div>
+                  <div className={styles.exampleDesc}>Sueldo: 1.500€</div>
+                </button>
               </div>
             </div>
-          )}
+          </div>
 
-          {/* Resultado */}
-          {showResult && (
-            <div className={styles.resultSection}>
-              <div className={styles.resultMain}>{resultMain}</div>
-              <div className={styles.resultExplanation}>{resultExplanation}</div>
+          {/* Panel de visualización */}
+          <div className={styles.visualizationPanel}>
+            <h3>Visualización</h3>
+            <div className={styles.chartContainer}>
+              {chartData && (
+                <Chart
+                  ref={chartRef}
+                  type={chartType}
+                  data={chartData}
+                  options={chartOptions}
+                />
+              )}
             </div>
-          )}
 
-          {/* Ejemplos predefinidos */}
-          <div className={styles.examplesSection}>
-            <h4>Ejemplos rápidos:</h4>
-            <div className={styles.examplesGrid}>
-              <button className={styles.exampleBtn} onClick={() => loadExample('discount20')}>
-                <div className={styles.exampleTitle}>Descuento 20%</div>
-                <div className={styles.exampleDesc}>Precio: 100€</div>
-              </button>
-              <button className={styles.exampleBtn} onClick={() => loadExample('iva21')}>
-                <div className={styles.exampleTitle}>IVA 21%</div>
-                <div className={styles.exampleDesc}>Base: 50€</div>
-              </button>
-              <button className={styles.exampleBtn} onClick={() => loadExample('tip10')}>
-                <div className={styles.exampleTitle}>Propina 10%</div>
-                <div className={styles.exampleDesc}>Cuenta: 35€</div>
-              </button>
-              <button className={styles.exampleBtn} onClick={() => loadExample('increase15')}>
-                <div className={styles.exampleTitle}>Aumento 15%</div>
-                <div className={styles.exampleDesc}>Sueldo: 1.500€</div>
+            {/* Historial */}
+            <div className={styles.historySection}>
+              <h4>Historial de cálculos</h4>
+              <div className={styles.historyList}>
+                {history.length === 0 ? (
+                  <div
+                    style={{
+                      padding: 'var(--spacing-md)',
+                      textAlign: 'center',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
+                    No hay cálculos aún
+                  </div>
+                ) : (
+                  history.map((item, index) => (
+                    <div key={index} className={styles.historyItem}>
+                      <div className={styles.historyCalculation}>{item.calculation}</div>
+                      <div className={styles.historyResult}>{item.result}</div>
+                      <small>{item.timestamp}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+              <button className={styles.clearHistory} onClick={clearHistory}>
+                Limpiar historial
               </button>
             </div>
           </div>
         </div>
 
-        {/* Panel de visualización */}
-        <div className={styles.visualizationPanel}>
-          <h3>Visualización</h3>
-          <div className={styles.chartContainer}>
-            <canvas ref={chartRef}></canvas>
-          </div>
+        {/* Secciones educativas */}
+        <div className={styles.meskeiaeduSection}>
+          <h2>¿Cómo usar la calculadora de porcentajes?</h2>
+          <p>
+            Esta herramienta te permite realizar todo tipo de cálculos con porcentajes de forma
+            rápida y precisa. Aquí te explicamos las funcionalidades principales:
+          </p>
+          <ul>
+            <li>
+              <strong>Cálculo básico:</strong> Calcula el X% de cualquier cantidad o determina qué
+              porcentaje representa una parte del total
+            </li>
+            <li>
+              <strong>Cambios porcentuales:</strong> Calcula aumentos o reducciones porcentuales
+              entre dos valores
+            </li>
+            <li>
+              <strong>IVA español:</strong> Calcula el IVA (21%, 10% o 4%) o extrae el precio base
+              sin IVA
+            </li>
+            <li>
+              <strong>Propinas:</strong> Calcula propinas según el nivel de servicio recibido
+            </li>
+          </ul>
+        </div>
 
-          {/* Historial */}
-          <div className={styles.historySection}>
-            <h4>Historial de cálculos</h4>
-            <div className={styles.historyList}>
-              {calculationHistory.length === 0 ? (
-                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#999' }}>
-                  No hay cálculos aún
-                </div>
-              ) : (
-                calculationHistory.map((item, index) => (
-                  <div key={index} className={styles.historyItem}>
-                    <div>
-                      <strong>{item.result}</strong><br />
-                      <small>{item.calculation}</small>
-                    </div>
-                    <small>{item.timestamp}</small>
-                  </div>
-                ))
-              )}
-            </div>
-            <button className={styles.clearHistory} onClick={clearHistory}>Limpiar historial</button>
-          </div>
+        <div className={styles.meskeiauSection}>
+          <h2>Ejemplos prácticos de uso</h2>
+          <p>Algunos casos donde esta calculadora resulta muy útil:</p>
+          <ul>
+            <li>
+              <strong>Compras:</strong> Calcular descuentos en rebajas (p.ej., 30% de descuento en
+              150€)
+            </li>
+            <li>
+              <strong>Finanzas personales:</strong> Determinar aumentos salariales o reducciones de
+              gastos
+            </li>
+            <li>
+              <strong>Negocios:</strong> Calcular márgenes de beneficio, comisiones o impuestos
+            </li>
+            <li>
+              <strong>Restaurantes:</strong> Calcular propinas apropiadas según la calidad del
+              servicio
+            </li>
+          </ul>
         </div>
       </div>
 
       {/* Footer meskeIA Unificado */}
-      <footer className={styles.footer}>
-        <div className={styles.footerTop}>
-          <span>💡 ¿Te resultó útil?</span>
-          <button type="button" onClick={() => {
-            if (navigator.share) {
-              navigator.share({
-                title: 'Calculadora de Porcentajes - meskeIA',
-                text: '¡Mira esta herramienta útil de meskeIA!',
-                url: window.location.href
-              })
-            } else {
-              navigator.clipboard.writeText(window.location.href)
-              alert('✅ Enlace copiado al portapapeles')
-            }
-          }}>
-            🔗 Compártela
-          </button>
-        </div>
-        <div className={styles.footerBottom}>
-          © 2025 meskeIA
-        </div>
-      </footer>
-    </div>
+      <Footer appName="Calculadora de Porcentajes" />
+    </>
   )
 }

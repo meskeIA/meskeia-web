@@ -1,8 +1,0 @@
-Reemplazar líneas 344-356 con:
-      {/* Logo meskeIA */}
-      <div className={styles.meskeiaLogoContainer} onClick={() => window.location.href = '/'}>
-        <div className={styles.meskeiaLogoIcon}></div>
-        <div className={styles.meskeiaLogoText}>
-          <span className={styles.meske}>meske</span><span className={styles.ia}>IA</span>
-        </div>
-      </div>

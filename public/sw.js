@@ -7,9 +7,11 @@ const STATIC_CACHE = 'meskeia-static-v1';
 // Archivos estáticos para cachear
 const STATIC_FILES = [
   '/',
+  '/offline.html',
   '/manifest.json',
   '/icon-192x192.png',
   '/icon-512x512.png',
+  '/icon_meskeia.png',
 ];
 
 // Instalación del Service Worker
@@ -78,7 +80,12 @@ self.addEventListener('fetch', (event) => {
             return cachedResponse;
           }
 
-          // Si no está en caché, retornar página offline básica
+          // Si es una navegación (HTML), mostrar página offline
+          if (request.headers.get('accept').includes('text/html')) {
+            return caches.match('/offline.html');
+          }
+
+          // Para otros recursos, intentar la página principal
           return caches.match('/');
         });
       })

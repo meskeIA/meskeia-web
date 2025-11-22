@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateCalculatorSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Propinas - Calcula la propina perfecta | meskeIA',
@@ -32,30 +33,22 @@ export const metadata: Metadata = {
   },
 };
 
-// Schema.org JSON-LD
-export const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
+// Schema.org JSON-LD con template reutilizable
+export const jsonLd = generateCalculatorSchema({
   name: 'Calculadora de Propinas',
   description:
-    'Calculadora online para calcular propinas automáticamente con diferentes porcentajes',
+    'Calculadora online gratuita para calcular propinas automáticamente con diferentes porcentajes. Divide la cuenta entre personas, selecciona país/contexto y guarda preferencias.',
   url: 'https://meskeia.com/calculadora-propinas/',
-  applicationCategory: 'UtilityApplication',
-  operatingSystem: 'Web Browser',
-  inLanguage: 'es-ES',
-  author: {
-    '@type': 'Organization',
-    name: 'meskeIA',
-  },
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'EUR',
-  },
-  featureList: [
-    'Cálculo automático de propinas',
-    'Múltiples porcentajes predefinidos',
-    'Funciona 100% offline',
-    'Sin registros ni publicidad',
+  calculationType: 'Propinas',
+  features: [
+    'Cálculo automático de propinas con múltiples porcentajes',
+    'Porcentajes predefinidos por país (España, USA, México, UK, Francia, Alemania, Japón)',
+    'División de cuenta entre múltiples personas',
+    'Porcentaje personalizado configurable',
+    'Guarda preferencias en el navegador',
+    'Funciona 100% offline (PWA)',
+    'Sin registros, sin publicidad, totalmente gratis',
+    'Formato español (números con coma decimal)',
+    'Responsive y optimizado para móviles',
   ],
-};
+});

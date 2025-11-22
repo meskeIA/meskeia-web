@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateGeneratorSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Contraseñas Seguras | meskeIA',
@@ -37,31 +38,26 @@ export const metadata: Metadata = {
   },
 };
 
-// Schema.org JSON-LD
-export const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
+// Schema.org JSON-LD con template reutilizable
+export const jsonLd = generateGeneratorSchema({
   name: 'Generador de Contraseñas Seguras',
   description:
-    'Generador de contraseñas ultra seguras con algoritmos criptográficos avanzados y opciones personalizables',
+    'Generador de contraseñas ultra seguras con algoritmos criptográficos avanzados (Web Crypto API). Personaliza longitud, tipos de caracteres, cantidad y genera contraseñas imposibles de descifrar. 100% privado (todo en tu navegador).',
   url: 'https://meskeia.com/generador-contrasenas/',
-  applicationCategory: 'SecurityApplication',
-  operatingSystem: 'Any',
-  browserRequirements: 'Requires JavaScript. Requires HTML5.',
-  inLanguage: 'es-ES',
-  author: {
-    '@type': 'Organization',
-    name: 'meskeIA',
-    url: 'https://meskeia.com',
-  },
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'EUR',
-  },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    ratingCount: '1250',
-  },
-};
+  generatorType: 'Contraseñas Seguras',
+  features: [
+    'Generación criptográfica con Web Crypto API (crypto.getRandomValues)',
+    'Longitud personalizable (8-128 caracteres)',
+    'Control de tipos: mayúsculas, minúsculas, números, símbolos',
+    'Generación múltiple (hasta 10 contraseñas simultáneas)',
+    'Análisis de fortaleza en tiempo real (débil, media, fuerte, muy fuerte)',
+    'Estimación de tiempo de hackeo',
+    'Copiado al portapapeles con un clic',
+    'Historial de contraseñas generadas',
+    '100% privado - todo se ejecuta en tu navegador',
+    'Sin almacenamiento en servidor',
+    'Sin registro ni publicidad',
+    'Funciona 100% offline (PWA)',
+    'Responsive y optimizado para móviles',
+  ],
+});
