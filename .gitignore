@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# documentación local (mantener en repo pero ignorar cambios frecuentes)
+# docs/ - Comentado para subir la primera vez, luego descomentar si quieres
+REORGANIZAR_DOCS.bat
