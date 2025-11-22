@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { generateBaseMetadata } from '@/lib/metadata';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -16,11 +16,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Viewport configuration (Next.js 16+)
+export const viewport: Viewport = {
+  themeColor: '#2E86AB',
+  width: 'device-width',
+  initialScale: 1,
+};
+
 // Metadata SEO optimizada con PWA
 export const metadata: Metadata = {
   ...generateBaseMetadata(),
   manifest: '/manifest.json',
-  themeColor: '#2E86AB',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

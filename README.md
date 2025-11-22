@@ -53,6 +53,9 @@ Genera archivos HTML estáticos en `out/`
 - `MIGRACION_CALCULADORA_PROPINAS.md` - Template paso a paso (checklist de 6 pasos)
 - `components/README_COMPONENTES.md` - Uso de componentes base
 
+### Deployment
+- `DEPLOYMENT_BETA.md` - Guía completa de deployment en /beta/ subdirectory
+
 ### Estado del Proyecto
 - `ESTADO_PROYECTO_COMPLETO.md` - Resumen ejecutivo + métricas + ROI
 

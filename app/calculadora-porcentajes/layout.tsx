@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: 'Calculadora de Porcentajes Avanzada - Cálculos con Visualización | meskeIA',
   description: '¿Necesitas calcular descuentos, IVA o cambios porcentuales? Calculadora de porcentajes con visualizaciones interactivas y ejemplos prácticos. Ideal para compras y finanzas.',
   keywords: 'calculadora porcentajes, descuentos, IVA España, propinas, cambio porcentual, incremento, reducción, cálculo porcentajes, matemáticas básicas, herramientas cálculo, meskeIA',
-  authors: [{ name: 'meskeIA', email: 'meskeia24@gmail.com' }],
+  authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',

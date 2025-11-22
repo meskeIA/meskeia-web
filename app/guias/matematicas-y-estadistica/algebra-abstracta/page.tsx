@@ -75,23 +75,23 @@ export default function GuiaPage() {
 <hr/>
 <h2 id="ejemplos">Ejemplos prácticos</h2>
 <h3 id="ejemplo-1-verificar-si-un-conjunto-forma-un-grupo">Ejemplo 1: Verificar si un conjunto forma un grupo</h3>
-<p><strong>Situación:</strong> Estás estudiando teoría de grupos y necesitas determinar si el conjunto Z₅ = {0, 1, 2, 3, 4} con la operación suma módulo 5 forma un grupo.</p>
+<p><strong>Situación:</strong> Estás estudiando teoría de grupos y necesitas determinar si el conjunto Z₅ = &#123;0, 1, 2, 3, 4&#125; con la operación suma módulo 5 forma un grupo.</p>
 <p><strong>Datos de entrada:</strong>
-- Conjunto: Z₅ = {0, 1, 2, 3, 4}
+- Conjunto: Z₅ = &#123;0, 1, 2, 3, 4&#125;
 - Operación: a ⊕ b = (a + b) mod 5
 - Necesitas verificar: cerradura, asociatividad, elemento identidad, elementos inversos</p>
 <p><strong>Resultado:</strong> Sí, (Z₅, ⊕) es un grupo abeliano de orden 5.</p>
 <p><strong>Interpretación:</strong> Compruebas que para cualquier par de elementos en Z₅, su suma módulo 5 permanece en Z₅ (cerradura), la suma es asociativa, el 0 actúa como identidad (0 ⊕ a = a para todo a), y cada elemento tiene un inverso único (por ejemplo, el inverso de 3 es 2 porque 3 ⊕ 2 = 0). Este ejemplo te muestra cómo los conceptos abstractos de grupo se aplican a estructuras numéricas concretas que usas en criptografía.</p>
 <h3 id="ejemplo-2-identificar-subestructuras-algebraicas">Ejemplo 2: Identificar subestructuras algebraicas</h3>
-<p><strong>Situación:</strong> Tienes el grupo multiplicativo de números complejos de módulo 1: U(1) = {e^(iθ) : θ ∈ ℝ}. Necesitas determinar si el conjunto de raíces n-ésimas de la unidad forma un subgrupo.</p>
+<p><strong>Situación:</strong> Tienes el grupo multiplicativo de números complejos de módulo 1: U(1) = &#123;e^(iθ) : θ ∈ ℝ&#125;. Necesitas determinar si el conjunto de raíces n-ésimas de la unidad forma un subgrupo.</p>
 <p><strong>Datos de entrada:</strong>
 - Grupo original: U(1) con multiplicación
-- Subconjunto propuesto: μₙ = {1, e^(2πi/n), e^(4πi/n), ..., e^(2πi(n-1)/n)}
+- Subconjunto propuesto: μₙ = &#123;1, e^(2πi/n), e^(4πi/n), ..., e^(2πi(n-1)/n)&#125;
 - Criterio: subgrupo no vacío es cerrado bajo la operación e incluye inversos</p>
 <p><strong>Resultado:</strong> Sí, μₙ es un subgrupo cíclico de orden n.</p>
 <p><strong>Interpretación:</strong> Comprendes que aunque U(1) es un grupo infinito, contiene subgrupos finitos (las raíces n-ésimas de la unidad). Este ejemplo ilustra cómo la estructura de anidación en álgebra abstracta funciona: tienes grandes estructuras que contienen subestructuras más pequeñas con propiedades interesantes.</p>
 <h3 id="ejemplo-3-aplicar-teoremas-fundamentales-a-anillos">Ejemplo 3: Aplicar teoremas fundamentales a anillos</h3>
-<p><strong>Situación:</strong> Estás estudiando anillos y necesitas analizar el conjunto Z[i] = {a + bi : a, b ∈ ℤ} (los enteros de Gauss) con suma y multiplicación usual.</p>
+<p><strong>Situación:</strong> Estás estudiando anillos y necesitas analizar el conjunto Z[i] = &#123;a + bi : a, b ∈ ℤ&#125; (los enteros de Gauss) con suma y multiplicación usual.</p>
 <p><strong>Datos de entrada:</strong>
 - Conjunto: Números de la forma a + bi donde a y b son enteros
 - Operaciones: Suma compleja y multiplicación compleja
