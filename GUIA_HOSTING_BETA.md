@@ -85,7 +85,10 @@ REORGANIZAR_DOCS.bat    # Scripts de desarrollo
 
 ## 🏗️ **PROCESO DE DEPLOYMENT**
 
-### Opción 1: Build + Upload (RECOMENDADO)
+⚠️ **IMPORTANTE**: Tu hosting usa **Static Export** (NO Node.js server).
+Ya tienes configurado `output: 'export'` en `next.config.ts` ✅
+
+### Opción 1: Static Export (TU CONFIGURACIÓN ACTUAL) ⭐ RECOMENDADO
 
 **1. En tu PC local:**
 ```bash
@@ -126,9 +129,9 @@ npm run start
 
 ---
 
-### Opción 2: Static Export (Si NO tienes Node.js en hosting)
+### Opción 2: Node.js Server (NO APLICABLE - Solo si cambias de hosting)
 
-Si tu hosting **NO soporta Node.js**, usa static export:
+Si en el futuro cambias a hosting con Node.js (VPS, Vercel, Netlify):
 
 **1. Modificar `next.config.ts`:**
 ```typescript
