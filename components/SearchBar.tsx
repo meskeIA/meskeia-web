@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Fuse from 'fuse.js';
+import type { FuseResult } from 'fuse.js';
 import { Application, applicationsDatabase } from '@/data/applications';
 import styles from './SearchBar.module.css';
 
 export default function SearchBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Fuse.FuseResult<Application>[]>([]);
+  const [results, setResults] = useState<FuseResult<Application>[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -135,7 +136,7 @@ export default function SearchBar() {
                 ref={searchInputRef}
                 type="text"
                 className={styles.searchInput}
-                placeholder="Buscar en 84 aplicaciones..."
+                placeholder="Buscar aplicaciones..."
                 value={query}
                 onChange={(e) => performSearch(e.target.value)}
                 onKeyDown={handleKeyDown}

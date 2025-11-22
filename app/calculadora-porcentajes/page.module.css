@@ -1,0 +1,579 @@
+/* Variables CSS globales (ya definidas en globals.css) */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 2rem;
+  padding-top: 80px;
+  min-height: 100vh;
+}
+
+/* Logo meskeIA */
+.meskeiaLogoContainer {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 8px 16px;
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.meskeiaLogoContainer:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+}
+
+.meskeiaLogoIcon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.meskeiaLogoIcon::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  top: 10px;
+  left: 10px;
+}
+
+.meskeiaLogoIcon::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #2E86AB;
+  border-radius: 50%;
+  top: 13px;
+  left: 13px;
+}
+
+/* Clases removidas - logo simplificado sin red neural */
+
+.meskeiaLogoText {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2C3E50;
+}
+
+.meske {
+  color: #2E86AB;
+}
+
+.ia {
+  color: #48A9A6;
+  font-weight: 700;
+  position: relative;
+}
+
+.ia::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #48A9A6, #7FB3D3);
+  border-radius: 1px;
+}
+
+/* Título principal */
+.pageTitle {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.pageTitle h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 1rem;
+}
+
+.pageSubtitle {
+  font-size: 1.2rem;
+  color: #666666;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Grid principal */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+/* Panel de calculadoras */
+.calculatorPanel {
+  background: #FFFFFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.calculatorTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.tabBtn {
+  background: none;
+  border: none;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #666666;
+}
+
+.tabBtn.active {
+  background: #2E86AB;
+  color: white;
+}
+
+.tabBtn:hover:not(.active) {
+  background: #F5F5F5;
+  color: #2E86AB;
+}
+
+.tabContent {
+  display: block;
+}
+
+/* Formularios de cálculo */
+.calcForm {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-weight: 500;
+  color: #1A1A1A;
+  font-size: 0.9rem;
+}
+
+.inputRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+.inputField {
+  padding: 1rem;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+  background: #FFFFFF;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: #2E86AB;
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.1);
+}
+
+.unitLabel {
+  background: #F5F5F5;
+  padding: 1rem;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #666666;
+  min-width: 50px;
+  text-align: center;
+}
+
+.calcBtn {
+  background: #2E86AB;
+  color: white;
+  border: none;
+  padding: 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calcBtn:hover {
+  background: #246b8a;
+  transform: translateY(-1px);
+}
+
+.calcBtn:disabled {
+  background: #999999;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Resultado */
+.resultSection {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #F5F5F5;
+  border-radius: 8px;
+  border: 1px solid #E5E5E5;
+}
+
+.resultMain {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #2E86AB;
+  margin-bottom: 1rem;
+}
+
+.resultExplanation {
+  color: #666666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Panel de visualización */
+.visualizationPanel {
+  background: #FFFFFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.visualizationPanel h3 {
+  margin-bottom: 1.5rem;
+  color: #1A1A1A;
+  text-align: center;
+}
+
+.chartContainer {
+  position: relative;
+  height: 300px;
+  margin-bottom: 2rem;
+}
+
+/* Ejemplos predefinidos */
+.examplesSection {
+  margin-top: 2rem;
+}
+
+.examplesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.exampleBtn {
+  background: #FFFFFF;
+  border: 1px solid #E5E5E5;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.exampleBtn:hover {
+  border-color: #2E86AB;
+  background: #F5F5F5;
+}
+
+.exampleTitle {
+  font-weight: 500;
+  color: #1A1A1A;
+  font-size: 0.9rem;
+}
+
+.exampleDesc {
+  font-size: 0.8rem;
+  color: #666666;
+}
+
+/* Historial */
+.historySection {
+  margin-top: 2rem;
+}
+
+.historyList {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  background: #FFFFFF;
+}
+
+.historyItem {
+  padding: 1rem;
+  border-bottom: 1px solid #E5E5E5;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.historyItem:last-child {
+  border-bottom: none;
+}
+
+.historyItem:hover {
+  background: #F5F5F5;
+}
+
+.clearHistory {
+  background: #F44336;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+/* Footer */
+.footer {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 8px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: 0.9rem;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.footerTop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: #2E86AB;
+}
+
+.footerTop button {
+  background: none;
+  border: none;
+  color: #2E86AB;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.footerTop button:hover {
+  opacity: 0.7;
+}
+
+.footerBottom {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .calculatorTabs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .pageTitle h1 {
+    font-size: 2rem;
+  }
+
+  .examplesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .container {
+    padding: 1.5rem 1rem;
+    padding-top: 70px;
+  }
+
+  .calculatorPanel,
+  .visualizationPanel {
+    padding: 1.5rem;
+  }
+
+  .inputRow {
+    gap: 0.5rem;
+  }
+
+  .inputField {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .unitLabel {
+    min-width: 40px;
+    padding: 0.5rem;
+  }
+
+  .tabBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .chartContainer {
+    height: 250px;
+  }
+
+  .historyList {
+    max-height: 150px;
+  }
+
+  .meskeiaLogoContainer {
+    top: 10px;
+    left: 10px;
+    padding: 6px 12px;
+    gap: 8px;
+  }
+
+  .meskeiaLogoIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .meskeiaLogoIcon::before {
+    width: 9px;
+    height: 9px;
+    top: 7.5px;
+    left: 7.5px;
+  }
+
+  .meskeiaLogoIcon::after {
+    width: 4px;
+    height: 4px;
+    top: 10px;
+    left: 10px;
+  }
+
+  .meskeiaLogoText {
+    font-size: 1rem;
+  }
+
+  .footer {
+    bottom: 5px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    padding: 5px 12px;
+    white-space: normal;
+    max-width: calc(100vw - 20px);
+  }
+
+  .footerTop {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .footerTop span,
+  .footerTop button {
+    font-size: 0.8rem;
+  }
+
+  .footerBottom {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .container {
+    padding: 1rem 0.5rem;
+  }
+
+  .calculatorPanel,
+  .visualizationPanel {
+    padding: 1rem;
+  }
+
+  .pageTitle h1 {
+    font-size: 1.8rem;
+  }
+
+  .pageSubtitle {
+    font-size: 1rem;
+  }
+
+  .tabBtn {
+    font-size: 0.75rem;
+    padding: 6px 4px;
+  }
+
+  .inputRow {
+    gap: 4px;
+  }
+
+  .inputField,
+  .unitLabel {
+    font-size: 0.9rem;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.calculatorPanel,
+.visualizationPanel {
+  animation: fadeInUp 0.4s ease forwards;
+}

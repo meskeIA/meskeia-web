@@ -7,16 +7,17 @@
   z-index: 1000;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(46, 134, 171, 0.2);
   border-radius: 12px;
-  padding: 8px 16px;
+  padding: 10px 20px;
   box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .logoContainer:hover {
@@ -25,10 +26,10 @@
 }
 
 .logoIcon {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
-  border-radius: 8px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,23 +40,23 @@
 .logoIcon::before {
   content: '';
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 15px;
+  height: 15px;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
-  top: 10px;
-  left: 10px;
+  top: 12.5px;
+  left: 12.5px;
 }
 
 .logoIcon::after {
   content: '';
   position: absolute;
-  width: 6px;
-  height: 6px;
+  width: 7.5px;
+  height: 7.5px;
   background: #2E86AB;
   border-radius: 50%;
-  top: 13px;
-  left: 13px;
+  top: 16.25px;
+  left: 16.25px;
 }
 
 .neuralNetwork {
@@ -67,34 +68,34 @@
 
 .neuralDot {
   position: absolute;
-  width: 2px;
-  height: 2px;
+  width: 2.5px;
+  height: 2.5px;
   background: white;
   border-radius: 50%;
 }
 
 .neuralDot:nth-child(1) {
-  top: 4px;
-  left: 6px;
+  top: 5px;
+  left: 7px;
 }
 
 .neuralDot:nth-child(2) {
-  top: 8px;
-  right: 5px;
+  top: 10px;
+  right: 6px;
 }
 
 .neuralDot:nth-child(3) {
-  bottom: 6px;
-  left: 4px;
+  bottom: 8px;
+  left: 5px;
 }
 
 .neuralDot:nth-child(4) {
-  bottom: 4px;
-  right: 8px;
+  bottom: 5px;
+  right: 10px;
 }
 
 .logoText {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 600;
   color: #2C3E50;
 }

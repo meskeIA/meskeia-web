@@ -1,0 +1,175 @@
+/* Páginas Legales - CSS Module compartido */
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 120px 2rem 80px;
+}
+
+.legalDocument {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 3rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.documentHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.documentTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.lastUpdated {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Tipografía */
+.legalDocument h2 {
+  font-size: 1.8rem;
+  color: var(--primary);
+  margin: 2.5rem 0 1.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.legalDocument h3 {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin: 2rem 0 1rem 0;
+  font-weight: 600;
+}
+
+.legalDocument h4 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.legalDocument p {
+  margin-bottom: 1rem;
+  text-align: justify;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.legalDocument ul,
+.legalDocument ol {
+  margin: 1rem 0 1.5rem 2rem;
+  color: var(--text-secondary);
+}
+
+.legalDocument li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.legalDocument strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Tabla de derechos */
+.rightsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.rightsTable th {
+  background: var(--primary);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.rightsTable td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.rightsTable tr:last-child td {
+  border-bottom: none;
+}
+
+.rightsTable tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+/* Contacto */
+.contactInfo {
+  background: var(--hover);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.contactInfo p {
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.contactInfo p:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 100px 1rem 60px;
+  }
+
+  .legalDocument {
+    padding: 2rem 1.5rem;
+  }
+
+  .documentTitle {
+    font-size: 2rem;
+  }
+
+  .legalDocument h2 {
+    font-size: 1.5rem;
+  }
+
+  .legalDocument h3 {
+    font-size: 1.2rem;
+  }
+
+  .legalDocument h4 {
+    font-size: 1rem;
+  }
+
+  .rightsTable {
+    font-size: 0.9rem;
+  }
+
+  .rightsTable th,
+  .rightsTable td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .legalDocument ul,
+  .legalDocument ol {
+    margin-left: 1.25rem;
+  }
+}

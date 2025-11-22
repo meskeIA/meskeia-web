@@ -1,0 +1,72 @@
+/* Header Actions - SearchBar + Botón Guías */
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.searchWrapper {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.guidesButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.1);
+}
+
+.guidesButton:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.2);
+}
+
+.guidesIcon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.guidesText {
+  font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .headerActions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .searchWrapper {
+    width: 100%;
+  }
+
+  .guidesButton {
+    width: 100%;
+    justify-content: center;
+    padding: 0.875rem 1.5rem;
+  }
+
+  .guidesIcon {
+    font-size: 1.1rem;
+  }
+
+  .guidesText {
+    font-size: 0.9rem;
+  }
+}

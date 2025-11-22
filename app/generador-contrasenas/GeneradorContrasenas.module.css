@@ -1,0 +1,581 @@
+/* Generador de Contraseñas - Estilos con Dark Mode */
+
+.container {
+  max-width: 800px;
+  margin: 80px auto 100px;
+  padding: 20px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Sección de configuración */
+.configSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.configSection h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.lengthControl {
+  margin-bottom: 25px;
+}
+
+.lengthControl label {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.lengthInput {
+  width: 100%;
+  max-width: 200px;
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+  text-align: center;
+}
+
+.lengthInput:focus {
+  border-color: var(--primary);
+}
+
+.lengthHint {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+/* Botón principal de generar contraseña */
+.generateBtn {
+  width: 100%;
+  padding: 20px 40px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 20px;
+}
+
+.generateBtn:hover {
+  background: var(--secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+.generateBtn:active {
+  transform: translateY(0);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.checkboxLabel:hover {
+  background: var(--hover);
+}
+
+.checkboxLabel input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+/* Sección de contraseña generada */
+.passwordSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.passwordDisplay {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.passwordInput {
+  flex: 1;
+  padding: 16px 20px;
+  font-size: 1.2rem;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.passwordInput:focus {
+  border-color: var(--primary);
+}
+
+.generateButton,
+.copyButton {
+  padding: 18px 32px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.generateButton {
+  background: var(--primary);
+  color: white;
+  min-width: 180px;
+  padding: 20px 40px;
+  font-size: 1.15rem;
+}
+
+.generateButton:hover {
+  background: var(--secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+.copyButton {
+  background: var(--secondary);
+  color: white;
+  min-width: 120px;
+}
+
+.copyButton:hover {
+  background: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(72, 169, 166, 0.3);
+}
+
+.copyButton:disabled {
+  background: var(--border);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Medidor de fortaleza */
+.strengthMeter {
+  margin-bottom: 15px;
+}
+
+.strengthMeter label {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.strengthBar {
+  width: 100%;
+  height: 12px;
+  background: var(--hover);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.strengthFill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strengthText {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Sección de consejos */
+.tipsSection {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05), rgba(72, 169, 166, 0.05));
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.tipsSection h3 {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tipsSection ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tipsSection li {
+  padding: 10px 0;
+  color: var(--text-primary);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.tipsSection li::before {
+  content: '✓';
+  color: var(--secondary);
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* Sección de historial */
+.historySection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.historySection h3 {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.historyList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.historyItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: background 0.2s;
+}
+
+.historyItem:hover {
+  background: var(--hover);
+}
+
+.historyPassword {
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 15px;
+}
+
+.historyTime {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.emptyHistory {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  padding: 20px;
+}
+
+/* Sección informativa SEO */
+.infoSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.infoSection h2 {
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.infoSection h3 {
+  font-size: 1.4rem;
+  color: var(--primary);
+  margin-top: 25px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.infoSection p {
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.infoSection ul {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0;
+}
+
+.infoSection li {
+  padding: 8px 0;
+  color: var(--text-primary);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.infoSection li::before {
+  content: '▸';
+  color: var(--primary);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Sección FAQ */
+.faqSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.faqSection h2 {
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.faqItem {
+  margin-bottom: 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.faqQuestion {
+  background: var(--bg-primary);
+  padding: 18px 20px;
+  cursor: pointer;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.faqQuestion:hover {
+  background: var(--hover);
+}
+
+.faqIcon {
+  font-size: 1.2rem;
+  color: var(--primary);
+  transition: transform 0.3s ease;
+}
+
+.faqIcon.open {
+  transform: rotate(180deg);
+}
+
+.faqAnswer {
+  padding: 18px 20px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+}
+
+/* Toast de notificación */
+.toast {
+  position: fixed;
+  bottom: 60px;
+  right: 20px;
+  background: var(--primary);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive - Móvil */
+@media (max-width: 768px) {
+  .container {
+    margin: 60px auto 80px;
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .configSection,
+  .passwordSection,
+  .historySection,
+  .infoSection,
+  .faqSection {
+    padding: 20px;
+  }
+
+  .optionsGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .passwordDisplay {
+    flex-direction: column;
+  }
+
+  .passwordInput {
+    font-size: 1rem;
+    padding: 14px 16px;
+  }
+
+  .generateButton,
+  .copyButton {
+    width: 100%;
+    padding: 18px 24px;
+    font-size: 1.05rem;
+  }
+
+  .generateButton {
+    padding: 20px 28px;
+    font-size: 1.1rem;
+  }
+
+  .historyItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .historyPassword {
+    margin-right: 0;
+  }
+
+  .infoSection h2 {
+    font-size: 1.5rem;
+  }
+
+  .infoSection h3 {
+    font-size: 1.2rem;
+  }
+
+  .faqSection h2 {
+    font-size: 1.5rem;
+  }
+
+  .faqQuestion {
+    font-size: 1rem;
+    padding: 15px;
+  }
+
+  .faqAnswer {
+    padding: 15px;
+    font-size: 0.9rem;
+  }
+
+  .toast {
+    bottom: 70px;
+    right: 10px;
+    left: 10px;
+    text-align: center;
+  }
+}

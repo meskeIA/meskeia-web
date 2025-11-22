@@ -1,0 +1,106 @@
+/* Info Boxes para páginas legales */
+
+/* Success Box */
+.successBox {
+  background: #F7FEF8;
+  border: 1px solid var(--border);
+  border-left: 3px solid #059669;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.successTitle {
+  font-weight: 600;
+  color: #059669;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Info Box */
+.infoBox {
+  background: #F8FAFC;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.infoTitle {
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Warning Box */
+.warningBox {
+  background: #FFFEF7;
+  border: 1px solid var(--border);
+  border-left: 3px solid #D97706;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.warningTitle {
+  font-weight: 600;
+  color: #D97706;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Medical Box */
+.medicalBox {
+  background: #FEF7F7;
+  border: 1px solid var(--border);
+  border-left: 4px solid #DC2626;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.medicalTitle {
+  font-weight: 600;
+  color: #DC2626;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+}
+
+/* Content */
+.boxContent {
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.boxContent p {
+  margin-bottom: 0.75rem;
+}
+
+.boxContent p:last-child {
+  margin-bottom: 0;
+}
+
+.boxContent ul {
+  margin: 0.75rem 0 0.75rem 1.5rem;
+}
+
+.boxContent li {
+  margin-bottom: 0.5rem;
+}
+
+.boxContent h3,
+.boxContent h4 {
+  color: var(--text-primary);
+  margin: 1rem 0 0.5rem 0;
+}

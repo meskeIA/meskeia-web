@@ -1,0 +1,244 @@
+/* Contenedor principal */
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* Labels */
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+/* Inputs */
+.input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--focus);
+}
+
+.select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--focus);
+}
+
+.select:hover {
+  border-color: var(--secondary);
+}
+
+/* Botones de porcentaje */
+.porcentajes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.btnPorcentaje {
+  padding: 10px;
+  border: 2px solid var(--border);
+  background: var(--bg-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btnPorcentaje:hover {
+  border-color: var(--secondary);
+  background: var(--hover);
+}
+
+.btnPorcentaje.activo {
+  background: var(--secondary);
+  color: white;
+  border-color: var(--secondary);
+}
+
+/* Resultados */
+.resultados {
+  background: var(--focus);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.resultadoItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.resultadoItem:last-child {
+  margin-bottom: 0;
+}
+
+.resultadoTotal {
+  border-top: 2px solid var(--primary);
+  padding-top: 12px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+.resultadoPersona {
+  border-top: 2px dashed var(--secondary);
+  padding-top: 12px;
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--secondary);
+}
+
+.etiqueta {
+  color: var(--text-secondary);
+}
+
+.valor {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* Secciones educativas */
+.eduSection {
+  max-width: 800px;
+  margin: 3rem auto 2rem;
+  padding: 2rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.1);
+  line-height: 1.6;
+}
+
+.eduSection h2 {
+  color: var(--primary);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--secondary);
+  padding-bottom: 0.5rem;
+}
+
+.eduSection p {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.eduSection ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.eduSection li {
+  padding: 0.75rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  color: var(--text-primary);
+}
+
+.eduSection li:before {
+  content: '→';
+  color: var(--secondary);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.eduSection strong {
+  color: var(--primary);
+}
+
+/* Responsive móvil */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .porcentajes {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .btnPorcentaje {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+
+  .input,
+  .select {
+    padding: 14px;
+    font-size: 16px; /* Previene zoom en iOS */
+  }
+
+  .resultadoItem {
+    font-size: 0.9rem;
+  }
+
+  .resultadoPersona {
+    font-size: 1rem;
+  }
+
+  .eduSection {
+    padding: 1.5rem;
+  }
+
+  .eduSection h2 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    max-width: 90%;
+  }
+}

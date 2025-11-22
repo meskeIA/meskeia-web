@@ -5,12 +5,15 @@
  * Compatible con diseño meskeIA
  */
 
+'use client';
+
 import React from 'react';
+import Link from 'next/link';
 import styles from './MeskeiaLogo.module.css';
 
 export default function MeskeiaLogo() {
   return (
-    <div className={styles.logoContainer} onClick={() => window.location.href = '/'}>
+    <Link href="/" className={styles.logoContainer}>
       <div className={styles.logoIcon}>
         <div className={styles.neuralNetwork}>
           <div className={styles.neuralDot}></div>
@@ -23,6 +26,6 @@ export default function MeskeiaLogo() {
         <span className={styles.meske}>meske</span>
         <span className={styles.ia}>IA</span>
       </div>
-    </div>
+    </Link>
   );
 }
