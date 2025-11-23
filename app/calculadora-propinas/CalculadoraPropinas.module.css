@@ -197,6 +197,70 @@
   color: var(--primary);
 }
 
+/* Botones */
+.btnSecondary {
+  padding: 14px 28px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.btnSecondary:hover {
+  background: var(--hover);
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+/* Toggle de contenido educativo */
+.educationalToggle {
+  text-align: center;
+  margin: 40px auto;
+  margin-bottom: 20px;
+  padding: 30px;
+  background: var(--hover);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  max-width: 800px;
+}
+
+.educationalToggle h3 {
+  color: var(--primary);
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.educationalSubtitle {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+/* Contenido educativo con animación */
+.educationalContent {
+  margin-top: 30px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Responsive móvil */
 @media (max-width: 768px) {
   .container {
@@ -233,6 +297,19 @@
 
   .eduSection h2 {
     font-size: 1.3rem;
+  }
+
+  .educationalToggle {
+    padding: 20px 15px;
+    margin: 20px 10px;
+  }
+
+  .educationalToggle h3 {
+    font-size: 1.3rem;
+  }
+
+  .educationalSubtitle {
+    font-size: 0.95rem;
   }
 }
 

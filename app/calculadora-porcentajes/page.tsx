@@ -45,6 +45,7 @@ export default function CalculadoraPorcentajes() {
   const [history, setHistory] = useState<CalculationHistory[]>([])
   const [chartData, setChartData] = useState<any>(null)
   const [chartType, setChartType] = useState<'bar' | 'doughnut'>('doughnut')
+  const [showEducationalContent, setShowEducationalContent] = useState<boolean>(false)
 
   // Estados para inputs de cada calculadora
   const [basicPercent, setBasicPercent] = useState('')
@@ -799,53 +800,73 @@ export default function CalculadoraPorcentajes() {
           </div>
         </div>
 
-        {/* Secciones educativas */}
-        <div className={styles.meskeiaeduSection}>
-          <h2>¿Cómo usar la calculadora de porcentajes?</h2>
-          <p>
-            Esta herramienta te permite realizar todo tipo de cálculos con porcentajes de forma
-            rápida y precisa. Aquí te explicamos las funcionalidades principales:
+        {/* Toggle de Contenido Educativo */}
+        <div className={styles.educationalToggle}>
+          <h3>📚 ¿Quieres aprender más sobre Cálculos de Porcentajes?</h3>
+          <p className={styles.educationalSubtitle}>
+            Descubre cómo usar la calculadora, ejemplos prácticos, casos de uso y consejos para sacar el máximo provecho
           </p>
-          <ul>
-            <li>
-              <strong>Cálculo básico:</strong> Calcula el X% de cualquier cantidad o determina qué
-              porcentaje representa una parte del total
-            </li>
-            <li>
-              <strong>Cambios porcentuales:</strong> Calcula aumentos o reducciones porcentuales
-              entre dos valores
-            </li>
-            <li>
-              <strong>IVA español:</strong> Calcula el IVA (21%, 10% o 4%) o extrae el precio base
-              sin IVA
-            </li>
-            <li>
-              <strong>Propinas:</strong> Calcula propinas según el nivel de servicio recibido
-            </li>
-          </ul>
+          <button
+            type="button"
+            onClick={() => setShowEducationalContent(!showEducationalContent)}
+            className={styles.btnSecondary}
+          >
+            {showEducationalContent ? '⬆️ Ocultar Guía Educativa' : '⬇️ Ver Guía Completa'}
+          </button>
         </div>
 
-        <div className={styles.meskeiauSection}>
-          <h2>Ejemplos prácticos de uso</h2>
-          <p>Algunos casos donde esta calculadora resulta muy útil:</p>
-          <ul>
-            <li>
-              <strong>Compras:</strong> Calcular descuentos en rebajas (p.ej., 30% de descuento en
-              150€)
-            </li>
-            <li>
-              <strong>Finanzas personales:</strong> Determinar aumentos salariales o reducciones de
-              gastos
-            </li>
-            <li>
-              <strong>Negocios:</strong> Calcular márgenes de beneficio, comisiones o impuestos
-            </li>
-            <li>
-              <strong>Restaurantes:</strong> Calcular propinas apropiadas según la calidad del
-              servicio
-            </li>
-          </ul>
-        </div>
+        {/* Contenido educativo colapsable */}
+        {showEducationalContent && (
+          <div className={styles.educationalContent}>
+            {/* Secciones educativas */}
+            <div className={styles.meskeiaeduSection}>
+              <h2>¿Cómo usar la calculadora de porcentajes?</h2>
+              <p>
+                Esta herramienta te permite realizar todo tipo de cálculos con porcentajes de forma
+                rápida y precisa. Aquí te explicamos las funcionalidades principales:
+              </p>
+              <ul>
+                <li>
+                  <strong>Cálculo básico:</strong> Calcula el X% de cualquier cantidad o determina qué
+                  porcentaje representa una parte del total
+                </li>
+                <li>
+                  <strong>Cambios porcentuales:</strong> Calcula aumentos o reducciones porcentuales
+                  entre dos valores
+                </li>
+                <li>
+                  <strong>IVA español:</strong> Calcula el IVA (21%, 10% o 4%) o extrae el precio base
+                  sin IVA
+                </li>
+                <li>
+                  <strong>Propinas:</strong> Calcula propinas según el nivel de servicio recibido
+                </li>
+              </ul>
+            </div>
+
+            <div className={styles.meskeiaeduSection}>
+              <h2>Ejemplos prácticos de uso</h2>
+              <p>Algunos casos donde esta calculadora resulta muy útil:</p>
+              <ul>
+                <li>
+                  <strong>Compras:</strong> Calcular descuentos en rebajas (p.ej., 30% de descuento en
+                  150€)
+                </li>
+                <li>
+                  <strong>Finanzas personales:</strong> Determinar aumentos salariales o reducciones de
+                  gastos
+                </li>
+                <li>
+                  <strong>Negocios:</strong> Calcular márgenes de beneficio, comisiones o impuestos
+                </li>
+                <li>
+                  <strong>Restaurantes:</strong> Calcular propinas apropiadas según la calidad del
+                  servicio
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer meskeIA Unificado */}

@@ -33,6 +33,7 @@ export default function GeneradorContrasenas() {
   });
   const [history, setHistory] = useState<PasswordHistory[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [showEducationalContent, setShowEducationalContent] = useState<boolean>(false);
 
   // Cargar historial del localStorage al montar
   useEffect(() => {
@@ -401,166 +402,145 @@ export default function GeneradorContrasenas() {
           </section>
         )}
 
-        {/* Información SEO */}
-        <section className={styles.infoSection}>
-          <h2 className={styles.sectionTitle}>¿Por qué usar un generador de contraseñas?</h2>
-          <p className={styles.infoParagraph}>
-            En la era digital, proteger tus cuentas con <strong>contraseñas seguras</strong> es fundamental.
-            Nuestro generador utiliza algoritmos criptográficos avanzados (crypto.getRandomValues()) para crear
-            contraseñas verdaderamente aleatorias que son prácticamente imposibles de descifrar mediante ataques
-            de fuerza bruta o diccionario.
+        {/* Toggle de Contenido Educativo */}
+        <div className={styles.educationalToggle}>
+          <h3>📚 ¿Quieres aprender más sobre Seguridad de Contraseñas?</h3>
+          <p className={styles.educationalSubtitle}>
+            Descubre por qué necesitas contraseñas ultra seguras, características de criptografía avanzada, gestores de contraseñas recomendados y respuestas a preguntas frecuentes
           </p>
-          <p className={styles.infoParagraph}>
-            A diferencia de las contraseñas creadas manualmente, que suelen contener patrones predecibles basados
-            en información personal, nuestras contraseñas generadas son <strong>100% aleatorias</strong> y no tienen
-            conexión con tu identidad, garantizando máxima seguridad para tus datos personales y financieros.
-          </p>
+          <button
+            type="button"
+            onClick={() => setShowEducationalContent(!showEducationalContent)}
+            className={styles.btnSecondary}
+          >
+            {showEducationalContent ? '⬆️ Ocultar Guía Educativa' : '⬇️ Ver Guía Completa'}
+          </button>
+        </div>
 
-          <h3 className={styles.subsectionTitle}>Características de nuestro generador</h3>
-          <ul className={styles.featuresList}>
-            <li><strong>Seguridad de nivel militar:</strong> Usa crypto.getRandomValues(), el mismo estándar utilizado en aplicaciones bancarias y gubernamentales</li>
-            <li><strong>Totalmente personalizable:</strong> Ajusta longitud, tipo de caracteres y complejidad según tus necesidades</li>
-            <li><strong>Evaluación en tiempo real:</strong> Medidor visual que muestra la fortaleza de cada contraseña generada</li>
-            <li><strong>Historial local:</strong> Guarda tus últimas 10 contraseñas de forma segura en tu navegador (no se envían a ningún servidor)</li>
-            <li><strong>Copia rápida:</strong> Un clic para copiar al portapapeles y usar inmediatamente</li>
-            <li><strong>100% privado:</strong> Todo el proceso ocurre en tu navegador, sin enviar datos a servidores externos</li>
-          </ul>
-
-          <h3 className={styles.subsectionTitle}>¿Qué hace a una contraseña realmente segura?</h3>
-          <p className={styles.infoParagraph}>
-            Una contraseña fuerte debe cumplir estos criterios:
-          </p>
-          <ul className={styles.criteriaList}>
-            <li><strong>Longitud mínima de 12 caracteres:</strong> Cada carácter adicional aumenta exponencialmente la dificultad de descifrado</li>
-            <li><strong>Combinación de tipos de caracteres:</strong> Mayúsculas, minúsculas, números y símbolos crean billones de combinaciones posibles</li>
-            <li><strong>Sin patrones predecibles:</strong> Evita secuencias como "123", "abc" o palabras del diccionario</li>
-            <li><strong>Única para cada cuenta:</strong> Reutilizar contraseñas pone en riesgo todas tus cuentas si una se ve comprometida</li>
-            <li><strong>Actualizada regularmente:</strong> Cambiar contraseñas cada 3-6 meses reduce el riesgo de brechas de seguridad antiguas</li>
-          </ul>
-
-          <h3 className={styles.subsectionTitle}>Gestores de contraseñas recomendados</h3>
-          <p className={styles.infoParagraph}>
-            Para recordar contraseñas complejas sin comprometer la seguridad, considera usar un gestor de contraseñas:
-          </p>
-          <ul className={styles.managersList}>
-            <li><strong>Bitwarden:</strong> Código abierto, gratuito y con opciones de auto-hospedaje</li>
-            <li><strong>1Password:</strong> Interfaz intuitiva y compartición segura para familias y equipos</li>
-            <li><strong>KeePass:</strong> Solución offline para máxima privacidad y control total</li>
-            <li><strong>LastPass:</strong> Sincronización multiplataforma y autocompletado inteligente</li>
-          </ul>
-        </section>
-
-        {/* FAQ */}
-        <section className={styles.faqSection}>
-          <h2 className={styles.sectionTitle}>❓ Preguntas Frecuentes</h2>
-
-          <details className={styles.faqItem}>
-            <summary className={styles.faqQuestion}>
-              ¿Es seguro generar contraseñas en línea?
-            </summary>
-            <div className={styles.faqAnswer}>
+        {/* Contenido Educativo Colapsable */}
+        {showEducationalContent && (
+          <div className={styles.educationalContent}>
+            {/* Sección 1: ¿Por qué necesitas contraseñas ultra seguras? */}
+            <section className={styles.securityGuide}>
+              <h2>🔐 ¿Por qué necesitas contraseñas ultra seguras?</h2>
               <p>
-                <strong>Sí, es completamente seguro.</strong> Nuestra herramienta funciona 100% en tu navegador
-                usando JavaScript local. Ninguna contraseña generada se envía a nuestros servidores ni a terceros.
-                El proceso utiliza crypto.getRandomValues(), una API criptográfica del navegador que garantiza
-                aleatoriedad verdadera sin depender de conexiones externas.
+                En 2025, la ciberseguridad es más crítica que nunca. Una contraseña débil puede exponer tu identidad digital,
+                cuentas bancarias, correos personales y datos profesionales. Los ciberdelincuentes emplean sofisticados
+                algoritmos de fuerza bruta capaces de descifrar millones de combinaciones por segundo.
               </p>
-            </div>
-          </details>
+              <p>
+                Nuestro generador utiliza el algoritmo <code>crypto.getRandomValues()</code> de Web Cryptography API,
+                el mismo estándar utilizado por instituciones bancarias y organismos gubernamentales. Cada contraseña generada
+                es criptográficamente segura, verdaderamente aleatoria e imposible de predecir mediante algoritmos estadísticos.
+              </p>
+            </section>
 
-          <details className={styles.faqItem}>
-            <summary className={styles.faqQuestion}>
-              ¿Cuál es la longitud ideal de una contraseña?
-            </summary>
-            <div className={styles.faqAnswer}>
-              <p>
-                Recomendamos <strong>mínimo 16 caracteres</strong> para cuentas importantes (banca, email, redes sociales).
-                Para cuentas menos críticas, 12 caracteres es aceptable. Sin embargo, cuanto más larga sea la contraseña,
-                más segura será. Una contraseña de 20+ caracteres con variedad de tipos es virtualmente imposible de descifrar
-                con tecnología actual.
-              </p>
-            </div>
-          </details>
+            {/* Sección 2: Características de una contraseña ultra segura */}
+            <section className={styles.characteristicsSection}>
+              <h3>Características de una contraseña ultra segura</h3>
+              <div className={styles.characteristicsGrid}>
+                <div className={styles.characteristicCard}>
+                  <h4>📏 Longitud óptima</h4>
+                  <p>Mínimo 12 caracteres, idealmente 16 o más para máxima seguridad. Cada carácter adicional aumenta exponencialmente la dificultad de descifrado.</p>
+                </div>
+                <div className={styles.characteristicCard}>
+                  <h4>🔢 Complejidad máxima</h4>
+                  <p>Combinación de mayúsculas, minúsculas, números y símbolos especiales. Billones de combinaciones posibles.</p>
+                </div>
+                <div className={styles.characteristicCard}>
+                  <h4>🎲 Aleatoriedad criptográfica</h4>
+                  <p>Generada con algoritmos seguros (crypto.getRandomValues()), sin patrones predecibles ni conexión con información personal.</p>
+                </div>
+                <div className={styles.characteristicCard}>
+                  <h4>🆔 Unicidad absoluta</h4>
+                  <p>Contraseña diferente para cada cuenta y plataforma. Reutilizar contraseñas pone en riesgo todas tus cuentas.</p>
+                </div>
+                <div className={styles.characteristicCard}>
+                  <h4>🔄 Rotación periódica</h4>
+                  <p>Cambio regular cada 3-6 meses, especialmente tras alertas de brechas de seguridad.</p>
+                </div>
+                <div className={styles.characteristicCard}>
+                  <h4>🛡️ Sin patrones predecibles</h4>
+                  <p>Evita secuencias como &quot;123&quot;, &quot;abc&quot;, palabras del diccionario o información personal (fechas, nombres).</p>
+                </div>
+              </div>
+            </section>
 
-          <details className={styles.faqItem}>
-            <summary className={styles.faqQuestion}>
-              ¿Necesito incluir todos los tipos de caracteres?
-            </summary>
-            <div className={styles.faqAnswer}>
-              <p>
-                <strong>Sí, es altamente recomendable.</strong> Incluir mayúsculas, minúsculas, números y símbolos
-                aumenta drásticamente el número de combinaciones posibles, haciendo que ataques de fuerza bruta requieran
-                millones de años para descifrarla. Algunos sitios web requieren todos los tipos de caracteres por motivos
-                de seguridad.
+            {/* Sección 3: Gestores de contraseñas */}
+            <section className={styles.managersSection}>
+              <h3>💾 Gestores de Contraseñas Recomendados</h3>
+              <p className={styles.managersIntro}>
+                No debes memorizar contraseñas complejas. Utiliza un gestor de contraseñas de confianza que las almacena cifradas. Solo necesitas recordar una contraseña maestra ultra fuerte.
               </p>
-            </div>
-          </details>
+              <div className={styles.managersGrid}>
+                <div className={styles.managerCard}>
+                  <h4>🔓 Bitwarden</h4>
+                  <p><strong>Código abierto y gratuito.</strong> Opciones de auto-hospedaje para máximo control. Sincronización multiplataforma. Auditorías de seguridad públicas.</p>
+                </div>
+                <div className={styles.managerCard}>
+                  <h4>🔑 1Password</h4>
+                  <p><strong>Interfaz intuitiva premium.</strong> Compartición segura para familias y equipos. Modo viaje para ocultar datos sensibles. Integración con empresas.</p>
+                </div>
+                <div className={styles.managerCard}>
+                  <h4>🗝️ KeePass</h4>
+                  <p><strong>Solución offline para máxima privacidad.</strong> Base de datos local encriptada. Control total sobre tus datos. Sin servicios en la nube.</p>
+                </div>
+                <div className={styles.managerCard}>
+                  <h4>🔐 LastPass</h4>
+                  <p><strong>Sincronización multiplataforma.</strong> Autocompletado inteligente. Compartición segura. Monitoreo de brechas de seguridad en dark web.</p>
+                </div>
+              </div>
+            </section>
 
-          <details className={styles.faqItem}>
-            <summary className={styles.faqQuestion}>
-              ¿Cómo puedo recordar contraseñas tan complejas?
-            </summary>
-            <div className={styles.faqAnswer}>
-              <p>
-                <strong>No necesitas memorizarlas.</strong> Usa un <strong>gestor de contraseñas</strong> como Bitwarden,
-                1Password o KeePass. Estos programas guardan todas tus contraseñas de forma encriptada y solo necesitas
-                recordar una contraseña maestra. También ofrecen autocompletado y sincronización entre dispositivos.
-              </p>
-            </div>
-          </details>
+            {/* Sección 4: FAQ */}
+            <section className={styles.faqSection}>
+              <h3>❓ Preguntas Frecuentes sobre Seguridad de Contraseñas</h3>
+              <div className={styles.faqGrid}>
+                <details className={styles.faqItem}>
+                  <summary>¿Qué hace que este generador sea tan seguro?</summary>
+                  <p>
+                    Utiliza el API Web Cryptography con <code>crypto.getRandomValues()</code>, garantizando aleatoriedad criptográfica de nivel militar. Implementa validación mejorada, interfaz optimizada y algoritmos de distribución uniforme que eliminan sesgos estadísticos en la generación.
+                  </p>
+                </details>
 
-          <details className={styles.faqItem}>
-            <summary className={styles.faqQuestion}>
-              ¿Con qué frecuencia debo cambiar mis contraseñas?
-            </summary>
-            <div className={styles.faqAnswer}>
-              <p>
-                La recomendación actual es cambiar contraseñas <strong>cada 3-6 meses</strong>, o inmediatamente si:
-              </p>
-              <ul>
-                <li>Sospechas que tu cuenta ha sido comprometida</li>
-                <li>Una empresa anuncia una brecha de seguridad</li>
-                <li>Has usado la contraseña en una red pública o compartida</li>
-                <li>Alguien no autorizado pudo haberla visto</li>
-              </ul>
-            </div>
-          </details>
+                <details className={styles.faqItem}>
+                  <summary>¿Es realmente seguro usar un generador online?</summary>
+                  <p>
+                    Absolutamente sí. Nuestro generador funciona 100% en tu navegador mediante JavaScript local. Ninguna contraseña es enviada a servidores externos, registrada en bases de datos o transmitida por internet. El código es de código abierto y auditable por cualquier experto en seguridad.
+                  </p>
+                </details>
 
-          <details className={styles.faqItem}>
-            <summary className={styles.faqQuestion}>
-              ¿Qué es la autenticación de dos factores (2FA)?
-            </summary>
-            <div className={styles.faqAnswer}>
-              <p>
-                La <strong>autenticación de dos factores (2FA)</strong> añade una capa extra de seguridad más allá de la
-                contraseña. Requiere un segundo factor de verificación, como:
-              </p>
-              <ul>
-                <li>Código enviado por SMS</li>
-                <li>Código generado por app (Google Authenticator, Authy)</li>
-                <li>Llave de seguridad física (YubiKey)</li>
-                <li>Verificación biométrica (huella, reconocimiento facial)</li>
-              </ul>
-              <p>
-                Incluso si alguien descubre tu contraseña, <strong>no podrá acceder sin el segundo factor</strong>.
-                Activa 2FA en todas las cuentas que lo permitan, especialmente email, banca y redes sociales.
-              </p>
-            </div>
-          </details>
+                <details className={styles.faqItem}>
+                  <summary>¿Con qué frecuencia debo cambiar mis contraseñas?</summary>
+                  <p>
+                    Para cuentas críticas (banca, email principal, redes sociales), se recomienda cambiar contraseñas cada 3-6 meses. Sin embargo, es más importante usar contraseñas únicas y ultra fuertes (16+ caracteres) que cambiarlas con extrema frecuencia. Si hay alerta de brecha de seguridad, cámbiala inmediatamente.
+                  </p>
+                </details>
 
-          <details className={styles.faqItem}>
-            <summary className={styles.faqQuestion}>
-              ¿Puedo usar la misma contraseña en varias cuentas?
-            </summary>
-            <div className={styles.faqAnswer}>
-              <p>
-                <strong>Nunca reutilices contraseñas.</strong> Si un servicio sufre una brecha de seguridad y tu contraseña
-                se filtra, los atacantes probarán esa misma contraseña en otros sitios (email, banca, redes sociales).
-                Usa contraseñas únicas para cada cuenta importante. Los gestores de contraseñas facilitan esto enormemente.
-              </p>
-            </div>
-          </details>
-        </section>
+                <details className={styles.faqItem}>
+                  <summary>¿Cómo memorizo contraseñas tan complejas?</summary>
+                  <p>
+                    No debes memorizarlas. Utiliza un gestor de contraseñas de confianza como Bitwarden (código abierto), 1Password, LastPass o KeePass. Estos programas almacenan tus contraseñas de forma cifrada y solo necesitas recordar una contraseña maestra ultra fuerte.
+                  </p>
+                </details>
+
+                <details className={styles.faqItem}>
+                  <summary>¿Qué hago si olvido una contraseña generada?</summary>
+                  <p>
+                    Si usas un gestor de contraseñas, la recuperas desde ahí. Sin gestor, debes usar el sistema de &quot;recuperar contraseña&quot; del sitio (generalmente envían email de reseteo). Por eso insistimos en usar gestores de contraseñas: evitan este problema y mejoran dramáticamente tu seguridad digital.
+                  </p>
+                </details>
+
+                <details className={styles.faqItem}>
+                  <summary>¿Puedo confiar en el historial de contraseñas?</summary>
+                  <p>
+                    El historial se almacena únicamente en tu navegador mediante localStorage, no en nuestros servidores. Sin embargo, por seguridad máxima, recomendamos limpiar el historial después de copiar la contraseña. Nunca dejes contraseñas visibles en dispositivos compartidos o públicos.
+                  </p>
+                </details>
+              </div>
+            </section>
+          </div>
+        )}
       </div>
 
       <Footer appName="Generador de Contraseñas Seguras - meskeIA" />

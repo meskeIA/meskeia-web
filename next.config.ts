@@ -18,7 +18,8 @@ const nextConfig: NextConfig = {
   // ============================================================================
   // PRODUCCIÓN: '/beta' para testing en https://meskeia.com/beta/
   // MIGRACIÓN FINAL: Cambiar a '' cuando se reemplace meskeia-web completamente
-  basePath: '/beta',
+  // DESARROLLO: Comentado para testing local sin /beta
+  // basePath: '/beta',
 
   // ============================================================================
   // SERVIDOR WEB - Optimizaciones para Apache
