@@ -1,0 +1,660 @@
+/* Las variables CSS están definidas en globals.css */
+
+.container {
+  max-width: 1000px;
+  margin: 80px auto 100px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 40px 30px;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.tabs {
+  display: flex;
+  background: var(--bg-primary);
+  border-bottom: 2px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.tab {
+  flex: 1;
+  min-width: 160px;
+  padding: 15px 10px;
+  text-align: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+  color: var(--primary);
+  background: var(--bg-card);
+  border-bottom-color: var(--primary);
+}
+
+.tab:hover:not(.active) {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.content {
+  padding: 40px 30px;
+}
+
+.inputSection {
+  background: var(--hover);
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 30px;
+}
+
+.inputSection h2 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.formGroup select,
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.formGroup select:focus,
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.btnConvertir {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnConvertir:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btnSecondary {
+  padding: 14px 32px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.2);
+}
+
+.btnSecondary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+.resultsSection {
+  background: var(--hover);
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.resultsSection h2 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.resultCard {
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border-left: 4px solid var(--primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resultLabel {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.resultValue {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 1.3rem;
+}
+
+.disclaimer {
+  background: var(--warning);
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.infoSection {
+  background: var(--hover);
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-top: 30px;
+}
+
+.infoSection h2 {
+  color: var(--primary);
+  font-size: 1.6rem;
+  margin-bottom: 15px;
+}
+
+.infoSection h3 {
+  color: var(--secondary);
+  font-size: 1.3rem;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.infoSection p {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.infoSection ul {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  padding-left: 20px;
+}
+
+.infoSection li {
+  margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    margin: 60px 10px 80px;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .header p {
+    font-size: 1rem;
+  }
+
+  .tabs {
+    flex-direction: column;
+  }
+
+  .tab {
+    min-width: 100%;
+  }
+
+  .content {
+    padding: 20px 15px;
+  }
+
+  .inputSection,
+  .resultsSection,
+  .infoSection {
+    padding: 20px;
+  }
+}
+
+/* Toggle educativo */
+.educationalToggle {
+  text-align: center;
+  margin-top: 40px;
+  padding: 40px 30px;
+  background: var(--hover);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.educationalToggle h3 {
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.educationalSubtitle {
+  color: var(--text-secondary);
+  margin-bottom: 25px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Contenido educativo con animación */
+.educationalContent {
+  margin-top: var(--spacing-xl);
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Secciones de contenido */
+.guideSection {
+  margin-bottom: var(--spacing-2xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-light);
+}
+
+.guideSection h2 {
+  color: var(--primary);
+  font-size: 1.8em;
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: var(--spacing-md);
+}
+
+.guideSection h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+}
+
+.guideSection h3 {
+  color: var(--primary);
+  font-size: 1.4em;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.guideSection h4 {
+  color: var(--text-primary);
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.guideSection p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-md);
+}
+
+.guideSection ul {
+  color: var(--text-secondary);
+  margin-left: var(--spacing-lg);
+  line-height: 1.6;
+}
+
+.guideSection li {
+  margin-bottom: var(--spacing-sm);
+}
+
+.guideSection strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Sección intro */
+.introSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Grid de sistemas */
+.systemsSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.systemsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.systemCard {
+  background: var(--hover);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.systemCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--primary);
+}
+
+.systemCard h4 {
+  color: var(--primary);
+  font-size: 1.15em;
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.systemCard p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.95em;
+}
+
+/* Grid de consejos */
+.tipsSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--hover);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tipCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--primary);
+}
+
+.tipCard h4 {
+  color: var(--primary);
+  font-size: 1.15em;
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.95em;
+}
+
+/* Grid de conversiones */
+.conversionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.conversionCard {
+  background: var(--hover);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.conversionCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--primary);
+}
+
+.conversionCard h3 {
+  color: var(--primary);
+  font-size: 1.2em;
+  margin-bottom: var(--spacing-md);
+  margin-top: 0;
+}
+
+.conversionCard ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.conversionCard li {
+  padding-left: var(--spacing-md);
+  position: relative;
+  margin-bottom: var(--spacing-sm);
+}
+
+.conversionCard li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* Grid de medición */
+.measuringGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.measureCategory {
+  background: var(--hover);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.measureCategory h3 {
+  color: var(--primary);
+  font-size: 1.3em;
+  margin-bottom: var(--spacing-md);
+  margin-top: 0;
+}
+
+.measuresList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.measureItem h4 {
+  color: var(--text-primary);
+  font-size: 1em;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.measureItem p {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* FAQ */
+.faqContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--hover);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: box-shadow 0.3s ease;
+}
+
+.faqItem:hover {
+  box-shadow: var(--shadow-light);
+}
+
+.faqItem h4 {
+  color: var(--primary);
+  font-size: 1.1em;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.faqItem p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Grid de shopping */
+.shoppingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.shoppingCard {
+  background: var(--hover);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.shoppingCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--primary);
+}
+
+.shoppingCard h3 {
+  color: var(--primary);
+  font-size: 1.2em;
+  margin-bottom: var(--spacing-md);
+  margin-top: 0;
+}
+
+.shoppingCard ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.shoppingCard li {
+  padding-left: var(--spacing-md);
+  position: relative;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.shoppingCard li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--success);
+  font-weight: bold;
+}
+
+/* Actualizar media query existente */
+@media (max-width: 768px) {
+  .systemsGrid,
+  .tipsGrid,
+  .conversionsGrid,
+  .measuringGrid,
+  .shoppingGrid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .guideSection {
+    padding: var(--spacing-lg);
+  }
+
+  .guideSection h2 {
+    font-size: 1.5em;
+  }
+
+  .guideSection h3 {
+    font-size: 1.2em;
+  }
+
+  .educationalToggle h3 {
+    font-size: 1.3em;
+  }
+}

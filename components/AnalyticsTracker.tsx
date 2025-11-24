@@ -3,10 +3,12 @@
 import { useEffect } from 'react';
 
 interface AnalyticsTrackerProps {
-  applicationName: string;
+  applicationName?: string;
+  appName?: string;
 }
 
-export default function AnalyticsTracker({ applicationName }: AnalyticsTrackerProps) {
+export default function AnalyticsTracker({ applicationName, appName }: AnalyticsTrackerProps) {
+  const finalAppName = applicationName || appName || 'unknown';
   useEffect(() => {
     // Generar ID único de sesión
     const sessionId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -16,7 +18,7 @@ export default function AnalyticsTracker({ applicationName }: AnalyticsTrackerPr
                   (window.navigator as any).standalone === true;
 
     // Detectar visita recurrente usando localStorage
-    const storageKey = `meskeia_${applicationName}`;
+    const storageKey = `meskeia_${finalAppName}`;
     const isRecurrent = localStorage.getItem(storageKey) !== null;
 
     // Marcar primera visita
@@ -34,7 +36,7 @@ export default function AnalyticsTracker({ applicationName }: AnalyticsTrackerPr
 
     // Datos de entrada (registro inicial)
     const entryData = {
-      aplicacion: applicationName,
+      aplicacion: finalAppName,
       modo: isPWA ? 'pwa' : 'web',
       navegador: navigator.userAgent,
       sistema_operativo: navigator.platform,
@@ -70,7 +72,7 @@ export default function AnalyticsTracker({ applicationName }: AnalyticsTrackerPr
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              aplicacion: applicationName,
+              aplicacion: finalAppName,
               duracion_segundos: durationSeconds,
               tipo_dispositivo: deviceType,
               modo: isPWA ? 'pwa' : 'web',
@@ -125,7 +127,7 @@ export default function AnalyticsTracker({ applicationName }: AnalyticsTrackerPr
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       // No es necesario remover beforeunload/pagehide ya que el componente se desmonta al salir
     };
-  }, [applicationName]);
+  }, [finalAppName]);
 
   return null; // No renderiza nada
 }

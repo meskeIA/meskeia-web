@@ -65,6 +65,7 @@ export default function RootLayout({
           defaultTheme="light"
           enableSystem={false}
           storageKey="meskeia-theme"
+          disableTransitionOnChange={false}
         >
           <DynamicThemeColor />
           <ServiceWorkerRegister />

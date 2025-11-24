@@ -19,9 +19,15 @@
   --hover: #F5F5F5;
   --focus: rgba(46, 134, 171, 0.1);
 
+  /* Estados y alertas */
+  --success: #4CAF50;
+  --warning: #FF9800;
+  --error: #F44336;
+
   /* Sombras y bordes */
   --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.05);
   --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.12);
   --radius: 8px;
 
   /* ========================================
@@ -80,9 +86,15 @@
   --hover: #383838;
   --focus: rgba(63, 165, 209, 0.15);
 
+  /* Estados y alertas (dark mode) */
+  --success: #66BB6A;
+  --warning: #FFA726;
+  --error: #EF5350;
+
   /* Sombras para dark mode */
   --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 /* Reset básico */
