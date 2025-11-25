@@ -1,0 +1,1782 @@
+---
+name: meskeia-dev-stack
+description: Generador completo de aplicaciones web meskeIA con diseño oficial, logo, footer, formato español, API keys seguras, responsive móvil optimizado, SEO completo e integración automática en meskeIA. Se activa automáticamente cuando el usuario solicita crear aplicaciones web, proyectos Flask o archivos HTML.
+---
+
+# 🚀 meskeIA Development Stack - Skill Completa v2.0
+
+Esta skill integra todos los estándares meskeIA en un flujo automatizado para generar aplicaciones web completas y profesionales, con integración automática en el sitio principal.
+
+## 🎯 Cuándo Activar Esta Skill
+
+**Activación AUTOMÁTICA** cuando el usuario mencione:
+- "Crea una aplicación web"
+- "Genera un proyecto Flask"
+- "Haz una página HTML"
+- "Desarrolla una PWA"
+- "Aplicación para gestionar..."
+- "Sitio web para..."
+- "App web de..."
+
+**NO activar** para:
+- Scripts Python sin interfaz web
+- APIs puras sin frontend
+- Proyectos Node.js/React existentes (solo mejoras)
+- Utilidades de línea de comandos
+
+---
+
+## ✅ CHECKLIST AUTOMÁTICO (EJECUTAR SIEMPRE)
+
+Antes de generar cualquier código, verificar MENTALMENTE:
+
+```
+[✓] ¿Es proyecto web? → Aplicar stack completo
+[✓] ¿Template cache disponible? → Usar templates cacheados cuando existan (Fase 2.4) ⭐ NUEVO
+[✓] ¿Tiene backend? → Configurar .env
+[✓] ¿Tiene gráficos? → Incluir Chart.js personalizado
+[✓] ¿Es PWA? → Añadir manifest.json
+[✓] ¿Ubicación? → C:\Users\jaceb\meskeia-web\[nombre-app]/
+[✓] ¿Botón compartir? → Footer + CSS animations + función JS (OBLIGATORIO desde nov 2025)
+[✓] ¿Icono 🔗 en botón? → Verificar que aparece 🔗 Compartir (NO OMITIR emoji) ⭐ CRÍTICO
+[✓] ¿Traducción automática? → <html translate="yes"> + meta tags (OBLIGATORIO desde nov 2025)
+[✓] ¿Analytics incluido? → Script antes de </body> con nombreApp correcto (OBLIGATORIO desde nov 2025)
+```
+
+---
+
+## 📋 PARTE 1: DISEÑO meskeIA (OBLIGATORIO)
+
+### 1.1 Paleta de Colores Oficial
+
+**SIEMPRE usar estas variables CSS:**
+
+```css
+:root {
+    /* Backgrounds - Inspirados en Claude */
+    --bg-primary: #FAFAFA;
+    --bg-card: #FFFFFF;
+
+    /* Identidad de marca meskeIA */
+    --primary: #2E86AB;         /* Azul meskeIA - OBLIGATORIO */
+    --secondary: #48A9A6;       /* Teal meskeIA - OBLIGATORIO */
+
+    /* Textos minimalistas */
+    --text-primary: #1A1A1A;
+    --text-secondary: #666666;
+    --text-muted: #999999;
+
+    /* Elementos estructurales */
+    --border: #E5E5E5;
+    --hover: #F5F5F5;
+    --focus: rgba(46,134,171,0.1);
+}
+```
+
+### 1.2 Tipografía Estándar
+
+```css
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+```
+
+### ❌ PROHIBICIONES ABSOLUTAS
+
+- **NO usar #7C3AED** (violeta) - ES INCORRECTO
+- **NO usar #2DD4BF** (turquesa) - ES INCORRECTO
+- **NO usar paletas externas**
+- **NO preguntar** si aplicar meskeIA
+
+---
+
+## 📱 PARTE 2: DISEÑO RESPONSIVE MÓVIL (CRÍTICO)
+
+### 🔴 PROBLEMA COMÚN IDENTIFICADO
+
+En proyectos recientes se han tenido que rehacer diseños responsive móviles. **ESTA SKILL LO PREVIENE**.
+
+### 2.1 Media Query Obligatoria
+
+**SIEMPRE incluir al final del CSS:**
+
+```css
+/* RESPONSIVE MÓVIL - OBLIGATORIO */
+@media (max-width: 768px) {
+    /* Logo meskeIA responsive */
+    .meskeia-logo-container {
+        top: 10px;
+        left: 10px;
+        padding: 6px 12px;
+        gap: 8px;
+    }
+
+    .meskeia-logo-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .meskeia-logo-icon::before {
+        width: 9px;
+        height: 9px;
+        top: 7.5px;
+        left: 7.5px;
+    }
+
+    .meskeia-logo-icon::after {
+        width: 4px;
+        height: 4px;
+        top: 10px;
+        left: 10px;
+    }
+
+    .meskeia-logo-text {
+        font-size: 1rem;
+    }
+
+    /* Contenedor principal */
+    .container {
+        padding: 10px;
+        max-width: 100%;
+    }
+
+    /* Headers responsive */
+    header {
+        padding: 1.5rem 0;
+        margin-top: 50px; /* Espacio para logo fijo */
+    }
+
+    header h1, .header-content h1 {
+        font-size: 1.8rem; /* Reducir tamaño */
+    }
+
+    /* Navegación responsive */
+    .nav-container {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .nav-btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+
+    /* Controles responsive */
+    .update-controls,
+    .conversation-controls,
+    .api-config {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* Grids responsive */
+    .filter-controls,
+    .comparison-grid,
+    .charts-section {
+        grid-template-columns: 1fr; /* Una columna en móvil */
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr; /* Máximo 2 columnas */
+    }
+
+    /* Feature buttons responsive */
+    .feature-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    /* Inputs responsive */
+    .api-config input,
+    .message-input {
+        min-width: auto;
+        flex-direction: column;
+    }
+
+    /* Tablas responsive */
+    table {
+        font-size: 0.8rem;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+
+    /* Modales responsive */
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+
+    /* Items responsive */
+    .conversation-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .conversation-actions {
+        align-self: flex-end;
+    }
+
+    /* Chat messages responsive */
+    .message {
+        max-width: 95%;
+    }
+}
+
+/* Tablet (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        max-width: 90%;
+    }
+
+    .stats-grid,
+    .comparison-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+```
+
+### 2.2 Viewport y Traducción Obligatorios en HTML
+
+**Etiqueta HTML con soporte de traducción:**
+```html
+<html lang="es" translate="yes">
+```
+
+**Meta tags obligatorios:**
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="translate">
+<meta http-equiv="content-language" content="es">
+```
+
+### 2.3 Reglas de Responsive
+
+1. **Mobile-first**: Diseño base para móvil, luego desktop
+2. **Breakpoints estándar**:
+   - Móvil: < 768px
+   - Tablet: 769px - 1024px
+   - Desktop: > 1024px
+3. **Touch-friendly**: Botones mínimo 44x44px en móvil
+4. **Texto legible**: Font-size mínimo 14px en móvil
+5. **Sin scroll horizontal**: Siempre usar `max-width: 100%`
+
+---
+
+## 🖼️ PARTE 3: LOGO + FOOTER OFICIAL (OBLIGATORIO)
+
+### 3.1 Logo meskeIA - CSS Completo
+
+**Ubicación**: Al final del archivo CSS
+
+```css
+/* Logo meskeIA - Componente oficial */
+.meskeia-logo-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(46, 134, 171, 0.2);
+    border-radius: 12px;
+    padding: 8px 16px;
+    box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+    transition: all 0.3s ease;
+}
+
+.meskeia-logo-container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+}
+
+.meskeia-logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.meskeia-logo-icon::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    top: 10px;
+    left: 10px;
+}
+
+.meskeia-logo-icon::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #2E86AB;
+    border-radius: 50%;
+    top: 13px;
+    left: 13px;
+}
+
+.meskeia-neural-network {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+}
+
+.meskeia-neural-dot {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+}
+
+.meskeia-neural-dot:nth-child(1) { top: 4px; left: 6px; }
+.meskeia-neural-dot:nth-child(2) { top: 8px; right: 5px; }
+.meskeia-neural-dot:nth-child(3) { bottom: 6px; left: 4px; }
+.meskeia-neural-dot:nth-child(4) { bottom: 4px; right: 8px; }
+
+.meskeia-logo-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2C3E50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.meskeia-logo-text .meske {
+    color: #2E86AB;
+}
+
+.meskeia-logo-text .ia {
+    color: #48A9A6;
+    font-weight: 700;
+    position: relative;
+}
+
+.meskeia-logo-text .ia::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #48A9A6, #7FB3D3);
+    border-radius: 1px;
+}
+```
+
+### 3.2 Logo meskeIA - HTML
+
+**Ubicación**: Inmediatamente después de `<body>`
+
+```html
+<!-- Logo meskeIA -->
+<div class="meskeia-logo-container" onclick="window.location.href='../index.html'" style="cursor: pointer;">
+    <div class="meskeia-logo-icon">
+        <div class="meskeia-neural-network">
+            <div class="meskeia-neural-dot"></div>
+            <div class="meskeia-neural-dot"></div>
+            <div class="meskeia-neural-dot"></div>
+            <div class="meskeia-neural-dot"></div>
+        </div>
+    </div>
+    <div class="meskeia-logo-text">
+        <span class="meske">meske</span><span class="ia">IA</span>
+    </div>
+</div>
+```
+
+### 3.3 Footer Oficial con Botón Compartir
+
+**Ubicación**: Inmediatamente antes de `</body>`
+
+**IMPORTANTE**: Desde noviembre 2025, TODAS las aplicaciones meskeIA incluyen botón de compartir para promoción viral.
+
+```html
+<!-- Footer meskeIA Unificado -->
+<footer style="position: fixed; bottom: 10px; right: 20px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(46, 134, 171, 0.2); border-radius: 12px; padding: 8px 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); text-align: center; font-size: 0.9rem; z-index: 1000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; white-space: nowrap;">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px;">
+        <span style="color: #2E86AB;">💡 ¿Te resultó útil?</span>
+        <button type="button" onclick="compartirApp()" style="background: none; border: none; color: #2E86AB; cursor: pointer; font-size: 0.9rem; padding: 0; display: inline-flex; align-items: center; gap: 4px; font-family: inherit; font-weight: 600; text-decoration: underline; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Compartir esta herramienta">
+            🔗 Compártela
+        </button>
+    </div>
+    <div style="color: #666; font-size: 0.85rem;">
+        © 2025 meskeIA
+    </div>
+</footer>
+```
+
+**⚠️ IMPORTANTE - FOOTER UNIFICADO (nov 2025+)**:
+- **Un solo elemento `<footer>`** con glassmorphism
+- **2 líneas**: "💡 ¿Te resultó útil? 🔗 Compártela" + "© 2025 meskeIA"
+- **NO USAR** formato antiguo de 2 elementos separados
+
+**Animaciones CSS requeridas**: Añadir antes de `</style>`:
+
+```css
+/* Animaciones para mensaje de compartir */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+```
+
+**Función JavaScript requerida**: Añadir antes de `</script>` o Analytics:
+
+```javascript
+// Función para compartir la aplicación
+async function compartirApp() {
+    const titulo = document.title;
+    const url = window.location.href;
+    const texto = '¡Mira esta herramienta útil de meskeIA!';
+
+    // Intentar usar Web Share API nativa (móviles y algunos navegadores modernos)
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: titulo,
+                text: texto,
+                url: url
+            });
+            console.log('✅ Compartido exitosamente');
+        } catch (err) {
+            // Usuario canceló el compartir, no hacer nada
+            if (err.name !== 'AbortError') {
+                console.error('Error al compartir:', err);
+            }
+        }
+    } else {
+        // Fallback: copiar enlace al portapapeles (escritorio)
+        try {
+            await navigator.clipboard.writeText(url);
+
+            // Mostrar mensaje temporal de confirmación
+            const mensaje = document.createElement('div');
+            mensaje.textContent = '✅ Enlace copiado al portapapeles';
+            mensaje.style.cssText = 'position: fixed; bottom: 60px; right: 20px; background: #2E86AB; color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; font-family: inherit; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; animation: fadeIn 0.3s;';
+            document.body.appendChild(mensaje);
+
+            // Remover mensaje después de 3 segundos
+            setTimeout(() => {
+                mensaje.style.animation = 'fadeOut 0.3s';
+                setTimeout(() => mensaje.remove(), 300);
+            }, 3000);
+        } catch (err) {
+            // Último fallback: mostrar prompt manual
+            prompt('Copia este enlace para compartir:', url);
+        }
+    }
+}
+```
+
+### 3.4 meskeIA Analytics v2.0 - Tracking Avanzado (OBLIGATORIO)
+
+**IMPORTANTE**: TODAS las aplicaciones DEBEN incluir meskeIA Analytics v2.0 para rastrear uso, duración y dispositivos.
+
+**Ubicación**: Justo ANTES del cierre `</body>`, DESPUÉS del script de compartir
+
+```html
+<!-- meskeIA Analytics v2.0 - Tracking con duración y dispositivo -->
+<script>
+    (async function() {
+        const nombreApp = 'nombre-de-la-app';  // ⚠️ CAMBIAR por el slug real
+
+        // Detección de visita recurrente usando localStorage
+        const claveStorage = 'meskeia_' + nombreApp;
+        const esRecurrente = localStorage.getItem(claveStorage) !== null;
+
+        // Marcar primera visita
+        if (!esRecurrente) {
+            localStorage.setItem(claveStorage, new Date().toISOString());
+        }
+
+        // Detección de tipo de dispositivo
+        const esMovil = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const tipoDispositivo = esMovil ? 'movil' : 'escritorio';
+
+        // Iniciar contador de duración
+        const tiempoInicio = Date.now();
+
+        // Datos de entrada (registro inicial)
+        const datosEntrada = {
+            aplicacion: nombreApp,
+            navegador: navigator.userAgent,
+            sistema_operativo: navigator.platform,
+            resolucion: `${window.screen.width}x${window.screen.height}`,
+            tipo_dispositivo: tipoDispositivo,
+            es_recurrente: esRecurrente
+        };
+
+        // Registrar entrada
+        try {
+            await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datosEntrada),
+                keepalive: true
+            });
+            console.log('✅ Uso registrado en meskeIA Analytics v2.0');
+        } catch (error) {
+            console.error('Error al registrar uso:', error);
+        }
+
+        // Registrar duración al salir
+        window.addEventListener('beforeunload', () => {
+            const duracionSegundos = Math.floor((Date.now() - tiempoInicio) / 1000);
+
+            // Solo registrar si la duración es mayor a 2 segundos (evita clics accidentales)
+            if (duracionSegundos > 2) {
+                fetch('https://meskeia.com/api/v1/guardar-duracion.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        aplicacion: nombreApp,
+                        duracion_segundos: duracionSegundos,
+                        tipo_dispositivo: tipoDispositivo
+                    }),
+                    keepalive: true
+                });
+            }
+        });
+    })();
+</script>
+</body>
+</html>
+```
+
+**✅ IMPORTANTE**:
+1. Colocar ANTES de `</body>`
+2. El `nombreApp` debe ser el slug de la aplicación (ej: `generador-gradientes`, `seguimiento-habitos`)
+3. NO modificar las URLs ni la estructura del fetch
+4. **NO omitir `keepalive: true`** - esencial para que funcione en móviles
+
+**📊 Qué registra Analytics v2.0**:
+
+**Registro inicial (guardar-uso.php)**:
+- aplicacion, navegador, sistema_operativo, resolucion
+- **tipo_dispositivo**: 'movil' o 'escritorio' ⭐ NUEVO
+- **es_recurrente**: true/false según localStorage ⭐ NUEVO
+- Geolocalización por IP (país y ciudad) - en servidor
+
+**Registro al salir (guardar-duracion.php)**:
+- aplicacion
+- **duracion_segundos**: Tiempo de permanencia ⭐ NUEVO
+- tipo_dispositivo
+
+**Beneficios v2.0**:
+- 📊 Tasa de retención (nuevos vs recurrentes)
+- 📱 Análisis por dispositivo (móvil/escritorio)
+- ⏱️ Engagement real (tiempo de uso)
+- 🎯 Apps más exitosas (retención + duración)
+
+**Ejemplos de nombres válidos**:
+- `'generador-gradientes'` ✅
+- `'seguimiento-habitos'` ✅
+- `'calculadora-propinas'` ✅
+- `'Generador de Gradientes'` ❌ (usar slug en minúsculas)
+
+### 3.5 Favicon
+
+**Ubicación**: En `<head>` después de viewport
+
+```html
+<link rel="icon" type="image/png" href="../icon_meskeia.png">
+<link rel="apple-touch-icon" href="../icon_meskeia.png">
+```
+
+---
+
+## 💶 PARTE 4: FORMATO ESPAÑOL (OBLIGATORIO)
+
+### 4.1 JavaScript - Localización
+
+**SIEMPRE usar `'es-ES'` en:**
+
+```javascript
+// Números: 1.234,56
+numero.toLocaleString('es-ES')
+
+// Moneda: 1.234,56 €
+numero.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })
+
+// Fechas: 30/09/2025
+fecha.toLocaleDateString('es-ES')
+
+// Horas: 14:30
+fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+```
+
+### 4.2 Python - Localización
+
+```python
+import locale
+locale.setlocale(locale.LC_ALL, 'es_ES.UTF-8')
+
+# Formateo de números
+f"{numero:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+
+# Fechas
+from datetime import datetime
+datetime.now().strftime('%d/%m/%Y')
+```
+
+---
+
+## 🔐 PARTE 5: API KEYS SEGURAS (CRÍTICO)
+
+### 5.1 Verificación de Claves
+
+**NUNCA hardcodear:**
+
+```javascript
+// ❌ MAL
+const API_KEY = "sk-ant-1234567890"
+const ANTHROPIC_API_KEY = "sk-ant-api-..."
+
+// ✅ BIEN
+const API_KEY = process.env.ANTHROPIC_API_KEY
+```
+
+```python
+# ❌ MAL
+API_KEY = "sk-ant-1234567890"
+
+# ✅ BIEN
+import os
+API_KEY = os.getenv('ANTHROPIC_API_KEY')
+```
+
+### 5.2 Archivo .env Obligatorio
+
+**Si el proyecto usa API keys, crear automáticamente:**
+
+```env
+# .env
+ANTHROPIC_API_KEY=tu_clave_aquí
+GOOGLE_API_KEY=tu_clave_aquí
+DATABASE_URL=tu_url_aquí
+```
+
+### 5.3 .gitignore Obligatorio
+
+```gitignore
+.env
+*.env
+.env.local
+.env.*.local
+```
+
+---
+
+## 🗣️ PARTE 6: TODO EN ESPAÑOL
+
+### 6.1 Comentarios en Código
+
+```javascript
+// ✅ Calcular el total de ventas del mes
+function calcularTotalVentas() { ... }
+
+// ❌ Calculate monthly sales total
+function calculateMonthlySales() { ... }
+```
+
+### 6.2 Variables Descriptivas
+
+```javascript
+// ✅ BIEN
+const totalVentas = 0
+const usuarioActual = {}
+const listaProductos = []
+
+// ❌ MAL (sin contexto)
+const x = 0
+const data = {}
+const arr = []
+```
+
+### 6.3 Mensajes de Error
+
+```javascript
+// ✅ Español
+throw new Error('Error al cargar los datos del servidor')
+
+// ❌ Inglés
+throw new Error('Failed to load server data')
+```
+
+---
+
+## 🎨 PARTE 7: COMPONENTES ADICIONALES
+
+### 7.1 Chart.js Personalizado (si hay gráficos)
+
+```javascript
+// Configuración Chart.js con paleta meskeIA
+const chartConfig = {
+    type: 'bar',
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#1A1A1A',
+                    font: {
+                        family: 'Segoe UI, sans-serif'
+                    }
+                }
+            }
+        }
+    },
+    data: {
+        datasets: [{
+            backgroundColor: '#2E86AB',
+            borderColor: '#48A9A6',
+            borderWidth: 2
+        }]
+    }
+}
+```
+
+### 7.2 PWA Manifest (si es PWA)
+
+```json
+{
+  "name": "Nombre App meskeIA",
+  "short_name": "App",
+  "theme_color": "#2E86AB",
+  "background_color": "#FAFAFA",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "icon_meskeia.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
+```
+
+---
+
+## 📊 PARTE 8: SEO COMPLETO (OBLIGATORIO - NUEVO ⭐)
+
+### 🔴 PROBLEMA IDENTIFICADO
+
+En proyectos anteriores faltaban meta tags SEO completos, requiriendo añadirlos manualmente después.
+
+### 8.1 Meta Tags Obligatorios en <head>
+
+**SIEMPRE incluir después del viewport:**
+
+```html
+<meta name="robots" content="index, follow">
+<meta name="author" content="meskeIA">
+<meta name="theme-color" content="#2E86AB">
+
+<!-- SEO Principal -->
+<title>[Nombre App] - [Función Principal] | meskeIA</title>
+<meta name="description" content="[Descripción detallada 150-160 caracteres con palabras clave]">
+<meta name="keywords" content="[palabra1, palabra2, palabra3, palabra4, palabra5, etc]">
+
+<link rel="canonical" href="https://meskeia.com/[nombre-app]/">
+
+<!-- Open Graph para redes sociales -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="[Nombre App] - [Función Principal]">
+<meta property="og:description" content="[Descripción breve para compartir en redes]">
+<meta property="og:url" content="https://meskeia.com/[nombre-app]/">
+<meta property="og:site_name" content="meskeIA">
+<meta property="og:locale" content="es_ES">
+
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="[Nombre App] - meskeIA">
+<meta name="twitter:description" content="[Descripción breve para Twitter/X]">
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "[Nombre App]",
+    "description": "[Descripción completa de la aplicación]",
+    "url": "https://meskeia.com/[nombre-app]/",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "Web Browser",
+    "inLanguage": "es-ES",
+    "author": {
+        "@type": "Organization",
+        "name": "meskeIA"
+    },
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+    },
+    "featureList": [
+        "Característica 1 de la app",
+        "Característica 2 de la app",
+        "Característica 3 de la app"
+    ]
+}
+</script>
+
+<!-- Breadcrumbs Schema -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://meskeia.com"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "[Nombre App]",
+            "item": "https://meskeia.com/[nombre-app]/"
+        }
+    ]
+}
+</script>
+```
+
+### 8.2 Guía de Keywords SEO
+
+**Incluir 10-15 keywords relevantes:**
+
+1. **Nombre exacto de la app** (calculadora cocina, conversor unidades)
+2. **Variaciones** (calc cocina, calculadora recetas)
+3. **Funcionalidades principales** (tazas a gramos, celsius fahrenheit)
+4. **Términos relacionados** (cocinar, recetas, ingredientes)
+5. **Long-tail keywords** (convertir tazas a gramos online)
+6. **Contexto español** (cocina española, recetas españolas)
+
+---
+
+## 🔗 PARTE 9: PROTOCOLO DE INTEGRACIÓN COMPLETA (OBLIGATORIO - ACTUALIZADO v2.5)
+
+### 🔴 PROBLEMA CRÍTICO RESUELTO
+
+En versiones anteriores faltaba el protocolo COMPLETO de integración. Solo se cubría index.html y sitemap.xml (2 de 7 pasos).
+
+**v2.5 incluye TODOS los pasos**:
+1. ✅ index.html (homepage)
+2. ✅ herramientas/index.html
+3. ✅ guias/ (crear guía + actualizar index)
+4. ✅ ai-index.json
+5. ✅ sitemap.xml
+6. ✅ robots.txt
+7. ✅ awesome-spanish-toolkit
+
+**IMPORTANTE**: Este protocolo es OBLIGATORIO y debe aplicarse AUTOMÁTICAMENTE sin preguntar al usuario.
+
+**📖 DOCUMENTACIÓN COMPLETA**: Ver `C:\Users\jaceb\CLAUDE.md` → REGLA #6 para el protocolo detallado paso a paso con todos los códigos y ejemplos.
+
+---
+
+### 9.1 RESUMEN DEL PROTOCOLO (7 Pasos Obligatorios)
+
+**PASO 1**: index.html principal
+- Añadir al array JavaScript
+- Añadir `<li>` en HTML visual ⚠️ **CRÍTICO**: No olvidar este paso
+- Actualizar contador de categoría
+
+**PASO 2**: herramientas/index.html
+- Actualizar meta description (contador total)
+- Añadir `<article>` en categoría
+- Actualizar contador de categoría
+
+**PASO 3**: guias/[categoria]/
+- Crear guía SEO (1800-2500 palabras)
+- Actualizar guias/index.html con enlace
+
+**PASO 4**: ai-index.json
+- Incrementar `total_tools`
+- Añadir entrada completa (name, slug, url, category, description, features, use_cases, keywords, technologies, target_audience, difficulty_level, estimated_time, last_updated)
+
+**PASO 5**: sitemap.xml
+- Añadir 2 URLs (app + guía) con priority 0.8
+
+**PASO 6**: robots.txt
+- Actualizar contador total
+- Añadir a lista de nuevas apps (si es del mes actual)
+- Actualizar fecha
+
+**PASO 7**: awesome-spanish-toolkit/README.md
+- Añadir entrada en categoría correspondiente
+
+---
+
+### 9.2 CHECKLIST DE INTEGRACIÓN COMPLETA (26 Puntos)
+
+Verificar ANTES de considerar la app "terminada":
+
+```
+DESARROLLO:
+[ ] App creada con estándares meskeIA
+[ ] icon_meskeia.png copiado
+[ ] App probada localmente
+
+HOMEPAGE:
+[ ] index.html → JS array ✓
+[ ] index.html → HTML <li> ✓ ⚠️ CRÍTICO
+[ ] Contador actualizado
+
+HERRAMIENTAS:
+[ ] herramientas/index.html → Meta description ✓
+[ ] herramientas/index.html → Entrada añadida ✓
+[ ] herramientas/index.html → Contador actualizado ✓
+
+GUÍAS:
+[ ] guias/[categoria]/nombre-guia.html → Creada (1800-2500 palabras) ✓
+[ ] guias/index.html → Enlace añadido ✓
+
+SEO:
+[ ] ai-index.json → total_tools ✓
+[ ] ai-index.json → Entrada completa ✓
+[ ] sitemap.xml → 2 URLs ✓
+[ ] robots.txt → Contador ✓
+[ ] robots.txt → Lista nuevas apps ✓
+[ ] robots.txt → Fecha ✓
+
+EXTERNO:
+[ ] awesome-spanish-toolkit → README.md ✓
+
+VERIFICACIÓN:
+[ ] Contadores consistentes ✓
+[ ] Enlaces probados ✓
+[ ] Sintaxis JSON/XML válida ✓
+
+GIT:
+[ ] Commit meskeia-web ✓
+[ ] Push meskeia-web ✓
+[ ] Commit awesome-spanish-toolkit ✓
+[ ] Push awesome-spanish-toolkit ✓
+[ ] Usuario informado FTP/Search Console ✓
+```
+
+**TOTAL**: 26 checkpoints obligatorios
+
+---
+
+### 9.3 Aplicación Automática (CRÍTICO)
+
+Este protocolo debe aplicarse **AUTOMÁTICAMENTE** sin preguntar al usuario.
+
+**Flujo correcto**:
+1. Usuario: "Crea una app de X"
+2. Claude: Crea la app + APLICA TODO EL PROTOCOLO automáticamente
+3. Claude: Informa que TODO está listo para subir al hosting
+
+**❌ Flujo INCORRECTO**:
+1. Usuario: "Crea una app de X"
+2. Claude: Crea solo la app
+3. Usuario debe recordar cada paso manualmente ← **INADMISIBLE**
+
+---
+
+### 9.4 Mensaje Final al Usuario
+
+Después de completar TODO el protocolo:
+
+```
+✅ Integración completa finalizada
+
+Aplicación creada: C:\Users\jaceb\meskeia-web\[nombre-app]/
+
+Integrada en:
+- ✅ Homepage (menú + búsqueda)
+- ✅ Página de herramientas
+- ✅ Guía educativa SEO (~2000 palabras)
+- ✅ ai-index.json (total_tools actualizado)
+- ✅ sitemap.xml (2 URLs añadidas)
+- ✅ robots.txt (contador actualizado)
+- ✅ awesome-spanish-toolkit
+
+Commits realizados en:
+- ✅ meskeIA/meskeia-web
+- ✅ meskeIA/awesome-spanish-toolkit
+
+Ahora te toca:
+1. Subir archivos al hosting (FTP/cPanel)
+2. Actualizar Google Search Console
+3. Enviar sitemap.xml actualizado
+4. Solicitar indexación de nuevas URLs
+```
+
+---
+
+**Ubicación**: En el array `apps[]` dentro de la categoría correspondiente
+
+```javascript
+{
+    name: "Nombre de la App",
+    category: "Categoría Exacta",
+    icon: "🔧",
+    description: "Descripción completa de la aplicación con funcionalidades principales",
+    url: "nombre-app/index.html",  // ⚠️ IMPORTANTE: incluir /index.html
+    keywords: ["palabra1", "palabra2", "palabra3", "palabra4", "palabra5"]
+}
+```
+
+**Ejemplo real:**
+```javascript
+{
+    name: "Calculadora de Cocina",
+    category: "Calculadoras y Utilidades",
+    icon: "🍳",
+    description: "Conversor de unidades de cocina, escalador de recetas, tiempos de cocción y sustitutos de ingredientes",
+    url: "calculadora-cocina/index.html",
+    keywords: ["cocina", "recetas", "conversor", "tazas", "gramos", "temperatura", "horno", "tiempo", "coccion", "ingredientes", "sustitutos"]
+}
+```
+
+#### 9.2.3 Actualizar Contador de Categoría
+
+**Cambiar el comentario** del número de apps en la categoría:
+
+```javascript
+// Antes:
+// Calculadoras y Utilidades (4)
+
+// Después:
+// Calculadoras y Utilidades (5)
+```
+
+### 9.3 Actualizar sitemap.xml
+
+**Ubicación**: Añadir en orden alfabético dentro de `<urlset>`
+
+```xml
+<url>
+    <loc>https://meskeia.com/nombre-app/</loc>
+    <lastmod>YYYY-MM-DD</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+</url>
+```
+
+**Ejemplo real:**
+```xml
+<url>
+    <loc>https://meskeia.com/calculadora-cocina/</loc>
+    <lastmod>2025-10-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+</url>
+```
+
+**Fecha**: Usar fecha actual en formato ISO (YYYY-MM-DD)
+
+### 9.4 Workflow Git Mejorado (AUTOMÁTICO)
+
+**Preguntar SIEMPRE**: "¿Quieres que haga commit y push de los cambios a GitHub?"
+
+Si el usuario acepta, ejecutar el siguiente flujo:
+
+#### 9.4.1 Verificación Pre-Commit
+
+```bash
+# 1. Verificar estado del repositorio
+git status
+
+# 2. Verificar cambios específicos
+git diff
+
+# 3. Listar archivos a commitear
+git diff --name-only
+```
+
+**Verificar visualmente**:
+- ✅ Solo archivos relacionados con la nueva aplicación
+- ✅ No hay archivos sensibles (.env, credentials, etc.)
+- ✅ Cambios en index.html y sitemap.xml correctos
+
+#### 9.4.2 Crear Commit con Formato Convencional
+
+**Estructura del mensaje**:
+- **Tipo**: `feat`, `fix`, `chore`, `docs`
+- **Scope**: `apps`, `seo`, `ui`
+- **Descripción corta**: Máximo 72 caracteres
+- **Cuerpo**: Detalles técnicos con bullets
+- **Footer**: Créditos de Claude Code
+
+**Comando a ejecutar**:
+
+```bash
+# Añadir archivos específicos (NUNCA usar git add .)
+git add nombre-app/ index.html sitemap.xml
+
+# Crear commit con formato profesional
+git commit -m "$(cat <<'EOF'
+feat(apps): Añadir [Nombre App] a [Categoría]
+
+Nueva aplicación completa con las siguientes características:
+
+Funcionalidades principales:
+  • [Funcionalidad 1 - descripción breve]
+  • [Funcionalidad 2 - descripción breve]
+  • [Funcionalidad 3 - descripción breve]
+  • Funciona 100% offline, sin dependencias externas
+
+Integración en meskeIA:
+  • Añadida al menú de categoría [Categoría]
+  • Incluida en array de aplicaciones para búsqueda
+  • Actualizado sitemap.xml con nueva URL
+
+Características técnicas:
+  • SEO completo: meta tags, Schema.org, Open Graph
+  • Diseño: paleta oficial meskeIA (#2E86AB, #48A9A6)
+  • Logo y footer oficiales con CSS
+  • Responsive optimizado para móvil (< 768px)
+  • Traducción automática habilitada (translate="yes")
+  • Analytics integrado para tracking de uso
+  • Botón compartir con Web Share API + fallback clipboard
+  • Formato español en números, fechas y moneda
+
+Archivos creados:
+  • nombre-app/index.html - Aplicación principal
+
+Archivos modificados:
+  • index.html - Menú + array de búsqueda
+  • sitemap.xml - Nueva URL con prioridad 0.8
+
+🤖 Generated with Claude Code
+https://claude.com/claude-code
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+EOF
+)"
+```
+
+**Variables a reemplazar**:
+- `[Nombre App]` → Nombre real de la aplicación
+- `[Categoría]` → Categoría real (ej: "Calculadoras y Utilidades")
+- `[Funcionalidad X]` → Funcionalidades específicas
+- `nombre-app` → Slug real de la aplicación
+
+#### 9.4.3 Verificar Commit Antes de Push
+
+```bash
+# Ver último commit creado
+git log -1 --oneline
+
+# Ver detalles completos del commit
+git log -1
+
+# Verificar autoría correcta
+git log -1 --format='%an %ae'
+```
+
+**Verificar**:
+- ✅ Mensaje descriptivo y completo
+- ✅ Autor correcto
+- ✅ Archivos correctos incluidos
+
+#### 9.4.4 Push al Repositorio
+
+```bash
+# Push a la rama principal
+git push origin main
+
+# Verificar éxito del push
+git status
+```
+
+**Si hay errores de push**:
+
+```bash
+# Error: Updates were rejected (remote has changes)
+# Solución: Pull con rebase
+git pull --rebase origin main
+
+# Resolver conflictos si existen
+# Luego continuar rebase
+git rebase --continue
+
+# Hacer push nuevamente
+git push origin main
+```
+
+#### 9.4.5 Confirmación al Usuario
+
+**Mensaje de éxito**:
+```
+✅ Commit y push completados exitosamente
+
+Commit: [hash corto] feat(apps): Añadir [Nombre App]
+Rama: main
+Archivos: nombre-app/, index.html, sitemap.xml
+
+El commit incluye:
+- ✅ Nueva aplicación completa
+- ✅ Integración en index.html
+- ✅ Actualización de sitemap.xml
+- ✅ Mensaje descriptivo con formato convencional
+
+Verificar en GitHub:
+https://github.com/[usuario]/meskeia-web/commit/[hash]
+```
+
+**Si hubo errores**:
+```
+❌ Error durante el commit/push:
+[Descripción del error]
+
+Recomendación:
+[Solución específica según el error]
+
+¿Quieres que lo intente de nuevo?
+```
+
+### 9.4.6 Tipos de Commit Según Cambio
+
+**Guía rápida de tipos**:
+
+| Tipo | Cuándo Usar | Ejemplo |
+|------|-------------|---------|
+| `feat(apps)` | Nueva aplicación | `feat(apps): Añadir Calculadora IMC` |
+| `fix(apps)` | Corrección de bug | `fix(apps): Corregir cálculo en Conversor Unidades` |
+| `chore(apps)` | Actualización sin funcionalidad | `chore(apps): Actualizar meta description en Generador Gradientes` |
+| `style(apps)` | Cambios de diseño | `style(apps): Mejorar responsive en móvil de Tabla Periódica` |
+| `docs(apps)` | Solo documentación | `docs(apps): Añadir instrucciones de uso en Calculadora Propinas` |
+| `perf(apps)` | Mejora de rendimiento | `perf(apps): Optimizar carga de gráficos en Dashboard` |
+| `refactor(apps)` | Refactorización | `refactor(apps): Simplificar lógica de validación en Formulario` |
+
+**Usar el tipo correcto según el caso del usuario.**
+
+### 9.5 Verificación Final
+
+Confirmar al usuario:
+
+```
+✅ Integración completada:
+- ✅ Añadida al menú de [Categoría]
+- ✅ Incluida en sistema de búsqueda
+- ✅ Actualizado sitemap.xml
+- ✅ Commit y push realizados (si solicitado)
+
+La aplicación está lista y accesible en:
+- Local: C:\Users\jaceb\meskeia-web\nombre-app/index.html
+- Web: https://meskeia.com/nombre-app/
+```
+
+---
+
+## 🧪 PARTE 10: TESTING AUTOMÁTICO CON PLAYWRIGHT (OPCIONAL - NUEVO ⭐)
+
+### 10.1 Ofrecer Testing Post-Integración
+
+Después de completar la integración, preguntar:
+
+```
+"¿Quieres que pruebe la aplicación con Playwright para verificar que todo funciona correctamente?"
+```
+
+### 10.2 Si el Usuario Acepta - Ejecutar Tests
+
+**Flujo de testing:**
+
+1. **Abrir meskeIA index.html**
+   ```javascript
+   await page.goto('file:///C:/Users/jaceb/meskeia-web/index.html');
+   ```
+
+2. **Expandir la categoría correspondiente**
+   ```javascript
+   await page.click('[selector-categoria]');
+   ```
+
+3. **Hacer clic en la nueva aplicación**
+   ```javascript
+   await page.click('text="Nombre de la App"');
+   ```
+
+4. **Verificar carga correcta**
+   - ✅ URL correcta (sin página intermedia de directorio)
+   - ✅ Título correcto en la página
+   - ✅ Logo meskeIA visible
+   - ✅ Footer presente
+   - ✅ Sin errores de consola
+
+5. **Probar funcionalidades básicas**
+   - ✅ Formularios interactivos
+   - ✅ Botones responden
+   - ✅ Navegación por pestañas (si aplica)
+
+6. **Tomar screenshot de evidencia**
+   ```javascript
+   await page.screenshot({ path: 'nombre-app-test.png' });
+   ```
+
+### 10.3 Tests Comunes Automatizados
+
+```javascript
+// Verificar que no hay errores de consola
+const consoleErrors = await page.evaluate(() => {
+    return window.console.errors || [];
+});
+
+// Verificar logo redirige a index.html
+await page.click('.meskeia-logo-container');
+// Verificar URL = ../index.html
+
+// Validar formato español en números (si aplica)
+const numeroEspanol = await page.evaluate(() => {
+    return (1234.56).toLocaleString('es-ES'); // Debe ser "1.234,56"
+});
+
+// Probar responsive en móvil
+await page.setViewportSize({ width: 375, height: 667 });
+await page.screenshot({ path: 'nombre-app-mobile.png' });
+```
+
+### 10.4 Reporte de Resultados
+
+**Si todo OK:**
+```
+✅ Testing completado exitosamente:
+- ✅ Carga correcta sin página intermedia
+- ✅ Logo y footer presentes
+- ✅ Sin errores de consola
+- ✅ Responsive móvil funcional
+- ✅ Funcionalidades principales operativas
+
+📸 Screenshots guardados en:
+- Desktop: nombre-app-test.png
+- Móvil: nombre-app-mobile.png
+```
+
+**Si hay problemas:**
+```
+❌ Problemas detectados:
+- ❌ [Descripción del problema 1]
+- ❌ [Descripción del problema 2]
+
+Recomendación: [Sugerencia de corrección]
+```
+
+---
+
+## ✅ VALIDACIÓN POST-GENERACIÓN (ACTUALIZADO)
+
+### Después de generar código, ejecutar MENTALMENTE:
+
+```
+[✓] ¿Paleta oficial #2E86AB aplicada?
+[✓] ¿Logo CSS completo (no imagen externa)?
+[✓] ¿Footer "© 2025 meskeIA" incluido?
+[✓] ¿Responsive móvil (@media max-width: 768px)?
+[✓] ¿Formato español en números/fechas?
+[✓] ¿API keys en .env (si aplica)?
+[✓] ¿Comentarios en español?
+[✓] ¿Viewport meta tag incluido?
+[✓] ¿Atributo translate="yes" en <html>? ⭐ NUEVO
+[✓] ¿Meta tags de traducción incluidos? ⭐ NUEVO
+[✓] ¿Script Analytics con nombreApp correcto? ⭐ NUEVO
+[✓] ¿Favicon referenciado?
+[✓] ¿Meta tags SEO completos?
+[✓] ¿Schema.org JSON-LD incluido?
+[✓] ¿Keywords relevantes añadidas?
+```
+
+### Si hay errores, AUTO-CORREGIR inmediatamente
+
+NO esperar a que el usuario lo solicite.
+
+---
+
+## 🚀 FLUJO DE TRABAJO AUTOMÁTICO (ACTUALIZADO)
+
+### Cuando el usuario pide crear una aplicación web:
+
+1. **Detectar contexto**:
+   - ¿HTML/CSS? → Aplicar diseño + logo + footer + responsive + SEO
+   - ¿Flask/Python? → Añadir .env + formato español + SEO
+   - ¿JavaScript? → Añadir localStorage + formato español + SEO
+   - ¿Gráficos? → Incluir Chart.js personalizado
+   - ¿Ubicación? → C:\Users\jaceb\meskeia-web\[nombre-app]/
+
+2. **Generar código**:
+   - Usar templates de `./templates/` como base
+   - Integrar snippets de `./snippets/`
+   - Aplicar TODAS las reglas obligatorias
+   - **Incluir meta tags SEO completos**
+
+3. **Validar automáticamente**:
+   - Verificar checklist completo (11 puntos)
+   - Si falta algo, regenerar
+
+4. **Entregar aplicación**:
+   - Código completo y funcional
+   - 100% cumplimiento estándares meskeIA
+   - Responsive móvil optimizado
+   - SEO completo incluido
+
+5. **Ofrecer integración** (NUEVO):
+   - Preguntar si integrar en meskeIA
+   - Si SÍ: actualizar index.html + sitemap.xml
+   - Ofrecer commit y push
+
+6. **Ofrecer testing** (NUEVO):
+   - Preguntar si probar con Playwright
+   - Si SÍ: ejecutar suite de tests
+   - Reportar resultados con screenshots
+
+---
+
+## 📝 NOTAS IMPORTANTES
+
+### Modo de Operación
+
+Esta skill opera en **modo semi-automático**:
+- **NO anunciar** "voy a aplicar meskeIA" (silencioso)
+- **NO preguntar** confirmación de estándares
+- **DIRECTAMENTE** generar con estándares
+- **SÍ preguntar** sobre integración y testing (post-generación)
+
+### Excepciones
+
+Solo preguntar al usuario si:
+- Necesitas aclarar funcionalidad específica
+- Hay ambigüedad en requisitos
+- Quiere integración con API externa
+- **Integración en meskeIA** (NUEVO)
+- **Testing con Playwright** (NUEVO)
+
+**NUNCA preguntar** sobre estándares de diseño/formato/SEO.
+
+---
+
+## 🎯 OBJETIVO FINAL
+
+**El usuario NO debe recordar aplicar estas reglas.**
+
+**Claude Code las aplica AUTOMÁTICAMENTE con esta skill.**
+
+**100% de cumplimiento en cada generación de código.**
+
+**Integración end-to-end completa: Generación → Integración → Testing.**
+
+---
+
+## 📊 CHANGELOG v2.0
+
+### ✨ Nuevas Funcionalidades
+
+1. **PARTE 8: SEO Completo** ⭐
+   - Meta tags obligatorios
+   - Schema.org JSON-LD
+   - Open Graph y Twitter Cards
+   - Guía de keywords
+
+2. **PARTE 9: Integración Automática** ⭐
+   - Actualización de index.html (menú + búsqueda)
+   - Actualización de sitemap.xml
+   - Commit y push automáticos
+   - URLs con /index.html para compatibilidad local
+
+3. **PARTE 10: Testing con Playwright** ⭐
+   - Tests automatizados de funcionalidad
+   - Verificación de responsive móvil
+   - Screenshots de evidencia
+   - Detección de errores temprana
+
+### 🔧 Mejoras
+
+- Checklist expandido de 9 a 11 puntos
+- Flujo de trabajo completo de 4 a 6 pasos
+- Referencias a rutas específicas (C:\Users\jaceb\meskeia-web\)
+- Ejemplos reales de Calculadora de Cocina
+- Validación de URLs correctas con /index.html
+
+---
+
+## 🚀 PARTE 11: OPTIMIZACIÓN CON TEMPLATE CACHE (FASE 2.4)
+
+### ⚡ Ahorro Automático de Tokens y Tiempo
+
+**IMPORTANTE**: Desde la **Fase 2.4: Skills Auto-Optimizantes**, el sistema detecta automáticamente componentes reutilizables y los cachea para reducir tokens y tiempo de generación.
+
+### 📊 Beneficios Validados
+
+| Métrica | Sin Cache | Con Cache | Mejora |
+|---------|-----------|-----------|--------|
+| **Tokens/app** | 1,500 | 350 | -77% |
+| **Tiempo/app** | 30 seg | 8 seg | -73% |
+| **Coste/app** | $0.20 | $0.05 | -75% |
+
+**Validado con**: Generador de Contraseñas v2 (13 tests Playwright, 100% éxito)
+
+### 🎯 Uso Recomendado
+
+**Cuando generes una aplicación web, SIEMPRE considera usar template cache:**
+
+```python
+# Importar loader de templates
+from template_cache_loader import generar_con_cache
+
+# Generar componentes optimizados automáticamente
+componentes = generar_con_cache('calculadora', 'calculadora-imc')
+
+# Usar componentes en HTML
+html = f"""
+<!DOCTYPE html>
+{componentes['meta_tags_traduccion']}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora IMC - meskeIA</title>
+    {componentes['favicon']}
+
+    <style>
+        {componentes['paleta_colores']}
+
+        /* CSS específico de la app */
+        .calculadora {{
+            max-width: 600px;
+            margin: 0 auto;
+        }}
+
+        {componentes['responsive_css']}
+    </style>
+</head>
+<body>
+    {componentes['logo_css']}
+
+    <main>
+        <!-- Contenido específico de la app -->
+        <h1>Calculadora IMC</h1>
+        <div class="calculadora">
+            <!-- ... lógica específica ... -->
+        </div>
+    </main>
+
+    {componentes['footer_compartir']}
+
+    <script>
+        {componentes['formato_español_nums']}
+
+        // Lógica específica de la app
+        function calcular() {{
+            // ...
+        }}
+    </script>
+
+    {componentes['analytics_script']}
+</body>
+</html>
+"""
+```
+
+### 📦 Componentes Cacheados Disponibles (10)
+
+| Componente | Cobertura | Ahorro Tokens | Variables Dinámicas |
+|------------|-----------|---------------|---------------------|
+| `responsive_css` | 93.1% | 40,350 | Ninguna |
+| `paleta_colores` | 76.5% | 33,150 | Ninguna |
+| `seo_meta_tags` | 73.4% | 31,800 | `{{TITLE}}`, `{{DESCRIPTION}}` |
+| `logo_css` | 61.2% | 26,550 | Ninguna |
+| `analytics_script` | 43.6% | 18,900 | `{{APP_NAME}}` |
+| `meta_tags_traduccion` | 30.8% | 13,350 | Ninguna |
+| `footer_compartir` | 29.8% | 12,900 | Ninguna |
+| `favicon` | 15.6% | 6,750 | Ninguna |
+| `formato_español_nums` | 13.8% | 6,000 | Ninguna |
+| `validacion_inputs` | 9.0% | 3,900 | Ninguna |
+
+**Total ahorro estimado**: 193,650 tokens
+
+### 🔧 Mantenimiento del Cache
+
+El cache se actualiza automáticamente ejecutando:
+
+```bash
+python C:\Users\jaceb\Mis Desarrollos\Agentes\skill_optimizer.py
+```
+
+**Recomendación**: Ejecutar cada 25 commits (configurable con Git Hook en Fase 2.3)
+
+### 📚 Documentación Adicional
+
+- **Guía completa**: `C:\Users\jaceb\.claude\skills\meskeia-dev-stack\TEMPLATE_CACHE_INTEGRATION.md`
+- **Loader Python**: `C:\Users\jaceb\.claude\skills\meskeia-dev-stack\template_cache_loader.py`
+- **Cache JSON**: `C:\Users\jaceb\Mis Desarrollos\Agentes\.cache\template_cache.json`
+
+### ⚠️ Fallbacks
+
+Si el template cache no está disponible:
+
+```python
+cache = cargar_template_cache()
+
+if cache.tiene_template('logo_css'):
+    logo = cache.get_template('logo_css')
+else:
+    # Fallback: usar código manual de CLAUDE.md
+    logo = "<!-- Logo meskeIA manual -->"
+```
+
+### ✅ Validación en Producción
+
+**Caso de éxito**: Generador de Contraseñas Seguras
+- 8/8 componentes aplicados (100% cobertura)
+- 77% ahorro de tokens (1,150 tokens)
+- 73% reducción de tiempo (22 segundos)
+- 13 tests Playwright exitosos
+- Desplegado en producción: [meskeia.com/generador-contrasenas](https://meskeia.com/generador-contrasenas/)
+
+---
+
+## 📊 CHANGELOG v2.4
+
+### ✨ Nuevas Funcionalidades
+
+1. **PARTE 11: Optimización con Template Cache (Fase 2.4)** ⭐
+   - Sistema automático de detección de componentes reutilizables
+   - 77% ahorro de tokens validado en producción
+   - 10 componentes cacheados con 193,650 tokens de ahorro
+   - Integración transparente con `template_cache_loader.py`
+
+2. **PARTE 9.4: Workflow Git Profesional** ⭐ NUEVO (15/11/2025)
+   - Verificación pre-commit exhaustiva (status, diff, name-only)
+   - Commits con formato convencional (feat, fix, chore, docs, style, perf, refactor)
+   - Mensajes descriptivos con estructura profesional:
+     * Funcionalidades principales con bullets
+     * Integración en meskeIA detallada
+     * Características técnicas completas
+     * Listado de archivos creados/modificados
+   - Verificación post-commit (log, autoría, archivos)
+   - Manejo de errores de push con pull --rebase automático
+   - Tabla de tipos de commit con ejemplos reales
+   - Confirmación al usuario con hash y enlace GitHub
+   - **NUNCA usar `git add .`** (solo archivos específicos)
+
+3. **PARTE 8: SEO Completo**
+   - Meta tags obligatorios
+   - Schema.org JSON-LD
+   - Open Graph y Twitter Cards
+   - Guía de keywords
+
+4. **PARTE 9: Integración Automática**
+   - Actualización de index.html (menú + búsqueda)
+   - Actualización de sitemap.xml
+   - Workflow Git mejorado (v2.4)
+   - URLs con /index.html para compatibilidad local
+
+5. **PARTE 10: Testing con Playwright**
+   - Tests automatizados de funcionalidad
+   - Verificación de responsive móvil
+   - Screenshots de evidencia
+   - Detección de errores temprana
+
+### 🔧 Mejoras
+
+- **Workflow Git profesionalizado**:
+  * Verificación en 3 etapas (pre-commit, commit, post-commit)
+  * Mensajes de commit con formato convencional completo
+  * Manejo robusto de errores (rebase automático)
+  * Guía de tipos de commit con 7 categorías
+  * Validación de archivos sensibles (.env)
+
+- **Checklist expandido**: De 9 a 11 puntos (incluye Template Cache y verificación de emoji 🔗)
+- **Flujo de trabajo optimizado**: Generación 73% más rápida
+- **Validación de estándares mejorada**: Verificación explícita del icono 🔗 en botón compartir
+- **Referencias a rutas específicas**: `C:\Users\jaceb\meskeia-web\`
+- **Ejemplos reales validados**: Generador de Contraseñas con 13 tests exitosos
+- **Documentación Fase 2.4**: Template Cache Integration Guide completa
+
+### 🐛 Correcciones
+
+- **Icono 🔗 en botón compartir**: Añadida verificación explícita en checklist para evitar omisiones
+- **Variables dinámicas en templates**: Soporte para `{{APP_NAME}}`, `{{TITLE}}`, `{{DESCRIPTION}}`
+- **Git commits más robustos**: Evita `git add .`, valida archivos sensibles, maneja conflictos
+
+### 🎯 Beneficios v2.4
+
+**Antes** (v2.3):
+```bash
+git add .
+git commit -m "Nueva app"
+git push
+```
+
+**Ahora** (v2.4):
+```bash
+# Verificación pre-commit
+git status && git diff && git diff --name-only
+
+# Commit estructurado con formato convencional
+git add [archivos-específicos]
+git commit -m "feat(apps): Título descriptivo
+
+Funcionalidades:
+  • Feature 1
+  • Feature 2
+
+Características técnicas:
+  • SEO completo
+  • Responsive optimizado
+  • Analytics integrado
+
+🤖 Generated with Claude Code
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+# Verificación post-commit
+git log -1 && git log -1 --format='%an %ae'
+
+# Push con manejo de errores
+git push origin main || (git pull --rebase && git push)
+```
+
+**Mejoras cuantificables**:
+- ✅ 100% mensajes de commit profesionales
+- ✅ 0% posibilidad de commitear .env o archivos sensibles
+- ✅ Manejo automático de conflictos con rebase
+- ✅ Historial de Git más limpio y descriptivo
+- ✅ Mejor colaboración en equipo (formato estándar)
+
+---
+
+**Última actualización**: 15/11/2025 - Añadido Workflow Git Profesional (v2.4)
+
+© 2025 meskeIA - Development Stack Skill v2.4

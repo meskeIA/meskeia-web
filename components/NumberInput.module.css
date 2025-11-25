@@ -1,0 +1,108 @@
+/* NumberInput Component - meskeIA */
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+.required {
+  color: #E53E3E;
+  margin-left: 0.25rem;
+}
+
+.input {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 2px solid var(--border);
+  border-radius: var(--radius, 8px);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px var(--focus, rgba(46, 134, 171, 0.1));
+}
+
+.input:disabled {
+  background: var(--hover);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.inputError {
+  border-color: #E53E3E;
+}
+
+.inputError:focus {
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+}
+
+.helperText {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.errorText {
+  font-size: 0.85rem;
+  color: #E53E3E;
+  margin: 0;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+/* Dark Mode Support */
+[data-theme='dark'] .input {
+  background: #333333;
+  color: #E5E5E5;
+  border-color: #505050;
+}
+
+[data-theme='dark'] .input:focus {
+  background: #3A3A3A;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .input:disabled {
+  background: #2A2A2A;
+  color: #808080;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .input {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.95rem;
+  }
+
+  .label {
+    font-size: 0.9rem;
+  }
+
+  .helperText,
+  .errorText {
+    font-size: 0.8rem;
+  }
+}

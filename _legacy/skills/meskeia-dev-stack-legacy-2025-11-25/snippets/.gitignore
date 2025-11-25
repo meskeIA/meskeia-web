@@ -1,0 +1,57 @@
+# Archivo .gitignore estándar - meskeIA
+
+# Variables de entorno (CRÍTICO - NO SUBIR)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# Flask
+instance/
+.webassets-cache
+
+# Bases de datos
+*.db
+*.sqlite
+*.sqlite3
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Node modules (si aplica)
+node_modules/
+npm-debug.log*
+
+# Build y dist
+dist/
+build/
+*.egg-info/
+
+# Archivos temporales
+*.tmp
+*.temp
+.cache/

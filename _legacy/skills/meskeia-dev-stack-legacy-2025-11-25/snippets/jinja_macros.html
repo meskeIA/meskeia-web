@@ -1,0 +1,573 @@
+{# ===============================================
+   MACROS JINJA2 REUTILIZABLES - meskeIA
+   ===============================================
+
+   📋 Cuándo usar este snippet:
+   - Proyectos Flask con muchas vistas
+   - Componentes repetitivos (formularios, tarjetas, modales)
+   - Dashboards con estadísticas
+   - Tablas de datos con paginación
+
+   ⚠️ USO MANUAL: Este snippet NO se aplica automáticamente.
+   Solo usar cuando el usuario trabaje con Flask/Jinja2.
+
+   ✅ Compatible con: Flask, cualquier framework que use Jinja2
+   🎨 Diseño: Todos los componentes usan paleta meskeIA oficial
+   ================================================ #}
+
+{# ========================================
+   CÓMO USAR ESTOS MACROS
+   ========================================
+
+   1. Guardar este archivo como: templates/macros.html
+
+   2. Importar en tus plantillas:
+   {% from 'macros.html' import stat_card, form_field, modal, alert %}
+
+   3. Usar los macros:
+   {{ stat_card("Ventas Totales", 1234.56, "💰") }}
+
+   ======================================== #}
+
+{# ========================================
+   MACRO: Tarjeta de Estadística
+   ========================================
+
+   Uso:
+   {{ stat_card("Total Ventas", 15420.50, "💰", "primary") }}
+
+   Parámetros:
+   - titulo: Título de la estadística
+   - valor: Valor numérico (se formatea automáticamente)
+   - icono: Emoji o HTML del icono
+   - color: "primary", "secondary", "success", "danger" (default: "primary")
+   - sufijo: Texto después del valor (ej: "€", "%", "items")
+   ======================================== #}
+
+{% macro stat_card(titulo, valor, icono="📊", color="primary", sufijo="") %}
+<div class="stat-card stat-card-{{ color }}" style="
+    background: var(--bg-card);
+    border: 2px solid {% if color == 'primary' %}var(--primary){% elif color == 'secondary' %}var(--secondary){% elif color == 'success' %}#27ae60{% elif color == 'danger' %}#e74c3c{% else %}var(--border){% endif %};
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+">
+    <div class="stat-icon" style="
+        font-size: 2.5rem;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: {% if color == 'primary' %}rgba(46,134,171,0.1){% elif color == 'secondary' %}rgba(72,169,166,0.1){% elif color == 'success' %}rgba(39,174,96,0.1){% elif color == 'danger' %}rgba(231,76,60,0.1){% else %}var(--hover){% endif %};
+        border-radius: 10px;
+    ">
+        {{ icono|safe }}
+    </div>
+    <div class="stat-content" style="flex: 1;">
+        <h3 style="
+            margin: 0 0 8px 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        ">
+            {{ titulo }}
+        </h3>
+        <p class="stat-value" style="
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        ">
+            {% if valor is number %}
+                {{ "{:,.2f}".format(valor)|replace(',', 'TEMP')|replace('.', ',')|replace('TEMP', '.') }}
+            {% else %}
+                {{ valor }}
+            {% endif %}
+            {% if sufijo %}
+                <span style="font-size: 1rem; color: var(--text-secondary); margin-left: 5px;">{{ sufijo }}</span>
+            {% endif %}
+        </p>
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   MACRO: Campo de Formulario
+   ========================================
+
+   Uso:
+   {{ form_field("email", "Correo Electrónico", type="email", required=True, placeholder="tu@email.com") }}
+
+   Parámetros:
+   - name: Nombre del campo (id y name del input)
+   - label: Etiqueta visible
+   - type: Tipo de input (text, email, password, number, date, etc.)
+   - required: Si es obligatorio (default: False)
+   - placeholder: Texto placeholder
+   - value: Valor inicial
+   - help_text: Texto de ayuda debajo del campo
+   ======================================== #}
+
+{% macro form_field(name, label, type="text", required=False, placeholder="", value="", help_text="") %}
+<div class="form-group" style="margin-bottom: 20px;">
+    <label for="{{ name }}" style="
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 0.95rem;
+    ">
+        {{ label }}
+        {% if required %}
+            <span style="color: #e74c3c; margin-left: 3px;">*</span>
+        {% endif %}
+    </label>
+
+    {% if type == 'textarea' %}
+        <textarea id="{{ name }}"
+                  name="{{ name }}"
+                  {% if required %}required{% endif %}
+                  placeholder="{{ placeholder }}"
+                  style="
+                      width: 100%;
+                      padding: 12px;
+                      border: 1px solid var(--border);
+                      border-radius: 8px;
+                      font-family: inherit;
+                      font-size: 1rem;
+                      resize: vertical;
+                      min-height: 100px;
+                      transition: border-color 0.3s ease;
+                  "
+                  onfocus="this.style.borderColor='var(--primary)'"
+                  onblur="this.style.borderColor='var(--border)'"
+        >{{ value }}</textarea>
+    {% elif type == 'select' %}
+        <select id="{{ name }}"
+                name="{{ name }}"
+                {% if required %}required{% endif %}
+                style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid var(--border);
+                    border-radius: 8px;
+                    font-family: inherit;
+                    font-size: 1rem;
+                    background: white;
+                    cursor: pointer;
+                    transition: border-color 0.3s ease;
+                "
+                onfocus="this.style.borderColor='var(--primary)'"
+                onblur="this.style.borderColor='var(--border)'"
+        >
+            {{ caller() }}
+        </select>
+    {% else %}
+        <input type="{{ type }}"
+               id="{{ name }}"
+               name="{{ name }}"
+               {% if required %}required{% endif %}
+               {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+               {% if value %}value="{{ value }}"{% endif %}
+               style="
+                   width: 100%;
+                   padding: 12px;
+                   border: 1px solid var(--border);
+                   border-radius: 8px;
+                   font-family: inherit;
+                   font-size: 1rem;
+                   transition: border-color 0.3s ease;
+               "
+               onfocus="this.style.borderColor='var(--primary)'"
+               onblur="this.style.borderColor='var(--border)'"
+        >
+    {% endif %}
+
+    {% if help_text %}
+        <small style="
+            display: block;
+            margin-top: 6px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        ">
+            {{ help_text }}
+        </small>
+    {% endif %}
+
+    <div id="{{ name }}-error" class="error-message" style="
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-top: 6px;
+        display: none;
+    "></div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   MACRO: Modal/Ventana Emergente
+   ========================================
+
+   Uso:
+   {% call modal("modal-confirmacion", "¿Confirmar acción?") %}
+       <p>¿Estás seguro de que deseas continuar?</p>
+       <div style="margin-top: 20px; text-align: right;">
+           <button onclick="cerrarModal('modal-confirmacion')">Cancelar</button>
+           <button style="background: var(--primary);">Confirmar</button>
+       </div>
+   {% endcall %}
+
+   Parámetros:
+   - id: ID único del modal
+   - titulo: Título del modal
+   ======================================== #}
+
+{% macro modal(id, titulo) %}
+<div id="{{ id }}" class="modal" style="
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+" onclick="if(event.target.id === '{{ id }}') cerrarModal('{{ id }}')">
+    <div class="modal-content" style="
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        position: relative;
+    " onclick="event.stopPropagation()">
+        <button onclick="cerrarModal('{{ id }}')" style="
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            line-height: 1;
+            padding: 5px 10px;
+        " title="Cerrar">
+            ×
+        </button>
+
+        <h2 style="
+            margin: 0 0 20px 0;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            padding-right: 30px;
+        ">
+            {{ titulo }}
+        </h2>
+
+        <div class="modal-body">
+            {{ caller() }}
+        </div>
+    </div>
+</div>
+
+<script>
+function abrirModal(id) {
+    document.getElementById(id).style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModal(id) {
+    document.getElementById(id).style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Cerrar con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modales = document.querySelectorAll('.modal[style*="display: flex"]');
+        modales.forEach(modal => cerrarModal(modal.id));
+    }
+});
+</script>
+{% endmacro %}
+
+{# ========================================
+   MACRO: Alerta/Notificación
+   ========================================
+
+   Uso:
+   {{ alert("Datos guardados correctamente", "success", dismissible=True) }}
+   {{ alert("Error al procesar la solicitud", "danger") }}
+
+   Parámetros:
+   - mensaje: Texto del mensaje
+   - tipo: "success", "danger", "warning", "info" (default: "info")
+   - dismissible: Si se puede cerrar (default: False)
+   - icono: Emoji o HTML del icono (auto según tipo si no se especifica)
+   ======================================== #}
+
+{% macro alert(mensaje, tipo="info", dismissible=False, icono="") %}
+{% set colores = {
+    'success': {'bg': '#d4edda', 'border': '#c3e6cb', 'text': '#155724', 'icono': '✅'},
+    'danger': {'bg': '#f8d7da', 'border': '#f5c6cb', 'text': '#721c24', 'icono': '❌'},
+    'warning': {'bg': '#fff3cd', 'border': '#ffeaa7', 'text': '#856404', 'icono': '⚠️'},
+    'info': {'bg': '#d1ecf1', 'border': '#bee5eb', 'text': '#0c5460', 'icono': 'ℹ️'}
+} %}
+{% set color = colores.get(tipo, colores['info']) %}
+
+<div class="alert alert-{{ tipo }}" style="
+    padding: 15px 20px;
+    background: {{ color.bg }};
+    border: 1px solid {{ color.border }};
+    border-radius: 8px;
+    color: {{ color.text }};
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+">
+    <span style="font-size: 1.3rem;">
+        {{ icono if icono else color.icono }}
+    </span>
+
+    <div style="flex: 1;">
+        {{ mensaje|safe }}
+    </div>
+
+    {% if dismissible %}
+        <button onclick="this.parentElement.remove()" style="
+            background: none;
+            border: none;
+            color: {{ color.text }};
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" title="Cerrar">
+            ×
+        </button>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# ========================================
+   MACRO: Tabla de Datos
+   ========================================
+
+   Uso:
+   {% call tabla(["Nombre", "Email", "Estado"], hover=True, striped=True) %}
+       <tr>
+           <td>Juan Pérez</td>
+           <td>juan@ejemplo.com</td>
+           <td><span class="badge badge-success">Activo</span></td>
+       </tr>
+       <tr>
+           <td>Ana García</td>
+           <td>ana@ejemplo.com</td>
+           <td><span class="badge badge-danger">Inactivo</span></td>
+       </tr>
+   {% endcall %}
+
+   Parámetros:
+   - columnas: Lista de nombres de columnas
+   - hover: Efecto hover en filas (default: True)
+   - striped: Filas alternadas (default: True)
+   ======================================== #}
+
+{% macro tabla(columnas, hover=True, striped=True) %}
+<div style="overflow-x: auto;">
+    <table style="
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-card);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    ">
+        <thead>
+            <tr style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                {% for columna in columnas %}
+                    <th style="
+                        padding: 15px;
+                        text-align: left;
+                        color: white;
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    ">
+                        {{ columna }}
+                    </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {{ caller() }}
+        </tbody>
+    </table>
+</div>
+
+<style>
+{% if striped %}
+    tbody tr:nth-child(even) {
+        background: var(--hover);
+    }
+{% endif %}
+
+{% if hover %}
+    tbody tr:hover {
+        background: var(--focus);
+        transition: background 0.2s ease;
+    }
+{% endif %}
+
+tbody td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+/* Badges para estados */
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.badge-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+</style>
+{% endmacro %}
+
+{# ========================================
+   MACRO: Paginación
+   ========================================
+
+   Uso:
+   {{ paginacion(pagina_actual=2, total_paginas=10, url_base="/productos") }}
+
+   Parámetros:
+   - pagina_actual: Página actual (1-indexed)
+   - total_paginas: Total de páginas
+   - url_base: URL base para los enlaces (ej: "/productos")
+   ======================================== #}
+
+{% macro paginacion(pagina_actual, total_paginas, url_base) %}
+<nav style="margin: 30px 0; text-align: center;">
+    <div style="display: inline-flex; gap: 5px; align-items: center;">
+        {% if pagina_actual > 1 %}
+            <a href="{{ url_base }}?pagina={{ pagina_actual - 1 }}" style="
+                padding: 8px 15px;
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                color: var(--text-primary);
+                text-decoration: none;
+                transition: all 0.2s;
+            " onmouseover="this.style.background='var(--primary)'; this.style.color='white'; this.style.borderColor='var(--primary)'" onmouseout="this.style.background='var(--bg-card)'; this.style.color='var(--text-primary)'; this.style.borderColor='var(--border)'">
+                ← Anterior
+            </a>
+        {% endif %}
+
+        <span style="margin: 0 15px; color: var(--text-secondary);">
+            Página {{ pagina_actual }} de {{ total_paginas }}
+        </span>
+
+        {% if pagina_actual < total_paginas %}
+            <a href="{{ url_base }}?pagina={{ pagina_actual + 1 }}" style="
+                padding: 8px 15px;
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                color: var(--text-primary);
+                text-decoration: none;
+                transition: all 0.2s;
+            " onmouseover="this.style.background='var(--primary)'; this.style.color='white'; this.style.borderColor='var(--primary)'" onmouseout="this.style.background='var(--bg-card)'; this.style.color='var(--text-primary)'; this.style.borderColor='var(--border)'">
+                Siguiente →
+            </a>
+        {% endif %}
+    </div>
+</nav>
+{% endmacro %}
+
+{# ========================================
+   EJEMPLO DE USO COMPLETO
+   ========================================
+
+   En tu plantilla Flask (ej: dashboard.html):
+
+   {% from 'macros.html' import stat_card, form_field, modal, alert, tabla %}
+
+   <!-- Grid de estadísticas -->
+   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+       {{ stat_card("Ventas Totales", ventas_total, "💰", "primary", "€") }}
+       {{ stat_card("Productos", total_productos, "📦", "secondary") }}
+       {{ stat_card("Clientes", total_clientes, "👥", "success") }}
+       {{ stat_card("Pendientes", pendientes, "⏳", "warning") }}
+   </div>
+
+   <!-- Alertas -->
+   {{ alert("Operación completada exitosamente", "success", dismissible=True) }}
+
+   <!-- Formulario -->
+   <form method="POST">
+       {{ form_field("nombre", "Nombre completo", required=True) }}
+       {{ form_field("email", "Correo electrónico", type="email", required=True) }}
+       {{ form_field("mensaje", "Mensaje", type="textarea", help_text="Máximo 500 caracteres") }}
+
+       <button type="submit" style="padding: 12px 30px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+           Enviar
+       </button>
+   </form>
+
+   <!-- Tabla -->
+   {% call tabla(["Nombre", "Email", "Estado"]) %}
+       {% for usuario in usuarios %}
+           <tr>
+               <td>{{ usuario.nombre }}</td>
+               <td>{{ usuario.email }}</td>
+               <td>
+                   <span class="badge {% if usuario.activo %}badge-success{% else %}badge-danger{% endif %}">
+                       {{ "Activo" if usuario.activo else "Inactivo" }}
+                   </span>
+               </td>
+           </tr>
+       {% endfor %}
+   {% endcall %}
+
+   ======================================== #}

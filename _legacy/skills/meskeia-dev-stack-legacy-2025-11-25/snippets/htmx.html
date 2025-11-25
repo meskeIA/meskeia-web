@@ -1,0 +1,340 @@
+<!-- ===============================================
+     HTMX - Interactividad Dinámica sin JavaScript
+     ===============================================
+
+     📋 Cuándo usar este snippet:
+     - Filtros en tiempo real
+     - Búsqueda dinámica
+     - Carga de contenido sin recargar página
+     - Formularios con validación instantánea
+     - Tablas con ordenamiento/paginación
+
+     ⚠️ USO MANUAL: Este snippet NO se aplica automáticamente.
+     Solo usar cuando el usuario pida explícitamente funcionalidades dinámicas.
+
+     ✅ Compatible con: HTML estático, Flask, cualquier backend
+     📦 Tamaño: 14KB minificado
+     🔗 Docs: https://htmx.org/
+     ================================================ -->
+
+<!-- 1️⃣ INCLUIR HTMX (añadir en <head> o antes de </body>) -->
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+<!-- Configuración global HTMX (opcional) -->
+<script>
+    // Configurar HTMX para mostrar indicador de carga
+    document.body.addEventListener('htmx:beforeRequest', function(evt) {
+        // Mostrar spinner o indicador de carga
+        const target = evt.detail.target;
+        if (target) {
+            target.style.opacity = '0.5';
+        }
+    });
+
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        // Quitar indicador de carga
+        const target = evt.detail.target;
+        if (target) {
+            target.style.opacity = '1';
+        }
+    });
+</script>
+
+<!-- ========================================
+     EJEMPLOS DE USO COMÚN
+     ======================================== -->
+
+<!-- EJEMPLO 1: Búsqueda dinámica en tiempo real -->
+<div class="search-container">
+    <input type="search"
+           name="query"
+           placeholder="Buscar..."
+           hx-get="/api/buscar"
+           hx-trigger="keyup changed delay:500ms"
+           hx-target="#resultados-busqueda"
+           hx-indicator="#spinner-busqueda"
+           style="padding: 10px; border: 1px solid var(--border); border-radius: 8px; width: 100%;">
+
+    <span id="spinner-busqueda" class="htmx-indicator" style="margin-left: 10px; display: none;">
+        🔄 Buscando...
+    </span>
+</div>
+
+<div id="resultados-busqueda">
+    <!-- Los resultados se cargarán aquí dinámicamente -->
+</div>
+
+<!-- EJEMPLO 2: Filtros dinámicos (sin recargar página) -->
+<select hx-get="/api/filtrar"
+        hx-trigger="change"
+        hx-target="#lista-items"
+        hx-include="[name='categoria'], [name='precio']"
+        style="padding: 8px; border: 1px solid var(--border); border-radius: 8px;">
+    <option value="">Todas las categorías</option>
+    <option value="tecnologia">Tecnología</option>
+    <option value="deportes">Deportes</option>
+    <option value="cocina">Cocina</option>
+</select>
+
+<div id="lista-items">
+    <!-- Los items filtrados aparecerán aquí -->
+</div>
+
+<!-- EJEMPLO 3: Paginación sin recargar página -->
+<div id="contenido-paginado">
+    <!-- Contenido inicial aquí -->
+</div>
+
+<div class="pagination-controls" style="margin-top: 20px; text-align: center;">
+    <button hx-get="/api/pagina?num=1"
+            hx-target="#contenido-paginado"
+            hx-swap="innerHTML"
+            style="padding: 8px 16px; margin: 0 5px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+        Anterior
+    </button>
+
+    <span style="margin: 0 15px; color: var(--text-secondary);">Página 1 de 10</span>
+
+    <button hx-get="/api/pagina?num=2"
+            hx-target="#contenido-paginado"
+            hx-swap="innerHTML"
+            style="padding: 8px 16px; margin: 0 5px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+        Siguiente
+    </button>
+</div>
+
+<!-- EJEMPLO 4: Formulario con validación instantánea -->
+<form hx-post="/api/guardar"
+      hx-target="#mensaje-resultado"
+      hx-swap="innerHTML"
+      style="max-width: 500px; margin: 20px 0;">
+
+    <div class="form-group" style="margin-bottom: 15px;">
+        <label for="email" style="display: block; margin-bottom: 5px; color: var(--text-primary);">
+            Email:
+        </label>
+        <input type="email"
+               id="email"
+               name="email"
+               hx-post="/api/validar-email"
+               hx-trigger="blur"
+               hx-target="#email-error"
+               required
+               style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px;">
+        <div id="email-error" style="color: #e74c3c; font-size: 0.9rem; margin-top: 5px;">
+            <!-- Mensajes de error aparecerán aquí -->
+        </div>
+    </div>
+
+    <button type="submit"
+            style="padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+        Guardar
+    </button>
+</form>
+
+<div id="mensaje-resultado" style="margin-top: 15px;">
+    <!-- Mensaje de éxito/error aparecerá aquí -->
+</div>
+
+<!-- EJEMPLO 5: Cargar más items (infinite scroll) -->
+<div id="lista-productos">
+    <!-- Productos iniciales aquí -->
+</div>
+
+<button hx-get="/api/productos?pagina=2"
+        hx-target="#lista-productos"
+        hx-swap="beforeend"
+        style="padding: 10px 20px; background: var(--secondary); color: white; border: none; border-radius: 8px; cursor: pointer; display: block; margin: 20px auto;">
+    Cargar más productos
+</button>
+
+<!-- EJEMPLO 6: Eliminar item con confirmación -->
+<div class="item" id="item-123">
+    <h3>Producto XYZ</h3>
+    <button hx-delete="/api/eliminar/123"
+            hx-target="#item-123"
+            hx-swap="outerHTML"
+            hx-confirm="¿Estás seguro de eliminar este item?"
+            style="padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer;">
+        Eliminar
+    </button>
+</div>
+
+<!-- ========================================
+     BACKEND EJEMPLO (FLASK)
+     ======================================== -->
+
+<!--
+# Ejemplo de endpoint Flask para HTMX
+
+from flask import Flask, request, render_template_string
+
+app = Flask(__name__)
+
+@app.route('/api/buscar')
+def buscar():
+    """Búsqueda dinámica"""
+    query = request.args.get('query', '').lower()
+
+    # Simular búsqueda en base de datos
+    items = [
+        {'id': 1, 'nombre': 'Calculadora', 'categoria': 'Utilidades'},
+        {'id': 2, 'nombre': 'Conversor', 'categoria': 'Herramientas'},
+        {'id': 3, 'nombre': 'Calendario', 'categoria': 'Productividad'}
+    ]
+
+    # Filtrar por query
+    resultados = [item for item in items if query in item['nombre'].lower()]
+
+    # Devolver HTML fragmento (no página completa)
+    html = ''
+    for item in resultados:
+        html += f'''
+        <div class="resultado-item" style="padding: 10px; border-bottom: 1px solid var(--border);">
+            <h4>{item['nombre']}</h4>
+            <span style="color: var(--text-secondary); font-size: 0.9rem;">{item['categoria']}</span>
+        </div>
+        '''
+
+    if not resultados:
+        html = '<p style="color: var(--text-muted); padding: 20px; text-align: center;">No se encontraron resultados</p>'
+
+    return html
+
+@app.route('/api/filtrar')
+def filtrar():
+    """Filtrar items por categoría"""
+    categoria = request.args.get('categoria', '')
+
+    # Lógica de filtrado...
+
+    return render_template_string('''
+        <div class="item">Item filtrado 1</div>
+        <div class="item">Item filtrado 2</div>
+    ''')
+
+@app.route('/api/validar-email', methods=['POST'])
+def validar_email():
+    """Validar email en tiempo real"""
+    email = request.form.get('email', '')
+
+    if '@' not in email:
+        return '<span style="color: #e74c3c;">❌ Email inválido</span>', 400
+
+    # Verificar si el email ya existe
+    if email == 'existente@ejemplo.com':
+        return '<span style="color: #e74c3c;">❌ Este email ya está registrado</span>', 400
+
+    return '<span style="color: #27ae60;">✅ Email válido</span>', 200
+
+@app.route('/api/guardar', methods=['POST'])
+def guardar():
+    """Guardar formulario"""
+    email = request.form.get('email')
+
+    # Guardar en base de datos...
+
+    return '''
+    <div style="padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; color: #155724;">
+        ✅ Datos guardados correctamente
+    </div>
+    '''
+-->
+
+<!-- ========================================
+     ATRIBUTOS HTMX MÁS COMUNES
+     ======================================== -->
+
+<!--
+hx-get="/url"           → Hacer petición GET
+hx-post="/url"          → Hacer petición POST
+hx-put="/url"           → Hacer petición PUT
+hx-delete="/url"        → Hacer petición DELETE
+
+hx-target="#id"         → Dónde insertar la respuesta
+hx-swap="innerHTML"     → Cómo insertar (innerHTML, outerHTML, beforeend, afterend)
+
+hx-trigger="click"      → Evento que activa la petición (click, change, keyup, etc.)
+hx-trigger="keyup changed delay:500ms"  → Con delay para búsqueda
+
+hx-include="[name='otro-campo']"  → Incluir otros campos en la petición
+hx-confirm="¿Seguro?"   → Mostrar confirmación antes de ejecutar
+
+hx-indicator="#spinner" → Elemento que se muestra durante la petición
+hx-push-url="true"      → Actualizar URL del navegador
+-->
+
+<!-- ========================================
+     ESTILOS RECOMENDADOS PARA HTMX
+     ======================================== -->
+
+<style>
+/* Indicador de carga global */
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator {
+    display: inline;
+}
+
+.htmx-request.htmx-indicator {
+    display: inline;
+}
+
+/* Animación de carga suave */
+.htmx-swapping {
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+}
+
+/* Elemento durante petición */
+.htmx-request {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Spinner de carga personalizado */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<!-- ========================================
+     NOTAS IMPORTANTES
+     ======================================== -->
+
+<!--
+✅ VENTAJAS DE HTMX:
+- Sin JavaScript complejo
+- HTML semántico y accesible
+- Compatible con cualquier backend
+- Progresive enhancement (funciona sin JS también)
+- Solo 14KB minificado
+
+⚠️ CUÁNDO NO USAR HTMX:
+- Aplicaciones SPA complejas (mejor React/Vue)
+- Necesitas estado complejo del lado del cliente
+- Requieres offline-first (usar Service Workers)
+
+🎨 INTEGRACIÓN CON meskeIA:
+- Mantiene todos los estilos CSS de meskeIA
+- Compatible con logo y footer oficiales
+- Responsive automático
+- Formato español en respuestas del servidor
+
+📚 RECURSOS:
+- Docs oficiales: https://htmx.org/docs/
+- Ejemplos: https://htmx.org/examples/
+- Extensiones: https://htmx.org/extensions/
+-->

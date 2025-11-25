@@ -1,0 +1,572 @@
+/* Variables CSS - Paleta meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --focus: rgba(46, 134, 171, 0.1);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  max-width: 1200px; /* Reducido de 1400px a 1200px */
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg); /* Aumentado padding vertical */
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Dark Mode Support */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #333333;
+  --focus: rgba(46, 134, 171, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  margin-top: 80px; /* Espacio para el logo fixed */
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+  box-shadow: var(--shadow-lg);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.95;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* Selector de tipo de ecuación */
+.typeSelector {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.typeButton {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.typeButton:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.typeButton.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+/* Contenido principal */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-2xl); /* Aumentado de xl a 2xl para más espacio entre columnas */
+  margin-bottom: var(--spacing-xl);
+  padding: 0 var(--spacing-md); /* Padding lateral para separar del borde */
+}
+
+/* Paneles */
+.inputPanel,
+.resultsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Cards */
+.equationCard,
+.resultsCard,
+.chartCard {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.cardTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+/* Inputs */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.inputGroup label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.input {
+  padding: var(--spacing-md);
+  font-size: 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+  background: var(--bg-card); /* Cambiado de bg-primary a bg-card */
+  color: var(--text-primary); /* Color de texto adaptable */
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-card); /* Mantiene fondo de card en focus */
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+/* Dark mode específico para inputs */
+[data-theme='dark'] .input {
+  background: #333333;
+  color: #E5E5E5;
+  border-color: #505050;
+}
+
+[data-theme='dark'] .input:focus {
+  background: #3A3A3A;
+  border-color: var(--primary);
+}
+
+/* Sistema de ecuaciones */
+.systemGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.systemRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.systemLabel {
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 100px;
+}
+
+.inputSmall {
+  width: 70px;
+  padding: var(--spacing-sm);
+  font-size: 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  transition: all 0.3s ease;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.inputSmall:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+/* Dark mode para inputs pequeños */
+[data-theme='dark'] .inputSmall {
+  background: #333333;
+  color: #E5E5E5;
+  border-color: #505050;
+}
+
+[data-theme='dark'] .inputSmall:focus {
+  background: #3A3A3A;
+  border-color: var(--primary);
+}
+
+/* Botones */
+.btnPrimary,
+.btnSecondary {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  font-family: inherit;
+}
+
+.btnPrimary {
+  background: var(--primary);
+  color: white;
+}
+
+.btnPrimary:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btnSecondary {
+  background: var(--secondary);
+  color: white;
+}
+
+.btnSecondary:hover {
+  background: #3a8784;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Resultados */
+.solution {
+  background: var(--hover);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.solutionValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: var(--spacing-sm) 0;
+  text-align: center;
+}
+
+.extraInfo {
+  background: var(--bg-primary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-lg);
+}
+
+.extraInfo p {
+  margin: var(--spacing-sm) 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+/* Pasos */
+.steps {
+  background: var(--bg-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.stepsTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.step {
+  padding: var(--spacing-sm) 0;
+  color: var(--text-primary);
+  line-height: 1.8;
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.step:last-child {
+  border-bottom: none;
+}
+
+/* Gráfica */
+.chartCard {
+  height: 400px;
+}
+
+.chart {
+  width: 100%;
+  height: 100%;
+}
+
+/* Disclaimer */
+.disclaimer {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.disclaimer h3 {
+  color: #856404;
+  font-size: 1.3rem;
+  margin-bottom: var(--spacing-md);
+  font-weight: 700;
+}
+
+.disclaimer p {
+  color: #856404;
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+/* Toggle educativo */
+.educationalToggle {
+  text-align: center;
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: var(--hover);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+}
+
+.educationalToggle h3 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.5rem;
+}
+
+.educationalSubtitle {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.05rem;
+}
+
+/* Contenido educativo con animación */
+.educationalContent {
+  margin-top: var(--spacing-xl);
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Secciones de contenido */
+.guideSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.guideSection h2 {
+  color: var(--primary);
+  font-size: 1.8rem;
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+  font-weight: 700;
+}
+
+.introParagraph {
+  color: var(--text-primary);
+  line-height: 1.8;
+  font-size: 1.05rem;
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Tarjetas de contenido */
+.contentCard {
+  background: var(--hover);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease;
+}
+
+.contentCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.contentCard h4 {
+  color: var(--primary);
+  font-size: 1.15rem;
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.contentCard p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.contentCard strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.contentCard ul,
+.contentCard ol {
+  margin-left: var(--spacing-lg);
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.contentCard li {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .chartCard {
+    height: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .typeSelector {
+    gap: var(--spacing-sm);
+  }
+
+  .typeButton {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 1rem;
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .educationalToggle h3 {
+    font-size: 1.3rem;
+  }
+
+  .chartCard {
+    height: 300px;
+  }
+
+  .systemRow {
+    font-size: 0.95rem;
+    gap: 0.3rem;
+  }
+
+  .inputSmall {
+    width: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .cardTitle {
+    font-size: 1.2rem;
+  }
+
+  .solutionValue {
+    font-size: 1.2rem;
+  }
+
+  .typeButton {
+    padding: var(--spacing-sm);
+    font-size: 0.9rem;
+  }
+
+  .systemRow {
+    font-size: 0.85rem;
+  }
+
+  .inputSmall {
+    width: 50px;
+    font-size: 0.9rem;
+  }
+}

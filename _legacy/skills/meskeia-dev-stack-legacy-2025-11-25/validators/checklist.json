@@ -1,0 +1,134 @@
+{
+  "version": "1.0.0",
+  "nombre": "Checklist de Validación meskeIA",
+  "descripcion": "Validación automática de estándares meskeIA",
+  "validaciones": {
+    "diseño": {
+      "nombre": "Diseño meskeIA",
+      "obligatorio": true,
+      "checks": [
+        {
+          "id": "paleta_colores",
+          "descripcion": "¿Paleta oficial #2E86AB aplicada?",
+          "tipo": "css",
+          "patron": "#2E86AB|--primary:\\s*#2E86AB"
+        },
+        {
+          "id": "paleta_incorrecta",
+          "descripcion": "¿NO usa paleta incorrecta #7C3AED?",
+          "tipo": "css",
+          "patron": "#7C3AED",
+          "invertido": true
+        },
+        {
+          "id": "tipografia",
+          "descripcion": "¿Tipografía oficial aplicada?",
+          "tipo": "css",
+          "patron": "font-family.*Segoe UI|font-family.*-apple-system"
+        }
+      ]
+    },
+    "componentes": {
+      "nombre": "Logo y Footer",
+      "obligatorio": true,
+      "checks": [
+        {
+          "id": "logo_oficial",
+          "descripcion": "¿Logo CSS completo (no imagen externa)?",
+          "tipo": "html",
+          "patron": "meskeia-logo-container"
+        },
+        {
+          "id": "footer_oficial",
+          "descripcion": "¿Footer '© 2025 meskeIA' incluido?",
+          "tipo": "html",
+          "patron": "2025 meskeIA"
+        },
+        {
+          "id": "favicon",
+          "descripcion": "¿Favicon referenciado?",
+          "tipo": "html",
+          "patron": "icon_meskeia\\.png|favicon"
+        }
+      ]
+    },
+    "responsive": {
+      "nombre": "Diseño Responsive Móvil",
+      "obligatorio": true,
+      "checks": [
+        {
+          "id": "viewport",
+          "descripcion": "¿Viewport meta tag incluido?",
+          "tipo": "html",
+          "patron": "name=\"viewport\""
+        },
+        {
+          "id": "media_query_mobile",
+          "descripcion": "¿Media query móvil (@media max-width: 768px)?",
+          "tipo": "css",
+          "patron": "@media.*max-width:\\s*768px"
+        },
+        {
+          "id": "logo_responsive",
+          "descripcion": "¿Logo responsive en móvil?",
+          "tipo": "css",
+          "patron": "@media.*768px.*meskeia-logo-container"
+        }
+      ]
+    },
+    "localizacion": {
+      "nombre": "Formato Español",
+      "obligatorio": true,
+      "checks": [
+        {
+          "id": "locale_es",
+          "descripcion": "¿Formato español en números/fechas?",
+          "tipo": "js",
+          "patron": "toLocaleString\\('es-ES'\\)|'es-ES'"
+        },
+        {
+          "id": "comentarios_espanol",
+          "descripcion": "¿Comentarios en español?",
+          "tipo": "js|py",
+          "patron": "//.*[áéíóúñ]|#.*[áéíóúñ]"
+        }
+      ]
+    },
+    "seguridad": {
+      "nombre": "API Keys Seguras",
+      "obligatorio": true,
+      "checks": [
+        {
+          "id": "no_hardcoded_keys",
+          "descripcion": "¿API keys NO hardcodeadas?",
+          "tipo": "js|py",
+          "patron": "sk-ant-[a-zA-Z0-9]{40}|API_KEY\\s*=\\s*['\"]sk-",
+          "invertido": true
+        },
+        {
+          "id": "env_file",
+          "descripcion": "¿Archivo .env presente (si hay API keys)?",
+          "tipo": "file",
+          "archivo": ".env"
+        },
+        {
+          "id": "gitignore",
+          "descripcion": "¿.gitignore incluye .env?",
+          "tipo": "file",
+          "patron": "\\.env"
+        }
+      ]
+    }
+  },
+  "puntuacion": {
+    "minimo_aprobado": 80,
+    "excelente": 95,
+    "perfecto": 100
+  },
+  "mensajes": {
+    "perfecto": "✅ Proyecto cumple 100% estándares meskeIA",
+    "excelente": "✅ Proyecto cumple estándares meskeIA con excelencia",
+    "aprobado": "⚠️  Proyecto parcialmente cumple estándares meskeIA",
+    "suspendido": "❌ Proyecto NO cumple estándares meskeIA"
+  }
+}
