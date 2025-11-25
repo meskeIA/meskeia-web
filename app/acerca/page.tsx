@@ -27,7 +27,7 @@ export default function AcercaPage() {
 
           <div className={styles.stats}>
             <div className={styles.stat}>
-              <span className={styles.statNumber}>84+</span>
+              <span className={styles.statNumber}>28</span>
               <span className={styles.statLabel}>Aplicaciones</span>
             </div>
             <div className={styles.stat}>

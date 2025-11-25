@@ -6,6 +6,7 @@ import WhyMeskeIA from '@/components/home/WhyMeskeIA';
 import FAQ from '@/components/home/FAQ';
 import HomeFooter from '@/components/home/HomeFooter';
 import { categories, applicationsDatabase } from '@/data/applications';
+import { isAppImplemented, TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -15,8 +16,11 @@ export default function Home() {
     setOpenCategory(openCategory === categoryId ? null : categoryId);
   };
 
+  // Filtrar solo apps implementadas
   const getAppsByCategory = (categoryName: string) => {
-    return applicationsDatabase.filter(app => app.category === categoryName);
+    return applicationsDatabase
+      .filter(app => app.category === categoryName)
+      .filter(app => isAppImplemented(app.url));
   };
 
   return (
@@ -31,7 +35,7 @@ export default function Home() {
               Biblioteca de Aplicaciones Web Gratuitas
             </h1>
             <p className={styles.subtitle}>
-              Herramientas online para facilitar tu día a día. Sin registro, sin anuncios.
+              {TOTAL_IMPLEMENTED_APPS} herramientas online para facilitar tu día a día. Sin registro, sin anuncios.
             </p>
           </div>
         </header>

@@ -10,10 +10,11 @@ export default function HeaderActions() {
       <div className={styles.searchWrapper}>
         <SearchBar />
       </div>
-      <Link href="/guias" className={styles.guidesButton}>
+      {/* Temporalmente oculto hasta completar todas las guías */}
+      {/* <Link href="/guias" className={styles.guidesButton}>
         <span className={styles.guidesIcon}>📚</span>
         <span className={styles.guidesText}>Guías</span>
-      </Link>
+      </Link> */}
     </div>
   )
 }

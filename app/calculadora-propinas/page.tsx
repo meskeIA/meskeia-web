@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import AnalyticsTracker from '@/components/AnalyticsTracker';
-import MeskeiaLogo from '@/components/MeskeiaLogo';
+import FixedHeader from '@/components/FixedHeader';
 import Footer from '@/components/Footer';
-import { Button } from '@/components/ui';
+import ResultCard from '@/components/ResultCard';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { formatCurrency } from '@/lib/formatters';
 import { jsonLd } from './metadata';
 import styles from './CalculadoraPropinas.module.css';
 
@@ -70,14 +71,6 @@ export default function CalculadoraPropinas() {
     setPaisSeleccionado('custom');
   };
 
-  // Formatear moneda española
-  const formatearMoneda = (valor: number) => {
-    return valor.toLocaleString('es-ES', {
-      style: 'currency',
-      currency: 'EUR',
-    });
-  };
-
   return (
     <>
       {/* Schema.org JSON-LD */}
@@ -89,23 +82,24 @@ export default function CalculadoraPropinas() {
       {/* Analytics v2.1 */}
       <AnalyticsTracker applicationName="calculadora-propinas" />
 
-      {/* Logo meskeIA */}
-      <MeskeiaLogo />
+      {/* Header meskeIA */}
+      <FixedHeader />
 
-      <div className="container-md">
-        <div className={styles.container}>
-          {/* Header */}
-          <header className={styles.header}>
-            <h1 className="text-2xl text-lg-3xl text-center mb-sm">
-              💶 Propinas
-            </h1>
-            <p className={`${styles.subtitle} text-center`}>
-              Calcula la propina automáticamente
-            </p>
-          </header>
+      <main className={styles.container}>
+        {/* Header */}
+        <header className={styles.header}>
+          <h1 className={styles.title}>
+            💶 Calculadora de Propinas
+          </h1>
+          <p className={styles.subtitle}>
+            Calcula la propina automáticamente según el país y divide la cuenta entre varias personas
+          </p>
+        </header>
 
+        {/* Formulario */}
+        <div className={styles.formSection}>
           {/* Input de monto */}
-          <div className="mb-md">
+          <div className={styles.inputGroup}>
             <label htmlFor="monto" className={styles.label}>
               Monto de la cuenta (€)
             </label>
@@ -113,16 +107,16 @@ export default function CalculadoraPropinas() {
               type="number"
               id="monto"
               className={styles.input}
-              placeholder="0,00"
-              min="0"
-              step="0.01"
               value={monto || ''}
               onChange={(e) => setMonto(parseFloat(e.target.value) || 0)}
+              placeholder="0,00"
+              min={0}
+              step={0.01}
             />
           </div>
 
           {/* Botones de porcentaje */}
-          <div className="mb-md">
+          <div className={styles.inputGroup}>
             <label className={styles.label}>Selecciona porcentaje:</label>
             <div className={styles.porcentajes}>
               <button
@@ -156,7 +150,7 @@ export default function CalculadoraPropinas() {
           </div>
 
           {/* Porcentaje personalizado */}
-          <div className="mb-md">
+          <div className={styles.inputGroup}>
             <label htmlFor="porcentaje" className={styles.label}>
               Porcentaje personalizado (%)
             </label>
@@ -164,19 +158,19 @@ export default function CalculadoraPropinas() {
               type="number"
               id="porcentaje"
               className={styles.input}
-              min="0"
-              max="100"
-              step="0.5"
-              value={porcentaje}
+              value={porcentaje || ''}
               onChange={(e) => {
                 setPorcentaje(parseFloat(e.target.value) || 0);
                 setPaisSeleccionado('custom');
               }}
+              min={0}
+              max={100}
+              step={0.5}
             />
           </div>
 
           {/* Selector de país */}
-          <div className="mb-md">
+          <div className={styles.inputGroup}>
             <label htmlFor="pais" className={styles.label}>
               País/Contexto de propina
             </label>
@@ -198,7 +192,7 @@ export default function CalculadoraPropinas() {
           </div>
 
           {/* División de cuenta */}
-          <div className="mb-md">
+          <div className={styles.inputGroup}>
             <label htmlFor="personas" className={styles.label}>
               Número de personas
             </label>
@@ -206,48 +200,50 @@ export default function CalculadoraPropinas() {
               type="number"
               id="personas"
               className={styles.input}
-              min="1"
-              max="50"
-              value={personas}
+              value={personas || ''}
               onChange={(e) => setPersonas(parseInt(e.target.value) || 1)}
+              min={1}
+              max={50}
+              step={1}
             />
           </div>
 
           {/* Botón Reset */}
-          <Button
-            variant="secondary"
-            fullWidth
+          <button
+            type="button"
+            className={styles.btnReset}
             onClick={resetear}
-            className="mb-md"
           >
             🔄 Limpiar
-          </Button>
+          </button>
+        </div>
 
-          {/* Resultados */}
-          <div className={styles.resultados}>
-            <div className={styles.resultadoItem}>
-              <span className={styles.etiqueta}>Monto original:</span>
-              <span className={styles.valor}>{formatearMoneda(monto)}</span>
-            </div>
-            <div className={styles.resultadoItem}>
-              <span className={styles.etiqueta}>Propina total:</span>
-              <span className={styles.valor}>{formatearMoneda(propina)}</span>
-            </div>
-            <div className={`${styles.resultadoItem} ${styles.resultadoTotal}`}>
-              <span className={styles.etiqueta}>Total:</span>
-              <span className={styles.valor}>{formatearMoneda(total)}</span>
-            </div>
-            {personas > 1 && (
-              <div
-                className={`${styles.resultadoItem} ${styles.resultadoPersona}`}
-              >
-                <span className={styles.etiqueta}>Por persona:</span>
-                <span className={styles.valor}>
-                  {formatearMoneda(totalPorPersona)}
-                </span>
-              </div>
-            )}
-          </div>
+        {/* Resultados usando ResultCard */}
+        <div className={styles.resultsSection}>
+          <ResultCard
+            title="Monto original"
+            value={formatCurrency(monto)}
+            variant="default"
+          />
+          <ResultCard
+            title="Propina total"
+            value={formatCurrency(propina)}
+            description={`${porcentaje}%`}
+            variant="info"
+          />
+          <ResultCard
+            title="Total a pagar"
+            value={formatCurrency(total)}
+            variant="highlight"
+          />
+          {personas > 1 && (
+            <ResultCard
+              title="Por persona"
+              value={formatCurrency(totalPorPersona)}
+              description={`${personas} ${personas === 1 ? 'persona' : 'personas'}`}
+              variant="success"
+            />
+          )}
         </div>
 
         {/* Toggle de Contenido Educativo */}
@@ -269,7 +265,7 @@ export default function CalculadoraPropinas() {
         {showEducationalContent && (
           <div className={styles.educationalContent}>
             {/* Secciones educativas */}
-            <div className={styles.eduSection}>
+            <section className={styles.guideSection}>
               <h2>¿Cómo usar la Calculadora de Propinas?</h2>
               <p>
                 Calcular propinas correctamente es muy sencillo con esta herramienta
@@ -298,86 +294,86 @@ export default function CalculadoraPropinas() {
                 Tus preferencias se guardan automáticamente para la próxima vez. Usa
                 el botón "Limpiar" para resetear todos los valores.
               </p>
-            </div>
+            </section>
 
-            <div className={styles.eduSection}>
+            <section className={styles.guideSection}>
               <h2>Porcentajes de Propina por País</h2>
               <p>
                 Las costumbres de propinas varían significativamente según el país y
                 la cultura. Aquí tienes una guía rápida de los porcentajes más
                 comunes:
               </p>
-              <ul>
-                <li>
-                  <strong>🇪🇸 España</strong>: 5-10% (opcional, servicio
-                  excepcional. No es obligatorio)
-                </li>
-                <li>
-                  <strong>🇺🇸 Estados Unidos</strong>: 15-20% (esperado y parte del
-                  salario del camarero)
-                </li>
-                <li>
-                  <strong>🇲🇽 México</strong>: 10-15% (común en restaurantes, a veces
-                  incluido en cuenta)
-                </li>
-                <li>
-                  <strong>🇬🇧 Reino Unido</strong>: 10-15% (discrecional, a veces
-                  incluido como "service charge")
-                </li>
-                <li>
-                  <strong>🇫🇷 Francia</strong>: 5-10% (el servicio suele estar
-                  incluido en la cuenta)
-                </li>
-                <li>
-                  <strong>🇩🇪 Alemania</strong>: 5-10% (costumbre redondear al alza
-                  el total)
-                </li>
-                <li>
-                  <strong>🇯🇵 Japón</strong>: 0% (dejar propina se considera
-                  ofensivo culturalmente)
-                </li>
-              </ul>
-              <p>
-                Recuerda: Siempre revisa si el servicio ya está incluido en la cuenta
+              <div className={styles.contentGrid}>
+                <div className={styles.contentCard}>
+                  <h4>🇪🇸 España</h4>
+                  <p><strong>5-10%</strong> (opcional, servicio excepcional. No es obligatorio)</p>
+                </div>
+                <div className={styles.contentCard}>
+                  <h4>🇺🇸 Estados Unidos</h4>
+                  <p><strong>15-20%</strong> (esperado y parte del salario del camarero)</p>
+                </div>
+                <div className={styles.contentCard}>
+                  <h4>🇲🇽 México</h4>
+                  <p><strong>10-15%</strong> (común en restaurantes, a veces incluido en cuenta)</p>
+                </div>
+                <div className={styles.contentCard}>
+                  <h4>🇬🇧 Reino Unido</h4>
+                  <p><strong>10-15%</strong> (discrecional, a veces incluido como "service charge")</p>
+                </div>
+                <div className={styles.contentCard}>
+                  <h4>🇫🇷 Francia</h4>
+                  <p><strong>5-10%</strong> (el servicio suele estar incluido en la cuenta)</p>
+                </div>
+                <div className={styles.contentCard}>
+                  <h4>🇩🇪 Alemania</h4>
+                  <p><strong>5-10%</strong> (costumbre redondear al alza el total)</p>
+                </div>
+                <div className={styles.contentCard}>
+                  <h4>🇯🇵 Japón</h4>
+                  <p><strong>0%</strong> (dejar propina se considera ofensivo culturalmente)</p>
+                </div>
+              </div>
+              <p className={styles.note}>
+                <strong>Importante:</strong> Siempre revisa si el servicio ya está incluido en la cuenta
                 antes de añadir propina adicional.
               </p>
-            </div>
+            </section>
 
-            <div className={styles.eduSection}>
+            <section className={styles.guideSection}>
               <h2>¿Cuándo dejar más propina?</h2>
               <p>
                 Hay situaciones donde es apropiado aumentar el porcentaje de propina
                 como reconocimiento al servicio:
               </p>
-              <ul>
-                <li>
-                  <strong>Servicio excepcional</strong>: Si el servicio superó tus
-                  expectativas, considera 20% o más
-                </li>
-                <li>
-                  <strong>Grupos grandes</strong>: Para 6 o más personas, 15-18% es
-                  apropiado (requiere más trabajo del personal)
-                </li>
-                <li>
-                  <strong>Pedidos complejos</strong>: Alergias alimentarias,
-                  personalizaciones o requerimientos especiales del menú
-                </li>
-                <li>
-                  <strong>Horarios difíciles</strong>: Servicio en madrugada,
-                  festivos o condiciones climáticas adversas
-                </li>
-                <li>
-                  <strong>Servicio a domicilio</strong>: Los repartidores merecen
-                  10-15% por el esfuerzo del transporte
-                </li>
-              </ul>
-              <p>
+              <div className={styles.contentGrid}>
+                <div className={styles.contentCard}>
+                  <h4>⭐ Servicio excepcional</h4>
+                  <p>Si el servicio superó tus expectativas, considera 20% o más</p>
+                </div>
+                <div className={styles.contentCard}>
+                  <h4>👥 Grupos grandes</h4>
+                  <p>Para 6 o más personas, 15-18% es apropiado (requiere más trabajo del personal)</p>
+                </div>
+                <div className={styles.contentCard}>
+                  <h4>🍽️ Pedidos complejos</h4>
+                  <p>Alergias alimentarias, personalizaciones o requerimientos especiales del menú</p>
+                </div>
+                <div className={styles.contentCard}>
+                  <h4>🌙 Horarios difíciles</h4>
+                  <p>Servicio en madrugada, festivos o condiciones climáticas adversas</p>
+                </div>
+                <div className={styles.contentCard}>
+                  <h4>🚗 Servicio a domicilio</h4>
+                  <p>Los repartidores merecen 10-15% por el esfuerzo del transporte</p>
+                </div>
+              </div>
+              <p className={styles.note}>
                 Por el contrario, si el servicio fue deficiente, es aceptable reducir
                 la propina o hablar con el gerente sobre el problema.
               </p>
-            </div>
+            </section>
 
-            <div className={styles.eduSection}>
+            <section className={styles.guideSection}>
               <h2>Consejos para calcular propinas</h2>
               <ul>
                 <li>
@@ -402,13 +398,13 @@ export default function CalculadoraPropinas() {
                   está incluida como "servicio" o "service charge"
                 </li>
               </ul>
-            </div>
+            </section>
           </div>
         )}
-      </div>
+      </main>
 
-      {/* Footer meskeIA Unificado */}
-      <Footer appName="Calculadora de Propinas - meskeIA" />
+      {/* Footer meskeIA */}
+      <Footer appName="Calculadora de Propinas" />
     </>
   );
 }

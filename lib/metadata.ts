@@ -6,7 +6,7 @@ export const siteConfig = {
   name: 'meskeIA',
   title: 'meskeIA - Herramientas Web Gratuitas con Inteligencia Artificial',
   description:
-    'Descubre 85+ herramientas web gratuitas potenciadas por IA: calculadoras avanzadas, conversores, generadores, juegos educativos y utilidades para mejorar tu productividad. Todo en español y sin registro.',
+    'Descubre 28 herramientas web gratuitas de calidad: calculadoras financieras avanzadas, conversores, utilidades y más. Todo en español, sin registro y completamente gratis.',
   url: 'https://meskeia.com',
   ogImage: 'https://meskeia.com/og-image.png',
   author: 'meskeIA',
@@ -219,7 +219,7 @@ export function generateLegalMetadata(
 export function generateToolsMetadata(): Metadata {
   const title = 'Catálogo Completo de Herramientas';
   const description =
-    'Explora nuestro catálogo completo de 85+ herramientas web gratuitas organizadas por categorías: calculadoras, conversores, generadores, juegos educativos y más. Todo en español.';
+    'Explora nuestro catálogo de 28 herramientas web gratuitas de alta calidad organizadas por categorías: calculadoras financieras, conversores, utilidades y más. Todo en español.';
 
   return generateBaseMetadata({
     title,

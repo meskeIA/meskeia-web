@@ -1,24 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import FixedHeader from '@/components/FixedHeader';
 import Footer from '@/components/Footer';
 import { categories, applicationsDatabase } from '@/data/applications';
+import { isAppImplemented, TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import styles from './page.module.css';
 
 export default function HerramientasPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
+  // Filtrar solo apps implementadas
+  const implementedApps = useMemo(() =>
+    applicationsDatabase.filter(app => isAppImplemented(app.url)),
+    []
+  );
+
   const getAppsByCategory = (categoryName: string) => {
-    return applicationsDatabase.filter(app => app.category === categoryName);
+    return implementedApps.filter(app => app.category === categoryName);
   };
 
   const filteredApps = selectedCategory === 'all'
-    ? applicationsDatabase
-    : applicationsDatabase.filter(app => app.category === selectedCategory);
+    ? implementedApps
+    : implementedApps.filter(app => app.category === selectedCategory);
 
-  const totalApps = applicationsDatabase.length;
+  const totalApps = TOTAL_IMPLEMENTED_APPS;
   const totalCategories = categories.length;
 
   return (
