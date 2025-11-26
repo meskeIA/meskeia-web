@@ -27,7 +27,8 @@ export const implementedAppsUrls = [
   // NOTA: Mantiene URL antigua temporalmente hasta renombrar carpeta
   "/algebra-ecuaciones/",            // TODO: Renombrar a /calculadora-ecuaciones/
 
-  // Herramientas de Productividad (7 implementadas)
+  // Herramientas de Productividad (8 implementadas)
+  "/notas/",
   "/generador-contrasenas/",
   "/lista-tareas/",
   "/cronometro/",
