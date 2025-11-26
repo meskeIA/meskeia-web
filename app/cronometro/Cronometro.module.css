@@ -1,0 +1,452 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 35px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 25px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  background: var(--bg-card);
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.tab:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.tabActivo {
+  background: var(--primary);
+  color: white;
+}
+
+.tabActivo:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* Main Content */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+/* Display Panel */
+.displayPanel {
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 30px;
+  text-align: center;
+}
+
+.tiempoDisplay {
+  font-size: 4rem;
+  font-weight: 300;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  color: var(--text-primary);
+  margin-bottom: 25px;
+  letter-spacing: 2px;
+}
+
+/* Círculo de progreso */
+.circuloProgreso {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 25px;
+}
+
+.circuloSvg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.circuloFondo {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 8;
+}
+
+.circuloRelleno {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.1s ease;
+}
+
+.tiempoDisplayTemporizador {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
+  font-weight: 300;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  color: var(--text-primary);
+}
+
+/* Inputs de tiempo */
+.inputsTiempo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.inputGrupo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.inputTiempo {
+  width: 70px;
+  padding: 12px;
+  font-size: 1.5rem;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  text-align: center;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.inputTiempo:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.inputLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.inputSeparador {
+  font-size: 2rem;
+  color: var(--text-muted);
+  margin-top: -20px;
+}
+
+/* Presets */
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.presetBtn {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.presetBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--focus);
+}
+
+/* Controles */
+.controles {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btnPrimario {
+  padding: 14px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnPrimario:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnPausar {
+  padding: 14px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  background: #f59e0b;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnPausar:hover {
+  background: #d97706;
+}
+
+.btnSecundario {
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSecundario:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnSecundario:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Vueltas Panel */
+.vueltasPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 20px;
+}
+
+.vueltasPanel h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+}
+
+.vueltasLista {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.vueltaItem {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.vueltaItem:last-child {
+  border-bottom: none;
+}
+
+.vueltaNumero {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 50px;
+}
+
+.vueltaTiempo {
+  flex: 1;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.vueltaDiferencia {
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Info Panel */
+.infoPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.infoPanel h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.infoItem {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.infoIcon {
+  font-size: 1.5rem;
+}
+
+.infoItem strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.infoItem p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 30px 20px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .tiempoDisplay {
+    font-size: 3rem;
+  }
+
+  .tiempoDisplayTemporizador {
+    font-size: 2rem;
+  }
+
+  .circuloProgreso {
+    width: 180px;
+    height: 180px;
+  }
+
+  .inputTiempo {
+    width: 60px;
+    font-size: 1.2rem;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .tiempoDisplay {
+    font-size: 2.5rem;
+  }
+
+  .displayPanel {
+    padding: 20px;
+  }
+
+  .controles {
+    flex-direction: column;
+  }
+
+  .btnPrimario,
+  .btnPausar,
+  .btnSecundario {
+    width: 100%;
+  }
+
+  .circuloProgreso {
+    width: 150px;
+    height: 150px;
+  }
+
+  .tiempoDisplayTemporizador {
+    font-size: 1.6rem;
+  }
+
+  .inputsTiempo {
+    gap: 5px;
+  }
+
+  .inputTiempo {
+    width: 50px;
+    font-size: 1rem;
+    padding: 10px;
+  }
+}
