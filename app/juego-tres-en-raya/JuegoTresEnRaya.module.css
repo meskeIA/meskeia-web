@@ -1,0 +1,341 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  color: white;
+  padding: 35px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 25px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Main Content */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+/* Game Panel */
+.gamePanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.panelTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+}
+
+/* Dificultad */
+.dificultadSelector {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dificultadLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.dificultadBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.dificultadBtn {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dificultadBtn:hover {
+  border-color: #3B82F6;
+}
+
+.dificultadBtn.active {
+  border-color: #3B82F6;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+}
+
+/* Estado */
+.estado {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  min-height: 35px;
+}
+
+.turno {
+  color: var(--text-primary);
+}
+
+.victoria {
+  color: #10B981;
+}
+
+.derrota {
+  color: #EF4444;
+}
+
+.empate {
+  color: #F59E0B;
+}
+
+/* Tablero */
+.tablero {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 25px;
+}
+
+.casilla {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.casilla:hover:not(:disabled):not(.ocupada) {
+  border-color: #3B82F6;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.casilla:disabled {
+  cursor: default;
+}
+
+.casilla.ocupada {
+  cursor: default;
+}
+
+.casilla.ganadora {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10B981;
+}
+
+.x {
+  color: #3B82F6;
+}
+
+.o {
+  color: #EF4444;
+}
+
+/* Reiniciar */
+.reiniciarBtn {
+  padding: 14px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: #3B82F6;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reiniciarBtn:hover {
+  background: #2563EB;
+  transform: translateY(-2px);
+}
+
+/* Stats Panel */
+.statsPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+}
+
+.statsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.statsHeader .panelTitle {
+  margin-bottom: 0;
+}
+
+.resetBtn {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.resetBtn:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.statCard {
+  text-align: center;
+  padding: 20px 10px;
+  border-radius: 10px;
+}
+
+.statCard.victorias {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.statCard.derrotas {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.statCard.empates {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.statValor {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.statLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Leyenda */
+.leyenda {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.leyendaItem .x,
+.leyendaItem .o {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 30px 20px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .casilla {
+    width: 90px;
+    height: 90px;
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .casilla {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+  }
+
+  .tablero {
+    gap: 6px;
+  }
+
+  .dificultadBtns {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .dificultadBtn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+}

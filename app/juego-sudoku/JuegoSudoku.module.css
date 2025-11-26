@@ -1,0 +1,435 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+  color: white;
+  padding: 30px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Controles superiores */
+.topControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+}
+
+.stat {
+  text-align: center;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Selector de dificultad */
+.difficultySelector {
+  display: flex;
+  gap: 8px;
+}
+
+.difficultyBtn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.difficultyBtn:hover {
+  border-color: #8B5CF6;
+  color: #8B5CF6;
+}
+
+.difficultyBtn.active {
+  background: #8B5CF6;
+  border-color: #8B5CF6;
+  color: white;
+}
+
+/* Tablero */
+.tablero {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 1px;
+  background: var(--text-primary);
+  border: 3px solid var(--text-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.celda {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 600;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.celda:hover:not(.fija) {
+  background: var(--hover);
+}
+
+.celda.fija {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: default;
+  font-weight: 700;
+}
+
+.celda.seleccionada {
+  background: #EDE9FE;
+}
+
+[data-theme='dark'] .celda.seleccionada {
+  background: #4C1D95;
+}
+
+.celda.mismoNumero {
+  background: #DDD6FE;
+}
+
+[data-theme='dark'] .celda.mismoNumero {
+  background: #5B21B6;
+}
+
+.celda.error {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+[data-theme='dark'] .celda.error {
+  background: #7F1D1D;
+  color: #FCA5A5;
+}
+
+.celda.correcto {
+  color: #8B5CF6;
+}
+
+/* Bordes de los cuadrantes 3x3 */
+.celda:nth-child(3n) {
+  border-right: 2px solid var(--text-primary);
+}
+
+.celda:nth-child(9n) {
+  border-right: none;
+}
+
+.celda:nth-child(n+19):nth-child(-n+27),
+.celda:nth-child(n+46):nth-child(-n+54) {
+  border-bottom: 2px solid var(--text-primary);
+}
+
+/* Teclado numérico */
+.teclado {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.teclaNum {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.teclaNum:hover:not(:disabled) {
+  background: #8B5CF6;
+  border-color: #8B5CF6;
+  color: white;
+}
+
+.teclaNum:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.teclaNum.completo {
+  background: #22C55E;
+  border-color: #22C55E;
+  color: white;
+}
+
+/* Botones de acción */
+.acciones {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.btnAccion {
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btnAccion:hover:not(:disabled) {
+  border-color: #8B5CF6;
+  color: #8B5CF6;
+}
+
+.btnAccion:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btnNuevo {
+  background: #8B5CF6;
+  border-color: #8B5CF6;
+  color: white;
+}
+
+.btnNuevo:hover {
+  background: #7C3AED;
+  border-color: #7C3AED;
+  color: white;
+}
+
+/* Mensaje */
+.mensaje {
+  text-align: center;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  animation: fadeIn 0.3s;
+}
+
+.mensaje.victoria {
+  background: #DCFCE7;
+  color: #166534;
+  border: 2px solid #22C55E;
+}
+
+[data-theme='dark'] .mensaje.victoria {
+  background: #14532D;
+  color: #86EFAC;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estadísticas */
+.estadisticas {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.estadisticas h3 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.statItem {
+  text-align: center;
+  padding: 10px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+}
+
+.statItem .valor {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #8B5CF6;
+}
+
+.statItem .label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Notas (candidatos) */
+.notas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.nota {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Modo notas activo */
+.modoNotas {
+  background: #FEF3C7;
+  border-color: #F59E0B;
+  color: #92400E;
+}
+
+[data-theme='dark'] .modoNotas {
+  background: #78350F;
+  border-color: #F59E0B;
+  color: #FDE68A;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .container {
+    padding: 15px 10px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .topControls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stats {
+    justify-content: center;
+  }
+
+  .difficultySelector {
+    justify-content: center;
+  }
+
+  .difficultyBtn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .celda {
+    font-size: 1.1rem;
+  }
+
+  .teclaNum {
+    font-size: 1.1rem;
+  }
+
+  .acciones {
+    flex-direction: column;
+  }
+
+  .btnAccion {
+    justify-content: center;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .statItem .valor {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .celda {
+    font-size: 0.95rem;
+  }
+
+  .teclaNum {
+    font-size: 0.95rem;
+  }
+
+  .nota {
+    font-size: 0.4rem;
+  }
+}

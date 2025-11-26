@@ -1,0 +1,479 @@
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: white;
+  padding: 30px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Pantalla de inicio */
+.pantallaInicio {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+}
+
+.pantallaInicio h2 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+}
+
+.pantallaInicio p {
+  color: var(--text-secondary);
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+/* Selector de modo */
+.modoSelector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.modoBtn {
+  padding: 15px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.modoBtn:hover {
+  border-color: #F59E0B;
+  background: #FEF3C7;
+}
+
+[data-theme='dark'] .modoBtn:hover {
+  background: #78350F;
+}
+
+.modoBtn.active {
+  border-color: #F59E0B;
+  background: #F59E0B;
+  color: white;
+}
+
+.modoBtn span {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+/* Botón comenzar */
+.btnComenzar {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnComenzar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+/* Pantalla de juego */
+.pantallaJuego {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+}
+
+/* Barra superior */
+.barraSuperior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat {
+  text-align: center;
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.statValue.tiempo {
+  color: #F59E0B;
+}
+
+/* Problema */
+.problema {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.ecuacion {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+}
+
+.tipoOperacion {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  padding: 6px 16px;
+  background: var(--bg-primary);
+  border-radius: 20px;
+  display: inline-block;
+}
+
+/* Input respuesta */
+.respuestaContainer {
+  margin-bottom: 25px;
+}
+
+.inputRespuesta {
+  width: 100%;
+  padding: 20px;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  border: 3px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.2s;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+}
+
+.inputRespuesta:focus {
+  border-color: #F59E0B;
+}
+
+.inputRespuesta.correcto {
+  border-color: #22C55E;
+  background: #DCFCE7;
+}
+
+.inputRespuesta.incorrecto {
+  border-color: #EF4444;
+  background: #FEE2E2;
+  animation: shake 0.3s;
+}
+
+[data-theme='dark'] .inputRespuesta.correcto {
+  background: #14532D;
+}
+
+[data-theme='dark'] .inputRespuesta.incorrecto {
+  background: #7F1D1D;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* Teclado numérico */
+.teclado {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tecla {
+  padding: 20px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.tecla:hover {
+  background: var(--hover);
+}
+
+.tecla:active {
+  transform: scale(0.95);
+}
+
+.tecla.especial {
+  background: var(--bg-primary);
+}
+
+.tecla.enviar {
+  background: #F59E0B;
+  border-color: #F59E0B;
+  color: white;
+}
+
+.tecla.enviar:hover {
+  background: #D97706;
+}
+
+/* Botones de acción */
+.acciones {
+  display: flex;
+  gap: 10px;
+}
+
+.btnAccion {
+  flex: 1;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAccion:hover {
+  border-color: #F59E0B;
+  color: #F59E0B;
+}
+
+/* Pantalla de resultados */
+.pantallaResultados {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+}
+
+.resultadoHeader {
+  margin-bottom: 25px;
+}
+
+.resultadoEmoji {
+  font-size: 4rem;
+  margin-bottom: 15px;
+}
+
+.resultadoTitulo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+}
+
+.resultadoSubtitulo {
+  color: var(--text-secondary);
+}
+
+/* Stats finales */
+.statsFinales {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.statFinal {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.statFinal .valor {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #F59E0B;
+}
+
+.statFinal .label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+/* Botones resultado */
+.botonesResultado {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btnReintentar {
+  padding: 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnReintentar:hover {
+  transform: translateY(-2px);
+}
+
+.btnVolver {
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnVolver:hover {
+  border-color: var(--text-secondary);
+}
+
+/* Estadísticas generales */
+.estadisticas {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.estadisticas h3 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.statItem {
+  text-align: center;
+  padding: 10px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+}
+
+.statItem .valor {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #F59E0B;
+}
+
+.statItem .label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Barra de progreso */
+.barraProgreso {
+  width: 100%;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B, #D97706);
+  transition: width 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .container {
+    padding: 15px 10px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .ecuacion {
+    font-size: 2.2rem;
+  }
+
+  .inputRespuesta {
+    font-size: 1.5rem;
+    padding: 15px;
+  }
+
+  .tecla {
+    padding: 15px;
+    font-size: 1.3rem;
+  }
+
+  .statsFinales {
+    grid-template-columns: 1fr;
+  }
+}

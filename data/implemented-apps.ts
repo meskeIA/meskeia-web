@@ -42,6 +42,16 @@ export const implementedAppsUrls = [
   "/conversor-texto/",
   "/limpiador-texto/",
   "/comparador-textos/",
+
+  // Juegos y Entretenimiento (8 implementadas)
+  "/juego-piedra-papel-tijera/",
+  "/juego-tres-en-raya/",
+  "/juego-memoria/",
+  "/juego-2048/",
+  "/juego-wordle/",
+  "/juego-sudoku/",
+  "/juego-puzzle-matematico/",
+  "/radio-meskeia/",
 ];
 
 /**
