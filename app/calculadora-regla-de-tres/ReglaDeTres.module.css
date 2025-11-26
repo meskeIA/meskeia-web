@@ -1,0 +1,522 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 40px 30px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 30px;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Main Content */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Section Title */
+.sectionTitle {
+  color: var(--primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* Config Panel - Tipo de Regla */
+.configPanel {
+  background: var(--bg-card);
+  padding: 30px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.tipoSelector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tipoBtn {
+  flex: 1;
+  min-width: 140px;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tipoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--focus);
+}
+
+.tipoBtn.activo {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+.tipoDescripcion {
+  background: var(--bg-primary);
+  padding: 16px 20px;
+  border-radius: 10px;
+  border-left: 4px solid var(--secondary);
+}
+
+.tipoDescripcion p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.tipoDescripcion em {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Input Panel */
+.inputPanel {
+  background: var(--bg-card);
+  padding: 30px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Proporción Simple */
+.proporcionSimple {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.proporcionRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.inputGroup {
+  flex: 1;
+  min-width: 120px;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 1.1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--focus);
+}
+
+.flecha {
+  font-size: 1.5rem;
+  color: var(--primary);
+  font-weight: bold;
+  padding-bottom: 10px;
+}
+
+.resultadoX {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  color: var(--primary);
+  text-align: center;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Proporción Compuesta */
+.proporcionCompuesta {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.magnitudGroup {
+  background: var(--bg-primary);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.magnitudGroup h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.selectRelacion {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.inputRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+}
+
+/* Error */
+.error {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-size: 0.95rem;
+}
+
+/* Botones de Acción */
+.botonesAccion {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.btnPrimary {
+  flex: 2;
+  min-width: 150px;
+  padding: 14px 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btnPrimary:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btnSecondary {
+  flex: 1;
+  min-width: 120px;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--secondary);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btnSecondary:hover {
+  background: var(--secondary);
+  color: white;
+}
+
+.btnOutline {
+  flex: 1;
+  min-width: 100px;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btnOutline:hover {
+  border-color: var(--text-secondary);
+  background: var(--hover);
+}
+
+/* Resultados Panel */
+.resultadosPanel {
+  background: var(--bg-card);
+  padding: 30px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.explicacionBox {
+  margin-top: 25px;
+  background: var(--bg-primary);
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.explicacionBox h3 {
+  color: var(--primary);
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.explicacionTexto {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  margin: 0;
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+/* Educational Content */
+.educationalContent {
+  padding: 20px 0;
+}
+
+.conceptoSection {
+  margin-bottom: 40px;
+}
+
+.conceptoSection h2 {
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.conceptoSection h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+}
+
+.conceptoSection > p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+/* Tipo Cards */
+.tipoCard {
+  background: var(--bg-card);
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.tipoCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.tipoCard h3 {
+  color: var(--text-primary);
+  font-size: 1.15rem;
+  margin-bottom: 12px;
+}
+
+.tipoCard p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.ejemploBox {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08) 0%, rgba(72, 169, 166, 0.08) 100%);
+  padding: 16px 20px;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+/* Lista Consejos */
+.listaConsejos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.listaConsejos li {
+  background: var(--bg-card);
+  padding: 16px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.listaConsejos li strong {
+  color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 30px 20px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .configPanel,
+  .inputPanel,
+  .resultadosPanel {
+    padding: 20px;
+  }
+
+  .tipoSelector {
+    flex-direction: column;
+  }
+
+  .tipoBtn {
+    min-width: auto;
+    flex: none;
+  }
+
+  .proporcionRow,
+  .inputRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .flecha {
+    text-align: center;
+    padding: 5px 0;
+  }
+
+  .inputGroup {
+    min-width: auto;
+  }
+
+  .botonesAccion {
+    flex-direction: column;
+  }
+
+  .btnPrimary,
+  .btnSecondary,
+  .btnOutline {
+    flex: none;
+    min-width: auto;
+  }
+
+  .conceptoSection h2 {
+    font-size: 1.3rem;
+  }
+
+  .explicacionTexto {
+    font-size: 0.85rem;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .configPanel,
+  .inputPanel,
+  .resultadosPanel {
+    padding: 15px;
+  }
+
+  .tipoCard {
+    padding: 20px;
+  }
+
+  .ejemploBox {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+  }
+}

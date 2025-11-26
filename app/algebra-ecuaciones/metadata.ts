@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Ecuaciones Algebraicas - Resolución Paso a Paso',
     description: 'Resuelve ecuaciones lineales, cuadráticas y sistemas 2x2 con explicaciones paso a paso y visualización gráfica de parábolas',
-    url: 'https://meskeia.com/beta/algebra-ecuaciones',
+    url: 'https://next.meskeia.com/algebra-ecuaciones',
     siteName: 'meskeIA',
     locale: 'es_ES',
   },

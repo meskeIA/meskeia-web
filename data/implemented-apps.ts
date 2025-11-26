@@ -1,39 +1,32 @@
 /**
  * Lista de aplicaciones IMPLEMENTADAS en meskeIA Next.js
- * Total: 28 aplicaciones
  *
- * Esta lista filtra applicationsDatabase para mostrar solo apps que existen realmente
+ * IMPORTANTE: Esta lista debe coincidir con las carpetas en app/
+ * Solo añadir URLs cuando la app esté realmente creada
+ *
+ * Actualizado: 2025-11-26
  */
 
 export const implementedAppsUrls = [
-  // Finanzas y Fiscalidad (13)
-  "/simulador-hipoteca/",
-  "/calculadora-jubilacion/",
-  "/calculadora-inversiones/",
-  "/interes-compuesto/",
-  "/control-gastos-mensual/",
-  "/simulador-irpf/",
-  "/impuesto-donaciones/",
-  "/impuesto-donaciones-nacional/",
-  "/impuesto-sucesiones/",
-  "/impuesto-sucesiones-nacional/",
-  "/tir-van/",
-  "/calculadora-porcentajes/",
+  // Finanzas y Fiscalidad (4 implementadas)
+  // NOTA: Estas 4 apps mantienen URLs antiguas temporalmente hasta migrar
+  "/impuesto-donaciones/",           // TODO: Renombrar a /calculadora-donaciones-cataluna/
+  "/impuesto-donaciones-nacional/",  // TODO: Renombrar a /calculadora-donaciones-nacional/
+  "/impuesto-sucesiones/",           // TODO: Renombrar a /calculadora-sucesiones-cataluna/
+  "/impuesto-sucesiones-nacional/",  // TODO: Renombrar a /calculadora-sucesiones-nacional/
+
+  // Calculadoras y Utilidades (6 implementadas)
   "/calculadora-propinas/",
-
-  // Calculadoras y Utilidades (6)
   "/calculadora-fechas/",
-  "/conversor-tallas/",
-  "/regla-de-tres/",
+  "/calculadora-regla-de-tres/",
   "/calculadora-cocina/",
-  "/lista-compras/",
-  "/conversor-divisas/",
+  "/conversor-tallas/",
 
-  // Matemáticas y Estadística (2)
-  "/algebra-ecuaciones/",
-  "/trigonometria/",
+  // Matemáticas y Estadística (1 implementada)
+  // NOTA: Mantiene URL antigua temporalmente hasta renombrar carpeta
+  "/algebra-ecuaciones/",            // TODO: Renombrar a /calculadora-ecuaciones/
 
-  // Herramientas de Productividad (1)
+  // Herramientas de Productividad (1 implementada)
   "/generador-contrasenas/",
 ];
 
@@ -47,4 +40,4 @@ export const isAppImplemented = (url: string): boolean => {
 /**
  * Total de apps implementadas (para contadores)
  */
-export const TOTAL_IMPLEMENTED_APPS = implementedAppsUrls.length; // 28
+export const TOTAL_IMPLEMENTED_APPS = implementedAppsUrls.length;

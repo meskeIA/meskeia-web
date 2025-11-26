@@ -7,9 +7,24 @@ interface AnalyticsTrackerProps {
   appName?: string;
 }
 
+/**
+ * Componente Analytics v2.1 para meskeIA
+ *
+ * IMPORTANTE: Desactivado en subdominios de desarrollo (next.meskeia.com)
+ * Solo registra analytics en producción (meskeia.com)
+ */
 export default function AnalyticsTracker({ applicationName, appName }: AnalyticsTrackerProps) {
   const finalAppName = applicationName || appName || 'unknown';
   useEffect(() => {
+    // NO ejecutar analytics en subdominios de desarrollo
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      // Solo ejecutar en producción (meskeia.com sin subdominios)
+      if (hostname !== 'meskeia.com' && hostname !== 'www.meskeia.com') {
+        console.log('[Analytics] Desactivado en entorno de desarrollo:', hostname);
+        return;
+      }
+    }
     // Generar ID único de sesión
     const sessionId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 

@@ -15,8 +15,23 @@ interface AnalyticsScriptProps {
   appName: string; // Slug de la aplicación (ej: "calculadora-porcentajes")
 }
 
+/**
+ * Componente Analytics v2.0 para meskeIA
+ *
+ * IMPORTANTE: Desactivado en subdominios de desarrollo (next.meskeia.com)
+ * Solo registra analytics en producción (meskeia.com)
+ */
 export default function AnalyticsScript({ appName }: AnalyticsScriptProps) {
   useEffect(() => {
+    // NO ejecutar analytics en subdominios de desarrollo
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      // Solo ejecutar en producción (meskeia.com sin subdominios)
+      if (hostname !== 'meskeia.com' && hostname !== 'www.meskeia.com') {
+        console.log('[Analytics] Desactivado en entorno de desarrollo:', hostname);
+        return;
+      }
+    }
     // Detección de visita recurrente usando localStorage
     const claveStorage = `meskeia_${appName}`;
     const esRecurrente = localStorage.getItem(claveStorage) !== null;

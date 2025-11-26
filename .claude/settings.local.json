@@ -3,7 +3,8 @@
     "allow": [
       "Bash(curl:*)",
       "Bash(done)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
