@@ -15,11 +15,12 @@ export const implementedAppsUrls = [
   "/impuesto-sucesiones/",           // TODO: Renombrar a /calculadora-sucesiones-cataluna/
   "/impuesto-sucesiones-nacional/",  // TODO: Renombrar a /calculadora-sucesiones-nacional/
 
-  // Calculadoras y Utilidades (6 implementadas)
+  // Calculadoras y Utilidades (7 implementadas)
   "/calculadora-propinas/",
   "/calculadora-fechas/",
   "/calculadora-regla-de-tres/",
   "/calculadora-cocina/",
+  "/lista-compras/",
   "/conversor-tallas/",
 
   // Matemáticas y Estadística (1 implementada)
@@ -28,6 +29,12 @@ export const implementedAppsUrls = [
 
   // Herramientas de Productividad (1 implementada)
   "/generador-contrasenas/",
+
+  // Texto y Documentos (4 implementadas)
+  "/contador-palabras/",
+  "/conversor-texto/",
+  "/limpiador-texto/",
+  "/comparador-textos/",
 ];
 
 /**

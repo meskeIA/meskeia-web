@@ -1,0 +1,645 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 35px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 25px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Main Content */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Header Panel */
+.headerPanel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 15px 20px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.nombreLista {
+  flex: 1;
+}
+
+.tituloLista {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.tituloLista:hover {
+  color: var(--primary);
+}
+
+.editIcon {
+  font-size: 0.9rem;
+  opacity: 0.5;
+}
+
+.inputNombreLista {
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  width: 100%;
+  max-width: 300px;
+}
+
+.progresoContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progresoBar {
+  width: 120px;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progresoTexto {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Add Panel */
+.addPanel {
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inputRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.inputProducto {
+  flex: 3;
+  min-width: 200px;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.inputProducto:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.inputCantidad {
+  width: 80px;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.selectUnidad,
+.selectCategoria {
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.selectUnidad {
+  width: 100px;
+}
+
+.selectCategoria {
+  flex: 1;
+  min-width: 150px;
+}
+
+.btnAgregar {
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAgregar:hover {
+  background: #256a8a;
+  transform: translateY(-1px);
+}
+
+/* Filtros Panel */
+.filtrosPanel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.filtrosCategorias {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filtroBtn {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filtroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filtroBtn.activo {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.checkboxLabel input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Lista Panel */
+.listaPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.listaVacia {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-secondary);
+}
+
+.iconVacio {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.hint {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* Categoria Grupo */
+.categoriaGrupo {
+  border-bottom: 1px solid var(--border);
+}
+
+.categoriaGrupo:last-child {
+  border-bottom: none;
+}
+
+.categoriaHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--bg-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.categoriaEmoji {
+  font-size: 1.2rem;
+}
+
+.categoriaCount {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+/* Items Lista */
+.itemsLista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.itemRow:last-child {
+  border-bottom: none;
+}
+
+.itemRow:hover {
+  background: var(--hover);
+}
+
+.itemRow.completado {
+  opacity: 0.5;
+}
+
+.itemRow.completado .itemNombre {
+  text-decoration: line-through;
+}
+
+.checkBtn {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.itemRow.completado .checkBtn {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+.itemCantidad {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary);
+  min-width: 80px;
+}
+
+.itemNombre {
+  flex: 1;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.deleteBtn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s;
+}
+
+.itemRow:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Acciones Panel */
+.accionesPanel {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btnAccion {
+  flex: 1;
+  min-width: 120px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAccion:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btnAccionSecundario {
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAccionSecundario:hover {
+  border-color: var(--text-secondary);
+  background: var(--hover);
+}
+
+.btnAccionDanger {
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: 2px solid #fee2e2;
+  border-radius: 10px;
+  background: transparent;
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAccionDanger:hover {
+  background: #fee2e2;
+}
+
+/* Listas Guardadas Panel */
+.listasGuardadasPanel {
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.seccionTitulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+}
+
+.listasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.listaCard {
+  background: var(--bg-primary);
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.listaCard:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.listaCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.listaNombre {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.listaFecha {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.listaResumen {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.listaCardAcciones {
+  display: flex;
+  gap: 8px;
+}
+
+.btnCargar {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnCargar:hover {
+  background: #256a8a;
+}
+
+.btnEliminar {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid #fee2e2;
+  border-radius: 6px;
+  background: transparent;
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnEliminar:hover {
+  background: #fee2e2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 30px 20px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .headerPanel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .progresoContainer {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .progresoBar {
+    flex: 1;
+  }
+
+  .inputRow {
+    flex-direction: column;
+  }
+
+  .inputProducto,
+  .inputCantidad,
+  .selectUnidad,
+  .selectCategoria {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .filtrosPanel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtrosCategorias {
+    justify-content: center;
+  }
+
+  .accionesPanel {
+    flex-direction: column;
+  }
+
+  .btnAccion,
+  .btnAccionSecundario,
+  .btnAccionDanger {
+    flex: none;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .filtroBtn {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+
+  .itemRow {
+    padding: 10px 15px;
+  }
+
+  .itemCantidad {
+    min-width: 60px;
+    font-size: 0.85rem;
+  }
+}

@@ -1,0 +1,415 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 35px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 25px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Main Content */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+/* Input Panel */
+.inputPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 20px;
+}
+
+.inputHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.inputActions {
+  display: flex;
+  gap: 10px;
+}
+
+.textArea {
+  width: 100%;
+  min-height: 350px;
+  padding: 15px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.textArea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.textArea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Results Panel */
+.resultsPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 20px;
+}
+
+.resultsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.statCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 15px 12px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.statCard:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.statValue {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.statLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 5px;
+}
+
+/* Tiempos Grid */
+.tiemposGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tiempoCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 10px;
+  padding: 15px;
+  color: white;
+}
+
+.tiempoIcon {
+  font-size: 1.8rem;
+}
+
+.tiempoInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.tiempoLabel {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.tiempoValue {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Botones */
+.btnSecundario {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSecundario:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnDensidad {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnDensidad:hover {
+  background: var(--hover);
+}
+
+/* Densidad Panel */
+.densidadPanel {
+  margin-top: 15px;
+  padding: 15px;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.densidadLista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.densidadItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg-card);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.densidadRank {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+.densidadPalabra {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.densidadFrecuencia {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  min-width: 35px;
+}
+
+.densidadBarContainer {
+  width: 80px;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.densidadBar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.densidadPorcentaje {
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 500;
+  min-width: 45px;
+  text-align: right;
+}
+
+.densidadVacia {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 20px;
+}
+
+.densidadNota {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* Info Panel */
+.infoPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.infoPanel h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.infoItem {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.infoIcon {
+  font-size: 1.5rem;
+}
+
+.infoItem strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.infoItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .textArea {
+    min-height: 200px;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 30px 20px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tiemposGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .densidadBarContainer {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .statCard {
+    padding: 12px 8px;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+  }
+
+  .statLabel {
+    font-size: 0.75rem;
+  }
+}
