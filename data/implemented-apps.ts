@@ -92,6 +92,12 @@ export const implementedAppsUrls = [
   "/calculadora-roi-marketing/",
   "/planificador-cashflow/",
   "/generador-nombres-empresa/",
+
+  // Física y Química (4 implementadas)
+  "/conversor-unidades/",
+  "/calculadora-movimiento/",
+  "/calculadora-electricidad/",
+  "/glosario-fisica-quimica/",
 ];
 
 /**
