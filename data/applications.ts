@@ -96,7 +96,8 @@ export const applicationsDatabase: Application[] = [
   { name: "Curso Decisiones de Inversión", category: "Campus Digital", icon: "📚", description: "Aprende a tomar decisiones de inversión inteligentes con este curso interactivo", url: "/curso-decisiones-inversion/", keywords: ["curso", "inversion", "finanzas", "aprender", "bolsa"] },
   { name: "Curso de Emprendimiento", category: "Campus Digital", icon: "📚", description: "Guía práctica de emprendimiento: de la idea al primer cliente con ejemplos españoles", url: "/curso-emprendimiento/", keywords: ["emprendimiento", "negocio", "startup", "empresa", "curso"] },
 
-  // Salud & Bienestar (6)
+  // Salud & Bienestar (7)
+  { name: "Calculadora IMC", category: "Salud & Bienestar", icon: "⚖️", description: "Calcula tu Índice de Masa Corporal y conoce tu clasificación según la OMS", url: "/calculadora-imc/", keywords: ["imc", "peso", "altura", "obesidad", "salud", "oms"] },
   { name: "Evaluador de Salud", category: "Salud & Bienestar", icon: "🏥", description: "Calcula tu IMC, metabolismo basal y evalúa tu estado de salud", url: "/evaluador-salud/", keywords: ["imc", "salud", "peso", "metabolismo", "calorias"] },
   { name: "Calculadora de Calorías", category: "Salud & Bienestar", icon: "🏥", description: "Calcula las calorías quemadas según tu actividad física, pasos y tiempo de ejercicio", url: "/calculadora-calorias-ejercicio/", keywords: ["calorias", "ejercicio", "deporte", "quemar", "actividad fisica"] },
   { name: "Calculadora de Hidratación", category: "Salud & Bienestar", icon: "🏥", description: "Calcula cuánta agua necesitas beber diariamente según tu peso, actividad física y clima", url: "/calculadora-hidratacion/", keywords: ["agua", "hidratacion", "beber", "litros", "salud"] },
