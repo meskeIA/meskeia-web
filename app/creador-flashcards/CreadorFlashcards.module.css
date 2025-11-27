@@ -1,0 +1,817 @@
+/* Variables CSS - Paleta meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  padding-top: 100px;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toolbarLeft {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.toolbarRight {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.btnPrimary {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.btnPrimary:hover {
+  background: #256a8a;
+  transform: translateY(-1px);
+}
+
+.btnSecondary {
+  composes: btnPrimary;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btnSecondary:hover {
+  background: var(--hover);
+}
+
+.btnSuccess {
+  composes: btnPrimary;
+  background: var(--success);
+}
+
+.btnSuccess:hover {
+  background: #059669;
+}
+
+.btnDanger {
+  composes: btnPrimary;
+  background: var(--danger);
+}
+
+.btnDanger:hover {
+  background: #dc2626;
+}
+
+/* Main Layout */
+.mainContent {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--spacing-xl);
+}
+
+/* Sidebar - Mazos */
+.sidebar {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+}
+
+.sidebarTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.mazosList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.mazoItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.mazoItem:hover {
+  border-color: var(--primary);
+}
+
+.mazoItem.activo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.mazoColor {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mazoInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.mazoNombre {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mazoContador {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.mazoActions {
+  display: flex;
+  gap: var(--spacing-xs);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.mazoItem:hover .mazoActions {
+  opacity: 1;
+}
+
+.btnIcono {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.btnIcono:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btnIcono.danger:hover {
+  background: var(--danger);
+}
+
+.btnAnadirMazo {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2px dashed var(--border);
+  background: transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  margin-top: var(--spacing-sm);
+}
+
+.btnAnadirMazo:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Content Panel */
+.contentPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.panelTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.panelActions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* Tarjetas Grid */
+.tarjetasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.tarjetaCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.tarjetaCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.tarjetaFront {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tarjetaBack {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tarjetaActions {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  display: flex;
+  gap: var(--spacing-xs);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.tarjetaCard:hover .tarjetaActions {
+  opacity: 1;
+}
+
+.btnAnadirTarjeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  min-height: 120px;
+  border: 2px dashed var(--border);
+  background: transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+
+.btnAnadirTarjeta:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.btnAnadirTarjeta span:first-child {
+  font-size: 2rem;
+}
+
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-lg);
+}
+
+.modal {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.modalTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.formGroup {
+  margin-bottom: var(--spacing-lg);
+}
+
+.label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.textarea {
+  composes: input;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.select {
+  composes: input;
+  cursor: pointer;
+}
+
+.colorPicker {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.colorOption {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.colorOption:hover {
+  transform: scale(1.1);
+}
+
+.colorOption.selected {
+  border-color: var(--text-primary);
+}
+
+.modalActions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  margin-top: var(--spacing-xl);
+}
+
+/* Modo Estudio */
+.modoEstudio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-xl);
+}
+
+.estudioProgreso {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.progresoTexto {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.progresoBarra {
+  height: 8px;
+  background: var(--hover);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progresoRelleno {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Flashcard Flip */
+.flashcardContainer {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 500px;
+  height: 320px;
+  margin-bottom: var(--spacing-xl);
+}
+
+.flashcard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+.flashcard.flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcardFace {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.flashcardFront {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.flashcardBack {
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  transform: rotateY(180deg);
+}
+
+.flashcardLabel {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  margin-bottom: var(--spacing-md);
+}
+
+.flashcardBack .flashcardLabel {
+  color: var(--primary);
+}
+
+.flashcardTexto {
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.flashcardBack .flashcardTexto {
+  color: var(--text-primary);
+}
+
+.flashcardHint {
+  position: absolute;
+  bottom: var(--spacing-md);
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.flashcardBack .flashcardHint {
+  color: var(--text-muted);
+}
+
+/* Controles Estudio */
+.estudioControles {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btnEstudio {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.btnAnterior {
+  composes: btnEstudio;
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.btnAnterior:hover {
+  background: var(--border);
+}
+
+.btnSiguiente {
+  composes: btnEstudio;
+  background: var(--primary);
+  color: white;
+}
+
+.btnSiguiente:hover {
+  background: #256a8a;
+}
+
+.btnMezclar {
+  composes: btnEstudio;
+  background: var(--secondary);
+  color: white;
+}
+
+.btnMezclar:hover {
+  background: #3d8a87;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-xl) * 2;
+  color: var(--text-muted);
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.emptyText {
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Stats */
+.statsBar {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.statIcon {
+  font-size: 1.2rem;
+}
+
+.statValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Hidden file input */
+.hiddenInput {
+  display: none;
+}
+
+/* Educational */
+.guideSection {
+  padding: var(--spacing-md) 0;
+}
+
+.guideSection h2 {
+  font-size: 1.4rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.introParagraph {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.7;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.contentCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  border-left: 3px solid var(--primary);
+}
+
+.contentCard h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.contentCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .mazosList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+    padding-top: 80px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbarLeft,
+  .toolbarRight {
+    justify-content: center;
+  }
+
+  .flashcardContainer {
+    height: 280px;
+  }
+
+  .flashcardTexto {
+    font-size: 1.2rem;
+  }
+
+  .statsBar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .estudioControles {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btnEstudio {
+    width: 100%;
+    justify-content: center;
+  }
+}
