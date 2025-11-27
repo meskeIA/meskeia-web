@@ -24,11 +24,12 @@ export interface Application {
 }
 
 export const applicationsDatabase: Application[] = [
-  // Finanzas y Fiscalidad (11)
+  // Finanzas y Fiscalidad (12)
   { name: "Simulador de Hipoteca", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula tu hipoteca con cuadro de amortización completo y análisis detallado", url: "/simulador-hipoteca/", keywords: ["prestamo", "casa", "vivienda", "banco", "interes", "amortizacion", "cuota", "euribor"] },
   { name: "Calculadora de Jubilación", category: "Finanzas y Fiscalidad", icon: "💰", description: "Planifica tu jubilación calculando ahorros necesarios y pensión estimada", url: "/calculadora-jubilacion/", keywords: ["pension", "retiro", "ahorro", "inversion", "planes", "seguridad social"] },
   { name: "Calculadora de Inversiones", category: "Finanzas y Fiscalidad", icon: "💰", description: "Simula el crecimiento de tus inversiones con interés compuesto", url: "/calculadora-inversiones/", keywords: ["bolsa", "acciones", "fondos", "rentabilidad", "capital", "dividendos"] },
-  { name: "Calculadora de Interés Compuesto", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula el interés compuesto de tus ahorros e inversiones a largo plazo", url: "/calculadora-interes-compuesto/", keywords: ["ahorro", "capital", "rentabilidad", "interes", "compuesto"] },
+  { name: "Calculadora de Interés Compuesto", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula el interés compuesto de tus ahorros e inversiones a largo plazo", url: "/interes-compuesto/", keywords: ["ahorro", "capital", "rentabilidad", "interes", "compuesto"] },
+  { name: "Test de Perfil Inversor", category: "Finanzas y Fiscalidad", icon: "🎯", description: "Descubre tu tolerancia al riesgo con un test de 10 preguntas y recibe recomendaciones personalizadas", url: "/test-perfil-inversor/", keywords: ["perfil", "inversor", "riesgo", "tolerancia", "test", "cuestionario", "inversion"] },
   { name: "Control de Gastos Mensual", category: "Finanzas y Fiscalidad", icon: "💰", description: "Controla tus gastos e ingresos mensuales con gráficos y categorización automática", url: "/control-gastos-mensual/", keywords: ["presupuesto", "gastos", "ingresos", "finanzas personales", "ahorro"] },
   { name: "Simulador IRPF", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula tu IRPF y retenciones según la normativa fiscal española actual", url: "/simulador-irpf/", keywords: ["impuestos", "renta", "hacienda", "declaracion", "retenciones", "fiscal"] },
   // NOTA: Estas 4 apps mantienen URLs antiguas (ya implementadas) - se renombrarán cuando se migren

@@ -154,12 +154,18 @@ export default function CursoDecisionesInversionPage() {
         <div className={styles.toolsGrid}>
           {TOOLS.map((tool) => (
             tool.available ? (
-              <Link key={tool.id} href={tool.href} className={styles.toolCard}>
+              <a
+                key={tool.id}
+                href={tool.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.toolCard}
+              >
                 <div className={styles.toolIcon}>{tool.icon}</div>
                 <div className={styles.toolName}>{tool.name}</div>
                 <div className={styles.toolDesc}>{tool.description}</div>
-                <div className={styles.toolExternal}>Abrir herramienta →</div>
-              </Link>
+                <div className={styles.toolExternal}>Abrir en nueva pestaña ↗</div>
+              </a>
             ) : (
               <div key={tool.id} className={`${styles.toolCard} ${styles.disabled}`}>
                 <span className={styles.toolBadge}>Próximamente</span>
