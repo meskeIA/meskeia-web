@@ -121,16 +121,16 @@ export const TOOLS = [
     name: 'Test de Perfil Inversor',
     description: 'Descubre tu tolerancia al riesgo y recibe recomendaciones personalizadas',
     icon: '🎯',
-    href: '/calculadora-perfil-riesgo/',
-    available: false, // Próximamente
+    href: '/test-perfil-inversor/',
+    available: true,
   },
   {
-    id: 'simulador-cartera',
-    name: 'Simulador de Cartera',
-    description: 'Simula diferentes distribuciones de activos y analiza resultados históricos',
+    id: 'calculadora-inversiones',
+    name: 'Calculadora de Inversiones',
+    description: 'Diseña tu cartera según tu perfil de riesgo y visualiza la distribución de activos',
     icon: '💼',
-    href: '/simulador-cartera/',
-    available: false, // Próximamente
+    href: '/calculadora-inversiones/',
+    available: true,
   },
 ];
 
