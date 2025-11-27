@@ -68,6 +68,23 @@ export const implementedAppsUrls = [
   "/validador-regex/",
   "/conversor-imagenes/",
   "/generador-iconos/",
+
+  // Creatividad y Diseño (7 implementadas)
+  "/calculadora-aspectos/",
+  "/conversor-colores/",
+  "/generador-gradientes/",
+  "/generador-sombras/",
+  "/contraste-colores/",
+  "/creador-paletas/",
+  "/generador-tipografias/",
+
+  // Emprendimiento y Negocios (6 implementadas)
+  "/calculadora-tarifa-freelance/",
+  "/simulador-gastos-deducibles/",
+  "/calculadora-break-even/",
+  "/calculadora-roi-marketing/",
+  "/planificador-cashflow/",
+  "/generador-nombres-empresa/",
 ];
 
 /**

@@ -1,0 +1,550 @@
+/* Variables CSS - Paleta meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  padding-top: 100px;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #333333;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Main Content */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Config Panel */
+.configPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Section */
+.section {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.sectionDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Gastos Lista */
+.gastosLista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.gastoItem {
+  display: grid;
+  grid-template-columns: 1fr 120px 40px;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.gastoConcepto {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.gastoConcepto:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-card);
+}
+
+.gastoImporteWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.gastoImporte {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  padding-right: 30px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-align: right;
+  transition: all 0.2s;
+}
+
+.gastoImporte:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-card);
+}
+
+.gastoSuffix {
+  position: absolute;
+  right: 10px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.btnEliminar {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--danger);
+  color: white;
+  border-radius: var(--radius);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnEliminar:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+.btnAgregar {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--hover);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAgregar:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.subtotal {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.subtotal strong {
+  color: var(--primary);
+}
+
+/* Config Grid */
+.configGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+}
+
+/* Select Group */
+.selectGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.selectLabel {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Results Panel */
+.resultsPanel {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  border: 2px solid var(--primary);
+}
+
+.resultsTitleMain {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+/* Tarifas principales */
+.tarifasPrincipales {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Desglose */
+.desglose {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.desgloseTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.desgloseGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+.desgloseItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xs) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.desgloseLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.desgloseValue {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Resumen anual */
+.resumenAnual {
+  margin-bottom: var(--spacing-lg);
+}
+
+.resumenGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+/* Días info */
+.diasInfo {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  color: white;
+}
+
+.diasInfo .desgloseTitle {
+  color: white;
+  opacity: 0.95;
+}
+
+.diasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+  text-align: center;
+}
+
+.diaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.diaNumero {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.diaLabel {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+/* Disclaimer */
+.disclaimer {
+  background: #FEF3C7;
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+[data-theme='dark'] .disclaimer {
+  background: #422006;
+  border-color: #D97706;
+}
+
+.disclaimer h3 {
+  color: #92400E;
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+[data-theme='dark'] .disclaimer h3 {
+  color: #FCD34D;
+}
+
+.disclaimer p {
+  color: #78350F;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .disclaimer p {
+  color: #FDE68A;
+}
+
+.disclaimer strong {
+  font-weight: 600;
+}
+
+/* Educational Section Styles */
+.guideSection {
+  padding: var(--spacing-md) 0;
+}
+
+.guideSection h2 {
+  font-size: 1.4rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.guideSection h3 {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin: var(--spacing-lg) 0 var(--spacing-md);
+}
+
+.introParagraph {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.7;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.contentCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  border-left: 3px solid var(--primary);
+}
+
+.contentCard h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.contentCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tipsList {
+  list-style: none;
+  padding: 0;
+}
+
+.tipsList li {
+  padding: var(--spacing-sm) 0;
+  padding-left: var(--spacing-lg);
+  position: relative;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tipsList li:last-child {
+  border-bottom: none;
+}
+
+.tipsList li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--secondary);
+  font-weight: bold;
+}
+
+.tipsList li strong {
+  color: var(--text-primary);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .resultsPanel {
+    position: static;
+  }
+
+  .tarifasPrincipales {
+    grid-template-columns: 1fr;
+  }
+
+  .resumenGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+    padding-top: 80px;
+  }
+
+  .hero {
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .gastoItem {
+    grid-template-columns: 1fr 100px 36px;
+  }
+
+  .configGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .desgloseGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .diasGrid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}

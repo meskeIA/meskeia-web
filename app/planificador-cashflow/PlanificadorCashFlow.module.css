@@ -1,0 +1,634 @@
+/* Variables CSS - Paleta meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --info: #3B82F6;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  padding-top: 100px;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+}
+
+/* Resumen Rápido */
+.resumenRapido {
+  margin-bottom: var(--spacing-xl);
+}
+
+.resumenGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-md);
+}
+
+/* Tabs */
+.tabsContainer {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  background: var(--hover);
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background: var(--border);
+}
+
+.tabActivo {
+  background: var(--bg-card);
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+}
+
+.tabContent {
+  padding: var(--spacing-lg);
+}
+
+/* Saldo Inicial */
+.saldoInicialCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.saldoInicialCard h3 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  min-width: 200px;
+}
+
+/* Sección Datos */
+.seccionDatos {
+  margin-bottom: var(--spacing-xl);
+}
+
+.seccionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.seccionHeader h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.btnAgregar, .btnAgregarVar {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAgregarVar {
+  background: var(--secondary);
+  margin-left: var(--spacing-sm);
+}
+
+.botonesGasto {
+  display: flex;
+}
+
+/* Tabla Datos */
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tablaDatos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tablaDatos th, .tablaDatos td {
+  padding: var(--spacing-xs);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.tablaDatos th {
+  background: var(--hover);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.thConcepto {
+  min-width: 150px;
+  text-align: left !important;
+}
+
+.inputConcepto {
+  width: 100%;
+  padding: var(--spacing-xs);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.inputConcepto:focus {
+  border-color: var(--primary);
+  outline: none;
+  background: var(--bg-card);
+}
+
+.inputValor {
+  width: 60px;
+  padding: var(--spacing-xs);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  text-align: right;
+  font-size: 0.8rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.inputValor:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.tipoGasto {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.gastoFijo td:first-child {
+  border-left: 3px solid var(--primary);
+}
+
+.gastoVariable td:first-child {
+  border-left: 3px solid var(--secondary);
+}
+
+.btnEliminar {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: var(--danger);
+  color: white;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.btnEliminar:hover {
+  opacity: 1;
+}
+
+/* Gráfico */
+.graficoContainer {
+  margin-bottom: var(--spacing-xl);
+}
+
+.graficoContainer h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.grafico {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  height: 200px;
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+}
+
+.graficoColumna {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.barrasWrapper {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.barraIngresos, .barraGastos {
+  flex: 1;
+  min-height: 4px;
+  border-radius: 2px 2px 0 0;
+  transition: height 0.3s ease;
+}
+
+.barraIngresos {
+  background: var(--success);
+}
+
+.barraGastos {
+  background: var(--danger);
+}
+
+.graficoMes {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: var(--spacing-xs);
+}
+
+.graficoFlujo {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--success);
+}
+
+.flujoNegativo {
+  color: var(--danger) !important;
+}
+
+.leyenda {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.dotIngresos, .dotGastos {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.dotIngresos {
+  background: var(--success);
+}
+
+.dotGastos {
+  background: var(--danger);
+}
+
+/* Saldo Acumulado */
+.saldoAcumuladoContainer {
+  margin-bottom: var(--spacing-xl);
+}
+
+.saldoAcumuladoContainer h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.saldoLinea {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.saldoPunto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 70px;
+  position: relative;
+}
+
+.saldoValor {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.saldoNegativo {
+  background: #FEE2E2;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+[data-theme='dark'] .saldoNegativo {
+  background: #450a0a;
+}
+
+.saldoMes {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.alertaIcono {
+  position: absolute;
+  top: -8px;
+  right: 0;
+  font-size: 0.9rem;
+}
+
+/* Tabla Resumen */
+.tablaResumenWrapper {
+  overflow-x: auto;
+}
+
+.tablaResumenWrapper h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.tablaResumen {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.tablaResumen th, .tablaResumen td {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  text-align: right;
+  border: 1px solid var(--border);
+}
+
+.tablaResumen th {
+  background: var(--hover);
+  font-weight: 600;
+}
+
+.tablaResumen td:first-child, .tablaResumen th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+.filaIngresos td {
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.filaGastos td {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.filaFlujo td {
+  font-weight: 600;
+}
+
+.filaSaldo td {
+  background: var(--hover);
+  font-weight: 600;
+}
+
+.valorPositivo {
+  color: var(--success);
+}
+
+.valorNegativo {
+  color: var(--danger);
+}
+
+/* Escenarios */
+.escenarioDesc {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.escenariosInputs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.escenarioResultados {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.alertaLiquidez {
+  background: #FEF2F2;
+  border: 2px solid var(--danger);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .alertaLiquidez {
+  background: #450a0a;
+}
+
+.alertaLiquidez h4 {
+  color: var(--danger);
+  margin-bottom: var(--spacing-sm);
+}
+
+.alertaLiquidez p {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.6;
+}
+
+/* Disclaimer */
+.disclaimer {
+  background: #FEF3C7;
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+[data-theme='dark'] .disclaimer {
+  background: #422006;
+  border-color: #D97706;
+}
+
+.disclaimer h3 {
+  color: #92400E;
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+[data-theme='dark'] .disclaimer h3 {
+  color: #FCD34D;
+}
+
+.disclaimer p {
+  color: #78350F;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .disclaimer p {
+  color: #FDE68A;
+}
+
+/* Educational */
+.guideSection {
+  padding: var(--spacing-md) 0;
+}
+
+.guideSection h2 {
+  font-size: 1.4rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.introParagraph {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.7;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.contentCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  border-left: 3px solid var(--primary);
+}
+
+.contentCard h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.contentCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .escenariosInputs {
+    grid-template-columns: 1fr;
+  }
+
+  .escenarioResultados {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+    padding-top: 80px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .saldoInicialCard {
+    flex-direction: column;
+  }
+
+  .grafico {
+    height: 150px;
+  }
+
+  .resumenGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
