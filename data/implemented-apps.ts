@@ -4,7 +4,7 @@
  * IMPORTANTE: Esta lista debe coincidir con las carpetas en app/
  * Solo añadir URLs cuando la app esté realmente creada
  *
- * Actualizado: 2025-11-26
+ * Actualizado: 2025-11-27
  */
 
 export const implementedAppsUrls = [
@@ -15,7 +15,7 @@ export const implementedAppsUrls = [
   "/impuesto-sucesiones/",           // TODO: Renombrar a /calculadora-sucesiones-cataluna/
   "/impuesto-sucesiones-nacional/",  // TODO: Renombrar a /calculadora-sucesiones-nacional/
 
-  // Calculadoras y Utilidades (7 implementadas)
+  // Calculadoras y Utilidades (6 implementadas)
   "/calculadora-propinas/",
   "/calculadora-fechas/",
   "/calculadora-regla-de-tres/",
@@ -23,9 +23,16 @@ export const implementedAppsUrls = [
   "/lista-compras/",
   "/conversor-tallas/",
 
-  // Matemáticas y Estadística (1 implementada)
-  // NOTA: Mantiene URL antigua temporalmente hasta renombrar carpeta
-  "/algebra-ecuaciones/",            // TODO: Renombrar a /calculadora-ecuaciones/
+  // Matemáticas y Estadística (9 implementadas)
+  "/algebra-ecuaciones/",            // Calculadora de Ecuaciones
+  "/calculadora-probabilidad/",
+  "/calculadora-estadistica/",
+  "/calculadora-matematica/",
+  "/calculadora-geometria/",
+  "/calculadora-calculo/",
+  "/calculadora-trigonometria/",
+  "/calculadora-teoria-numeros/",
+  "/calculadora-algebra-abstracta/",
 
   // Herramientas de Productividad (8 implementadas)
   "/notas/",
