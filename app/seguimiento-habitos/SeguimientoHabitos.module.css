@@ -1,0 +1,1056 @@
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #333333;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin: 0;
+}
+
+/* Navegación */
+.navegacion {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  background: var(--bg-card);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.navBtn {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navBtn:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.navBtnActivo {
+  background: var(--primary);
+  color: white;
+}
+
+.navBtnActivo:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* Acciones */
+.acciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.accionesSecundarias {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.btnPrimary {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btnSecondary {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnSecondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Hábitos Container */
+.habitosContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.estadoVacio {
+  text-align: center;
+  padding: var(--spacing-xl) * 2;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+}
+
+.estadoVacioIcono {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.5;
+}
+
+.estadoVacio p {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Tarjeta de Hábito */
+.habitoCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.habitoCard:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.habitoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.habitoInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.habitoColor {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.habitoNombre {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.habitoTipoEvitar {
+  font-size: 0.75rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(229, 115, 115, 0.15);
+  color: #E57373;
+  border-radius: 50px;
+  font-weight: 600;
+}
+
+.habitoRacha {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.habitoStats {
+  display: flex;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.statValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.progressBar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.5s ease;
+}
+
+/* Últimos 7 días */
+.ultimosDias {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  justify-content: center;
+}
+
+.diaCirculo {
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.diaCirculo:hover {
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
+.diaCompletado {
+  color: white;
+}
+
+.diaCirculoLetra {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.diaCirculoCheck {
+  font-size: 0.8rem;
+  position: absolute;
+  bottom: 2px;
+}
+
+.habitoAcciones {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.btnMarcar {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnMarcar:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnMarcado {
+  color: white;
+}
+
+.btnMarcado:hover {
+  color: white;
+}
+
+.btnIcon {
+  padding: var(--spacing-sm);
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.btnIcon:hover {
+  background: var(--hover);
+}
+
+/* Calendario */
+.calendarioSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.calendarioHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.calendarioTitulo {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0;
+}
+
+.calendarioNav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.navMesBtn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navMesBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.mesActual {
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 140px;
+  text-align: center;
+}
+
+.calendarioGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.diaSemana {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: var(--spacing-sm);
+  font-size: 0.85rem;
+}
+
+.diaCelda {
+  aspect-ratio: 1;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  transition: all 0.2s ease;
+}
+
+.diaOtroMes {
+  opacity: 0.3;
+}
+
+.diaHoy {
+  border-color: var(--primary);
+  border-width: 3px;
+}
+
+.diaNumero {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.diaIndicadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  justify-content: center;
+}
+
+.indicadorHabito {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.calendarioLeyenda {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+  flex-wrap: wrap;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.leyendaColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* Estadísticas */
+.estadisticasSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.resumenGeneral {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+.resumenCard {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.resumenIcono {
+  font-size: 2rem;
+}
+
+.resumenValor {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.resumenLabel {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.seccionTitulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-md);
+  color: var(--text-primary);
+}
+
+/* Logros */
+.logrosSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.logrosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.logroCard {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 2px solid var(--border);
+}
+
+.logroCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.logroDesbloqueado {
+  border-color: var(--secondary);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05), rgba(72, 169, 166, 0.05));
+}
+
+.logroBloqueado .logroIcono {
+  filter: grayscale(100%);
+  opacity: 0.3;
+}
+
+.logroIcono {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.logroTitulo {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.logroDescripcion {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Detalle por hábito */
+.detalleHabitos {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.detalleCard {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.detalleHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.detalleColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.detalleNombre {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.detalleStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+.detalleStat {
+  text-align: center;
+}
+
+.detalleStatValor {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.detalleStatLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: var(--spacing-lg);
+}
+
+.modalContent {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  max-width: 500px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.modalHeader h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: var(--spacing-xs);
+  line-height: 1;
+}
+
+.modalClose:hover {
+  color: var(--text-primary);
+}
+
+.formGroup {
+  margin-bottom: var(--spacing-lg);
+}
+
+.formLabel {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.95rem;
+}
+
+.formInput {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  transition: border-color 0.2s ease;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.iconosGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.iconoBtn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.iconoBtn:hover {
+  border-color: var(--primary);
+}
+
+.iconoSeleccionado {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.coloresGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.colorBtn {
+  width: 36px;
+  height: 36px;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.colorBtn:hover {
+  transform: scale(1.15);
+}
+
+.colorSeleccionado {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--primary);
+}
+
+.categoriasGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.categoriaBtn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.categoriaBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.categoriaSeleccionada {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+}
+
+.tipoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.tipoBtn {
+  padding: var(--spacing-lg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.tipoBtn:hover {
+  border-color: var(--primary);
+}
+
+.tipoSeleccionado {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.tipoDesc {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.frecuenciaGrid {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.frecuenciaBtn {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.frecuenciaBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.frecuenciaSeleccionada {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+}
+
+.diasSemanaGrid {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}
+
+.diaSemanaBtn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.diaSemanaBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.diaSemanaSeleccionado {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.modalAcciones {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+}
+
+.modalAcciones .btnPrimary,
+.modalAcciones .btnSecondary {
+  flex: 1;
+}
+
+/* Modal Celebración */
+.modalCelebracion {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl) * 2;
+  text-align: center;
+  animation: modalSlideIn 0.3s ease;
+  max-width: 400px;
+}
+
+.celebracionIcono {
+  font-size: 5rem;
+  margin-bottom: var(--spacing-lg);
+  animation: celebrar 0.6s ease-in-out;
+}
+
+@keyframes celebrar {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.2) rotate(-10deg); }
+  75% { transform: scale(1.2) rotate(10deg); }
+}
+
+.celebracionTitulo {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-md);
+}
+
+.celebracionMensaje {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-lg);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .resumenGeneral {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .detalleStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+
+  .hero {
+    padding: var(--spacing-lg);
+    margin-top: 60px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .navegacion {
+    flex-direction: column;
+  }
+
+  .acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .accionesSecundarias {
+    justify-content: center;
+  }
+
+  .habitoStats {
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+
+  .ultimosDias {
+    flex-wrap: wrap;
+  }
+
+  .calendarioNav {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .resumenGeneral {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .logrosGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tipoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .diasSemanaGrid {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .diaCirculo {
+    width: 38px;
+    height: 38px;
+  }
+
+  .resumenGeneral {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .resumenValor {
+    font-size: 1.5rem;
+  }
+
+  .detalleStats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .frecuenciaGrid {
+    flex-direction: column;
+  }
+}

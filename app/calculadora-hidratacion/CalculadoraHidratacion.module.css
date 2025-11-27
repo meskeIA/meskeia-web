@@ -43,7 +43,7 @@
   margin-bottom: var(--spacing-xl);
   margin-top: 80px;
   padding: var(--spacing-xl);
-  background: linear-gradient(135deg, #3498db 0%, #1abc9c 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   border-radius: var(--radius-large);
   color: white;
 }
@@ -197,7 +197,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, #3498db 0%, #1abc9c 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -256,7 +256,7 @@
 .litrosValor {
   font-size: 4rem;
   font-weight: 700;
-  color: #3498db;
+  color: var(--primary);
   line-height: 1;
 }
 
@@ -319,7 +319,7 @@
 .distCantidad {
   font-size: 1rem;
   font-weight: 700;
-  color: #3498db;
+  color: var(--primary);
 }
 
 .tipsSection {
@@ -356,7 +356,7 @@
   background: var(--hover);
   border-radius: var(--radius);
   padding: var(--spacing-lg);
-  border-left: 4px solid #3498db;
+  border-left: 4px solid var(--primary);
 }
 
 .formulaBox h4 {
@@ -369,7 +369,7 @@
 .formulaText {
   font-family: 'Courier New', monospace;
   font-size: 0.95rem;
-  color: #3498db;
+  color: var(--primary);
   margin: 0 0 var(--spacing-sm);
   font-weight: 600;
 }

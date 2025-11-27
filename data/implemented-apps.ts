@@ -53,11 +53,12 @@ export const implementedAppsUrls = [
   "/juego-puzzle-matematico/",
   "/radio-meskeia/",
 
-  // Salud y Bienestar (4 implementadas)
+  // Salud y Bienestar (5 implementadas)
   "/calculadora-imc/",
   "/calculadora-calorias-ejercicio/",
   "/calculadora-hidratacion/",
   "/calculadora-sueno/",
+  "/seguimiento-habitos/",
 ];
 
 /**

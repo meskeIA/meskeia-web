@@ -43,7 +43,7 @@
   margin-bottom: var(--spacing-xl);
   margin-top: 80px;
   padding: var(--spacing-xl);
-  background: linear-gradient(135deg, #2c3e50 0%, #8e44ad 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   border-radius: var(--radius-large);
   color: white;
 }
@@ -103,12 +103,12 @@
 }
 
 .modoBtn:hover {
-  border-color: #8e44ad;
+  border-color: var(--primary);
 }
 
 .modoBtn.activo {
-  border-color: #8e44ad;
-  background: rgba(142, 68, 173, 0.1);
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
 }
 
 .modoIcono {
@@ -154,7 +154,7 @@
 
 .horaInput:focus {
   outline: none;
-  border-color: #8e44ad;
+  border-color: var(--primary);
 }
 
 .btnPrimary {
@@ -164,7 +164,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, #2c3e50 0%, #8e44ad 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -180,7 +180,7 @@
   background: var(--hover);
   border-radius: var(--radius);
   padding: var(--spacing-lg);
-  border-left: 4px solid #8e44ad;
+  border-left: 4px solid var(--primary);
 }
 
 .infoBox h3 {
@@ -253,7 +253,7 @@
 .horaCiclos {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #8e44ad;
+  color: var(--primary);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -322,7 +322,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #8e44ad;
+  background: var(--primary);
   color: white;
   border-radius: 50%;
   font-weight: 600;
