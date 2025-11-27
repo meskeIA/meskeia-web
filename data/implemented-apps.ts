@@ -8,12 +8,19 @@
  */
 
 export const implementedAppsUrls = [
-  // Finanzas y Fiscalidad (4 implementadas)
+  // Finanzas y Fiscalidad (11 implementadas)
   // NOTA: Estas 4 apps mantienen URLs antiguas temporalmente hasta migrar
   "/impuesto-donaciones/",           // TODO: Renombrar a /calculadora-donaciones-cataluna/
   "/impuesto-donaciones-nacional/",  // TODO: Renombrar a /calculadora-donaciones-nacional/
   "/impuesto-sucesiones/",           // TODO: Renombrar a /calculadora-sucesiones-cataluna/
   "/impuesto-sucesiones-nacional/",  // TODO: Renombrar a /calculadora-sucesiones-nacional/
+  "/simulador-irpf/",
+  "/calculadora-tir-van/",
+  "/control-gastos/",
+  "/interes-compuesto/",
+  "/simulador-hipoteca/",
+  "/calculadora-jubilacion/",
+  "/calculadora-inversiones/",
 
   // Calculadoras y Utilidades (6 implementadas)
   "/calculadora-propinas/",
