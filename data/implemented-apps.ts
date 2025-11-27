@@ -59,6 +59,14 @@ export const implementedAppsUrls = [
   "/calculadora-hidratacion/",
   "/calculadora-sueno/",
   "/seguimiento-habitos/",
+
+  // Herramientas Web y Tecnología (6 implementadas)
+  "/validador-json/",
+  "/conversor-base64/",
+  "/generador-hash/",
+  "/generador-utm/",
+  "/validador-regex/",
+  "/conversor-imagenes/",
 ];
 
 /**
