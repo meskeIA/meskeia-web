@@ -31,7 +31,7 @@ export const implementedAppsUrls = [
   "/lista-compras/",
   "/conversor-tallas/",
 
-  // Matemáticas y Estadística (9 implementadas)
+  // Matemáticas y Estadística (10 implementadas)
   "/algebra-ecuaciones/",            // Calculadora de Ecuaciones
   "/calculadora-probabilidad/",
   "/calculadora-estadistica/",
@@ -41,6 +41,7 @@ export const implementedAppsUrls = [
   "/calculadora-trigonometria/",
   "/calculadora-teoria-numeros/",
   "/calculadora-algebra-abstracta/",
+  "/calculadora-teoria-colas/",
 
   // Herramientas de Productividad (8 implementadas)
   "/notas/",
