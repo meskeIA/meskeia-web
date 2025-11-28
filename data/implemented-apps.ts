@@ -4,7 +4,7 @@
  * IMPORTANTE: Esta lista debe coincidir con las carpetas en app/
  * Solo añadir URLs cuando la app esté realmente creada
  *
- * Actualizado: 2025-11-27
+ * Actualizado: 2025-11-28
  */
 
 export const implementedAppsUrls = [
@@ -68,12 +68,16 @@ export const implementedAppsUrls = [
   "/juego-puzzle-matematico/",
   "/radio-meskeia/",
 
-  // Salud y Bienestar (5 implementadas)
+  // Salud y Bienestar (9 implementadas)
   "/calculadora-imc/",
   "/calculadora-calorias-ejercicio/",
   "/calculadora-hidratacion/",
   "/calculadora-sueno/",
   "/seguimiento-habitos/",
+  "/curso-nutrisalud/",
+  "/planificador-menu/",
+  "/calculadora-porciones/",
+  "/test-habitos/",
 
   // Herramientas Web y Tecnología (7 implementadas)
   "/validador-json/",

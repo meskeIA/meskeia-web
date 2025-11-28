@@ -1,0 +1,590 @@
+/* ===== CALCULADORA DE PORCIONES - CSS MODULE ===== */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  margin-top: 80px;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 16px;
+  color: white;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Section Titles */
+.sectionTitle {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.sectionDescription {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+/* Methods Section */
+.methodsSection {
+  margin-bottom: 3rem;
+}
+
+.methodsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1rem;
+}
+
+.methodCard {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.methodCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.methodCard.methodSelected {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+}
+
+.methodIcon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.methodName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.methodDescription {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.methodEquivalent {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.methodUse {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Method Detail */
+.methodDetail {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.15) 0%, rgba(72, 169, 166, 0.15) 100%);
+  border: 2px solid var(--primary);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.methodDetailIcon {
+  font-size: 4rem;
+  flex-shrink: 0;
+}
+
+.methodDetailContent h3 {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.methodDetailContent p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.methodDetailEquiv,
+.methodDetailUse {
+  font-size: 0.9rem;
+}
+
+/* Categories Section */
+.categoriesSection {
+  margin-bottom: 3rem;
+}
+
+.categoryTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.categoryTab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid var(--border);
+  border-radius: 25px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.categoryTab:hover {
+  border-color: var(--category-color);
+  background: var(--hover);
+}
+
+.categoryTab.categoryTabActive {
+  border-color: var(--category-color);
+  background: var(--category-color);
+  color: white;
+}
+
+.categoryIcon {
+  font-size: 1.2rem;
+}
+
+.categoryName {
+  font-weight: 500;
+}
+
+/* Foods Table */
+.foodsTable {
+  background: var(--bg-card);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.tableHeader {
+  padding: 1rem 1.5rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.foodsList {
+  padding: 0.5rem;
+}
+
+.foodItem {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
+}
+
+.foodItem:last-child {
+  border-bottom: none;
+}
+
+.foodItem:hover {
+  background: var(--hover);
+}
+
+.foodMain {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.foodName {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.foodPortion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-primary);
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+}
+
+[data-theme='dark'] .foodPortion {
+  background: var(--hover);
+}
+
+.portionIcon {
+  font-size: 1.1rem;
+}
+
+.portionText {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.foodDetails {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.foodGrams {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: var(--border);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.foodTip {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  font-style: italic;
+}
+
+/* Plate Section */
+.plateSection {
+  margin-bottom: 3rem;
+}
+
+.plateGuide {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+}
+
+.plateVisual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.plateCircle {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  border: 4px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.plateHalf {
+  width: 100%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.plateQuarter {
+  width: 50%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.plateHalf span,
+.plateQuarter span {
+  font-size: 1.8rem;
+}
+
+.plateHalf p,
+.plateQuarter p {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0.25rem 0;
+}
+
+.plateHalf small,
+.plateQuarter small {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.plateSide {
+  display: flex;
+  justify-content: center;
+}
+
+.plateFat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(46, 134, 171, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--primary);
+}
+
+.plateFat span {
+  font-size: 1.5rem;
+}
+
+.plateFat small {
+  font-size: 0.85rem;
+  color: var(--primary);
+}
+
+.plateDescription h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.plateDescription ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plateDescription li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.plateDescription li:last-child {
+  border-bottom: none;
+}
+
+.plateDescription li span {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* Tips Section */
+.tipsSection {
+  margin-bottom: 2rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.tipCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.tipIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.tipCard h4 {
+  font-size: 1rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Disclaimer */
+.disclaimer {
+  background: #e8f4f8;
+  border: 1px solid var(--secondary);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+}
+
+[data-theme='dark'] .disclaimer {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+.disclaimer h3 {
+  font-size: 1.1rem;
+  color: var(--secondary);
+  margin-bottom: 0.75rem;
+}
+
+.disclaimer p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .plateGuide {
+    grid-template-columns: 1fr;
+  }
+
+  .plateCircle {
+    width: 220px;
+    height: 220px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .hero {
+    padding: 1.5rem 1rem;
+    margin-top: 70px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .methodsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .methodCard {
+    padding: 1rem;
+  }
+
+  .methodIcon {
+    font-size: 2rem;
+  }
+
+  .methodName {
+    font-size: 0.85rem;
+  }
+
+  .methodDescription {
+    font-size: 0.7rem;
+  }
+
+  .methodDetail {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .methodDetailIcon {
+    font-size: 3rem;
+  }
+
+  .categoryTabs {
+    gap: 0.4rem;
+  }
+
+  .categoryTab {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  .categoryName {
+    display: none;
+  }
+
+  .categoryIcon {
+    font-size: 1.4rem;
+  }
+
+  .foodMain {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .plateCircle {
+    width: 200px;
+    height: 200px;
+  }
+
+  .plateHalf span,
+  .plateQuarter span {
+    font-size: 1.4rem;
+  }
+
+  .plateDescription li {
+    font-size: 0.85rem;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
