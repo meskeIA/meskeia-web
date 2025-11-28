@@ -107,12 +107,13 @@ export const implementedAppsUrls = [
   "/calculadora-electricidad/",
   "/glosario-fisica-quimica/",
 
-  // Campus Digital (5 implementadas)
+  // Campus Digital (6 implementadas)
   "/calculadora-notas/",
   "/creador-flashcards/",
   "/generador-horarios-estudio/",
   "/curso-emprendimiento/",
   "/curso-decisiones-inversion/",
+  "/curso-nutrisalud/",
 ];
 
 /**
