@@ -107,11 +107,12 @@ export const implementedAppsUrls = [
   "/planificador-cashflow/",
   "/generador-nombres-empresa/",
 
-  // Física y Química (4 implementadas)
+  // Física y Química (5 implementadas)
   "/conversor-unidades/",
   "/calculadora-movimiento/",
   "/calculadora-electricidad/",
   "/glosario-fisica-quimica/",
+  "/tabla-periodica/",
 
   // Campus Digital (6 implementadas)
   "/calculadora-notas/",

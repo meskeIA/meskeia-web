@@ -1,0 +1,759 @@
+/* ===== TABLA PERIÓDICA INTERACTIVA - CSS MODULE ===== */
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 2.5rem;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  margin-top: 80px;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 16px;
+  color: white;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.95;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Filtros Panel */
+.filtrosPanel {
+  background: var(--bg-card);
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.filtrosGrid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filtroGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex: 1;
+  min-width: 180px;
+}
+
+.filtroGroup label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.select, .input {
+  padding: 0.625rem 0.875rem;
+  font-size: 0.95rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.select:focus, .input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .select,
+[data-theme='dark'] .input {
+  background: var(--hover);
+}
+
+.btnOutline {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btnOutline:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+
+.contadorElementos {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Tabla Periódica Container */
+.tablaContainer {
+  overflow-x: auto;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+}
+
+.tablaPeriodica {
+  display: grid;
+  grid-template-columns: repeat(18, minmax(50px, 1fr));
+  grid-template-rows: repeat(9, auto);
+  gap: 3px;
+  min-width: 900px;
+  padding: 0.5rem;
+}
+
+/* Elemento Individual */
+.elemento {
+  aspect-ratio: 1;
+  min-width: 50px;
+  max-width: 70px;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.elemento:hover {
+  transform: scale(1.15);
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.elemento.filtrado {
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.numeroAtomico {
+  font-size: 0.55rem;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  position: absolute;
+  top: 2px;
+  left: 3px;
+}
+
+.simbolo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.85);
+  line-height: 1;
+}
+
+.nombre {
+  font-size: 0.45rem;
+  color: rgba(0, 0, 0, 0.7);
+  text-align: center;
+  line-height: 1.1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.masa {
+  font-size: 0.45rem;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Colores por Familia */
+.metales-alcalinos { background: #FF6B6B; }
+.metales-alcalinoterreos { background: #FFB347; }
+.metales-transicion { background: #87CEEB; }
+.metaloides { background: #98D8C8; }
+.no-metales { background: #C3B1E1; }
+.halogenos { background: #F9E79F; }
+.gases-nobles { background: #AED6F1; }
+.lantanidos { background: #F5B7B1; }
+.actinidos { background: #D5DBDB; }
+.otros-metales { background: #A9DFBF; }
+
+/* Indicadores de series */
+.indicadorSerie {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--hover);
+  border-radius: 4px;
+  padding: 4px;
+}
+
+/* Leyenda */
+.leyenda {
+  background: var(--bg-card);
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.leyenda h3 {
+  color: var(--primary);
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.leyendaGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.colorBox {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Calculadora de Masa Molar */
+.calculadoraPanel {
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.calculadoraPanel h2 {
+  color: var(--primary);
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.calculadoraDesc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.calculadoraForm {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 500px;
+  margin: 0 auto 1rem;
+}
+
+.inputFormula {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  font-family: 'Consolas', monospace;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.inputFormula:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .inputFormula {
+  background: var(--hover);
+}
+
+.btnPrimary {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnPrimary:hover {
+  background: #256a8a;
+}
+
+.errorMasa {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+[data-theme='dark'] .errorMasa {
+  background: #3a1e21;
+  color: #f87171;
+}
+
+.resultadoMasa {
+  background: var(--bg-primary);
+  padding: 1.25rem;
+  border-radius: 10px;
+  max-width: 500px;
+  margin: 0 auto 1rem;
+}
+
+[data-theme='dark'] .resultadoMasa {
+  background: var(--hover);
+}
+
+.masaTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.masaTotal span {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.masaTotal strong {
+  color: var(--primary);
+  font-size: 1.4rem;
+}
+
+.desgloseMasa h4 {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.desgloseMasa table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.desgloseMasa th,
+.desgloseMasa td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.desgloseMasa th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.desgloseMasa td {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.ejemplosFormula {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ejemplosFormula span {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.ejemplosFormula button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.85rem;
+  font-family: 'Consolas', monospace;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ejemplosFormula button:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+
+/* Modal de Elemento */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: var(--bg-card);
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+}
+
+.cerrarModal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--hover);
+  color: var(--text-secondary);
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.cerrarModal:hover {
+  background: var(--border);
+  color: var(--text-primary);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modalSimbolo {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.modalInfo h2 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.modalInfo p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0.125rem 0;
+}
+
+.modalDetalles {
+  padding: 1.5rem;
+}
+
+.propiedadesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.propiedad {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.propiedad strong {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.propiedad span {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.configuracion {
+  background: var(--bg-primary);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+}
+
+[data-theme='dark'] .configuracion {
+  background: var(--hover);
+}
+
+.configuracion strong {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.375rem;
+}
+
+.configuracion code {
+  color: var(--primary);
+  font-family: 'Consolas', monospace;
+  font-size: 1.1rem;
+}
+
+.usosSection h3,
+.datoCurioso h3 {
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 0.625rem;
+}
+
+.usosSection ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0;
+}
+
+.usosSection li {
+  color: var(--text-secondary);
+  margin-bottom: 0.375rem;
+  font-size: 0.95rem;
+}
+
+.datoCurioso {
+  background: linear-gradient(135deg, #e7f3ff 0%, #d0e8ff 100%);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: 1rem;
+}
+
+[data-theme='dark'] .datoCurioso {
+  background: linear-gradient(135deg, #1a2a3a 0%, #1e3040 100%);
+}
+
+.datoCurioso p {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Contenido educativo */
+.guideSection h2 {
+  color: var(--primary);
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.introParagraph {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.conceptGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+}
+
+.conceptCard {
+  background: var(--bg-primary);
+  padding: 1.25rem;
+  border-radius: 10px;
+  border-left: 4px solid var(--primary);
+}
+
+[data-theme='dark'] .conceptCard {
+  background: var(--hover);
+}
+
+.conceptCard h4 {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+}
+
+.conceptCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.conceptCard li {
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.conceptCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0.5rem 0;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .tablaPeriodica {
+    grid-template-columns: repeat(18, minmax(45px, 1fr));
+  }
+
+  .elemento {
+    min-width: 45px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem 0.5rem;
+  }
+
+  .hero {
+    margin-top: 70px;
+    padding: 1.5rem 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .filtrosGrid {
+    flex-direction: column;
+  }
+
+  .filtroGroup {
+    width: 100%;
+  }
+
+  .tablaPeriodica {
+    grid-template-columns: repeat(18, minmax(38px, 1fr));
+    gap: 2px;
+  }
+
+  .elemento {
+    min-width: 38px;
+    padding: 2px;
+  }
+
+  .simbolo {
+    font-size: 0.9rem;
+  }
+
+  .nombre, .masa {
+    display: none;
+  }
+
+  .numeroAtomico {
+    font-size: 0.5rem;
+  }
+
+  .leyendaGrid {
+    gap: 0.5rem;
+  }
+
+  .leyendaItem {
+    font-size: 0.75rem;
+  }
+
+  .colorBox {
+    width: 16px;
+    height: 16px;
+  }
+
+  .calculadoraForm {
+    flex-direction: column;
+  }
+
+  .propiedadesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .modalSimbolo {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tablaPeriodica {
+    grid-template-columns: repeat(18, minmax(28px, 1fr));
+    gap: 1px;
+  }
+
+  .elemento {
+    min-width: 28px;
+    border-radius: 3px;
+  }
+
+  .simbolo {
+    font-size: 0.7rem;
+  }
+
+  .numeroAtomico {
+    font-size: 0.4rem;
+  }
+
+  .indicadorSerie {
+    font-size: 0.5rem;
+    padding: 2px;
+  }
+}
