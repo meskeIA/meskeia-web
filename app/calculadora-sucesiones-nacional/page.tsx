@@ -380,20 +380,20 @@ export default function CalculadoraSucesionesNacionalPage() {
   // Calcular totales en tiempo real
   const totalActivos = useMemo(() => {
     return (
-      parseSpanishNumber(saldosCuentas) +
-      parseSpanishNumber(accionesFondos) +
-      parseSpanishNumber(inmuebles) +
-      parseSpanishNumber(vehiculos) +
-      parseSpanishNumber(otrosBienes) +
-      parseSpanishNumber(seguroVida)
+      (parseSpanishNumber(saldosCuentas) || 0) +
+      (parseSpanishNumber(accionesFondos) || 0) +
+      (parseSpanishNumber(inmuebles) || 0) +
+      (parseSpanishNumber(vehiculos) || 0) +
+      (parseSpanishNumber(otrosBienes) || 0) +
+      (parseSpanishNumber(seguroVida) || 0)
     );
   }, [saldosCuentas, accionesFondos, inmuebles, vehiculos, otrosBienes, seguroVida]);
 
   const totalDeudas = useMemo(() => {
     return (
-      parseSpanishNumber(hipotecas) +
-      parseSpanishNumber(prestamos) +
-      parseSpanishNumber(gastosEntierro)
+      (parseSpanishNumber(hipotecas) || 0) +
+      (parseSpanishNumber(prestamos) || 0) +
+      (parseSpanishNumber(gastosEntierro) || 0)
     );
   }, [hipotecas, prestamos, gastosEntierro]);
 

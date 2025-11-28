@@ -121,14 +121,18 @@ export default function CalculadoraDonacionesCatalunaPage() {
 
   // Calcular total donación
   const totalDonacion = useMemo(() => {
-    return (
-      parseSpanishNumber(importePrimeraVivienda) +
-      parseSpanishNumber(dineroPrimeraVivienda) +
-      parseSpanishNumber(dineroReformas) +
-      parseSpanishNumber(segundaVivienda) +
-      parseSpanishNumber(dineroPagarImpuesto) +
-      parseSpanishNumber(otrosBienes)
-    ) || 0;
+    const valores = [
+      importePrimeraVivienda,
+      dineroPrimeraVivienda,
+      dineroReformas,
+      segundaVivienda,
+      dineroPagarImpuesto,
+      otrosBienes
+    ];
+    return valores.reduce((sum, val) => {
+      const num = parseSpanishNumber(val);
+      return sum + (isNaN(num) ? 0 : num);
+    }, 0);
   }, [importePrimeraVivienda, dineroPrimeraVivienda, dineroReformas, segundaVivienda, dineroPagarImpuesto, otrosBienes]);
 
   // Obtener grupo base (I, II, III o IV)
@@ -172,9 +176,9 @@ export default function CalculadoraDonacionesCatalunaPage() {
 
     // Total primera vivienda
     const totalPrimeraVivienda =
-      parseSpanishNumber(importePrimeraVivienda) +
-      parseSpanishNumber(dineroPrimeraVivienda) +
-      parseSpanishNumber(dineroReformas);
+      (parseSpanishNumber(importePrimeraVivienda) || 0) +
+      (parseSpanishNumber(dineroPrimeraVivienda) || 0) +
+      (parseSpanishNumber(dineroReformas) || 0);
 
     // Reducción primera vivienda (95%)
     if (totalPrimeraVivienda > 0 && escrituraPublica) {
@@ -315,7 +319,7 @@ export default function CalculadoraDonacionesCatalunaPage() {
 
   // Verificar requisitos primera vivienda
   const verificarRequisitos = useMemo(() => {
-    const totalPV = parseSpanishNumber(importePrimeraVivienda) + parseSpanishNumber(dineroPrimeraVivienda) + parseSpanishNumber(dineroReformas);
+    const totalPV = (parseSpanishNumber(importePrimeraVivienda) || 0) + (parseSpanishNumber(dineroPrimeraVivienda) || 0) + (parseSpanishNumber(dineroReformas) || 0);
     if (totalPV <= 0) return null;
 
     const edad = parseSpanishNumber(edadDonatario) || 0;
