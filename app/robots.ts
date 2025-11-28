@@ -4,19 +4,19 @@ import { MetadataRoute } from 'next';
 export const dynamic = 'force-static';
 
 /**
- * robots.txt para subdominio de DESARROLLO (next.meskeia.com)
+ * robots.txt para PRODUCCIÓN (meskeia.com)
  *
- * BLOQUEA todo rastreo de buscadores.
- * Cuando se migre a producción (meskeia.com), cambiar Disallow a Allow.
+ * PERMITE rastreo completo de buscadores.
+ * Incluye referencia al sitemap para indexación.
  */
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: '*',
-        disallow: '/', // BLOQUEA todo el sitio para buscadores
+        allow: '/',
       },
     ],
-    // No incluir sitemap en desarrollo
+    sitemap: 'https://meskeia.com/sitemap.xml',
   };
 }
