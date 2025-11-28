@@ -52,11 +52,12 @@ export const implementedAppsUrls = [
   "/generador-codigos-barras/",
   "/informacion-tiempo/",
 
-  // Texto y Documentos (4 implementadas)
+  // Texto y Documentos (5 implementadas)
   "/contador-palabras/",
   "/conversor-texto/",
   "/limpiador-texto/",
   "/comparador-textos/",
+  "/conversor-markdown-html/",
 
   // Juegos y Entretenimiento (8 implementadas)
   "/juego-piedra-papel-tijera/",
