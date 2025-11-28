@@ -24,7 +24,7 @@ export interface Application {
 }
 
 export const applicationsDatabase: Application[] = [
-  // Finanzas y Fiscalidad (12)
+  // Finanzas y Fiscalidad (13)
   { name: "Simulador de Hipoteca", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula tu hipoteca con cuadro de amortización completo y análisis detallado", url: "/simulador-hipoteca/", keywords: ["prestamo", "casa", "vivienda", "banco", "interes", "amortizacion", "cuota", "euribor"] },
   { name: "Calculadora de Jubilación", category: "Finanzas y Fiscalidad", icon: "💰", description: "Planifica tu jubilación calculando ahorros necesarios y pensión estimada", url: "/calculadora-jubilacion/", keywords: ["pension", "retiro", "ahorro", "inversion", "planes", "seguridad social"] },
   { name: "Calculadora de Inversiones", category: "Finanzas y Fiscalidad", icon: "💰", description: "Simula el crecimiento de tus inversiones con interés compuesto", url: "/calculadora-inversiones/", keywords: ["bolsa", "acciones", "fondos", "rentabilidad", "capital", "dividendos"] },
@@ -38,6 +38,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora de Sucesiones - Cataluña", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula el impuesto de sucesiones con la normativa catalana", url: "/impuesto-sucesiones/", keywords: ["herencia", "testamento", "sucesion", "impuesto", "cataluna", "catalunya", "fiscal"] },
   { name: "Calculadora de Sucesiones - Nacional", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula el impuesto de sucesiones para régimen común (todas las CCAA excepto Cataluña, País Vasco y Navarra)", url: "/impuesto-sucesiones-nacional/", keywords: ["herencia", "testamento", "sucesion", "impuesto", "regimen comun", "nacional", "fiscal"] },
   { name: "Calculadora TIR-VAN", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula TIR y VAN para análisis de inversiones y proyectos", url: "/calculadora-tir-van/", keywords: ["tir", "van", "inversion", "proyecto", "rentabilidad", "flujo caja"] },
+  { name: "Calculadora Plusvalías IRPF", category: "Finanzas y Fiscalidad", icon: "📊", description: "Calcula el IRPF de tus inversiones: plusvalías de acciones, fondos, criptomonedas, dividendos e intereses con tramos 2025", url: "/calculadora-plusvalias-irpf/", keywords: ["plusvalias", "irpf", "capital mobiliario", "dividendos", "acciones", "criptomonedas", "fondos", "tramos ahorro"] },
 
   // Calculadoras y Utilidades (7)
   { name: "Calculadora de Porcentajes", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calculadora avanzada de porcentajes con visualizaciones: descuentos, IVA, propinas y cambios porcentuales", url: "/calculadora-porcentajes/", keywords: ["porcentaje", "descuento", "iva", "propina", "rebaja", "aumento"] },
