@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import FixedHeader from '@/components/FixedHeader';
-import Footer from '@/components/Footer';
-import ResultCard from '@/components/ResultCard';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency } from '@/lib/formatters';
 import { jsonLd } from './metadata';
@@ -15,7 +13,6 @@ export default function CalculadoraPropinas() {
   const [porcentaje, setPorcentaje] = useState<number>(15);
   const [personas, setPersonas] = useState<number>(1);
   const [paisSeleccionado, setPaisSeleccionado] = useState<string>('custom');
-  const [showEducationalContent, setShowEducationalContent] = useState<boolean>(false);
 
   // Cargar preferencias guardadas
   useEffect(() => {
@@ -82,8 +79,8 @@ export default function CalculadoraPropinas() {
       {/* Analytics v2.1 */}
       <AnalyticsTracker applicationName="calculadora-propinas" />
 
-      {/* Header meskeIA */}
-      <FixedHeader />
+      {/* Logo meskeIA */}
+      <MeskeiaLogo />
 
       <main className={styles.container}>
         {/* Header */}
@@ -246,161 +243,81 @@ export default function CalculadoraPropinas() {
           )}
         </div>
 
-        {/* Toggle de Contenido Educativo */}
-        <div className={styles.educationalToggle}>
-          <h3>📚 ¿Quieres aprender más sobre Propinas y Costumbres Internacionales?</h3>
-          <p className={styles.educationalSubtitle}>
-            Descubre cómo calcular propinas correctamente, porcentajes por país, cuándo dejar más y consejos prácticos
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowEducationalContent(!showEducationalContent)}
-            className={styles.btnSecondary}
-          >
-            {showEducationalContent ? '⬆️ Ocultar Guía Educativa' : '⬇️ Ver Guía Completa'}
-          </button>
-        </div>
-
         {/* Contenido educativo colapsable */}
-        {showEducationalContent && (
-          <div className={styles.educationalContent}>
-            {/* Secciones educativas */}
-            <section className={styles.guideSection}>
-              <h2>¿Cómo usar la Calculadora de Propinas?</h2>
-              <p>
-                Calcular propinas correctamente es muy sencillo con esta herramienta
-                gratuita. Sigue estos pasos para obtener el cálculo perfecto:
-              </p>
-              <ul>
-                <li>
-                  <strong>Paso 1</strong>: Introduce el monto total de la cuenta en
-                  euros (ejemplo: 45,50 €)
-                </li>
-                <li>
-                  <strong>Paso 2</strong>: Selecciona un país/contexto para aplicar
-                  el porcentaje recomendado, o usa los botones rápidos (10%, 15%,
-                  20%)
-                </li>
-                <li>
-                  <strong>Paso 3</strong>: Si estás en grupo, indica el número de
-                  personas para dividir la cuenta automáticamente
-                </li>
-                <li>
-                  <strong>Paso 4</strong>: La calculadora muestra al instante el
-                  total con propina y el monto que debe pagar cada persona
-                </li>
-              </ul>
-              <p>
-                Tus preferencias se guardan automáticamente para la próxima vez. Usa
-                el botón "Limpiar" para resetear todos los valores.
-              </p>
-            </section>
-
-            <section className={styles.guideSection}>
-              <h2>Porcentajes de Propina por País</h2>
-              <p>
-                Las costumbres de propinas varían significativamente según el país y
-                la cultura. Aquí tienes una guía rápida de los porcentajes más
-                comunes:
-              </p>
-              <div className={styles.contentGrid}>
-                <div className={styles.contentCard}>
-                  <h4>🇪🇸 España</h4>
-                  <p><strong>5-10%</strong> (opcional, servicio excepcional. No es obligatorio)</p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🇺🇸 Estados Unidos</h4>
-                  <p><strong>15-20%</strong> (esperado y parte del salario del camarero)</p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🇲🇽 México</h4>
-                  <p><strong>10-15%</strong> (común en restaurantes, a veces incluido en cuenta)</p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🇬🇧 Reino Unido</h4>
-                  <p><strong>10-15%</strong> (discrecional, a veces incluido como "service charge")</p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🇫🇷 Francia</h4>
-                  <p><strong>5-10%</strong> (el servicio suele estar incluido en la cuenta)</p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🇩🇪 Alemania</h4>
-                  <p><strong>5-10%</strong> (costumbre redondear al alza el total)</p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🇯🇵 Japón</h4>
-                  <p><strong>0%</strong> (dejar propina se considera ofensivo culturalmente)</p>
-                </div>
+        <EducationalSection
+          title="¿Quieres aprender más sobre Propinas?"
+          subtitle="Descubre porcentajes por país, cuándo dejar más y consejos prácticos"
+        >
+          <section className={styles.guideSection}>
+            <h2>Conceptos Clave</h2>
+            <div className={styles.contentGrid}>
+              <div className={styles.contentCard}>
+                <h4>🇪🇸 España: 5-10%</h4>
+                <p>
+                  Opcional, solo para servicio excepcional. No es obligatorio ni esperado.
+                  Redondear al alza es lo más común.
+                </p>
               </div>
-              <p className={styles.note}>
-                <strong>Importante:</strong> Siempre revisa si el servicio ya está incluido en la cuenta
-                antes de añadir propina adicional.
-              </p>
-            </section>
-
-            <section className={styles.guideSection}>
-              <h2>¿Cuándo dejar más propina?</h2>
-              <p>
-                Hay situaciones donde es apropiado aumentar el porcentaje de propina
-                como reconocimiento al servicio:
-              </p>
-              <div className={styles.contentGrid}>
-                <div className={styles.contentCard}>
-                  <h4>⭐ Servicio excepcional</h4>
-                  <p>Si el servicio superó tus expectativas, considera 20% o más</p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>👥 Grupos grandes</h4>
-                  <p>Para 6 o más personas, 15-18% es apropiado (requiere más trabajo del personal)</p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🍽️ Pedidos complejos</h4>
-                  <p>Alergias alimentarias, personalizaciones o requerimientos especiales del menú</p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🌙 Horarios difíciles</h4>
-                  <p>Servicio en madrugada, festivos o condiciones climáticas adversas</p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🚗 Servicio a domicilio</h4>
-                  <p>Los repartidores merecen 10-15% por el esfuerzo del transporte</p>
-                </div>
+              <div className={styles.contentCard}>
+                <h4>🇺🇸 Estados Unidos: 15-20%</h4>
+                <p>
+                  Obligatorio socialmente. Los camareros dependen de propinas ya que el
+                  salario base es muy bajo. Menos del 15% es ofensivo.
+                </p>
               </div>
-              <p className={styles.note}>
-                Por el contrario, si el servicio fue deficiente, es aceptable reducir
-                la propina o hablar con el gerente sobre el problema.
-              </p>
-            </section>
+              <div className={styles.contentCard}>
+                <h4>🇯🇵 Japón: 0%</h4>
+                <p>
+                  Dejar propina se considera ofensivo. El buen servicio es parte de la
+                  cultura y está incluido en el precio.
+                </p>
+              </div>
+              <div className={styles.contentCard}>
+                <h4>💡 Truco del 10%</h4>
+                <p>
+                  Mueve el decimal un lugar: 45€ → 4,50€. Para 15% suma la mitad: 4,50€ + 2,25€ = 6,75€.
+                  Rápido y sin calculadora.
+                </p>
+              </div>
+            </div>
+          </section>
 
-            <section className={styles.guideSection}>
-              <h2>Consejos para calcular propinas</h2>
-              <ul>
-                <li>
-                  <strong>Método rápido 10%</strong>: Mueve el decimal un lugar a la
-                  izquierda (45,00€ → 4,50€ de propina)
-                </li>
-                <li>
-                  <strong>Para 15%</strong>: Calcula 10% y súmale la mitad (10% =
-                  4,50€ → 15% = 4,50€ + 2,25€ = 6,75€)
-                </li>
-                <li>
-                  <strong>Divide antes o después</strong>: Puedes calcular la propina
-                  del total y luego dividir, o dividir la cuenta primero y que cada
-                  uno añada su propina
-                </li>
-                <li>
-                  <strong>Usa efectivo cuando puedas</strong>: Algunos camareros
-                  prefieren propinas en efectivo en lugar de tarjeta
-                </li>
-                <li>
-                  <strong>Revisa la cuenta</strong>: En algunos países la propina ya
-                  está incluida como "servicio" o "service charge"
-                </li>
-              </ul>
-            </section>
-          </div>
-        )}
+          <section className={styles.guideSection}>
+            <h2>Preguntas Frecuentes</h2>
+            <div className={styles.faqGrid}>
+              <details className={styles.faqItem}>
+                <summary>¿Debo dejar propina si el servicio ya está incluido?</summary>
+                <p>
+                  Si la cuenta ya incluye &quot;servicio&quot; o &quot;service charge&quot;, no es necesario
+                  añadir más. Revisa siempre el desglose de la factura antes de calcular.
+                  Si el servicio fue excepcional, puedes añadir algo extra.
+                </p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Cuánto dejar en grupos grandes?</summary>
+                <p>
+                  Para 6 o más personas, 15-18% es apropiado ya que requiere más trabajo
+                  del personal. Algunos restaurantes añaden propina automática para grupos.
+                </p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Es mejor propina en efectivo o tarjeta?</summary>
+                <p>
+                  Muchos camareros prefieren efectivo porque lo reciben directamente sin
+                  esperar al cierre de caja. Sin embargo, tarjeta es perfectamente aceptable.
+                </p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Qué hago si el servicio fue malo?</summary>
+                <p>
+                  Puedes reducir la propina, pero considera hablar con el gerente sobre el
+                  problema. Un mal día del camarero no siempre justifica eliminar la propina
+                  completamente.
+                </p>
+              </details>
+            </div>
+          </section>
+        </EducationalSection>
       </main>
 
       {/* Footer meskeIA */}

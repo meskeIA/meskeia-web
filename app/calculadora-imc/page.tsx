@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraIMC.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
 type Clasificacion = {
@@ -268,6 +268,92 @@ export default function CalculadoraIMCPage() {
           orientativa y <strong>no sustituye la valoración de un profesional de la salud</strong>.
         </p>
       </div>
+
+      <EducationalSection
+        title="¿Quieres aprender más sobre el IMC?"
+        subtitle="Descubre qué significa tu resultado, sus limitaciones y cómo mejorar tu salud"
+      >
+        <section className={styles.guideSection}>
+          <h2>Conceptos Clave</h2>
+          <div className={styles.contentGrid}>
+            <div className={styles.contentCard}>
+              <h4>📊 ¿Qué es el IMC?</h4>
+              <p>
+                El Índice de Masa Corporal es una medida que relaciona el peso con la altura.
+                Fue desarrollado por Adolphe Quetelet en el siglo XIX y es utilizado por la OMS
+                como indicador de referencia para clasificar el peso corporal.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>⚖️ Limitaciones del IMC</h4>
+              <p>
+                El IMC no distingue entre masa muscular y grasa corporal. Un deportista con
+                mucha masa muscular puede tener un IMC alto sin tener exceso de grasa.
+                Tampoco considera la distribución de grasa (más peligrosa en el abdomen).
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>📏 Alternativas al IMC</h4>
+              <p>
+                Otros indicadores complementarios: perímetro de cintura (riesgo cardiovascular),
+                índice cintura-cadera, porcentaje de grasa corporal (bioimpedancia o pliegues
+                cutáneos), y el índice de masa grasa.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>🎯 IMC según edad</h4>
+              <p>
+                En niños y adolescentes se usan percentiles específicos por edad y sexo.
+                En adultos mayores (+65 años), un IMC ligeramente superior (25-27) puede
+                ser protector. Los rangos estándar aplican principalmente a adultos 18-65 años.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes</h2>
+          <div className={styles.faqGrid}>
+            <details className={styles.faqItem}>
+              <summary>¿Por qué mi IMC dice sobrepeso si estoy musculado?</summary>
+              <p>
+                El IMC no diferencia entre masa muscular y grasa. El músculo pesa más que la
+                grasa por volumen, por lo que deportistas con mucha masa muscular pueden tener
+                un IMC elevado sin tener exceso de grasa corporal. En estos casos, es mejor
+                medir el porcentaje de grasa corporal.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Es el mismo IMC ideal para hombres y mujeres?</summary>
+              <p>
+                Los rangos de la OMS son iguales para ambos sexos, pero fisiológicamente las
+                mujeres tienen mayor porcentaje de grasa corporal de forma natural. Algunos
+                expertos sugieren que mujeres pueden estar saludables con un IMC ligeramente
+                mayor, mientras que hombres con un IMC en el límite superior del rango normal
+                podrían tener exceso de grasa.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Cómo puedo mejorar mi IMC de forma saludable?</summary>
+              <p>
+                Para perder peso: déficit calórico moderado (300-500 kcal/día), aumentar
+                actividad física, priorizar proteínas y vegetales. Para ganar peso: superávit
+                calórico con alimentos nutritivos y ejercicio de fuerza. En ambos casos,
+                cambios graduales y sostenibles son más efectivos que dietas extremas.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Cada cuánto debo calcular mi IMC?</summary>
+              <p>
+                Para seguimiento general, una vez al mes es suficiente. Si estás en un programa
+                de pérdida o ganancia de peso, puedes pesarte semanalmente (siempre a la misma
+                hora, idealmente por la mañana en ayunas). Evita pesarte diariamente, ya que las
+                fluctuaciones normales pueden ser desmotivantes.
+              </p>
+            </details>
+          </div>
+        </section>
+      </EducationalSection>
 
       <Footer appName="calculadora-imc" />
     </div>

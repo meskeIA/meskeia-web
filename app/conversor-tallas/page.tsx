@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ConversorTallas.module.css';
-import { Footer, ResultCard, MeskeiaLogo } from '@/components';
+import { Footer, ResultCard, MeskeiaLogo, EducationalSection } from '@/components';
 
 // Tipos
 type TabType = 'hombre' | 'mujer' | 'calzado' | 'complementos';
@@ -47,8 +47,6 @@ export default function ConversorTallasPage() {
   const [complementoInput, setComplementoInput] = useState('');
   const [complementoResult, setComplementoResult] = useState<ResultadoTalla | null>(null);
 
-  // Estado para contenido educativo
-  const [showEducationalContent, setShowEducationalContent] = useState(false);
 
   // Conversiones para Ropa de Hombre
   const convertHombreTalla = () => {
@@ -738,132 +736,81 @@ export default function ConversorTallasPage() {
         </p>
       </div>
 
-      {/* Toggle educativo */}
-      <div className={styles.educationalToggle}>
-        <h3>¿Quieres aprender mas sobre Tallas Internacionales?</h3>
-        <p>
-          Descubre consejos para compras online, como medir correctamente y respuestas a las preguntas
-          mas frecuentes
-        </p>
-        <button
-          className={styles.btnSecondary}
-          onClick={() => setShowEducationalContent(!showEducationalContent)}
-        >
-          {showEducationalContent ? '⬆️ Ocultar Guia Educativa' : '⬇️ Ver Guia Completa'}
-        </button>
-      </div>
-
-      {/* Contenido educativo colapsable */}
-      {showEducationalContent && (
-        <div className={styles.educationalContent}>
-          <section className={styles.guideSection}>
-            <h2>Sistemas de Tallas Principales</h2>
-            <div className={styles.contentGrid}>
-              <div className={styles.contentCard}>
-                <h4>🇪🇸 España/Europa (ES/EU)</h4>
-                <p>
-                  <strong>Sistema metrico</strong> basado en centimetros. Usado en toda la Union
-                  Europea. Para ropa usa medidas directas del cuerpo, para calzado longitud en
-                  centimetros (Paris Point).
-                </p>
-              </div>
-              <div className={styles.contentCard}>
-                <h4>🇺🇸 Estados Unidos (US)</h4>
-                <p>
-                  <strong>Sistema imperial</strong> basado en pulgadas. Usa letras (XS, S, M, L, XL) y
-                  numeros. Las tallas americanas suelen ser mas grandes que las europeas para la misma
-                  medida corporal.
-                </p>
-              </div>
-              <div className={styles.contentCard}>
-                <h4>🇬🇧 Reino Unido (UK)</h4>
-                <p>
-                  <strong>Sistema mixto</strong> que combina elementos imperiales y propios. Similar al
-                  americano pero con diferencias significativas en calzado y ropa formal.
-                </p>
-              </div>
-              <div className={styles.contentCard}>
-                <h4>🌏 Otros Sistemas</h4>
-                <p>
-                  <strong>Francia (FR):</strong> Similar al EU pero con pequenas diferencias
-                  <br />
-                  <strong>Italia (IT):</strong> Propio sistema numerico
-                  <br />
-                  <strong>Asia:</strong> Generalmente mas pequeno que occidentales
-                </p>
-              </div>
+      <EducationalSection
+        title="¿Quieres aprender más sobre Tallas Internacionales?"
+        subtitle="Descubre consejos para compras online, cómo medir correctamente y respuestas a las preguntas más frecuentes"
+      >
+        <section className={styles.guideSection}>
+          <h2>Sistemas de Tallas Principales</h2>
+          <div className={styles.contentGrid}>
+            <div className={styles.contentCard}>
+              <h4>🇪🇸 España/Europa (ES/EU)</h4>
+              <p>
+                <strong>Sistema métrico</strong> basado en centímetros. Usado en toda la Unión
+                Europea. Para ropa usa medidas directas del cuerpo, para calzado longitud en
+                centímetros (Paris Point).
+              </p>
             </div>
-          </section>
-
-          <section className={styles.guideSection}>
-            <h2>Consejos para Compras Online Internacionales</h2>
-            <div className={styles.contentGrid}>
-              <div className={styles.contentCard}>
-                <h4>📏 Mide tu Cuerpo</h4>
-                <p>
-                  Toma medidas precisas de <strong>pecho, cintura, cadera y largo</strong>. Para
-                  calzado, mide tu pie en centimetros. Estas medidas son mas fiables que las tallas.
-                </p>
-              </div>
-              <div className={styles.contentCard}>
-                <h4>📋 Consulta Guias Especificas</h4>
-                <p>
-                  Cada marca tiene su <strong>guia de tallas</strong>. Las marcas asiaticas suelen
-                  tallar 1-2 tallas mas pequenas que las occidentales.
-                </p>
-              </div>
-              <div className={styles.contentCard}>
-                <h4>📱 Lee Resenas</h4>
-                <p>
-                  Los comentarios de otros compradores suelen mencionar si el producto{' '}
-                  <strong>&quot;talla grande&quot; o &quot;talla pequeno&quot;</strong> respecto a la guia oficial.
-                </p>
-              </div>
-              <div className={styles.contentCard}>
-                <h4>🎯 Talla de Seguridad</h4>
-                <p>
-                  En caso de duda, elige la <strong>talla mayor</strong>. Es mas facil ajustar una
-                  prenda grande que estirar una pequena.
-                </p>
-              </div>
+            <div className={styles.contentCard}>
+              <h4>🇺🇸 Estados Unidos (US)</h4>
+              <p>
+                <strong>Sistema imperial</strong> basado en pulgadas. Usa letras (XS, S, M, L, XL) y
+                números. Las tallas americanas suelen ser más grandes que las europeas para la misma
+                medida corporal.
+              </p>
             </div>
-          </section>
-
-          <section className={styles.guideSection}>
-            <h2>Preguntas Frecuentes</h2>
-            <div className={styles.faqGrid}>
-              <div className={styles.faqItem}>
-                <h4>¿Por que una talla M americana no es igual a una M europea?</h4>
-                <p>
-                  Cada pais desarrollo sus estandares basandose en las caracteristicas fisicas promedio
-                  de su poblacion. Las tallas americanas suelen ser mas amplias que las europeas.
-                </p>
-              </div>
-              <div className={styles.faqItem}>
-                <h4>¿Que hago si estoy entre dos tallas?</h4>
-                <p>
-                  Para ropa ajustada elige la mayor, para oversize la menor. Para calzado, elige la
-                  mayor si tienes pies anchos. Siempre consulta las medidas en centimetros.
-                </p>
-              </div>
-              <div className={styles.faqItem}>
-                <h4>¿Las tallas de hombre y mujer se convierten igual?</h4>
-                <p>
-                  No, tienen sistemas diferentes. En calzado, las tallas de mujer son tipicamente 1.5-2
-                  numeros menores que las de hombre para el mismo pie.
-                </p>
-              </div>
-              <div className={styles.faqItem}>
-                <h4>¿Como afecta el material a la talla?</h4>
-                <p>
-                  Materiales elasticos permiten mas flexibilidad. Materiales rigidos (denim, cuero)
-                  requieren tallas mas precisas. Tejidos que encogen pueden requerir una talla mayor.
-                </p>
-              </div>
+            <div className={styles.contentCard}>
+              <h4>🇬🇧 Reino Unido (UK)</h4>
+              <p>
+                <strong>Sistema mixto</strong> que combina elementos imperiales y propios. Similar al
+                americano pero con diferencias significativas en calzado y ropa formal.
+              </p>
             </div>
-          </section>
-        </div>
-      )}
+            <div className={styles.contentCard}>
+              <h4>🌏 Otros Sistemas</h4>
+              <p>
+                <strong>Francia (FR):</strong> Similar al EU pero con pequeñas diferencias.{' '}
+                <strong>Italia (IT):</strong> Propio sistema numérico.{' '}
+                <strong>Asia:</strong> Generalmente más pequeño que occidentales.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes</h2>
+          <div className={styles.faqGrid}>
+            <details className={styles.faqItem}>
+              <summary>¿Por qué una talla M americana no es igual a una M europea?</summary>
+              <p>
+                Cada país desarrolló sus estándares basándose en las características físicas promedio
+                de su población. Las tallas americanas suelen ser más amplias que las europeas.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Qué hago si estoy entre dos tallas?</summary>
+              <p>
+                Para ropa ajustada elige la mayor, para oversize la menor. Para calzado, elige la
+                mayor si tienes pies anchos. Siempre consulta las medidas en centímetros.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Las tallas de hombre y mujer se convierten igual?</summary>
+              <p>
+                No, tienen sistemas diferentes. En calzado, las tallas de mujer son típicamente 1.5-2
+                números menores que las de hombre para el mismo pie.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Cómo afecta el material a la talla?</summary>
+              <p>
+                Materiales elásticos permiten más flexibilidad. Materiales rígidos (denim, cuero)
+                requieren tallas más precisas. Tejidos que encogen pueden requerir una talla mayor.
+              </p>
+            </details>
+          </div>
+        </section>
+      </EducationalSection>
 
       <Footer appName="conversor-tallas" />
     </div>

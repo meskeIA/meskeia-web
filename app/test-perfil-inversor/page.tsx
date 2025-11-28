@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './TestPerfilInversor.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
 
 // Definición de preguntas con puntuaciones
 interface Option {
@@ -357,6 +357,89 @@ export default function TestPerfilInversorPage() {
             invertir, consulta con un profesional autorizado.
           </p>
         </div>
+
+        <EducationalSection
+          title="¿Quieres aprender más sobre perfiles de inversor?"
+          subtitle="Descubre qué significan los perfiles, cómo influyen en tu estrategia y conceptos clave"
+        >
+          <section className={styles.guideSection}>
+            <h2>Conceptos Clave</h2>
+            <div className={styles.contentGrid}>
+              <div className={styles.contentCard}>
+                <h4>🎯 ¿Qué es el perfil inversor?</h4>
+                <p>
+                  Es una clasificación que combina tu tolerancia al riesgo, horizonte temporal,
+                  situación financiera y objetivos. Determina qué tipo de inversiones son
+                  más adecuadas para ti y cómo distribuir tu cartera.
+                </p>
+              </div>
+              <div className={styles.contentCard}>
+                <h4>📊 Renta Variable vs Renta Fija</h4>
+                <p>
+                  La renta variable (acciones, fondos) tiene mayor potencial de rentabilidad
+                  pero más volatilidad. La renta fija (bonos, depósitos) es más estable pero
+                  con menor rentabilidad esperada. Tu perfil determina la proporción ideal.
+                </p>
+              </div>
+              <div className={styles.contentCard}>
+                <h4>⏰ Horizonte temporal</h4>
+                <p>
+                  El tiempo que puedes mantener la inversión es crucial. A más largo plazo,
+                  puedes asumir más riesgo porque tienes tiempo de recuperarte de caídas.
+                  A corto plazo, necesitas inversiones más conservadoras.
+                </p>
+              </div>
+              <div className={styles.contentCard}>
+                <h4>💰 Diversificación</h4>
+                <p>
+                  No pongas todos los huevos en la misma cesta. Diversificar entre diferentes
+                  tipos de activos, sectores y geografías reduce el riesgo global de tu
+                  cartera sin sacrificar necesariamente la rentabilidad esperada.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className={styles.guideSection}>
+            <h2>Preguntas Frecuentes</h2>
+            <div className={styles.faqGrid}>
+              <details className={styles.faqItem}>
+                <summary>¿Puede cambiar mi perfil inversor con el tiempo?</summary>
+                <p>
+                  Sí, es normal que cambie. A medida que te acercas a la jubilación, sueles
+                  volverte más conservador. También puede cambiar por eventos vitales (herencia,
+                  pérdida de empleo, matrimonio) o simplemente por más experiencia invirtiendo.
+                  Se recomienda revisar el perfil anualmente.
+                </p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Es malo ser conservador?</summary>
+                <p>
+                  No existe un perfil "mejor" o "peor". Lo importante es que se ajuste a tu
+                  situación real. Un perfil conservador es perfectamente válido si tienes
+                  horizonte corto, baja tolerancia a pérdidas, o necesitas preservar capital.
+                  Lo malo sería invertir de forma agresiva cuando no puedes permitirte perder.
+                </p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Debo invertir todo según mi perfil?</summary>
+                <p>
+                  El perfil es una guía, no una regla absoluta. Puedes tener una parte más
+                  conservadora (fondo de emergencia, metas a corto plazo) y otra más agresiva
+                  (jubilación lejana). Lo importante es entender por qué tomas cada decisión.
+                </p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Qué pasa si mis respuestas están en el límite entre dos perfiles?</summary>
+                <p>
+                  Es normal. Los perfiles son un espectro, no categorías rígidas. Si estás entre
+                  "moderado" y "equilibrado", puedes elegir una distribución intermedia. Además,
+                  puedes ajustar según tu intuición personal y experiencia previa.
+                </p>
+              </details>
+            </div>
+          </section>
+        </EducationalSection>
 
         <Footer appName="test-perfil-inversor" />
       </div>

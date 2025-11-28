@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import styles from './AlgebraEcuaciones.module.css';
-import Footer from '@/components/Footer';
-import MeskeiaLogo from '@/components/MeskeiaLogo';
+import { Footer, MeskeiaLogo, EducationalSection } from '@/components';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import * as Algebrite from 'algebrite';
 
@@ -15,7 +14,6 @@ type EquationType = 'linear' | 'quadratic' | 'system';
 export default function AlgebraEcuacionesPage() {
   // Estado principal
   const [equationType, setEquationType] = useState<EquationType>('linear');
-  const [showEducationalContent, setShowEducationalContent] = useState<boolean>(false);
 
   // Estados para ecuación lineal (ax + b = c)
   const [linearA, setLinearA] = useState<string>('2');
@@ -601,25 +599,10 @@ export default function AlgebraEcuacionesPage() {
         </p>
       </div>
 
-      {/* Toggle para contenido educativo */}
-      <div className={styles.educationalToggle}>
-        <h3>📚 ¿Quieres aprender más sobre Ecuaciones Algebraicas?</h3>
-        <p className={styles.educationalSubtitle}>
-          Descubre métodos de resolución, conceptos clave, ejemplos prácticos y respuestas a las
-          preguntas más frecuentes
-        </p>
-        <button
-          type="button"
-          onClick={() => setShowEducationalContent(!showEducationalContent)}
-          className={styles.btnSecondary}
-        >
-          {showEducationalContent ? '⬆️ Ocultar Guía Educativa' : '⬇️ Ver Guía Completa'}
-        </button>
-      </div>
-
-      {/* Contenido educativo colapsable */}
-      {showEducationalContent && (
-        <div className={styles.educationalContent}>
+      <EducationalSection
+        title="¿Quieres aprender más sobre Ecuaciones Algebraicas?"
+        subtitle="Descubre métodos de resolución, conceptos clave, ejemplos prácticos y respuestas a las preguntas más frecuentes"
+      >
           {/* Sección 1: Introducción */}
           <section className={styles.guideSection}>
             <h2>¿Qué son las Ecuaciones Algebraicas?</h2>
@@ -963,8 +946,7 @@ export default function AlgebraEcuacionesPage() {
               </div>
             </div>
           </section>
-        </div>
-      )}
+      </EducationalSection>
 
       <Footer appName="algebra-ecuaciones" />
     </div>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCalorias.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
 interface Actividad {
@@ -254,6 +254,90 @@ export default function CalculadoraCaloriasPage() {
           de la salud o entrenador personal</strong>.
         </p>
       </div>
+
+      <EducationalSection
+        title="¿Quieres aprender más sobre calorías y ejercicio?"
+        subtitle="Descubre cómo funcionan los MET, optimiza tu entrenamiento y entiende el gasto energético"
+      >
+        <section className={styles.guideSection}>
+          <h2>Conceptos Clave</h2>
+          <div className={styles.contentGrid}>
+            <div className={styles.contentCard}>
+              <h4>🔥 ¿Qué son los MET?</h4>
+              <p>
+                MET significa Equivalente Metabólico de Tarea. 1 MET equivale al consumo de
+                oxígeno en reposo (3,5 ml O₂/kg/min). Una actividad de 5 MET significa que
+                quemas 5 veces más calorías que estando en reposo absoluto.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>⚡ Efecto EPOC</h4>
+              <p>
+                El EPOC (Excess Post-exercise Oxygen Consumption) es el consumo extra de
+                calorías después del ejercicio. El entrenamiento HIIT y pesas generan mayor
+                EPOC que el cardio suave, quemando calorías hasta 24-48h después.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>📊 Factores que afectan al gasto</h4>
+              <p>
+                El gasto calórico real depende de: peso corporal (más peso = más gasto),
+                intensidad real (no solo tipo de ejercicio), condición física (más eficiente
+                = menos gasto), temperatura ambiente y altitud.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>🎯 Déficit vs Superávit</h4>
+              <p>
+                Para perder 1 kg de grasa necesitas un déficit de ~7.700 kcal. Para ganar
+                músculo, un superávit moderado de 300-500 kcal con entrenamiento de fuerza.
+                El ejercicio ayuda, pero la alimentación es el factor principal.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes</h2>
+          <div className={styles.faqGrid}>
+            <details className={styles.faqItem}>
+              <summary>¿Por qué quemo menos calorías que mi amigo haciendo lo mismo?</summary>
+              <p>
+                El gasto calórico depende principalmente del peso corporal. Una persona de
+                90 kg quema más calorías que una de 60 kg haciendo el mismo ejercicio.
+                También influye la eficiencia: personas entrenadas son más eficientes y
+                pueden quemar menos calorías en la misma actividad.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Es mejor cardio o pesas para quemar calorías?</summary>
+              <p>
+                El cardio quema más calorías durante el ejercicio. Pero las pesas generan
+                mayor EPOC y aumentan la masa muscular, lo que eleva el metabolismo basal.
+                Lo ideal es combinar ambos: entrenamiento de fuerza 2-3 veces/semana y
+                cardio 2-3 veces/semana para resultados óptimos.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Puedo confiar en las calorías que marca mi smartwatch?</summary>
+              <p>
+                Los dispositivos wearables tienen un margen de error del 15-30%. Son útiles
+                para comparar entre días o actividades, pero no como valor absoluto. Los
+                pulsómetros de pecho son más precisos que los de muñeca.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Cuánto ejercicio necesito para compensar una comida?</summary>
+              <p>
+                Mejor enfoque: no "compensar" comidas con ejercicio (crea una relación
+                insana). Una hamburguesa (~540 kcal) requiere ~1 hora de running. Es más
+                práctico mantener un déficit moderado diario que intentar quemar excesos
+                puntuales.
+              </p>
+            </details>
+          </div>
+        </section>
+      </EducationalSection>
 
       <Footer appName="calculadora-calorias-ejercicio" />
     </div>

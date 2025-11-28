@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraHidratacion.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
 type NivelActividad = 'sedentario' | 'ligero' | 'moderado' | 'activo' | 'muy_activo';
@@ -293,6 +293,90 @@ export default function CalculadoraHidratacionPage() {
           con problemas renales o cardíacos deben seguir indicaciones médicas específicas</strong>.
         </p>
       </div>
+
+      <EducationalSection
+        title="¿Quieres aprender más sobre hidratación?"
+        subtitle="Descubre la ciencia detrás de la hidratación, señales de deshidratación y mitos comunes"
+      >
+        <section className={styles.guideSection}>
+          <h2>Conceptos Clave</h2>
+          <div className={styles.contentGrid}>
+            <div className={styles.contentCard}>
+              <h4>💧 ¿Por qué 35 ml/kg?</h4>
+              <p>
+                Esta fórmula está respaldada por investigaciones científicas como punto de
+                partida. La EFSA (Autoridad Europea de Seguridad Alimentaria) recomienda
+                2,5 L/día para hombres y 2 L/día para mujeres, incluyendo agua de alimentos.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>🚰 Agua de los alimentos</h4>
+              <p>
+                Aproximadamente el 20% del agua diaria proviene de alimentos. Frutas como
+                sandía (92%), melón (90%), naranja (87%) y verduras como pepino (96%),
+                lechuga (95%) y tomate (94%) contribuyen significativamente.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>⚠️ Señales de deshidratación</h4>
+              <p>
+                Orina oscura (debe ser amarillo pálido), sed intensa, dolor de cabeza,
+                fatiga, mareos, piel seca. La sed aparece cuando ya hay un 1-2% de
+                deshidratación, por lo que es mejor beber antes de sentirla.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>🏃 Hidratación durante ejercicio</h4>
+              <p>
+                Durante el ejercicio intenso se pueden perder 0,5-2 L/hora de sudor.
+                Recomendación: 150-250 ml cada 15-20 minutos. Para ejercicios de más de
+                1 hora, añadir electrolitos (sodio, potasio).
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes</h2>
+          <div className={styles.faqGrid}>
+            <details className={styles.faqItem}>
+              <summary>¿Es verdad que hay que beber 8 vasos de agua al día?</summary>
+              <p>
+                El mito de los "8 vasos" no tiene base científica sólida. Las necesidades
+                varían según peso, actividad, clima y dieta. La regla de 35 ml/kg es más
+                personalizada. Una persona de 60 kg necesita ~2,1 L, mientras que una de
+                80 kg necesita ~2,8 L.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿El café y té deshidratan?</summary>
+              <p>
+                Mito parcial. Aunque la cafeína tiene efecto diurético leve, el agua que
+                contienen estas bebidas compensa con creces. Cantidades moderadas (3-4
+                tazas/día) no causan deshidratación neta y cuentan para la ingesta diaria.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Puedo beber demasiada agua?</summary>
+              <p>
+                Sí, se llama hiponatremia (niveles bajos de sodio en sangre). Ocurre
+                raramente en atletas de resistencia que beben en exceso sin reponer
+                electrolitos. Para la mayoría, es difícil excederse. Síntomas: náuseas,
+                confusión, en casos graves puede ser peligroso.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Es mejor agua fría o a temperatura ambiente?</summary>
+              <p>
+                Para hidratación general, la temperatura es preferencia personal. El agua
+                fría se absorbe ligeramente más rápido y puede ser más refrescante durante
+                el ejercicio. El agua a temperatura ambiente es mejor tolerada por personas
+                con estómagos sensibles.
+              </p>
+            </details>
+          </div>
+        </section>
+      </EducationalSection>
 
       <Footer appName="calculadora-hidratacion" />
     </div>

@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import FixedHeader from '@/components/FixedHeader';
-import Footer from '@/components/Footer';
-import ResultCard from '@/components/ResultCard';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { jsonLd, faqSchema } from './metadata';
 import styles from './CalculadoraFechas.module.css';
@@ -33,8 +31,6 @@ export default function CalculadoraFechas() {
   const [referenceDate, setReferenceDate] = useState<string>('');
   const [ageResult, setAgeResult] = useState<any>(null);
 
-  // Estado para contenido educativo
-  const [showEducationalContent, setShowEducationalContent] = useState<boolean>(false);
 
   // Inicializar fechas
   useEffect(() => {
@@ -278,8 +274,8 @@ export default function CalculadoraFechas() {
       {/* Analytics */}
       <AnalyticsTracker applicationName="calculadora-fechas" />
 
-      {/* Header meskeIA */}
-      <FixedHeader />
+      {/* Logo meskeIA */}
+      <MeskeiaLogo />
 
       <main className={styles.container}>
         {/* Header */}
@@ -545,231 +541,83 @@ export default function CalculadoraFechas() {
           </article>
         </div>
 
-        {/* Toggle de Contenido Educativo */}
-        <div className={styles.educationalToggle}>
-          <h3>📚 ¿Quieres aprender más sobre Cálculos de Fechas?</h3>
-          <p className={styles.educationalSubtitle}>
-            Descubre casos de uso prácticos, trucos para plazos legales, ejemplos reales y
-            respuestas a las preguntas más frecuentes
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowEducationalContent(!showEducationalContent)}
-            className={styles.btnSecondary}
-          >
-            {showEducationalContent ? '⬆️ Ocultar Guía Educativa' : '⬇️ Ver Guía Completa'}
-          </button>
-        </div>
-
         {/* Contenido educativo colapsable */}
-        {showEducationalContent && (
-          <div className={styles.educationalContent}>
-            {/* Casos de uso prácticos */}
-            <section className={styles.guideSection}>
-              <h2>Casos de Uso Prácticos</h2>
-              <div className={styles.contentGrid}>
-                <div className={styles.contentCard}>
-                  <h4>📄 Contratos y Plazos</h4>
-                  <p>
-                    <strong>Ejemplo:</strong> Firmaste un contrato el 15/01/2024 con duración
-                    de 18 meses. ¿Cuándo vence?
-                  </p>
-                  <p>
-                    <strong>Resultado:</strong> 15/07/2025
-                  </p>
-                </div>
-
-                <div className={styles.contentCard}>
-                  <h4>💼 Gestión de Proyectos</h4>
-                  <p>
-                    <strong>Ejemplo:</strong> Proyecto inicia 03/06/2024, entrega 25/11/2024.
-                    ¿Cuántos días laborables?
-                  </p>
-                  <p>
-                    <strong>Resultado:</strong> ~124 días hábiles
-                  </p>
-                </div>
-
-                <div className={styles.contentCard}>
-                  <h4>👶 Embarazo y Parto</h4>
-                  <p>
-                    <strong>Ejemplo:</strong> Última menstruación: 10/02/2024. Fecha probable
-                    parto (280 días)?
-                  </p>
-                  <p>
-                    <strong>Resultado:</strong> 17/11/2024
-                  </p>
-                </div>
-
-                <div className={styles.contentCard}>
-                  <h4>⚖️ Plazos Legales</h4>
-                  <p>
-                    <strong>Ejemplo:</strong> Notificación 05/03/2024, plazo 30 días hábiles.
-                    ¿Vencimiento?
-                  </p>
-                  <p>
-                    <strong>Resultado:</strong> 16/04/2024
-                  </p>
-                </div>
-
-                <div className={styles.contentCard}>
-                  <h4>🎓 Antigüedad Laboral</h4>
-                  <p>
-                    <strong>Ejemplo:</strong> Contratación: 01/06/2020. Antigüedad en
-                    diciembre 2024?
-                  </p>
-                  <p>
-                    <strong>Resultado:</strong> 4 años, 6 meses
-                  </p>
-                </div>
-
-                <div className={styles.contentCard}>
-                  <h4>🎂 Edad Precisa</h4>
-                  <p>
-                    <strong>Ejemplo:</strong> Naciste el 23/05/1995. ¿Edad exacta el
-                    15/06/2024?
-                  </p>
-                  <p>
-                    <strong>Resultado:</strong> 29 años, 23 días
-                  </p>
-                </div>
+        <EducationalSection
+          title="¿Quieres aprender más sobre Cálculos de Fechas?"
+          subtitle="Descubre casos de uso prácticos y respuestas a preguntas frecuentes"
+        >
+          <section className={styles.guideSection}>
+            <h2>Conceptos Clave</h2>
+            <div className={styles.contentGrid}>
+              <div className={styles.contentCard}>
+                <h4>📅 Años Bisiestos</h4>
+                <p>
+                  La calculadora considera automáticamente los años bisiestos (cada 4 años,
+                  excepto los divisibles por 100, salvo los divisibles por 400).
+                </p>
               </div>
-            </section>
-
-            {/* ¿Qué es una calculadora de fechas? */}
-            <section className={styles.guideSection}>
-              <h2>¿Qué es una Calculadora de Fechas?</h2>
-              <p>
-                Una calculadora de fechas es una herramienta digital que permite realizar
-                cálculos precisos con fechas y periodos de tiempo. Facilita operaciones complejas
-                como determinar la diferencia exacta entre dos fechas, calcular edades precisas,
-                sumar o restar días laborables, y determinar qué día de la semana corresponde a
-                cualquier fecha histórica o futura.
-              </p>
-              <p>
-                Esta herramienta es esencial para profesionales de recursos humanos, contadores,
-                project managers, historiadores y cualquier persona que necesite realizar cálculos
-                temporales precisos. Nuestra calculadora considera años bisiestos, meses con
-                diferentes cantidades de días y proporciona resultados exactos en múltiples
-                formatos.
-              </p>
-            </section>
-
-            {/* Aplicaciones principales */}
-            <section className={styles.guideSection}>
-              <h2>Aplicaciones Principales</h2>
-              <div className={styles.contentGrid}>
-                <div className={styles.contentCard}>
-                  <h4>📊 Gestión de Proyectos</h4>
-                  <p>
-                    Calcular duraciones, fechas límite y plazos de entrega. Determinar días
-                    laborables entre hitos del proyecto.
-                  </p>
-                </div>
-
-                <div className={styles.contentCard}>
-                  <h4>👥 Recursos Humanos</h4>
-                  <p>
-                    Determinar antigüedad laboral, calcular vacaciones proporcionales,
-                    jubilaciones y periodos de prueba.
-                  </p>
-                </div>
-
-                <div className={styles.contentCard}>
-                  <h4>⚖️ Legal y Contable</h4>
-                  <p>
-                    Calcular vencimientos de contratos, prescripciones legales, periodos
-                    fiscales y plazos procesales.
-                  </p>
-                </div>
-
-                <div className={styles.contentCard}>
-                  <h4>👨‍👩‍👧 Personal</h4>
-                  <p>
-                    Conocer edad exacta, planificar eventos, calcular aniversarios y fechas
-                    especiales familiares.
-                  </p>
-                </div>
-
-                <div className={styles.contentCard}>
-                  <h4>🎓 Educación</h4>
-                  <p>
-                    Determinar duraciones de cursos, periodos académicos, calendarios escolares
-                    y fechas de exámenes.
-                  </p>
-                </div>
-
-                <div className={styles.contentCard}>
-                  <h4>🏥 Salud</h4>
-                  <p>
-                    Calcular fechas de parto estimadas, periodos de tratamiento, seguimiento de
-                    medicación y citas médicas.
-                  </p>
-                </div>
+              <div className={styles.contentCard}>
+                <h4>📊 Días vs Días Hábiles</h4>
+                <p>
+                  Esta herramienta calcula días naturales (calendario). Para días laborables,
+                  resta fines de semana y festivos según tu localidad.
+                </p>
               </div>
-            </section>
-
-            {/* FAQ */}
-            <section className={styles.guideSection}>
-              <h2>Preguntas Frecuentes (FAQ)</h2>
-              <div className={styles.faqGrid}>
-                <div className={styles.faqItem}>
-                  <h4>¿Cómo calculo la diferencia entre dos fechas?</h4>
-                  <p>
-                    Simplemente selecciona la fecha inicial y la fecha final en la primera
-                    calculadora. La herramienta te mostrará la diferencia en días, semanas,
-                    meses y años, además del tiempo exacto en formato años-meses-días.
-                  </p>
-                </div>
-
-                <div className={styles.faqItem}>
-                  <h4>¿La calculadora considera los años bisiestos?</h4>
-                  <p>
-                    Sí, nuestra calculadora tiene en cuenta los años bisiestos, los diferentes
-                    días de cada mes y proporciona cálculos precisos considerando el calendario
-                    gregoriano actual.
-                  </p>
-                </div>
-
-                <div className={styles.faqItem}>
-                  <h4>¿Puedo calcular fechas futuras?</h4>
-                  <p>
-                    Por supuesto. Puedes sumar días, semanas, meses o años a cualquier fecha
-                    base para obtener una fecha futura. También puedes restar tiempo para
-                    obtener fechas pasadas.
-                  </p>
-                </div>
-
-                <div className={styles.faqItem}>
-                  <h4>¿Cómo sé qué día de la semana fue una fecha histórica?</h4>
-                  <p>
-                    Usa la calculadora &quot;Día de la semana&quot; e introduce cualquier fecha desde
-                    1900. Te dirá exactamente qué día de la semana fue y cuánto tiempo ha pasado
-                    desde entonces.
-                  </p>
-                </div>
-
-                <div className={styles.faqItem}>
-                  <h4>¿La calculadora de edad es precisa?</h4>
-                  <p>
-                    Totalmente. La calculadora de edad proporciona la edad exacta en años, meses
-                    y días, además de información adicional como días totales vividos y días
-                    hasta el próximo cumpleaños.
-                  </p>
-                </div>
-
-                <div className={styles.faqItem}>
-                  <h4>¿Puedo calcular días laborables?</h4>
-                  <p>
-                    La calculadora actual calcula días calendario completos. Para cálculos de
-                    días laborables, te recomendamos usar herramientas especializadas que
-                    consideren festivos específicos de tu localidad.
-                  </p>
-                </div>
+              <div className={styles.contentCard}>
+                <h4>⚖️ Plazos Legales</h4>
+                <p>
+                  En España, los plazos administrativos suelen ser hábiles (excluyendo sábados,
+                  domingos y festivos nacionales/autonómicos).
+                </p>
               </div>
-            </section>
-          </div>
-        )}
+              <div className={styles.contentCard}>
+                <h4>🎂 Edad Exacta</h4>
+                <p>
+                  La edad se calcula considerando si ya ha pasado el cumpleaños del año actual.
+                  Incluye años, meses y días exactos.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className={styles.guideSection}>
+            <h2>Preguntas Frecuentes</h2>
+            <div className={styles.faqGrid}>
+              <details className={styles.faqItem}>
+                <summary>¿La calculadora considera los años bisiestos?</summary>
+                <p>
+                  Sí, nuestra calculadora tiene en cuenta los años bisiestos, los diferentes
+                  días de cada mes y proporciona cálculos precisos considerando el calendario
+                  gregoriano actual.
+                </p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Cómo sé qué día de la semana fue una fecha histórica?</summary>
+                <p>
+                  Usa la calculadora &quot;Día de la semana&quot; e introduce cualquier fecha desde
+                  1900. Te dirá exactamente qué día de la semana fue y cuánto tiempo ha pasado
+                  desde entonces.
+                </p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Puedo calcular fechas futuras?</summary>
+                <p>
+                  Por supuesto. Puedes sumar días, semanas, meses o años a cualquier fecha
+                  base para obtener una fecha futura. También puedes restar tiempo para
+                  obtener fechas pasadas.
+                </p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Puedo calcular días laborables?</summary>
+                <p>
+                  La calculadora actual calcula días calendario completos. Para días laborables,
+                  deberías restar manualmente fines de semana (~2 días por cada 7) y festivos
+                  según tu localidad.
+                </p>
+              </details>
+            </div>
+          </section>
+        </EducationalSection>
       </main>
 
       {/* Footer meskeIA */}

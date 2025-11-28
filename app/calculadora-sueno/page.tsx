@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraSueno.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
 
 type ModoCalculo = 'despertar' | 'dormir';
 
@@ -267,6 +267,91 @@ export default function CalculadoraSuenoPage() {
           Esta herramienta no sustituye el diagnóstico ni tratamiento médico.
         </p>
       </div>
+
+      <EducationalSection
+        title="¿Quieres aprender más sobre el sueño?"
+        subtitle="Descubre la ciencia del sueño, cómo mejorar tu descanso y mitos comunes"
+      >
+        <section className={styles.guideSection}>
+          <h2>Conceptos Clave</h2>
+          <div className={styles.contentGrid}>
+            <div className={styles.contentCard}>
+              <h4>🌙 Arquitectura del sueño</h4>
+              <p>
+                Un ciclo de sueño dura ~90 minutos y tiene 4 fases: N1 (adormecimiento),
+                N2 (sueño ligero), N3 (sueño profundo/reparador) y REM (sueños). Cada noche
+                completamos 4-6 ciclos, con más sueño profundo al inicio y más REM al final.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>⏰ Ritmo circadiano</h4>
+              <p>
+                Nuestro reloj biológico interno regula cuándo tenemos sueño. Se sincroniza
+                con la luz solar: la luz inhibe la melatonina (hormona del sueño). Por eso
+                las pantallas por la noche (luz azul) dificultan el sueño.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>😴 Deuda de sueño</h4>
+              <p>
+                Dormir menos de lo necesario acumula "deuda de sueño". No se recupera
+                completamente durmiendo más el fin de semana. La privación crónica afecta
+                la memoria, el sistema inmune, el metabolismo y el estado de ánimo.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>📊 Horas recomendadas por edad</h4>
+              <p>
+                Adultos (18-64): 7-9 horas. Adolescentes (14-17): 8-10 horas. Niños (6-13):
+                9-11 horas. Mayores (+65): 7-8 horas. La calidad es tan importante como la
+                cantidad: 7 horas de sueño profundo superan a 9 horas de sueño fragmentado.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes</h2>
+          <div className={styles.faqGrid}>
+            <details className={styles.faqItem}>
+              <summary>¿Por qué me despierto cansado aunque duermo 8 horas?</summary>
+              <p>
+                Posibles causas: despertar a mitad de un ciclo (no al final), apnea del
+                sueño no diagnosticada, consumo de alcohol (fragmenta el sueño), estrés,
+                colchón inadecuado, temperatura de la habitación (ideal: 18-21°C), o
+                condiciones médicas. Si persiste, consulta a un especialista.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Es malo dormir la siesta?</summary>
+              <p>
+                Las siestas cortas (15-20 min) mejoran la alerta y el rendimiento. Siestas
+                largas (+30 min) pueden causar inercia del sueño (despertar aturdido) y
+                dificultar el sueño nocturno. Ideal: siesta antes de las 15:00 y máximo
+                20 minutos.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Es verdad que necesito menos sueño conforme envejezco?</summary>
+              <p>
+                No exactamente. Las necesidades de sueño no disminuyen mucho con la edad,
+                pero sí cambia la arquitectura del sueño: menos sueño profundo, despertares
+                más frecuentes. Los mayores a menudo duermen menos por la noche pero
+                compensan con siestas.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿El ejercicio ayuda a dormir mejor?</summary>
+              <p>
+                Sí, el ejercicio regular mejora la calidad del sueño. Pero evita ejercicio
+                intenso 2-3 horas antes de acostarte: eleva la temperatura corporal y la
+                adrenalina. El ejercicio por la mañana o tarde temprana es ideal para
+                optimizar el sueño nocturno.
+              </p>
+            </details>
+          </div>
+        </section>
+      </EducationalSection>
 
       <Footer appName="calculadora-sueno" />
     </div>
