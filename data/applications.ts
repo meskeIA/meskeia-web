@@ -1,6 +1,7 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 84 aplicaciones organizadas por 12 categorías
+ * Total: 89 aplicaciones organizadas por 12 categorías
+ * Actualizado: 2025-11-28
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
  * - calculadora-: Apps que calculan/resuelven
@@ -30,7 +31,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora de Inversiones", category: "Finanzas y Fiscalidad", icon: "💰", description: "Simula el crecimiento de tus inversiones con interés compuesto", url: "/calculadora-inversiones/", keywords: ["bolsa", "acciones", "fondos", "rentabilidad", "capital", "dividendos"] },
   { name: "Calculadora de Interés Compuesto", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula el interés compuesto de tus ahorros e inversiones a largo plazo", url: "/interes-compuesto/", keywords: ["ahorro", "capital", "rentabilidad", "interes", "compuesto"] },
   { name: "Test de Perfil Inversor", category: "Finanzas y Fiscalidad", icon: "🎯", description: "Descubre tu tolerancia al riesgo con un test de 10 preguntas y recibe recomendaciones personalizadas", url: "/test-perfil-inversor/", keywords: ["perfil", "inversor", "riesgo", "tolerancia", "test", "cuestionario", "inversion"] },
-  { name: "Control de Gastos Mensual", category: "Finanzas y Fiscalidad", icon: "💰", description: "Controla tus gastos e ingresos mensuales con gráficos y categorización automática", url: "/control-gastos-mensual/", keywords: ["presupuesto", "gastos", "ingresos", "finanzas personales", "ahorro"] },
+  { name: "Control de Gastos", category: "Finanzas y Fiscalidad", icon: "💰", description: "Controla tus gastos e ingresos mensuales con gráficos y categorización automática", url: "/control-gastos/", keywords: ["presupuesto", "gastos", "ingresos", "finanzas personales", "ahorro"] },
   { name: "Simulador IRPF", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula tu IRPF y retenciones según la normativa fiscal española actual", url: "/simulador-irpf/", keywords: ["impuestos", "renta", "hacienda", "declaracion", "retenciones", "fiscal"] },
   { name: "Calculadora de Donaciones - Cataluña", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula el impuesto de donaciones según la normativa catalana con tarifa reducida, primera vivienda y bonificaciones", url: "/calculadora-donaciones-cataluna/", keywords: ["donacion", "impuesto", "cataluna", "catalunya", "herencia", "fiscal", "tarifa reducida"] },
   { name: "Calculadora de Donaciones - Nacional", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula el impuesto de donaciones para 14 comunidades autónomas con bonificaciones actualizadas 2025", url: "/calculadora-donaciones-nacional/", keywords: ["donacion", "impuesto", "comunidad autonoma", "regimen comun", "nacional", "fiscal", "madrid", "andalucia"] },
@@ -39,8 +40,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora TIR-VAN", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula TIR y VAN para análisis de inversiones y proyectos", url: "/calculadora-tir-van/", keywords: ["tir", "van", "inversion", "proyecto", "rentabilidad", "flujo caja"] },
   { name: "Calculadora Plusvalías IRPF", category: "Finanzas y Fiscalidad", icon: "📊", description: "Calcula el IRPF de tus inversiones: plusvalías de acciones, fondos, criptomonedas, dividendos e intereses con tramos 2025", url: "/calculadora-plusvalias-irpf/", keywords: ["plusvalias", "irpf", "capital mobiliario", "dividendos", "acciones", "criptomonedas", "fondos", "tramos ahorro"] },
 
-  // Calculadoras y Utilidades (7)
-  { name: "Calculadora de Porcentajes", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calculadora avanzada de porcentajes con visualizaciones: descuentos, IVA, propinas y cambios porcentuales", url: "/calculadora-porcentajes/", keywords: ["porcentaje", "descuento", "iva", "propina", "rebaja", "aumento"] },
+  // Calculadoras y Utilidades (6)
   { name: "Calculadora de Propinas", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calcula propinas y divide la cuenta entre varias personas fácilmente", url: "/calculadora-propinas/", keywords: ["propina", "cuenta", "dividir", "restaurante", "porcentaje"] },
   { name: "Calculadora Regla de Tres", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calculadora completa de regla de tres simple y compuesta con ejemplos prácticos españoles", url: "/calculadora-regla-de-tres/", keywords: ["proporcion", "regla", "tres", "directa", "inversa", "matematicas"] },
   { name: "Calculadora de Fechas", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calcula días entre fechas, suma o resta días a cualquier fecha", url: "/calculadora-fechas/", keywords: ["fecha", "dias", "calendario", "diferencia", "tiempo"] },
@@ -95,9 +95,8 @@ export const applicationsDatabase: Application[] = [
   { name: "Curso Decisiones de Inversión", category: "Campus Digital", icon: "📚", description: "Aprende a tomar decisiones de inversión inteligentes con este curso interactivo", url: "/curso-decisiones-inversion/", keywords: ["curso", "inversion", "finanzas", "aprender", "bolsa"] },
   { name: "Curso de Emprendimiento", category: "Campus Digital", icon: "📚", description: "Guía práctica de emprendimiento: de la idea al primer cliente con ejemplos españoles", url: "/curso-emprendimiento/", keywords: ["emprendimiento", "negocio", "startup", "empresa", "curso"] },
 
-  // Salud & Bienestar (10)
+  // Salud & Bienestar (9)
   { name: "Calculadora IMC", category: "Salud & Bienestar", icon: "⚖️", description: "Calcula tu Índice de Masa Corporal y conoce tu clasificación según la OMS", url: "/calculadora-imc/", keywords: ["imc", "peso", "altura", "obesidad", "salud", "oms"] },
-  { name: "Evaluador de Salud", category: "Salud & Bienestar", icon: "🏥", description: "Calcula tu IMC, metabolismo basal y evalúa tu estado de salud", url: "/evaluador-salud/", keywords: ["imc", "salud", "peso", "metabolismo", "calorias"] },
   { name: "Calculadora de Calorías", category: "Salud & Bienestar", icon: "🏥", description: "Calcula las calorías quemadas según tu actividad física, pasos y tiempo de ejercicio", url: "/calculadora-calorias-ejercicio/", keywords: ["calorias", "ejercicio", "deporte", "quemar", "actividad fisica"] },
   { name: "Calculadora de Hidratación", category: "Salud & Bienestar", icon: "🏥", description: "Calcula cuánta agua necesitas beber diariamente según tu peso, actividad física y clima", url: "/calculadora-hidratacion/", keywords: ["agua", "hidratacion", "beber", "litros", "salud"] },
   { name: "Calculadora de Sueño", category: "Salud & Bienestar", icon: "🏥", description: "Calcula tus ciclos de sueño ideales y descubre a qué hora acostarte para despertar descansado", url: "/calculadora-sueno/", keywords: ["sueño", "dormir", "ciclos", "descanso", "rem"] },
@@ -116,17 +115,16 @@ export const applicationsDatabase: Application[] = [
   { name: "Validador RegEx", category: "Herramientas Web y Tecnología", icon: "💻", description: "Testa y valida expresiones regulares con resaltado de coincidencias y ejemplos prácticos", url: "/validador-regex/", keywords: ["regex", "expresiones regulares", "validar", "patron", "programacion"] },
   { name: "Conversor de Imágenes", category: "Herramientas Web y Tecnología", icon: "💻", description: "Convierte formatos de imagen (JPG, PNG, WebP), comprime y redimensiona con control de calidad total", url: "/conversor-imagenes/", keywords: ["imagen", "convertir", "comprimir", "redimensionar", "jpg", "png"] },
 
-  // Texto y Documentos (6)
+  // Texto y Documentos (5)
   { name: "Contador de Palabras", category: "Texto y Documentos", icon: "📝", description: "Cuenta palabras, caracteres, párrafos y tiempo de lectura en tiempo real. Objetivo de palabras configurable", url: "/contador-palabras/", keywords: ["contar", "palabras", "caracteres", "texto", "escritura"] },
   { name: "Conversor de Texto", category: "Texto y Documentos", icon: "📝", description: "Convierte texto entre MAYÚSCULAS, minúsculas, Capitalizado, Título, aLtErNaDo e iNvErTiDo", url: "/conversor-texto/", keywords: ["convertir", "mayusculas", "minusculas", "texto", "formato"] },
   { name: "Limpiador de Texto", category: "Texto y Documentos", icon: "📝", description: "Limpia texto eliminando espacios duplicados, líneas vacías extras, tabulaciones y caracteres especiales", url: "/limpiador-texto/", keywords: ["limpiar", "texto", "espacios", "formato", "eliminar"] },
-  { name: "Generador de Texto", category: "Texto y Documentos", icon: "📝", description: "Genera texto de relleno: Lorem Ipsum, español simulado, texto profesional y técnico. Control por párrafos, palabras o caracteres", url: "/generador-texto/", keywords: ["lorem ipsum", "texto", "placeholder", "relleno", "dummy"] },
   { name: "Comparador de Textos", category: "Texto y Documentos", icon: "📝", description: "Compara dos textos línea por línea detectando diferencias añadidas, eliminadas y modificadas. Ideal para editores, escritores y traductores", url: "/comparador-textos/", keywords: ["comparar", "diff", "diferencias", "texto", "cambios"] },
   { name: "Conversor Markdown-HTML", category: "Texto y Documentos", icon: "📝", description: "Convierte Markdown a HTML limpio con vista previa en tiempo real. Soporte completo de sintaxis: títulos, listas, enlaces, código, tablas", url: "/conversor-markdown-html/", keywords: ["markdown", "html", "convertir", "formato", "codigo"] },
 
   // Creatividad y Diseño (7)
   { name: "Conversor de Colores", category: "Creatividad y Diseño", icon: "🎨", description: "Convierte entre HEX, RGB, HSL y CMYK con color picker visual y generación de paletas automáticas", url: "/conversor-colores/", keywords: ["colores", "hex", "rgb", "hsl", "cmyk", "convertidor", "color picker", "paleta"] },
-  { name: "Calculadora de Contraste", category: "Creatividad y Diseño", icon: "🎨", description: "Verifica accesibilidad WCAG con ratios de contraste AA/AAA y simulación de daltonismo", url: "/calculadora-contraste-colores/", keywords: ["contraste", "accesibilidad", "wcag", "daltonismo", "aa", "aaa", "diseño accesible"] },
+  { name: "Calculadora de Contraste", category: "Creatividad y Diseño", icon: "🎨", description: "Verifica accesibilidad WCAG con ratios de contraste AA/AAA y simulación de daltonismo", url: "/contraste-colores/", keywords: ["contraste", "accesibilidad", "wcag", "daltonismo", "aa", "aaa", "diseño accesible"] },
   { name: "Generador de Gradientes", category: "Creatividad y Diseño", icon: "🎨", description: "Crea gradientes CSS lineales, radiales y cónicos con presets populares y código listo para copiar", url: "/generador-gradientes/", keywords: ["gradientes", "css", "gradient", "linear", "radial", "conic", "background"] },
   { name: "Generador de Sombras", category: "Creatividad y Diseño", icon: "🎨", description: "Genera box-shadow y text-shadow con múltiples capas, presets de neuromorfismo y material design", url: "/generador-sombras/", keywords: ["sombras", "shadow", "box-shadow", "text-shadow", "neuromorfismo", "material design"] },
   { name: "Calculadora de Aspectos", category: "Creatividad y Diseño", icon: "🎨", description: "Mantiene proporciones al redimensionar, presets para redes sociales (Instagram, Facebook, YouTube)", url: "/calculadora-aspectos/", keywords: ["aspectos", "ratio", "proporciones", "redimensionar", "instagram", "facebook", "16:9", "4:3"] },
