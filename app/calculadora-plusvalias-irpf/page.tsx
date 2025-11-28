@@ -5,6 +5,36 @@ import styles from './CalculadoraPlusvalias.module.css';
 import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
+// Componente Input reutilizable - FUERA del componente principal para evitar re-renders
+interface InputCampoProps {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  icon: string;
+  helperText?: string;
+}
+
+function InputCampo({ label, value, onChange, placeholder = '0,00', icon, helperText }: InputCampoProps) {
+  return (
+    <div className={styles.inputGroup}>
+      <label className={styles.label}>
+        <span className={styles.labelIcon}>{icon}</span>
+        {label}
+      </label>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={styles.input}
+        inputMode="decimal"
+      />
+      {helperText && <span className={styles.helperText}>{helperText}</span>}
+    </div>
+  );
+}
+
 // Tramos del ahorro IRPF 2025
 const TRAMOS_AHORRO = [
   { limite: 6000, tipo: 0.19, nombre: 'Hasta 6.000 €' },
@@ -125,41 +155,6 @@ export default function CalculadoraPlusvaliasIrpfPage() {
     setRetenciones('');
   };
 
-  // Componente Input reutilizable
-  const InputCampo = ({
-    label,
-    value,
-    onChange,
-    placeholder = '0,00',
-    icon,
-    permitirNegativos = false,
-    helperText
-  }: {
-    label: string;
-    value: string;
-    onChange: (v: string) => void;
-    placeholder?: string;
-    icon: string;
-    permitirNegativos?: boolean;
-    helperText?: string;
-  }) => (
-    <div className={styles.inputGroup}>
-      <label className={styles.label}>
-        <span className={styles.labelIcon}>{icon}</span>
-        {label}
-      </label>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={styles.input}
-        inputMode="decimal"
-      />
-      {helperText && <span className={styles.helperText}>{helperText}</span>}
-    </div>
-  );
-
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -220,7 +215,6 @@ export default function CalculadoraPlusvaliasIrpfPage() {
               value={plusvaliasFondos}
               onChange={setPlusvaliasFondos}
               icon="🏦"
-              permitirNegativos
               helperText="Fondos, ETFs, SICAVs"
             />
             <InputCampo
@@ -228,7 +222,6 @@ export default function CalculadoraPlusvaliasIrpfPage() {
               value={plusvaliasAcciones}
               onChange={setPlusvaliasAcciones}
               icon="📊"
-              permitirNegativos
               helperText="Compra-venta de acciones"
             />
             <InputCampo
@@ -236,7 +229,6 @@ export default function CalculadoraPlusvaliasIrpfPage() {
               value={plusvaliasCripto}
               onChange={setPlusvaliasCripto}
               icon="₿"
-              permitirNegativos
               helperText="Bitcoin, Ethereum, otros criptoactivos"
             />
           </div>
