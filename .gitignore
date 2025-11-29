@@ -49,3 +49,4 @@ next-env.d.ts
 # documentación local (mantener en repo pero ignorar cambios frecuentes)
 # docs/ - Comentado para subir la primera vez, luego descomentar si quieres
 REORGANIZAR_DOCS.bat
+desktop.ini
