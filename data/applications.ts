@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 103 aplicaciones organizadas por 12 categorías
+ * Total: 104 aplicaciones organizadas por 12 categorías
  * Actualizado: 2025-11-29
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
@@ -25,7 +25,7 @@ export interface Application {
 }
 
 export const applicationsDatabase: Application[] = [
-  // Finanzas y Fiscalidad (14)
+  // Finanzas y Fiscalidad (15)
   { name: "Simulador de Hipoteca", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula tu hipoteca con cuadro de amortización completo y análisis detallado", url: "/simulador-hipoteca/", keywords: ["prestamo", "casa", "vivienda", "banco", "interes", "amortizacion", "cuota", "euribor"] },
   { name: "Calculadora de Jubilación", category: "Finanzas y Fiscalidad", icon: "💰", description: "Planifica tu jubilación calculando ahorros necesarios y pensión estimada", url: "/calculadora-jubilacion/", keywords: ["pension", "retiro", "ahorro", "inversion", "planes", "seguridad social"] },
   { name: "Calculadora de Inversiones", category: "Finanzas y Fiscalidad", icon: "💰", description: "Simula el crecimiento de tus inversiones con interés compuesto", url: "/calculadora-inversiones/", keywords: ["bolsa", "acciones", "fondos", "rentabilidad", "capital", "dividendos"] },
@@ -40,6 +40,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora TIR-VAN", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula TIR y VAN para análisis de inversiones y proyectos", url: "/calculadora-tir-van/", keywords: ["tir", "van", "inversion", "proyecto", "rentabilidad", "flujo caja"] },
   { name: "Calculadora Plusvalías IRPF", category: "Finanzas y Fiscalidad", icon: "📊", description: "Calcula el IRPF de tus inversiones: plusvalías de acciones, fondos, criptomonedas, dividendos e intereses con tramos 2025", url: "/calculadora-plusvalias-irpf/", keywords: ["plusvalias", "irpf", "capital mobiliario", "dividendos", "acciones", "criptomonedas", "fondos", "tramos ahorro"] },
   { name: "Simulador de Préstamos", category: "Finanzas y Fiscalidad", icon: "🏦", description: "Compara sistemas de amortización: francés, alemán y americano. Cuadro completo, TAE vs TIN y comisiones", url: "/simulador-prestamos/", keywords: ["prestamo", "amortizacion", "frances", "aleman", "americano", "cuota", "TAE", "TIN", "interes"] },
+  { name: "Amortización Anticipada Hipoteca", category: "Finanzas y Fiscalidad", icon: "🏠", description: "Calcula el ahorro al amortizar tu hipoteca: reducir cuota vs reducir plazo. Comparativa y recomendación", url: "/amortizacion-hipoteca/", keywords: ["amortizacion anticipada", "hipoteca", "reducir cuota", "reducir plazo", "ahorro intereses", "cancelacion parcial"] },
 
   // Calculadoras y Utilidades (10)
   { name: "Calculadora de Propinas", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calcula propinas y divide la cuenta entre varias personas fácilmente", url: "/calculadora-propinas/", keywords: ["propina", "cuenta", "dividir", "restaurante", "porcentaje"] },
