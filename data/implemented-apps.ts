@@ -74,9 +74,11 @@ export const implementedAppsUrls = [
   "/generador-anagramas/",
   "/generador-lorem-ipsum/",    // Generador de texto de prueba
 
-  // Criptografía y Seguridad (4 implementadas)
+  // Criptografía y Seguridad (6 implementadas)
   "/cifrado-clasico/",          // César + ROT13 + Atbash
   "/cifrado-vigenere/",         // Cifrado polialfabético con clave
+  "/cifrado-transposicion/",    // Columnas, Rail Fence, Escítala
+  "/cifrado-playfair/",         // Matriz 5x5, digramas
   "/generador-hashes/",         // MD5, SHA-256, SHA-512
   "/codificador-base64/",       // Base64, URL encode, Hexadecimal
 

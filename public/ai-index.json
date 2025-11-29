@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 108+ aplicaciones web educativas organizadas en 13 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, y Criptografía y Seguridad. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 110+ aplicaciones web educativas organizadas en 13 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, y Criptografía y Seguridad. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 108,
+  "total_tools": 110,
   "updated": "2025-11-29",
   "features": {
     "all_free": true,
@@ -852,6 +852,20 @@
           "url": "https://meskeia.com/generador-hashes/",
           "description": "Genera hashes MD5, SHA-256, SHA-512 para verificar integridad de datos. Compara archivos y textos de forma segura",
           "keywords": ["hash", "md5", "sha256", "sha512", "checksum", "integridad", "seguridad", "verificar"]
+        },
+        {
+          "name": "Cifrado por Transposición",
+          "slug": "cifrado-transposicion",
+          "url": "https://meskeia.com/cifrado-transposicion/",
+          "description": "Cifra reordenando letras: Columnas, Rail Fence y Escítala. Visualización interactiva de cada método",
+          "keywords": ["transposicion", "columnas", "rail fence", "escitala", "reordenar", "cifrado", "criptografia"]
+        },
+        {
+          "name": "Cifrado Playfair",
+          "slug": "cifrado-playfair",
+          "url": "https://meskeia.com/cifrado-playfair/",
+          "description": "Cifrado por digramas con matriz 5x5. Usado en guerras mundiales. Visualización de matriz y proceso de cifrado",
+          "keywords": ["playfair", "matriz", "digramas", "5x5", "wheatstone", "cifrado", "criptografia"]
         },
         {
           "name": "Codificador Base64",
