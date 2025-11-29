@@ -1,0 +1,522 @@
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --hover: #333333;
+}
+
+.hero {
+  text-align: center;
+  margin: 80px 0 var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.95;
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.inputSection,
+.resultSection {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+}
+
+.sectionTitle {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--primary);
+}
+
+.formGroup {
+  margin-bottom: var(--spacing-md);
+}
+
+.formGroup label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.formGroup input:focus {
+  border-color: var(--primary);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.buttonRow {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.btnPrimary {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+.btnSecondary {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnSecondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.taeBox {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border-radius: var(--radius);
+  text-align: center;
+  border: 1px solid var(--primary);
+}
+
+.taeLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.taeValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.taeNote {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-sm);
+}
+
+.comparativaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.sistemaCard {
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.sistemaCard:hover {
+  border-color: var(--primary);
+}
+
+.sistemaCard.active {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05) 0%, rgba(72, 169, 166, 0.05) 100%);
+}
+
+.sistemaCard h3 {
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.sistemaStats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.statRow span {
+  color: var(--text-secondary);
+}
+
+.statRow strong {
+  color: var(--text-primary);
+}
+
+.statRow.highlight {
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border);
+  margin-top: var(--spacing-sm);
+}
+
+.statRow.highlight strong {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.resumenComparativo {
+  margin-bottom: var(--spacing-lg);
+}
+
+.resumenComparativo h3 {
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.comparativaTable th {
+  background: var(--hover);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.comparativaTable th:first-child,
+.comparativaTable td:first-child {
+  text-align: left;
+}
+
+.comparativaTable td {
+  color: var(--text-primary);
+}
+
+.comparativaTable .rowActive {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+}
+
+.btnToggleCuadro {
+  width: 100%;
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnToggleCuadro:hover {
+  background: var(--border);
+}
+
+.cuadroAmortizacion {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--hover);
+  border-radius: var(--radius);
+}
+
+.cuadroAmortizacion h3 {
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.tableWrapper {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.amortizacionTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.amortizacionTable th,
+.amortizacionTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.amortizacionTable th {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+.amortizacionTable td {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.amortizacionTable th:first-child,
+.amortizacionTable td:first-child {
+  text-align: center;
+}
+
+.amortizacionTable tfoot td {
+  background: var(--hover);
+  font-weight: 600;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: 1rem;
+}
+
+.infoSection {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-xl);
+}
+
+.infoSection h2 {
+  text-align: center;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.infoCard {
+  padding: var(--spacing-lg);
+  background: var(--hover);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--primary);
+}
+
+.infoCard h3 {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.infoCard p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.infoCard ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.infoCard li {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  padding: 4px 0;
+}
+
+.glossarySection {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-xl);
+}
+
+.glossarySection h2 {
+  text-align: center;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.glossaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.glossaryItem {
+  padding: var(--spacing-md);
+}
+
+.glossaryItem strong {
+  display: block;
+  color: var(--primary);
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.glossaryItem p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.disclaimer {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+[data-theme='dark'] .disclaimer {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: rgba(255, 193, 7, 0.5);
+}
+
+.disclaimer h3 {
+  color: #856404;
+  margin-bottom: var(--spacing-sm);
+}
+
+[data-theme='dark'] .disclaimer h3 {
+  color: #ffc107;
+}
+
+.disclaimer p {
+  color: #856404;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .disclaimer p {
+  color: #e0c36a;
+}
+
+@media (max-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .glossaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable {
+    font-size: 0.8rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: var(--spacing-sm);
+  }
+}

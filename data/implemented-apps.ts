@@ -8,7 +8,7 @@
  */
 
 export const implementedAppsUrls = [
-  // Finanzas y Fiscalidad (13 implementadas)
+  // Finanzas y Fiscalidad (14 implementadas)
   "/calculadora-donaciones-cataluna/",
   "/calculadora-donaciones-nacional/",
   "/calculadora-sucesiones-cataluna/",
@@ -19,6 +19,7 @@ export const implementedAppsUrls = [
   "/control-gastos/",
   "/interes-compuesto/",
   "/simulador-hipoteca/",
+  "/simulador-prestamos/",           // Compara sistemas francés, alemán, americano
   "/calculadora-jubilacion/",
   "/calculadora-inversiones/",
   "/test-perfil-inversor/",
