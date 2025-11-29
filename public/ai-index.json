@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 110+ aplicaciones web educativas organizadas en 13 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, y Criptografía y Seguridad. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 111+ aplicaciones web educativas organizadas en 13 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, y Criptografía y Seguridad. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 110,
+  "total_tools": 111,
   "updated": "2025-11-29",
   "features": {
     "all_free": true,
@@ -866,6 +866,13 @@
           "url": "https://meskeia.com/cifrado-playfair/",
           "description": "Cifrado por digramas con matriz 5x5. Usado en guerras mundiales. Visualización de matriz y proceso de cifrado",
           "keywords": ["playfair", "matriz", "digramas", "5x5", "wheatstone", "cifrado", "criptografia"]
+        },
+        {
+          "name": "Cifrado AES",
+          "slug": "cifrado-aes",
+          "url": "https://meskeia.com/cifrado-aes/",
+          "description": "Cifrado simétrico moderno AES-256. Modos GCM y CBC, derivación de clave PBKDF2. El estándar mundial de seguridad",
+          "keywords": ["aes", "aes-256", "cifrado simetrico", "gcm", "cbc", "pbkdf2", "criptografia moderna", "seguridad"]
         },
         {
           "name": "Codificador Base64",

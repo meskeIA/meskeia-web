@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 110 aplicaciones organizadas por 13 categorías
+ * Total: 111 aplicaciones organizadas por 13 categorías
  * Actualizado: 2025-11-29
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
@@ -135,11 +135,12 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Anagramas", category: "Texto y Documentos", icon: "🔤", description: "Encuentra todas las palabras que puedes formar con tus letras. Ideal para Wordle, Scrabble y crucigramas", url: "/generador-anagramas/", keywords: ["anagramas", "palabras", "wordle", "scrabble", "crucigrama", "letras", "juego palabras"] },
   { name: "Generador Lorem Ipsum", category: "Texto y Documentos", icon: "📄", description: "Genera texto Lorem Ipsum de 1 a 10 párrafos. Ideal para diseño, maquetación y desarrollo web", url: "/generador-lorem-ipsum/", keywords: ["lorem ipsum", "texto prueba", "placeholder", "maquetacion", "diseño", "dummy text"] },
 
-  // Criptografía y Seguridad (6)
+  // Criptografía y Seguridad (7)
   { name: "Cifrado Clásico", category: "Criptografía y Seguridad", icon: "🔐", description: "Cifra textos con métodos clásicos: César, ROT13 y Atbash. Visualización del alfabeto cifrado y presets históricos", url: "/cifrado-clasico/", keywords: ["cifrado", "cesar", "rot13", "atbash", "criptografia", "encriptar", "clasico"] },
   { name: "Cifrado Vigenère", category: "Criptografía y Seguridad", icon: "🔑", description: "Cifrado polialfabético con palabra clave. Más seguro que César, usado durante siglos. Visualización de tabla Vigenère", url: "/cifrado-vigenere/", keywords: ["vigenere", "cifrado", "clave", "polialfabetico", "criptografia", "bellaso"] },
   { name: "Cifrado por Transposición", category: "Criptografía y Seguridad", icon: "🔀", description: "Cifra reordenando letras: Columnas, Rail Fence y Escítala. Visualización interactiva de cada método", url: "/cifrado-transposicion/", keywords: ["transposicion", "columnas", "rail fence", "escitala", "reordenar", "cifrado", "criptografia"] },
   { name: "Cifrado Playfair", category: "Criptografía y Seguridad", icon: "🔲", description: "Cifrado por digramas con matriz 5x5. Usado en guerras mundiales. Visualización de matriz y proceso de cifrado", url: "/cifrado-playfair/", keywords: ["playfair", "matriz", "digramas", "5x5", "wheatstone", "cifrado", "criptografia"] },
+  { name: "Cifrado AES", category: "Criptografía y Seguridad", icon: "🔷", description: "Cifrado simétrico moderno AES-256. Modos GCM y CBC, derivación de clave PBKDF2. El estándar mundial de seguridad", url: "/cifrado-aes/", keywords: ["aes", "aes-256", "cifrado simetrico", "gcm", "cbc", "pbkdf2", "criptografia moderna", "seguridad"] },
   { name: "Generador de Hashes", category: "Criptografía y Seguridad", icon: "🛡️", description: "Genera hashes MD5, SHA-256, SHA-512 para verificar integridad de datos. Compara archivos y textos de forma segura", url: "/generador-hashes/", keywords: ["hash", "md5", "sha256", "sha512", "checksum", "integridad", "seguridad", "verificar"] },
   { name: "Codificador Base64", category: "Criptografía y Seguridad", icon: "🔒", description: "Codifica y decodifica texto en Base64, URL encode y Hexadecimal. Soporta archivos e imágenes", url: "/codificador-base64/", keywords: ["base64", "url encode", "hexadecimal", "codificar", "decodificar", "btoa", "atob"] },
 
