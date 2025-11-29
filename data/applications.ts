@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 104 aplicaciones organizadas por 12 categorías
+ * Total: 108 aplicaciones organizadas por 13 categorías
  * Actualizado: 2025-11-29
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
@@ -114,11 +114,9 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora de Porciones", category: "Salud & Bienestar", icon: "✋", description: "Aprende a medir porciones de alimentos usando tu mano como referencia. Método visual y práctico", url: "/calculadora-porciones/", keywords: ["porciones", "mano", "medir", "raciones", "plato", "equilibrado"] },
   { name: "Test de Hábitos Saludables", category: "Salud & Bienestar", icon: "🌟", description: "Evalúa tus hábitos de vida con un test de 21 preguntas. Perfil visual de hidratación, alimentación, actividad y descanso", url: "/test-habitos/", keywords: ["test", "habitos", "saludables", "evaluacion", "bienestar", "estilo vida"] },
 
-  // Herramientas Web y Tecnología (7)
+  // Herramientas Web y Tecnología (5) - generador-hash y conversor-base64 movidos a Criptografía
   { name: "Validador JSON", category: "Herramientas Web y Tecnología", icon: "💻", description: "Valida, formatea y minifica código JSON y XML al instante con detección de errores", url: "/validador-json/", keywords: ["json", "xml", "validar", "formatear", "codigo"] },
   { name: "Generador de Iconos PWA", category: "Herramientas Web y Tecnología", icon: "💻", description: "Genera todos los tamaños de iconos para PWA, favicon y apps móviles. Múltiples formatos y presets para diferentes plataformas", url: "/generador-iconos/", keywords: ["iconos", "pwa", "favicon", "app icons", "manifest", "apple touch"] },
-  { name: "Conversor Base64", category: "Herramientas Web y Tecnología", icon: "💻", description: "Codifica y decodifica texto, imágenes y archivos en Base64. Genera data URI para desarrollo web", url: "/conversor-base64/", keywords: ["base64", "codificar", "decodificar", "encode", "decode"] },
-  { name: "Generador de Hash", category: "Herramientas Web y Tecnología", icon: "💻", description: "Genera hashes MD5, SHA-1, SHA-256, SHA-384 y SHA-512 para verificar integridad de archivos y datos", url: "/generador-hash/", keywords: ["hash", "md5", "sha", "checksum", "seguridad"] },
   { name: "Generador de Enlaces UTM", category: "Herramientas Web y Tecnología", icon: "💻", description: "Genera enlaces UTM para Google Analytics. Trackea campañas de marketing con parámetros utm_source, utm_medium, utm_campaign", url: "/generador-utm/", keywords: ["utm", "google analytics", "tracking", "marketing", "campañas", "enlaces"] },
   { name: "Validador RegEx", category: "Herramientas Web y Tecnología", icon: "💻", description: "Testa y valida expresiones regulares con resaltado de coincidencias y ejemplos prácticos", url: "/validador-regex/", keywords: ["regex", "expresiones regulares", "validar", "patron", "programacion"] },
   { name: "Conversor de Imágenes", category: "Herramientas Web y Tecnología", icon: "💻", description: "Convierte formatos de imagen (JPG, PNG, WebP), comprime y redimensiona con control de calidad total", url: "/conversor-imagenes/", keywords: ["imagen", "convertir", "comprimir", "redimensionar", "jpg", "png"] },
@@ -132,10 +130,16 @@ export const applicationsDatabase: Application[] = [
   { name: "Conversor de Código Morse", category: "Texto y Documentos", icon: "📡", description: "Convierte texto a código Morse y viceversa con reproducción de audio. Alfabeto completo y señales internacionales", url: "/conversor-morse/", keywords: ["morse", "codigo", "puntos", "rayas", "telegrafo", "sos", "audio"] },
   { name: "Conversor Números Romanos", category: "Texto y Documentos", icon: "🏛️", description: "Convierte entre números arábigos y romanos con desglose paso a paso. Tabla de símbolos y reglas explicadas", url: "/conversor-numeros-romanos/", keywords: ["romanos", "numeros", "conversion", "romano", "arabigo", "I", "V", "X", "L", "C", "D", "M"] },
   { name: "Detector de Idioma", category: "Texto y Documentos", icon: "🌍", description: "Detecta automáticamente el idioma de cualquier texto. Soporta 10+ idiomas con porcentaje de confianza", url: "/detector-idioma/", keywords: ["idioma", "detector", "lengua", "traduccion", "español", "ingles", "frances"] },
-  { name: "Cifrado César", category: "Texto y Documentos", icon: "🔐", description: "Cifra y descifra textos con el cifrado César clásico. Desplazamiento ajustable de 1 a 25 posiciones", url: "/cifrado-cesar/", keywords: ["cifrado", "cesar", "criptografia", "encriptar", "desencriptar", "rot13"] },
   { name: "Conversor Binario", category: "Texto y Documentos", icon: "💾", description: "Convierte texto a binario y viceversa. Muestra también hexadecimal, octal y decimal con tabla ASCII", url: "/conversor-binario/", keywords: ["binario", "texto", "ascii", "hexadecimal", "octal", "conversion", "bits"] },
   { name: "Conversor Braille", category: "Texto y Documentos", icon: "⠃", description: "Convierte texto a Braille español y viceversa. Sistema completo con ñ, acentos, números y visualización de celdas", url: "/conversor-braille/", keywords: ["braille", "accesibilidad", "discapacidad visual", "alfabeto", "puntos", "ciego", "inclusion"] },
   { name: "Generador de Anagramas", category: "Texto y Documentos", icon: "🔤", description: "Encuentra todas las palabras que puedes formar con tus letras. Ideal para Wordle, Scrabble y crucigramas", url: "/generador-anagramas/", keywords: ["anagramas", "palabras", "wordle", "scrabble", "crucigrama", "letras", "juego palabras"] },
+  { name: "Generador Lorem Ipsum", category: "Texto y Documentos", icon: "📄", description: "Genera texto Lorem Ipsum de 1 a 10 párrafos. Ideal para diseño, maquetación y desarrollo web", url: "/generador-lorem-ipsum/", keywords: ["lorem ipsum", "texto prueba", "placeholder", "maquetacion", "diseño", "dummy text"] },
+
+  // Criptografía y Seguridad (4)
+  { name: "Cifrado Clásico", category: "Criptografía y Seguridad", icon: "🔐", description: "Cifra textos con métodos clásicos: César, ROT13 y Atbash. Visualización del alfabeto cifrado y presets históricos", url: "/cifrado-clasico/", keywords: ["cifrado", "cesar", "rot13", "atbash", "criptografia", "encriptar", "clasico"] },
+  { name: "Cifrado Vigenère", category: "Criptografía y Seguridad", icon: "🔑", description: "Cifrado polialfabético con palabra clave. Más seguro que César, usado durante siglos. Visualización de tabla Vigenère", url: "/cifrado-vigenere/", keywords: ["vigenere", "cifrado", "clave", "polialfabetico", "criptografia", "bellaso"] },
+  { name: "Generador de Hashes", category: "Criptografía y Seguridad", icon: "🛡️", description: "Genera hashes MD5, SHA-256, SHA-512 para verificar integridad de datos. Compara archivos y textos de forma segura", url: "/generador-hashes/", keywords: ["hash", "md5", "sha256", "sha512", "checksum", "integridad", "seguridad", "verificar"] },
+  { name: "Codificador Base64", category: "Criptografía y Seguridad", icon: "🔒", description: "Codifica y decodifica texto en Base64, URL encode y Hexadecimal. Soporta archivos e imágenes", url: "/codificador-base64/", keywords: ["base64", "url encode", "hexadecimal", "codificar", "decodificar", "btoa", "atob"] },
 
   // Creatividad y Diseño (7)
   { name: "Conversor de Colores", category: "Creatividad y Diseño", icon: "🎨", description: "Convierte entre HEX, RGB, HSL y CMYK con color picker visual y generación de paletas automáticas", url: "/conversor-colores/", keywords: ["colores", "hex", "rgb", "hsl", "cmyk", "convertidor", "color picker", "paleta"] },
@@ -227,5 +231,11 @@ export const categories = [
     name: 'Emprendimiento y Negocios',
     icon: '💼',
     description: 'Gestiona tu negocio como un profesional'
+  },
+  {
+    id: 'criptografia',
+    name: 'Criptografía y Seguridad',
+    icon: '🔐',
+    description: 'Cifrado de textos y verificación de datos'
   },
 ];

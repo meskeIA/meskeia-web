@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 104+ aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 108+ aplicaciones web educativas organizadas en 13 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, y Criptografía y Seguridad. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 104,
+  "total_tools": 108,
   "updated": "2025-11-29",
   "features": {
     "all_free": true,
@@ -693,13 +693,6 @@
           "keywords": ["idioma", "detector", "lengua", "traduccion", "español", "ingles", "frances"]
         },
         {
-          "name": "Cifrado César",
-          "slug": "cifrado-cesar",
-          "url": "https://meskeia.com/cifrado-cesar/",
-          "description": "Cifra y descifra textos con el cifrado César clásico. Desplazamiento ajustable de 1 a 25 posiciones",
-          "keywords": ["cifrado", "cesar", "criptografia", "encriptar", "desencriptar", "rot13"]
-        },
-        {
           "name": "Conversor Binario",
           "slug": "conversor-binario",
           "url": "https://meskeia.com/conversor-binario/",
@@ -719,6 +712,13 @@
           "url": "https://meskeia.com/generador-anagramas/",
           "description": "Encuentra todas las palabras que puedes formar con tus letras. Ideal para Wordle, Scrabble y crucigramas",
           "keywords": ["anagramas", "palabras", "wordle", "scrabble", "crucigrama", "letras", "juego palabras"]
+        },
+        {
+          "name": "Generador Lorem Ipsum",
+          "slug": "generador-lorem-ipsum",
+          "url": "https://meskeia.com/generador-lorem-ipsum/",
+          "description": "Genera texto Lorem Ipsum de 1 a 10 párrafos. Ideal para diseño, maquetación y desarrollo web",
+          "keywords": ["lorem ipsum", "texto prueba", "placeholder", "maquetacion", "diseño", "dummy text"]
         }
       ]
     },
@@ -824,6 +824,41 @@
           "url": "https://meskeia.com/simulador-gastos-deducibles/",
           "description": "Calcula tu ahorro fiscal con gastos deducibles. Descubre qué gastos puedes deducir (100%, 50%, 30%) y optimiza tu declaración de IRPF e IVA",
           "keywords": ["gastos deducibles", "autonomo", "irpf", "iva", "hacienda", "deduccion"]
+        }
+      ]
+    },
+    {
+      "name": "Criptografía y Seguridad",
+      "description": "Cifrado de textos y verificación de datos",
+      "icon": "🔐",
+      "tools": [
+        {
+          "name": "Cifrado Clásico",
+          "slug": "cifrado-clasico",
+          "url": "https://meskeia.com/cifrado-clasico/",
+          "description": "Cifra textos con métodos clásicos: César, ROT13 y Atbash. Visualización del alfabeto cifrado y presets históricos",
+          "keywords": ["cifrado", "cesar", "rot13", "atbash", "criptografia", "encriptar", "clasico"]
+        },
+        {
+          "name": "Cifrado Vigenère",
+          "slug": "cifrado-vigenere",
+          "url": "https://meskeia.com/cifrado-vigenere/",
+          "description": "Cifrado polialfabético con palabra clave. Más seguro que César, usado durante siglos. Visualización de tabla Vigenère",
+          "keywords": ["vigenere", "cifrado", "clave", "polialfabetico", "criptografia", "bellaso"]
+        },
+        {
+          "name": "Generador de Hashes",
+          "slug": "generador-hashes",
+          "url": "https://meskeia.com/generador-hashes/",
+          "description": "Genera hashes MD5, SHA-256, SHA-512 para verificar integridad de datos. Compara archivos y textos de forma segura",
+          "keywords": ["hash", "md5", "sha256", "sha512", "checksum", "integridad", "seguridad", "verificar"]
+        },
+        {
+          "name": "Codificador Base64",
+          "slug": "codificador-base64",
+          "url": "https://meskeia.com/codificador-base64/",
+          "description": "Codifica y decodifica texto en Base64, URL encode y Hexadecimal. Soporta archivos e imágenes",
+          "keywords": ["base64", "url encode", "hexadecimal", "codificar", "decodificar", "btoa", "atob"]
         }
       ]
     }

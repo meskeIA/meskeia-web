@@ -2,34 +2,11 @@
 
 import { useState } from 'react';
 import styles from './ConversorTexto.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
-
-// ==================== TIPOS ====================
-
-type TabType = 'convertir' | 'codificar' | 'lorem';
-
-// ==================== DATOS ====================
-
-const loremIpsumParrafos = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-  'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-  'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-  'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.',
-  'Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.',
-  'Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.',
-  'Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.',
-  'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.',
-  'Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.',
-  'Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.',
-];
-
-// ==================== COMPONENTE PRINCIPAL ====================
+import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
 
 export default function ConversorTextoPage() {
-  const [tabActual, setTabActual] = useState<TabType>('convertir');
   const [textoEntrada, setTextoEntrada] = useState('');
   const [textoSalida, setTextoSalida] = useState('');
-  const [loremParrafos, setLoremParrafos] = useState(3);
 
   // ==================== FUNCIONES DE CONVERSIÓN ====================
 
@@ -93,63 +70,21 @@ export default function ConversorTextoPage() {
     );
   };
 
-  // ==================== FUNCIONES DE CODIFICACIÓN ====================
-
-  const codificarBase64 = () => {
-    try {
-      setTextoSalida(btoa(unescape(encodeURIComponent(textoEntrada))));
-    } catch {
-      setTextoSalida('Error: No se pudo codificar el texto');
-    }
-  };
-
-  const decodificarBase64 = () => {
-    try {
-      setTextoSalida(decodeURIComponent(escape(atob(textoEntrada))));
-    } catch {
-      setTextoSalida('Error: El texto no es Base64 válido');
-    }
-  };
-
-  const codificarURL = () => {
-    setTextoSalida(encodeURIComponent(textoEntrada));
-  };
-
-  const decodificarURL = () => {
-    try {
-      setTextoSalida(decodeURIComponent(textoEntrada));
-    } catch {
-      setTextoSalida('Error: El texto no está codificado correctamente');
-    }
-  };
-
-  const textoAHex = () => {
+  const invertirMayusculas = () => {
     setTextoSalida(
       textoEntrada
         .split('')
-        .map((c) => c.charCodeAt(0).toString(16).padStart(2, '0'))
-        .join(' ')
+        .map((char) => {
+          if (char >= 'a' && char <= 'z') return char.toUpperCase();
+          if (char >= 'A' && char <= 'Z') return char.toLowerCase();
+          return char;
+        })
+        .join('')
     );
   };
 
-  const hexATexto = () => {
-    try {
-      const hex = textoEntrada.replace(/\s/g, '');
-      let resultado = '';
-      for (let i = 0; i < hex.length; i += 2) {
-        resultado += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-      }
-      setTextoSalida(resultado);
-    } catch {
-      setTextoSalida('Error: El texto no es hexadecimal válido');
-    }
-  };
-
-  // ==================== FUNCIONES LOREM IPSUM ====================
-
-  const generarLoremIpsum = () => {
-    const parrafos = loremIpsumParrafos.slice(0, loremParrafos);
-    setTextoSalida(parrafos.join('\n\n'));
+  const eliminarEspaciosExtra = () => {
+    setTextoSalida(textoEntrada.replace(/\s+/g, ' ').trim());
   };
 
   // ==================== FUNCIONES AUXILIARES ====================
@@ -158,9 +93,8 @@ export default function ConversorTextoPage() {
     if (!textoSalida) return;
     try {
       await navigator.clipboard.writeText(textoSalida);
-      alert('Texto copiado al portapapeles');
     } catch {
-      alert('No se pudo copiar el texto');
+      // Silencioso
     }
   };
 
@@ -184,143 +118,74 @@ export default function ConversorTextoPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Conversor de Texto</h1>
         <p className={styles.subtitle}>
-          Transforma tu texto: mayúsculas, minúsculas, codificación y más
+          Transforma tu texto: mayúsculas, minúsculas, invertir y más
         </p>
       </header>
 
-      {/* Tabs */}
-      <div className={styles.tabs}>
-        <button
-          className={`${styles.tab} ${tabActual === 'convertir' ? styles.tabActivo : ''}`}
-          onClick={() => setTabActual('convertir')}
-        >
-          Aa Convertir
-        </button>
-        <button
-          className={`${styles.tab} ${tabActual === 'codificar' ? styles.tabActivo : ''}`}
-          onClick={() => setTabActual('codificar')}
-        >
-          {'<>'} Codificar
-        </button>
-        <button
-          className={`${styles.tab} ${tabActual === 'lorem' ? styles.tabActivo : ''}`}
-          onClick={() => setTabActual('lorem')}
-        >
-          Lorem Ipsum
-        </button>
-      </div>
-
       <div className={styles.mainContent}>
-        {/* Panel de entrada (oculto en Lorem Ipsum) */}
-        {tabActual !== 'lorem' && (
-          <section className={styles.inputPanel}>
-            <div className={styles.panelHeader}>
-              <h2 className={styles.sectionTitle}>Texto de entrada</h2>
-              <button onClick={limpiarTodo} className={styles.btnSecundario}>
-                Limpiar
-              </button>
-            </div>
-            <textarea
-              value={textoEntrada}
-              onChange={(e) => setTextoEntrada(e.target.value)}
-              placeholder="Escribe o pega tu texto aquí..."
-              className={styles.textArea}
-              rows={8}
-            />
-          </section>
-        )}
+        {/* Panel de entrada */}
+        <section className={styles.inputPanel}>
+          <div className={styles.panelHeader}>
+            <h2 className={styles.sectionTitle}>Texto de entrada</h2>
+            <button type="button" onClick={limpiarTodo} className={styles.btnSecundario}>
+              Limpiar
+            </button>
+          </div>
+          <textarea
+            value={textoEntrada}
+            onChange={(e) => setTextoEntrada(e.target.value)}
+            placeholder="Escribe o pega tu texto aquí..."
+            className={styles.textArea}
+            rows={6}
+          />
+          <div className={styles.stats}>
+            <span>{textoEntrada.length} caracteres</span>
+            <span>{textoEntrada.split(/\s+/).filter(Boolean).length} palabras</span>
+          </div>
+        </section>
 
         {/* Botones de acción */}
         <section className={styles.accionesPanel}>
-          {tabActual === 'convertir' && (
-            <>
-              <h3 className={styles.accionesTitle}>Conversiones de texto</h3>
-              <div className={styles.botonesGrid}>
-                <button onClick={convertirMayusculas} className={styles.btnAccion}>
-                  MAYÚSCULAS
-                </button>
-                <button onClick={convertirMinusculas} className={styles.btnAccion}>
-                  minúsculas
-                </button>
-                <button onClick={convertirCapitalizar} className={styles.btnAccion}>
-                  Capitalizar Palabras
-                </button>
-                <button onClick={convertirTitulo} className={styles.btnAccion}>
-                  Formato Título
-                </button>
-                <button onClick={convertirOracion} className={styles.btnAccion}>
-                  Formato oración
-                </button>
-                <button onClick={convertirAlternar} className={styles.btnAccion}>
-                  aLtErNaR
-                </button>
-                <button onClick={convertirInvertir} className={styles.btnAccion}>
-                  Invertir ↔
-                </button>
-                <button onClick={convertirInvertirPalabras} className={styles.btnAccion}>
-                  Invertir palabras
-                </button>
-                <button onClick={eliminarAcentos} className={styles.btnAccion}>
-                  Sin acentos
-                </button>
-              </div>
-            </>
-          )}
+          <h3 className={styles.accionesTitle}>Conversiones disponibles</h3>
+          <div className={styles.botonesGrid}>
+            <button type="button" onClick={convertirMayusculas} className={styles.btnAccion} disabled={!textoEntrada}>
+              MAYÚSCULAS
+            </button>
+            <button type="button" onClick={convertirMinusculas} className={styles.btnAccion} disabled={!textoEntrada}>
+              minúsculas
+            </button>
+            <button type="button" onClick={convertirCapitalizar} className={styles.btnAccion} disabled={!textoEntrada}>
+              Capitalizar Palabras
+            </button>
+            <button type="button" onClick={convertirTitulo} className={styles.btnAccion} disabled={!textoEntrada}>
+              Formato Título
+            </button>
+            <button type="button" onClick={convertirOracion} className={styles.btnAccion} disabled={!textoEntrada}>
+              Formato oración
+            </button>
+            <button type="button" onClick={convertirAlternar} className={styles.btnAccion} disabled={!textoEntrada}>
+              aLtErNaR
+            </button>
+            <button type="button" onClick={invertirMayusculas} className={styles.btnAccion} disabled={!textoEntrada}>
+              iNVERTIR mAYÚS
+            </button>
+            <button type="button" onClick={convertirInvertir} className={styles.btnAccion} disabled={!textoEntrada}>
+              Invertir ↔
+            </button>
+            <button type="button" onClick={convertirInvertirPalabras} className={styles.btnAccion} disabled={!textoEntrada}>
+              Invertir palabras
+            </button>
+            <button type="button" onClick={eliminarAcentos} className={styles.btnAccion} disabled={!textoEntrada}>
+              Sin acentos
+            </button>
+            <button type="button" onClick={eliminarEspaciosExtra} className={styles.btnAccion} disabled={!textoEntrada}>
+              Limpiar espacios
+            </button>
+          </div>
 
-          {tabActual === 'codificar' && (
-            <>
-              <h3 className={styles.accionesTitle}>Codificación / Decodificación</h3>
-              <div className={styles.botonesGrid}>
-                <button onClick={codificarBase64} className={styles.btnAccion}>
-                  Codificar Base64
-                </button>
-                <button onClick={decodificarBase64} className={styles.btnAccion}>
-                  Decodificar Base64
-                </button>
-                <button onClick={codificarURL} className={styles.btnAccion}>
-                  Codificar URL
-                </button>
-                <button onClick={decodificarURL} className={styles.btnAccion}>
-                  Decodificar URL
-                </button>
-                <button onClick={textoAHex} className={styles.btnAccion}>
-                  Texto → Hex
-                </button>
-                <button onClick={hexATexto} className={styles.btnAccion}>
-                  Hex → Texto
-                </button>
-              </div>
-            </>
-          )}
-
-          {tabActual === 'lorem' && (
-            <>
-              <h3 className={styles.accionesTitle}>Generador Lorem Ipsum</h3>
-              <div className={styles.loremConfig}>
-                <label className={styles.loremLabel}>
-                  Número de párrafos:
-                  <select
-                    value={loremParrafos}
-                    onChange={(e) => setLoremParrafos(parseInt(e.target.value))}
-                    className={styles.loremSelect}
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                      <option key={n} value={n}>
-                        {n} {n === 1 ? 'párrafo' : 'párrafos'}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <button onClick={generarLoremIpsum} className={styles.btnPrimario}>
-                  Generar Lorem Ipsum
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* Botón intercambiar (solo en convertir/codificar) */}
-          {tabActual !== 'lorem' && textoSalida && (
-            <button onClick={intercambiarTextos} className={styles.btnIntercambiar}>
+          {/* Botón intercambiar */}
+          {textoSalida && (
+            <button type="button" onClick={intercambiarTextos} className={styles.btnIntercambiar}>
               ↕ Usar resultado como entrada
             </button>
           )}
@@ -331,11 +196,12 @@ export default function ConversorTextoPage() {
           <div className={styles.panelHeader}>
             <h2 className={styles.sectionTitle}>Resultado</h2>
             <button
+              type="button"
               onClick={copiarResultado}
               className={styles.btnSecundario}
               disabled={!textoSalida}
             >
-              Copiar
+              📋 Copiar
             </button>
           </div>
           <textarea
@@ -343,38 +209,59 @@ export default function ConversorTextoPage() {
             readOnly
             placeholder="El resultado aparecerá aquí..."
             className={styles.textArea}
-            rows={8}
+            rows={6}
           />
+          {textoSalida && (
+            <div className={styles.stats}>
+              <span>{textoSalida.length} caracteres</span>
+              <span>{textoSalida.split(/\s+/).filter(Boolean).length} palabras</span>
+            </div>
+          )}
         </section>
       </div>
 
-      {/* Info panel */}
-      <section className={styles.infoPanel}>
-        <h3>Sobre esta herramienta</h3>
-        <div className={styles.infoGrid}>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🔒</span>
-            <div>
-              <strong>100% Privado</strong>
-              <p>Tu texto nunca sale de tu navegador</p>
+      {/* Sección educativa */}
+      <EducationalSection
+        title="¿Quieres aprender más sobre conversión de texto?"
+        subtitle="Descubre las diferentes transformaciones y cuándo usarlas"
+      >
+        <section className={styles.infoSection}>
+          <h2>Tipos de conversión</h2>
+          <div className={styles.infoGrid}>
+            <div className={styles.infoCard}>
+              <h3>🔠 Mayúsculas y minúsculas</h3>
+              <p>
+                <strong>MAYÚSCULAS:</strong> Todo el texto en mayúsculas. Útil para títulos o énfasis.<br />
+                <strong>minúsculas:</strong> Todo el texto en minúsculas. Ideal para normalizar texto.
+              </p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>📝 Formatos de título</h3>
+              <p>
+                <strong>Capitalizar:</strong> Primera letra de cada palabra en mayúscula.<br />
+                <strong>Formato Título:</strong> Similar pero respeta artículos y preposiciones.<br />
+                <strong>Formato oración:</strong> Solo la primera letra de cada oración.
+              </p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>🔄 Transformaciones</h3>
+              <p>
+                <strong>Alternar:</strong> Alterna mayúsculas y minúsculas (aLtErNaDo).<br />
+                <strong>Invertir:</strong> Invierte el orden de los caracteres.<br />
+                <strong>Sin acentos:</strong> Elimina tildes y diacríticos.
+              </p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>💡 Consejos de uso</h3>
+              <p>
+                • Usa &quot;Formato Título&quot; para títulos de artículos en español<br />
+                • &quot;Sin acentos&quot; es útil para URLs amigables<br />
+                • &quot;Limpiar espacios&quot; elimina espacios duplicados
+              </p>
             </div>
           </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>⚡</span>
-            <div>
-              <strong>Instantáneo</strong>
-              <p>Conversiones en tiempo real</p>
-            </div>
-          </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🛠️</span>
-            <div>
-              <strong>Múltiples formatos</strong>
-              <p>Texto, Base64, URL, Hexadecimal</p>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      </EducationalSection>
 
       <Footer appName="conversor-texto" />
     </div>

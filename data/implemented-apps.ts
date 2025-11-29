@@ -69,10 +69,16 @@ export const implementedAppsUrls = [
   "/conversor-morse/",
   "/conversor-numeros-romanos/",
   "/detector-idioma/",
-  "/cifrado-cesar/",
   "/conversor-binario/",
   "/conversor-braille/",
   "/generador-anagramas/",
+  "/generador-lorem-ipsum/",    // Generador de texto de prueba
+
+  // Criptografía y Seguridad (4 implementadas)
+  "/cifrado-clasico/",          // César + ROT13 + Atbash
+  "/cifrado-vigenere/",         // Cifrado polialfabético con clave
+  "/generador-hashes/",         // MD5, SHA-256, SHA-512
+  "/codificador-base64/",       // Base64, URL encode, Hexadecimal
 
   // Juegos y Entretenimiento (9 implementadas)
   "/test-velocidad-escritura/",
@@ -96,10 +102,9 @@ export const implementedAppsUrls = [
   "/calculadora-porciones/",
   "/test-habitos/",
 
-  // Herramientas Web y Tecnología (7 implementadas)
+  // Herramientas Web y Tecnología (6 implementadas)
   "/validador-json/",
   "/conversor-base64/",
-  "/generador-hash/",
   "/generador-utm/",
   "/validador-regex/",
   "/conversor-imagenes/",

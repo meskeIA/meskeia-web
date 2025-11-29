@@ -57,6 +57,67 @@
   margin-bottom: var(--spacing-xl);
 }
 
+/* Selector de método (César, ROT13, Atbash) */
+.methodSelector {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  background: var(--hover);
+  padding: 4px;
+  border-radius: var(--radius);
+}
+
+.methodBtn {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.methodBtn.active {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.3);
+}
+
+.methodBtn:hover:not(.active) {
+  color: var(--primary);
+}
+
+/* Info del método seleccionado */
+.methodInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-lg);
+  border-left: 3px solid var(--primary);
+}
+
+.methodEmoji {
+  font-size: 2rem;
+}
+
+.methodInfo strong {
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.methodInfo p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
 .modeSelector {
   display: flex;
   gap: var(--spacing-sm);
