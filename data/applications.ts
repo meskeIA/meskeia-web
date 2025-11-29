@@ -1,7 +1,7 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 89 aplicaciones organizadas por 12 categorías
- * Actualizado: 2025-11-28
+ * Total: 94 aplicaciones organizadas por 12 categorías
+ * Actualizado: 2025-11-29
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
  * - calculadora-: Apps que calculan/resuelven
@@ -40,16 +40,20 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora TIR-VAN", category: "Finanzas y Fiscalidad", icon: "💰", description: "Calcula TIR y VAN para análisis de inversiones y proyectos", url: "/calculadora-tir-van/", keywords: ["tir", "van", "inversion", "proyecto", "rentabilidad", "flujo caja"] },
   { name: "Calculadora Plusvalías IRPF", category: "Finanzas y Fiscalidad", icon: "📊", description: "Calcula el IRPF de tus inversiones: plusvalías de acciones, fondos, criptomonedas, dividendos e intereses con tramos 2025", url: "/calculadora-plusvalias-irpf/", keywords: ["plusvalias", "irpf", "capital mobiliario", "dividendos", "acciones", "criptomonedas", "fondos", "tramos ahorro"] },
 
-  // Calculadoras y Utilidades (6)
+  // Calculadoras y Utilidades (10)
   { name: "Calculadora de Propinas", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calcula propinas y divide la cuenta entre varias personas fácilmente", url: "/calculadora-propinas/", keywords: ["propina", "cuenta", "dividir", "restaurante", "porcentaje"] },
+  { name: "Calculadora de IVA", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calcula el IVA español: añade o quita IVA al 21%, 10% o 4% con un clic", url: "/calculadora-iva/", keywords: ["iva", "impuesto", "base imponible", "21%", "10%", "4%", "fiscal"] },
+  { name: "Calculadora de Descuentos", category: "Calculadoras y Utilidades", icon: "🏷️", description: "Calcula el precio final con descuento y cuánto ahorras. Soporta descuentos encadenados", url: "/calculadora-descuentos/", keywords: ["descuento", "rebaja", "oferta", "ahorro", "black friday", "rebajas"] },
+  { name: "Calculadora de Porcentajes", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calculadora de porcentajes completa: X% de cantidad, qué % es, aumentos, disminuciones y variaciones", url: "/calculadora-porcentajes/", keywords: ["porcentaje", "tanto por ciento", "aumento", "disminucion", "variacion"] },
   { name: "Calculadora Regla de Tres", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calculadora completa de regla de tres simple y compuesta con ejemplos prácticos españoles", url: "/calculadora-regla-de-tres/", keywords: ["proporcion", "regla", "tres", "directa", "inversa", "matematicas"] },
   { name: "Calculadora de Fechas", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calcula días entre fechas, suma o resta días a cualquier fecha", url: "/calculadora-fechas/", keywords: ["fecha", "dias", "calendario", "diferencia", "tiempo"] },
   { name: "Conversor de Tallas", category: "Calculadoras y Utilidades", icon: "🧮", description: "Convierte tallas de ropa y calzado entre sistemas EU, UK, US", url: "/conversor-tallas/", keywords: ["talla", "ropa", "zapatos", "conversion", "medida"] },
   { name: "Calculadora de Cocina", category: "Calculadoras y Utilidades", icon: "🍳", description: "Conversor de unidades de cocina, escalador de recetas, tiempos de cocción y sustitutos de ingredientes", url: "/calculadora-cocina/", keywords: ["cocina", "recetas", "conversor", "tazas", "gramos", "temperatura", "horno", "tiempo", "coccion", "ingredientes", "sustitutos"] },
   { name: "Lista de Compras", category: "Calculadoras y Utilidades", icon: "🛒", description: "Lista de compras con organización automática por categorías del supermercado, guardado local y exportación", url: "/lista-compras/", keywords: ["lista", "compras", "supermercado", "shopping", "productos", "mercado", "groceries", "organizar", "categorias", "offline"] },
 
-  // Matemáticas y Estadística (10)
+  // Matemáticas y Estadística (11)
   { name: "Calculadora de Probabilidad", category: "Matemáticas y Estadística", icon: "📐", description: "Calculadora completa de probabilidades con teoría y simulaciones", url: "/calculadora-probabilidad/", keywords: ["probabilidad", "estadistica", "azar", "combinatoria", "permutaciones"] },
+  { name: "Calculadora MCD y MCM", category: "Matemáticas y Estadística", icon: "📐", description: "Calcula el Máximo Común Divisor y Mínimo Común Múltiplo de hasta 5 números con explicación paso a paso", url: "/calculadora-mcd-mcm/", keywords: ["mcd", "mcm", "maximo comun divisor", "minimo comun multiplo", "factorizacion", "primos"] },
   { name: "Calculadora Estadística", category: "Matemáticas y Estadística", icon: "📐", description: "Calcula media, mediana, desviación estándar y análisis estadístico completo", url: "/calculadora-estadistica/", keywords: ["estadistica", "media", "mediana", "desviacion", "datos"] },
   { name: "Calculadora Matemática Avanzada", category: "Matemáticas y Estadística", icon: "📐", description: "Resuelve ecuaciones, matrices, derivadas e integrales online", url: "/calculadora-matematica/", keywords: ["matematicas", "ecuaciones", "matrices", "calcular", "resolver"] },
   // NOTA: Mantiene URL antigua (ya implementada) - se renombrará a /calculadora-ecuaciones/
@@ -78,7 +82,8 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Códigos QR", category: "Herramientas de Productividad", icon: "⚡", description: "Crea códigos QR para URLs, texto, WiFi, contactos vCard, email y teléfono", url: "/generador-qr/", keywords: ["qr", "codigo", "generar", "escanear", "wifi", "vcard"] },
   { name: "Generador de Códigos de Barras", category: "Herramientas de Productividad", icon: "⚡", description: "Genera códigos de barras EAN-13, EAN-8, UPC-A, Code128 y Code39", url: "/generador-codigos-barras/", keywords: ["codigo barras", "ean13", "ean8", "code128", "upc", "barcode", "generar barras", "etiquetas productos", "inventario"] },
 
-  // Juegos y Entretenimiento (8)
+  // Juegos y Entretenimiento (9)
+  { name: "Test de Velocidad de Escritura", category: "Juegos y Entretenimiento", icon: "⌨️", description: "Mide tu velocidad de escritura en palabras por minuto (PPM) y mejora tu mecanografía con textos en español", url: "/test-velocidad-escritura/", keywords: ["mecanografia", "velocidad", "escritura", "ppm", "palabras por minuto", "typing test", "teclado"] },
   { name: "Radio meskeIA", category: "Juegos y Entretenimiento", icon: "📻", description: "Escucha miles de emisoras de radio de todo el mundo en vivo", url: "/radio-meskeia/", keywords: ["radio", "musica", "emisoras", "streaming", "noticias", "podcasts", "online"] },
   { name: "Juego Wordle", category: "Juegos y Entretenimiento", icon: "🎮", description: "Adivina la palabra del día en español con 6 intentos", url: "/juego-wordle/", keywords: ["wordle", "palabra", "juego", "adivinar", "español"] },
   { name: "Juego Sudoku", category: "Juegos y Entretenimiento", icon: "🎮", description: "Resuelve puzzles Sudoku con diferentes niveles de dificultad", url: "/juego-sudoku/", keywords: ["sudoku", "puzzle", "numeros", "logica", "juego"] },

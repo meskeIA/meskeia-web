@@ -4,7 +4,7 @@
  * IMPORTANTE: Esta lista debe coincidir con las carpetas en app/
  * Solo añadir URLs cuando la app esté realmente creada
  *
- * Actualizado: 2025-11-28
+ * Actualizado: 2025-11-29
  */
 
 export const implementedAppsUrls = [
@@ -23,16 +23,20 @@ export const implementedAppsUrls = [
   "/calculadora-inversiones/",
   "/test-perfil-inversor/",
 
-  // Calculadoras y Utilidades (6 implementadas)
+  // Calculadoras y Utilidades (10 implementadas)
   "/calculadora-propinas/",
+  "/calculadora-iva/",
+  "/calculadora-descuentos/",
+  "/calculadora-porcentajes/",
   "/calculadora-fechas/",
   "/calculadora-regla-de-tres/",
   "/calculadora-cocina/",
   "/lista-compras/",
   "/conversor-tallas/",
 
-  // Matemáticas y Estadística (10 implementadas)
+  // Matemáticas y Estadística (11 implementadas)
   "/algebra-ecuaciones/",            // Calculadora de Ecuaciones
+  "/calculadora-mcd-mcm/",
   "/calculadora-probabilidad/",
   "/calculadora-estadistica/",
   "/calculadora-matematica/",
@@ -60,7 +64,8 @@ export const implementedAppsUrls = [
   "/comparador-textos/",
   "/conversor-markdown-html/",
 
-  // Juegos y Entretenimiento (8 implementadas)
+  // Juegos y Entretenimiento (9 implementadas)
+  "/test-velocidad-escritura/",
   "/juego-piedra-papel-tijera/",
   "/juego-tres-en-raya/",
   "/juego-memoria/",

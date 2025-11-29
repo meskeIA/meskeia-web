@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 84+ aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 94+ aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 84,
-  "updated": "2025-11-28",
+  "total_tools": 94,
+  "updated": "2025-11-29",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -126,6 +126,27 @@
           "keywords": ["propina", "cuenta", "dividir", "restaurante", "porcentaje"]
         },
         {
+          "name": "Calculadora de IVA",
+          "slug": "calculadora-iva",
+          "url": "https://meskeia.com/calculadora-iva/",
+          "description": "Calcula el IVA español: añade o quita IVA al 21%, 10% o 4% con un clic",
+          "keywords": ["iva", "impuesto", "base imponible", "21%", "10%", "4%", "fiscal"]
+        },
+        {
+          "name": "Calculadora de Descuentos",
+          "slug": "calculadora-descuentos",
+          "url": "https://meskeia.com/calculadora-descuentos/",
+          "description": "Calcula el precio final con descuento y cuánto ahorras. Soporta descuentos encadenados",
+          "keywords": ["descuento", "rebaja", "oferta", "ahorro", "black friday", "rebajas"]
+        },
+        {
+          "name": "Calculadora de Porcentajes",
+          "slug": "calculadora-porcentajes",
+          "url": "https://meskeia.com/calculadora-porcentajes/",
+          "description": "Calculadora de porcentajes completa: X% de cantidad, qué % es, aumentos, disminuciones y variaciones",
+          "keywords": ["porcentaje", "tanto por ciento", "aumento", "disminucion", "variacion"]
+        },
+        {
           "name": "Calculadora Regla de Tres",
           "slug": "calculadora-regla-de-tres",
           "url": "https://meskeia.com/calculadora-regla-de-tres/",
@@ -180,6 +201,13 @@
           "url": "https://meskeia.com/calculadora-probabilidad/",
           "description": "Calculadora completa de probabilidades con teoría y simulaciones",
           "keywords": ["probabilidad", "estadistica", "azar", "combinatoria", "permutaciones"]
+        },
+        {
+          "name": "Calculadora MCD y MCM",
+          "slug": "calculadora-mcd-mcm",
+          "url": "https://meskeia.com/calculadora-mcd-mcm/",
+          "description": "Calcula el Máximo Común Divisor y Mínimo Común Múltiplo de hasta 5 números con explicación paso a paso",
+          "keywords": ["mcd", "mcm", "maximo comun divisor", "minimo comun multiplo", "factorizacion", "primos"]
         },
         {
           "name": "Calculadora Estadística",
@@ -349,6 +377,13 @@
       "description": "Diviértete mientras aprendes",
       "icon": "🎮",
       "tools": [
+        {
+          "name": "Test de Velocidad de Escritura",
+          "slug": "test-velocidad-escritura",
+          "url": "https://meskeia.com/test-velocidad-escritura/",
+          "description": "Mide tu velocidad de escritura en palabras por minuto (PPM) y mejora tu mecanografía con textos en español",
+          "keywords": ["mecanografia", "velocidad", "escritura", "ppm", "palabras por minuto", "typing test", "teclado"]
+        },
         {
           "name": "Radio meskeIA",
           "slug": "radio-meskeia",
