@@ -47,7 +47,7 @@ export const implementedAppsUrls = [
   "/calculadora-algebra-abstracta/",
   "/calculadora-teoria-colas/",
 
-  // Herramientas de Productividad (8 implementadas)
+  // Herramientas de Productividad (9 implementadas)
   "/notas/",
   "/generador-contrasenas/",
   "/lista-tareas/",
@@ -56,8 +56,9 @@ export const implementedAppsUrls = [
   "/generador-qr/",
   "/generador-codigos-barras/",
   "/informacion-tiempo/",
+  "/generador-firma-email/",
 
-  // Texto y Documentos (10 implementadas)
+  // Texto y Documentos (12 implementadas)
   "/contador-palabras/",
   "/conversor-texto/",
   "/limpiador-texto/",
@@ -68,6 +69,8 @@ export const implementedAppsUrls = [
   "/detector-idioma/",
   "/cifrado-cesar/",
   "/conversor-binario/",
+  "/conversor-braille/",
+  "/generador-anagramas/",
 
   // Juegos y Entretenimiento (9 implementadas)
   "/test-velocidad-escritura/",

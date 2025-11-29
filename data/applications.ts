@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 99 aplicaciones organizadas por 12 categorías
+ * Total: 102 aplicaciones organizadas por 12 categorías
  * Actualizado: 2025-11-29
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
@@ -81,6 +81,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Contraseñas", category: "Herramientas de Productividad", icon: "⚡", description: "Crea contraseñas seguras y personalizadas con diferentes niveles de complejidad", url: "/generador-contrasenas/", keywords: ["password", "seguridad", "contrasena", "generar", "segura"] },
   { name: "Generador de Códigos QR", category: "Herramientas de Productividad", icon: "⚡", description: "Crea códigos QR para URLs, texto, WiFi, contactos vCard, email y teléfono", url: "/generador-qr/", keywords: ["qr", "codigo", "generar", "escanear", "wifi", "vcard"] },
   { name: "Generador de Códigos de Barras", category: "Herramientas de Productividad", icon: "⚡", description: "Genera códigos de barras EAN-13, EAN-8, UPC-A, Code128 y Code39", url: "/generador-codigos-barras/", keywords: ["codigo barras", "ean13", "ean8", "code128", "upc", "barcode", "generar barras", "etiquetas productos", "inventario"] },
+  { name: "Generador de Firmas Email", category: "Herramientas de Productividad", icon: "✉️", description: "Crea firmas de email profesionales en HTML. Compatible con Gmail, Outlook, Apple Mail. Múltiples plantillas y redes sociales", url: "/generador-firma-email/", keywords: ["firma", "email", "html", "gmail", "outlook", "profesional", "plantilla", "correo"] },
 
   // Juegos y Entretenimiento (9)
   { name: "Test de Velocidad de Escritura", category: "Juegos y Entretenimiento", icon: "⌨️", description: "Mide tu velocidad de escritura en palabras por minuto (PPM) y mejora tu mecanografía con textos en español", url: "/test-velocidad-escritura/", keywords: ["mecanografia", "velocidad", "escritura", "ppm", "palabras por minuto", "typing test", "teclado"] },
@@ -131,6 +132,8 @@ export const applicationsDatabase: Application[] = [
   { name: "Detector de Idioma", category: "Texto y Documentos", icon: "🌍", description: "Detecta automáticamente el idioma de cualquier texto. Soporta 10+ idiomas con porcentaje de confianza", url: "/detector-idioma/", keywords: ["idioma", "detector", "lengua", "traduccion", "español", "ingles", "frances"] },
   { name: "Cifrado César", category: "Texto y Documentos", icon: "🔐", description: "Cifra y descifra textos con el cifrado César clásico. Desplazamiento ajustable de 1 a 25 posiciones", url: "/cifrado-cesar/", keywords: ["cifrado", "cesar", "criptografia", "encriptar", "desencriptar", "rot13"] },
   { name: "Conversor Binario", category: "Texto y Documentos", icon: "💾", description: "Convierte texto a binario y viceversa. Muestra también hexadecimal, octal y decimal con tabla ASCII", url: "/conversor-binario/", keywords: ["binario", "texto", "ascii", "hexadecimal", "octal", "conversion", "bits"] },
+  { name: "Conversor Braille", category: "Texto y Documentos", icon: "⠃", description: "Convierte texto a Braille español y viceversa. Sistema completo con ñ, acentos, números y visualización de celdas", url: "/conversor-braille/", keywords: ["braille", "accesibilidad", "discapacidad visual", "alfabeto", "puntos", "ciego", "inclusion"] },
+  { name: "Generador de Anagramas", category: "Texto y Documentos", icon: "🔤", description: "Encuentra todas las palabras que puedes formar con tus letras. Ideal para Wordle, Scrabble y crucigramas", url: "/generador-anagramas/", keywords: ["anagramas", "palabras", "wordle", "scrabble", "crucigrama", "letras", "juego palabras"] },
 
   // Creatividad y Diseño (7)
   { name: "Conversor de Colores", category: "Creatividad y Diseño", icon: "🎨", description: "Convierte entre HEX, RGB, HSL y CMYK con color picker visual y generación de paletas automáticas", url: "/conversor-colores/", keywords: ["colores", "hex", "rgb", "hsl", "cmyk", "convertidor", "color picker", "paleta"] },

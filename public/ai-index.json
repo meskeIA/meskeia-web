@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 99+ aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 102+ aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 99,
+  "total_tools": 102,
   "updated": "2025-11-29",
   "features": {
     "all_free": true,
@@ -369,6 +369,13 @@
           "url": "https://meskeia.com/generador-codigos-barras/",
           "description": "Genera códigos de barras EAN-13, EAN-8, UPC-A, Code128 y Code39",
           "keywords": ["codigo barras", "ean13", "ean8", "code128", "upc", "barcode"]
+        },
+        {
+          "name": "Generador de Firmas Email",
+          "slug": "generador-firma-email",
+          "url": "https://meskeia.com/generador-firma-email/",
+          "description": "Crea firmas de email profesionales en HTML. Compatible con Gmail, Outlook, Apple Mail. Múltiples plantillas y redes sociales",
+          "keywords": ["firma", "email", "html", "gmail", "outlook", "profesional", "plantilla", "correo"]
         }
       ]
     },
@@ -684,6 +691,20 @@
           "url": "https://meskeia.com/conversor-binario/",
           "description": "Convierte texto a binario y viceversa. Muestra también hexadecimal, octal y decimal con tabla ASCII",
           "keywords": ["binario", "texto", "ascii", "hexadecimal", "octal", "conversion", "bits"]
+        },
+        {
+          "name": "Conversor Braille",
+          "slug": "conversor-braille",
+          "url": "https://meskeia.com/conversor-braille/",
+          "description": "Convierte texto a Braille español y viceversa. Sistema completo con ñ, acentos, números y visualización de celdas",
+          "keywords": ["braille", "accesibilidad", "discapacidad visual", "alfabeto", "puntos", "ciego", "inclusion"]
+        },
+        {
+          "name": "Generador de Anagramas",
+          "slug": "generador-anagramas",
+          "url": "https://meskeia.com/generador-anagramas/",
+          "description": "Encuentra todas las palabras que puedes formar con tus letras. Ideal para Wordle, Scrabble y crucigramas",
+          "keywords": ["anagramas", "palabras", "wordle", "scrabble", "crucigrama", "letras", "juego palabras"]
         }
       ]
     },
