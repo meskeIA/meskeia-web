@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 94 aplicaciones organizadas por 12 categorías
+ * Total: 99 aplicaciones organizadas por 12 categorías
  * Actualizado: 2025-11-29
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
@@ -120,12 +120,17 @@ export const applicationsDatabase: Application[] = [
   { name: "Validador RegEx", category: "Herramientas Web y Tecnología", icon: "💻", description: "Testa y valida expresiones regulares con resaltado de coincidencias y ejemplos prácticos", url: "/validador-regex/", keywords: ["regex", "expresiones regulares", "validar", "patron", "programacion"] },
   { name: "Conversor de Imágenes", category: "Herramientas Web y Tecnología", icon: "💻", description: "Convierte formatos de imagen (JPG, PNG, WebP), comprime y redimensiona con control de calidad total", url: "/conversor-imagenes/", keywords: ["imagen", "convertir", "comprimir", "redimensionar", "jpg", "png"] },
 
-  // Texto y Documentos (5)
+  // Texto y Documentos (10)
   { name: "Contador de Palabras", category: "Texto y Documentos", icon: "📝", description: "Cuenta palabras, caracteres, párrafos y tiempo de lectura en tiempo real. Objetivo de palabras configurable", url: "/contador-palabras/", keywords: ["contar", "palabras", "caracteres", "texto", "escritura"] },
   { name: "Conversor de Texto", category: "Texto y Documentos", icon: "📝", description: "Convierte texto entre MAYÚSCULAS, minúsculas, Capitalizado, Título, aLtErNaDo e iNvErTiDo", url: "/conversor-texto/", keywords: ["convertir", "mayusculas", "minusculas", "texto", "formato"] },
   { name: "Limpiador de Texto", category: "Texto y Documentos", icon: "📝", description: "Limpia texto eliminando espacios duplicados, líneas vacías extras, tabulaciones y caracteres especiales", url: "/limpiador-texto/", keywords: ["limpiar", "texto", "espacios", "formato", "eliminar"] },
   { name: "Comparador de Textos", category: "Texto y Documentos", icon: "📝", description: "Compara dos textos línea por línea detectando diferencias añadidas, eliminadas y modificadas. Ideal para editores, escritores y traductores", url: "/comparador-textos/", keywords: ["comparar", "diff", "diferencias", "texto", "cambios"] },
   { name: "Conversor Markdown-HTML", category: "Texto y Documentos", icon: "📝", description: "Convierte Markdown a HTML limpio con vista previa en tiempo real. Soporte completo de sintaxis: títulos, listas, enlaces, código, tablas", url: "/conversor-markdown-html/", keywords: ["markdown", "html", "convertir", "formato", "codigo"] },
+  { name: "Conversor de Código Morse", category: "Texto y Documentos", icon: "📡", description: "Convierte texto a código Morse y viceversa con reproducción de audio. Alfabeto completo y señales internacionales", url: "/conversor-morse/", keywords: ["morse", "codigo", "puntos", "rayas", "telegrafo", "sos", "audio"] },
+  { name: "Conversor Números Romanos", category: "Texto y Documentos", icon: "🏛️", description: "Convierte entre números arábigos y romanos con desglose paso a paso. Tabla de símbolos y reglas explicadas", url: "/conversor-numeros-romanos/", keywords: ["romanos", "numeros", "conversion", "romano", "arabigo", "I", "V", "X", "L", "C", "D", "M"] },
+  { name: "Detector de Idioma", category: "Texto y Documentos", icon: "🌍", description: "Detecta automáticamente el idioma de cualquier texto. Soporta 10+ idiomas con porcentaje de confianza", url: "/detector-idioma/", keywords: ["idioma", "detector", "lengua", "traduccion", "español", "ingles", "frances"] },
+  { name: "Cifrado César", category: "Texto y Documentos", icon: "🔐", description: "Cifra y descifra textos con el cifrado César clásico. Desplazamiento ajustable de 1 a 25 posiciones", url: "/cifrado-cesar/", keywords: ["cifrado", "cesar", "criptografia", "encriptar", "desencriptar", "rot13"] },
+  { name: "Conversor Binario", category: "Texto y Documentos", icon: "💾", description: "Convierte texto a binario y viceversa. Muestra también hexadecimal, octal y decimal con tabla ASCII", url: "/conversor-binario/", keywords: ["binario", "texto", "ascii", "hexadecimal", "octal", "conversion", "bits"] },
 
   // Creatividad y Diseño (7)
   { name: "Conversor de Colores", category: "Creatividad y Diseño", icon: "🎨", description: "Convierte entre HEX, RGB, HSL y CMYK con color picker visual y generación de paletas automáticas", url: "/conversor-colores/", keywords: ["colores", "hex", "rgb", "hsl", "cmyk", "convertidor", "color picker", "paleta"] },

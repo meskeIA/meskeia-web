@@ -57,12 +57,17 @@ export const implementedAppsUrls = [
   "/generador-codigos-barras/",
   "/informacion-tiempo/",
 
-  // Texto y Documentos (5 implementadas)
+  // Texto y Documentos (10 implementadas)
   "/contador-palabras/",
   "/conversor-texto/",
   "/limpiador-texto/",
   "/comparador-textos/",
   "/conversor-markdown-html/",
+  "/conversor-morse/",
+  "/conversor-numeros-romanos/",
+  "/detector-idioma/",
+  "/cifrado-cesar/",
+  "/conversor-binario/",
 
   // Juegos y Entretenimiento (9 implementadas)
   "/test-velocidad-escritura/",

@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 94+ aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 99+ aplicaciones web educativas organizadas en 12 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, y Emprendimiento y Negocios. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 94,
+  "total_tools": 99,
   "updated": "2025-11-29",
   "features": {
     "all_free": true,
@@ -649,6 +649,41 @@
           "url": "https://meskeia.com/conversor-markdown-html/",
           "description": "Convierte Markdown a HTML limpio con vista previa en tiempo real. Soporte completo de sintaxis: títulos, listas, enlaces, código, tablas",
           "keywords": ["markdown", "html", "convertir", "formato", "codigo"]
+        },
+        {
+          "name": "Conversor de Código Morse",
+          "slug": "conversor-morse",
+          "url": "https://meskeia.com/conversor-morse/",
+          "description": "Convierte texto a código Morse y viceversa con reproducción de audio. Alfabeto completo y señales internacionales",
+          "keywords": ["morse", "codigo", "puntos", "rayas", "telegrafo", "sos", "audio"]
+        },
+        {
+          "name": "Conversor Números Romanos",
+          "slug": "conversor-numeros-romanos",
+          "url": "https://meskeia.com/conversor-numeros-romanos/",
+          "description": "Convierte entre números arábigos y romanos con desglose paso a paso. Tabla de símbolos y reglas explicadas",
+          "keywords": ["romanos", "numeros", "conversion", "romano", "arabigo", "I", "V", "X"]
+        },
+        {
+          "name": "Detector de Idioma",
+          "slug": "detector-idioma",
+          "url": "https://meskeia.com/detector-idioma/",
+          "description": "Detecta automáticamente el idioma de cualquier texto. Soporta 10+ idiomas con porcentaje de confianza",
+          "keywords": ["idioma", "detector", "lengua", "traduccion", "español", "ingles", "frances"]
+        },
+        {
+          "name": "Cifrado César",
+          "slug": "cifrado-cesar",
+          "url": "https://meskeia.com/cifrado-cesar/",
+          "description": "Cifra y descifra textos con el cifrado César clásico. Desplazamiento ajustable de 1 a 25 posiciones",
+          "keywords": ["cifrado", "cesar", "criptografia", "encriptar", "desencriptar", "rot13"]
+        },
+        {
+          "name": "Conversor Binario",
+          "slug": "conversor-binario",
+          "url": "https://meskeia.com/conversor-binario/",
+          "description": "Convierte texto a binario y viceversa. Muestra también hexadecimal, octal y decimal con tabla ASCII",
+          "keywords": ["binario", "texto", "ascii", "hexadecimal", "octal", "conversion", "bits"]
         }
       ]
     },
