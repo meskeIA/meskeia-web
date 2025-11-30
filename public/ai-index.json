@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 119+ aplicaciones web educativas organizadas en 14 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, Criptografía y Seguridad, y SEO & Marketing. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 123+ aplicaciones web educativas organizadas en 14 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, Criptografía y Seguridad, y SEO & Marketing. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 119,
+  "total_tools": 123,
   "updated": "2025-11-30",
   "features": {
     "all_free": true,
@@ -943,6 +943,34 @@
           "url": "https://meskeia.com/generador-hashtags/",
           "description": "Genera hashtags relevantes para Instagram, TikTok, Twitter y LinkedIn. Nichos populares y recomendaciones por plataforma",
           "keywords": ["hashtags", "instagram", "tiktok", "twitter", "linkedin", "redes sociales", "engagement"]
+        },
+        {
+          "name": "Analizador de Títulos SEO",
+          "slug": "analizador-titulos-seo",
+          "url": "https://meskeia.com/analizador-titulos-seo/",
+          "description": "Analiza y optimiza títulos para SEO. Puntuación CTR, palabras poderosas, longitud óptima y vista previa SERP",
+          "keywords": ["titulo", "seo", "ctr", "serp", "headline", "h1", "meta title", "palabras poderosas"]
+        },
+        {
+          "name": "Calculadora de Legibilidad",
+          "slug": "calculadora-legibilidad",
+          "url": "https://meskeia.com/calculadora-legibilidad/",
+          "description": "Calcula índices de legibilidad Flesch-Szigriszt, Fernández Huerta e INFLESZ. Optimiza textos para tu audiencia española",
+          "keywords": ["legibilidad", "flesch", "readability", "inflesz", "fernandez huerta", "lectura", "comprension"]
+        },
+        {
+          "name": "Calculadora Tiempo de Lectura",
+          "slug": "calculadora-tiempo-lectura",
+          "url": "https://meskeia.com/calculadora-tiempo-lectura/",
+          "description": "Calcula el tiempo de lectura de tu contenido. Velocidad configurable, tiempo hablado y badge para tu artículo",
+          "keywords": ["tiempo lectura", "reading time", "palabras por minuto", "ppm", "contenido", "articulo", "badge"]
+        },
+        {
+          "name": "Generador de Schema Markup",
+          "slug": "generador-schema-markup",
+          "url": "https://meskeia.com/generador-schema-markup/",
+          "description": "Genera código JSON-LD Schema.org para SEO. Artículos, productos, FAQ, negocios locales y recetas",
+          "keywords": ["schema", "json-ld", "structured data", "rich snippets", "seo tecnico", "schema.org", "markup"]
         }
       ]
     }

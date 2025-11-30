@@ -1,7 +1,7 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 118 aplicaciones organizadas por 14 categorías
- * Actualizado: 2025-11-29
+ * Total: 122 aplicaciones organizadas por 14 categorías
+ * Actualizado: 2025-11-30
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
  * - calculadora-: Apps que calculan/resuelven
@@ -165,11 +165,15 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Nombres", category: "Emprendimiento y Negocios", icon: "💼", description: "Genera nombres creativos para tu empresa por sectores. Enlaces directos para verificar disponibilidad y registrar dominios .com, .es", url: "/generador-nombres-empresa/", keywords: ["nombre", "empresa", "marca", "branding", "dominio", "startup"] },
   { name: "Simulador Gastos Deducibles", category: "Emprendimiento y Negocios", icon: "💼", description: "Calcula tu ahorro fiscal con gastos deducibles. Descubre qué gastos puedes deducir (100%, 50%, 30%) y optimiza tu declaración de IRPF e IVA", url: "/simulador-gastos-deducibles/", keywords: ["gastos deducibles", "autonomo", "irpf", "iva", "hacienda", "deduccion"] },
 
-  // SEO & Marketing (4)
+  // SEO & Marketing (8)
   { name: "Generador de Meta Descripciones", category: "SEO & Marketing", icon: "🔍", description: "Genera meta descripciones optimizadas para SEO con contador de caracteres y vista previa de Google. Mejora tu CTR", url: "/generador-meta-descripciones/", keywords: ["meta description", "seo", "google", "serp", "ctr", "snippet", "descripcion"] },
   { name: "Analizador de Densidad SEO", category: "SEO & Marketing", icon: "📊", description: "Analiza la densidad de palabras clave en tu texto. Detecta sobreoptimización y sugiere mejoras para SEO on-page", url: "/analizador-densidad-seo/", keywords: ["densidad", "keywords", "seo", "palabras clave", "optimizacion", "on-page"] },
   { name: "Generador de Palabras Clave", category: "SEO & Marketing", icon: "🔑", description: "Genera ideas de palabras clave long-tail a partir de una semilla. Variaciones, preguntas y sugerencias por categoría", url: "/generador-palabras-clave/", keywords: ["palabras clave", "keywords", "seo", "long tail", "semrush", "ideas", "contenido"] },
   { name: "Generador de Hashtags", category: "SEO & Marketing", icon: "#️⃣", description: "Genera hashtags relevantes para Instagram, Twitter, TikTok y LinkedIn. Categorías por nicho y tendencias", url: "/generador-hashtags/", keywords: ["hashtags", "instagram", "twitter", "tiktok", "redes sociales", "trending", "viral"] },
+  { name: "Analizador de Títulos SEO", category: "SEO & Marketing", icon: "📝", description: "Analiza y optimiza títulos para SEO. Puntuación CTR, palabras poderosas, longitud óptima y vista previa SERP", url: "/analizador-titulos-seo/", keywords: ["titulo", "seo", "ctr", "serp", "headline", "h1", "meta title", "palabras poderosas"] },
+  { name: "Calculadora de Legibilidad", category: "SEO & Marketing", icon: "📖", description: "Calcula índices de legibilidad Flesch-Szigriszt, Fernández Huerta e INFLESZ. Optimiza textos para tu audiencia", url: "/calculadora-legibilidad/", keywords: ["legibilidad", "flesch", "readability", "inflesz", "fernandez huerta", "lectura", "comprension"] },
+  { name: "Calculadora Tiempo de Lectura", category: "SEO & Marketing", icon: "⏱️", description: "Calcula el tiempo de lectura de tu contenido. Velocidad configurable, tiempo hablado y badge para tu artículo", url: "/calculadora-tiempo-lectura/", keywords: ["tiempo lectura", "reading time", "palabras por minuto", "ppm", "contenido", "articulo", "badge"] },
+  { name: "Generador de Schema Markup", category: "SEO & Marketing", icon: "🏷️", description: "Genera código JSON-LD Schema.org para SEO. Artículos, productos, FAQ, negocios locales y recetas", url: "/generador-schema-markup/", keywords: ["schema", "json-ld", "structured data", "rich snippets", "seo tecnico", "schema.org", "markup"] },
 ];
 
 export const categories = [

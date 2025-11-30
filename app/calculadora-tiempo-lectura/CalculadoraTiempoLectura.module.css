@@ -1,0 +1,581 @@
+/* Variables meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --radius: 12px;
+  --radius-large: 16px;
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.2rem;
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin: 0;
+}
+
+/* Main Content */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Panels */
+.inputPanel,
+.resultsPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.panelTitle {
+  font-size: 1.2rem;
+  margin: 0 0 1.5rem;
+  color: var(--text-primary);
+}
+
+/* Input */
+.inputGroup {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  resize: vertical;
+  min-height: 280px;
+  font-family: inherit;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.1);
+}
+
+.charInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.ejemploBtn {
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.ejemploBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Velocidad Section */
+.velocidadSection {
+  margin-top: 1.5rem;
+}
+
+.velocidadOptions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.velocidadBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.velocidadBtn:hover {
+  border-color: var(--primary);
+}
+
+.velocidadBtn.active {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.velocidadLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.velocidadValue {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.customVelocidad {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.velocidadInput {
+  width: 70px;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  text-align: center;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Tiempo Card */
+.tiempoCard {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: white;
+}
+
+.tiempoPrincipal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tiempoIcon {
+  font-size: 2.5rem;
+}
+
+.tiempoInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.tiempoValor {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.tiempoLabel {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.tiempoSecundario {
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tiempoItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tiempoItemIcon {
+  font-size: 1.25rem;
+}
+
+.tiempoItemValor {
+  font-weight: 600;
+}
+
+.tiempoItemLabel {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* Tipo Card */
+.tipoCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+}
+
+.tipoEmoji {
+  font-size: 2rem;
+}
+
+.tipoInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.tipoNombre {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tipoDesc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.statCard {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.statValue {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Metricas Section */
+.metricasSection {
+  margin-bottom: 1.5rem;
+}
+
+.metricasSection h3 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.metricasList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metricaItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.metricaLabel {
+  color: var(--text-secondary);
+}
+
+.metricaValue {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.metricaValue.denso { color: var(--warning); }
+.metricaValue.ligero { color: var(--success); }
+.metricaValue.normal { color: var(--primary); }
+
+/* Badge Section */
+.badgeSection {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.badgeSection h3 {
+  font-size: 0.9rem;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.badgePreview {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.copyBtn {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.copyBtn:hover {
+  background: #256a8a;
+}
+
+/* Placeholder */
+.placeholder {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+
+.placeholderIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+  display: block;
+}
+
+/* Referencia Section */
+.referenciaSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.referenciaSection h3 {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.referenciaGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.referenciaCard {
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.referenciaIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.referenciaCard h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.referenciaPalabras {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.referenciaTiempo {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Educational Content */
+.educationalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.eduSection h2 {
+  font-size: 1.3rem;
+  color: var(--primary);
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.eduSection p {
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.factGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.factCard {
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.factValue {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.factLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.tipsList {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tipsList li {
+  padding: 0.75rem 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--secondary);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .referenciaGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .velocidadOptions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .factGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .hero {
+    margin-top: 70px;
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .referenciaGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tiempoValor {
+    font-size: 1.5rem;
+  }
+}

@@ -4,7 +4,7 @@
  * IMPORTANTE: Esta lista debe coincidir con las carpetas en app/
  * Solo añadir URLs cuando la app esté realmente creada
  *
- * Actualizado: 2025-11-29
+ * Actualizado: 2025-11-30
  */
 
 export const implementedAppsUrls = [
@@ -149,11 +149,15 @@ export const implementedAppsUrls = [
   "/curso-decisiones-inversion/",
   "/curso-nutrisalud/",
 
-  // SEO & Marketing (4 implementadas)
+  // SEO & Marketing (8 implementadas)
   "/generador-meta-descripciones/",
   "/analizador-densidad-seo/",
   "/generador-palabras-clave/",
   "/generador-hashtags/",
+  "/analizador-titulos-seo/",
+  "/calculadora-legibilidad/",
+  "/calculadora-tiempo-lectura/",
+  "/generador-schema-markup/",
 ];
 
 /**

@@ -1,0 +1,554 @@
+/* Variables meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --radius: 12px;
+  --radius-large: 16px;
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.2rem;
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin: 0;
+}
+
+/* Main Content */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Panels */
+.inputPanel,
+.resultsPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.panelTitle {
+  font-size: 1.2rem;
+  margin: 0 0 1.5rem;
+  color: var(--text-primary);
+}
+
+/* Input */
+.inputGroup {
+  margin-bottom: 1rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  resize: vertical;
+  min-height: 300px;
+  font-family: inherit;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.1);
+}
+
+.charInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.ejemploBtn {
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.ejemploBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Main Score */
+.mainScore {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-radius: var(--radius-large);
+  margin-bottom: 1.5rem;
+}
+
+.mainScore.facil {
+  background: rgba(34, 197, 94, 0.1);
+  border: 2px solid var(--success);
+}
+
+.mainScore.normal {
+  background: rgba(46, 134, 171, 0.1);
+  border: 2px solid var(--primary);
+}
+
+.mainScore.dificil {
+  background: rgba(245, 158, 11, 0.1);
+  border: 2px solid var(--warning);
+}
+
+.mainScore.muyDificil {
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid var(--error);
+}
+
+.scoreCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+}
+
+.scoreValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.scoreDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.scoreLabel {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.scoreNivel {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Metrics Grid */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.metricCard {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.metricValue {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.metricLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Indices Section */
+.indicesSection {
+  margin-bottom: 1.5rem;
+}
+
+.indicesSection h3 {
+  font-size: 1rem;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.indiceItem {
+  margin-bottom: 1rem;
+}
+
+.indiceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.indiceName {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.indiceScore {
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.indiceScore.facil { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+.indiceScore.normal { background: rgba(46, 134, 171, 0.2); color: var(--primary); }
+.indiceScore.dificil { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+.indiceScore.muyDificil { background: rgba(239, 68, 68, 0.2); color: var(--error); }
+
+.indiceBar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.indiceProgress {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.indiceProgress.facil { background: var(--success); }
+.indiceProgress.normal { background: var(--primary); }
+.indiceProgress.dificil { background: var(--warning); }
+.indiceProgress.muyDificil { background: var(--error); }
+
+.indiceDesc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Extra Analysis */
+.extraAnalysis {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+}
+
+.extraItem {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.extraLabel {
+  color: var(--text-secondary);
+}
+
+.extraValue {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Sugerencias */
+.sugerencias {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: 1rem;
+  border-left: 3px solid var(--primary);
+}
+
+.sugerencias h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.sugerencias ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.sugerencias li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Placeholder */
+.placeholder {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+
+.placeholderIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+  display: block;
+}
+
+/* Guide Section */
+.guideSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.guideSection h3 {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.guideGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.75rem;
+}
+
+.guideItem {
+  padding: 1rem 0.5rem;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.guideItem.facil { background: rgba(34, 197, 94, 0.1); border: 1px solid var(--success); }
+.guideItem.normal { background: rgba(46, 134, 171, 0.1); border: 1px solid var(--primary); }
+.guideItem.dificil { background: rgba(245, 158, 11, 0.1); border: 1px solid var(--warning); }
+.guideItem.muyDificil { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--error); }
+
+.guideRange {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.guideLabel {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0.25rem 0;
+}
+
+.guideDesc {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Educational Content */
+.educationalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.eduSection h2 {
+  font-size: 1.3rem;
+  color: var(--primary);
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.eduSection p {
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.formulaCard {
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+}
+
+.formulaCard h4 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.formula {
+  font-family: 'Consolas', 'Monaco', monospace;
+  background: var(--bg-card);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--primary);
+  margin: 0.5rem 0;
+  overflow-x: auto;
+}
+
+.tipsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tipsList li {
+  padding: 0.75rem 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--secondary);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.contentTypeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.contentTypeCard {
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.contentTypeCard h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.recommendedScore {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.contentTypeCard p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .guideGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .contentTypeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .hero {
+    margin-top: 70px;
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .guideGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contentTypeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mainScore {
+    flex-direction: column;
+    text-align: center;
+  }
+}
