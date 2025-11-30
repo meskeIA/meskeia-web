@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>meskeIA - Mockup Momentos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+            min-height: 100vh;
+        }
+
+        /* Header fijo simulado */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 12px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2E86AB;
+        }
+
+        .search-btn {
+            background: #F5F5F5;
+            border: 1px solid #E5E5E5;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        /* Contenido principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 24px 48px;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        /* Sección de Momentos */
+        .momentos-section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .momentos-title {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .momentos-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .momentos-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .momentos-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .momento-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            background: #F8F9FA;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .momento-btn:hover {
+            background: #EBF5F9;
+            border-color: #2E86AB;
+            transform: translateY(-2px);
+        }
+
+        .momento-btn.active {
+            background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .momento-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .momento-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .momento-count {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .momento-btn.active .momento-count {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Panel de apps filtradas */
+        .apps-panel {
+            display: none;
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid #E5E5E5;
+        }
+
+        .apps-panel.visible {
+            display: block;
+        }
+
+        .apps-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .apps-panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .apps-panel-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .app-card {
+            background: #F8F9FA;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .app-card:hover {
+            background: #EBF5F9;
+            transform: translateX(4px);
+        }
+
+        .app-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .app-info {
+            flex: 1;
+        }
+
+        .app-name {
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .app-desc {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .app-tags {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .app-tag {
+            font-size: 0.7rem;
+            background: #E5E5E5;
+            color: #666;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* Separador */
+        .separator {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 48px 0 32px;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #E5E5E5;
+        }
+
+        /* Categorías tradicionales */
+        .categorias-section h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1A1A1A;
+        }
+
+        .categoria-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .categoria-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 24px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .categoria-header:hover {
+            background: #F8F9FA;
+        }
+
+        .categoria-icon {
+            font-size: 1.5rem;
+            margin-right: 16px;
+        }
+
+        .categoria-info {
+            flex: 1;
+        }
+
+        .categoria-name {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .categoria-desc {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .categoria-count {
+            font-size: 0.85rem;
+            color: #2E86AB;
+            font-weight: 500;
+        }
+
+        .categoria-arrow {
+            font-size: 1.2rem;
+            color: #999;
+            margin-left: 16px;
+            transition: transform 0.2s;
+        }
+
+        /* Footer nota */
+        .mockup-note {
+            background: #FFF3CD;
+            border: 1px solid #FFE69C;
+            border-radius: 8px;
+            padding: 16px 24px;
+            margin-top: 48px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #664D03;
+        }
+
+        .mockup-note strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header simulado -->
+    <header class="fixed-header">
+        <div class="logo">meskeIA</div>
+        <button class="search-btn">🔍 Buscar · Ctrl+K</button>
+    </header>
+
+    <div class="container">
+        <!-- Hero -->
+        <section class="hero">
+            <h1>Biblioteca de Aplicaciones Web Gratuitas</h1>
+            <p>122 herramientas online para facilitar tu día a día. Sin registro, sin anuncios.</p>
+        </section>
+
+        <!-- Sección de Momentos -->
+        <section class="momentos-section">
+            <p class="momentos-title">¿Qué estás haciendo ahora?</p>
+
+            <div class="momentos-grid">
+                <button class="momento-btn" data-momento="trabajo" onclick="toggleMomento('trabajo')">
+                    <span class="momento-icon">💼</span>
+                    <span class="momento-label">Trabajando</span>
+                    <span class="momento-count">25 apps</span>
+                </button>
+
+                <button class="momento-btn" data-momento="estudio" onclick="toggleMomento('estudio')">
+                    <span class="momento-icon">🎓</span>
+                    <span class="momento-label">Estudiando</span>
+                    <span class="momento-count">22 apps</span>
+                </button>
+
+                <button class="momento-btn" data-momento="casa" onclick="toggleMomento('casa')">
+                    <span class="momento-icon">🏠</span>
+                    <span class="momento-label">En casa</span>
+                    <span class="momento-count">18 apps</span>
+                </button>
+
+                <button class="momento-btn" data-momento="dinero" onclick="toggleMomento('dinero')">
+                    <span class="momento-icon">💰</span>
+                    <span class="momento-label">Mi dinero</span>
+                    <span class="momento-count">20 apps</span>
+                </button>
+
+                <button class="momento-btn" data-momento="creando" onclick="toggleMomento('creando')">
+                    <span class="momento-icon">🎨</span>
+                    <span class="momento-label">Creando</span>
+                    <span class="momento-count">24 apps</span>
+                </button>
+
+                <button class="momento-btn" data-momento="relax" onclick="toggleMomento('relax')">
+                    <span class="momento-icon">🎮</span>
+                    <span class="momento-label">Relajándome</span>
+                    <span class="momento-count">12 apps</span>
+                </button>
+            </div>
+
+            <!-- Panel de apps (se muestra al hacer clic) -->
+            <div id="apps-panel" class="apps-panel">
+                <div class="apps-panel-header">
+                    <h3 class="apps-panel-title" id="panel-title">Apps para trabajar</h3>
+                    <button class="apps-panel-close" onclick="closeMomento()">×</button>
+                </div>
+                <div class="apps-grid" id="apps-grid">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Separador -->
+        <div class="separator">
+            o explora por categorías
+        </div>
+
+        <!-- Categorías tradicionales -->
+        <section class="categorias-section">
+            <h2>📁 Todas las categorías</h2>
+
+            <div class="categoria-card">
+                <div class="categoria-header">
+                    <span class="categoria-icon">💰</span>
+                    <div class="categoria-info">
+                        <div class="categoria-name">Finanzas y Fiscalidad</div>
+                        <div class="categoria-desc">Planifica tu economía y calcula impuestos</div>
+                    </div>
+                    <span class="categoria-count">16 apps</span>
+                    <span class="categoria-arrow">›</span>
+                </div>
+            </div>
+
+            <div class="categoria-card">
+                <div class="categoria-header">
+                    <span class="categoria-icon">🧮</span>
+                    <div class="categoria-info">
+                        <div class="categoria-name">Calculadoras y Utilidades</div>
+                        <div class="categoria-desc">Herramientas prácticas para el día a día</div>
+                    </div>
+                    <span class="categoria-count">10 apps</span>
+                    <span class="categoria-arrow">›</span>
+                </div>
+            </div>
+
+            <div class="categoria-card">
+                <div class="categoria-header">
+                    <span class="categoria-icon">📐</span>
+                    <div class="categoria-info">
+                        <div class="categoria-name">Matemáticas y Estadística</div>
+                        <div class="categoria-desc">Resuelve problemas matemáticos</div>
+                    </div>
+                    <span class="categoria-count">11 apps</span>
+                    <span class="categoria-arrow">›</span>
+                </div>
+            </div>
+
+            <div class="categoria-card">
+                <div class="categoria-header">
+                    <span class="categoria-icon">🏥</span>
+                    <div class="categoria-info">
+                        <div class="categoria-name">Salud & Bienestar</div>
+                        <div class="categoria-desc">Cuida tu salud con herramientas especializadas</div>
+                    </div>
+                    <span class="categoria-count">9 apps</span>
+                    <span class="categoria-arrow">›</span>
+                </div>
+            </div>
+
+            <div class="categoria-card">
+                <div class="categoria-header">
+                    <span class="categoria-icon">🎨</span>
+                    <div class="categoria-info">
+                        <div class="categoria-name">Creatividad y Diseño</div>
+                        <div class="categoria-desc">Herramientas para diseñadores web</div>
+                    </div>
+                    <span class="categoria-count">7 apps</span>
+                    <span class="categoria-arrow">›</span>
+                </div>
+            </div>
+
+            <p style="text-align: center; color: #999; margin-top: 24px; font-size: 0.9rem;">
+                ... y 9 categorías más
+            </p>
+        </section>
+
+        <!-- Nota del mockup -->
+        <div class="mockup-note">
+            <strong>📌 Esto es un MOCKUP de prueba</strong>
+            No afecta a la web real. Es solo para visualizar cómo funcionarían los "Momentos".
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo para cada momento
+        const momentosData = {
+            trabajo: {
+                title: "💼 Apps para trabajar",
+                apps: [
+                    { icon: "🍅", name: "Temporizador Pomodoro", desc: "Técnica Pomodoro con estadísticas de productividad", tags: ["tiempo", "productividad"] },
+                    { icon: "⏱️", name: "Time Tracker", desc: "Registra tiempo por proyecto y cliente", tags: ["freelance", "horas"] },
+                    { icon: "✉️", name: "Generador Firma Email", desc: "Crea firmas profesionales para Gmail y Outlook", tags: ["email", "profesional"] },
+                    { icon: "⚡", name: "Generador QR", desc: "Crea códigos QR para URLs, WiFi, contactos", tags: ["marketing", "compartir"] },
+                    { icon: "🔐", name: "Generador Contraseñas", desc: "Contraseñas seguras y personalizadas", tags: ["seguridad"] },
+                    { icon: "💻", name: "Validador JSON", desc: "Valida y formatea código JSON al instante", tags: ["desarrollo", "código"] },
+                    { icon: "📝", name: "Lista de Tareas", desc: "Organiza tus pendientes con prioridades", tags: ["organización"] },
+                    { icon: "🌍", name: "Conversor Horarios", desc: "Convierte horas entre zonas horarias", tags: ["internacional"] },
+                ]
+            },
+            estudio: {
+                title: "🎓 Apps para estudiar",
+                apps: [
+                    { icon: "📐", name: "Calculadora de Ecuaciones", desc: "Resuelve ecuaciones lineales y cuadráticas paso a paso", tags: ["matemáticas", "álgebra"] },
+                    { icon: "📚", name: "Creador de Flashcards", desc: "Crea y estudia con tarjetas personalizadas", tags: ["memorizar", "aprender"] },
+                    { icon: "📐", name: "Calculadora MCD y MCM", desc: "Máximo Común Divisor y Mínimo Común Múltiplo", tags: ["matemáticas"] },
+                    { icon: "🍅", name: "Temporizador Pomodoro", desc: "Gestiona tu tiempo de estudio", tags: ["tiempo", "concentración"] },
+                    { icon: "📚", name: "Generador Horarios Estudio", desc: "Planifica tu calendario de estudio", tags: ["planificar"] },
+                    { icon: "📐", name: "Calculadora Probabilidad", desc: "Probabilidades con teoría y simulaciones", tags: ["estadística"] },
+                    { icon: "⚛️", name: "Tabla Periódica", desc: "118 elementos con propiedades y masa molar", tags: ["química"] },
+                    { icon: "📐", name: "Calculadora Trigonometría", desc: "Seno, coseno, tangente y triángulos", tags: ["matemáticas"] },
+                ]
+            },
+            casa: {
+                title: "🏠 Apps para el hogar",
+                apps: [
+                    { icon: "🛒", name: "Lista de Compras", desc: "Organiza por categorías del supermercado", tags: ["compras", "organizar"] },
+                    { icon: "📅", name: "Planificador de Menú", desc: "Planifica comidas semanales equilibradas", tags: ["cocina", "salud"] },
+                    { icon: "🍳", name: "Calculadora de Cocina", desc: "Conversiones, tiempos y sustitutos", tags: ["recetas", "cocina"] },
+                    { icon: "⚡", name: "Gasto Energético", desc: "Calcula el consumo de electrodomésticos", tags: ["ahorro", "electricidad"] },
+                    { icon: "🏠", name: "Amortización Hipoteca", desc: "Calcula ahorro al amortizar anticipadamente", tags: ["hipoteca", "ahorro"] },
+                    { icon: "✋", name: "Calculadora Porciones", desc: "Mide porciones con tu mano como referencia", tags: ["cocina", "salud"] },
+                    { icon: "💰", name: "Control de Gastos", desc: "Controla ingresos y gastos mensuales", tags: ["finanzas", "presupuesto"] },
+                    { icon: "⚡", name: "Calculadora Electricidad", desc: "Ley de Ohm y análisis de circuitos", tags: ["hogar", "bricolaje"] },
+                ]
+            },
+            dinero: {
+                title: "💰 Apps para gestionar dinero",
+                apps: [
+                    { icon: "💰", name: "Simulador IRPF", desc: "Calcula tu IRPF según normativa española", tags: ["impuestos", "fiscal"] },
+                    { icon: "🧮", name: "Calculadora IVA", desc: "Añade o quita IVA al 21%, 10% o 4%", tags: ["impuestos", "facturas"] },
+                    { icon: "💰", name: "Interés Compuesto", desc: "Simula el crecimiento de tus ahorros", tags: ["ahorro", "inversión"] },
+                    { icon: "🏦", name: "Simulador Préstamos", desc: "Compara sistemas francés, alemán y americano", tags: ["préstamo", "banco"] },
+                    { icon: "💰", name: "Simulador Hipoteca", desc: "Cuadro de amortización completo", tags: ["vivienda", "banco"] },
+                    { icon: "📊", name: "Calculadora Plusvalías", desc: "IRPF de acciones, fondos y criptomonedas", tags: ["inversión", "fiscal"] },
+                    { icon: "💰", name: "Sucesiones Nacional", desc: "Impuesto de herencias por comunidad", tags: ["herencia", "fiscal"] },
+                    { icon: "💰", name: "Control de Gastos", desc: "Visualiza tus finanzas personales", tags: ["presupuesto"] },
+                ]
+            },
+            creando: {
+                title: "🎨 Apps para crear contenido",
+                apps: [
+                    { icon: "🎨", name: "Conversor de Colores", desc: "HEX, RGB, HSL, CMYK con color picker", tags: ["diseño", "colores"] },
+                    { icon: "🎨", name: "Generador Gradientes", desc: "Gradientes CSS lineales y radiales", tags: ["css", "diseño"] },
+                    { icon: "🔍", name: "Generador Meta Descripciones", desc: "SEO optimizado con vista previa Google", tags: ["seo", "contenido"] },
+                    { icon: "📄", name: "Generador Lorem Ipsum", desc: "Texto de prueba para maquetación", tags: ["diseño", "desarrollo"] },
+                    { icon: "🎨", name: "Generador Sombras", desc: "Box-shadow con presets neuromorfismo", tags: ["css", "diseño"] },
+                    { icon: "#️⃣", name: "Generador Hashtags", desc: "Hashtags para Instagram, Twitter, TikTok", tags: ["redes sociales"] },
+                    { icon: "🎨", name: "Creador Paletas", desc: "Diseña paletas de colores profesionales", tags: ["diseño", "colores"] },
+                    { icon: "💻", name: "Conversor Imágenes", desc: "JPG, PNG, WebP con compresión", tags: ["imágenes", "web"] },
+                ]
+            },
+            relax: {
+                title: "🎮 Apps para relajarte",
+                apps: [
+                    { icon: "🎮", name: "Juego Wordle", desc: "Adivina la palabra del día en español", tags: ["palabras", "diario"] },
+                    { icon: "🎮", name: "Juego Sudoku", desc: "Puzzles con diferentes dificultades", tags: ["lógica", "números"] },
+                    { icon: "📻", name: "Radio meskeIA", desc: "Miles de emisoras de todo el mundo", tags: ["música", "radio"] },
+                    { icon: "🎮", name: "Juego 2048", desc: "Combina números hasta llegar a 2048", tags: ["puzzle", "estrategia"] },
+                    { icon: "🎮", name: "Juego Memoria", desc: "Entrena tu memoria con parejas", tags: ["memoria", "cartas"] },
+                    { icon: "⌨️", name: "Test Velocidad Escritura", desc: "Mide tus palabras por minuto", tags: ["mecanografía", "reto"] },
+                    { icon: "🎮", name: "Tres en Raya", desc: "El clásico contra la computadora", tags: ["clásico"] },
+                    { icon: "🎮", name: "Puzzle Matemático", desc: "Ejercita tu mente con puzzles", tags: ["lógica", "matemáticas"] },
+                ]
+            }
+        };
+
+        let currentMomento = null;
+
+        function toggleMomento(momento) {
+            const panel = document.getElementById('apps-panel');
+            const buttons = document.querySelectorAll('.momento-btn');
+
+            // Si es el mismo momento, cerrar
+            if (currentMomento === momento) {
+                closeMomento();
+                return;
+            }
+
+            // Actualizar botón activo
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-momento="${momento}"]`).classList.add('active');
+
+            // Mostrar panel con apps
+            const data = momentosData[momento];
+            document.getElementById('panel-title').textContent = data.title;
+
+            const grid = document.getElementById('apps-grid');
+            grid.innerHTML = data.apps.map(app => `
+                <a href="#" class="app-card">
+                    <span class="app-icon">${app.icon}</span>
+                    <div class="app-info">
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-desc">${app.desc}</div>
+                        <div class="app-tags">
+                            ${app.tags.map(tag => `<span class="app-tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </a>
+            `).join('');
+
+            panel.classList.add('visible');
+            currentMomento = momento;
+
+            // Scroll suave al panel
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function closeMomento() {
+            const panel = document.getElementById('apps-panel');
+            const buttons = document.querySelectorAll('.momento-btn');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            panel.classList.remove('visible');
+            currentMomento = null;
+        }
+    </script>
+</body>
+</html>
