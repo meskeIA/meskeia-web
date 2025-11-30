@@ -8,7 +8,8 @@
  */
 
 export const implementedAppsUrls = [
-  // Finanzas y Fiscalidad (15 implementadas)
+  // Finanzas y Fiscalidad (16 implementadas)
+  "/calculadora-inflacion/",
   "/calculadora-donaciones-cataluna/",
   "/calculadora-donaciones-nacional/",
   "/calculadora-sucesiones-cataluna/",
@@ -50,7 +51,8 @@ export const implementedAppsUrls = [
   "/calculadora-algebra-abstracta/",
   "/calculadora-teoria-colas/",
 
-  // Herramientas de Productividad (10 implementadas)
+  // Herramientas de Productividad (11 implementadas)
+  "/time-tracker/",
   "/notas/",
   "/generador-contrasenas/",
   "/lista-tareas/",
@@ -146,6 +148,12 @@ export const implementedAppsUrls = [
   "/curso-emprendimiento/",
   "/curso-decisiones-inversion/",
   "/curso-nutrisalud/",
+
+  // SEO & Marketing (4 implementadas)
+  "/generador-meta-descripciones/",
+  "/analizador-densidad-seo/",
+  "/generador-palabras-clave/",
+  "/generador-hashtags/",
 ];
 
 /**

@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 111+ aplicaciones web educativas organizadas en 13 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, y Criptografía y Seguridad. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 119+ aplicaciones web educativas organizadas en 14 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, Criptografía y Seguridad, y SEO & Marketing. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 113,
+  "total_tools": 119,
   "updated": "2025-11-30",
   "features": {
     "all_free": true,
@@ -124,6 +124,13 @@
           "url": "https://meskeia.com/amortizacion-hipoteca/",
           "description": "Calcula el ahorro al amortizar tu hipoteca: reducir cuota vs reducir plazo. Comparativa y recomendación",
           "keywords": ["amortizacion anticipada", "hipoteca", "reducir cuota", "reducir plazo", "ahorro intereses", "cancelacion parcial"]
+        },
+        {
+          "name": "Calculadora de Inflación",
+          "slug": "calculadora-inflacion",
+          "url": "https://meskeia.com/calculadora-inflacion/",
+          "description": "Calcula el impacto de la inflación en tu dinero con datos del IPC español desde 1961. Compara poder adquisitivo entre años",
+          "keywords": ["inflacion", "ipc", "poder adquisitivo", "precios", "coste vida", "ine", "euros", "pesetas"]
         }
       ]
     },
@@ -404,6 +411,13 @@
           "url": "https://meskeia.com/generador-firma-email/",
           "description": "Crea firmas de email profesionales en HTML. Compatible con Gmail, Outlook, Apple Mail. Múltiples plantillas y redes sociales",
           "keywords": ["firma", "email", "html", "gmail", "outlook", "profesional", "plantilla", "correo"]
+        },
+        {
+          "name": "Time Tracker",
+          "slug": "time-tracker",
+          "url": "https://meskeia.com/time-tracker/",
+          "description": "Registra el tiempo dedicado a proyectos y clientes. Cronómetro, tarifas por hora, estadísticas y exportación CSV",
+          "keywords": ["time tracker", "control tiempo", "horas", "proyectos", "freelance", "facturacion", "cronometro", "productividad"]
         }
       ]
     },
@@ -894,6 +908,41 @@
           "url": "https://meskeia.com/codificador-base64/",
           "description": "Codifica y decodifica texto en Base64, URL encode y Hexadecimal. Soporta archivos e imágenes",
           "keywords": ["base64", "url encode", "hexadecimal", "codificar", "decodificar", "btoa", "atob"]
+        }
+      ]
+    },
+    {
+      "name": "SEO & Marketing",
+      "description": "Optimiza tu presencia online y contenido digital",
+      "icon": "🔍",
+      "tools": [
+        {
+          "name": "Generador de Meta Descripciones",
+          "slug": "generador-meta-descripciones",
+          "url": "https://meskeia.com/generador-meta-descripciones/",
+          "description": "Crea meta descripciones optimizadas para SEO con contador de caracteres, vista previa SERP de Google y código HTML",
+          "keywords": ["meta descripcion", "seo", "serp", "google", "snippet", "ctr", "posicionamiento"]
+        },
+        {
+          "name": "Analizador de Densidad SEO",
+          "slug": "analizador-densidad-seo",
+          "url": "https://meskeia.com/analizador-densidad-seo/",
+          "description": "Analiza la densidad de palabras clave en tu texto. Detecta keyword stuffing, bigramas y trigramas relevantes",
+          "keywords": ["densidad", "keyword", "seo", "analisis", "palabras clave", "stuffing", "frecuencia"]
+        },
+        {
+          "name": "Generador de Palabras Clave",
+          "slug": "generador-palabras-clave",
+          "url": "https://meskeia.com/generador-palabras-clave/",
+          "description": "Genera ideas de palabras clave SEO a partir de una semilla. Preguntas, comparativas, comerciales e informacionales",
+          "keywords": ["palabras clave", "keywords", "seo", "long tail", "generador", "ideas", "semilla"]
+        },
+        {
+          "name": "Generador de Hashtags",
+          "slug": "generador-hashtags",
+          "url": "https://meskeia.com/generador-hashtags/",
+          "description": "Genera hashtags relevantes para Instagram, TikTok, Twitter y LinkedIn. Nichos populares y recomendaciones por plataforma",
+          "keywords": ["hashtags", "instagram", "tiktok", "twitter", "linkedin", "redes sociales", "engagement"]
         }
       ]
     }

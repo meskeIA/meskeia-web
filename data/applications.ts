@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 112 aplicaciones organizadas por 13 categorías
+ * Total: 118 aplicaciones organizadas por 14 categorías
  * Actualizado: 2025-11-29
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
@@ -41,6 +41,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora Plusvalías IRPF", category: "Finanzas y Fiscalidad", icon: "📊", description: "Calcula el IRPF de tus inversiones: plusvalías de acciones, fondos, criptomonedas, dividendos e intereses con tramos 2025", url: "/calculadora-plusvalias-irpf/", keywords: ["plusvalias", "irpf", "capital mobiliario", "dividendos", "acciones", "criptomonedas", "fondos", "tramos ahorro"] },
   { name: "Simulador de Préstamos", category: "Finanzas y Fiscalidad", icon: "🏦", description: "Compara sistemas de amortización: francés, alemán y americano. Cuadro completo, TAE vs TIN y comisiones", url: "/simulador-prestamos/", keywords: ["prestamo", "amortizacion", "frances", "aleman", "americano", "cuota", "TAE", "TIN", "interes"] },
   { name: "Amortización Anticipada Hipoteca", category: "Finanzas y Fiscalidad", icon: "🏠", description: "Calcula el ahorro al amortizar tu hipoteca: reducir cuota vs reducir plazo. Comparativa y recomendación", url: "/amortizacion-hipoteca/", keywords: ["amortizacion anticipada", "hipoteca", "reducir cuota", "reducir plazo", "ahorro intereses", "cancelacion parcial"] },
+  { name: "Calculadora de Inflación", category: "Finanzas y Fiscalidad", icon: "📈", description: "Calcula cómo la inflación afecta tu dinero. Poder adquisitivo histórico con datos del INE desde 1961", url: "/calculadora-inflacion/", keywords: ["inflacion", "ipc", "poder adquisitivo", "ine", "precios", "coste vida", "devaluacion"] },
 
   // Calculadoras y Utilidades (11)
   { name: "Calculadora de Propinas", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calcula propinas y divide la cuenta entre varias personas fácilmente", url: "/calculadora-propinas/", keywords: ["propina", "cuenta", "dividir", "restaurante", "porcentaje"] },
@@ -86,6 +87,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Códigos QR", category: "Herramientas de Productividad", icon: "⚡", description: "Crea códigos QR para URLs, texto, WiFi, contactos vCard, email y teléfono", url: "/generador-qr/", keywords: ["qr", "codigo", "generar", "escanear", "wifi", "vcard"] },
   { name: "Generador de Códigos de Barras", category: "Herramientas de Productividad", icon: "⚡", description: "Genera códigos de barras EAN-13, EAN-8, UPC-A, Code128 y Code39", url: "/generador-codigos-barras/", keywords: ["codigo barras", "ean13", "ean8", "code128", "upc", "barcode", "generar barras", "etiquetas productos", "inventario"] },
   { name: "Generador de Firmas Email", category: "Herramientas de Productividad", icon: "✉️", description: "Crea firmas de email profesionales en HTML. Compatible con Gmail, Outlook, Apple Mail. Múltiples plantillas y redes sociales", url: "/generador-firma-email/", keywords: ["firma", "email", "html", "gmail", "outlook", "profesional", "plantilla", "correo"] },
+  { name: "Time Tracker", category: "Herramientas de Productividad", icon: "⏱️", description: "Registra tiempo por proyecto y cliente. Informes de horas trabajadas, exportación y tarifa por hora para freelancers", url: "/time-tracker/", keywords: ["time tracker", "horas", "proyecto", "cliente", "freelance", "registro tiempo", "facturacion"] },
 
   // Juegos y Entretenimiento (9)
   { name: "Test de Velocidad de Escritura", category: "Juegos y Entretenimiento", icon: "⌨️", description: "Mide tu velocidad de escritura en palabras por minuto (PPM) y mejora tu mecanografía con textos en español", url: "/test-velocidad-escritura/", keywords: ["mecanografia", "velocidad", "escritura", "ppm", "palabras por minuto", "typing test", "teclado"] },
@@ -162,6 +164,12 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora ROI Marketing", category: "Emprendimiento y Negocios", icon: "💼", description: "Calcula el ROI por canal de marketing (Google Ads, Facebook, email, SEO). Analiza CAC, CLV y optimiza tu inversión publicitaria", url: "/calculadora-roi-marketing/", keywords: ["roi", "marketing", "publicidad", "cac", "clv", "ads"] },
   { name: "Generador de Nombres", category: "Emprendimiento y Negocios", icon: "💼", description: "Genera nombres creativos para tu empresa por sectores. Enlaces directos para verificar disponibilidad y registrar dominios .com, .es", url: "/generador-nombres-empresa/", keywords: ["nombre", "empresa", "marca", "branding", "dominio", "startup"] },
   { name: "Simulador Gastos Deducibles", category: "Emprendimiento y Negocios", icon: "💼", description: "Calcula tu ahorro fiscal con gastos deducibles. Descubre qué gastos puedes deducir (100%, 50%, 30%) y optimiza tu declaración de IRPF e IVA", url: "/simulador-gastos-deducibles/", keywords: ["gastos deducibles", "autonomo", "irpf", "iva", "hacienda", "deduccion"] },
+
+  // SEO & Marketing (4)
+  { name: "Generador de Meta Descripciones", category: "SEO & Marketing", icon: "🔍", description: "Genera meta descripciones optimizadas para SEO con contador de caracteres y vista previa de Google. Mejora tu CTR", url: "/generador-meta-descripciones/", keywords: ["meta description", "seo", "google", "serp", "ctr", "snippet", "descripcion"] },
+  { name: "Analizador de Densidad SEO", category: "SEO & Marketing", icon: "📊", description: "Analiza la densidad de palabras clave en tu texto. Detecta sobreoptimización y sugiere mejoras para SEO on-page", url: "/analizador-densidad-seo/", keywords: ["densidad", "keywords", "seo", "palabras clave", "optimizacion", "on-page"] },
+  { name: "Generador de Palabras Clave", category: "SEO & Marketing", icon: "🔑", description: "Genera ideas de palabras clave long-tail a partir de una semilla. Variaciones, preguntas y sugerencias por categoría", url: "/generador-palabras-clave/", keywords: ["palabras clave", "keywords", "seo", "long tail", "semrush", "ideas", "contenido"] },
+  { name: "Generador de Hashtags", category: "SEO & Marketing", icon: "#️⃣", description: "Genera hashtags relevantes para Instagram, Twitter, TikTok y LinkedIn. Categorías por nicho y tendencias", url: "/generador-hashtags/", keywords: ["hashtags", "instagram", "twitter", "tiktok", "redes sociales", "trending", "viral"] },
 ];
 
 export const categories = [
@@ -242,5 +250,11 @@ export const categories = [
     name: 'Criptografía y Seguridad',
     icon: '🔐',
     description: 'Cifrado de textos y verificación de datos'
+  },
+  {
+    id: 'seo-marketing',
+    name: 'SEO & Marketing',
+    icon: '🔍',
+    description: 'Optimiza tu presencia online y contenido digital'
   },
 ];
