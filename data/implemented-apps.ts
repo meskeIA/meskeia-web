@@ -49,11 +49,12 @@ export const implementedAppsUrls = [
   "/calculadora-algebra-abstracta/",
   "/calculadora-teoria-colas/",
 
-  // Herramientas de Productividad (9 implementadas)
+  // Herramientas de Productividad (10 implementadas)
   "/notas/",
   "/generador-contrasenas/",
   "/lista-tareas/",
   "/cronometro/",
+  "/temporizador-pomodoro/",       // Técnica Pomodoro con estadísticas
   "/conversor-horarios/",
   "/generador-qr/",
   "/generador-codigos-barras/",

@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 111+ aplicaciones web educativas organizadas en 13 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, y Criptografía y Seguridad. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 111,
-  "updated": "2025-11-29",
+  "total_tools": 112,
+  "updated": "2025-11-30",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -347,7 +347,14 @@
           "slug": "cronometro",
           "url": "https://meskeia.com/cronometro/",
           "description": "Cronómetro con vueltas y temporizador con cuenta regresiva y alarma sonora",
-          "keywords": ["cronometro", "temporizador", "pomodoro", "stopwatch", "timer", "alarma"]
+          "keywords": ["cronometro", "temporizador", "stopwatch", "timer", "alarma"]
+        },
+        {
+          "name": "Temporizador Pomodoro",
+          "slug": "temporizador-pomodoro",
+          "url": "https://meskeia.com/temporizador-pomodoro/",
+          "description": "Técnica Pomodoro con sesiones configurables, estadísticas de productividad y sonidos. Mejora tu concentración",
+          "keywords": ["pomodoro", "productividad", "concentracion", "tecnica pomodoro", "timer", "enfoque", "trabajo", "estudio"]
         },
         {
           "name": "Conversor de Horarios",
