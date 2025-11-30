@@ -351,7 +351,7 @@ export default function PlanificacionPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>🎓 Felicidades:</strong> Has completado NutriSalud. Ahora tienes
+              <strong>🎓 Felicidades:</strong> Has completado el Curso de Nutrición. Ahora tienes
               los conocimientos para tomar decisiones alimentarias informadas.
               Recuerda: el mejor plan es el que puedes mantener. La perfección
               no existe, pero la mejora continua sí. ¡Buen viaje nutricional!

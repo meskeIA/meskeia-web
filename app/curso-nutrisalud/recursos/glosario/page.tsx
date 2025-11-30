@@ -321,7 +321,7 @@ export default function GlosarioPage() {
         <span className={styles.heroIcon}>📖</span>
         <h1 className={styles.title}>Glosario Nutricional</h1>
         <p className={styles.subtitle}>
-          Términos clave del curso NutriSalud ordenados alfabéticamente
+          Términos clave del Curso de Nutrición ordenados alfabéticamente
         </p>
       </header>
 

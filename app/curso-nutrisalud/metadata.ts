@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'NutriSalud - Nutrición Avanzada Basada en Ciencia | meskeIA',
+  title: 'Curso de Nutrición - Nutrición Avanzada Basada en Ciencia | meskeIA',
   description: 'Descubre la diferencia entre comer y nutrirse con conocimiento nutricional avanzado basado en ciencia. Fundamentos, interacciones alimentarias, efectos en órganos y aplicación práctica.',
   keywords: 'nutrición avanzada, alimentación saludable, macronutrientes, micronutrientes, biodisponibilidad, interacciones alimentarias, nutrición científica, educación nutricional, meskeIA',
   authors: [{ name: 'meskeIA' }],
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'NutriSalud - Nutrición Avanzada Basada en Ciencia',
+    title: 'Curso de Nutrición - Nutrición Avanzada Basada en Ciencia',
     description: 'Conocimiento nutricional avanzado basado en ciencia. Más allá de los consejos básicos que ya conoces.',
     url: 'https://meskeia.com/curso-nutrisalud',
     siteName: 'meskeIA',
@@ -18,10 +18,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NutriSalud - Nutrición Avanzada Basada en Ciencia',
+    title: 'Curso de Nutrición - Nutrición Avanzada Basada en Ciencia',
     description: 'Conocimiento nutricional avanzado basado en ciencia. Más allá de los consejos básicos que ya conoces.',
   },
   other: {
-    'application-name': 'NutriSalud - meskeIA',
+    'application-name': 'Curso de Nutrición - meskeIA',
   },
 };

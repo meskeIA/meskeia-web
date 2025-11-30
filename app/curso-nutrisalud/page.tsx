@@ -36,7 +36,7 @@ function ConsentModal() {
           <span className={styles.consentIcon}>🩺</span>
           <h2 className={styles.consentTitle}>Antes de continuar</h2>
           <p className={styles.consentSubtitle}>
-            Información importante sobre el contenido de NutriSalud
+            Información importante sobre el Curso de Nutrición
           </p>
         </div>
 
@@ -44,7 +44,7 @@ function ConsentModal() {
           <div className={styles.importantNotice}>
             <h3>⚠️ Aviso Médico Importante</h3>
             <p>
-              NutriSalud es una herramienta educativa e informativa que proporciona
+              Este Curso de Nutrición es una herramienta educativa e informativa que proporciona
               conocimiento nutricional basado en literatura científica. El contenido
               está diseñado para fines de educación general y culturización sobre
               nutrición.
@@ -153,7 +153,7 @@ function MedicalDisclaimer() {
     <div className={styles.medicalDisclaimer}>
       <span className={styles.disclaimerIcon}>ℹ️</span>
       <p className={styles.disclaimerText}>
-        <strong>Recordatorio:</strong> NutriSalud es una herramienta educativa.
+        <strong>Recordatorio:</strong> Este curso es una herramienta educativa.
         El contenido no sustituye el consejo médico profesional. Consulta siempre
         con profesionales de la salud antes de realizar cambios en tu alimentación.
       </p>
@@ -188,7 +188,7 @@ export default function CursoNutrisaludPage() {
       {/* Hero Section */}
       <header className={styles.hero}>
         <span className={styles.heroIcon}>🥗</span>
-        <h1 className={styles.title}>NutriSalud</h1>
+        <h1 className={styles.title}>Curso de Nutrición</h1>
         <p className={styles.subtitle}>
           Conocimiento nutricional avanzado basado en ciencia.
           Más allá de los consejos básicos que ya conoces.
