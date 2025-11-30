@@ -25,7 +25,7 @@ export const implementedAppsUrls = [
   "/calculadora-inversiones/",
   "/test-perfil-inversor/",
 
-  // Calculadoras y Utilidades (10 implementadas)
+  // Calculadoras y Utilidades (11 implementadas)
   "/calculadora-propinas/",
   "/calculadora-iva/",
   "/calculadora-descuentos/",
@@ -35,6 +35,7 @@ export const implementedAppsUrls = [
   "/calculadora-cocina/",
   "/lista-compras/",
   "/conversor-tallas/",
+  "/calculadora-gasto-energetico/",
 
   // Matemáticas y Estadística (11 implementadas)
   "/algebra-ecuaciones/",            // Calculadora de Ecuaciones

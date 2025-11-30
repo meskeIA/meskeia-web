@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 111+ aplicaciones web educativas organizadas en 13 categorías: Finanzas y Fiscalidad, Calculadoras y Utilidades, Matemáticas y Estadística, Física y Química, Herramientas de Productividad, Creatividad y Diseño, Juegos y Entretenimiento, Campus Digital, Salud & Bienestar, Herramientas Web y Tecnología, Texto y Documentos, Emprendimiento y Negocios, y Criptografía y Seguridad. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 112,
+  "total_tools": 113,
   "updated": "2025-11-30",
   "features": {
     "all_free": true,
@@ -194,6 +194,13 @@
           "url": "https://meskeia.com/lista-compras/",
           "description": "Lista de compras con organización automática por categorías del supermercado, guardado local y exportación",
           "keywords": ["lista", "compras", "supermercado", "shopping", "productos", "mercado", "groceries", "organizar"]
+        },
+        {
+          "name": "Calculadora de Gasto Energético",
+          "slug": "calculadora-gasto-energetico",
+          "url": "https://meskeia.com/calculadora-gasto-energetico/",
+          "description": "Calcula el consumo eléctrico de tus electrodomésticos y el coste mensual en tu factura de luz. Precios PVPC y mercado libre",
+          "keywords": ["gasto energetico", "consumo electrico", "factura luz", "electrodomesticos", "kwh", "pvpc", "ahorro energia", "precio electricidad"]
         },
         {
           "name": "Conversor de Unidades",

@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 111 aplicaciones organizadas por 13 categorías
+ * Total: 112 aplicaciones organizadas por 13 categorías
  * Actualizado: 2025-11-29
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
@@ -42,7 +42,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Simulador de Préstamos", category: "Finanzas y Fiscalidad", icon: "🏦", description: "Compara sistemas de amortización: francés, alemán y americano. Cuadro completo, TAE vs TIN y comisiones", url: "/simulador-prestamos/", keywords: ["prestamo", "amortizacion", "frances", "aleman", "americano", "cuota", "TAE", "TIN", "interes"] },
   { name: "Amortización Anticipada Hipoteca", category: "Finanzas y Fiscalidad", icon: "🏠", description: "Calcula el ahorro al amortizar tu hipoteca: reducir cuota vs reducir plazo. Comparativa y recomendación", url: "/amortizacion-hipoteca/", keywords: ["amortizacion anticipada", "hipoteca", "reducir cuota", "reducir plazo", "ahorro intereses", "cancelacion parcial"] },
 
-  // Calculadoras y Utilidades (10)
+  // Calculadoras y Utilidades (11)
   { name: "Calculadora de Propinas", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calcula propinas y divide la cuenta entre varias personas fácilmente", url: "/calculadora-propinas/", keywords: ["propina", "cuenta", "dividir", "restaurante", "porcentaje"] },
   { name: "Calculadora de IVA", category: "Calculadoras y Utilidades", icon: "🧮", description: "Calcula el IVA español: añade o quita IVA al 21%, 10% o 4% con un clic", url: "/calculadora-iva/", keywords: ["iva", "impuesto", "base imponible", "21%", "10%", "4%", "fiscal"] },
   { name: "Calculadora de Descuentos", category: "Calculadoras y Utilidades", icon: "🏷️", description: "Calcula el precio final con descuento y cuánto ahorras. Soporta descuentos encadenados", url: "/calculadora-descuentos/", keywords: ["descuento", "rebaja", "oferta", "ahorro", "black friday", "rebajas"] },
@@ -52,6 +52,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Conversor de Tallas", category: "Calculadoras y Utilidades", icon: "🧮", description: "Convierte tallas de ropa y calzado entre sistemas EU, UK, US", url: "/conversor-tallas/", keywords: ["talla", "ropa", "zapatos", "conversion", "medida"] },
   { name: "Calculadora de Cocina", category: "Calculadoras y Utilidades", icon: "🍳", description: "Conversor de unidades de cocina, escalador de recetas, tiempos de cocción y sustitutos de ingredientes", url: "/calculadora-cocina/", keywords: ["cocina", "recetas", "conversor", "tazas", "gramos", "temperatura", "horno", "tiempo", "coccion", "ingredientes", "sustitutos"] },
   { name: "Lista de Compras", category: "Calculadoras y Utilidades", icon: "🛒", description: "Lista de compras con organización automática por categorías del supermercado, guardado local y exportación", url: "/lista-compras/", keywords: ["lista", "compras", "supermercado", "shopping", "productos", "mercado", "groceries", "organizar", "categorias", "offline"] },
+  { name: "Calculadora de Gasto Energético", category: "Calculadoras y Utilidades", icon: "⚡", description: "Calcula el consumo eléctrico de tus electrodomésticos y el coste mensual en tu factura de luz. Precios PVPC y mercado libre", url: "/calculadora-gasto-energetico/", keywords: ["gasto energetico", "consumo electrico", "factura luz", "electrodomesticos", "kwh", "pvpc", "ahorro energia", "precio electricidad", "potencia contratada"] },
 
   // Matemáticas y Estadística (11)
   { name: "Calculadora de Probabilidad", category: "Matemáticas y Estadística", icon: "📐", description: "Calculadora completa de probabilidades con teoría y simulaciones", url: "/calculadora-probabilidad/", keywords: ["probabilidad", "estadistica", "azar", "combinatoria", "permutaciones"] },
