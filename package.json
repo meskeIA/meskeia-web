@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "npx playwright test",
+    "test:unit": "npx playwright test tests/formatters.spec.ts",
     "generate:llm-index": "node scripts/generate-llm-index.js"
   },
   "dependencies": {
