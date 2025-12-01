@@ -95,13 +95,13 @@
 .tablero {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
   gap: 10px;
   padding: 10px;
   background: #bbada0;
   border-radius: 12px;
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1;
+  width: 400px;
+  height: 400px;
 }
 
 .tile {
@@ -274,6 +274,8 @@
   }
 
   .tablero {
+    width: 320px;
+    height: 320px;
     gap: 8px;
     padding: 8px;
   }

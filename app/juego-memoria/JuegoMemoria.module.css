@@ -62,13 +62,13 @@
 }
 
 .dificultadBtn:hover {
-  border-color: #EC4899;
+  border-color: #2E86AB;
 }
 
 .dificultadBtn.active {
-  border-color: #EC4899;
-  background: rgba(236, 72, 153, 0.1);
-  color: #EC4899;
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+  color: #2E86AB;
 }
 
 .stats {
@@ -148,7 +148,7 @@
 }
 
 .cartaFront {
-  background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
   color: white;
   border: 2px solid transparent;
 }
@@ -243,7 +243,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -251,7 +251,7 @@
 
 .playAgainBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
+  box-shadow: 0 8px 20px rgba(46, 134, 171, 0.3);
 }
 
 /* Responsive */
