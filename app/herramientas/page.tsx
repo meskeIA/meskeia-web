@@ -11,9 +11,11 @@ import styles from './page.module.css';
 export default function HerramientasPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // Filtrar solo apps implementadas
+  // Filtrar solo apps implementadas y ordenar alfabéticamente
   const implementedApps = useMemo(() =>
-    applicationsDatabase.filter(app => isAppImplemented(app.url)),
+    applicationsDatabase
+      .filter(app => isAppImplemented(app.url))
+      .sort((a, b) => a.name.localeCompare(b.name, 'es')),
     []
   );
 
@@ -21,6 +23,7 @@ export default function HerramientasPage() {
     return implementedApps.filter(app => app.category === categoryName);
   };
 
+  // Las apps ya están ordenadas desde implementedApps
   const filteredApps = selectedCategory === 'all'
     ? implementedApps
     : implementedApps.filter(app => app.category === selectedCategory);

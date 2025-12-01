@@ -1,0 +1,392 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  padding: 35px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 25px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Main Content */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+/* Input Panel */
+.inputPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+}
+
+.panelTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+
+/* Input Groups */
+.inputGroup {
+  margin-bottom: 15px;
+}
+
+.textarea {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  resize: vertical;
+  min-height: 150px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #2E86AB;
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.1);
+}
+
+.textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Ejemplos */
+.ejemplos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.ejemplosLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.ejemploBtn {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ejemploBtn:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+/* Botones */
+.botones {
+  display: flex;
+  gap: 10px;
+}
+
+.btnPrimary {
+  flex: 2;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+.btnSecondary {
+  flex: 1;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSecondary:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+/* Results Panel */
+.resultsPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+}
+
+/* Resumen */
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.resumenItem {
+  text-align: center;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border-radius: 10px;
+}
+
+.resumenValor {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2E86AB;
+}
+
+.resumenLabel {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Palabras Lista */
+.palabrasLista h3 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+}
+
+.palabrasGrid {
+  display: grid;
+  gap: 10px;
+  max-height: 350px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.palabraCard {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 15px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+}
+
+.palabraOriginal {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.palabraSilabas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.silaba {
+  background: #2E86AB;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.separador {
+  color: var(--text-muted);
+  margin: 0 2px;
+  display: none;
+}
+
+.palabraTotal {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Placeholder */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 350px;
+  color: var(--text-muted);
+}
+
+.placeholderIcon {
+  font-size: 4rem;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.placeholder p {
+  font-size: 1rem;
+}
+
+/* Reglas */
+.reglas {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.reglas h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.reglasGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.reglaCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.reglaCard h4 {
+  font-size: 0.95rem;
+  color: #2E86AB;
+  margin-bottom: 8px;
+}
+
+.reglaCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.reglaCard em {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Dark mode */
+[data-theme='dark'] .inputPanel,
+[data-theme='dark'] .resultsPanel,
+[data-theme='dark'] .reglas {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .palabraCard,
+[data-theme='dark'] .reglaCard {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .silaba {
+  background: #48A9A6;
+}
+
+/* Scrollbar personalizado */
+.palabrasGrid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.palabrasGrid::-webkit-scrollbar-track {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.palabrasGrid::-webkit-scrollbar-thumb {
+  background: #2E86AB;
+  border-radius: 3px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 25px 20px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .botones {
+    flex-direction: column;
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    flex: none;
+  }
+
+  .resumen {
+    grid-template-columns: 1fr;
+  }
+
+  .palabraCard {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .reglasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resumenValor {
+    font-size: 1.6rem;
+  }
+}

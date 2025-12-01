@@ -4,7 +4,7 @@
  * IMPORTANTE: Esta lista debe coincidir con las carpetas en app/
  * Solo añadir URLs cuando la app esté realmente creada
  *
- * Actualizado: 2025-11-30
+ * Actualizado: 2025-12-01
  */
 
 export const implementedAppsUrls = [
@@ -26,7 +26,7 @@ export const implementedAppsUrls = [
   "/calculadora-inversiones/",
   "/test-perfil-inversor/",
 
-  // Calculadoras y Utilidades (11 implementadas)
+  // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",
   "/calculadora-iva/",
   "/calculadora-descuentos/",
@@ -37,6 +37,9 @@ export const implementedAppsUrls = [
   "/lista-compras/",
   "/conversor-tallas/",
   "/calculadora-gasto-energetico/",
+  "/calculadora-pintura/",           // Calcular litros de pintura
+  "/calculadora-combustible/",       // Consumo L/100km y coste viajes
+  "/calculadora-edad-mascotas/",     // Edad perros/gatos en años humanos
 
   // Matemáticas y Estadística (11 implementadas)
   "/algebra-ecuaciones/",            // Calculadora de Ecuaciones
@@ -51,7 +54,7 @@ export const implementedAppsUrls = [
   "/calculadora-algebra-abstracta/",
   "/calculadora-teoria-colas/",
 
-  // Herramientas de Productividad (11 implementadas)
+  // Herramientas de Productividad (12 implementadas)
   "/time-tracker/",
   "/notas/",
   "/generador-contrasenas/",
@@ -63,8 +66,9 @@ export const implementedAppsUrls = [
   "/generador-codigos-barras/",
   "/informacion-tiempo/",
   "/generador-firma-email/",
+  "/lista-equipaje/",              // Checklist personalizado de viaje
 
-  // Texto y Documentos (12 implementadas)
+  // Texto y Documentos (13 implementadas)
   "/contador-palabras/",
   "/conversor-texto/",
   "/limpiador-texto/",
@@ -77,6 +81,7 @@ export const implementedAppsUrls = [
   "/conversor-braille/",
   "/generador-anagramas/",
   "/generador-lorem-ipsum/",    // Generador de texto de prueba
+  "/contador-silabas/",         // Separar y contar sílabas en español
 
   // Criptografía y Seguridad (7 implementadas)
   "/cifrado-clasico/",          // César + ROT13 + Atbash
@@ -98,7 +103,7 @@ export const implementedAppsUrls = [
   "/juego-puzzle-matematico/",
   "/radio-meskeia/",
 
-  // Salud y Bienestar (9 implementadas)
+  // Salud y Bienestar (11 implementadas)
   "/calculadora-imc/",
   "/calculadora-calorias-ejercicio/",
   "/calculadora-hidratacion/",
@@ -108,6 +113,8 @@ export const implementedAppsUrls = [
   "/planificador-menu/",
   "/calculadora-porciones/",
   "/test-habitos/",
+  "/calculadora-fecha-parto/",       // Fecha probable de parto y semanas gestación
+  "/calculadora-percentiles/",       // Percentiles peso/talla infantil OMS
 
   // Herramientas Web y Tecnología (6 implementadas)
   "/validador-json/",

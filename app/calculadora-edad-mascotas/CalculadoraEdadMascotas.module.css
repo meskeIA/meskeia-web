@@ -1,0 +1,485 @@
+.container {
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  padding: 35px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 25px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Main Content */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+/* Input Panel */
+.inputPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+}
+
+/* Mascota Selector */
+.mascotaSelector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.mascotaBtn {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mascotaBtn:hover {
+  border-color: #2E86AB;
+}
+
+.mascotaBtn.active {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+  color: #2E86AB;
+  font-weight: 600;
+}
+
+/* Input Groups */
+.inputGroup {
+  margin-bottom: 20px;
+}
+
+.inputGroup > label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+/* Tamaño Grid */
+.tamanoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.tamanoBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tamanoBtn:hover {
+  border-color: #2E86AB;
+}
+
+.tamanoBtn.active {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.tamanoIcon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.tamanoNombre {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tamanoPeso {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Input con unidad */
+.inputConUnidad {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.input {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 1.1rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #2E86AB;
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.1);
+}
+
+.unidad {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.hint {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* Botones */
+.botones {
+  display: flex;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.btnPrimary {
+  flex: 2;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+.btnSecondary {
+  flex: 1;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSecondary:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+/* Results Panel */
+.resultsPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+}
+
+/* Resultado Principal */
+.resultadoPrincipal {
+  text-align: center;
+  padding: 25px 20px;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.resultadoIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.resultadoValor {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2E86AB;
+}
+
+.resultadoLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+
+/* Etapa de Vida */
+.etapaVida {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.etapaTitulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.etapaEmoji {
+  font-size: 1.3rem;
+}
+
+.etapaDescripcion {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Comparación */
+.comparacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.comparacionItem {
+  text-align: center;
+}
+
+.comparacionIcono {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.comparacionEdad {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.comparacionLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.comparacionIgual {
+  font-size: 1.5rem;
+  color: #2E86AB;
+  font-weight: bold;
+}
+
+/* Info Adicional */
+.infoAdicional {
+  background: rgba(46, 134, 171, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.infoAdicional h4 {
+  font-size: 0.9rem;
+  color: #2E86AB;
+  margin-bottom: 8px;
+}
+
+.infoAdicional p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Placeholder */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 350px;
+  color: var(--text-muted);
+}
+
+.placeholderIcon {
+  font-size: 4rem;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.placeholder p {
+  font-size: 1rem;
+}
+
+/* Tabla de Referencia */
+.tablaReferencia {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.tablaReferencia h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.tablasGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.tablaCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.tablaCard h4 {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.tablaCard table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tablaCard th,
+.tablaCard td {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.tablaCard th {
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+}
+
+.tablaCard td {
+  color: var(--text-primary);
+}
+
+.tablaCard tr:not(:last-child) td {
+  border-bottom: 1px solid var(--border);
+}
+
+/* Dark mode */
+[data-theme='dark'] .inputPanel,
+[data-theme='dark'] .resultsPanel,
+[data-theme='dark'] .tablaReferencia {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .etapaVida,
+[data-theme='dark'] .comparacion,
+[data-theme='dark'] .tablaCard {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .infoAdicional {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 25px 20px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .mascotaSelector {
+    flex-direction: column;
+  }
+
+  .tamanoGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .botones {
+    flex-direction: column;
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    flex: none;
+  }
+
+  .comparacion {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .comparacionIgual {
+    transform: rotate(90deg);
+  }
+
+  .tablasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resultadoValor {
+    font-size: 1.6rem;
+  }
+}

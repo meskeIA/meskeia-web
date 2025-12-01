@@ -21,18 +21,20 @@ export default function Home() {
     setSelectedMoment(selectedMoment === momentId ? null : momentId);
   };
 
-  // Filtrar solo apps implementadas
+  // Filtrar solo apps implementadas y ordenar alfabéticamente
   const getAppsByCategory = (categoryName: string) => {
     return applicationsDatabase
       .filter(app => app.category === categoryName)
-      .filter(app => isAppImplemented(app.url));
+      .filter(app => isAppImplemented(app.url))
+      .sort((a, b) => a.name.localeCompare(b.name, 'es'));
   };
 
-  // Obtener apps por momento (solo implementadas)
+  // Obtener apps por momento (solo implementadas) y ordenar alfabéticamente
   const getAppsByMoment = (momentId: MomentType) => {
     return applicationsDatabase
       .filter(app => app.contexts?.includes(momentId))
-      .filter(app => isAppImplemented(app.url));
+      .filter(app => isAppImplemented(app.url))
+      .sort((a, b) => a.name.localeCompare(b.name, 'es'));
   };
 
   // Contar apps por momento (solo implementadas)

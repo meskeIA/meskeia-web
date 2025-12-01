@@ -1,7 +1,7 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 122 aplicaciones organizadas por 12 categorías + 7 momentos
- * Actualizado: 2025-11-30
+ * Total: 129 aplicaciones organizadas por 12 categorías + 7 momentos
+ * Actualizado: 2025-12-01
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
  * - calculadora-: Apps que calculan/resuelven
@@ -96,6 +96,9 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora de Cocina", category: "Calculadoras Prácticas", contexts: ["casa"], icon: "🍳", description: "Conversor de unidades de cocina, escalador de recetas, tiempos de cocción y sustitutos de ingredientes", url: "/calculadora-cocina/", keywords: ["cocina", "recetas", "conversor", "tazas", "gramos", "temperatura", "horno", "tiempo", "coccion", "ingredientes", "sustitutos"] },
   { name: "Lista de Compras", category: "Calculadoras Prácticas", contexts: ["casa"], icon: "🛒", description: "Lista de compras con organización automática por categorías del supermercado, guardado local y exportación", url: "/lista-compras/", keywords: ["lista", "compras", "supermercado", "shopping", "productos", "mercado", "groceries", "organizar", "categorias", "offline"] },
   { name: "Calculadora de Gasto Energético", category: "Calculadoras Prácticas", contexts: ["casa", "dinero"], icon: "⚡", description: "Calcula el consumo eléctrico de tus electrodomésticos y el coste mensual en tu factura de luz. Precios PVPC y mercado libre", url: "/calculadora-gasto-energetico/", keywords: ["gasto energetico", "consumo electrico", "factura luz", "electrodomesticos", "kwh", "pvpc", "ahorro energia", "precio electricidad", "potencia contratada"] },
+  { name: "Calculadora de Pintura", category: "Calculadoras Prácticas", contexts: ["casa"], icon: "🎨", description: "Calcula cuánta pintura necesitas para pintar paredes y techos. Estimación de botes y coste según tipo de superficie", url: "/calculadora-pintura/", keywords: ["pintura", "paredes", "litros", "metros cuadrados", "botes", "superficie", "habitacion", "pintar"] },
+  { name: "Calculadora Consumo Combustible", category: "Calculadoras Prácticas", contexts: ["casa", "dinero"], icon: "⛽", description: "Calcula el consumo de combustible de tu vehículo en L/100km y el coste de tus viajes", url: "/calculadora-combustible/", keywords: ["combustible", "gasolina", "diesel", "consumo", "litros", "kilometros", "coche", "viaje"] },
+  { name: "Calculadora Edad Mascotas", category: "Calculadoras Prácticas", contexts: ["casa", "curiosidad"], icon: "🐾", description: "Calcula la edad de tu perro o gato en años humanos según su tamaño. Fórmula científica actualizada", url: "/calculadora-edad-mascotas/", keywords: ["edad perro", "edad gato", "años humanos", "mascota", "veterinario", "perros", "gatos"] },
 
   // ============================================
   // 2. Criptografía y Seguridad (7)
@@ -222,6 +225,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Firmas Email", category: "Productividad", contexts: ["trabajo"], icon: "✉️", description: "Crea firmas de email profesionales en HTML. Compatible con Gmail, Outlook, Apple Mail. Múltiples plantillas y redes sociales", url: "/generador-firma-email/", keywords: ["firma", "email", "html", "gmail", "outlook", "profesional", "plantilla", "correo"] },
   { name: "Time Tracker", category: "Productividad", contexts: ["trabajo"], icon: "⏱️", description: "Registra tiempo por proyecto y cliente. Informes de horas trabajadas, exportación y tarifa por hora para freelancers", url: "/time-tracker/", keywords: ["time tracker", "horas", "proyecto", "cliente", "freelance", "registro tiempo", "facturacion"] },
   { name: "Conversor de Unidades", category: "Productividad", contexts: ["estudio", "casa", "trabajo"], icon: "🧪", description: "Conversor científico avanzado: 13 categorías incluyendo química, presión, energía, fuerza y potencia", url: "/conversor-unidades/", keywords: ["conversion", "unidades", "medidas", "fisica", "quimica"] },
+  { name: "Lista de Equipaje", category: "Productividad", contexts: ["casa", "curiosidad"], icon: "🧳", description: "Genera una lista de equipaje personalizada según tipo de viaje, clima y duración. Checklist interactivo", url: "/lista-equipaje/", keywords: ["equipaje", "maleta", "viaje", "checklist", "vacaciones", "viajar", "empacar"] },
 
   // ============================================
   // 11. Salud y Bienestar (9)
@@ -235,6 +239,8 @@ export const applicationsDatabase: Application[] = [
   { name: "Planificador de Menú Semanal", category: "Salud y Bienestar", contexts: ["casa"], icon: "📅", description: "Planifica tu menú semanal de forma equilibrada con sugerencias mediterráneas y consejos de compra", url: "/planificador-menu/", keywords: ["menu", "semanal", "planificar", "comidas", "dieta", "mediterranea", "batch cooking"] },
   { name: "Calculadora de Porciones", category: "Salud y Bienestar", contexts: ["casa"], icon: "✋", description: "Aprende a medir porciones de alimentos usando tu mano como referencia. Método visual y práctico", url: "/calculadora-porciones/", keywords: ["porciones", "mano", "medir", "raciones", "plato", "equilibrado"] },
   { name: "Test de Hábitos Saludables", category: "Salud y Bienestar", contexts: ["casa"], icon: "🌟", description: "Evalúa tus hábitos de vida con un test de 21 preguntas. Perfil visual de hidratación, alimentación, actividad y descanso", url: "/test-habitos/", keywords: ["test", "habitos", "saludables", "evaluacion", "bienestar", "estilo vida"] },
+  { name: "Calculadora Fecha de Parto", category: "Salud y Bienestar", contexts: ["casa"], icon: "🤰", description: "Calcula tu fecha probable de parto (FPP) y semanas de gestación a partir de la última regla", url: "/calculadora-fecha-parto/", keywords: ["embarazo", "fecha parto", "fpp", "semanas gestacion", "trimestre", "fur", "regla naegele"] },
+  { name: "Calculadora Percentiles Infantiles", category: "Salud y Bienestar", contexts: ["casa"], icon: "👶", description: "Calcula el percentil de peso y talla de tu bebé o niño según las tablas de crecimiento de la OMS", url: "/calculadora-percentiles/", keywords: ["percentiles", "peso bebe", "talla niño", "oms", "crecimiento infantil", "pediatria"] },
 
   // ============================================
   // 12. Texto y Conversores (14)
@@ -251,6 +257,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Conversor Braille", category: "Texto y Conversores", contexts: ["curiosidad"], icon: "⠃", description: "Convierte texto a Braille español y viceversa. Sistema completo con ñ, acentos, números y visualización de celdas", url: "/conversor-braille/", keywords: ["braille", "accesibilidad", "discapacidad visual", "alfabeto", "puntos", "ciego", "inclusion"] },
   { name: "Generador de Anagramas", category: "Texto y Conversores", contexts: ["relax", "curiosidad"], icon: "🔤", description: "Encuentra todas las palabras que puedes formar con tus letras. Ideal para Wordle, Scrabble y crucigramas", url: "/generador-anagramas/", keywords: ["anagramas", "palabras", "wordle", "scrabble", "crucigrama", "letras", "juego palabras"] },
   { name: "Generador Lorem Ipsum", category: "Texto y Conversores", contexts: ["creando"], icon: "📄", description: "Genera texto Lorem Ipsum de 1 a 10 párrafos. Ideal para diseño, maquetación y desarrollo web", url: "/generador-lorem-ipsum/", keywords: ["lorem ipsum", "texto prueba", "placeholder", "maquetacion", "diseño", "dummy text"] },
+  { name: "Contador de Sílabas", category: "Texto y Conversores", contexts: ["estudio", "creando"], icon: "📝", description: "Cuenta y separa las sílabas de cualquier palabra o texto en español. Útil para poesía y ortografía", url: "/contador-silabas/", keywords: ["silabas", "separar", "silabeador", "division silabica", "poesia", "metrica", "ortografia"] },
 ];
 
 // ============================================
