@@ -8,7 +8,7 @@ export const siteConfig = {
   description:
     'Descubre 28 herramientas web gratuitas de calidad: calculadoras financieras avanzadas, conversores, utilidades y más. Todo en español, sin registro y completamente gratis.',
   url: 'https://meskeia.com',
-  ogImage: 'https://meskeia.com/og-image.png',
+  ogImage: 'https://meskeia.com/icon-512x512.png',
   author: 'meskeIA',
   keywords: [
     'herramientas online',
