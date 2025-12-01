@@ -43,7 +43,8 @@
         { "name": "Cifrado Playfair", "slug": "cifrado-playfair", "url": "https://meskeia.com/cifrado-playfair/", "description": "Cifrado por digramas con matriz 5x5" },
         { "name": "Cifrado AES", "slug": "cifrado-aes", "url": "https://meskeia.com/cifrado-aes/", "description": "Cifrado simétrico moderno AES-256" },
         { "name": "Generador de Hashes", "slug": "generador-hashes", "url": "https://meskeia.com/generador-hashes/", "description": "Genera hashes MD5, SHA-256, SHA-512" },
-        { "name": "Codificador Base64", "slug": "codificador-base64", "url": "https://meskeia.com/codificador-base64/", "description": "Codifica y decodifica texto en Base64, URL encode y Hexadecimal" }
+        { "name": "Codificador Base64", "slug": "codificador-base64", "url": "https://meskeia.com/codificador-base64/", "description": "Codifica y decodifica texto en Base64, URL encode y Hexadecimal" },
+        { "name": "Generador de Contraseñas", "slug": "generador-contrasenas", "url": "https://meskeia.com/generador-contrasenas/", "description": "Crea contraseñas seguras y personalizadas" }
       ]
     },
     {
@@ -177,7 +178,6 @@
         { "name": "Cronómetro y Temporizador", "slug": "cronometro", "url": "https://meskeia.com/cronometro/", "description": "Cronómetro con vueltas y temporizador" },
         { "name": "Conversor de Horarios", "slug": "conversor-horarios", "url": "https://meskeia.com/conversor-horarios/", "description": "Convierte horarios entre 25+ ciudades" },
         { "name": "Información del Tiempo", "slug": "informacion-tiempo", "url": "https://meskeia.com/informacion-tiempo/", "description": "Pronóstico del tiempo mundial" },
-        { "name": "Generador de Contraseñas", "slug": "generador-contrasenas", "url": "https://meskeia.com/generador-contrasenas/", "description": "Crea contraseñas seguras" },
         { "name": "Generador de Códigos QR", "slug": "generador-qr", "url": "https://meskeia.com/generador-qr/", "description": "Crea códigos QR para URLs, WiFi, vCard" },
         { "name": "Generador de Códigos de Barras", "slug": "generador-codigos-barras", "url": "https://meskeia.com/generador-codigos-barras/", "description": "Genera EAN-13, EAN-8, UPC-A, Code128" },
         { "name": "Generador de Firmas Email", "slug": "generador-firma-email", "url": "https://meskeia.com/generador-firma-email/", "description": "Crea firmas de email profesionales" },
