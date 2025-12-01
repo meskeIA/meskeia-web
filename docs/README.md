@@ -1,58 +1,58 @@
-# 📚 Documentación del Proyecto meskeia-web-nextjs
+# Documentacion del Proyecto meskeia-web
 
-## 📂 Estructura de Documentación
+## Estructura de Documentacion
 
 ### `/docs/decisiones/`
-Documentos estratégicos y decisiones de arquitectura
+Documentos estrategicos y decisiones de arquitectura
+
+### `/docs/deployment/`
+Guias de deployment y configuracion de hosting
 
 ### `/docs/testing/`
-Resultados de testing, guías de QA y validación
+Resultados de testing, guias de QA y validacion
 
-### `/docs/migracion/`
-Checklists, guías paso a paso y logs de migración
+### `/docs/referencia/`
+Documentacion tecnica de componentes y sistemas
 
-### `/docs/pendientes/`
-TODOs, tareas pendientes y contexto de conversaciones
+### `/docs/historico/`
+Archivos historicos de sesiones anteriores
 
 ---
 
-## 📖 Documentos por Carpeta
+## Documentos por Carpeta
 
-### Decisiones Estratégicas
-- `DECISIONES_CONSOLIDACION.md` - Qué implementar/descartar antes de migraciones
+### Decisiones Estrategicas
+- `DECISIONES_CONSOLIDACION.md` - Que implementar/descartar
 - `DARK_MODE_IMPLEMENTACION.md` - Sistema de temas dark/light
 - `PWA_ANALYTICS_README.md` - PWA + Analytics v2.0
 - `DEPLOYMENT_BETA.md` - Estrategia de deployment
 
+### Deployment
+- `DEPLOYMENT_SIMPLE.md` - Guia de deployment simplificada
+- `GUIA_HOSTING_BETA.md` - Configuracion de hosting
+- `database-update-analytics-v2.1.sql` - Script SQL para analytics
+
 ### Testing y QA
 - `RESULTADOS_TESTING_PLAYWRIGHT.md` - Resultados Playwright + axe-core
-- `ACCESIBILIDAD_REVIEW.md` - Análisis de accesibilidad
+- `ACCESIBILIDAD_REVIEW.md` - Analisis de accesibilidad
 - `TESTING_ACCESIBILIDAD_RESULTADOS.md` - Resultados detallados WCAG
-- `GUIA_TESTING_MANUAL.md` - Guía manual (superseded by Playwright)
+- `GUIA_TESTING_MANUAL.md` - Guia de testing manual
 
-### Migración
-- `CHECKLIST_MIGRACION_FINAL.md` - Protocolo paso a paso (75 min/app)
-- `MIGRACION_CALCULADORA_PROPINAS.md` - Ejemplo de primera migración
-- `ESTADO_PROYECTO_COMPLETO.md` - Estado general del proyecto
-
-### Componentes y Sistemas
+### Referencia Tecnica
 - `COMPONENTES_UI_README.md` - Sistema de componentes reutilizables
 - `RESPONSIVE_SYSTEM_README.md` - Sistema responsive
-- `SITEMAP_AUTOMATICO_INFO.md` - Generación automática de sitemap
+- `SITEMAP_AUTOMATICO_INFO.md` - Generacion automatica de sitemap
 - `FASE_5_SEO_OPTIMIZACION.md` - Optimizaciones SEO
 
-### Pendientes
-- `TODO_FAVICON_ICO.md` - Generar favicon.ico multi-resolución
-- `FAVICON_SETUP.md` - Setup de favicons
-- `CONTEXTO_NUEVA_CONVERSACION.md` - Contexto para nuevas conversaciones
+---
+
+## Fuentes de Verdad
+
+- **Apps y Categorias**: `data/applications.ts`
+- **Apps Implementadas**: `data/implemented-apps.ts`
+- **Guia Claude**: `CLAUDE.md` (raiz del proyecto)
+- **Estrategia Web**: `ESTRATEGIA-NUEVA-WEB-MESKEIA.md`
 
 ---
 
-## 🎯 Documentos en Raíz (Mantener)
-
-- `README.md` - Readme principal del proyecto
-- `DOCS_INDEX.md` - Índice de toda la documentación (este archivo lo reemplaza)
-
----
-
-© 2025 meskeIA - Sistema de Migración Next.js 15
+Ultima actualizacion: 2025-12-01
