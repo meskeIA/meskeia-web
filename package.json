@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/generate-llm-index.js",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:llm-index": "node scripts/generate-llm-index.js"
   },
   "dependencies": {
     "algebrite": "^1.4.0",
