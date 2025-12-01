@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import ThemeToggle from '@/components/ThemeToggle';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import DynamicThemeColor from '@/components/DynamicThemeColor';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,6 +60,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        {/* Preconnect para optimizar carga de fuentes */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ThemeProvider
           attribute="data-theme"
@@ -67,10 +73,12 @@ export default function RootLayout({
           storageKey="meskeia-theme"
           disableTransitionOnChange={false}
         >
-          <DynamicThemeColor />
-          <ServiceWorkerRegister />
-          {children}
-          <ThemeToggle />
+          <ErrorBoundary>
+            <DynamicThemeColor />
+            <ServiceWorkerRegister />
+            {children}
+            <ThemeToggle />
+          </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>

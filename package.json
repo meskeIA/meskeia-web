@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test": "npx playwright test",
     "test:unit": "npx playwright test tests/formatters.spec.ts",
-    "generate:llm-index": "node scripts/generate-llm-index.js"
+    "generate:llm-index": "node scripts/generate-llm-index.js",
+    "analyze": "set ANALYZE=true && npm run build"
   },
   "dependencies": {
     "algebrite": "^1.4.0",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
+    "@next/bundle-analyzer": "^16.0.6",
     "@playwright/test": "^1.56.1",
     "@types/node": "^20",
     "@types/react": "^19",

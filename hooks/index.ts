@@ -1,0 +1,1 @@
+export { useSpanishNumber } from './useSpanishNumber';
