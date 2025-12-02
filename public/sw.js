@@ -1,8 +1,8 @@
 // Service Worker para meskeIA PWA
-// Versión: 1.0.0
+// Versión: 1.1.0
 
-const CACHE_NAME = 'meskeia-pwa-v1';
-const STATIC_CACHE = 'meskeia-static-v1';
+const CACHE_NAME = 'meskeia-pwa-v2';
+const STATIC_CACHE = 'meskeia-static-v2';
 
 // Archivos estáticos para cachear
 const STATIC_FILES = [
