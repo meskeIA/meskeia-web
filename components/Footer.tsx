@@ -22,9 +22,10 @@ export default function Footer({ appName }: FooterProps) {
   const compartirApp = async () => {
     const titulo = appName || document.title;
     const url = window.location.href;
-    const texto = '¡Mira esta herramienta útil de meskeIA!';
+    const texto = '¡Mira lo que he encontrado en meskeIA!';
 
-    // Intentar Web Share API (móviles y navegadores modernos)
+    // Web Share API (móviles) - incluye texto + URL
+    // Fallback clipboard (PC) - solo URL (el texto se pierde en algunos sistemas)
     if (navigator.share) {
       try {
         await navigator.share({ title: titulo, text: texto, url: url });
@@ -35,7 +36,7 @@ export default function Footer({ appName }: FooterProps) {
         }
       }
     } else {
-      // Fallback: Copiar al portapapeles
+      // Fallback: Copiar URL al portapapeles
       try {
         await navigator.clipboard.writeText(url);
         mostrarMensaje('✅ Enlace copiado al portapapeles');
