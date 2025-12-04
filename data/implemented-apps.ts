@@ -136,13 +136,14 @@ export const implementedAppsUrls = [
   "/creador-paletas/",
   "/generador-tipografias/",
 
-  // Emprendimiento y Negocios (6 implementadas)
+  // Emprendimiento y Negocios (7 implementadas)
   "/calculadora-tarifa-freelance/",
   "/simulador-gastos-deducibles/",
   "/calculadora-break-even/",
   "/calculadora-roi-marketing/",
   "/planificador-cashflow/",
   "/generador-nombres-empresa/",
+  "/generador-facturas/",           // Facturas para autónomos con IVA/IRPF
 
   // Física y Química (5 implementadas)
   "/conversor-unidades/",

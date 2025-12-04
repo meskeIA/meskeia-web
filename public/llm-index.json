@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 131+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 132+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 131,
+  "total_tools": 132,
   "last_updated": "2025-12-04",
   "features": {
     "all_free": true,
@@ -42,7 +42,7 @@
       "name": "Emprendimiento y SEO",
       "icon": "💼",
       "description": "Gestiona tu negocio y optimiza tu presencia online",
-      "tool_count": 15
+      "tool_count": 16
     },
     {
       "id": "finanzas",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 49
+      "tool_count": 50
     },
     {
       "id": "estudio",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 28
+      "tool_count": 29
     },
     {
       "id": "creando",
@@ -1110,6 +1110,28 @@
         "markup"
       ],
       "icon": "🏷️"
+    },
+    {
+      "slug": "generador-facturas",
+      "name": "Generador de Facturas",
+      "url": "https://meskeia.com/generador-facturas/",
+      "description": "Crea facturas profesionales para autónomos. IVA automático, retención IRPF, múltiples líneas y exportación a PDF",
+      "category": "Emprendimiento y SEO",
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "factura",
+        "autonomo",
+        "facturar",
+        "iva",
+        "irpf",
+        "pdf",
+        "plantilla factura",
+        "pequeña empresa"
+      ],
+      "icon": "🧾"
     },
     {
       "slug": "simulador-hipoteca",

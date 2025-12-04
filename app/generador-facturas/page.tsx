@@ -1,0 +1,878 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import styles from './GeneradorFacturas.module.css';
+import MeskeiaLogo from '@/components/MeskeiaLogo';
+import Footer from '@/components/Footer';
+import { formatCurrency, formatDate } from '@/lib';
+
+// Tipos
+interface DatosEmisor {
+  nombre: string;
+  nif: string;
+  direccion: string;
+  codigoPostal: string;
+  ciudad: string;
+  provincia: string;
+  telefono: string;
+  email: string;
+}
+
+interface DatosCliente {
+  nombre: string;
+  nif: string;
+  direccion: string;
+  codigoPostal: string;
+  ciudad: string;
+  provincia: string;
+}
+
+interface LineaFactura {
+  id: string;
+  concepto: string;
+  cantidad: number;
+  precioUnitario: number;
+  tipoIva: number;
+}
+
+interface ConfiguracionFactura {
+  serie: string;
+  numero: number;
+  fecha: string;
+  aplicarIrpf: boolean;
+  porcentajeIrpf: number;
+  notas: string;
+  formaPago: string;
+}
+
+interface FacturaGuardada {
+  id: string;
+  numero: string;
+  fecha: string;
+  cliente: string;
+  total: number;
+}
+
+const STORAGE_KEY_EMISOR = 'meskeia_factura_emisor';
+const STORAGE_KEY_CONFIG = 'meskeia_factura_config';
+const STORAGE_KEY_HISTORIAL = 'meskeia_factura_historial';
+
+const TIPOS_IVA = [
+  { valor: 21, label: '21% (General)' },
+  { valor: 10, label: '10% (Reducido)' },
+  { valor: 4, label: '4% (Superreducido)' },
+  { valor: 0, label: '0% (Exento)' },
+];
+
+const FORMAS_PAGO = [
+  'Transferencia bancaria',
+  'Domiciliación bancaria',
+  'Efectivo',
+  'Tarjeta de crédito',
+  'PayPal',
+  'Bizum',
+  'Otro',
+];
+
+export default function GeneradorFacturasPage() {
+  // Estado del emisor
+  const [emisor, setEmisor] = useState<DatosEmisor>({
+    nombre: '',
+    nif: '',
+    direccion: '',
+    codigoPostal: '',
+    ciudad: '',
+    provincia: '',
+    telefono: '',
+    email: '',
+  });
+
+  // Estado del cliente
+  const [cliente, setCliente] = useState<DatosCliente>({
+    nombre: '',
+    nif: '',
+    direccion: '',
+    codigoPostal: '',
+    ciudad: '',
+    provincia: '',
+  });
+
+  // Líneas de factura
+  const [lineas, setLineas] = useState<LineaFactura[]>([
+    { id: '1', concepto: '', cantidad: 1, precioUnitario: 0, tipoIva: 21 },
+  ]);
+
+  // Configuración
+  const [config, setConfig] = useState<ConfiguracionFactura>({
+    serie: 'A',
+    numero: 1,
+    fecha: new Date().toISOString().split('T')[0],
+    aplicarIrpf: false,
+    porcentajeIrpf: 15,
+    notas: '',
+    formaPago: 'Transferencia bancaria',
+  });
+
+  // Historial
+  const [historial, setHistorial] = useState<FacturaGuardada[]>([]);
+  const [mostrarHistorial, setMostrarHistorial] = useState(false);
+
+  // Vista previa
+  const [mostrarPreview, setMostrarPreview] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  // Cargar datos guardados
+  useEffect(() => {
+    const savedEmisor = localStorage.getItem(STORAGE_KEY_EMISOR);
+    if (savedEmisor) {
+      try {
+        setEmisor(JSON.parse(savedEmisor));
+      } catch { /* ignorar */ }
+    }
+
+    const savedConfig = localStorage.getItem(STORAGE_KEY_CONFIG);
+    if (savedConfig) {
+      try {
+        const parsed = JSON.parse(savedConfig);
+        setConfig(prev => ({
+          ...prev,
+          serie: parsed.serie || 'A',
+          numero: parsed.numero || 1,
+          aplicarIrpf: parsed.aplicarIrpf || false,
+          porcentajeIrpf: parsed.porcentajeIrpf || 15,
+          formaPago: parsed.formaPago || 'Transferencia bancaria',
+        }));
+      } catch { /* ignorar */ }
+    }
+
+    const savedHistorial = localStorage.getItem(STORAGE_KEY_HISTORIAL);
+    if (savedHistorial) {
+      try {
+        setHistorial(JSON.parse(savedHistorial));
+      } catch { /* ignorar */ }
+    }
+  }, []);
+
+  // Guardar emisor cuando cambia
+  useEffect(() => {
+    if (emisor.nombre || emisor.nif) {
+      localStorage.setItem(STORAGE_KEY_EMISOR, JSON.stringify(emisor));
+    }
+  }, [emisor]);
+
+  // Guardar config cuando cambia
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify({
+      serie: config.serie,
+      numero: config.numero,
+      aplicarIrpf: config.aplicarIrpf,
+      porcentajeIrpf: config.porcentajeIrpf,
+      formaPago: config.formaPago,
+    }));
+  }, [config]);
+
+  // Cálculos
+  const calculos = (() => {
+    let baseImponible = 0;
+    const desglosesIva: Record<number, { base: number; cuota: number }> = {};
+
+    lineas.forEach(linea => {
+      const subtotal = linea.cantidad * linea.precioUnitario;
+      baseImponible += subtotal;
+
+      if (!desglosesIva[linea.tipoIva]) {
+        desglosesIva[linea.tipoIva] = { base: 0, cuota: 0 };
+      }
+      desglosesIva[linea.tipoIva].base += subtotal;
+      desglosesIva[linea.tipoIva].cuota += subtotal * (linea.tipoIva / 100);
+    });
+
+    const totalIva = Object.values(desglosesIva).reduce((sum, d) => sum + d.cuota, 0);
+    const retencionIrpf = config.aplicarIrpf ? baseImponible * (config.porcentajeIrpf / 100) : 0;
+    const total = baseImponible + totalIva - retencionIrpf;
+
+    return { baseImponible, desglosesIva, totalIva, retencionIrpf, total };
+  })();
+
+  // Funciones de líneas
+  const agregarLinea = () => {
+    setLineas([...lineas, {
+      id: Date.now().toString(),
+      concepto: '',
+      cantidad: 1,
+      precioUnitario: 0,
+      tipoIva: 21,
+    }]);
+  };
+
+  const eliminarLinea = (id: string) => {
+    if (lineas.length > 1) {
+      setLineas(lineas.filter(l => l.id !== id));
+    }
+  };
+
+  const actualizarLinea = (id: string, campo: keyof LineaFactura, valor: string | number) => {
+    setLineas(lineas.map(l =>
+      l.id === id ? { ...l, [campo]: valor } : l
+    ));
+  };
+
+  // Número de factura formateado
+  const numeroFactura = `${config.serie}-${config.numero.toString().padStart(4, '0')}`;
+
+  // Validación
+  const esValida = emisor.nombre && emisor.nif && cliente.nombre &&
+    lineas.some(l => l.concepto && l.precioUnitario > 0);
+
+  // Guardar en historial y avanzar número
+  const guardarFactura = () => {
+    const nueva: FacturaGuardada = {
+      id: Date.now().toString(),
+      numero: numeroFactura,
+      fecha: config.fecha,
+      cliente: cliente.nombre,
+      total: calculos.total,
+    };
+
+    const nuevoHistorial = [nueva, ...historial].slice(0, 50); // Máximo 50
+    setHistorial(nuevoHistorial);
+    localStorage.setItem(STORAGE_KEY_HISTORIAL, JSON.stringify(nuevoHistorial));
+
+    // Avanzar número
+    setConfig(prev => ({ ...prev, numero: prev.numero + 1 }));
+  };
+
+  // Generar PDF
+  const generarPDF = async () => {
+    if (!esValida) {
+      alert('Por favor, completa los datos obligatorios: emisor (nombre y NIF), cliente (nombre) y al menos una línea con concepto y precio.');
+      return;
+    }
+
+    guardarFactura();
+    setMostrarPreview(true);
+
+    // Esperar a que se renderice y usar window.print()
+    setTimeout(() => {
+      window.print();
+    }, 500);
+  };
+
+  // Nueva factura
+  const nuevaFactura = () => {
+    setCliente({
+      nombre: '',
+      nif: '',
+      direccion: '',
+      codigoPostal: '',
+      ciudad: '',
+      provincia: '',
+    });
+    setLineas([{ id: '1', concepto: '', cantidad: 1, precioUnitario: 0, tipoIva: 21 }]);
+    setConfig(prev => ({
+      ...prev,
+      fecha: new Date().toISOString().split('T')[0],
+      notas: '',
+    }));
+    setMostrarPreview(false);
+  };
+
+  return (
+    <div className={styles.container}>
+      <MeskeiaLogo />
+
+      <header className={styles.hero}>
+        <h1 className={styles.title}>Generador de Facturas</h1>
+        <p className={styles.subtitle}>Crea facturas profesionales y expórtalas a PDF</p>
+      </header>
+
+      {/* Disclaimer */}
+      <div className={styles.disclaimer}>
+        <strong>⚠️ Aviso importante:</strong> Esta herramienta genera facturas para uso orientativo y personal.
+        A partir de 2026, los autónomos en España deberán usar software homologado con el sistema Verifactu.
+        Consulta con tu asesor fiscal para cumplir con la normativa vigente.
+      </div>
+
+      <div className={styles.mainContent}>
+        {/* Panel izquierdo: Formulario */}
+        <div className={styles.formPanel}>
+          {/* Datos del emisor */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>
+              👤 Tus datos (Emisor)
+              <span className={styles.sectionHint}>Se guardan automáticamente</span>
+            </h2>
+            <div className={styles.formGrid}>
+              <div className={styles.formGroup}>
+                <label htmlFor="emisorNombre">Nombre / Razón social *</label>
+                <input
+                  id="emisorNombre"
+                  type="text"
+                  value={emisor.nombre}
+                  onChange={e => setEmisor({ ...emisor, nombre: e.target.value })}
+                  placeholder="Tu nombre o empresa"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="emisorNif">NIF / CIF *</label>
+                <input
+                  id="emisorNif"
+                  type="text"
+                  value={emisor.nif}
+                  onChange={e => setEmisor({ ...emisor, nif: e.target.value.toUpperCase() })}
+                  placeholder="12345678A"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup + ' ' + styles.fullWidth}>
+                <label htmlFor="emisorDireccion">Dirección</label>
+                <input
+                  id="emisorDireccion"
+                  type="text"
+                  value={emisor.direccion}
+                  onChange={e => setEmisor({ ...emisor, direccion: e.target.value })}
+                  placeholder="Calle, número, piso..."
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="emisorCP">Código Postal</label>
+                <input
+                  id="emisorCP"
+                  type="text"
+                  value={emisor.codigoPostal}
+                  onChange={e => setEmisor({ ...emisor, codigoPostal: e.target.value })}
+                  placeholder="08001"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="emisorCiudad">Ciudad</label>
+                <input
+                  id="emisorCiudad"
+                  type="text"
+                  value={emisor.ciudad}
+                  onChange={e => setEmisor({ ...emisor, ciudad: e.target.value })}
+                  placeholder="Barcelona"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="emisorTelefono">Teléfono</label>
+                <input
+                  id="emisorTelefono"
+                  type="tel"
+                  value={emisor.telefono}
+                  onChange={e => setEmisor({ ...emisor, telefono: e.target.value })}
+                  placeholder="600 123 456"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="emisorEmail">Email</label>
+                <input
+                  id="emisorEmail"
+                  type="email"
+                  value={emisor.email}
+                  onChange={e => setEmisor({ ...emisor, email: e.target.value })}
+                  placeholder="tu@email.com"
+                  className={styles.input}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Datos del cliente */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>🏢 Datos del cliente</h2>
+            <div className={styles.formGrid}>
+              <div className={styles.formGroup}>
+                <label htmlFor="clienteNombre">Nombre / Razón social *</label>
+                <input
+                  id="clienteNombre"
+                  type="text"
+                  value={cliente.nombre}
+                  onChange={e => setCliente({ ...cliente, nombre: e.target.value })}
+                  placeholder="Nombre del cliente"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="clienteNif">NIF / CIF</label>
+                <input
+                  id="clienteNif"
+                  type="text"
+                  value={cliente.nif}
+                  onChange={e => setCliente({ ...cliente, nif: e.target.value.toUpperCase() })}
+                  placeholder="B12345678"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup + ' ' + styles.fullWidth}>
+                <label htmlFor="clienteDireccion">Dirección</label>
+                <input
+                  id="clienteDireccion"
+                  type="text"
+                  value={cliente.direccion}
+                  onChange={e => setCliente({ ...cliente, direccion: e.target.value })}
+                  placeholder="Calle, número..."
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="clienteCP">Código Postal</label>
+                <input
+                  id="clienteCP"
+                  type="text"
+                  value={cliente.codigoPostal}
+                  onChange={e => setCliente({ ...cliente, codigoPostal: e.target.value })}
+                  placeholder="28001"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="clienteCiudad">Ciudad</label>
+                <input
+                  id="clienteCiudad"
+                  type="text"
+                  value={cliente.ciudad}
+                  onChange={e => setCliente({ ...cliente, ciudad: e.target.value })}
+                  placeholder="Madrid"
+                  className={styles.input}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Configuración factura */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>⚙️ Configuración</h2>
+            <div className={styles.formGrid}>
+              <div className={styles.formGroup}>
+                <label htmlFor="configSerie">Serie</label>
+                <input
+                  id="configSerie"
+                  type="text"
+                  value={config.serie}
+                  onChange={e => setConfig({ ...config, serie: e.target.value.toUpperCase() })}
+                  maxLength={3}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="configNumero">Número</label>
+                <input
+                  id="configNumero"
+                  type="number"
+                  value={config.numero}
+                  onChange={e => setConfig({ ...config, numero: parseInt(e.target.value) || 1 })}
+                  min={1}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="configFecha">Fecha</label>
+                <input
+                  id="configFecha"
+                  type="date"
+                  value={config.fecha}
+                  onChange={e => setConfig({ ...config, fecha: e.target.value })}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="configFormaPago">Forma de pago</label>
+                <select
+                  id="configFormaPago"
+                  value={config.formaPago}
+                  onChange={e => setConfig({ ...config, formaPago: e.target.value })}
+                  className={styles.select}
+                >
+                  {FORMAS_PAGO.map(fp => (
+                    <option key={fp} value={fp}>{fp}</option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.formGroup + ' ' + styles.checkboxGroup}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={config.aplicarIrpf}
+                    onChange={e => setConfig({ ...config, aplicarIrpf: e.target.checked })}
+                  />
+                  Aplicar retención IRPF
+                </label>
+              </div>
+              {config.aplicarIrpf && (
+                <div className={styles.formGroup}>
+                  <label htmlFor="configIrpf">% IRPF</label>
+                  <select
+                    id="configIrpf"
+                    value={config.porcentajeIrpf}
+                    onChange={e => setConfig({ ...config, porcentajeIrpf: parseInt(e.target.value) })}
+                    className={styles.select}
+                  >
+                    <option value={7}>7% (Nuevos autónomos)</option>
+                    <option value={15}>15% (General)</option>
+                    <option value={19}>19% (Profesionales)</option>
+                  </select>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Líneas de factura */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>📝 Conceptos</h2>
+            <div className={styles.lineasContainer}>
+              {lineas.map((linea, index) => (
+                <div key={linea.id} className={styles.lineaItem}>
+                  <div className={styles.lineaNumero}>{index + 1}</div>
+                  <div className={styles.lineaFields}>
+                    <div className={styles.formGroup + ' ' + styles.conceptoField}>
+                      <label htmlFor={`concepto-${linea.id}`}>Concepto *</label>
+                      <input
+                        id={`concepto-${linea.id}`}
+                        type="text"
+                        value={linea.concepto}
+                        onChange={e => actualizarLinea(linea.id, 'concepto', e.target.value)}
+                        placeholder="Descripción del servicio o producto"
+                        className={styles.input}
+                      />
+                    </div>
+                    <div className={styles.formGroup + ' ' + styles.cantidadField}>
+                      <label htmlFor={`cantidad-${linea.id}`}>Cantidad</label>
+                      <input
+                        id={`cantidad-${linea.id}`}
+                        type="number"
+                        value={linea.cantidad}
+                        onChange={e => actualizarLinea(linea.id, 'cantidad', parseFloat(e.target.value) || 0)}
+                        min={0}
+                        step={0.01}
+                        className={styles.input}
+                      />
+                    </div>
+                    <div className={styles.formGroup + ' ' + styles.precioField}>
+                      <label htmlFor={`precio-${linea.id}`}>Precio unit. (€) *</label>
+                      <input
+                        id={`precio-${linea.id}`}
+                        type="number"
+                        value={linea.precioUnitario || ''}
+                        onChange={e => actualizarLinea(linea.id, 'precioUnitario', parseFloat(e.target.value) || 0)}
+                        min={0}
+                        step={0.01}
+                        placeholder="0,00"
+                        className={styles.input}
+                      />
+                    </div>
+                    <div className={styles.formGroup + ' ' + styles.ivaField}>
+                      <label htmlFor={`iva-${linea.id}`}>IVA</label>
+                      <select
+                        id={`iva-${linea.id}`}
+                        value={linea.tipoIva}
+                        onChange={e => actualizarLinea(linea.id, 'tipoIva', parseInt(e.target.value))}
+                        className={styles.select}
+                      >
+                        {TIPOS_IVA.map(tipo => (
+                          <option key={tipo.valor} value={tipo.valor}>{tipo.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className={styles.lineaSubtotal}>
+                      {formatCurrency(linea.cantidad * linea.precioUnitario)}
+                    </div>
+                    {lineas.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => eliminarLinea(linea.id)}
+                        className={styles.btnEliminarLinea}
+                        title="Eliminar línea"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <button type="button" onClick={agregarLinea} className={styles.btnAgregarLinea}>
+                + Añadir línea
+              </button>
+            </div>
+          </div>
+
+          {/* Notas */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>📌 Notas (opcional)</h2>
+            <textarea
+              value={config.notas}
+              onChange={e => setConfig({ ...config, notas: e.target.value })}
+              placeholder="Observaciones, datos bancarios, condiciones de pago..."
+              className={styles.textarea}
+              rows={3}
+            />
+          </div>
+        </div>
+
+        {/* Panel derecho: Resumen y acciones */}
+        <div className={styles.summaryPanel}>
+          <div className={styles.summaryCard}>
+            <h3 className={styles.summaryTitle}>Factura {numeroFactura}</h3>
+            <p className={styles.summaryFecha}>{formatDate(new Date(config.fecha))}</p>
+
+            <div className={styles.summaryTotales}>
+              <div className={styles.summaryRow}>
+                <span>Base imponible</span>
+                <span>{formatCurrency(calculos.baseImponible)}</span>
+              </div>
+
+              {Object.entries(calculos.desglosesIva)
+                .filter(([, datos]) => datos.cuota > 0)
+                .map(([tipo, datos]) => (
+                  <div key={tipo} className={styles.summaryRow}>
+                    <span>IVA {tipo}%</span>
+                    <span>{formatCurrency(datos.cuota)}</span>
+                  </div>
+                ))}
+
+              {config.aplicarIrpf && calculos.retencionIrpf > 0 && (
+                <div className={styles.summaryRow + ' ' + styles.retencion}>
+                  <span>Retención IRPF -{config.porcentajeIrpf}%</span>
+                  <span>-{formatCurrency(calculos.retencionIrpf)}</span>
+                </div>
+              )}
+
+              <div className={styles.summaryTotal}>
+                <span>TOTAL</span>
+                <span>{formatCurrency(calculos.total)}</span>
+              </div>
+            </div>
+
+            <div className={styles.summaryActions}>
+              <button
+                type="button"
+                onClick={() => setMostrarPreview(true)}
+                className={styles.btnPreview}
+              >
+                👁️ Vista previa
+              </button>
+              <button
+                type="button"
+                onClick={generarPDF}
+                disabled={!esValida}
+                className={styles.btnGenerar}
+              >
+                📄 Generar PDF
+              </button>
+              <button
+                type="button"
+                onClick={nuevaFactura}
+                className={styles.btnNueva}
+              >
+                🔄 Nueva factura
+              </button>
+            </div>
+          </div>
+
+          {/* Historial */}
+          <div className={styles.historialCard}>
+            <button
+              type="button"
+              onClick={() => setMostrarHistorial(!mostrarHistorial)}
+              className={styles.historialToggle}
+            >
+              📋 Historial ({historial.length})
+              <span className={mostrarHistorial ? styles.arrowUp : styles.arrowDown}>▼</span>
+            </button>
+
+            {mostrarHistorial && historial.length > 0 && (
+              <div className={styles.historialLista}>
+                {historial.slice(0, 10).map(f => (
+                  <div key={f.id} className={styles.historialItem}>
+                    <div className={styles.historialInfo}>
+                      <span className={styles.historialNumero}>{f.numero}</span>
+                      <span className={styles.historialCliente}>{f.cliente}</span>
+                    </div>
+                    <div className={styles.historialMeta}>
+                      <span>{formatDate(new Date(f.fecha))}</span>
+                      <span className={styles.historialTotal}>{formatCurrency(f.total)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {mostrarHistorial && historial.length === 0 && (
+              <p className={styles.historialVacio}>No hay facturas en el historial</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Modal Vista Previa */}
+      {mostrarPreview && (
+        <div className={styles.modalOverlay} onClick={() => setMostrarPreview(false)}>
+          <div className={styles.modalPreview} onClick={e => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setMostrarPreview(false)}
+              className={styles.btnCerrarPreview}
+            >
+              ×
+            </button>
+
+            <div ref={previewRef} className={styles.facturaPreview} id="factura-print">
+              {/* Cabecera */}
+              <div className={styles.previewHeader}>
+                <div className={styles.previewEmisor}>
+                  <h2>{emisor.nombre || 'Tu Empresa'}</h2>
+                  <p>{emisor.nif}</p>
+                  {emisor.direccion && <p>{emisor.direccion}</p>}
+                  {(emisor.codigoPostal || emisor.ciudad) && (
+                    <p>{emisor.codigoPostal} {emisor.ciudad}</p>
+                  )}
+                  {emisor.telefono && <p>Tel: {emisor.telefono}</p>}
+                  {emisor.email && <p>{emisor.email}</p>}
+                </div>
+                <div className={styles.previewNumero}>
+                  <h1>FACTURA</h1>
+                  <p className={styles.previewNumeroValor}>{numeroFactura}</p>
+                  <p>Fecha: {formatDate(new Date(config.fecha))}</p>
+                </div>
+              </div>
+
+              {/* Cliente */}
+              <div className={styles.previewCliente}>
+                <h3>Facturar a:</h3>
+                <p><strong>{cliente.nombre || 'Cliente'}</strong></p>
+                {cliente.nif && <p>NIF: {cliente.nif}</p>}
+                {cliente.direccion && <p>{cliente.direccion}</p>}
+                {(cliente.codigoPostal || cliente.ciudad) && (
+                  <p>{cliente.codigoPostal} {cliente.ciudad}</p>
+                )}
+              </div>
+
+              {/* Tabla de conceptos */}
+              <table className={styles.previewTabla}>
+                <thead>
+                  <tr>
+                    <th>Concepto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unit.</th>
+                    <th>IVA</th>
+                    <th>Importe</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lineas.filter(l => l.concepto).map(linea => (
+                    <tr key={linea.id}>
+                      <td>{linea.concepto}</td>
+                      <td>{linea.cantidad}</td>
+                      <td>{formatCurrency(linea.precioUnitario)}</td>
+                      <td>{linea.tipoIva}%</td>
+                      <td>{formatCurrency(linea.cantidad * linea.precioUnitario)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Totales */}
+              <div className={styles.previewTotales}>
+                <div className={styles.previewTotalRow}>
+                  <span>Base imponible:</span>
+                  <span>{formatCurrency(calculos.baseImponible)}</span>
+                </div>
+                {Object.entries(calculos.desglosesIva)
+                  .filter(([, datos]) => datos.cuota > 0)
+                  .map(([tipo, datos]) => (
+                    <div key={tipo} className={styles.previewTotalRow}>
+                      <span>IVA {tipo}% (sobre {formatCurrency(datos.base)}):</span>
+                      <span>{formatCurrency(datos.cuota)}</span>
+                    </div>
+                  ))}
+                {config.aplicarIrpf && calculos.retencionIrpf > 0 && (
+                  <div className={styles.previewTotalRow}>
+                    <span>Retención IRPF -{config.porcentajeIrpf}%:</span>
+                    <span>-{formatCurrency(calculos.retencionIrpf)}</span>
+                  </div>
+                )}
+                <div className={styles.previewTotalFinal}>
+                  <span>TOTAL:</span>
+                  <span>{formatCurrency(calculos.total)}</span>
+                </div>
+              </div>
+
+              {/* Pie */}
+              <div className={styles.previewPie}>
+                <p><strong>Forma de pago:</strong> {config.formaPago}</p>
+                {config.notas && (
+                  <div className={styles.previewNotas}>
+                    <p><strong>Observaciones:</strong></p>
+                    <p>{config.notas}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.previewActions}>
+              <button type="button" onClick={() => window.print()} className={styles.btnImprimir}>
+                🖨️ Imprimir / Guardar PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Info Panel */}
+      <div className={styles.infoPanel}>
+        <h3>💡 ¿Cómo funciona?</h3>
+        <div className={styles.infoGrid}>
+          <div className={styles.infoItem}>
+            <span className={styles.infoIcon}>1️⃣</span>
+            <div>
+              <strong>Rellena tus datos</strong>
+              <p>Se guardan automáticamente para futuras facturas</p>
+            </div>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.infoIcon}>2️⃣</span>
+            <div>
+              <strong>Añade los conceptos</strong>
+              <p>El IVA y los totales se calculan automáticamente</p>
+            </div>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.infoIcon}>3️⃣</span>
+            <div>
+              <strong>Genera el PDF</strong>
+              <p>Usa el diálogo de impresión para guardar como PDF</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Footer appName="generador-facturas" />
+
+      {/* Estilos para impresión */}
+      <style jsx global>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          #factura-print,
+          #factura-print * {
+            visibility: visible;
+          }
+          #factura-print {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 20mm;
+            background: white;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
