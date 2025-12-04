@@ -139,7 +139,7 @@ export const implementedAppsUrls = [
   "/creador-paletas/",
   "/generador-tipografias/",
 
-  // Emprendimiento y Negocios (7 implementadas)
+  // Emprendimiento y Negocios (8 implementadas)
   "/calculadora-tarifa-freelance/",
   "/simulador-gastos-deducibles/",
   "/calculadora-break-even/",
@@ -147,6 +147,7 @@ export const implementedAppsUrls = [
   "/planificador-cashflow/",
   "/generador-nombres-empresa/",
   "/generador-facturas/",           // Facturas para autónomos con IVA/IRPF
+  "/generador-carruseles/",         // Carruseles para Instagram/LinkedIn
 
   // Física y Química (5 implementadas)
   "/conversor-unidades/",

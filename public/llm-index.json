@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 135+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 136+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 135,
+  "total_tools": 136,
   "last_updated": "2025-12-04",
   "features": {
     "all_free": true,
@@ -42,7 +42,7 @@
       "name": "Emprendimiento y SEO",
       "icon": "💼",
       "description": "Gestiona tu negocio y optimiza tu presencia online",
-      "tool_count": 16
+      "tool_count": 17
     },
     {
       "id": "finanzas",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 50
+      "tool_count": 51
     },
     {
       "id": "estudio",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 32
+      "tool_count": 33
     },
     {
       "id": "relax",
@@ -1132,6 +1132,28 @@
         "pequeña empresa"
       ],
       "icon": "🧾"
+    },
+    {
+      "slug": "generador-carruseles",
+      "name": "Generador de Carruseles",
+      "url": "https://meskeia.com/generador-carruseles/",
+      "description": "Crea carruseles profesionales para Instagram y LinkedIn. Diseña slides, elige plantillas, personaliza colores y descarga como imágenes PNG",
+      "category": "Emprendimiento y SEO",
+      "contexts": [
+        "creando",
+        "trabajo"
+      ],
+      "keywords": [
+        "carrusel",
+        "instagram",
+        "linkedin",
+        "slides",
+        "redes sociales",
+        "marketing",
+        "contenido",
+        "png"
+      ],
+      "icon": "📱"
     },
     {
       "slug": "simulador-hipoteca",

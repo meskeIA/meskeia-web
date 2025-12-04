@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 136 aplicaciones organizadas por 12 categorías + 7 momentos
+ * Total: 137 aplicaciones organizadas por 12 categorías + 7 momentos
  * Actualizado: 2025-12-04
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
@@ -128,7 +128,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Enlaces UTM", category: "Diseño Web", contexts: ["trabajo", "creando"], icon: "💻", description: "Genera enlaces UTM para Google Analytics. Trackea campañas de marketing con parámetros utm_source, utm_medium, utm_campaign", url: "/generador-utm/", keywords: ["utm", "google analytics", "tracking", "marketing", "campañas", "enlaces"] },
 
   // ============================================
-  // 4. Emprendimiento y SEO (15)
+  // 4. Emprendimiento y SEO (16)
   // ============================================
   { name: "Calculadora Tarifa Freelance", category: "Emprendimiento y SEO", contexts: ["trabajo", "dinero"], icon: "💼", description: "Calcula tu tarifa freelance ideal considerando gastos, impuestos, vacaciones y margen de beneficio. Evita cobrar de menos", url: "/calculadora-tarifa-freelance/", keywords: ["freelance", "tarifa", "precio", "autonomo", "honorarios"] },
   { name: "Calculadora Break-Even", category: "Emprendimiento y SEO", contexts: ["trabajo", "dinero"], icon: "💼", description: "Calcula el punto de equilibrio de tus productos. Analiza margen de contribución, rentabilidad y escenarios de costos/precios", url: "/calculadora-break-even/", keywords: ["break even", "punto equilibrio", "costos", "precio", "rentabilidad"] },
@@ -146,6 +146,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora Tiempo de Lectura", category: "Emprendimiento y SEO", contexts: ["creando"], icon: "⏱️", description: "Calcula el tiempo de lectura de tu contenido. Velocidad configurable, tiempo hablado y badge para tu artículo", url: "/calculadora-tiempo-lectura/", keywords: ["tiempo lectura", "reading time", "palabras por minuto", "ppm", "contenido", "articulo", "badge"] },
   { name: "Generador de Schema Markup", category: "Emprendimiento y SEO", contexts: ["creando", "trabajo"], icon: "🏷️", description: "Genera código JSON-LD Schema.org para SEO. Artículos, productos, FAQ, negocios locales y recetas", url: "/generador-schema-markup/", keywords: ["schema", "json-ld", "structured data", "rich snippets", "seo tecnico", "schema.org", "markup"] },
   { name: "Generador de Facturas", category: "Emprendimiento y SEO", contexts: ["trabajo", "dinero"], icon: "🧾", description: "Crea facturas profesionales para autónomos. IVA automático, retención IRPF, múltiples líneas y exportación a PDF", url: "/generador-facturas/", keywords: ["factura", "autonomo", "facturar", "iva", "irpf", "pdf", "plantilla factura", "pequeña empresa"] },
+  { name: "Generador de Carruseles", category: "Emprendimiento y SEO", contexts: ["creando", "trabajo"], icon: "📱", description: "Crea carruseles profesionales para Instagram y LinkedIn. Diseña slides, elige plantillas, personaliza colores y descarga como imágenes PNG", url: "/generador-carruseles/", keywords: ["carrusel", "instagram", "linkedin", "slides", "redes sociales", "marketing", "contenido", "png"] },
 
   // ============================================
   // 5. Finanzas Personales (15)

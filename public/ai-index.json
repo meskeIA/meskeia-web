@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 136+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 136,
+  "total_tools": 137,
   "updated": "2025-12-04",
   "features": {
     "all_free": true,
@@ -89,7 +89,8 @@
         { "name": "Calculadora de Legibilidad", "slug": "calculadora-legibilidad", "url": "https://meskeia.com/calculadora-legibilidad/", "description": "Calcula índices de legibilidad Flesch" },
         { "name": "Calculadora Tiempo de Lectura", "slug": "calculadora-tiempo-lectura", "url": "https://meskeia.com/calculadora-tiempo-lectura/", "description": "Calcula el tiempo de lectura de tu contenido" },
         { "name": "Generador de Schema Markup", "slug": "generador-schema-markup", "url": "https://meskeia.com/generador-schema-markup/", "description": "Genera código JSON-LD Schema.org para SEO" },
-        { "name": "Generador de Facturas", "slug": "generador-facturas", "url": "https://meskeia.com/generador-facturas/", "description": "Crea facturas profesionales con IVA y exporta a PDF" }
+        { "name": "Generador de Facturas", "slug": "generador-facturas", "url": "https://meskeia.com/generador-facturas/", "description": "Crea facturas profesionales con IVA y exporta a PDF" },
+        { "name": "Generador de Carruseles", "slug": "generador-carruseles", "url": "https://meskeia.com/generador-carruseles/", "description": "Crea carruseles para Instagram y LinkedIn, descarga como PNG" }
       ]
     },
     {
