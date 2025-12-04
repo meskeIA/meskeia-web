@@ -200,9 +200,31 @@
   margin-bottom: 4px;
 }
 
+.resultadoMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
 .resultadoFecha {
   font-size: 0.85rem;
   color: var(--text-secondary);
+}
+
+.resultadoOffset {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--focus);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.resultadoAcronimo {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .sinResultados {
@@ -245,6 +267,25 @@
 .zonaBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.zonaBtnOffset {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.zonaBtn:hover:not(:disabled) .zonaBtnOffset {
+  color: var(--primary);
+}
+
+/* Offset label en selector origen */
+.offsetLabel {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 500;
+  margin-top: 4px;
 }
 
 /* Reloj Panel */
@@ -380,5 +421,140 @@
 
   .resultadoHora {
     font-size: 1.6rem;
+  }
+}
+
+/* Panel de Acrónimos */
+.acronimosPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 25px;
+  overflow: hidden;
+}
+
+.acronimosToggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.acronimosToggle:hover {
+  background: var(--hover);
+}
+
+.toggleIcon {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: transform 0.3s ease;
+}
+
+.toggleIconOpen {
+  transform: rotate(180deg);
+}
+
+.acronimosContent {
+  padding: 0 20px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.acronimosIntro {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 15px 0;
+  line-height: 1.5;
+}
+
+.acronimosTable {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.85rem;
+}
+
+.acronimosHeader {
+  display: grid;
+  grid-template-columns: 100px 1fr 80px 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  border-radius: 8px 8px 0 0;
+}
+
+.acronimosRow {
+  display: grid;
+  grid-template-columns: 100px 1fr 80px 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.acronimosRow:last-child {
+  border-bottom: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.acronimosRow:hover {
+  background: var(--hover);
+}
+
+.acronimoCode {
+  font-weight: 600;
+  color: var(--primary);
+  font-family: 'SF Mono', 'Consolas', monospace;
+}
+
+.acronimoNombre {
+  color: var(--text-primary);
+}
+
+.acronimoUtc {
+  font-weight: 500;
+  color: var(--secondary);
+  font-family: 'SF Mono', 'Consolas', monospace;
+}
+
+.acronimoCiudades {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+/* Responsive para tabla de acrónimos */
+@media (max-width: 768px) {
+  .acronimosHeader,
+  .acronimosRow {
+    grid-template-columns: 80px 1fr;
+    gap: 5px;
+  }
+
+  .acronimosHeader span:nth-child(3),
+  .acronimosHeader span:nth-child(4),
+  .acronimosRow .acronimoUtc,
+  .acronimosRow .acronimoCiudades {
+    display: none;
+  }
+
+  .acronimoNombre {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .acronimosToggle {
+    font-size: 0.9rem;
+    padding: 15px;
   }
 }

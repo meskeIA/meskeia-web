@@ -12,46 +12,91 @@ interface ZonaHoraria {
   zona: string;
   pais: string;
   emoji: string;
+  acronimo?: string; // Acrónimo común (CET, EST, etc.)
 }
 
 // ==================== DATOS ====================
 
 const zonasHorarias: ZonaHoraria[] = [
   // Europa
-  { id: 'madrid', nombre: 'Madrid', zona: 'Europe/Madrid', pais: 'España', emoji: '🇪🇸' },
-  { id: 'londres', nombre: 'Londres', zona: 'Europe/London', pais: 'Reino Unido', emoji: '🇬🇧' },
-  { id: 'paris', nombre: 'París', zona: 'Europe/Paris', pais: 'Francia', emoji: '🇫🇷' },
-  { id: 'berlin', nombre: 'Berlín', zona: 'Europe/Berlin', pais: 'Alemania', emoji: '🇩🇪' },
-  { id: 'roma', nombre: 'Roma', zona: 'Europe/Rome', pais: 'Italia', emoji: '🇮🇹' },
-  { id: 'amsterdam', nombre: 'Ámsterdam', zona: 'Europe/Amsterdam', pais: 'Países Bajos', emoji: '🇳🇱' },
-  { id: 'moscu', nombre: 'Moscú', zona: 'Europe/Moscow', pais: 'Rusia', emoji: '🇷🇺' },
-  { id: 'estambul', nombre: 'Estambul', zona: 'Europe/Istanbul', pais: 'Turquía', emoji: '🇹🇷' },
+  { id: 'madrid', nombre: 'Madrid', zona: 'Europe/Madrid', pais: 'España', emoji: '🇪🇸', acronimo: 'CET/CEST' },
+  { id: 'londres', nombre: 'Londres', zona: 'Europe/London', pais: 'Reino Unido', emoji: '🇬🇧', acronimo: 'GMT/BST' },
+  { id: 'paris', nombre: 'París', zona: 'Europe/Paris', pais: 'Francia', emoji: '🇫🇷', acronimo: 'CET/CEST' },
+  { id: 'berlin', nombre: 'Berlín', zona: 'Europe/Berlin', pais: 'Alemania', emoji: '🇩🇪', acronimo: 'CET/CEST' },
+  { id: 'roma', nombre: 'Roma', zona: 'Europe/Rome', pais: 'Italia', emoji: '🇮🇹', acronimo: 'CET/CEST' },
+  { id: 'amsterdam', nombre: 'Ámsterdam', zona: 'Europe/Amsterdam', pais: 'Países Bajos', emoji: '🇳🇱', acronimo: 'CET/CEST' },
+  { id: 'moscu', nombre: 'Moscú', zona: 'Europe/Moscow', pais: 'Rusia', emoji: '🇷🇺', acronimo: 'MSK' },
+  { id: 'estambul', nombre: 'Estambul', zona: 'Europe/Istanbul', pais: 'Turquía', emoji: '🇹🇷', acronimo: 'TRT' },
   // América
-  { id: 'nueva_york', nombre: 'Nueva York', zona: 'America/New_York', pais: 'EE.UU.', emoji: '🇺🇸' },
-  { id: 'los_angeles', nombre: 'Los Ángeles', zona: 'America/Los_Angeles', pais: 'EE.UU.', emoji: '🇺🇸' },
-  { id: 'chicago', nombre: 'Chicago', zona: 'America/Chicago', pais: 'EE.UU.', emoji: '🇺🇸' },
-  { id: 'mexico', nombre: 'Ciudad de México', zona: 'America/Mexico_City', pais: 'México', emoji: '🇲🇽' },
-  { id: 'bogota', nombre: 'Bogotá', zona: 'America/Bogota', pais: 'Colombia', emoji: '🇨🇴' },
-  { id: 'lima', nombre: 'Lima', zona: 'America/Lima', pais: 'Perú', emoji: '🇵🇪' },
-  { id: 'buenos_aires', nombre: 'Buenos Aires', zona: 'America/Argentina/Buenos_Aires', pais: 'Argentina', emoji: '🇦🇷' },
-  { id: 'santiago', nombre: 'Santiago', zona: 'America/Santiago', pais: 'Chile', emoji: '🇨🇱' },
-  { id: 'sao_paulo', nombre: 'São Paulo', zona: 'America/Sao_Paulo', pais: 'Brasil', emoji: '🇧🇷' },
+  { id: 'nueva_york', nombre: 'Nueva York', zona: 'America/New_York', pais: 'EE.UU.', emoji: '🇺🇸', acronimo: 'EST/EDT' },
+  { id: 'los_angeles', nombre: 'Los Ángeles', zona: 'America/Los_Angeles', pais: 'EE.UU.', emoji: '🇺🇸', acronimo: 'PST/PDT' },
+  { id: 'chicago', nombre: 'Chicago', zona: 'America/Chicago', pais: 'EE.UU.', emoji: '🇺🇸', acronimo: 'CST/CDT' },
+  { id: 'mexico', nombre: 'Ciudad de México', zona: 'America/Mexico_City', pais: 'México', emoji: '🇲🇽', acronimo: 'CST' },
+  { id: 'bogota', nombre: 'Bogotá', zona: 'America/Bogota', pais: 'Colombia', emoji: '🇨🇴', acronimo: 'COT' },
+  { id: 'lima', nombre: 'Lima', zona: 'America/Lima', pais: 'Perú', emoji: '🇵🇪', acronimo: 'PET' },
+  { id: 'buenos_aires', nombre: 'Buenos Aires', zona: 'America/Argentina/Buenos_Aires', pais: 'Argentina', emoji: '🇦🇷', acronimo: 'ART' },
+  { id: 'santiago', nombre: 'Santiago', zona: 'America/Santiago', pais: 'Chile', emoji: '🇨🇱', acronimo: 'CLT/CLST' },
+  { id: 'sao_paulo', nombre: 'São Paulo', zona: 'America/Sao_Paulo', pais: 'Brasil', emoji: '🇧🇷', acronimo: 'BRT' },
   // Asia
-  { id: 'tokio', nombre: 'Tokio', zona: 'Asia/Tokyo', pais: 'Japón', emoji: '🇯🇵' },
-  { id: 'pekin', nombre: 'Pekín', zona: 'Asia/Shanghai', pais: 'China', emoji: '🇨🇳' },
-  { id: 'hong_kong', nombre: 'Hong Kong', zona: 'Asia/Hong_Kong', pais: 'Hong Kong', emoji: '🇭🇰' },
-  { id: 'singapur', nombre: 'Singapur', zona: 'Asia/Singapore', pais: 'Singapur', emoji: '🇸🇬' },
-  { id: 'seul', nombre: 'Seúl', zona: 'Asia/Seoul', pais: 'Corea del Sur', emoji: '🇰🇷' },
-  { id: 'dubai', nombre: 'Dubái', zona: 'Asia/Dubai', pais: 'EAU', emoji: '🇦🇪' },
-  { id: 'mumbai', nombre: 'Bombay', zona: 'Asia/Kolkata', pais: 'India', emoji: '🇮🇳' },
-  { id: 'bangkok', nombre: 'Bangkok', zona: 'Asia/Bangkok', pais: 'Tailandia', emoji: '🇹🇭' },
+  { id: 'tokio', nombre: 'Tokio', zona: 'Asia/Tokyo', pais: 'Japón', emoji: '🇯🇵', acronimo: 'JST' },
+  { id: 'pekin', nombre: 'Pekín', zona: 'Asia/Shanghai', pais: 'China', emoji: '🇨🇳', acronimo: 'CST (China)' },
+  { id: 'hong_kong', nombre: 'Hong Kong', zona: 'Asia/Hong_Kong', pais: 'Hong Kong', emoji: '🇭🇰', acronimo: 'HKT' },
+  { id: 'singapur', nombre: 'Singapur', zona: 'Asia/Singapore', pais: 'Singapur', emoji: '🇸🇬', acronimo: 'SGT' },
+  { id: 'seul', nombre: 'Seúl', zona: 'Asia/Seoul', pais: 'Corea del Sur', emoji: '🇰🇷', acronimo: 'KST' },
+  { id: 'dubai', nombre: 'Dubái', zona: 'Asia/Dubai', pais: 'EAU', emoji: '🇦🇪', acronimo: 'GST' },
+  { id: 'mumbai', nombre: 'Bombay', zona: 'Asia/Kolkata', pais: 'India', emoji: '🇮🇳', acronimo: 'IST' },
+  { id: 'bangkok', nombre: 'Bangkok', zona: 'Asia/Bangkok', pais: 'Tailandia', emoji: '🇹🇭', acronimo: 'ICT' },
   // Oceanía
-  { id: 'sydney', nombre: 'Sídney', zona: 'Australia/Sydney', pais: 'Australia', emoji: '🇦🇺' },
-  { id: 'auckland', nombre: 'Auckland', zona: 'Pacific/Auckland', pais: 'Nueva Zelanda', emoji: '🇳🇿' },
+  { id: 'sydney', nombre: 'Sídney', zona: 'Australia/Sydney', pais: 'Australia', emoji: '🇦🇺', acronimo: 'AEST/AEDT' },
+  { id: 'auckland', nombre: 'Auckland', zona: 'Pacific/Auckland', pais: 'Nueva Zelanda', emoji: '🇳🇿', acronimo: 'NZST/NZDT' },
   // África
-  { id: 'cairo', nombre: 'El Cairo', zona: 'Africa/Cairo', pais: 'Egipto', emoji: '🇪🇬' },
-  { id: 'johannesburgo', nombre: 'Johannesburgo', zona: 'Africa/Johannesburg', pais: 'Sudáfrica', emoji: '🇿🇦' },
+  { id: 'cairo', nombre: 'El Cairo', zona: 'Africa/Cairo', pais: 'Egipto', emoji: '🇪🇬', acronimo: 'EET' },
+  { id: 'johannesburgo', nombre: 'Johannesburgo', zona: 'Africa/Johannesburg', pais: 'Sudáfrica', emoji: '🇿🇦', acronimo: 'SAST' },
 ];
+
+// Datos para la sección de referencia de acrónimos
+const acronimosReferencia = [
+  { acronimo: 'GMT', nombre: 'Greenwich Mean Time', utc: 'UTC+0', ciudades: 'Londres (invierno)' },
+  { acronimo: 'CET', nombre: 'Central European Time', utc: 'UTC+1', ciudades: 'Madrid, París, Berlín, Roma (invierno)' },
+  { acronimo: 'CEST', nombre: 'Central European Summer Time', utc: 'UTC+2', ciudades: 'Madrid, París, Berlín, Roma (verano)' },
+  { acronimo: 'BST', nombre: 'British Summer Time', utc: 'UTC+1', ciudades: 'Londres (verano)' },
+  { acronimo: 'EET', nombre: 'Eastern European Time', utc: 'UTC+2', ciudades: 'El Cairo, Atenas' },
+  { acronimo: 'MSK', nombre: 'Moscow Standard Time', utc: 'UTC+3', ciudades: 'Moscú' },
+  { acronimo: 'EST', nombre: 'Eastern Standard Time', utc: 'UTC-5', ciudades: 'Nueva York, Miami (invierno)' },
+  { acronimo: 'EDT', nombre: 'Eastern Daylight Time', utc: 'UTC-4', ciudades: 'Nueva York, Miami (verano)' },
+  { acronimo: 'CST', nombre: 'Central Standard Time', utc: 'UTC-6', ciudades: 'Chicago, México (invierno)' },
+  { acronimo: 'CDT', nombre: 'Central Daylight Time', utc: 'UTC-5', ciudades: 'Chicago (verano)' },
+  { acronimo: 'PST', nombre: 'Pacific Standard Time', utc: 'UTC-8', ciudades: 'Los Ángeles, San Francisco (invierno)' },
+  { acronimo: 'PDT', nombre: 'Pacific Daylight Time', utc: 'UTC-7', ciudades: 'Los Ángeles, San Francisco (verano)' },
+  { acronimo: 'JST', nombre: 'Japan Standard Time', utc: 'UTC+9', ciudades: 'Tokio, Osaka' },
+  { acronimo: 'KST', nombre: 'Korea Standard Time', utc: 'UTC+9', ciudades: 'Seúl' },
+  { acronimo: 'CST (China)', nombre: 'China Standard Time', utc: 'UTC+8', ciudades: 'Pekín, Shanghái' },
+  { acronimo: 'IST', nombre: 'India Standard Time', utc: 'UTC+5:30', ciudades: 'Mumbai, Nueva Delhi' },
+  { acronimo: 'SGT', nombre: 'Singapore Time', utc: 'UTC+8', ciudades: 'Singapur' },
+  { acronimo: 'AEST', nombre: 'Australian Eastern Standard Time', utc: 'UTC+10', ciudades: 'Sídney, Melbourne (invierno)' },
+  { acronimo: 'AEDT', nombre: 'Australian Eastern Daylight Time', utc: 'UTC+11', ciudades: 'Sídney, Melbourne (verano)' },
+];
+
+// ==================== FUNCIONES AUXILIARES ====================
+
+// Obtener el offset UTC de una zona horaria para una fecha específica
+const obtenerOffsetUTC = (zonaIANA: string, fecha: Date): string => {
+  try {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: zonaIANA,
+      timeZoneName: 'shortOffset',
+    });
+    const partes = formatter.formatToParts(fecha);
+    const offsetParte = partes.find(p => p.type === 'timeZoneName');
+    if (offsetParte) {
+      // Convertir "GMT+1" a "UTC+1"
+      return offsetParte.value.replace('GMT', 'UTC');
+    }
+    return '';
+  } catch {
+    return '';
+  }
+};
 
 // ==================== COMPONENTE PRINCIPAL ====================
 
@@ -62,6 +107,7 @@ export default function ConversorHorariosPage() {
   const [fechaOrigen, setFechaOrigen] = useState('');
   const [zonasSeleccionadas, setZonasSeleccionadas] = useState<string[]>(['nueva_york', 'tokio', 'londres']);
   const [horaActual, setHoraActual] = useState(new Date());
+  const [mostrarAcronimos, setMostrarAcronimos] = useState(false);
 
   // Actualizar hora actual cada segundo
   useEffect(() => {
@@ -149,11 +195,13 @@ export default function ConversorHorariosPage() {
 
       const horaConvertida = obtenerHoraEnZona(zona.zona, fechaUTC);
       const fechaConvertida = obtenerFechaEnZona(zona.zona, fechaUTC);
+      const offsetUTC = obtenerOffsetUTC(zona.zona, fechaUTC);
 
       return {
         ...zona,
         hora: horaConvertida,
         fecha: fechaConvertida,
+        offsetUTC,
       };
     }).filter(Boolean);
   }, [zonaOrigen, horaOrigen, fechaOrigen, zonasSeleccionadas]);
@@ -176,6 +224,7 @@ export default function ConversorHorariosPage() {
 
   // Zona origen datos
   const zonaOrigenData = zonasHorarias.find(z => z.id === zonaOrigen);
+  const offsetOrigenActual = zonaOrigenData ? obtenerOffsetUTC(zonaOrigenData.zona, horaActual) : '';
 
   return (
     <div className={styles.container}>
@@ -195,8 +244,10 @@ export default function ConversorHorariosPage() {
           <div className={styles.origenForm}>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label>Ciudad</label>
+                <label htmlFor="ciudad-origen">Ciudad</label>
                 <select
+                  id="ciudad-origen"
+                  title="Seleccionar ciudad de origen"
                   value={zonaOrigen}
                   onChange={(e) => setZonaOrigen(e.target.value)}
                   className={styles.select}
@@ -207,10 +258,15 @@ export default function ConversorHorariosPage() {
                     </option>
                   ))}
                 </select>
+                {offsetOrigenActual && (
+                  <span className={styles.offsetLabel}>{offsetOrigenActual} · {zonaOrigenData?.acronimo}</span>
+                )}
               </div>
               <div className={styles.formGroup}>
-                <label>Hora</label>
+                <label htmlFor="hora-origen">Hora</label>
                 <input
+                  id="hora-origen"
+                  title="Seleccionar hora"
                   type="time"
                   value={horaOrigen}
                   onChange={(e) => setHoraOrigen(e.target.value)}
@@ -218,8 +274,10 @@ export default function ConversorHorariosPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Fecha</label>
+                <label htmlFor="fecha-origen">Fecha</label>
                 <input
+                  id="fecha-origen"
+                  title="Seleccionar fecha"
                   type="date"
                   value={fechaOrigen}
                   onChange={(e) => setFechaOrigen(e.target.value)}
@@ -227,7 +285,7 @@ export default function ConversorHorariosPage() {
                 />
               </div>
             </div>
-            <button onClick={usarHoraActual} className={styles.btnActual}>
+            <button type="button" onClick={usarHoraActual} className={styles.btnActual}>
               🕐 Usar hora actual
             </button>
           </div>
@@ -251,6 +309,7 @@ export default function ConversorHorariosPage() {
                       <span className={styles.resultadoPais}>{resultado.pais}</span>
                     </div>
                     <button
+                      type="button"
                       onClick={() => toggleZona(resultado.id)}
                       className={styles.btnRemover}
                       title="Quitar"
@@ -259,7 +318,13 @@ export default function ConversorHorariosPage() {
                     </button>
                   </div>
                   <div className={styles.resultadoHora}>{resultado.hora}</div>
-                  <div className={styles.resultadoFecha}>{resultado.fecha}</div>
+                  <div className={styles.resultadoMeta}>
+                    <span className={styles.resultadoFecha}>{resultado.fecha}</span>
+                    <span className={styles.resultadoOffset}>{resultado.offsetUTC}</span>
+                  </div>
+                  {resultado.acronimo && (
+                    <div className={styles.resultadoAcronimo}>{resultado.acronimo}</div>
+                  )}
                 </div>
               ))}
             </div>
@@ -276,12 +341,15 @@ export default function ConversorHorariosPage() {
               .filter(z => z.id !== zonaOrigen && !zonasSeleccionadas.includes(z.id))
               .map(zona => (
                 <button
+                  type="button"
                   key={zona.id}
                   onClick={() => toggleZona(zona.id)}
                   className={styles.zonaBtn}
                   disabled={zonasSeleccionadas.length >= 6}
+                  title={`${zona.acronimo || ''} - ${obtenerOffsetUTC(zona.zona, horaActual)}`}
                 >
                   {zona.emoji} {zona.nombre}
+                  <span className={styles.zonaBtnOffset}>{obtenerOffsetUTC(zona.zona, horaActual)}</span>
                 </button>
               ))}
           </div>
@@ -332,6 +400,46 @@ export default function ConversorHorariosPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Sección de referencia de acrónimos */}
+      <section className={styles.acronimosPanel}>
+        <button
+          type="button"
+          className={styles.acronimosToggle}
+          onClick={() => setMostrarAcronimos(!mostrarAcronimos)}
+          aria-expanded={mostrarAcronimos}
+        >
+          <span>📖 Guía de zonas horarias (GMT, CET, EST, PST...)</span>
+          <span className={`${styles.toggleIcon} ${mostrarAcronimos ? styles.toggleIconOpen : ''}`}>
+            ▼
+          </span>
+        </button>
+
+        {mostrarAcronimos && (
+          <div className={styles.acronimosContent}>
+            <p className={styles.acronimosIntro}>
+              Referencia rápida de los acrónimos más utilizados en reuniones internacionales.
+              El offset UTC puede variar según el horario de verano/invierno.
+            </p>
+            <div className={styles.acronimosTable}>
+              <div className={styles.acronimosHeader}>
+                <span>Acrónimo</span>
+                <span>Nombre completo</span>
+                <span>UTC</span>
+                <span>Ciudades</span>
+              </div>
+              {acronimosReferencia.map((item) => (
+                <div key={item.acronimo} className={styles.acronimosRow}>
+                  <span className={styles.acronimoCode}>{item.acronimo}</span>
+                  <span className={styles.acronimoNombre}>{item.nombre}</span>
+                  <span className={styles.acronimoUtc}>{item.utc}</span>
+                  <span className={styles.acronimoCiudades}>{item.ciudades}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
 
       <Footer appName="conversor-horarios" />
