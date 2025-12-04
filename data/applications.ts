@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 133 aplicaciones organizadas por 12 categorías + 7 momentos
+ * Total: 136 aplicaciones organizadas por 12 categorías + 7 momentos
  * Actualizado: 2025-12-04
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
@@ -187,7 +187,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora Plusvalías IRPF", category: "Impuestos y Fiscalidad", contexts: ["dinero"], icon: "📊", description: "Calcula el IRPF de tus inversiones: plusvalías de acciones, fondos, criptomonedas, dividendos e intereses con tramos 2025", url: "/calculadora-plusvalias-irpf/", keywords: ["plusvalias", "irpf", "capital mobiliario", "dividendos", "acciones", "criptomonedas", "fondos", "tramos ahorro"] },
 
   // ============================================
-  // 8. Juegos y Entretenimiento (9)
+  // 8. Juegos y Entretenimiento (12)
   // ============================================
   { name: "Test de Velocidad de Escritura", category: "Juegos y Entretenimiento", contexts: ["relax", "trabajo", "estudio"], icon: "⌨️", description: "Mide tu velocidad de escritura en palabras por minuto (PPM) y mejora tu mecanografía con textos en español", url: "/test-velocidad-escritura/", keywords: ["mecanografia", "velocidad", "escritura", "ppm", "palabras por minuto", "typing test", "teclado"] },
   { name: "Radio meskeIA", category: "Juegos y Entretenimiento", contexts: ["relax", "casa", "trabajo"], icon: "📻", description: "Escucha miles de emisoras de radio de todo el mundo en vivo", url: "/radio-meskeia/", keywords: ["radio", "musica", "emisoras", "streaming", "noticias", "podcasts", "online"] },
@@ -198,6 +198,9 @@ export const applicationsDatabase: Application[] = [
   { name: "Juego Piedra Papel Tijera", category: "Juegos y Entretenimiento", contexts: ["relax"], icon: "🎮", description: "Juega piedra, papel o tijera contra la computadora", url: "/juego-piedra-papel-tijera/", keywords: ["piedra", "papel", "tijera", "juego", "clasico"] },
   { name: "Juego 2048", category: "Juegos y Entretenimiento", contexts: ["relax"], icon: "🎮", description: "Desliza y combina números para llegar a 2048", url: "/juego-2048/", keywords: ["2048", "numeros", "puzzle", "juego", "estrategia"] },
   { name: "Juego Puzzle Matemático", category: "Juegos y Entretenimiento", contexts: ["relax", "estudio"], icon: "🎮", description: "Resuelve puzzles matemáticos y ejercita tu mente", url: "/juego-puzzle-matematico/", keywords: ["puzzle", "matematicas", "logica", "juego", "cerebro"] },
+  { name: "Juego Asteroids", category: "Juegos y Entretenimiento", contexts: ["relax"], icon: "🚀", description: "Juega al clásico Asteroids: controla tu nave, destruye asteroides y OVNIs en este arcade espacial", url: "/juego-asteroids/", keywords: ["asteroids", "arcade", "nave", "espacio", "retro", "clasico", "disparos"] },
+  { name: "Juego Space Invaders", category: "Juegos y Entretenimiento", contexts: ["relax"], icon: "👾", description: "Defiende la Tierra de la invasión alienígena en el clásico Space Invaders", url: "/juego-space-invaders/", keywords: ["space invaders", "arcade", "aliens", "invasores", "retro", "clasico", "disparos"] },
+  { name: "Juego Platform Runner", category: "Juegos y Entretenimiento", contexts: ["relax"], icon: "🏃", description: "Corre, salta, recolecta monedas y derrota enemigos en este juego de plataformas", url: "/juego-platform-runner/", keywords: ["plataformas", "runner", "saltar", "monedas", "enemigos", "niveles", "arcade"] },
 
   // ============================================
   // 9. Matemáticas y Estadística (11)

@@ -95,7 +95,7 @@ export const implementedAppsUrls = [
   "/generador-hashes/",         // MD5, SHA-256, SHA-512
   "/codificador-base64/",       // Base64, URL encode, Hexadecimal
 
-  // Juegos y Entretenimiento (9 implementadas)
+  // Juegos y Entretenimiento (12 implementadas)
   "/test-velocidad-escritura/",
   "/juego-piedra-papel-tijera/",
   "/juego-tres-en-raya/",
@@ -105,6 +105,9 @@ export const implementedAppsUrls = [
   "/juego-sudoku/",
   "/juego-puzzle-matematico/",
   "/radio-meskeia/",
+  "/juego-asteroids/",          // Arcade clásico espacial
+  "/juego-space-invaders/",     // Arcade clásico de invasores
+  "/juego-platform-runner/",    // Juego de plataformas
 
   // Salud y Bienestar (11 implementadas)
   "/calculadora-imc/",

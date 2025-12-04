@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 133+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 136+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 133,
+  "total_tools": 136,
   "updated": "2025-12-04",
   "features": {
     "all_free": true,
@@ -153,7 +153,10 @@
         { "name": "Juego de Memoria", "slug": "juego-memoria", "url": "https://meskeia.com/juego-memoria/", "description": "Entrena tu memoria con parejas de cartas" },
         { "name": "Juego Piedra Papel Tijera", "slug": "juego-piedra-papel-tijera", "url": "https://meskeia.com/juego-piedra-papel-tijera/", "description": "Piedra, papel o tijera" },
         { "name": "Juego 2048", "slug": "juego-2048", "url": "https://meskeia.com/juego-2048/", "description": "Desliza y combina números" },
-        { "name": "Juego Puzzle Matemático", "slug": "juego-puzzle-matematico", "url": "https://meskeia.com/juego-puzzle-matematico/", "description": "Resuelve puzzles matemáticos" }
+        { "name": "Juego Puzzle Matemático", "slug": "juego-puzzle-matematico", "url": "https://meskeia.com/juego-puzzle-matematico/", "description": "Resuelve puzzles matemáticos" },
+        { "name": "Juego Asteroids", "slug": "juego-asteroids", "url": "https://meskeia.com/juego-asteroids/", "description": "Arcade clásico: destruye asteroides y OVNIs" },
+        { "name": "Juego Space Invaders", "slug": "juego-space-invaders", "url": "https://meskeia.com/juego-space-invaders/", "description": "Arcade clásico: defiende la Tierra de los invasores" },
+        { "name": "Juego Platform Runner", "slug": "juego-platform-runner", "url": "https://meskeia.com/juego-platform-runner/", "description": "Plataformas: corre, salta y recolecta monedas" }
       ]
     },
     {

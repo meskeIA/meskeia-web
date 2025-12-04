@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 132+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 135+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 132,
+  "total_tools": 135,
   "last_updated": "2025-12-04",
   "features": {
     "all_free": true,
@@ -70,7 +70,7 @@
       "name": "Juegos y Entretenimiento",
       "icon": "🎮",
       "description": "Diviértete mientras aprendes",
-      "tool_count": 9
+      "tool_count": 12
     },
     {
       "id": "matematicas",
@@ -142,7 +142,7 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 11
+      "tool_count": 14
     },
     {
       "id": "curiosidad",
@@ -1841,6 +1841,66 @@
         "cerebro"
       ],
       "icon": "🎮"
+    },
+    {
+      "slug": "juego-asteroids",
+      "name": "Juego Asteroids",
+      "url": "https://meskeia.com/juego-asteroids/",
+      "description": "Juega al clásico Asteroids: controla tu nave, destruye asteroides y OVNIs en este arcade espacial",
+      "category": "Juegos y Entretenimiento",
+      "contexts": [
+        "relax"
+      ],
+      "keywords": [
+        "asteroids",
+        "arcade",
+        "nave",
+        "espacio",
+        "retro",
+        "clasico",
+        "disparos"
+      ],
+      "icon": "🚀"
+    },
+    {
+      "slug": "juego-space-invaders",
+      "name": "Juego Space Invaders",
+      "url": "https://meskeia.com/juego-space-invaders/",
+      "description": "Defiende la Tierra de la invasión alienígena en el clásico Space Invaders",
+      "category": "Juegos y Entretenimiento",
+      "contexts": [
+        "relax"
+      ],
+      "keywords": [
+        "space invaders",
+        "arcade",
+        "aliens",
+        "invasores",
+        "retro",
+        "clasico",
+        "disparos"
+      ],
+      "icon": "👾"
+    },
+    {
+      "slug": "juego-platform-runner",
+      "name": "Juego Platform Runner",
+      "url": "https://meskeia.com/juego-platform-runner/",
+      "description": "Corre, salta, recolecta monedas y derrota enemigos en este juego de plataformas",
+      "category": "Juegos y Entretenimiento",
+      "contexts": [
+        "relax"
+      ],
+      "keywords": [
+        "plataformas",
+        "runner",
+        "saltar",
+        "monedas",
+        "enemigos",
+        "niveles",
+        "arcade"
+      ],
+      "icon": "🏃"
     },
     {
       "slug": "calculadora-probabilidad",
