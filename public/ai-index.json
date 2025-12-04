@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 129+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 132+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 129,
-  "updated": "2025-12-01",
+  "total_tools": 132,
+  "updated": "2025-12-04",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -106,7 +106,10 @@
         { "name": "Simulador de Préstamos", "slug": "simulador-prestamos", "url": "https://meskeia.com/simulador-prestamos/", "description": "Compara sistemas de amortización" },
         { "name": "Amortización Anticipada Hipoteca", "slug": "amortizacion-hipoteca", "url": "https://meskeia.com/amortizacion-hipoteca/", "description": "Calcula el ahorro al amortizar tu hipoteca" },
         { "name": "Calculadora de Inflación", "slug": "calculadora-inflacion", "url": "https://meskeia.com/calculadora-inflacion/", "description": "Calcula cómo la inflación afecta tu dinero" },
-        { "name": "Curso Decisiones de Inversión", "slug": "curso-decisiones-inversion", "url": "https://meskeia.com/curso-decisiones-inversion/", "description": "Aprende a tomar decisiones de inversión" }
+        { "name": "Curso Decisiones de Inversión", "slug": "curso-decisiones-inversion", "url": "https://meskeia.com/curso-decisiones-inversion/", "description": "Aprende a tomar decisiones de inversión" },
+        { "name": "Calculadora de Suscripciones", "slug": "calculadora-suscripciones", "url": "https://meskeia.com/calculadora-suscripciones/", "description": "Controla suscripciones: Netflix, Spotify, gym. Gasto mensual y anual" },
+        { "name": "Calculadora Roommates", "slug": "calculadora-roommates", "url": "https://meskeia.com/calculadora-roommates/", "description": "Divide gastos del piso compartido entre compañeros" },
+        { "name": "Calculadora Alquiler vs Compra", "slug": "calculadora-alquiler-vs-compra", "url": "https://meskeia.com/calculadora-alquiler-vs-compra/", "description": "Análisis financiero alquiler vs compra vivienda" }
       ]
     },
     {

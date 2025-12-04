@@ -1,7 +1,7 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 129 aplicaciones organizadas por 12 categorías + 7 momentos
- * Actualizado: 2025-12-01
+ * Total: 132 aplicaciones organizadas por 12 categorías + 7 momentos
+ * Actualizado: 2025-12-04
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
  * - calculadora-: Apps que calculan/resuelven
@@ -147,7 +147,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Schema Markup", category: "Emprendimiento y SEO", contexts: ["creando", "trabajo"], icon: "🏷️", description: "Genera código JSON-LD Schema.org para SEO. Artículos, productos, FAQ, negocios locales y recetas", url: "/generador-schema-markup/", keywords: ["schema", "json-ld", "structured data", "rich snippets", "seo tecnico", "schema.org", "markup"] },
 
   // ============================================
-  // 5. Finanzas Personales (12)
+  // 5. Finanzas Personales (15)
   // ============================================
   { name: "Simulador de Hipoteca", category: "Finanzas Personales", contexts: ["dinero", "casa"], icon: "💰", description: "Calcula tu hipoteca con cuadro de amortización completo y análisis detallado", url: "/simulador-hipoteca/", keywords: ["prestamo", "casa", "vivienda", "banco", "interes", "amortizacion", "cuota", "euribor"] },
   { name: "Calculadora de Jubilación", category: "Finanzas Personales", contexts: ["dinero"], icon: "💰", description: "Planifica tu jubilación calculando ahorros necesarios y pensión estimada", url: "/calculadora-jubilacion/", keywords: ["pension", "retiro", "ahorro", "inversion", "planes", "seguridad social"] },
@@ -160,6 +160,9 @@ export const applicationsDatabase: Application[] = [
   { name: "Amortización Anticipada Hipoteca", category: "Finanzas Personales", contexts: ["dinero", "casa"], icon: "🏠", description: "Calcula el ahorro al amortizar tu hipoteca: reducir cuota vs reducir plazo. Comparativa y recomendación", url: "/amortizacion-hipoteca/", keywords: ["amortizacion anticipada", "hipoteca", "reducir cuota", "reducir plazo", "ahorro intereses", "cancelacion parcial"] },
   { name: "Calculadora de Inflación", category: "Finanzas Personales", contexts: ["dinero", "curiosidad"], icon: "📈", description: "Calcula cómo la inflación afecta tu dinero. Poder adquisitivo histórico con datos del INE desde 1961", url: "/calculadora-inflacion/", keywords: ["inflacion", "ipc", "poder adquisitivo", "ine", "precios", "coste vida", "devaluacion"] },
   { name: "Curso Decisiones de Inversión", category: "Finanzas Personales", contexts: ["estudio", "dinero"], icon: "📚", description: "Aprende a tomar decisiones de inversión inteligentes con este curso interactivo", url: "/curso-decisiones-inversion/", keywords: ["curso", "inversion", "finanzas", "aprender", "bolsa"] },
+  { name: "Calculadora de Suscripciones", category: "Finanzas Personales", contexts: ["dinero", "casa"], icon: "💳", description: "Controla tus suscripciones (Netflix, Spotify, gym...). Calcula gasto mensual y anual. Detecta gastos olvidados", url: "/calculadora-suscripciones/", keywords: ["suscripciones", "netflix", "spotify", "gastos recurrentes", "mensual", "anual", "control gastos"] },
+  { name: "Calculadora Roommates", category: "Finanzas Personales", contexts: ["dinero", "casa"], icon: "🏠", description: "Divide los gastos del piso entre compañeros de forma justa. Calcula quién debe a quién automáticamente", url: "/calculadora-roommates/", keywords: ["roommates", "piso compartido", "dividir gastos", "compañeros", "deudas", "luz", "internet"] },
+  { name: "Calculadora Alquiler vs Compra", category: "Finanzas Personales", contexts: ["dinero", "casa"], icon: "🏡", description: "¿Alquilar o comprar vivienda? Análisis financiero completo con hipoteca, gastos y coste de oportunidad", url: "/calculadora-alquiler-vs-compra/", keywords: ["alquiler", "compra", "vivienda", "hipoteca", "inversion", "coste oportunidad"] },
 
   // ============================================
   // 6. Herramientas Académicas (7)

@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 128+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 131+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 128,
+  "total_tools": 131,
   "last_updated": "2025-12-04",
   "features": {
     "all_free": true,
@@ -49,7 +49,7 @@
       "name": "Finanzas Personales",
       "icon": "💰",
       "description": "Inversiones, ahorro y planificación financiera",
-      "tool_count": 11
+      "tool_count": 14
     },
     {
       "id": "academicas",
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 37
+      "tool_count": 40
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 25
+      "tool_count": 28
     },
     {
       "id": "creando",
@@ -1331,6 +1331,68 @@
         "bolsa"
       ],
       "icon": "📚"
+    },
+    {
+      "slug": "calculadora-suscripciones",
+      "name": "Calculadora de Suscripciones",
+      "url": "https://meskeia.com/calculadora-suscripciones/",
+      "description": "Controla tus suscripciones (Netflix, Spotify, gym...). Calcula gasto mensual y anual. Detecta gastos olvidados",
+      "category": "Finanzas Personales",
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "suscripciones",
+        "netflix",
+        "spotify",
+        "gastos recurrentes",
+        "mensual",
+        "anual",
+        "control gastos"
+      ],
+      "icon": "💳"
+    },
+    {
+      "slug": "calculadora-roommates",
+      "name": "Calculadora Roommates",
+      "url": "https://meskeia.com/calculadora-roommates/",
+      "description": "Divide los gastos del piso entre compañeros de forma justa. Calcula quién debe a quién automáticamente",
+      "category": "Finanzas Personales",
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "roommates",
+        "piso compartido",
+        "dividir gastos",
+        "compañeros",
+        "deudas",
+        "luz",
+        "internet"
+      ],
+      "icon": "🏠"
+    },
+    {
+      "slug": "calculadora-alquiler-vs-compra",
+      "name": "Calculadora Alquiler vs Compra",
+      "url": "https://meskeia.com/calculadora-alquiler-vs-compra/",
+      "description": "¿Alquilar o comprar vivienda? Análisis financiero completo con hipoteca, gastos y coste de oportunidad",
+      "category": "Finanzas Personales",
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "alquiler",
+        "compra",
+        "vivienda",
+        "hipoteca",
+        "inversion",
+        "coste oportunidad"
+      ],
+      "icon": "🏡"
     },
     {
       "slug": "calculadora-movimiento",

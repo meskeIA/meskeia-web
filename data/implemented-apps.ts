@@ -4,11 +4,11 @@
  * IMPORTANTE: Esta lista debe coincidir con las carpetas en app/
  * Solo añadir URLs cuando la app esté realmente creada
  *
- * Actualizado: 2025-12-01
+ * Actualizado: 2025-12-04
  */
 
 export const implementedAppsUrls = [
-  // Finanzas y Fiscalidad (16 implementadas)
+  // Finanzas y Fiscalidad (19 implementadas)
   "/calculadora-inflacion/",
   "/calculadora-donaciones-cataluna/",
   "/calculadora-donaciones-nacional/",
@@ -25,6 +25,9 @@ export const implementedAppsUrls = [
   "/calculadora-jubilacion/",
   "/calculadora-inversiones/",
   "/test-perfil-inversor/",
+  "/calculadora-suscripciones/",      // Control de suscripciones recurrentes
+  "/calculadora-roommates/",          // División gastos piso compartido
+  "/calculadora-alquiler-vs-compra/", // Análisis alquiler vs compra vivienda
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",
