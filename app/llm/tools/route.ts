@@ -1,15 +1,18 @@
 /**
- * API Endpoint: /api/tools
+ * API Endpoint: /llm/tools
  *
  * Genera automáticamente un JSON estructurado con todas las herramientas de meskeIA.
  * Optimizado para indexación por LLMs (Claude, ChatGPT, Perplexity, Gemini).
  *
  * Se auto-genera desde data/applications.ts en cada build.
+ *
+ * NOTA: Movido de /api/tools a /llm/tools para evitar conflicto con
+ * el sistema Analytics que usa /api/v1/ en el hosting.
  */
 
 import { applicationsDatabase, categories, moments, MomentType } from '@/data/applications';
 
-// Configuración para static export - genera /api/tools.json
+// Configuración para static export - genera /llm/tools.json
 export const dynamic = 'force-static';
 
 // Interfaz para la respuesta del API
