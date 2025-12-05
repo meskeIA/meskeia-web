@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 136+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 137+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 136,
+  "total_tools": 137,
   "last_updated": "2025-12-05",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 7
+      "tool_count": 8
     },
     {
       "id": "impuestos",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 36
+      "tool_count": 37
     },
     {
       "id": "casa",
@@ -1570,6 +1570,31 @@
         "aprender"
       ],
       "icon": "📚"
+    },
+    {
+      "slug": "curso-teoria-politica",
+      "name": "Curso de Introducción a la Teoría Política",
+      "url": "https://meskeia.com/curso-teoria-politica/",
+      "description": "Aprende los fundamentos del pensamiento político: desde Platón y Aristóteles hasta Marx y Rawls. 9 capítulos con los grandes pensadores",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "teoria politica",
+        "filosofia politica",
+        "platon",
+        "aristoteles",
+        "maquiavelo",
+        "hobbes",
+        "locke",
+        "rousseau",
+        "marx",
+        "rawls",
+        "curso",
+        "politica"
+      ],
+      "icon": "🏛️"
     },
     {
       "slug": "simulador-irpf",
