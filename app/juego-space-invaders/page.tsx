@@ -546,13 +546,14 @@ export default function JuegoSpaceInvadersPage() {
       </header>
 
       <div className={styles.gameLayout}>
-        <div className={styles.canvasWrapper}>
-          <canvas
-            ref={canvasRef}
-            width={CANVAS_WIDTH}
-            height={CANVAS_HEIGHT}
-            className={styles.canvas}
-          />
+        <div className={styles.gameColumn}>
+          <div className={styles.canvasWrapper}>
+            <canvas
+              ref={canvasRef}
+              width={CANVAS_WIDTH}
+              height={CANVAS_HEIGHT}
+              className={styles.canvas}
+            />
 
           {/* Pantalla de inicio */}
           {gameState === 'start' && (
@@ -604,6 +605,68 @@ export default function JuegoSpaceInvadersPage() {
               </div>
             </div>
           )}
+          </div>
+
+          {/* Controles táctiles para móvil */}
+          <div className={styles.touchControls}>
+            <div className={styles.touchControlsLeft}>
+              <button
+                type="button"
+                className={styles.touchBtn}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  if (gameStateRef.current === 'playing') {
+                    const player = playerRef.current;
+                    player.x -= player.gridStep;
+                    player.x = Math.max(0, player.x);
+                  }
+                }}
+                onTouchEnd={(e) => e.preventDefault()}
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                className={styles.touchBtn}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  if (gameStateRef.current === 'playing') {
+                    const player = playerRef.current;
+                    player.x += player.gridStep;
+                    player.x = Math.min(CANVAS_WIDTH - player.width, player.x);
+                  }
+                }}
+                onTouchEnd={(e) => e.preventDefault()}
+              >
+                →
+              </button>
+            </div>
+            <button
+              type="button"
+              className={`${styles.touchBtn} ${styles.touchBtnPause}`}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                togglePause();
+              }}
+            >
+              ⏸
+            </button>
+            <div className={styles.touchControlsRight}>
+              <button
+                type="button"
+                className={`${styles.touchBtn} ${styles.touchBtnFire}`}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  if (gameStateRef.current === 'playing') {
+                    shootBullet();
+                  }
+                }}
+                onTouchEnd={(e) => e.preventDefault()}
+              >
+                🔥
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className={styles.sidebar}>

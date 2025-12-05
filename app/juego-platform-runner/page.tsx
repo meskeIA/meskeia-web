@@ -634,15 +634,16 @@ export default function JuegoPlatformRunnerPage() {
       </header>
 
       <div className={styles.gameLayout}>
-        <div className={styles.canvasWrapper}>
-          <canvas
-            ref={canvasRef}
-            width={CANVAS_WIDTH}
-            height={CANVAS_HEIGHT}
-            className={styles.canvas}
-          />
+        <div className={styles.gameColumn}>
+          <div className={styles.canvasWrapper}>
+            <canvas
+              ref={canvasRef}
+              width={CANVAS_WIDTH}
+              height={CANVAS_HEIGHT}
+              className={styles.canvas}
+            />
 
-          {/* Pantalla de inicio */}
+            {/* Pantalla de inicio */}
           {gameState === 'start' && (
             <div className={styles.gameScreen}>
               <div className={styles.screenContent}>
@@ -699,7 +700,68 @@ export default function JuegoPlatformRunnerPage() {
                 </button>
               </div>
             </div>
-          )}
+            )}
+          </div>
+
+          {/* Controles táctiles para móvil */}
+          <div className={styles.touchControls}>
+            <div className={styles.touchControlsLeft}>
+              <button
+                type="button"
+                className={styles.touchBtn}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  keysRef.current['ArrowLeft'] = true;
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  keysRef.current['ArrowLeft'] = false;
+                }}
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                className={styles.touchBtn}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  keysRef.current['ArrowRight'] = true;
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  keysRef.current['ArrowRight'] = false;
+                }}
+              >
+                →
+              </button>
+            </div>
+            <button
+              type="button"
+              className={`${styles.touchBtn} ${styles.touchBtnPause}`}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                togglePause();
+              }}
+            >
+              ⏸
+            </button>
+            <div className={styles.touchControlsRight}>
+              <button
+                type="button"
+                className={`${styles.touchBtn} ${styles.touchBtnJump}`}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  if (gameStateRef.current === 'playing' && playerRef.current.onGround) {
+                    playerRef.current.velocityY = JUMP_STRENGTH;
+                    playerRef.current.onGround = false;
+                  }
+                }}
+                onTouchEnd={(e) => e.preventDefault()}
+              >
+                ⬆
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className={styles.sidebar}>

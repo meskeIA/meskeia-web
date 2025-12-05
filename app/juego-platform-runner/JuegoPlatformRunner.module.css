@@ -68,6 +68,12 @@
   margin-bottom: var(--spacing-xl);
 }
 
+.gameColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
 /* Canvas Wrapper */
 .canvasWrapper {
   background: var(--bg-card);
@@ -314,5 +320,125 @@
 
   .panel {
     min-width: auto;
+  }
+
+  /* Overlay de pantallas de juego en móvil */
+  .gameScreen {
+    padding: var(--spacing-sm);
+  }
+
+  .screenContent {
+    padding: var(--spacing-md);
+    max-height: 90%;
+    overflow-y: auto;
+  }
+
+  .screenContent h2 {
+    font-size: 1.4rem;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .screenContent p {
+    font-size: 0.85rem;
+    margin: var(--spacing-xs) 0;
+  }
+
+  .instructions {
+    font-size: 0.95rem !important;
+    margin-bottom: var(--spacing-md) !important;
+  }
+
+  .gameRules {
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .gameRules p {
+    font-size: 0.75rem;
+    margin: 2px 0;
+    line-height: 1.3;
+  }
+
+  .gameBtn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.9rem;
+  }
+}
+
+/* Controles táctiles para móvil */
+.touchControls {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  margin-top: var(--spacing-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .touchControls {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.touchControlsLeft {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.touchControlsRight {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.touchBtn {
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.touchBtn:active {
+  transform: scale(0.95);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.touchBtnJump {
+  width: 80px;
+  height: 80px;
+  font-size: 2rem;
+  background: linear-gradient(135deg, #00CC66, #00FF88);
+}
+
+.touchBtnPause {
+  width: 50px;
+  height: 50px;
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, #666, #888);
+}
+
+/* Mostrar controles táctiles solo en dispositivos táctiles */
+@media (hover: none) and (pointer: coarse) {
+  .touchControls {
+    display: flex;
+  }
+}
+
+/* También mostrar en pantallas pequeñas como fallback */
+@media (max-width: 768px) {
+  .touchControls {
+    display: flex;
   }
 }

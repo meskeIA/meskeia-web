@@ -709,15 +709,16 @@ export default function JuegoAsteroidsPage() {
       </header>
 
       <div className={styles.gameLayout}>
-        <div className={styles.canvasWrapper}>
-          <canvas
-            ref={canvasRef}
-            width={CANVAS_WIDTH}
-            height={CANVAS_HEIGHT}
-            className={styles.canvas}
-          />
+        <div className={styles.gameColumn}>
+          <div className={styles.canvasWrapper}>
+            <canvas
+              ref={canvasRef}
+              width={CANVAS_WIDTH}
+              height={CANVAS_HEIGHT}
+              className={styles.canvas}
+            />
 
-          {/* Pantalla de inicio */}
+            {/* Pantalla de inicio */}
           {gameState === 'start' && (
             <div className={styles.gameScreen}>
               <div className={styles.screenContent}>
@@ -759,7 +760,85 @@ export default function JuegoAsteroidsPage() {
                 </button>
               </div>
             </div>
-          )}
+            )}
+          </div>
+
+          {/* Controles táctiles para móvil */}
+          <div className={styles.touchControls}>
+            <div className={styles.touchControlsLeft}>
+              <button
+                type="button"
+                className={styles.touchBtn}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  keysRef.current['ArrowLeft'] = true;
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  keysRef.current['ArrowLeft'] = false;
+                }}
+              >
+                ↺
+              </button>
+              <button
+                type="button"
+                className={styles.touchBtn}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  keysRef.current['ArrowRight'] = true;
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  keysRef.current['ArrowRight'] = false;
+                }}
+              >
+                ↻
+              </button>
+            </div>
+            <div className={styles.touchControlsCenter}>
+              <button
+                type="button"
+                className={`${styles.touchBtn} ${styles.touchBtnThrust}`}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  if (gameStateRef.current === 'playing') {
+                    const ship = shipRef.current;
+                    ship.velocity.x += Math.cos(ship.angle) * 3;
+                    ship.velocity.y += Math.sin(ship.angle) * 3;
+                    createThrustParticles();
+                  }
+                }}
+                onTouchEnd={(e) => e.preventDefault()}
+              >
+                🚀
+              </button>
+              <button
+                type="button"
+                className={`${styles.touchBtn} ${styles.touchBtnPause}`}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  togglePause();
+                }}
+              >
+                ⏸
+              </button>
+            </div>
+            <div className={styles.touchControlsRight}>
+              <button
+                type="button"
+                className={`${styles.touchBtn} ${styles.touchBtnFire}`}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  if (gameStateRef.current === 'playing') {
+                    shootBullet();
+                  }
+                }}
+                onTouchEnd={(e) => e.preventDefault()}
+              >
+                🔥
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className={styles.sidebar}>
