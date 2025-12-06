@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 138,
+  "total_tools": 139,
   "updated": "2025-12-06",
   "features": {
     "all_free": true,
@@ -126,7 +126,9 @@
         { "name": "Calculadora de Electricidad", "slug": "calculadora-electricidad", "url": "https://meskeia.com/calculadora-electricidad/", "description": "Ley de Ohm, potencia y circuitos" },
         { "name": "Calculadora de Notas", "slug": "calculadora-notas", "url": "https://meskeia.com/calculadora-notas/", "description": "Calcula tu media académica ponderada" },
         { "name": "Generador de Horarios de Estudio", "slug": "generador-horarios-estudio", "url": "https://meskeia.com/generador-horarios-estudio/", "description": "Genera horarios de estudio personalizados" },
-        { "name": "Creador de Flashcards", "slug": "creador-flashcards", "url": "https://meskeia.com/creador-flashcards/", "description": "Crea y estudia con flashcards" }
+        { "name": "Creador de Flashcards", "slug": "creador-flashcards", "url": "https://meskeia.com/creador-flashcards/", "description": "Crea y estudia con flashcards" },
+        { "name": "Curso de Empresa Familiar", "slug": "curso-empresa-familiar", "url": "https://meskeia.com/curso-empresa-familiar/", "description": "Gestión de empresas familiares: gobierno, sucesión, profesionalización" },
+        { "name": "Curso de Negociación Exitosa", "slug": "curso-negociacion", "url": "https://meskeia.com/curso-negociacion/", "description": "Domina BATNA, ZOPA, tácticas de persuasión y cierre de acuerdos" }
       ]
     },
     {

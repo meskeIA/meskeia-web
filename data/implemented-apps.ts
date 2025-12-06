@@ -167,6 +167,7 @@ export const implementedAppsUrls = [
   "/curso-teoria-politica/",
   "/curso-pensamiento-cientifico/",
   "/curso-empresa-familiar/",
+  "/curso-negociacion/",
 
   // SEO & Marketing (8 implementadas)
   "/generador-meta-descripciones/",

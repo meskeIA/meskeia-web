@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 140+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 141+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 140,
+  "total_tools": 141,
   "last_updated": "2025-12-06",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 10
+      "tool_count": 11
     },
     {
       "id": "impuestos",
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 52
+      "tool_count": 53
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 39
+      "tool_count": 40
     },
     {
       "id": "casa",
@@ -1664,6 +1664,30 @@
         "profesionalizacion"
       ],
       "icon": "🏢"
+    },
+    {
+      "slug": "curso-negociacion",
+      "name": "Curso de Negociación Exitosa",
+      "url": "https://meskeia.com/curso-negociacion/",
+      "description": "Domina el arte de negociar: BATNA, ZOPA, tácticas de persuasión, Cialdini, cierre de acuerdos, resolución de conflictos y negociación multicultural. 12 capítulos",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "negociacion",
+        "batna",
+        "zopa",
+        "persuasion",
+        "cialdini",
+        "cierre ventas",
+        "contratos",
+        "mediacion",
+        "arbitraje",
+        "negociacion internacional"
+      ],
+      "icon": "🤝"
     },
     {
       "slug": "simulador-irpf",
