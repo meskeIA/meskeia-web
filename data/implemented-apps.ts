@@ -168,6 +168,7 @@ export const implementedAppsUrls = [
   "/curso-pensamiento-cientifico/",
   "/curso-empresa-familiar/",
   "/curso-negociacion/",
+  "/curso-optimizacion-ia/",        // Curso GEO/AEO: optimización para IAs (6 capítulos)
 
   // SEO & Marketing (9 implementadas)
   "/generador-meta-descripciones/",
