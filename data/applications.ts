@@ -129,7 +129,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Enlaces UTM", category: "Diseño Web", contexts: ["trabajo", "creando"], icon: "💻", description: "Genera enlaces UTM para Google Analytics. Trackea campañas de marketing con parámetros utm_source, utm_medium, utm_campaign", url: "/generador-utm/", keywords: ["utm", "google analytics", "tracking", "marketing", "campañas", "enlaces"] },
 
   // ============================================
-  // 4. Emprendimiento y SEO (16)
+  // 4. Emprendimiento y SEO (17)
   // ============================================
   { name: "Calculadora Tarifa Freelance", category: "Emprendimiento y SEO", contexts: ["trabajo", "dinero"], icon: "💼", description: "Calcula tu tarifa freelance ideal considerando gastos, impuestos, vacaciones y margen de beneficio. Evita cobrar de menos", url: "/calculadora-tarifa-freelance/", keywords: ["freelance", "tarifa", "precio", "autonomo", "honorarios"] },
   { name: "Calculadora Break-Even", category: "Emprendimiento y SEO", contexts: ["trabajo", "dinero"], icon: "💼", description: "Calcula el punto de equilibrio de tus productos. Analiza margen de contribución, rentabilidad y escenarios de costos/precios", url: "/calculadora-break-even/", keywords: ["break even", "punto equilibrio", "costos", "precio", "rentabilidad"] },
@@ -148,6 +148,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Schema Markup", category: "Emprendimiento y SEO", contexts: ["creando", "trabajo"], icon: "🏷️", description: "Genera código JSON-LD Schema.org para SEO. Artículos, productos, FAQ, negocios locales y recetas", url: "/generador-schema-markup/", keywords: ["schema", "json-ld", "structured data", "rich snippets", "seo tecnico", "schema.org", "markup"] },
   { name: "Generador de Facturas", category: "Emprendimiento y SEO", contexts: ["trabajo", "dinero"], icon: "🧾", description: "Crea facturas profesionales para autónomos. IVA automático, retención IRPF, múltiples líneas y exportación a PDF", url: "/generador-facturas/", keywords: ["factura", "autonomo", "facturar", "iva", "irpf", "pdf", "plantilla factura", "pequeña empresa"] },
   { name: "Generador de Carruseles", category: "Emprendimiento y SEO", contexts: ["creando", "trabajo"], icon: "📱", description: "Crea carruseles profesionales para Instagram y LinkedIn. Diseña slides, elige plantillas, personaliza colores y descarga como imágenes PNG", url: "/generador-carruseles/", keywords: ["carrusel", "instagram", "linkedin", "slides", "redes sociales", "marketing", "contenido", "png"] },
+  { name: "Analizador GEO/AEO", category: "Emprendimiento y SEO", contexts: ["creando", "trabajo"], icon: "🤖", description: "Analiza y optimiza tu contenido para ser citado por ChatGPT, Perplexity, Gemini y Google AI Overviews. Puntuación GEO con recomendaciones", url: "/analizador-geo/", keywords: ["geo", "aeo", "ia", "chatgpt", "perplexity", "gemini", "optimizacion", "citabilidad", "seo ia", "answer engine"] },
 
   // ============================================
   // 5. Finanzas Personales (15)

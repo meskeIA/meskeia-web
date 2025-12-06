@@ -169,7 +169,7 @@ export const implementedAppsUrls = [
   "/curso-empresa-familiar/",
   "/curso-negociacion/",
 
-  // SEO & Marketing (8 implementadas)
+  // SEO & Marketing (9 implementadas)
   "/generador-meta-descripciones/",
   "/analizador-densidad-seo/",
   "/generador-palabras-clave/",
@@ -178,6 +178,7 @@ export const implementedAppsUrls = [
   "/calculadora-legibilidad/",
   "/calculadora-tiempo-lectura/",
   "/generador-schema-markup/",
+  "/analizador-geo/",                // Optimización contenido para IAs (GEO/AEO)
 ];
 
 /**

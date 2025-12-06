@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 141+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 142+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 141,
+  "total_tools": 142,
   "last_updated": "2025-12-06",
   "features": {
     "all_free": true,
@@ -42,7 +42,7 @@
       "name": "Emprendimiento y SEO",
       "icon": "💼",
       "description": "Gestiona tu negocio y optimiza tu presencia online",
-      "tool_count": 17
+      "tool_count": 18
     },
     {
       "id": "finanzas",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 53
+      "tool_count": 54
     },
     {
       "id": "estudio",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 33
+      "tool_count": 34
     },
     {
       "id": "relax",
@@ -1176,6 +1176,30 @@
         "png"
       ],
       "icon": "📱"
+    },
+    {
+      "slug": "analizador-geo",
+      "name": "Analizador GEO/AEO",
+      "url": "https://meskeia.com/analizador-geo/",
+      "description": "Analiza y optimiza tu contenido para ser citado por ChatGPT, Perplexity, Gemini y Google AI Overviews. Puntuación GEO con recomendaciones",
+      "category": "Emprendimiento y SEO",
+      "contexts": [
+        "creando",
+        "trabajo"
+      ],
+      "keywords": [
+        "geo",
+        "aeo",
+        "ia",
+        "chatgpt",
+        "perplexity",
+        "gemini",
+        "optimizacion",
+        "citabilidad",
+        "seo ia",
+        "answer engine"
+      ],
+      "icon": "🤖"
     },
     {
       "slug": "simulador-hipoteca",
