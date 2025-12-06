@@ -695,6 +695,14 @@ export default function CalculadoraFechaPartoPage() {
               <li>Si se retrasa alguna dosis, consulta con tu pediatra cómo recuperarla</li>
             </ul>
           </div>
+
+          {/* Enlace a Calculadora de Percentiles */}
+          <div className={styles.enlaceRelacionado}>
+            <p>📊 <strong>¿Tu bebé ya nació?</strong> Sigue su crecimiento con la{' '}
+              <a href="/calculadora-percentiles/">Calculadora de Percentiles Infantiles</a>
+              {' '}(peso y talla según tablas OMS)
+            </p>
+          </div>
         </div>
       )}
 

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './CalculadoraPercentiles.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { formatNumber } from '@/lib';
 
 type Sexo = 'nino' | 'nina';
 
@@ -305,6 +304,14 @@ export default function CalculadoraPercentilesPage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Enlace relacionado */}
+      <div className={styles.enlaceRelacionado}>
+        <p>🤰 <strong>¿Esperando un bebé?</strong> Planifica todo con el{' '}
+          <a href="/calculadora-fecha-parto/">Planificador de Embarazo y Bebé</a>
+          {' '}(calculadora FPP, checklist, lista de compras y vacunas)
+        </p>
       </div>
 
       {/* DISCLAIMER - SIEMPRE VISIBLE */}

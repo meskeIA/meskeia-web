@@ -651,6 +651,32 @@
   margin-bottom: 5px;
 }
 
+/* Enlace relacionado */
+.enlaceRelacionado {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.enlaceRelacionado p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.enlaceRelacionado a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.enlaceRelacionado a:hover {
+  color: var(--secondary);
+}
+
 /* Disclaimer */
 .disclaimer {
   background: #FFF3CD;
