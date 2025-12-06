@@ -309,7 +309,7 @@ export default function CalculadoraPercentilesPage() {
       {/* Enlace relacionado */}
       <div className={styles.enlaceRelacionado}>
         <p>🤰 <strong>¿Esperando un bebé?</strong> Planifica todo con el{' '}
-          <a href="/calculadora-fecha-parto/">Planificador de Embarazo y Bebé</a>
+          <a href="/planificador-embarazo/">Planificador de Embarazo y Bebé</a>
           {' '}(calculadora FPP, checklist, lista de compras y vacunas)
         </p>
       </div>

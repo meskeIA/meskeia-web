@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import styles from './CalculadoraFechaParto.module.css';
+import styles from './PlanificadorEmbarazo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import EducationalSection from '@/components/EducationalSection';
@@ -941,7 +941,7 @@ export default function CalculadoraFechaPartoPage() {
         </section>
       </EducationalSection>
 
-      <Footer appName="calculadora-fecha-parto" />
+      <Footer appName="planificador-embarazo" />
     </div>
   );
 }

@@ -120,7 +120,7 @@ export const implementedAppsUrls = [
   "/planificador-menu/",
   "/calculadora-porciones/",
   "/test-habitos/",
-  "/calculadora-fecha-parto/",       // Fecha probable de parto y semanas gestación
+  "/planificador-embarazo/",         // Planificador embarazo: FPP, checklist, compras, vacunas
   "/calculadora-percentiles/",       // Percentiles peso/talla infantil OMS
 
   // Herramientas Web y Tecnología (6 implementadas)

@@ -2718,9 +2718,9 @@
       "icon": "🌟"
     },
     {
-      "slug": "calculadora-fecha-parto",
+      "slug": "planificador-embarazo",
       "name": "Planificador Embarazo y Bebé",
-      "url": "https://meskeia.com/calculadora-fecha-parto/",
+      "url": "https://meskeia.com/planificador-embarazo/",
       "description": "Planifica tu embarazo: calculadora FPP, checklist por trimestre, lista de compras del bebé y calendario de vacunación España 2024",
       "category": "Salud y Bienestar",
       "contexts": [
@@ -2737,7 +2737,8 @@
         "checklist embarazo",
         "lista compras bebe",
         "vacunas recien nacido",
-        "canastilla"
+        "canastilla",
+        "planificador"
       ],
       "icon": "🤰"
     },

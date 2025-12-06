@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Planificador de Embarazo y Bebé - Calculadora, Checklist, Compras y Vacunas',
     description: 'Tu guía completa para el embarazo: calcula la fecha de parto, organiza tareas por trimestre, lista de compras y calendario de vacunación.',
-    url: 'https://meskeia.com/calculadora-fecha-parto',
+    url: 'https://meskeia.com/planificador-embarazo',
     siteName: 'meskeIA',
     locale: 'es_ES',
   },
