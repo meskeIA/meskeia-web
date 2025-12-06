@@ -2647,9 +2647,9 @@
     },
     {
       "slug": "calculadora-fecha-parto",
-      "name": "Calculadora Fecha de Parto",
+      "name": "Planificador Embarazo y Bebé",
       "url": "https://meskeia.com/calculadora-fecha-parto/",
-      "description": "Calcula tu fecha probable de parto (FPP) y semanas de gestación a partir de la última regla",
+      "description": "Planifica tu embarazo: calculadora FPP, checklist por trimestre, lista de compras del bebé y calendario de vacunación España 2024",
       "category": "Salud y Bienestar",
       "contexts": [
         "casa"
@@ -2661,7 +2661,11 @@
         "semanas gestacion",
         "trimestre",
         "fur",
-        "regla naegele"
+        "regla naegele",
+        "checklist embarazo",
+        "lista compras bebe",
+        "vacunas recien nacido",
+        "canastilla"
       ],
       "icon": "🤰"
     },

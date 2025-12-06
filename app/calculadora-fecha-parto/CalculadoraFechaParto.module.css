@@ -1,5 +1,5 @@
 .container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
   min-height: 100vh;
@@ -28,7 +28,49 @@
   opacity: 0.9;
 }
 
-/* Main Content */
+/* Tabs Navigation */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 25px;
+  background: var(--bg-card);
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.tab {
+  flex: 1;
+  min-width: 110px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.tabActiva {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+}
+
+.tabActiva:hover {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+}
+
+/* Main Content Grid (Calculadora) */
 .mainContent {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -36,8 +78,9 @@
   margin-bottom: 25px;
 }
 
-/* Input Panel */
-.inputPanel {
+/* Panels */
+.inputPanel,
+.resultsPanel {
   background: var(--bg-card);
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -151,14 +194,6 @@
   color: var(--text-secondary);
   line-height: 1.5;
   margin: 0;
-}
-
-/* Results Panel */
-.resultsPanel {
-  background: var(--bg-card);
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  padding: 25px;
 }
 
 /* Resultado Principal */
@@ -301,6 +336,321 @@
   text-align: center;
 }
 
+/* ===================== */
+/* CHECKLIST STYLES      */
+/* ===================== */
+
+.checklistContainer,
+.comprasContainer,
+.vacunasContainer {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.checklistHeader,
+.comprasHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.progresoCompacto {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.progresoBarMini {
+  width: 120px;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progresoFillMini {
+  height: 100%;
+  background: linear-gradient(90deg, #2E86AB, #48A9A6);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.porcentaje {
+  font-weight: 600;
+  color: #2E86AB;
+}
+
+/* Filtros */
+.filtros,
+.filtrosCategoria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.filtrosCompras {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.filtroBtn {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filtroBtn:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.filtroBtn.activo {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  border-color: transparent;
+  color: white;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.checkboxLabel input {
+  width: 18px;
+  height: 18px;
+  accent-color: #2E86AB;
+}
+
+/* Checklist List */
+.checklistList,
+.comprasList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.checklistItem,
+.compraItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.checklistItem:hover,
+.compraItem:hover {
+  border-color: #2E86AB;
+  transform: translateX(4px);
+}
+
+.checklistItem.completado,
+.compraItem.comprado {
+  background: rgba(72, 169, 166, 0.1);
+  border-color: rgba(72, 169, 166, 0.3);
+}
+
+.checklistItem.completado .checklistTexto,
+.compraItem.comprado .compraNombre {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #48A9A6;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.checklistItem.completado .checkbox,
+.compraItem.comprado .checkbox {
+  background: #48A9A6;
+  border-color: #48A9A6;
+  color: white;
+}
+
+.checklistTexto,
+.compraNombre {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.trimestreBadge {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  background: rgba(46, 134, 171, 0.1);
+  color: #2E86AB;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* Prioridad Badges */
+.leyendaPrioridad {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+  font-size: 0.85rem;
+}
+
+.esencial {
+  color: #dc3545;
+}
+
+.recomendado {
+  color: #fd7e14;
+}
+
+.opcional {
+  color: #6c757d;
+}
+
+.prioridadBadge {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 12px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.prioridadBadge.esencial {
+  background: rgba(220, 53, 69, 0.1);
+}
+
+.prioridadBadge.recomendado {
+  background: rgba(253, 126, 20, 0.1);
+}
+
+.prioridadBadge.opcional {
+  background: rgba(108, 117, 125, 0.1);
+}
+
+/* ===================== */
+/* VACUNAS STYLES        */
+/* ===================== */
+
+.vacunasInfo {
+  background: rgba(46, 134, 171, 0.1);
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.vacunasInfo p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.vacunasList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.vacunaItem {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  align-items: flex-start;
+}
+
+.vacunaEdad {
+  min-width: 100px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.vacunaInfo {
+  flex: 1;
+}
+
+.vacunaInfo strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.vacunaInfo span {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.vacunasNota {
+  background: #FFF3CD;
+  border: 1px solid #FFC107;
+  border-radius: 10px;
+  padding: 15px 20px;
+}
+
+.vacunasNota h4 {
+  font-size: 0.95rem;
+  color: #856404;
+  margin-bottom: 10px;
+}
+
+.vacunasNota ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.vacunasNota li {
+  font-size: 0.85rem;
+  color: #664D03;
+  margin-bottom: 5px;
+}
+
 /* Disclaimer */
 .disclaimer {
   background: #FFF3CD;
@@ -327,9 +677,219 @@
   margin-bottom: 0;
 }
 
-/* Dark mode */
+/* ===================== */
+/* EDUCATIONAL SECTION   */
+/* ===================== */
+
+.guideSection {
+  margin-bottom: 30px;
+}
+
+.guideSection h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+
+/* Consejos Grid */
+.consejosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.consejoCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.consejoCard h4 {
+  font-size: 1rem;
+  color: #2E86AB;
+  margin-bottom: 12px;
+}
+
+.consejoCard ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.consejoCard li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+/* Errores Grid */
+.erroresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.errorCard {
+  background: rgba(220, 53, 69, 0.05);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.errorCard strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #dc3545;
+  margin-bottom: 8px;
+}
+
+.errorCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Bolsa Grid */
+.bolsaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.bolsaCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.bolsaCard h4 {
+  font-size: 1rem;
+  color: #2E86AB;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.bolsaCard ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.bolsaCard li {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+
+/* Tramites Timeline */
+.tramitesTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.tramiteItem {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
+
+.tramiteDia {
+  min-width: 80px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.tramiteContenido {
+  flex: 1;
+  padding: 8px 0;
+}
+
+.tramiteContenido strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.tramiteContenido p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* FAQ Grid */
+.faqGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.faqItem summary {
+  padding: 15px 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+
+.faqItem summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem summary::before {
+  content: '▶';
+  font-size: 0.7rem;
+  margin-right: 10px;
+  transition: transform 0.2s;
+  color: #2E86AB;
+}
+
+.faqItem[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.faqItem p {
+  padding: 0 20px 15px 35px;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ===================== */
+/* DARK MODE             */
+/* ===================== */
+
 [data-theme='dark'] .inputPanel,
-[data-theme='dark'] .resultsPanel {
+[data-theme='dark'] .resultsPanel,
+[data-theme='dark'] .checklistContainer,
+[data-theme='dark'] .comprasContainer,
+[data-theme='dark'] .vacunasContainer {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tabs {
   background: var(--bg-card);
 }
 
@@ -337,16 +897,23 @@
   background: rgba(46, 134, 171, 0.15);
 }
 
-[data-theme='dark'] .disclaimer {
+[data-theme='dark'] .vacunasInfo {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .disclaimer,
+[data-theme='dark'] .vacunasNota {
   background: rgba(255, 193, 7, 0.1);
   border-color: rgba(255, 193, 7, 0.3);
 }
 
-[data-theme='dark'] .disclaimer h3 {
+[data-theme='dark'] .disclaimer h3,
+[data-theme='dark'] .vacunasNota h4 {
   color: #FFC107;
 }
 
-[data-theme='dark'] .disclaimer p {
+[data-theme='dark'] .disclaimer p,
+[data-theme='dark'] .vacunasNota li {
   color: #FFD54F;
 }
 
@@ -354,7 +921,32 @@
   background: rgba(72, 169, 166, 0.2);
 }
 
-/* Responsive */
+[data-theme='dark'] .consejoCard,
+[data-theme='dark'] .bolsaCard,
+[data-theme='dark'] .faqItem {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .errorCard {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+[data-theme='dark'] .checklistItem,
+[data-theme='dark'] .compraItem,
+[data-theme='dark'] .vacunaItem {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .checklistItem.completado,
+[data-theme='dark'] .compraItem.comprado {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+/* ===================== */
+/* RESPONSIVE            */
+/* ===================== */
+
 @media (max-width: 768px) {
   .container {
     padding: 15px;
@@ -366,7 +958,18 @@
   }
 
   .title {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
+  }
+
+  .tabs {
+    gap: 5px;
+    padding: 6px;
+  }
+
+  .tab {
+    min-width: 90px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
   }
 
   .mainContent {
@@ -388,5 +991,60 @@
 
   .resultadoFecha {
     font-size: 1.2rem;
+  }
+
+  .checklistHeader,
+  .comprasHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .progresoCompacto {
+    width: 100%;
+  }
+
+  .progresoBarMini {
+    flex: 1;
+  }
+
+  .filtros,
+  .filtrosCategoria {
+    overflow-x: auto;
+    padding-bottom: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .filtrosCompras {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .trimestreBadge {
+    display: none;
+  }
+
+  .vacunaItem {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .vacunaEdad {
+    min-width: auto;
+  }
+
+  .consejosGrid,
+  .erroresGrid,
+  .bolsaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tramiteItem {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .tramiteDia {
+    min-width: auto;
+    align-self: flex-start;
   }
 }

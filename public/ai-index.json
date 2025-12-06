@@ -212,7 +212,7 @@
         { "name": "Planificador de Menú Semanal", "slug": "planificador-menu", "url": "https://meskeia.com/planificador-menu/", "description": "Planifica menú equilibrado" },
         { "name": "Calculadora de Porciones", "slug": "calculadora-porciones", "url": "https://meskeia.com/calculadora-porciones/", "description": "Mide porciones con tu mano" },
         { "name": "Test de Hábitos Saludables", "slug": "test-habitos", "url": "https://meskeia.com/test-habitos/", "description": "Evalúa tus hábitos de vida" },
-        { "name": "Calculadora Fecha de Parto", "slug": "calculadora-fecha-parto", "url": "https://meskeia.com/calculadora-fecha-parto/", "description": "Calcula fecha probable de parto y semanas de gestación" },
+        { "name": "Planificador Embarazo y Bebé", "slug": "calculadora-fecha-parto", "url": "https://meskeia.com/calculadora-fecha-parto/", "description": "Planificador completo: calculadora FPP, checklist por trimestre, lista compras bebé y vacunas España 2024" },
         { "name": "Calculadora Percentiles Infantiles", "slug": "calculadora-percentiles", "url": "https://meskeia.com/calculadora-percentiles/", "description": "Percentil de peso y talla según tablas OMS" }
       ]
     },
