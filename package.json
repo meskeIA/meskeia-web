@@ -28,12 +28,14 @@
     "react-dom": "19.2.0"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
     "@axe-core/playwright": "^4.11.0",
     "@next/bundle-analyzer": "^16.0.6",
     "@playwright/test": "^1.56.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "typescript": "^5"

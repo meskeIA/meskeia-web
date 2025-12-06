@@ -167,7 +167,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora Alquiler vs Compra", category: "Finanzas Personales", contexts: ["dinero", "casa"], icon: "🏡", description: "¿Alquilar o comprar vivienda? Análisis financiero completo con hipoteca, gastos y coste de oportunidad", url: "/calculadora-alquiler-vs-compra/", keywords: ["alquiler", "compra", "vivienda", "hipoteca", "inversion", "coste oportunidad"] },
 
   // ============================================
-  // 6. Herramientas Académicas (8)
+  // 6. Herramientas Académicas (9)
   // ============================================
   { name: "Calculadora de Movimiento", category: "Herramientas Académicas", contexts: ["estudio"], icon: "🧪", description: "Calculadora interactiva de cinemática con gráficos y animaciones para MRU, MRUA, caída libre y tiro parabólico", url: "/calculadora-movimiento/", keywords: ["fisica", "cinematica", "movimiento", "velocidad", "aceleracion", "mru", "mrua"] },
   { name: "Tabla Periódica Interactiva", category: "Herramientas Académicas", contexts: ["estudio", "curiosidad"], icon: "⚛️", description: "Tabla periódica interactiva con 118 elementos, calculadora de masa molar y filtros avanzados", url: "/tabla-periodica/", keywords: ["quimica", "elementos", "atomos", "tabla periodica", "propiedades", "masa molar"] },
@@ -177,6 +177,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Horarios de Estudio", category: "Herramientas Académicas", contexts: ["estudio"], icon: "📚", description: "Genera horarios de estudio personalizados con distribución inteligente de tiempo. Técnica Pomodoro, gestión de prioridades y calendario visual", url: "/generador-horarios-estudio/", keywords: ["horario", "estudio", "planificar", "calendario", "pomodoro"] },
   { name: "Creador de Flashcards", category: "Herramientas Académicas", contexts: ["estudio"], icon: "📚", description: "Crea y estudia con flashcards personalizadas. Modo estudio interactivo, gestión de mazos, importa/exporta tarjetas", url: "/creador-flashcards/", keywords: ["flashcards", "tarjetas", "estudio", "memorizar", "aprender"] },
   { name: "Curso de Introducción a la Teoría Política", category: "Herramientas Académicas", contexts: ["estudio"], icon: "🏛️", description: "Aprende los fundamentos del pensamiento político: desde Platón y Aristóteles hasta Marx y Rawls. 9 capítulos con los grandes pensadores", url: "/curso-teoria-politica/", keywords: ["teoria politica", "filosofia politica", "platon", "aristoteles", "maquiavelo", "hobbes", "locke", "rousseau", "marx", "rawls", "curso", "politica"] },
+  { name: "Curso de Pensamiento Científico", category: "Herramientas Académicas", contexts: ["estudio"], icon: "🧠", description: "Aprende el método científico, pensamiento crítico, falacias lógicas y cómo aplicar la ciencia en tu vida cotidiana. 12 capítulos interactivos", url: "/curso-pensamiento-cientifico/", keywords: ["pensamiento cientifico", "metodo cientifico", "pensamiento critico", "falacias", "logica", "ciencia", "sesgos", "pseudociencia", "popper", "kuhn"] },
 
   // ============================================
   // 7. Impuestos y Fiscalidad (9)

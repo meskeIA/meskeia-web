@@ -156,7 +156,7 @@ export const implementedAppsUrls = [
   "/glosario-fisica-quimica/",
   "/tabla-periodica/",
 
-  // Campus Digital (7 implementadas)
+  // Campus Digital (8 implementadas)
   "/calculadora-notas/",
   "/creador-flashcards/",
   "/generador-horarios-estudio/",
@@ -164,6 +164,7 @@ export const implementedAppsUrls = [
   "/curso-decisiones-inversion/",
   "/curso-nutrisalud/",
   "/curso-teoria-politica/",
+  "/curso-pensamiento-cientifico/",
 
   // SEO & Marketing (8 implementadas)
   "/generador-meta-descripciones/",
