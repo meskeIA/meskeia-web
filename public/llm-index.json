@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 137+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 139+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 137,
-  "last_updated": "2025-12-05",
+  "total_tools": 139,
+  "last_updated": "2025-12-06",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -21,7 +21,7 @@
       "name": "Calculadoras Prácticas",
       "icon": "🧮",
       "description": "Herramientas de cálculo para el día a día",
-      "tool_count": 13
+      "tool_count": 14
     },
     {
       "id": "criptografia",
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 8
+      "tool_count": 9
     },
     {
       "id": "impuestos",
@@ -114,21 +114,21 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 37
+      "tool_count": 38
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 40
+      "tool_count": 41
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 29
+      "tool_count": 30
     },
     {
       "id": "creando",
@@ -424,6 +424,28 @@
         "gatos"
       ],
       "icon": "🐾"
+    },
+    {
+      "slug": "planificador-boda",
+      "name": "Planificador de Boda",
+      "url": "https://meskeia.com/planificador-boda/",
+      "description": "Organiza tu boda paso a paso: checklist por meses, calculadora de presupuesto, timeline del día y consejos de wedding planner",
+      "category": "Calculadoras Prácticas",
+      "contexts": [
+        "casa",
+        "dinero"
+      ],
+      "keywords": [
+        "boda",
+        "wedding planner",
+        "matrimonio",
+        "checklist boda",
+        "presupuesto boda",
+        "organizador boda",
+        "lista tareas boda",
+        "timeline boda"
+      ],
+      "icon": "💒"
     },
     {
       "slug": "cifrado-clasico",
@@ -1595,6 +1617,29 @@
         "politica"
       ],
       "icon": "🏛️"
+    },
+    {
+      "slug": "curso-pensamiento-cientifico",
+      "name": "Curso de Pensamiento Científico",
+      "url": "https://meskeia.com/curso-pensamiento-cientifico/",
+      "description": "Aprende el método científico, pensamiento crítico, falacias lógicas y cómo aplicar la ciencia en tu vida cotidiana. 12 capítulos interactivos",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "pensamiento cientifico",
+        "metodo cientifico",
+        "pensamiento critico",
+        "falacias",
+        "logica",
+        "ciencia",
+        "sesgos",
+        "pseudociencia",
+        "popper",
+        "kuhn"
+      ],
+      "icon": "🧠"
     },
     {
       "slug": "simulador-irpf",

@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 137,
-  "updated": "2025-12-04",
+  "total_tools": 138,
+  "updated": "2025-12-06",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -32,7 +32,8 @@
         { "name": "Calculadora de Gasto Energético", "slug": "calculadora-gasto-energetico", "url": "https://meskeia.com/calculadora-gasto-energetico/", "description": "Calcula el consumo eléctrico y coste mensual en tu factura" },
         { "name": "Calculadora de Pintura", "slug": "calculadora-pintura", "url": "https://meskeia.com/calculadora-pintura/", "description": "Calcula cuánta pintura necesitas para paredes y techos" },
         { "name": "Calculadora Consumo Combustible", "slug": "calculadora-combustible", "url": "https://meskeia.com/calculadora-combustible/", "description": "Calcula consumo en L/100km y coste de viajes" },
-        { "name": "Calculadora Edad Mascotas", "slug": "calculadora-edad-mascotas", "url": "https://meskeia.com/calculadora-edad-mascotas/", "description": "Edad de perros y gatos en años humanos" }
+        { "name": "Calculadora Edad Mascotas", "slug": "calculadora-edad-mascotas", "url": "https://meskeia.com/calculadora-edad-mascotas/", "description": "Edad de perros y gatos en años humanos" },
+        { "name": "Planificador de Boda", "slug": "planificador-boda", "url": "https://meskeia.com/planificador-boda/", "description": "Organiza tu boda: checklist, presupuesto y timeline del día" }
       ]
     },
     {

@@ -43,6 +43,7 @@ export const implementedAppsUrls = [
   "/calculadora-pintura/",           // Calcular litros de pintura
   "/calculadora-combustible/",       // Consumo L/100km y coste viajes
   "/calculadora-edad-mascotas/",     // Edad perros/gatos en años humanos
+  "/planificador-boda/",             // Wedding planner: checklist, presupuesto, timeline
 
   // Matemáticas y Estadística (11 implementadas)
   "/algebra-ecuaciones/",            // Calculadora de Ecuaciones
