@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 139+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 140+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 139,
+  "total_tools": 140,
   "last_updated": "2025-12-06",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 9
+      "tool_count": 10
     },
     {
       "id": "impuestos",
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 51
+      "tool_count": 52
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 38
+      "tool_count": 39
     },
     {
       "id": "casa",
@@ -1640,6 +1640,30 @@
         "kuhn"
       ],
       "icon": "🧠"
+    },
+    {
+      "slug": "curso-empresa-familiar",
+      "name": "Curso de Empresa Familiar",
+      "url": "https://meskeia.com/curso-empresa-familiar/",
+      "description": "Domina la gestión de empresas familiares: gobierno corporativo, protocolo familiar, sucesión, modelos de gestión. Casos Inditex, Mercadona, El Corte Inglés. 12 capítulos",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "empresa familiar",
+        "sucesion",
+        "protocolo familiar",
+        "consejo familia",
+        "gobierno corporativo",
+        "inditex",
+        "mercadona",
+        "pyme",
+        "herencia empresarial",
+        "profesionalizacion"
+      ],
+      "icon": "🏢"
     },
     {
       "slug": "simulador-irpf",
