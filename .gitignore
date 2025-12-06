@@ -50,3 +50,7 @@ next-env.d.ts
 # docs/ - Comentado para subir la primera vez, luego descomentar si quieres
 REORGANIZAR_DOCS.bat
 desktop.ini
+
+# scripts de generación de cursos (uso local)
+scripts/generate-curso.js
+scripts/cursos-generados/
