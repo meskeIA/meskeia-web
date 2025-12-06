@@ -42,7 +42,7 @@
       "name": "Emprendimiento y SEO",
       "icon": "💼",
       "description": "Gestiona tu negocio y optimiza tu presencia online",
-      "tool_count": 18
+      "tool_count": 19
     },
     {
       "id": "finanzas",
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 12
+      "tool_count": 11
     },
     {
       "id": "impuestos",
@@ -1718,7 +1718,7 @@
       "name": "Curso de Optimización para IAs (GEO/AEO)",
       "url": "https://meskeia.com/curso-optimizacion-ia/",
       "description": "Aprende GEO y AEO: optimiza tu contenido para que ChatGPT, Perplexity y Gemini lo citen. LLMs, RAG, E-E-A-T, Schema Markup y estrategias por plataforma. 6 capítulos",
-      "category": "Herramientas Académicas",
+      "category": "Emprendimiento y SEO",
       "contexts": [
         "estudio",
         "trabajo",
