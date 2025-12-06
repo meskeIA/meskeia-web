@@ -187,6 +187,13 @@
   overflow: hidden;
 }
 
+.resultMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .resultCategory {
   font-size: 0.75rem;
   color: var(--primary);
@@ -195,6 +202,11 @@
   padding: 0.25rem 0.5rem;
   background: var(--focus);
   border-radius: 4px;
+}
+
+.resultMoments {
+  font-size: 0.85rem;
+  opacity: 0.8;
 }
 
 /* Sin resultados */

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Fuse from 'fuse.js';
 import type { FuseResult } from 'fuse.js';
-import { Application, applicationsDatabase } from '@/data/applications';
+import { Application, applicationsDatabase, moments } from '@/data/applications';
 import styles from './SearchBar.module.css';
 
 export default function SearchBar() {
@@ -158,29 +158,43 @@ export default function SearchBar() {
                     </p>
                   </div>
                 ) : (
-                  results.map((result, index) => (
-                    <a
-                      key={index}
-                      href={result.item.url}
-                      className={`${styles.resultItem} ${
-                        index === selectedIndex ? styles.selected : ''
-                      }`}
-                      onClick={closeSearch}
-                    >
-                      <div className={styles.resultIcon}>{result.item.icon}</div>
-                      <div className={styles.resultContent}>
-                        <div className={styles.resultTitle}>
-                          {result.item.name}
+                  results.map((result, index) => {
+                    // Obtener los momentos de la app
+                    const appMoments = result.item.contexts?.map(contextId =>
+                      moments.find(m => m.id === contextId)
+                    ).filter(Boolean) || [];
+
+                    return (
+                      <a
+                        key={index}
+                        href={result.item.url}
+                        className={`${styles.resultItem} ${
+                          index === selectedIndex ? styles.selected : ''
+                        }`}
+                        onClick={closeSearch}
+                      >
+                        <div className={styles.resultIcon}>{result.item.icon}</div>
+                        <div className={styles.resultContent}>
+                          <div className={styles.resultTitle}>
+                            {result.item.name}
+                          </div>
+                          <div className={styles.resultDescription}>
+                            {result.item.description}
+                          </div>
+                          <div className={styles.resultMeta}>
+                            <span className={styles.resultCategory}>
+                              {result.item.category}
+                            </span>
+                            {appMoments.length > 0 && (
+                              <span className={styles.resultMoments}>
+                                {appMoments.map(m => m?.icon).join(' ')}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <div className={styles.resultDescription}>
-                          {result.item.description}
-                        </div>
-                        <div className={styles.resultCategory}>
-                          {result.item.category}
-                        </div>
-                      </div>
-                    </a>
-                  ))
+                      </a>
+                    );
+                  })
                 )}
               </div>
             )}
