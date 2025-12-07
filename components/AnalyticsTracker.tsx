@@ -76,28 +76,37 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       }
     };
 
-    // Registrar duración
-    const registerDuration = async () => {
+    // Registrar duración usando sendBeacon (más fiable para móviles)
+    const registerDuration = () => {
       const durationSeconds = Math.floor((Date.now() - sessionStartTime) / 1000);
 
       // Solo registrar si la duración es mayor a 2 segundos
       if (durationSeconds > 2 && isActive) {
-        try {
-          await fetch('https://meskeia.com/api/v1/guardar-duracion.php', {
+        const data = JSON.stringify({
+          aplicacion: finalAppName,
+          duracion_segundos: durationSeconds,
+          tipo_dispositivo: deviceType,
+          modo: isPWA ? 'pwa' : 'web',
+          sesion_id: sessionId,
+        });
+
+        // sendBeacon es más fiable que fetch para eventos de salida
+        // Se envía aunque el navegador esté cerrando la página
+        if (navigator.sendBeacon) {
+          const blob = new Blob([data], { type: 'application/json' });
+          const sent = navigator.sendBeacon('https://meskeia.com/api/v1/guardar-duracion.php', blob);
+          if (sent) {
+            console.log(`✅ Duración registrada (sendBeacon): ${durationSeconds}s`);
+          }
+        } else {
+          // Fallback para navegadores sin sendBeacon
+          fetch('https://meskeia.com/api/v1/guardar-duracion.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              aplicacion: finalAppName,
-              duracion_segundos: durationSeconds,
-              tipo_dispositivo: deviceType,
-              modo: isPWA ? 'pwa' : 'web',
-              sesion_id: sessionId,
-            }),
+            body: data,
             keepalive: true,
-          });
-          console.log(`✅ Duración registrada: ${durationSeconds}s`);
-        } catch (error) {
-          console.error('❌ Error al registrar duración:', error);
+          }).catch(() => {});
+          console.log(`✅ Duración registrada (fetch): ${durationSeconds}s`);
         }
       }
     };
