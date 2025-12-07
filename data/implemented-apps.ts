@@ -4,7 +4,7 @@
  * IMPORTANTE: Esta lista debe coincidir con las carpetas en app/
  * Solo añadir URLs cuando la app esté realmente creada
  *
- * Actualizado: 2025-12-04
+ * Actualizado: 2025-12-07
  */
 
 export const implementedAppsUrls = [
@@ -110,7 +110,7 @@ export const implementedAppsUrls = [
   "/juego-space-invaders/",     // Arcade clásico de invasores
   "/juego-platform-runner/",    // Juego de plataformas
 
-  // Salud y Bienestar (11 implementadas)
+  // Salud y Bienestar (14 implementadas)
   "/calculadora-imc/",
   "/calculadora-calorias-ejercicio/",
   "/calculadora-hidratacion/",
@@ -122,6 +122,9 @@ export const implementedAppsUrls = [
   "/test-habitos/",
   "/planificador-embarazo/",         // Planificador embarazo: FPP, checklist, compras, vacunas
   "/planificador-mascota/",          // Planificador mascota: cachorro/gatito, checklist, compras, vacunas
+  "/calculadora-alimentacion-mascotas/", // Alimentación perros/gatos: raciones, tóxicos, transición pienso
+  "/calculadora-medicamentos-mascotas/", // Medicamentos mascotas: antiparasitarios, frecuencia, síntomas
+  "/calculadora-tamano-adulto-perro/",   // Predicción peso adulto cachorros
   "/calculadora-percentiles/",       // Percentiles peso/talla infantil OMS
 
   // Herramientas Web y Tecnología (6 implementadas)

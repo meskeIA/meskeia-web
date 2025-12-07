@@ -482,4 +482,81 @@
   .resultadoValor {
     font-size: 1.6rem;
   }
+
+  .appsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ===================== */
+/* APPS RELACIONADAS     */
+/* ===================== */
+
+.appsRelacionadas {
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.appsRelacionadas h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.appsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.appCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 15px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.appCard:hover {
+  border-color: #2E86AB;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(46, 134, 171, 0.15);
+}
+
+.appIcon {
+  font-size: 2rem;
+}
+
+.appName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.appDesc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+[data-theme='dark'] .appsRelacionadas {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .appCard {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .appCard:hover {
+  background: rgba(46, 134, 171, 0.1);
 }

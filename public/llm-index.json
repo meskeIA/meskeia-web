@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 147+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 150+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 147,
+  "total_tools": 150,
   "last_updated": "2025-12-07",
   "features": {
     "all_free": true,
@@ -91,7 +91,7 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Cuida tu salud con herramientas especializadas",
-      "tool_count": 12
+      "tool_count": 15
     },
     {
       "id": "texto",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 42
+      "tool_count": 45
     },
     {
       "id": "dinero",
@@ -2872,6 +2872,70 @@
         "adoptar gato"
       ],
       "icon": "🐾"
+    },
+    {
+      "slug": "calculadora-alimentacion-mascotas",
+      "name": "Calculadora de Alimentación Mascotas",
+      "url": "https://meskeia.com/calculadora-alimentacion-mascotas/",
+      "description": "Calcula la cantidad diaria de comida para tu perro o gato según peso, edad y actividad. Incluye detector de alimentos tóxicos y guía de transición de pienso",
+      "category": "Salud y Bienestar",
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "alimentacion perro",
+        "comida gato",
+        "cantidad pienso",
+        "gramos diarios",
+        "racion perro",
+        "dieta mascota",
+        "alimentos toxicos",
+        "chocolate perro",
+        "transicion pienso"
+      ],
+      "icon": "🍖"
+    },
+    {
+      "slug": "calculadora-medicamentos-mascotas",
+      "name": "Calculadora de Medicamentos Mascotas",
+      "url": "https://meskeia.com/calculadora-medicamentos-mascotas/",
+      "description": "Calcula la dosis de antiparasitarios y medicamentos comunes para tu mascota según su peso. Incluye frecuencia de desparasitación y recordatorios",
+      "category": "Salud y Bienestar",
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "dosis medicamento perro",
+        "antiparasitario perro",
+        "desparasitar gato",
+        "pipeta perro",
+        "collar antiparasitario",
+        "dosis peso mascota",
+        "veterinario",
+        "pulgas",
+        "garrapatas"
+      ],
+      "icon": "💊"
+    },
+    {
+      "slug": "calculadora-tamano-adulto-perro",
+      "name": "Calculadora Tamaño Adulto Cachorro",
+      "url": "https://meskeia.com/calculadora-tamano-adulto-perro/",
+      "description": "Predice el peso adulto de tu cachorro según su edad, peso actual y tamaño de raza. Curvas de crecimiento y tabla de razas de referencia",
+      "category": "Salud y Bienestar",
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "peso adulto cachorro",
+        "tamano perro",
+        "crecimiento cachorro",
+        "prediccion peso",
+        "raza perro",
+        "cuanto pesara mi perro",
+        "desarrollo cachorro"
+      ],
+      "icon": "📏"
     },
     {
       "slug": "calculadora-percentiles",

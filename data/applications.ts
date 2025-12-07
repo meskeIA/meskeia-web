@@ -1,7 +1,7 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 137 aplicaciones organizadas por 12 categorías + 7 momentos
- * Actualizado: 2025-12-04
+ * Total: 140 aplicaciones organizadas por 12 categorías + 7 momentos
+ * Actualizado: 2025-12-07
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
  * - calculadora-: Apps que calculan/resuelven
@@ -246,7 +246,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Lista de Equipaje", category: "Productividad", contexts: ["casa", "curiosidad"], icon: "🧳", description: "Genera una lista de equipaje personalizada según tipo de viaje, clima y duración. Checklist interactivo", url: "/lista-equipaje/", keywords: ["equipaje", "maleta", "viaje", "checklist", "vacaciones", "viajar", "empacar"] },
 
   // ============================================
-  // 11. Salud y Bienestar (9)
+  // 11. Salud y Bienestar (15)
   // ============================================
   { name: "Calculadora IMC", category: "Salud y Bienestar", contexts: ["casa"], icon: "⚖️", description: "Calcula tu Índice de Masa Corporal y conoce tu clasificación según la OMS", url: "/calculadora-imc/", keywords: ["imc", "peso", "altura", "obesidad", "salud", "oms"] },
   { name: "Calculadora de Calorías", category: "Salud y Bienestar", contexts: ["casa"], icon: "🏥", description: "Calcula las calorías quemadas según tu actividad física, pasos y tiempo de ejercicio", url: "/calculadora-calorias-ejercicio/", keywords: ["calorias", "ejercicio", "deporte", "quemar", "actividad fisica"] },
@@ -259,6 +259,9 @@ export const applicationsDatabase: Application[] = [
   { name: "Test de Hábitos Saludables", category: "Salud y Bienestar", contexts: ["casa"], icon: "🌟", description: "Evalúa tus hábitos de vida con un test de 21 preguntas. Perfil visual de hidratación, alimentación, actividad y descanso", url: "/test-habitos/", keywords: ["test", "habitos", "saludables", "evaluacion", "bienestar", "estilo vida"] },
   { name: "Planificador Embarazo y Bebé", category: "Salud y Bienestar", contexts: ["casa"], icon: "🤰", description: "Planifica tu embarazo: calculadora FPP, checklist por trimestre, lista de compras del bebé y calendario de vacunación España 2024", url: "/planificador-embarazo/", keywords: ["embarazo", "fecha parto", "fpp", "semanas gestacion", "trimestre", "fur", "regla naegele", "checklist embarazo", "lista compras bebe", "vacunas recien nacido", "canastilla", "planificador"] },
   { name: "Planificador de Mascota", category: "Salud y Bienestar", contexts: ["casa"], icon: "🐾", description: "Organiza la llegada de tu cachorro o gatito: perfil, checklist por etapas, lista de compras y calendario de vacunas. Perros y gatos", url: "/planificador-mascota/", keywords: ["mascota", "cachorro", "gatito", "perro", "gato", "checklist", "vacunas perro", "vacunas gato", "compras mascota", "cuidados cachorro", "adoptar perro", "adoptar gato"] },
+  { name: "Calculadora de Alimentación Mascotas", category: "Salud y Bienestar", contexts: ["casa"], icon: "🍖", description: "Calcula la cantidad diaria de comida para tu perro o gato según peso, edad y actividad. Incluye detector de alimentos tóxicos y guía de transición de pienso", url: "/calculadora-alimentacion-mascotas/", keywords: ["alimentacion perro", "comida gato", "cantidad pienso", "gramos diarios", "racion perro", "dieta mascota", "alimentos toxicos", "chocolate perro", "transicion pienso"] },
+  { name: "Calculadora de Medicamentos Mascotas", category: "Salud y Bienestar", contexts: ["casa"], icon: "💊", description: "Calcula la dosis de antiparasitarios y medicamentos comunes para tu mascota según su peso. Incluye frecuencia de desparasitación y recordatorios", url: "/calculadora-medicamentos-mascotas/", keywords: ["dosis medicamento perro", "antiparasitario perro", "desparasitar gato", "pipeta perro", "collar antiparasitario", "dosis peso mascota", "veterinario", "pulgas", "garrapatas"] },
+  { name: "Calculadora Tamaño Adulto Cachorro", category: "Salud y Bienestar", contexts: ["casa"], icon: "📏", description: "Predice el peso adulto de tu cachorro según su edad, peso actual y tamaño de raza. Curvas de crecimiento y tabla de razas de referencia", url: "/calculadora-tamano-adulto-perro/", keywords: ["peso adulto cachorro", "tamano perro", "crecimiento cachorro", "prediccion peso", "raza perro", "cuanto pesara mi perro", "desarrollo cachorro"] },
   { name: "Calculadora Percentiles Infantiles", category: "Salud y Bienestar", contexts: ["casa"], icon: "👶", description: "Calcula el percentil de peso y talla de tu bebé o niño según las tablas de crecimiento de la OMS", url: "/calculadora-percentiles/", keywords: ["percentiles", "peso bebe", "talla niño", "oms", "crecimiento infantil", "pediatria"] },
 
   // ============================================
