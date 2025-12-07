@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 142,
+  "total_tools": 143,
   "updated": "2025-12-07",
   "features": {
     "all_free": true,
@@ -93,7 +93,8 @@
         { "name": "Generador de Facturas", "slug": "generador-facturas", "url": "https://meskeia.com/generador-facturas/", "description": "Crea facturas profesionales con IVA y exporta a PDF" },
         { "name": "Generador de Carruseles", "slug": "generador-carruseles", "url": "https://meskeia.com/generador-carruseles/", "description": "Crea carruseles para Instagram y LinkedIn, descarga como PNG" },
         { "name": "Analizador GEO/AEO", "slug": "analizador-geo", "url": "https://meskeia.com/analizador-geo/", "description": "Analiza y optimiza tu contenido para ser citado por ChatGPT, Perplexity y Gemini" },
-        { "name": "Curso de Optimización para IAs (GEO/AEO)", "slug": "curso-optimizacion-ia", "url": "https://meskeia.com/curso-optimizacion-ia/", "description": "Aprende GEO/AEO: optimiza contenido para ChatGPT, Perplexity y Gemini. LLMs, RAG, E-E-A-T, Schema Markup" }
+        { "name": "Curso de Optimización para IAs (GEO/AEO)", "slug": "curso-optimizacion-ia", "url": "https://meskeia.com/curso-optimizacion-ia/", "description": "Aprende GEO/AEO: optimiza contenido para ChatGPT, Perplexity y Gemini. LLMs, RAG, E-E-A-T, Schema Markup" },
+        { "name": "Curso de Marketing Digital 2025", "slug": "curso-marketing-digital", "url": "https://meskeia.com/curso-marketing-digital/", "description": "Domina el marketing digital: branding, SEO, redes sociales, Meta Ads, Google Ads, automatización e IA. 30 capítulos prácticos" }
       ]
     },
     {

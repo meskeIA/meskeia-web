@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 144+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 145+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 144,
+  "total_tools": 145,
   "last_updated": "2025-12-07",
   "features": {
     "all_free": true,
@@ -42,7 +42,7 @@
       "name": "Emprendimiento y SEO",
       "icon": "💼",
       "description": "Gestiona tu negocio y optimiza tu presencia online",
-      "tool_count": 19
+      "tool_count": 20
     },
     {
       "id": "finanzas",
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 56
+      "tool_count": 57
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 42
+      "tool_count": 43
     },
     {
       "id": "casa",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 35
+      "tool_count": 36
     },
     {
       "id": "relax",
@@ -1763,6 +1763,34 @@
         "seo 2025"
       ],
       "icon": "🤖"
+    },
+    {
+      "slug": "curso-marketing-digital",
+      "name": "Curso de Marketing Digital 2025",
+      "url": "https://meskeia.com/curso-marketing-digital/",
+      "description": "Domina el marketing digital: branding, SEO, redes sociales, Meta Ads, Google Ads, automatización e IA. 30 capítulos prácticos con ejemplos reales",
+      "category": "Emprendimiento y SEO",
+      "contexts": [
+        "estudio",
+        "trabajo",
+        "creando"
+      ],
+      "keywords": [
+        "marketing digital",
+        "branding",
+        "seo",
+        "redes sociales",
+        "meta ads",
+        "google ads",
+        "automatizacion",
+        "ia marketing",
+        "customer journey",
+        "kpis",
+        "storytelling",
+        "copywriting",
+        "publicidad digital"
+      ],
+      "icon": "📈"
     },
     {
       "slug": "simulador-irpf",

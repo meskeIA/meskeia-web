@@ -1,0 +1,414 @@
+{
+  "course": {
+    "name": "Curso de Marketing Digital",
+    "slug": "curso-marketing-digital",
+    "description": "Domina el marketing digital en 2025: desde fundamentos de branding hasta IA y automatización. Estrategias prácticas para emprendedores, marketers y profesionales que quieren resultados reales.",
+    "icon": "📈",
+    "expertiseArea": "marketing digital, branding, customer centricity, redes sociales, publicidad online, automatización",
+    "targetAudience": "Emprendedores, profesionales de marketing, freelancers, dueños de pequeños negocios y cualquier persona que quiera aprender marketing digital actualizado",
+    "modules": [
+      {
+        "id": "fundamentos",
+        "title": "Fundamentos del Marketing Moderno",
+        "description": "Del producto al cliente: cómo ha evolucionado el marketing y qué principios siguen siendo esenciales",
+        "chapters": [
+          {
+            "id": "evolucion-marketing",
+            "title": "La Evolución del Marketing: Del Producto al Propósito",
+            "topics": [
+              "Del marketing de producto al marketing centrado en el cliente",
+              "La era del propósito: marcas con significado",
+              "Product-centric vs Customer-centric: cuándo usar cada enfoque",
+              "El marketing en la era de la desconfianza"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "nuevas-4p",
+            "title": "Las Nuevas 4P del Marketing Digital",
+            "topics": [
+              "Producto: de físico a experiencia",
+              "Precio: estrategias dinámicas y value-based pricing",
+              "Plaza (distribución): omnicanalidad real",
+              "La cuarta P moderna: Personalización"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "segmentacion-moderna",
+            "title": "Segmentación en la Era de la Privacidad",
+            "topics": [
+              "El fin de las cookies de terceros",
+              "First-party data y zero-party data",
+              "Segmentación contextual vs comportamental",
+              "Construir audiencias propias"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "customer-journey",
+            "title": "El Customer Journey Moderno",
+            "topics": [
+              "Del embudo lineal al journey circular",
+              "Touchpoints digitales y físicos",
+              "Momentos de la verdad (ZMOT, FMOT, SMOT)",
+              "Mapear el viaje de tu cliente ideal"
+            ],
+            "duration": 13
+          }
+        ]
+      },
+      {
+        "id": "branding",
+        "title": "Branding y Posicionamiento",
+        "description": "Construye una marca memorable que conecte emocionalmente con tu audiencia",
+        "chapters": [
+          {
+            "id": "construccion-marca",
+            "title": "Construcción de Marca: Identidad y Personalidad",
+            "topics": [
+              "Qué es realmente una marca (más allá del logo)",
+              "Arquetipos de marca: los 12 patrones universales",
+              "Brand personality: voz, tono y valores",
+              "Coherencia visual y verbal"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "posicionamiento",
+            "title": "Posicionamiento: Ser Único en la Mente del Cliente",
+            "topics": [
+              "La batalla por la mente del consumidor",
+              "Estrategias de posicionamiento (líder, retador, nicho)",
+              "Propuesta de valor única (UVP)",
+              "El brand mantra: tu esencia en 3 palabras"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "storytelling",
+            "title": "Storytelling: El Poder de las Historias",
+            "topics": [
+              "Por qué las historias venden más que los datos",
+              "La estructura del viaje del héroe aplicada a marcas",
+              "Tu cliente es el héroe, tú eres el guía",
+              "Casos de storytelling efectivo"
+            ],
+            "duration": 13
+          },
+          {
+            "id": "marca-personal",
+            "title": "Marca Personal para Profesionales",
+            "topics": [
+              "Por qué necesitas una marca personal",
+              "LinkedIn como plataforma de autoridad",
+              "Contenido que construye credibilidad",
+              "De empleado a referente del sector"
+            ],
+            "duration": 12
+          }
+        ]
+      },
+      {
+        "id": "customer-centricity",
+        "title": "Customer Centricity y Datos",
+        "description": "Pon al cliente en el centro de todas las decisiones con datos, no intuiciones",
+        "chapters": [
+          {
+            "id": "clv-customer-lifetime-value",
+            "title": "Customer Lifetime Value: El Valor Real de un Cliente",
+            "topics": [
+              "Qué es el CLV y por qué es la métrica más importante",
+              "Cómo calcular el CLV de tu negocio",
+              "Adquisición vs retención: dónde invertir",
+              "Estrategias para aumentar el CLV"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "data-driven-marketing",
+            "title": "Marketing Basado en Datos (Sin Ser Data Scientist)",
+            "topics": [
+              "Métricas que importan vs vanity metrics",
+              "Google Analytics 4: lo esencial",
+              "Dashboards simples para decisiones inteligentes",
+              "El equilibrio entre datos e intuición"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "personalizacion",
+            "title": "Personalización a Escala",
+            "topics": [
+              "De la segmentación a la personalización 1:1",
+              "Email marketing personalizado",
+              "Recomendaciones dinámicas",
+              "Privacidad y personalización: el equilibrio"
+            ],
+            "duration": 13
+          }
+        ]
+      },
+      {
+        "id": "contenidos-seo",
+        "title": "Marketing de Contenidos y SEO",
+        "description": "Crea contenido que atraiga, eduque y convierta a tu audiencia ideal",
+        "chapters": [
+          {
+            "id": "estrategia-contenidos",
+            "title": "Estrategia de Contenidos: Más Allá del Blog",
+            "topics": [
+              "El funnel de contenidos: TOFU, MOFU, BOFU",
+              "Formatos de contenido para cada etapa",
+              "Calendario editorial que funciona",
+              "Repurposing: un contenido, múltiples formatos"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "seo-fundamentos",
+            "title": "SEO: Fundamentos que Siguen Funcionando",
+            "topics": [
+              "Cómo funciona Google (simplificado)",
+              "Keywords: investigación y selección",
+              "SEO on-page: títulos, metas, estructura",
+              "SEO técnico básico: velocidad, mobile, indexación"
+            ],
+            "duration": 16
+          },
+          {
+            "id": "seo-contenidos",
+            "title": "SEO de Contenidos: Escribir para Humanos y Algoritmos",
+            "topics": [
+              "E-E-A-T: Experiencia, Expertise, Autoridad, Confianza",
+              "Intención de búsqueda: informacional, transaccional, navegacional",
+              "Estructura de contenido que rankea",
+              "Featured snippets y posición cero"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "geo-aeo",
+            "title": "GEO y AEO: Optimización para IAs",
+            "topics": [
+              "Qué es GEO (Generative Engine Optimization)",
+              "Cómo ChatGPT, Perplexity y Gemini eligen fuentes",
+              "Estructura de contenido para ser citado por IAs",
+              "El futuro del SEO es híbrido"
+            ],
+            "duration": 13
+          }
+        ]
+      },
+      {
+        "id": "redes-sociales",
+        "title": "Redes Sociales y Comunidades",
+        "description": "Estrategias específicas para cada plataforma y cómo construir comunidad",
+        "chapters": [
+          {
+            "id": "estrategia-redes",
+            "title": "Estrategia de Redes Sociales: No Estar en Todas",
+            "topics": [
+              "Elegir las plataformas correctas para tu negocio",
+              "Objetivos: awareness, engagement, conversión, comunidad",
+              "Frecuencia y consistencia vs burnout",
+              "Métricas de redes sociales que importan"
+            ],
+            "duration": 13
+          },
+          {
+            "id": "plataformas-2025",
+            "title": "Las Plataformas en 2025: Qué Funciona Dónde",
+            "topics": [
+              "Instagram: Reels, Stories y el algoritmo actual",
+              "TikTok: viralidad, tendencias y autenticidad",
+              "LinkedIn: B2B, thought leadership y networking",
+              "YouTube: long-form, Shorts y SEO de vídeo"
+            ],
+            "duration": 16
+          },
+          {
+            "id": "influencer-marketing",
+            "title": "Influencer Marketing: De Celebrities a Micro-Influencers",
+            "topics": [
+              "El espectro de influencers: nano, micro, macro, mega",
+              "Por qué los micro-influencers convierten más",
+              "UGC (User Generated Content) como estrategia",
+              "Cómo colaborar con influencers (sin arruinarte)"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "community-building",
+            "title": "Community Building: De Seguidores a Comunidad",
+            "topics": [
+              "La diferencia entre audiencia y comunidad",
+              "Plataformas de comunidad: Discord, Slack, Circle",
+              "Engagement genuino vs métricas vacías",
+              "Convertir clientes en embajadores"
+            ],
+            "duration": 13
+          }
+        ]
+      },
+      {
+        "id": "publicidad-digital",
+        "title": "Publicidad Digital",
+        "description": "Cómo invertir en ads de forma inteligente: Meta, Google, TikTok",
+        "chapters": [
+          {
+            "id": "fundamentos-paid",
+            "title": "Publicidad Digital: Conceptos Fundamentales",
+            "topics": [
+              "CPM, CPC, CPA, ROAS: el vocabulario esencial",
+              "Orgánico vs Paid: cuándo invertir en cada uno",
+              "El embudo de paid media",
+              "Presupuestos: cuánto invertir según tu fase"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "meta-ads",
+            "title": "Meta Ads: Facebook e Instagram",
+            "topics": [
+              "Estructura de campañas: Campaña > Conjunto > Anuncio",
+              "Audiencias: Guardadas, Personalizadas, Similares",
+              "Creatividades que convierten",
+              "Optimización y escalado de campañas"
+            ],
+            "duration": 16
+          },
+          {
+            "id": "google-ads",
+            "title": "Google Ads: Search, Display y Shopping",
+            "topics": [
+              "Search ads: capturar demanda existente",
+              "Display y remarketing: estar presente",
+              "Performance Max: la automatización de Google",
+              "Google vs Meta: cuándo usar cada uno"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "atribucion-medicion",
+            "title": "Atribución y Medición de Resultados",
+            "topics": [
+              "El problema de la atribución en 2025",
+              "Modelos de atribución: último clic, lineal, basado en datos",
+              "UTMs y tracking de campañas",
+              "Dashboards de rendimiento de paid media"
+            ],
+            "duration": 13
+          }
+        ]
+      },
+      {
+        "id": "automatizacion-ia",
+        "title": "Automatización e Inteligencia Artificial",
+        "description": "Usa la tecnología para escalar tu marketing sin perder el toque humano",
+        "chapters": [
+          {
+            "id": "marketing-automation",
+            "title": "Marketing Automation: Más Allá del Email",
+            "topics": [
+              "Qué es marketing automation (y qué no es)",
+              "Flujos automatizados: welcome, abandono, reactivación",
+              "Lead scoring: identificar leads calientes",
+              "Herramientas: de gratuitas a enterprise"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "ia-generativa-marketing",
+            "title": "IA Generativa en Marketing: Uso Práctico",
+            "topics": [
+              "ChatGPT, Claude, Gemini para marketers",
+              "Casos de uso: copy, ideas, research, análisis",
+              "Prompts efectivos para marketing",
+              "Lo que la IA no puede hacer (aún)"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "futuro-marketing",
+            "title": "El Futuro del Marketing Digital",
+            "topics": [
+              "Tendencias 2025-2027: hacia dónde vamos",
+              "First-party data y privacy-first marketing",
+              "La convergencia de canales",
+              "Skills del marketer del futuro"
+            ],
+            "duration": 12
+          }
+        ]
+      },
+      {
+        "id": "aplicacion-practica",
+        "title": "Aplicación Práctica",
+        "description": "Pon todo en acción: planifica y ejecuta tu estrategia de marketing",
+        "chapters": [
+          {
+            "id": "plan-marketing",
+            "title": "Cómo Crear tu Plan de Marketing Digital",
+            "topics": [
+              "Análisis de situación: DAFO digital",
+              "Definir objetivos SMART",
+              "Elegir canales y tácticas",
+              "Presupuesto y recursos necesarios"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "campana-integral",
+            "title": "Tu Primera Campaña Integral",
+            "topics": [
+              "Paso 1: Define tu público (keywords, buyer persona)",
+              "Paso 2: Crea contenido optimizado (SEO + GEO)",
+              "Paso 3: Produce material visual (posts, anuncios)",
+              "Paso 4: Mide y optimiza (UTMs, ROI)"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "errores-evitar",
+            "title": "10 Errores de Marketing que Debes Evitar",
+            "topics": [
+              "Errores de estrategia: no tener objetivos claros",
+              "Errores de ejecución: inconsistencia y dispersión",
+              "Errores de medición: vanity metrics",
+              "Errores de presupuesto: gastar antes de validar"
+            ],
+            "duration": 12
+          },
+          {
+            "id": "recursos-herramientas",
+            "title": "Kit de Herramientas del Marketer 2025",
+            "topics": [
+              "Herramientas gratuitas esenciales",
+              "Stack tecnológico según presupuesto",
+              "Recursos de formación continua",
+              "La mentalidad de mejora continua"
+            ],
+            "duration": 11
+          }
+        ]
+      }
+    ]
+  },
+  "generation": {
+    "model": "claude-sonnet-4-20250514",
+    "draftModel": "claude-3-5-haiku-20241022",
+    "depth": "comprehensive",
+    "style": "educational-practical",
+    "tone": "profesional pero accesible, orientado a resultados",
+    "language": "es",
+    "includeExamples": true,
+    "includeExercises": true,
+    "includeReflections": true,
+    "context": "Usar conceptos sólidos de marketing (Wharton, Kotler, Cialdini) pero aplicados al contexto digital 2025. Incluir ejemplos de empresas españolas cuando sea posible. Mencionar herramientas meskeIA donde aplique (Generador Palabras Clave, Analizador SEO, Calculadora ROI Marketing, Generador UTM, etc.)"
+  },
+  "output": {
+    "contentFile": "curso-marketing-digital-content.json",
+    "pagesDir": "app/curso-marketing-digital"
+  }
+}

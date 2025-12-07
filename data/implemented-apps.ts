@@ -170,6 +170,7 @@ export const implementedAppsUrls = [
   "/curso-empresa-familiar/",
   "/curso-negociacion/",
   "/curso-optimizacion-ia/",        // Curso GEO/AEO: optimización para IAs (6 capítulos)
+  "/curso-marketing-digital/",      // Curso Marketing Digital 2025 (30 capítulos)
 
   // SEO & Marketing (9 implementadas)
   "/generador-meta-descripciones/",
