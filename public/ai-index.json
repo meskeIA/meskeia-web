@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 143,
+  "total_tools": 144,
   "updated": "2025-12-07",
   "features": {
     "all_free": true,
@@ -132,7 +132,8 @@
         { "name": "Creador de Flashcards", "slug": "creador-flashcards", "url": "https://meskeia.com/creador-flashcards/", "description": "Crea y estudia con flashcards" },
         { "name": "Curso de Empresa Familiar", "slug": "curso-empresa-familiar", "url": "https://meskeia.com/curso-empresa-familiar/", "description": "Gestión de empresas familiares: gobierno, sucesión, profesionalización" },
         { "name": "Curso de Negociación Exitosa", "slug": "curso-negociacion", "url": "https://meskeia.com/curso-negociacion/", "description": "Domina BATNA, ZOPA, tácticas de persuasión y cierre de acuerdos" },
-        { "name": "Curso de Pensamiento Sistémico", "slug": "curso-pensamiento-sistemico", "url": "https://meskeia.com/curso-pensamiento-sistemico/", "description": "Aprende a entender el mundo como sistemas interconectados: redes, retroalimentación, emergencia, antifragilidad. 20 capítulos" }
+        { "name": "Curso de Pensamiento Sistémico", "slug": "curso-pensamiento-sistemico", "url": "https://meskeia.com/curso-pensamiento-sistemico/", "description": "Aprende a entender el mundo como sistemas interconectados: redes, retroalimentación, emergencia, antifragilidad. 20 capítulos" },
+        { "name": "Curso de Estrategia Empresarial", "slug": "curso-estrategia-empresarial", "url": "https://meskeia.com/curso-estrategia-empresarial/", "description": "Pensamiento estratégico para la era de la incertidumbre: Porter actualizado, nuevos moats, experimentación vs planificación. 10 capítulos" }
       ]
     },
     {

@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 145+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 146+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 145,
+  "total_tools": 146,
   "last_updated": "2025-12-07",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 12
+      "tool_count": 13
     },
     {
       "id": "impuestos",
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 57
+      "tool_count": 58
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 43
+      "tool_count": 44
     },
     {
       "id": "casa",
@@ -1791,6 +1791,33 @@
         "publicidad digital"
       ],
       "icon": "📈"
+    },
+    {
+      "slug": "curso-estrategia-empresarial",
+      "name": "Curso de Estrategia Empresarial",
+      "url": "https://meskeia.com/curso-estrategia-empresarial/",
+      "description": "Pensamiento estratégico para la era de la incertidumbre: Porter actualizado, fracasos de empresas excelentes, nuevos moats, experimentación vs planificación. 10 capítulos",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "estrategia empresarial",
+        "porter",
+        "swot",
+        "ventaja competitiva",
+        "disrupcion",
+        "antifragilidad",
+        "planificacion estrategica",
+        "moats",
+        "kodak",
+        "nokia",
+        "openai",
+        "tesla",
+        "amazon"
+      ],
+      "icon": "♟️"
     },
     {
       "slug": "simulador-irpf",

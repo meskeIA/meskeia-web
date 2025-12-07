@@ -1,0 +1,202 @@
+{
+  "courseId": "curso-estrategia-empresarial",
+  "courseTitle": "Curso de Estrategia Empresarial",
+  "courseSubtitle": "Pensamiento estratégico para la era de la incertidumbre",
+  "courseDescription": "Aprende a pensar estratégicamente en entornos hiperdinámicos. Desde los fundamentos clásicos hasta las nuevas realidades de la IA y la disrupción continua. Un curso honesto sobre qué funciona y qué ha dejado de funcionar en estrategia empresarial.",
+  "targetAudience": "Emprendedores, directivos de PYMEs, estudiantes y profesionales que necesitan tomar decisiones estratégicas en entornos de alta incertidumbre",
+  "totalDuration": "120 minutos",
+  "heroIcon": "♟️",
+  "modules": {
+    "fundamentos": {
+      "title": "Fundamentos Atemporales",
+      "description": "Los principios estratégicos que siguen siendo válidos independientemente del contexto tecnológico",
+      "chapters": {
+        "que-es-estrategia": {
+          "title": "¿Qué es Estrategia Realmente?",
+          "duration": 12,
+          "topics": [
+            "Definición honesta de estrategia",
+            "Misión y valores como brújula",
+            "Decisiones coherentes a largo plazo",
+            "Estrategia vs. táctica vs. operaciones"
+          ],
+          "sourceReference": "Darden Chapter 1 - Introduction to Strategic Analysis",
+          "modernContext": "Contrastar definiciones clásicas con la realidad actual donde los planes a 5 años son ficción"
+        },
+        "analisis-entorno": {
+          "title": "Análisis del Entorno: De Porter a la Complejidad",
+          "duration": 14,
+          "topics": [
+            "Las 5 Fuerzas de Porter: utilidad y limitaciones",
+            "Análisis del ciclo de vida competitivo",
+            "Dinámicas no lineales y cisnes negros",
+            "Escenarios vs. predicciones"
+          ],
+          "sourceReference": "Darden Chapter 2 - Competitive Life Cycle Analysis, Chapter 3 - Five Forces",
+          "modernContext": "Por qué Porter sigue siendo útil para estructura pero falla en velocidad de cambio"
+        },
+        "recursos-capacidades": {
+          "title": "Recursos y Capacidades: Lo Que Sí Puedes Controlar",
+          "duration": 12,
+          "topics": [
+            "Análisis interno honesto",
+            "Capacidades distintivas reales",
+            "Core competencies: qué son realmente",
+            "Build vs. buy vs. partner"
+          ],
+          "sourceReference": "Darden Chapter 4 - Capabilities Analysis",
+          "modernContext": "En un mundo de APIs y servicios, qué significa realmente 'capacidad distintiva'"
+        }
+      }
+    },
+    "cambios": {
+      "title": "Lo Que Ha Cambiado",
+      "description": "Por qué muchos frameworks clásicos ya no funcionan y qué los ha reemplazado",
+      "chapters": {
+        "fracaso-excelentes": {
+          "title": "Por Qué Fracasaron las Empresas 'Excelentes'",
+          "duration": 14,
+          "topics": [
+            "El mito de 'In Search of Excellence'",
+            "Kodak: la maldición del éxito",
+            "Nokia: de líder a irrelevante en 5 años",
+            "Blockbuster vs. Netflix: la ceguera estratégica",
+            "Lecciones para no repetir errores"
+          ],
+          "sourceReference": "Research on Peters & Waterman companies + Darden cases",
+          "modernContext": "Análisis actualizado de por qué el 2/3 de las 'excelentes' fracasaron"
+        },
+        "nuevos-moats": {
+          "title": "Los Nuevos 'Moats': Ventajas Competitivas del Siglo XXI",
+          "duration": 12,
+          "topics": [
+            "De barreras de entrada a data loops",
+            "Efectos de red en la era digital",
+            "Distribución como ventaja",
+            "Loops de aprendizaje y velocidad de iteración",
+            "Por qué los moats tradicionales se erosionan"
+          ],
+          "sourceReference": "Modern strategy research + AI industry analysis",
+          "modernContext": "Cómo empresas como Google, Amazon y las IA companies construyen ventajas"
+        },
+        "entornos-hiperdinamicos": {
+          "title": "Estrategia en Entornos Hiperdinámicos",
+          "duration": 14,
+          "topics": [
+            "Qué hace diferente al entorno actual",
+            "La IA como factor de disrupción continua",
+            "Estrategia cuando la planificación es imposible",
+            "Antifragilidad empresarial",
+            "Optionalidad estratégica"
+          ],
+          "sourceReference": "Taleb + modern strategy research",
+          "modernContext": "Cómo sobrevivir cuando ChatGPT puede hacer obsoleto tu negocio en meses"
+        }
+      }
+    },
+    "herramientas": {
+      "title": "Herramientas del Siglo XXI",
+      "description": "Frameworks prácticos adaptados a la realidad actual",
+      "chapters": {
+        "analisis-opciones": {
+          "title": "De SWOT a Análisis de Opciones Estratégicas",
+          "duration": 12,
+          "topics": [
+            "Limitaciones del SWOT tradicional",
+            "Pensamiento en opciones reales",
+            "Matriz de decisiones bajo incertidumbre",
+            "Análisis de escenarios práctico",
+            "Herramientas para PYMEs y emprendedores"
+          ],
+          "sourceReference": "Darden SWOT + modern decision analysis",
+          "modernContext": "Herramientas actualizadas para tomar decisiones con información incompleta"
+        },
+        "experimentacion-rapida": {
+          "title": "Experimentación Rápida vs. Planificación Detallada",
+          "duration": 12,
+          "topics": [
+            "El mito del plan de negocio perfecto",
+            "Lean Strategy: hipótesis y validación",
+            "MVPs estratégicos",
+            "Fail fast, learn faster",
+            "Cuándo sí planificar en detalle"
+          ],
+          "sourceReference": "Lean Startup + Darden planning concepts",
+          "modernContext": "El equilibrio entre actuar rápido y pensar antes de actuar"
+        },
+        "estrategia-emergente": {
+          "title": "Estrategia Emergente: Aprender Haciendo",
+          "duration": 12,
+          "topics": [
+            "Mintzberg y la estrategia emergente",
+            "Patrones que emergen de la acción",
+            "Feedback loops y adaptación continua",
+            "Decisiones reversibles vs. irreversibles",
+            "Construir capacidad de pivote"
+          ],
+          "sourceReference": "Mintzberg + modern agile strategy",
+          "modernContext": "Cómo las startups exitosas realmente encontraron su estrategia"
+        }
+      }
+    },
+    "aplicacion": {
+      "title": "Aplicación Práctica",
+      "description": "Casos reales y síntesis para la acción",
+      "chapters": {
+        "casos-actuales": {
+          "title": "Casos Actuales: Estrategia en Acción",
+          "duration": 16,
+          "topics": [
+            "OpenAI vs. Anthropic: dos filosofías estratégicas",
+            "Tesla vs. fabricantes tradicionales: disrupción desde fuera",
+            "Amazon: la estrategia del 'Day 1'",
+            "Empresas españolas: Inditex y su modelo único",
+            "Tu propia estrategia: framework de síntesis"
+          ],
+          "sourceReference": "Current business analysis + Darden case methodology",
+          "modernContext": "Análisis de empresas que están definiendo las reglas del juego ahora mismo"
+        }
+      }
+    }
+  },
+  "apiConfig": {
+    "searchModel": "claude-3-haiku-20240307",
+    "refinementModel": "claude-sonnet-4-20250514",
+    "maxTokensPerChapter": 4000,
+    "temperature": 0.7
+  },
+  "contentGuidelines": {
+    "tone": "Directo, honesto, sin jerga innecesaria. Cuestionar dogmas establecidos.",
+    "approach": "30% fundamentos clásicos (contextualizados), 70% realidad 2025",
+    "examples": "Casos reales y actuales, evitar ejemplos genéricos o inventados",
+    "actionable": "Cada capítulo debe terminar con acciones concretas para el lector",
+    "honesty": "Admitir abiertamente qué no sabemos y qué ha dejado de funcionar"
+  },
+  "structurePerChapter": {
+    "introduction": "Gancho que conecte con la realidad del lector (100-150 palabras)",
+    "sections": [
+      {
+        "type": "concept",
+        "title": "El concepto clásico",
+        "content": "Explicación del framework tradicional",
+        "example": "Ejemplo histórico relevante"
+      },
+      {
+        "type": "reality-check",
+        "title": "La realidad actual",
+        "content": "Por qué funciona o no funciona hoy",
+        "example": "Caso actual que lo ilustre"
+      },
+      {
+        "type": "practical",
+        "title": "Aplicación práctica",
+        "content": "Cómo usar esto en tu contexto",
+        "example": "Ejercicio o herramienta concreta"
+      }
+    ],
+    "keyIdeas": "3-5 ideas principales (bullets concisos)",
+    "actionItems": "3-4 acciones concretas para implementar",
+    "reflectionQuestions": "2-3 preguntas para profundizar",
+    "curiosity": "Dato sorprendente o contraejemplo que desafíe asunciones"
+  }
+}
