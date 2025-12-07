@@ -16,6 +16,7 @@ export const implementedAppsUrls = [
   "/calculadora-sucesiones-nacional/",
   "/simulador-irpf/",
   "/calculadora-plusvalias-irpf/",   // Plusvalías capital mobiliario (acciones, fondos, cripto)
+  "/guia-tramitacion-herencias/",    // Guía paso a paso para tramitar herencias
   "/calculadora-tir-van/",
   "/control-gastos/",
   "/interes-compuesto/",
