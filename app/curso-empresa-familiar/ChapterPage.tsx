@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import { ReactNode, useRef } from 'react';
 import styles from './CursoEmpresaFamiliar.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, TextToSpeech } from '@/components';
 import { useCourse, getChapterById, getNextChapter, getPreviousChapter } from './CourseContext';
 
 interface ChapterPageProps {
@@ -13,6 +13,7 @@ interface ChapterPageProps {
 
 export default function ChapterPage({ chapterId, children }: ChapterPageProps) {
   const { isCompleted, markAsCompleted, markAsIncomplete, getProgressPercentage, getCompletedCount, getTotalChapters } = useCourse();
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const chapterData = getChapterById(chapterId);
   const nextChapter = getNextChapter(chapterId);
@@ -84,8 +85,11 @@ export default function ChapterPage({ chapterId, children }: ChapterPageProps) {
           )}
         </nav>
 
+        {/* TTS Controls */}
+        <TextToSpeech contentRef={contentRef} resetKey={chapterId} />
+
         {/* Content */}
-        {children}
+        <div ref={contentRef}>{children}</div>
 
         {/* Complete Button */}
         <div className={styles.completeSection}>

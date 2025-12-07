@@ -1,9 +1,9 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useRef } from 'react';
 import Link from 'next/link';
 import styles from './CursoTeoriaPolitica.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, TextToSpeech } from '@/components';
 import {
   CHAPTERS,
   useCourse,
@@ -18,6 +18,7 @@ interface ChapterPageProps {
 
 export default function ChapterPage({ chapterId, children }: ChapterPageProps) {
   const { markChapterComplete, isChapterCompleted, getProgressPercentage } = useCourse();
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const chapter = CHAPTERS.find((ch) => ch.id === chapterId);
   const prevChapter = getPreviousChapter(chapterId);
@@ -88,8 +89,11 @@ export default function ChapterPage({ chapterId, children }: ChapterPageProps) {
           )}
         </nav>
 
+        {/* TTS Controls */}
+        <TextToSpeech contentRef={contentRef} resetKey={String(chapterId)} />
+
         {/* Content */}
-        {children}
+        <div ref={contentRef}>{children}</div>
 
         {/* Complete Section */}
         <div className={styles.completeSection}>

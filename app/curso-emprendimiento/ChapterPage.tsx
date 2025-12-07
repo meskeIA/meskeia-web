@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { ReactNode, useRef } from 'react';
 import styles from './CursoEmprendimiento.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, TextToSpeech } from '@/components';
 import { CHAPTERS, useCourse } from './CourseContext';
-import { ReactNode } from 'react';
 
 interface ChapterSection {
   title: string;
@@ -19,6 +19,7 @@ interface ChapterPageProps {
 
 export default function ChapterPage({ slug, sections }: ChapterPageProps) {
   const { markChapterComplete, isChapterCompleted } = useCourse();
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const chapter = CHAPTERS.find(ch => ch.slug === slug);
   const chapterIndex = CHAPTERS.findIndex(ch => ch.slug === slug);
@@ -58,16 +59,21 @@ export default function ChapterPage({ slug, sections }: ChapterPageProps) {
         <p className={styles.chapterIntro}>{chapter.description}</p>
       </div>
 
+      {/* TTS Controls */}
+      <TextToSpeech contentRef={contentRef} resetKey={slug} />
+
       {/* Contenido */}
-      {sections.map((section, idx) => (
-        <section key={idx} className={styles.contentSection}>
-          <h2>
-            {section.icon && <span>{section.icon}</span>}
-            {section.title}
-          </h2>
-          {section.content}
-        </section>
-      ))}
+      <div ref={contentRef}>
+        {sections.map((section, idx) => (
+          <section key={idx} className={styles.contentSection}>
+            <h2>
+              {section.icon && <span>{section.icon}</span>}
+              {section.title}
+            </h2>
+            {section.content}
+          </section>
+        ))}
+      </div>
 
       {/* Marcar como completado */}
       <div className={styles.completeSection}>

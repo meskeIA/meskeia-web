@@ -494,6 +494,13 @@
   color: var(--primary);
 }
 
+.navCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
 .navProgress {
   text-align: center;
 }

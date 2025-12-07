@@ -1,0 +1,66 @@
+/* Text-to-Speech Controls */
+.ttsControls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ttsButton {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--hover, #F5F5F5);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: var(--radius, 12px);
+  color: var(--text-primary, #1A1A1A);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ttsButton:hover {
+  border-color: var(--primary, #2E86AB);
+  color: var(--primary, #2E86AB);
+  background: var(--bg-card, #FFFFFF);
+}
+
+.ttsButton.ttsActive {
+  background: linear-gradient(135deg, var(--primary, #2E86AB), var(--secondary, #48A9A6));
+  color: white;
+  border-color: transparent;
+}
+
+.ttsLabel {
+  font-size: 0.8rem;
+}
+
+.ttsStopButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--danger, #EF4444);
+  border: none;
+  border-radius: var(--radius, 12px);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ttsStopButton:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+/* Dark Mode Support */
+[data-theme='dark'] .ttsButton {
+  background: var(--hover, #333333);
+  border-color: var(--border, #404040);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .ttsButton:hover {
+  background: var(--bg-card, #2A2A2A);
+}

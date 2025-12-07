@@ -12,3 +12,4 @@ export { default as AnalyticsTracker } from './AnalyticsTracker';
 export { default as NumberInput } from './NumberInput';
 export { default as ResultCard } from './ResultCard';
 export { default as EducationalSection } from './EducationalSection';
+export { default as TextToSpeech } from './TextToSpeech';
