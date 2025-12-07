@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 146+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 147+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 146,
+  "total_tools": 147,
   "last_updated": "2025-12-07",
   "features": {
     "all_free": true,
@@ -91,7 +91,7 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Cuida tu salud con herramientas especializadas",
-      "tool_count": 11
+      "tool_count": 12
     },
     {
       "id": "texto",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 41
+      "tool_count": 42
     },
     {
       "id": "dinero",
@@ -2847,6 +2847,31 @@
         "planificador"
       ],
       "icon": "🤰"
+    },
+    {
+      "slug": "planificador-mascota",
+      "name": "Planificador de Mascota",
+      "url": "https://meskeia.com/planificador-mascota/",
+      "description": "Organiza la llegada de tu cachorro o gatito: perfil, checklist por etapas, lista de compras y calendario de vacunas. Perros y gatos",
+      "category": "Salud y Bienestar",
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "mascota",
+        "cachorro",
+        "gatito",
+        "perro",
+        "gato",
+        "checklist",
+        "vacunas perro",
+        "vacunas gato",
+        "compras mascota",
+        "cuidados cachorro",
+        "adoptar perro",
+        "adoptar gato"
+      ],
+      "icon": "🐾"
     },
     {
       "slug": "calculadora-percentiles",

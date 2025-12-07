@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 144,
+  "total_tools": 145,
   "updated": "2025-12-07",
   "features": {
     "all_free": true,
@@ -220,6 +220,7 @@
         { "name": "Calculadora de Porciones", "slug": "calculadora-porciones", "url": "https://meskeia.com/calculadora-porciones/", "description": "Mide porciones con tu mano" },
         { "name": "Test de Hábitos Saludables", "slug": "test-habitos", "url": "https://meskeia.com/test-habitos/", "description": "Evalúa tus hábitos de vida" },
         { "name": "Planificador Embarazo y Bebé", "slug": "planificador-embarazo", "url": "https://meskeia.com/planificador-embarazo/", "description": "Planificador completo: calculadora FPP, checklist por trimestre, lista compras bebé y vacunas España 2024" },
+        { "name": "Planificador de Mascota", "slug": "planificador-mascota", "url": "https://meskeia.com/planificador-mascota/", "description": "Organiza la llegada de tu cachorro o gatito: perfil, checklist por etapas, lista de compras y vacunas para perros y gatos" },
         { "name": "Calculadora Percentiles Infantiles", "slug": "calculadora-percentiles", "url": "https://meskeia.com/calculadora-percentiles/", "description": "Percentil de peso y talla según tablas OMS" }
       ]
     },

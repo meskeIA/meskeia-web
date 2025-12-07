@@ -91,7 +91,7 @@ export default function CursoEmprendimientoPage() {
             return (
               <Link
                 key={chapter.id}
-                href={`/curso-emprendimiento/capitulo/${chapter.slug}`}
+                href={`/curso-emprendimiento/${chapter.slug}`}
                 className={styles.chapterCard}
               >
                 <div className={styles.chapterHeader}>
@@ -158,7 +158,7 @@ export default function CursoEmprendimientoPage() {
           href={
             completedCount === 6
               ? '/curso-emprendimiento/herramientas/business-model-canvas'
-              : `/curso-emprendimiento/capitulo/${CHAPTERS[Math.min(completedCount, 5)].slug}`
+              : `/curso-emprendimiento/${CHAPTERS[Math.min(completedCount, 5)].slug}`
           }
           className={styles.ctaButton}
         >

@@ -121,6 +121,7 @@ export const implementedAppsUrls = [
   "/calculadora-porciones/",
   "/test-habitos/",
   "/planificador-embarazo/",         // Planificador embarazo: FPP, checklist, compras, vacunas
+  "/planificador-mascota/",          // Planificador mascota: cachorro/gatito, checklist, compras, vacunas
   "/calculadora-percentiles/",       // Percentiles peso/talla infantil OMS
 
   // Herramientas Web y Tecnología (6 implementadas)

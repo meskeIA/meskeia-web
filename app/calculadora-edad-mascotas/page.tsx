@@ -308,6 +308,33 @@ export default function CalculadoraEdadMascotasPage() {
         </div>
       </div>
 
+      {/* Apps relacionadas */}
+      <div className={styles.appsRelacionadas}>
+        <h3>🐾 Más herramientas para tu mascota</h3>
+        <div className={styles.appsGrid}>
+          <a href="/planificador-mascota/" className={styles.appCard}>
+            <span className={styles.appIcon}>📋</span>
+            <span className={styles.appName}>Planificador de Mascota</span>
+            <span className={styles.appDesc}>Checklist completo para nuevos dueños</span>
+          </a>
+          <a href="/calculadora-alimentacion-mascotas/" className={styles.appCard}>
+            <span className={styles.appIcon}>🍖</span>
+            <span className={styles.appName}>Calculadora de Alimentación</span>
+            <span className={styles.appDesc}>Cuánto debe comer tu mascota</span>
+          </a>
+          <a href="/calculadora-medicamentos-mascotas/" className={styles.appCard}>
+            <span className={styles.appIcon}>💊</span>
+            <span className={styles.appName}>Calculadora de Medicamentos</span>
+            <span className={styles.appDesc}>Dosis de antiparasitarios</span>
+          </a>
+          <a href="/calculadora-tamano-adulto-perro/" className={styles.appCard}>
+            <span className={styles.appIcon}>📏</span>
+            <span className={styles.appName}>Tamaño Adulto Cachorro</span>
+            <span className={styles.appDesc}>Predice cuánto pesará de adulto</span>
+          </a>
+        </div>
+      </div>
+
       <Footer appName="calculadora-edad-mascotas" />
     </div>
   );
