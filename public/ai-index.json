@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 141,
-  "updated": "2025-12-06",
+  "total_tools": 142,
+  "updated": "2025-12-07",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -130,7 +130,8 @@
         { "name": "Generador de Horarios de Estudio", "slug": "generador-horarios-estudio", "url": "https://meskeia.com/generador-horarios-estudio/", "description": "Genera horarios de estudio personalizados" },
         { "name": "Creador de Flashcards", "slug": "creador-flashcards", "url": "https://meskeia.com/creador-flashcards/", "description": "Crea y estudia con flashcards" },
         { "name": "Curso de Empresa Familiar", "slug": "curso-empresa-familiar", "url": "https://meskeia.com/curso-empresa-familiar/", "description": "Gestión de empresas familiares: gobierno, sucesión, profesionalización" },
-        { "name": "Curso de Negociación Exitosa", "slug": "curso-negociacion", "url": "https://meskeia.com/curso-negociacion/", "description": "Domina BATNA, ZOPA, tácticas de persuasión y cierre de acuerdos" }
+        { "name": "Curso de Negociación Exitosa", "slug": "curso-negociacion", "url": "https://meskeia.com/curso-negociacion/", "description": "Domina BATNA, ZOPA, tácticas de persuasión y cierre de acuerdos" },
+        { "name": "Curso de Pensamiento Sistémico", "slug": "curso-pensamiento-sistemico", "url": "https://meskeia.com/curso-pensamiento-sistemico/", "description": "Aprende a entender el mundo como sistemas interconectados: redes, retroalimentación, emergencia, antifragilidad. 20 capítulos" }
       ]
     },
     {

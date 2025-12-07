@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 143+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 144+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 143,
+  "total_tools": 144,
   "last_updated": "2025-12-07",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 11
+      "tool_count": 12
     },
     {
       "id": "impuestos",
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 55
+      "tool_count": 56
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 41
+      "tool_count": 42
     },
     {
       "id": "casa",
@@ -1664,6 +1664,30 @@
         "kuhn"
       ],
       "icon": "🧠"
+    },
+    {
+      "slug": "curso-pensamiento-sistemico",
+      "name": "Curso de Pensamiento Sistémico",
+      "url": "https://meskeia.com/curso-pensamiento-sistemico/",
+      "description": "Aprende a entender el mundo como sistemas interconectados: redes, retroalimentación, emergencia, antifragilidad y aplicaciones prácticas. 20 capítulos",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "pensamiento sistemico",
+        "teoria sistemas",
+        "complejidad",
+        "retroalimentacion",
+        "emergencia",
+        "antifragilidad",
+        "redes",
+        "holismo",
+        "sistemas complejos",
+        "dinamica sistemas"
+      ],
+      "icon": "🔄"
     },
     {
       "slug": "curso-empresa-familiar",

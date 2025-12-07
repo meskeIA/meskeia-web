@@ -1,0 +1,275 @@
+{
+  "course": {
+    "name": "Curso de Pensamiento Sistémico",
+    "slug": "curso-pensamiento-sistemico",
+    "description": "Aprende a entender el mundo como sistemas interconectados. Descubre cómo las partes se relacionan para formar totalidades complejas y aplica este enfoque a decisiones personales, profesionales y organizacionales.",
+    "icon": "🔄",
+    "expertiseArea": "sistemas complejos, teoría de sistemas, pensamiento holístico",
+    "targetAudience": "Profesionales, emprendedores, estudiantes y cualquier persona interesada en comprender mejor la complejidad del mundo moderno",
+    "modules": [
+      {
+        "id": "fundamentos",
+        "title": "Fundamentos del Pensamiento Sistémico",
+        "description": "Historia, orígenes y relevancia actual del enfoque sistémico",
+        "chapters": [
+          {
+            "id": "que-es-pensamiento-sistemico",
+            "title": "¿Qué es el Pensamiento Sistémico?",
+            "topics": [
+              "Definición y origen del concepto",
+              "Diferencia entre pensamiento lineal y sistémico",
+              "El todo es más que la suma de las partes",
+              "Por qué necesitamos pensar en sistemas hoy"
+            ],
+            "duration": 12
+          },
+          {
+            "id": "historia-sistemas",
+            "title": "Breve Historia del Pensamiento Sistémico",
+            "topics": [
+              "Antecedentes filosóficos: de Aristóteles al holismo",
+              "Ludwig von Bertalanffy y la Teoría General de Sistemas",
+              "La cibernética de Norbert Wiener",
+              "Del reduccionismo al pensamiento complejo"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "reduccionismo-vs-holismo",
+            "title": "Reduccionismo vs. Holismo",
+            "topics": [
+              "El método científico reduccionista y sus límites",
+              "Problemas que no se pueden descomponer",
+              "El enfoque holístico como complemento",
+              "Cuándo usar cada aproximación"
+            ],
+            "duration": 12
+          },
+          {
+            "id": "relevancia-siglo-xxi",
+            "title": "Relevancia en el Siglo XXI",
+            "topics": [
+              "Globalización e interdependencia",
+              "Crisis sistémicas: pandemia, clima, economía",
+              "Tecnología e hiperconectividad",
+              "La era de la complejidad"
+            ],
+            "duration": 14
+          }
+        ]
+      },
+      {
+        "id": "conceptos-clave",
+        "title": "Conceptos Clave",
+        "description": "Herramientas conceptuales para analizar sistemas",
+        "chapters": [
+          {
+            "id": "elementos-sistemas",
+            "title": "Elementos de un Sistema",
+            "topics": [
+              "Componentes, relaciones y fronteras",
+              "Subsistemas y metasistemas",
+              "Escalas: micro, meso y macro",
+              "Identificar sistemas en tu entorno"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "redes-conexiones",
+            "title": "Redes y Conexiones",
+            "topics": [
+              "Teoría de redes básica",
+              "Nodos, enlaces y topologías",
+              "Redes aleatorias vs. redes de mundo pequeño",
+              "El poder de los conectores (hubs)"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "retroalimentacion",
+            "title": "Retroalimentación y Dinámica",
+            "topics": [
+              "Bucles de retroalimentación positiva y negativa",
+              "Efectos amplificadores y estabilizadores",
+              "Puntos de inflexión y cambios no lineales",
+              "Ejemplos: termostatos, mercados, ecosistemas"
+            ],
+            "duration": 16
+          },
+          {
+            "id": "emergencia-autoorganizacion",
+            "title": "Emergencia y Autoorganización",
+            "topics": [
+              "Propiedades emergentes: qué son y cómo surgen",
+              "La inteligencia colectiva de las hormigas",
+              "Autoorganización sin control central",
+              "Emergencia en sistemas sociales y tecnológicos"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "informacion-complejidad",
+            "title": "Información y Complejidad",
+            "topics": [
+              "Información como medida del cambio",
+              "Qué hace complejo a un sistema",
+              "Complejidad vs. complicación",
+              "Gestionar la incertidumbre"
+            ],
+            "duration": 13
+          },
+          {
+            "id": "fragilidad-antifragilidad",
+            "title": "Fragilidad, Robustez y Antifragilidad",
+            "topics": [
+              "Sistemas frágiles: rompen con el cambio",
+              "Sistemas robustos: resisten el cambio",
+              "Sistemas antifrágiles: mejoran con el estrés",
+              "Diseñar para la antifragilidad"
+            ],
+            "duration": 15
+          }
+        ]
+      },
+      {
+        "id": "sistemas-accion",
+        "title": "Sistemas en Acción",
+        "description": "Aplicaciones prácticas en diferentes dominios",
+        "chapters": [
+          {
+            "id": "sistemas-biologicos",
+            "title": "Sistemas Biológicos",
+            "topics": [
+              "El cuerpo humano como sistema de sistemas",
+              "El microbioma y la salud sistémica",
+              "Ecosistemas y equilibrio ecológico",
+              "La mente extendida: más allá del cerebro"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "organizaciones-empresas",
+            "title": "Organizaciones y Empresas",
+            "topics": [
+              "La empresa como sistema adaptativo",
+              "Cultura organizacional emergente",
+              "Jerarquías vs. redes distribuidas",
+              "La tragedia de los comunes en organizaciones"
+            ],
+            "duration": 16
+          },
+          {
+            "id": "economia-mercados",
+            "title": "Economía y Mercados",
+            "topics": [
+              "Mercados como sistemas complejos",
+              "Crisis financieras: cascadas sistémicas",
+              "Criptoeconomías y sistemas descentralizados",
+              "Economía circular y sostenibilidad"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "ciudades-sociedades",
+            "title": "Ciudades y Sociedades",
+            "topics": [
+              "La ciudad como organismo vivo",
+              "Ciudades inteligentes y IoT",
+              "Dinámicas sociales y polarización",
+              "Epidemias: lecciones sistémicas del COVID-19"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "tecnologia-ia",
+            "title": "Tecnología e Inteligencia Artificial",
+            "topics": [
+              "Internet como sistema de sistemas",
+              "Redes neuronales y emergencia en IA",
+              "Sistemas sociotécnicos",
+              "Riesgos sistémicos de la tecnología"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "cambio-climatico",
+            "title": "Cambio Climático: El Reto Sistémico Global",
+            "topics": [
+              "El clima como sistema complejo",
+              "Puntos de inflexión climáticos",
+              "Interconexión de sistemas naturales y humanos",
+              "Soluciones sistémicas vs. soluciones aisladas"
+            ],
+            "duration": 14
+          }
+        ]
+      },
+      {
+        "id": "aplicacion-practica",
+        "title": "Pensamiento Sistémico Aplicado",
+        "description": "Herramientas y métodos para aplicar el pensamiento sistémico",
+        "chapters": [
+          {
+            "id": "herramientas-analisis",
+            "title": "Herramientas de Análisis Sistémico",
+            "topics": [
+              "Diagramas causales y mapas sistémicos",
+              "Identificar bucles de retroalimentación",
+              "Arquetipos sistémicos comunes",
+              "Simulación y modelado básico"
+            ],
+            "duration": 16
+          },
+          {
+            "id": "toma-decisiones",
+            "title": "Toma de Decisiones Sistémica",
+            "topics": [
+              "Evitar soluciones que crean nuevos problemas",
+              "Identificar puntos de apalancamiento",
+              "Pensar en consecuencias de segundo orden",
+              "Decidir bajo incertidumbre"
+            ],
+            "duration": 15
+          },
+          {
+            "id": "liderazgo-sistemico",
+            "title": "Liderazgo y Cambio Sistémico",
+            "topics": [
+              "El líder como facilitador de sistemas",
+              "Cambiar las reglas del juego",
+              "Fomentar cooperación vs. competencia",
+              "Gestionar sistemas que no puedes controlar"
+            ],
+            "duration": 14
+          },
+          {
+            "id": "pensamiento-sistemico-vida",
+            "title": "Pensamiento Sistémico en tu Vida",
+            "topics": [
+              "Tu vida como sistema interconectado",
+              "Salud, trabajo, relaciones: todo está conectado",
+              "Pequeños cambios, grandes efectos",
+              "Cultivar una mentalidad sistémica"
+            ],
+            "duration": 12
+          }
+        ]
+      }
+    ]
+  },
+  "generation": {
+    "model": "claude-sonnet-4-20250514",
+    "draftModel": "claude-haiku-3",
+    "depth": "comprehensive",
+    "style": "educational-practical",
+    "tone": "profesional pero accesible",
+    "language": "es",
+    "includeExamples": true,
+    "includeExercises": true,
+    "includeReflections": true
+  },
+  "output": {
+    "contentFile": "curso-pensamiento-sistemico-content.json",
+    "pagesDir": "app/curso-pensamiento-sistemico"
+  }
+}

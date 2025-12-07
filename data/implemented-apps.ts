@@ -166,6 +166,7 @@ export const implementedAppsUrls = [
   "/curso-nutrisalud/",
   "/curso-teoria-politica/",
   "/curso-pensamiento-cientifico/",
+  "/curso-pensamiento-sistemico/",   // Curso Pensamiento Sistémico (20 capítulos)
   "/curso-empresa-familiar/",
   "/curso-negociacion/",
   "/curso-optimizacion-ia/",        // Curso GEO/AEO: optimización para IAs (6 capítulos)
