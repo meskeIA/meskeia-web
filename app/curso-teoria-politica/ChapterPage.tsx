@@ -67,9 +67,12 @@ export default function ChapterPage({ chapterId, children }: ChapterPageProps) {
             </Link>
           )}
 
-          <div className={styles.navProgress}>
-            <div className={styles.navProgressText}>{progress}%</div>
-            <div className={styles.navProgressLabel}>Progreso</div>
+          <div className={styles.navCenter}>
+            <div className={styles.navProgress}>
+              <div className={styles.navProgressText}>{progress}%</div>
+              <div className={styles.navProgressLabel}>Progreso</div>
+            </div>
+            <TextToSpeech contentRef={contentRef} resetKey={String(chapterId)} />
           </div>
 
           {nextChapter ? (
@@ -88,9 +91,6 @@ export default function ChapterPage({ chapterId, children }: ChapterPageProps) {
             </Link>
           )}
         </nav>
-
-        {/* TTS Controls */}
-        <TextToSpeech contentRef={contentRef} resetKey={String(chapterId)} />
 
         {/* Content */}
         <div ref={contentRef}>{children}</div>

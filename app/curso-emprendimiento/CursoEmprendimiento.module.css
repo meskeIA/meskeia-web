@@ -668,6 +668,12 @@
   line-height: 1.8;
 }
 
+.ttsWrapper {
+  margin-top: var(--spacing-md);
+  display: flex;
+  justify-content: center;
+}
+
 /* Content Sections */
 .contentSection {
   background: var(--bg-card);

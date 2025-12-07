@@ -57,10 +57,10 @@ export default function ChapterPage({ slug, sections }: ChapterPageProps) {
           <span className={styles.chapterBadge}>{chapter.duration}</span>
         </h1>
         <p className={styles.chapterIntro}>{chapter.description}</p>
+        <div className={styles.ttsWrapper}>
+          <TextToSpeech contentRef={contentRef} resetKey={slug} />
+        </div>
       </div>
-
-      {/* TTS Controls */}
-      <TextToSpeech contentRef={contentRef} resetKey={slug} />
 
       {/* Contenido */}
       <div ref={contentRef}>
