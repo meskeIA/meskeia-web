@@ -19,10 +19,15 @@
   transition: all 0.2s ease;
 }
 
-.ttsButton:hover {
+.ttsButton:hover:not(:disabled) {
   border-color: var(--primary, #2E86AB);
   color: var(--primary, #2E86AB);
   background: var(--bg-card, #FFFFFF);
+}
+
+.ttsButton:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .ttsButton.ttsActive {
