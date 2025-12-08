@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 151+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 152+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 151,
+  "total_tools": 152,
   "last_updated": "2025-12-08",
   "features": {
     "all_free": true,
@@ -35,7 +35,7 @@
       "name": "Diseño Web",
       "icon": "🎨",
       "description": "Colores, tipografías y herramientas para diseñadores",
-      "tool_count": 12
+      "tool_count": 13
     },
     {
       "id": "emprendimiento",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 58
+      "tool_count": 59
     },
     {
       "id": "estudio",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 36
+      "tool_count": 37
     },
     {
       "id": "relax",
@@ -732,6 +732,28 @@
         "armonia cromatica"
       ],
       "icon": "🎨"
+    },
+    {
+      "slug": "creador-thumbnails",
+      "name": "Creador de Thumbnails YouTube",
+      "url": "https://meskeia.com/creador-thumbnails/",
+      "description": "Diseña miniaturas profesionales para YouTube: texto, imágenes, formas y exportación PNG 1280x720",
+      "category": "Diseño Web",
+      "contexts": [
+        "creando",
+        "trabajo"
+      ],
+      "keywords": [
+        "thumbnails",
+        "youtube",
+        "miniaturas",
+        "portadas",
+        "editor",
+        "diseño",
+        "1280x720",
+        "videos"
+      ],
+      "icon": "🎬"
     },
     {
       "slug": "validador-json",

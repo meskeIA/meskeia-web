@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 149,
-  "updated": "2025-12-07",
+  "total_tools": 150,
+  "updated": "2025-12-08",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -67,7 +67,8 @@
         { "name": "Generador de Iconos PWA", "slug": "generador-iconos", "url": "https://meskeia.com/generador-iconos/", "description": "Genera todos los tamaños de iconos para PWA y favicon" },
         { "name": "Validador RegEx", "slug": "validador-regex", "url": "https://meskeia.com/validador-regex/", "description": "Testa y valida expresiones regulares" },
         { "name": "Conversor de Imágenes", "slug": "conversor-imagenes", "url": "https://meskeia.com/conversor-imagenes/", "description": "Convierte formatos de imagen, comprime y redimensiona" },
-        { "name": "Generador de Enlaces UTM", "slug": "generador-utm", "url": "https://meskeia.com/generador-utm/", "description": "Genera enlaces UTM para Google Analytics" }
+        { "name": "Generador de Enlaces UTM", "slug": "generador-utm", "url": "https://meskeia.com/generador-utm/", "description": "Genera enlaces UTM para Google Analytics" },
+        { "name": "Creador de Thumbnails YouTube", "slug": "creador-thumbnails", "url": "https://meskeia.com/creador-thumbnails/", "description": "Diseña miniaturas profesionales para YouTube con texto, imágenes, formas y exportación PNG 1280x720" }
       ]
     },
     {

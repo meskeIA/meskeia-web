@@ -144,6 +144,7 @@ export const implementedAppsUrls = [
   "/contraste-colores/",
   "/creador-paletas/",
   "/generador-tipografias/",
+  "/creador-thumbnails/",           // Creador de thumbnails para YouTube
 
   // Emprendimiento y Negocios (8 implementadas)
   "/calculadora-tarifa-freelance/",
