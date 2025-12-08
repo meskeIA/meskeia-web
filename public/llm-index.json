@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 150+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 151+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 150,
-  "last_updated": "2025-12-07",
+  "total_tools": 151,
+  "last_updated": "2025-12-08",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -63,7 +63,7 @@
       "name": "Impuestos y Fiscalidad",
       "icon": "📋",
       "description": "IRPF, sucesiones, donaciones y normativa fiscal española",
-      "tool_count": 6
+      "tool_count": 7
     },
     {
       "id": "juegos",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 30
+      "tool_count": 31
     },
     {
       "id": "creando",
@@ -1941,6 +1941,29 @@
         "tramos ahorro"
       ],
       "icon": "📊"
+    },
+    {
+      "slug": "guia-tramitacion-herencias",
+      "name": "Guía Tramitación Herencias",
+      "url": "https://meskeia.com/guia-tramitacion-herencias/",
+      "description": "Guía paso a paso para tramitar una herencia: checklist documentos, orden de gestiones, plazos críticos y costes orientativos de notaría y registro",
+      "category": "Impuestos y Fiscalidad",
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "herencia",
+        "tramitar",
+        "testamento",
+        "notario",
+        "registro",
+        "sucesion",
+        "documentos",
+        "checklist",
+        "plazos",
+        "abintestato"
+      ],
+      "icon": "📋"
     },
     {
       "slug": "test-velocidad-escritura",
