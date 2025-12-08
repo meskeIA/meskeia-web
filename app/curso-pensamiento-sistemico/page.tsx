@@ -42,6 +42,15 @@ export default function CursoPensamientoSistemicoPage() {
           Aprende a entender el mundo como sistemas interconectados.
           Descubre cómo las partes se relacionan para formar totalidades complejas y aplica este enfoque a tu vida personal y profesional.
         </p>
+        <a
+          href="https://youtu.be/pFsqX12OSVw"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.videoButton}
+        >
+          <span className={styles.videoIcon}>▶️</span>
+          Ver introducción en video
+        </a>
       </header>
 
       {/* Stats Grid */}
