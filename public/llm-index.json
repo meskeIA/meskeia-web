@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 152+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 153+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 152,
+  "total_tools": 153,
   "last_updated": "2025-12-08",
   "features": {
     "all_free": true,
@@ -28,7 +28,7 @@
       "name": "Criptografía y Seguridad",
       "icon": "🔐",
       "description": "Cifrado de textos y verificación de datos",
-      "tool_count": 8
+      "tool_count": 9
     },
     {
       "id": "diseno",
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 59
+      "tool_count": 60
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 44
+      "tool_count": 45
     },
     {
       "id": "casa",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 18
+      "tool_count": 19
     }
   ],
   "tools": [
@@ -1840,6 +1840,35 @@
         "amazon"
       ],
       "icon": "♟️"
+    },
+    {
+      "slug": "curso-criptografia-seguridad",
+      "name": "Curso de Criptografía y Seguridad",
+      "url": "https://meskeia.com/curso-criptografia-seguridad/",
+      "description": "Domina la criptografía: desde cifrados históricos (César, Vigenère, Enigma) hasta técnicas modernas (AES, SHA-256, 2FA). 15 capítulos con herramientas prácticas",
+      "category": "Criptografía y Seguridad",
+      "contexts": [
+        "estudio",
+        "trabajo",
+        "curiosidad"
+      ],
+      "keywords": [
+        "criptografia",
+        "seguridad",
+        "cifrado",
+        "aes",
+        "hash",
+        "sha256",
+        "md5",
+        "contrasenas",
+        "cesar",
+        "vigenere",
+        "playfair",
+        "base64",
+        "2fa",
+        "autenticacion"
+      ],
+      "icon": "🔐"
     },
     {
       "slug": "simulador-irpf",

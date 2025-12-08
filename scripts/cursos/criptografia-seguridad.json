@@ -1,0 +1,264 @@
+{
+  "course": {
+    "name": "Curso de Criptografía y Seguridad",
+    "slug": "criptografia-seguridad",
+    "description": "Domina los fundamentos de la criptografía: desde cifrados históricos hasta técnicas modernas de seguridad digital. Aprende practicando con herramientas reales.",
+    "icon": "🔐",
+    "expertiseArea": "criptografía, seguridad informática y protección de datos",
+    "modules": [
+      {
+        "id": "historia",
+        "title": "Historia de la Criptografía",
+        "chapters": [
+          {
+            "id": "origenes-cifrado",
+            "title": "Los Orígenes del Cifrado",
+            "topics": [
+              "Qué es la criptografía y por qué existe",
+              "La escítala espartana y primeros métodos",
+              "El cifrado César: el emperador que cifraba mensajes",
+              "Criptografía en la antigüedad"
+            ],
+            "duration": 12,
+            "context": "Enfoque accesible para principiantes. Incluir historias y anécdotas que enganchen. HERRAMIENTA VINCULADA: Cifrado Clásico (/cifrado-clasico/)",
+            "linkedTool": {
+              "name": "Cifrado Clásico",
+              "url": "/cifrado-clasico/",
+              "description": "Practica el cifrado César y otros métodos clásicos"
+            }
+          },
+          {
+            "id": "cifrados-medievales",
+            "title": "Cifrados de la Edad Media al Renacimiento",
+            "topics": [
+              "La sustitución polialfabética",
+              "El cifrado Vigenère: el cifrado indescifrable",
+              "El cifrado Playfair y las matrices",
+              "Transposición vs Sustitución"
+            ],
+            "duration": 15,
+            "context": "Explicar la evolución de sustitución simple a polialfabética. HERRAMIENTAS: Cifrado Vigenère (/cifrado-vigenere/), Cifrado Playfair (/cifrado-playfair/), Cifrado por Transposición (/cifrado-transposicion/)",
+            "linkedTools": [
+              {"name": "Cifrado Vigenère", "url": "/cifrado-vigenere/"},
+              {"name": "Cifrado Playfair", "url": "/cifrado-playfair/"},
+              {"name": "Cifrado por Transposición", "url": "/cifrado-transposicion/"}
+            ]
+          },
+          {
+            "id": "enigma-guerra",
+            "title": "Enigma y la Criptografía en la Guerra",
+            "topics": [
+              "La máquina Enigma alemana",
+              "Alan Turing y el descifrado de Enigma",
+              "Impacto de la criptografía en la Segunda Guerra Mundial",
+              "La transición a la era digital"
+            ],
+            "duration": 14,
+            "context": "Historia fascinante con impacto real en la historia mundial. Mencionar la película 'The Imitation Game'. No hay herramienta directa pero conectar con el concepto de por qué la criptografía importa."
+          }
+        ]
+      },
+      {
+        "id": "fundamentos",
+        "title": "Fundamentos de Criptografía Moderna",
+        "chapters": [
+          {
+            "id": "cifrar-vs-codificar",
+            "title": "Cifrar vs Codificar: La Diferencia Crucial",
+            "topics": [
+              "Qué significa cifrar (con clave secreta)",
+              "Qué significa codificar (transformación reversible)",
+              "Base64: codificación, no cifrado",
+              "Por qué la distinción importa para la seguridad"
+            ],
+            "duration": 10,
+            "context": "Concepto fundamental que muchos confunden. HERRAMIENTA: Codificador Base64 (/codificador-base64/)",
+            "linkedTool": {
+              "name": "Codificador Base64",
+              "url": "/codificador-base64/",
+              "description": "Experimenta con codificación Base64"
+            }
+          },
+          {
+            "id": "simetrico-asimetrico",
+            "title": "Cifrado Simétrico vs Asimétrico",
+            "topics": [
+              "Cifrado simétrico: una clave para todo",
+              "El problema del intercambio de claves",
+              "Cifrado asimétrico: claves pública y privada",
+              "Casos de uso de cada tipo"
+            ],
+            "duration": 15,
+            "context": "Explicar con analogías (caja fuerte con una llave vs buzón con dos llaves). Preparar el terreno para AES."
+          },
+          {
+            "id": "aes-estandar",
+            "title": "AES: El Estándar de Oro del Cifrado",
+            "topics": [
+              "Qué es AES y por qué es el estándar mundial",
+              "Tamaños de clave: 128, 192 y 256 bits",
+              "Modos de operación (CBC, GCM)",
+              "Aplicaciones prácticas de AES"
+            ],
+            "duration": 18,
+            "context": "Nivel técnico medio. Explicar que AES protege desde WhatsApp hasta bancos. HERRAMIENTA: Cifrado AES (/cifrado-aes/)",
+            "linkedTool": {
+              "name": "Cifrado AES",
+              "url": "/cifrado-aes/",
+              "description": "Cifra y descifra con el estándar AES"
+            }
+          }
+        ]
+      },
+      {
+        "id": "hashes",
+        "title": "Funciones Hash y Verificación",
+        "chapters": [
+          {
+            "id": "que-es-hash",
+            "title": "¿Qué es un Hash y Para Qué Sirve?",
+            "topics": [
+              "Concepto de función hash (huella digital)",
+              "Propiedades: determinismo, irreversibilidad, efecto avalancha",
+              "Hash no es cifrado: no se puede revertir",
+              "Usos comunes: verificación de archivos, contraseñas"
+            ],
+            "duration": 12,
+            "context": "Usar analogía de huella digital humana. HERRAMIENTA: Generador de Hashes (/generador-hashes/)",
+            "linkedTool": {
+              "name": "Generador de Hashes",
+              "url": "/generador-hashes/",
+              "description": "Genera hashes MD5, SHA-1, SHA-256 y más"
+            }
+          },
+          {
+            "id": "algoritmos-hash",
+            "title": "MD5, SHA-1, SHA-256: Comparativa",
+            "topics": [
+              "MD5: historia y vulnerabilidades conocidas",
+              "SHA-1: el sucesor comprometido",
+              "SHA-256 y SHA-512: el estándar actual",
+              "Cuándo usar cada algoritmo"
+            ],
+            "duration": 14,
+            "context": "Explicar por qué MD5 y SHA-1 están obsoletos para seguridad pero siguen útiles para checksums. HERRAMIENTA: Generador de Hashes para comparar outputs.",
+            "linkedTool": {
+              "name": "Generador de Hashes",
+              "url": "/generador-hashes/",
+              "description": "Compara diferentes algoritmos hash"
+            }
+          },
+          {
+            "id": "hashes-practica",
+            "title": "Hashes en la Práctica: Verificación de Archivos",
+            "topics": [
+              "Verificar integridad de descargas",
+              "Checksums en distribuciones de software",
+              "Detectar archivos modificados",
+              "Herramientas de línea de comandos"
+            ],
+            "duration": 10,
+            "context": "Enfoque 100% práctico. Ejemplos reales de verificación de ISOs, software descargado, etc."
+          }
+        ]
+      },
+      {
+        "id": "contrasenas",
+        "title": "Seguridad de Contraseñas",
+        "chapters": [
+          {
+            "id": "anatomia-contrasena",
+            "title": "Anatomía de una Contraseña Segura",
+            "topics": [
+              "Por qué fallan las contraseñas comunes",
+              "Longitud vs complejidad: qué importa más",
+              "Entropía: midiendo la fuerza real",
+              "El mito de los caracteres especiales obligatorios"
+            ],
+            "duration": 12,
+            "context": "Desmitificar creencias erróneas. Explicar que 'correcthorsebatterystaple' es más segura que 'P@ssw0rd!'. HERRAMIENTA: Generador de Contraseñas (/generador-contrasenas/)",
+            "linkedTool": {
+              "name": "Generador de Contraseñas",
+              "url": "/generador-contrasenas/",
+              "description": "Genera contraseñas seguras personalizadas"
+            }
+          },
+          {
+            "id": "ataques-contrasenas",
+            "title": "Cómo se Atacan las Contraseñas",
+            "topics": [
+              "Ataques de fuerza bruta",
+              "Ataques de diccionario",
+              "Rainbow tables y por qué importa el salt",
+              "Credential stuffing y filtraciones"
+            ],
+            "duration": 15,
+            "context": "Conocer al enemigo para defenderse mejor. Explicar por qué reutilizar contraseñas es peligroso."
+          },
+          {
+            "id": "gestores-contrasenas",
+            "title": "Gestores de Contraseñas: Tu Mejor Aliado",
+            "topics": [
+              "Qué es un gestor de contraseñas",
+              "Ventajas: una contraseña maestra, miles únicas",
+              "Comparativa de gestores populares",
+              "Buenas prácticas de uso"
+            ],
+            "duration": 12,
+            "context": "Recomendación práctica sin promocionar marcas específicas. Mencionar opciones como Bitwarden (open source), 1Password, LastPass."
+          }
+        ]
+      },
+      {
+        "id": "seguridad-avanzada",
+        "title": "Seguridad Digital Avanzada",
+        "chapters": [
+          {
+            "id": "https-certificados",
+            "title": "HTTPS y Certificados Digitales",
+            "topics": [
+              "Qué es HTTPS y por qué importa",
+              "Cómo funcionan los certificados SSL/TLS",
+              "El candado verde del navegador",
+              "Let's Encrypt y la democratización de HTTPS"
+            ],
+            "duration": 14,
+            "context": "Conectar con la experiencia diaria del usuario al navegar. Explicar el handshake TLS de forma simplificada."
+          },
+          {
+            "id": "autenticacion-2fa",
+            "title": "Autenticación de Dos Factores (2FA)",
+            "topics": [
+              "Los tres factores: algo que sabes, tienes, eres",
+              "SMS vs Apps autenticadoras vs Llaves físicas",
+              "TOTP: cómo funcionan los códigos de 6 dígitos",
+              "Configurar 2FA en servicios importantes"
+            ],
+            "duration": 12,
+            "context": "Guía práctica para proteger cuentas personales. Enfatizar que 2FA es imprescindible hoy."
+          },
+          {
+            "id": "futuro-criptografia",
+            "title": "El Futuro: Criptografía Post-Cuántica",
+            "topics": [
+              "La amenaza de los ordenadores cuánticos",
+              "Por qué la criptografía actual podría romperse",
+              "Algoritmos post-cuánticos en desarrollo",
+              "Qué puedes hacer hoy para prepararte"
+            ],
+            "duration": 15,
+            "context": "Capítulo de cierre mirando al futuro. Nivel divulgativo sobre computación cuántica sin entrar en física compleja."
+          }
+        ]
+      }
+    ]
+  },
+  "generation": {
+    "model": "claude-3-5-haiku-20241022",
+    "refinementModel": "claude-sonnet-4-20250514",
+    "depth": "medium",
+    "style": "educational",
+    "maxTokens": 4000,
+    "delayBetweenCalls": 1500
+  }
+}

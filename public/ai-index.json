@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 150,
+  "total_tools": 151,
   "updated": "2025-12-08",
   "features": {
     "all_free": true,
@@ -48,6 +48,7 @@
         { "name": "Cifrado AES", "slug": "cifrado-aes", "url": "https://meskeia.com/cifrado-aes/", "description": "Cifrado simétrico moderno AES-256" },
         { "name": "Generador de Hashes", "slug": "generador-hashes", "url": "https://meskeia.com/generador-hashes/", "description": "Genera hashes MD5, SHA-256, SHA-512" },
         { "name": "Codificador Base64", "slug": "codificador-base64", "url": "https://meskeia.com/codificador-base64/", "description": "Codifica y decodifica texto en Base64, URL encode y Hexadecimal" },
+        { "name": "Curso de Criptografía y Seguridad", "slug": "curso-criptografia-seguridad", "url": "https://meskeia.com/curso-criptografia-seguridad/", "description": "Domina la criptografía: desde César y Vigenère hasta AES y SHA-256. 15 capítulos con herramientas prácticas integradas" },
         { "name": "Generador de Contraseñas", "slug": "generador-contrasenas", "url": "https://meskeia.com/generador-contrasenas/", "description": "Crea contraseñas seguras y personalizadas" }
       ]
     },
