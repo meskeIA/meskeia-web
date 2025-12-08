@@ -80,6 +80,15 @@ export default function CursoCriptografiaSeguridadPage() {
           Domina los fundamentos de la criptografía: desde cifrados históricos como César y Vigenère
           hasta técnicas modernas como AES y SHA-256. Aprende practicando con herramientas reales.
         </p>
+        <a
+          href="https://youtu.be/ML8dP8yihBw"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.videoButton}
+        >
+          <span className={styles.videoIcon}>▶️</span>
+          Ver introducción en video
+        </a>
       </header>
 
       {/* Stats Grid */}
