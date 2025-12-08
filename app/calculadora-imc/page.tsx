@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import styles from './CalculadoraIMC.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
@@ -248,6 +249,17 @@ export default function CalculadoraIMCPage() {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+
+              {/* Sugerencia: Calculadora de Calorías */}
+              <div className={styles.sugerenciaBox}>
+                <h4>🔥 ¿Quieres calcular tus calorías diarias recomendadas?</h4>
+                <p>
+                  Conoce cuántas calorías necesitas según tu edad, peso, altura y nivel de actividad física.
+                </p>
+                <Link href="/calculadora-calorias-ejercicio/" className={styles.sugerenciaLink}>
+                  Ir a Calculadora de Calorías →
+                </Link>
               </div>
             </>
           ) : (
