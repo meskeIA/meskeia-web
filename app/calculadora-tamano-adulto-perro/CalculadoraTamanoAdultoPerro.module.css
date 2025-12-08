@@ -100,7 +100,7 @@
 
 .tamanoGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
   gap: 8px;
 }
 
@@ -640,10 +640,6 @@
     grid-template-columns: 1fr;
   }
 
-  .tamanoGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
   .botones {
     flex-direction: column;
   }
@@ -667,5 +663,85 @@
 
   .appsGrid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+
+  .hero {
+    padding: 20px 15px;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .tamanoBtn {
+    padding: 10px 6px;
+  }
+
+  .tamanoLabel {
+    font-size: 0.75rem;
+  }
+
+  .tamanoPeso {
+    font-size: 0.65rem;
+  }
+
+  .resultadoValor {
+    font-size: 2rem;
+  }
+
+  .filtrosRaza {
+    gap: 4px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    padding-bottom: 8px;
+  }
+
+  .filtroBtn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .razasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .razaCard {
+    padding: 10px;
+  }
+
+  .appsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .appCard {
+    flex-direction: row;
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .appIcon {
+    font-size: 1.5rem;
+  }
+
+  .appName {
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .appDesc {
+    display: none;
   }
 }

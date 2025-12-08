@@ -776,3 +776,100 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+
+  .hero {
+    padding: 20px 15px;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .tabs {
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .tab {
+    min-width: 80px;
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+
+  .inputPanel,
+  .productosPanel {
+    padding: 15px;
+  }
+
+  .productoCard {
+    padding: 12px;
+  }
+
+  .productoNombre {
+    font-size: 0.9rem;
+  }
+
+  .productoDescripcion {
+    font-size: 0.85rem;
+  }
+
+  .sintomaCard {
+    padding: 12px;
+  }
+
+  .sintomaHeader {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .urgenciaBadge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
+  .factoresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .factorItem {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+
+  .appsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .appCard {
+    flex-direction: row;
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .appIcon {
+    font-size: 1.5rem;
+  }
+
+  .appName {
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .appDesc {
+    display: none;
+  }
+
+  .parasitosGrid {
+    grid-template-columns: 1fr;
+  }
+}

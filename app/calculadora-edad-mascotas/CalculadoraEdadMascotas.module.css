@@ -488,6 +488,108 @@
   }
 }
 
+/* Pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+
+  .hero {
+    padding: 20px 15px;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .inputPanel,
+  .resultsPanel {
+    padding: 15px;
+  }
+
+  .tamanoGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .tamanoBtn {
+    padding: 10px 6px;
+  }
+
+  .tamanoNombre {
+    font-size: 0.8rem;
+  }
+
+  .tamanoPeso {
+    font-size: 0.7rem;
+  }
+
+  .resultadoPrincipal {
+    padding: 20px 15px;
+  }
+
+  .resultadoIcon {
+    font-size: 2.5rem;
+  }
+
+  .resultadoValor {
+    font-size: 1.5rem;
+  }
+
+  .comparacionIcono {
+    font-size: 1.5rem;
+  }
+
+  .comparacionEdad {
+    font-size: 1rem;
+  }
+
+  .tablaReferencia {
+    padding: 15px;
+  }
+
+  .tablaCard {
+    padding: 12px;
+  }
+
+  .tablaCard h4 {
+    font-size: 0.9rem;
+  }
+
+  .tablaCard th,
+  .tablaCard td {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+
+  .appsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .appCard {
+    flex-direction: row;
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .appIcon {
+    font-size: 1.5rem;
+  }
+
+  .appName {
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .appDesc {
+    display: none;
+  }
+}
+
 /* ===================== */
 /* APPS RELACIONADAS     */
 /* ===================== */

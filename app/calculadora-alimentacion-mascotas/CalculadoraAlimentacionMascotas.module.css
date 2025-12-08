@@ -864,3 +864,89 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+
+  .hero {
+    padding: 20px 15px;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .tamanoGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tamanoBtn {
+    padding: 8px 6px;
+  }
+
+  .tamanoLabel {
+    font-size: 0.75rem;
+  }
+
+  .tamanoPeso {
+    font-size: 0.65rem;
+  }
+
+  .opcionesGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .opcionBtn {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  .resultadoValor {
+    font-size: 2rem;
+  }
+
+  .appsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .appCard {
+    flex-direction: row;
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .appIcon {
+    font-size: 1.5rem;
+  }
+
+  .appName {
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .appDesc {
+    display: none;
+  }
+
+  .tabs {
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .tab {
+    min-width: 90px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .toxicosGrid {
+    grid-template-columns: 1fr;
+  }
+}
