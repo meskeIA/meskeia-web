@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import styles from './CalculadoraSucesionesCataluna.module.css';
 import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
+import Link from 'next/link';
 
 // ===== TIPOS =====
 interface TramoTarifa {
@@ -615,6 +616,18 @@ export default function CalculadoraSucesionesCatalunaPage() {
                   <li>Modelo: <strong>660</strong> (inventario) + <strong>650</strong> (autoliquidación)</li>
                   <li>Si hereda vivienda habitual, mantenerla <strong>5 años</strong></li>
                 </ul>
+              </div>
+
+              {/* Enlace a Guía de Herencias */}
+              <div className={styles.guiaHerenciasBox}>
+                <h4>📋 ¿Necesitas tramitar la herencia completa?</h4>
+                <p>
+                  Consulta nuestra guía paso a paso con checklist de documentos,
+                  orden de gestiones, plazos críticos y costes de notaría.
+                </p>
+                <Link href="/guia-tramitacion-herencias/" className={styles.guiaHerenciasLink}>
+                  Ver Guía de Tramitación de Herencias →
+                </Link>
               </div>
             </>
           )}

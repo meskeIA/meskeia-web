@@ -4,6 +4,7 @@ import { useState, useMemo, ChangeEvent } from 'react';
 import styles from './CalculadoraSucesionesNacional.module.css';
 import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
+import Link from 'next/link';
 
 // ===== TIPOS =====
 type GrupoParentesco = 'I-conyuge' | 'I-descendiente' | 'II' | 'II-ascendiente' | 'III' | 'IV';
@@ -1132,6 +1133,18 @@ export default function CalculadoraSucesionesNacionalPage() {
               <div className={styles.resultItem} style={{ background: 'rgba(46,134,171,0.1)', marginTop: '1rem' }}>
                 <span className={styles.resultLabel}>Tipo efectivo:</span>
                 <span className={styles.resultValue}>{resultado.tipoEfectivo.toFixed(2)}%</span>
+              </div>
+
+              {/* Enlace a Guía de Herencias */}
+              <div className={styles.guiaHerenciasBox}>
+                <h4>📋 ¿Necesitas tramitar la herencia completa?</h4>
+                <p>
+                  Consulta nuestra guía paso a paso con checklist de documentos,
+                  orden de gestiones, plazos críticos y costes de notaría.
+                </p>
+                <Link href="/guia-tramitacion-herencias/" className={styles.guiaHerenciasLink}>
+                  Ver Guía de Tramitación de Herencias →
+                </Link>
               </div>
             </>
           )}
