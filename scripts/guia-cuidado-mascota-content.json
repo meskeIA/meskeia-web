@@ -1,0 +1,448 @@
+{
+  "preparacion": {
+    "title": "Preparación",
+    "icon": "🏠",
+    "chapters": {
+      "antes-de-adoptar": {
+        "id": "antes-de-adoptar",
+        "title": "Antes de Adoptar",
+        "topics": [
+          "¿Perro o gato? Cuál se adapta mejor a tu estilo de vida",
+          "Lo que necesitas tener preparado en casa antes de que llegue",
+          "Presupuesto mensual realista: comida, veterinario, extras",
+          "Cómo elegir un veterinario de confianza"
+        ],
+        "relatedApp": "Planificador de Mascota",
+        "relatedAppUrl": "/planificador-mascota/",
+        "contextFromApp": "Checklist de 40 tareas organizadas por prioridad, lista de compras de 48 artículos esenciales, calendario de vacunas",
+        "content": {
+          "introduction": "¡Bienvenido al maravilloso mundo de tener mascota! Si estás pensando en adoptar un perrito cariñoso o un gatito mimoso, estás a punto de vivir algo increíble. Te ayudamos a prepararte para que tanto tú como tu nuevo amigo sean felices desde el primer día.",
+          "sections": [
+            {
+              "title": "¿Perro o Gato? Encuentra tu match perfecto",
+              "content": "Es como elegir entre salir de fiesta o una noche de Netflix. Los perros son como ese amigo extrovertido: necesitan salir, jugar y estar siempre contigo. Perfecto si te gusta caminar, tienes patio o eres de los que van al parque los domingos. Los gatos son más tipo 'amigo introvertido genial': cariñosos pero independientes, ideales si vives en un piso pequeño o trabajas todo el día. Un perro necesita salir al menos 3 veces al día (¡llueva o truene!), mientras que tu gato se las arregla solito con su arenero. ¿Viajas mucho por trabajo? Definitivamente, gato. ¿Te encanta hacer senderismo? Tu perro será tu mejor compañero de aventuras.",
+              "tip": "Elige pensando en tu día a día real, no en el ideal de Instagram"
+            },
+            {
+              "title": "Convierte tu casa en su hogar perfecto",
+              "content": "Imagínate llegar a una casa nueva: necesitas una cama cómoda, saber dónde comer y sentirte seguro. Tu mascota piensa igual. Lo básico: una camita (o transportín para perros pequeños), dos bowls (uno para agua, otro para comida), y juguetes para que no se aburra. Si adoptas un perro, necesitarás correa, collar con su nombre, y empapadores para los primeros meses. Para gatos: arenero, arena que no haga polvo, y un rascador (tu sofá te lo agradecerá). Un truco: coloca todo en un rincón tranquilo donde pueda relajarse cuando se sienta abrumado.",
+              "tip": "Su rincón debe ser su 'zona de confort', respétala siempre"
+            },
+            {
+              "title": "Lo que realmente cuesta tener mascota",
+              "content": "Hablemos claro de dinero. Cuenta unos 40-70€ al mes en comida (más si adoptas un San Bernardo, menos si es un Chihuahua). Las vacunas y revisión anual rondan los 150€. Pero lo importante: ten siempre 400-600€ guardados para emergencias (como cuando tu perro se come un calcetín o tu gato decide que las plantas son deliciosas). Los perros suelen costar más: comen más, necesitan más accesorios y a veces clases de educación. Los gatos son más económicos día a día, pero no escatimes en su comida de calidad ni en sus revisiones anuales.",
+              "tip": "Piénsalo como un 'capricho mensual' que vale oro en compañía"
+            },
+            {
+              "title": "Tu veterinario: más importante que tu médico",
+              "content": "Busca uno como buscarías pediatra para tu hijo. Pregunta a otros dueños de mascotas del barrio, mira reseñas en Google, pero sobre todo: visítalo antes de decidir. Fíjate si trata bien a los animales, si te explica las cosas con paciencia y si la clínica está limpia. Pregunta si atienden urgencias (tu gato no va a decidir ponerse malo solo en horario de oficina). Valora también que esté cerca de casa: cuando tengas una emergencia a las 2 AM, te importará mucho más que los 5€ que ahorres yendo al más barato.",
+              "tip": "Una buena relación con tu veterinario vale más que el precio más barato"
+            }
+          ],
+          "quickTips": [
+            "Esteriliza: evita embarazos no deseados y problemas de salud futuros",
+            "Socialízalo desde pequeño: que conozca gente, ruidos y otros animales",
+            "Un seguro veterinario te puede salvar de sustos económicos enormes",
+            "Rutinas fijas: misma hora de comida y paseos, les da seguridad"
+          ],
+          "relatedTool": {
+            "name": "Planificador de Mascota",
+            "url": "/planificador-mascota/",
+            "description": "Te ayudamos a organizar todo lo que necesitas antes de que llegue tu nuevo amigo"
+          },
+          "forDogs": "Paciencia y premios: enséñale paso a paso con cariño, nunca con gritos",
+          "forCats": "Déjale explorar a su ritmo, los gatos necesitan tiempo para sentirse seguros"
+        }
+      }
+    }
+  },
+  "alimentacion": {
+    "title": "Alimentación",
+    "icon": "🍖",
+    "chapters": {
+      "nutricion-basica": {
+        "id": "nutricion-basica",
+        "title": "Nutrición Básica",
+        "topics": [
+          "Cuánto debe comer tu mascota según su peso y actividad",
+          "Alimentos prohibidos que pueden ser tóxicos (lista completa)",
+          "Cómo cambiar de pienso sin causar problemas digestivos",
+          "Señales de que tu mascota está bien alimentada"
+        ],
+        "relatedApp": "Calculadora de Alimentación",
+        "relatedAppUrl": "/calculadora-alimentacion-mascotas/",
+        "contextFromApp": "Fórmulas de calorías basadas en peso y actividad, 12 alimentos tóxicos (chocolate, uvas, cebolla, ajo, aguacate, xilitol, alcohol, cafeína, huesos cocidos, lácteos, nueces macadamia, masas crudas), guía de transición alimentaria 7-14 días",
+        "content": {
+          "introduction": "Alimentar a tu peludo no es solo llenar su plato con comida. Es como ser su chef personal: cada bocado cuenta para que tenga una vida súper feliz y llena de energía. No te preocupes, no necesitas ser un experto. Te voy a enseñar todo lo que necesitas saber para convertirte en el mejor 'chef' de tu mascota.",
+          "sections": [
+            {
+              "title": "¿Cuánto debe comer tu mascota?",
+              "content": "Imagínate que tu mascota fuera tu mejor amigo: ¿le darías la misma cantidad de comida a un amigo que pesa 50 kg que a uno que pesa 80 kg? Pues con las mascotas es igual. Un Chihuahua de 3 kg necesita mucho menos que un Golden Retriever de 25 kg. Lo mejor es dividir su comida en 2-3 raciones al día (como nosotros con desayuno, almuerzo y cena). Aquí tienes un truco súper fácil: toca suavemente los costados de tu mascota. Si sientes las costillas sin presionar mucho, perfecto. Si no las sientes para nada, probablemente esté comiendo demasiado. Para perros pequeños, piensa en el tamaño de tu puño cerrado; para perros grandes, dos puños. Los gatos son más delicados: porciones pequeñas pero más seguido durante el día.",
+              "tip": "Pesa a tu mascota cada mes y toma una foto de perfil - así verás mejor si está en su peso ideal"
+            },
+            {
+              "title": "Alimentos prohibidos: ¡Alerta roja!",
+              "content": "Esto es súper importante: hay alimentos que para nosotros son ricos, pero para ellos son como veneno. El chocolate es el más conocido - ni una gotita, especialmente el chocolate negro. Las uvas (incluso una sola) pueden dañar sus riñones. La cebolla y el ajo que usamos para cocinar destruyen sus defensas. Y ojo con el aguacate, el café, las bebidas alcohólicas y los chicles sin azúcar (tienen xilitol que es tóxico). Mi regla de oro: si dudas aunque sea un poquito, mejor no se lo des. Es mejor un perro o gato un poco enojado que uno enfermo, ¿verdad?",
+              "tip": "Pon una nota en el refrigerador con los alimentos prohibidos - así toda la familia lo recordará"
+            }
+          ],
+          "quickTips": [
+            "Al cambiar de comida, mezcla la nueva con la anterior durante una semana - así no le dará dolor de panza",
+            "Su plato de agua debe estar siempre lleno y limpio, como si fuera tu vaso favorito",
+            "Antes de cambiar completamente su dieta, habla con tu veterinario - es como consultar a un nutricionista",
+            "Lee las etiquetas: el primer ingrediente debe ser carne real, no harinas raras que no entiendes"
+          ],
+          "relatedTool": {
+            "name": "Calculadora de Alimentación",
+            "url": "/calculadora-alimentacion-mascotas/",
+            "description": "¿No sabes cuánto darle? Nuestra calculadora te dice exactamente la cantidad perfecta para tu mascota en 2 minutos"
+          },
+          "forDogs": "Los perros son como nosotros en las barbacoas: aman la carne. Busca alimentos donde la carne sea el ingrediente principal",
+          "forCats": "Los gatos son súper carnívoros - necesitan mucha más proteína animal que los perros. Son como pequeños leones caseros"
+        }
+      }
+    }
+  },
+  "salud": {
+    "title": "Salud",
+    "icon": "💊",
+    "chapters": {
+      "prevencion-parasitos": {
+        "id": "prevencion-parasitos",
+        "title": "Prevención de Parásitos",
+        "topics": [
+          "Tipos de antiparasitarios: cuál usar y cada cuánto tiempo",
+          "Calendario de desparasitación según la edad",
+          "Señales de que tu mascota tiene parásitos",
+          "Cómo proteger a toda la familia"
+        ],
+        "relatedApp": "Calculadora de Medicamentos",
+        "relatedAppUrl": "/calculadora-medicamentos-mascotas/",
+        "contextFromApp": "5 tipos de antiparasitarios (Milbemax, Drontal, Nexgard, Bravecto, Seresto), calendario de desparasitación (cachorros: cada 2 semanas hasta 3 meses, luego mensual hasta 6 meses; adultos: cada 3-4 meses), 8 síntomas de parásitos",
+        "content": {
+          "introduction": "¿Has notado que tu peludo compañero se rasca más de lo normal o parece menos animado? Los parásitos son como huéspedes no invitados que pueden incomodar a tu mascota, pero aquí tienes buenas noticias: protegerlos es más fácil de lo que piensas. Te explico todo de manera súper sencilla.",
+          "sections": [
+            {
+              "title": "Tipos de Antiparasitarios: Encuentra el Ideal para Tu Peludo",
+              "content": "Piensa en los antiparasitarios como los guardianes de tu mascota. Tienes tres opciones principales: las pastillas (como Drontal o Milbemax) que se dan por la boca y eliminan lombrices intestinales, las pipetas (como Nexgard) que se aplican en el cuello y protegen contra pulgas y garrapatas, y los collares (como Seresto) que actúan por varios meses. ¿Tu mascota es un cachorro o gatito? Necesitarán protección cada 15 días hasta los 3 meses, después una vez al mes hasta los 6 meses. Si ya es adulto, cada 3 meses está perfecto. Los perritos que pasean mucho por parques pueden necesitarlo un poco más seguido.",
+              "tip": "Tu veterinario conoce a tu mascota mejor que nadie, siempre pregúntale cuál es el mejor para tu caso"
+            },
+            {
+              "title": "Cómo Saber si Tu Mascota Tiene Parásitos",
+              "content": "Tu peludo no puede decirte 'me siento mal', pero su cuerpo te da pistas claras. Si notas que come igual pero baja de peso, su pelo se ve sin brillo, tiene diarrea o vómitos frecuentes, su pancita se ve hinchada, está más decaído que de costumbre o se rasca muchísimo, es momento de actuar. Los perros suelen ser más evidentes (como ese amigo dramático que todos tenemos), mientras que los gatos son más reservados y disimulan mejor. Un truco infalible: revisa su popó. Si ves gusanitos blancos como granos de arroz o algo raro, ¡bingo!",
+              "tip": "Una mascota feliz corre, juega y tiene buen apetito. Si algo cambió, investiga"
+            }
+          ],
+          "quickTips": [
+            "Lava la camita y mantitas de tu mascota cada semana",
+            "Aspira bien los lugares donde más le gusta estar",
+            "Si tienes varios peludos en casa, desparasita a todos el mismo día",
+            "Haz una revisión rápida cada semana: pelo, piel y comportamiento"
+          ],
+          "relatedTool": {
+            "name": "Calculadora de Medicamentos",
+            "url": "/calculadora-medicamentos-mascotas/",
+            "description": "Te ayuda a calcular la dosis exacta de antiparasitario según el peso y edad de tu mascota. ¡Súper fácil de usar!"
+          },
+          "forDogs": "¿Tu perrito es aventurero y le encanta el parque? Los que salen mucho necesitan desparasitación cada 2-3 meses",
+          "forCats": "¿Tu gatito caza ratoncitos o sale al jardín? Estos pequeños cazadores necesitan control antiparasitario más frecuente"
+        }
+      }
+    }
+  },
+  "crecimiento": {
+    "title": "Crecimiento",
+    "icon": "📏",
+    "chapters": {
+      "desarrollo-cachorro": {
+        "id": "desarrollo-cachorro",
+        "title": "Desarrollo del Cachorro",
+        "topics": [
+          "¿Cuánto va a pesar mi cachorro cuando sea adulto?",
+          "Las etapas del crecimiento: qué esperar en cada fase",
+          "Alimentación especial según la edad del cachorro",
+          "¿Cuándo deja de crecer un perro?"
+        ],
+        "relatedApp": "Calculadora de Tamaño Adulto",
+        "relatedAppUrl": "/calculadora-tamano-adulto-perro/",
+        "contextFromApp": "Curvas de crecimiento por tamaño (toy, pequeño, mediano, grande, gigante), 28 razas de referencia con pesos adultos, fases de desarrollo (neonatal, transición, socialización, juvenil, adolescente, adulto)",
+        "content": {
+          "introduction": "¿Te has preguntado cómo será tu pequeño peludo cuando crezca? Cada cachorro y gatito tiene su propia historia de crecimiento, y conocer estas etapas te ayudará a cuidarlo mejor en cada momento. ¡Es como ser testigo de una increíble transformación!",
+          "sections": [
+            {
+              "title": "Las Etapas de Crecimiento: Como Ver Crecer a un Niño",
+              "content": "El crecimiento de tu mascota es como ver crecer a un hijo. Al principio (primeras 8 semanas), tu pequeño depende totalmente de mamá para todo. Entre las 8 y 16 semanas viene la etapa más divertida: la socialización. Es cuando tu cachorro o gatito se convierte en una esponjita que absorbe todo - nuevos sonidos, olores, personas. Luego llega la 'adolescencia' (6 a 18 meses): crecen como maleza, prueban límites y desarrollan su personalidad única. Los perros pequeños como un Yorkshire crecen súper rápido y ya están casi listos a los 10 meses, mientras que los grandotes como un Labrador siguen creciendo hasta los 18 meses. Los gatos son más parejos: la mayoría está listo alrededor del año.",
+              "tip": "Toma una foto mensual junto al mismo objeto (como tu zapato) - ¡te sorprenderás de lo rápido que crecen!"
+            },
+            {
+              "title": "Alimentación: La Gasolina Premium de tu Mascota",
+              "content": "Piensa en la comida como la gasolina premium de tu auto deportivo. Los cachorros y gatitos queman energía como locos, así que necesitan 'combustible' especial: más proteína y calorías que los adultos. Un cachorro pequeño (como un Pug) necesita comer 3-4 veces al día hasta los 6 meses - imagínate como un bebé que come cada pocas horas. Los grandotes (como un Golden) comen menos veces pero porciones más grandes. Los gatitos son similares: 3-4 comidas hasta los 6 meses. La clave está en buscar la bolsa que diga 'cachorro' o 'kitten' - no es marketing, realmente tienen la fórmula que necesitan para crecer fuertes y sanos.",
+              "tip": "Si cambias de comida, hazlo gradualmente mezclando la nueva con la vieja durante una semana"
+            }
+          ],
+          "quickTips": [
+            "Pésalo una vez al mes - usa tu báscula casera para los pequeños",
+            "Entre los 2-4 meses es el momento perfecto para presentarle nuevas experiencias",
+            "No le des comida de adulto hasta que pare de crecer - sería como darle comida dietética a un niño",
+            "Su tamaño final ya está 'programado' en sus genes, pero tu cuidado marca la diferencia en su salud"
+          ],
+          "relatedTool": {
+            "name": "Calculadora de Tamaño Adulto",
+            "url": "/calculadora-tamano-adulto-perro/",
+            "description": "¿Curioso sobre el tamaño final de tu cachorro? Nuestra calculadora te da una idea aproximada"
+          },
+          "forDogs": "Mantén al día sus vacunas y desparasitaciones - es como construir su sistema de defensa mientras crece",
+          "forCats": "Dale juguetes que pueda 'cazar' y lugares altos donde trepar - necesita estimular sus instintos naturales"
+        }
+      }
+    }
+  },
+  "etapas": {
+    "title": "Etapas de Vida",
+    "icon": "🎂",
+    "chapters": {
+      "edad-y-cuidados": {
+        "id": "edad-y-cuidados",
+        "title": "Edad y Cuidados",
+        "topics": [
+          "¿Cuántos años humanos tiene mi perro o gato?",
+          "Cachorro, adulto o senior: cómo identificar cada etapa",
+          "Cuidados específicos según la etapa de vida",
+          "Expectativa de vida: qué factores influyen"
+        ],
+        "relatedApp": "Calculadora de Edad",
+        "relatedAppUrl": "/calculadora-edad-mascotas/",
+        "contextFromApp": "Fórmula de edad: primer año=15 humanos, segundo=9, después varía por tamaño (pequeño:4x, mediano:5x, grande:6x, gigante:7x). Etapas: cachorro/gatito (<6m), joven (6m-2a), adulto (2-7a), maduro (7-10/11a), senior (10/11-15a), geriátrico (>15a)",
+        "content": {
+          "introduction": "¿Te has preguntado cuántos años 'humanos' tiene tu peludo amigo? Tu perrito de 5 años podría ser como un treintañero, o tu gatito de 2 años como un adolescente. Cada etapa de su vida es especial y tiene sus propias necesidades. ¡Vamos a descubrir cómo cuidar mejor a tu compañero según su edad!",
+          "sections": [
+            {
+              "title": "Las Etapas de tu Mascota: Como Nosotros, Pero en Versión Acelerada",
+              "content": "Imagínate que la vida de tu mascota es como una película en cámara rápida. Los bebés (cachorros y gatitos) son pura energía: corren, juegan, se meten en problemas y aprenden todo súper rápido. Como un niño de 2 años, necesitan sus vacunas al día, comida especial para crecer y conocer el mundo poco a poco. Los adultos jóvenes (1-7 años en perros chicos, 1-5 en perros grandes, 1-7 en gatos) están en su mejor momento: son como esa persona de 25-40 años que tiene todo bajo control. Finalmente, nuestros seniors (desde los 7-8 años) son como nuestros abuelos: más tranquilos, necesitan más cuidados médicos y una dieta más suave. Aquí viene lo curioso: un Chihuahua de 10 años apenas está entrando a la tercera edad, pero un Gran Danés de la misma edad ya es un abuelito.",
+              "tip": "Fíjate si tu mascota duerme más, tiene el pelaje más opaco o le cuesta subir escalones. Son señales de que está cambiando de etapa"
+            }
+          ],
+          "quickTips": [
+            "La regla de '7 años humanos = 1 año de perro' no es real, cada raza envejece diferente",
+            "Cambia su comida según su edad: cachorro, adulto o senior (viene marcado en las bolsas)",
+            "Lleva a tu mascota al veterinario cada 6 meses después de los 7 años",
+            "Un Golden Retriever envejece más rápido que un Poodle pequeño, aunque tengan la misma edad"
+          ],
+          "relatedTool": {
+            "name": "Calculadora de Edad",
+            "url": "/calculadora-edad-mascotas/",
+            "description": "¿Cuántos años humanos tiene realmente tu peludo? Averígualo en segundos con nuestra calculadora súper fácil"
+          },
+          "forDogs": "Si tienes un perro grande (como un Labrador o Pastor Alemán), considera que a los 6 años ya necesita cuidados de senior. Los pequeñitos pueden esperar hasta los 8-9 años",
+          "forCats": "Los gatos son actores profesionales escondiendo que se sienten mal. Aunque tu gato parezca igual de juguetón, agenda chequeos regulares después de los 7 años"
+        }
+      }
+    }
+  },
+  "convivencia": {
+    "title": "Convivencia",
+    "icon": "🏡",
+    "chapters": {
+      "primeros-meses": {
+        "id": "primeros-meses",
+        "title": "Los Primeros Meses",
+        "topics": [
+          "La primera noche en casa: cómo hacerla más fácil",
+          "Rutinas diarias básicas que debes establecer",
+          "Socialización temprana: por qué es tan importante",
+          "Educación en positivo: sin castigos ni gritos"
+        ],
+        "relatedApp": "Planificador de Mascota",
+        "relatedAppUrl": "/planificador-mascota/",
+        "contextFromApp": "Tareas de la primera semana, socialización en las primeras 16 semanas, rutinas de paseo, alimentación y descanso, FAQs sobre adaptación",
+        "content": {
+          "introduction": "¡Felicidades por tu nueva mascota! Estás a punto de iniciar una aventura increíble llena de amor, travesuras y momentos únicos. Los primeros días juntos serán clave para construir una amistad sólida y establecer las bases de una convivencia súper feliz.",
+          "sections": [
+            {
+              "title": "La Primera Noche: Sin Dramas ni Lágrimas",
+              "content": "La primera noche puede ser intensa para ambos, ¡pero no te preocupes! Prepara un espacio súper acogedor donde se sienta seguro. Para perros: una esquina con su mantita o transportadora abierta. Para gatos: un rincón con su camita y algún juguete suave. Pon temperatura agradable y evita ruidos fuertes (nada de TV a todo volumen). Mantente relajado y transmite buena vibra. No lo agobies queriendo consolarlo cada 5 minutos: déjalo que curiosee y se vaya sintiendo como en casa. Es normal que se sienta un poco perdido al principio.",
+              "tip": "Un rincón tranquilo y siempre igual le da mucha seguridad durante la adaptación"
+            },
+            {
+              "title": "Rutinas Diarias: Tu Mejor Aliado",
+              "content": "Las mascotas aman saber qué viene después. Crea horarios sencillos para comida, paseos, juegos y siesta. Con perros: paseo mañanero para hacer sus necesidades y uno nocturno para relajarse. Con gatos: sesiones de juego de 10-15 minutos cuando estén más activos (usually al amanecer o atardecer). Mantén estos horarios lo más parecidos posible cada día. Esta rutina les da tranquilidad y les ayuda a entender cómo funciona su nuevo hogar. Premia con caricias o su snack favorito cuando hagan las cosas bien.",
+              "tip": "Ser constante es más importante que ser perfecto todos los días"
+            },
+            {
+              "title": "Socialización: Preparándolo para el Mundo Real",
+              "content": "Los primeros meses son oro puro para que tu mascota aprenda a llevarse bien con todo y todos. Preséntale poco a poco diferentes personas, sonidos, lugares y situaciones. Con perros: paseos cortitos y encuentros amigables con otros perritos (siempre supervisados). Con gatos: juegos que despierten su curiosidad y le permitan explorar sin sustos. La meta es tener una mascota sociable, confiada y adaptable. Evita exponerlo a cosas que lo estresen mucho o le den miedo real.",
+              "tip": "Cada experiencia nueva es como una clase que lo prepara para ser más feliz"
+            }
+          ],
+          "quickTips": [
+            "La paciencia es tu superpoder durante la adaptación",
+            "Mantente tranquilo: tu mascota lee tus emociones como un libro",
+            "Pon límites con mucho amor y siempre igual",
+            "Celebra cada pequeño logro como si fuera enorme"
+          ],
+          "relatedTool": {
+            "name": "Planificador de Mascota",
+            "url": "/planificador-mascota/",
+            "description": "Nuestra app te ayuda a crear y seguir las rutinas perfectas para que tu nueva mascota se sienta como en casa"
+          },
+          "forDogs": "Desde el día uno, enséñale a caminar contigo sin convertir el paseo en un remolcador",
+          "forCats": "Prepara varios rincones cómodos por la casa para que elija su spot favorito para las siestas"
+        }
+      }
+    }
+  },
+  "emergencias": {
+    "title": "Emergencias",
+    "icon": "🚨",
+    "chapters": {
+      "cuando-ir-veterinario": {
+        "id": "cuando-ir-veterinario",
+        "title": "¿Cuándo Ir al Veterinario?",
+        "topics": [
+          "Señales de alarma que requieren atención urgente",
+          "Botiquín básico que debes tener en casa",
+          "Primeros auxilios simples que puedes hacer",
+          "Qué hacer si tu mascota come algo tóxico"
+        ],
+        "relatedApp": "Calculadora de Medicamentos",
+        "relatedAppUrl": "/calculadora-medicamentos-mascotas/",
+        "contextFromApp": "8 síntomas de alarma (vómitos persistentes, diarrea con sangre, letargia extrema, dificultad respiratoria, convulsiones, abdomen hinchado, no come >24h, fiebre >39.5°C), teléfonos de emergencia veterinaria",
+        "content": {
+          "introduction": "Como veterinario, sé que a veces no es fácil saber cuándo una situación realmente requiere una visita urgente al consultorio. Te voy a explicar de manera sencilla cuáles son las verdaderas señales de alarma y qué puedes hacer en casa mientras decides si es necesario salir corriendo con tu peludo.",
+          "sections": [
+            {
+              "title": "🚨 Señales de Alarma: Cuándo Es Urgencia Real",
+              "content": "Hay 8 síntomas que NO debes ignorar nunca: vómitos que no paran (más de 3 en pocas horas), diarrea con sangre visible, letargia extrema (no responde a estímulos que normalmente le interesan), dificultad para respirar (jadeo excesivo sin causa), convulsiones, abdomen hinchado y duro, más de 24 horas sin comer, y fiebre superior a 39.5°C. Si notas cualquiera de estos síntomas, es momento de actuar rápido. No esperes 'a ver si se le pasa'. También presta atención a cambios súbitos de comportamiento: si tu mascota súbitamente se esconde, llora sin razón aparente, o camina de manera extraña, algo está pasando. La regla de oro es: si tu instinto te dice que algo no está bien, probablemente tengas razón. Es mejor una falsa alarma que lamentar haber esperado demasiado.",
+              "tip": "Siempre ten a mano el número de tu veterinario y de una clínica de emergencias 24 horas."
+            },
+            {
+              "title": "🏠 Tu Botiquín de Emergencias en Casa",
+              "content": "Un botiquín básico puede salvarte en momentos críticos. Incluye: termómetro digital (¡fundamental para detectar fiebre!), gasas estériles y vendas elásticas para heridas, solución salina para limpiar, guantes desechables, jeringa sin aguja para dar medicamentos líquidos, manta térmica, y una linterna pequeña para examinar mejor. También ten carbón activado (solo úsalo si el veterinario te lo indica por teléfono), peróxido de hidrógeno al 3% para inducir vómito (nuevamente, solo bajo supervisión veterinaria), y los números de teléfono de emergencia pegados en la tapa del botiquín. Guarda todo en una caja fácil de encontrar y revisa las fechas de vencimiento cada 6 meses. No olvides incluir cualquier medicamento específico que tu mascota tome regularmente. La clave está en tener todo organizado y a mano, porque en una emergencia cada minuto cuenta y no querrás perder tiempo buscando cosas.",
+              "tip": "Practica tomar la temperatura de tu mascota cuando esté sana, así sabrás hacerlo en una emergencia."
+            },
+            {
+              "title": "⛑️ Primeros Auxilios que Sí Puedes Hacer",
+              "content": "Hay cosas simples pero efectivas que puedes hacer mientras vas camino al veterinario. Para heridas sangrantes: presión directa con gasa limpia, nunca quites el primer vendaje si se empapa, pon otro encima. Si hay algo clavado, NO lo saques, inmovilízalo. Para quemaduras: agua fría (nunca hielo) por 10-15 minutos. Si tu mascota se está ahogando: abre su boca, mira si puedes ver el objeto y retíralo con pinzas, nunca con los dedos porque puedes empujarlo más adentro. Para golpe de calor: llévala inmediatamente a la sombra, aplica paños húmedos y frescos (no helados) en patas, cuello y axilas, y ofrece agua en pequeñas cantidades si está consciente. En casos de convulsiones: mantén la calma, aleja objetos con los que pueda golpearse, NO metas nada en su boca, y cronometra cuánto dura la convulsión. Recuerda: estos son primeros auxilios, no reemplazan la atención veterinaria.",
+              "tip": "Mantén la calma y habla con voz suave a tu mascota; tu tranquilidad la ayudará a estar más relajada."
+            },
+            {
+              "title": "☠️ Intoxicaciones: Qué Hacer Si Comió Algo Tóxico",
+              "content": "¡Tiempo récord! En intoxicaciones cada minuto es oro. Primero: identifica QUÉ comió, CUÁNTO y CUÁNDO (toma foto del envase si es posible). Llama inmediatamente a tu veterinario o centro de toxicología veterinaria. NUNCA induzcas vómito a menos que un profesional te lo indique, porque algunas sustancias (como lejía o derivados del petróleo) causan más daño al volver a pasar por el esófago. Los tóxicos más comunes son: chocolate, uvas, cebolla, ajo, xilitol (chicles sin azúcar), ibuprofeno, paracetamol, plantas como lirios, productos de limpieza y raticidas. Si el veterinario te dice que induzcas vómito, usa peróxido de hidrógeno al 3%: 1 ml por kilo de peso en perros (NUNCA en gatos). Mantén a tu mascota calmada y cálida mientras vas al veterinario. Si está inconsciente, colócala de lado para evitar que se ahogue con su propio vómito.",
+              "tip": "Ten siempre el número del centro de intoxicaciones veterinarias en tu teléfono: pueden orientarte por teléfono."
+            }
+          ],
+          "quickTips": [
+            "Confía en tu instinto: si algo te parece raro, consulta",
+            "Nunca esperes 'a ver si mejora' con los 8 síntomas de alarma",
+            "Ten siempre números de emergencia veterinaria a mano",
+            "En intoxicaciones, llama antes de hacer cualquier cosa"
+          ],
+          "relatedTool": {
+            "name": "Calculadora de Medicamentos",
+            "url": "/calculadora-medicamentos-mascotas/",
+            "description": "Calcula dosis exactas de medicamentos de emergencia según el peso de tu mascota"
+          },
+          "forDogs": "Los perros suelen mostrar dolor jadeando excesivamente o buscando lugares frescos para echarse. Si tu perro normalmente te recibe en la puerta y no lo hace, es una señal de que algo no está bien.",
+          "forCats": "Los gatos son maestros ocultando el dolor. Si tu gato deja de usar la caja de arena, se esconde en lugares inusuales, o deja de acicalarse, son señales claras de que necesita atención veterinaria."
+        }
+      }
+    }
+  },
+  "recursos": {
+    "title": "Recursos",
+    "icon": "🧰",
+    "chapters": {
+      "herramientas": {
+        "id": "herramientas",
+        "title": "Herramientas Útiles",
+        "topics": [
+          "Todas nuestras calculadoras para mascotas",
+          "Checklist del buen dueño responsable",
+          "Calendario de vacunas y desparasitación",
+          "Resumen de la guía: lo más importante"
+        ],
+        "relatedApp": "Planificador de Mascota",
+        "relatedAppUrl": "/planificador-mascota/",
+        "contextFromApp": "Links a las 5 apps de mascotas, checklist descargable, calendario anual de cuidados",
+        "content": {
+          "introduction": "¡Felicidades! Has completado esta guía completa para el cuidado de mascotas. Ahora tienes todos los conocimientos fundamentales y las herramientas necesarias para brindar a tu compañero peludo una vida plena, saludable y feliz. Es momento de poner en práctica todo lo aprendido.",
+          "toolsSummary": [
+            {
+              "name": "Planificador de Mascota",
+              "url": "/planificador-mascota/",
+              "icon": "📋",
+              "description": "Checklist completo con todo lo que necesitas antes de adoptar una mascota",
+              "whenToUse": "Antes de adoptar tu primera mascota o cuando quieras agregar una nueva a la familia"
+            },
+            {
+              "name": "Calculadora de Alimentación",
+              "url": "/calculadora-alimentacion-mascotas/",
+              "icon": "🍽️",
+              "description": "Calcula la cantidad exacta de comida que necesita tu mascota diariamente",
+              "whenToUse": "Al cambiar de alimento, cuando tu mascota gana o pierde peso, o cada 6 meses para ajustar porciones"
+            },
+            {
+              "name": "Calculadora de Medicamentos",
+              "url": "/calculadora-medicamentos-mascotas/",
+              "icon": "💊",
+              "description": "Determina la dosis correcta de antiparasitarios según el peso de tu mascota",
+              "whenToUse": "Antes de administrar cualquier medicamento antiparasitario o cuando el veterinario lo indique"
+            },
+            {
+              "name": "Calculadora de Tamaño Adulto",
+              "url": "/calculadora-tamano-adulto-perro/",
+              "icon": "📏",
+              "description": "Predice el peso y tamaño que alcanzará tu cachorro cuando sea adulto",
+              "whenToUse": "Con cachorros de 8-16 semanas para planificar espacio, alimentación y accesorios futuros"
+            },
+            {
+              "name": "Calculadora de Edad",
+              "url": "/calculadora-edad-mascotas/",
+              "icon": "🎂",
+              "description": "Convierte la edad de tu mascota a años humanos equivalentes",
+              "whenToUse": "Para entender la etapa de vida de tu mascota y adaptar sus cuidados según su edad"
+            }
+          ],
+          "checklistGoodOwner": [
+            "Proporciona alimentación balanceada y agua fresca diariamente",
+            "Mantiene al día las vacunas y desparasitaciones",
+            "Programa revisiones veterinarias preventivas regulares",
+            "Dedica tiempo diario al ejercicio y estimulación mental",
+            "Mantiene un ambiente seguro y cómodo para su mascota",
+            "Socializa adecuadamente a su mascota con otros animales y personas",
+            "Practica el entrenamiento positivo y establece rutinas consistentes",
+            "Demuestra amor, paciencia y compromiso incondicional hacia su compañero"
+          ],
+          "annualCalendar": {
+            "monthly": [
+              "Revisión de peso corporal y condición física",
+              "Inspección de orejas, ojos y dientes",
+              "Control de pulgas y garrapatas",
+              "Mantenimiento de higiene básica"
+            ],
+            "quarterly": [
+              "Desparasitación interna según protocolo veterinario",
+              "Revisión y actualización del botiquín de primeros auxilios",
+              "Evaluación del comportamiento y necesidades de entrenamiento",
+              "Limpieza profunda de accesorios y área de descanso"
+            ],
+            "yearly": [
+              "Examen veterinario completo con análisis de sangre",
+              "Actualización del calendario de vacunación",
+              "Evaluación dental profesional",
+              "Revisión del plan de alimentación y ejercicio"
+            ]
+          },
+          "guideSummary": [
+            "La preparación previa a la adopción es crucial: evalúa tu estilo de vida, presupuesto y espacio disponible antes de elegir la mascota ideal",
+            "Una alimentación balanceada, ejercicio regular y cuidados veterinarios preventivos son los pilares de una vida saludable para tu mascota",
+            "El entrenamiento temprano con refuerzo positivo y la socialización adecuada previenen problemas de comportamiento futuros",
+            "Reconocer señales de alarma y tener un plan de emergencia puede salvar la vida de tu mascota en situaciones críticas",
+            "El amor, la paciencia y el compromiso a largo plazo son tan importantes como los cuidados físicos para el bienestar integral de tu compañero"
+          ],
+          "finalMessage": "Ser un dueño responsable es un viaje de aprendizaje constante lleno de momentos únicos y gratificantes. Con las herramientas y conocimientos que ahora posees, estás completamente preparado para brindar a tu mascota una vida extraordinaria. Recuerda: cada día es una oportunidad para fortalecer ese vínculo especial que los une. ¡Disfruta cada momento junto a tu fiel compañero!"
+        }
+      }
+    }
+  }
+}

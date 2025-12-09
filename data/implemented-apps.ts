@@ -180,6 +180,7 @@ export const implementedAppsUrls = [
   "/curso-estrategia-empresarial/", // Curso Estrategia Empresarial (10 capítulos)
   "/curso-criptografia-seguridad/", // Curso Criptografía y Seguridad (15 capítulos)
   "/curso-redaccion-academica/",    // Curso Redacción Académica (13 capítulos)
+  "/guia-cuidado-mascota/",         // Guía Cuidado de Mascotas (8 capítulos)
 
   // SEO & Marketing (9 implementadas)
   "/generador-meta-descripciones/",

@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 154+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 155+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 154,
+  "total_tools": 155,
   "last_updated": "2025-12-09",
   "features": {
     "all_free": true,
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 45
+      "tool_count": 46
     },
     {
       "id": "dinero",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 19
+      "tool_count": 20
     }
   ],
   "tools": [
@@ -1896,6 +1896,30 @@
         "escritura"
       ],
       "icon": "📝"
+    },
+    {
+      "slug": "guia-cuidado-mascota",
+      "name": "Guía Cuidado de Mascotas",
+      "url": "https://meskeia.com/guia-cuidado-mascota/",
+      "description": "Todo lo que necesitas saber para cuidar a tu perro o gato: alimentación, salud, parásitos, crecimiento, emergencias y herramientas útiles. 8 capítulos fáciles y cercanos",
+      "category": "Vida Cotidiana",
+      "contexts": [
+        "casa",
+        "curiosidad"
+      ],
+      "keywords": [
+        "mascotas",
+        "perros",
+        "gatos",
+        "alimentacion",
+        "veterinario",
+        "antiparasitarios",
+        "cachorros",
+        "salud mascota",
+        "cuidado animal",
+        "adopcion"
+      ],
+      "icon": "🐾"
     },
     {
       "slug": "simulador-irpf",
