@@ -81,7 +81,7 @@ export default function CursoCriptografiaSeguridadPage() {
           hasta técnicas modernas como AES y SHA-256. Aprende practicando con herramientas reales.
         </p>
         <a
-          href="https://youtu.be/ML8dP8yihBw"
+          href="/videos/curso-criptografia-seguridad.mp4"
           target="_blank"
           rel="noopener noreferrer"
           className={styles.videoButton}

@@ -43,7 +43,7 @@ export default function CursoPensamientoSistemicoPage() {
           Descubre cómo las partes se relacionan para formar totalidades complejas y aplica este enfoque a tu vida personal y profesional.
         </p>
         <a
-          href="https://youtu.be/pFsqX12OSVw"
+          href="/videos/curso-pensamiento-sistemico.mp4"
           target="_blank"
           rel="noopener noreferrer"
           className={styles.videoButton}

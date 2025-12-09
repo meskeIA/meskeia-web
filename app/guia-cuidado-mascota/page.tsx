@@ -22,7 +22,7 @@ function GuideContent() {
           Consejos prácticos, fáciles y cercanos para dueños de todos los niveles.
         </p>
         <a
-          href="https://youtu.be/i5SXshyovLI"
+          href="/videos/guia-cuidado-mascota.mp4"
           target="_blank"
           rel="noopener noreferrer"
           className={styles.videoButton}

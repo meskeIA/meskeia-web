@@ -61,7 +61,7 @@ export default function CursoRedaccionAcademicaPage() {
           Aprende a estructurar tu TFG, TFM, tesis o artículo científico con pautas aplicables desde el primer día.
         </p>
         <a
-          href="https://youtu.be/QW_YTKbZ2EQ"
+          href="/videos/curso-redaccion-academica.mp4"
           target="_blank"
           rel="noopener noreferrer"
           className={styles.videoButton}
