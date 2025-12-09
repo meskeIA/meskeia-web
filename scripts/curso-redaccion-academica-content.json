@@ -1,0 +1,951 @@
+{
+  "fundamentos": {
+    "title": "Fundamentos",
+    "chapters": {
+      "que-es-texto-academico": {
+        "id": "que-es-texto-academico",
+        "title": "Fundamentos del Texto Académico",
+        "topics": [
+          "Qué es un texto académico y sus características distintivas",
+          "Diferencias entre texto académico, divulgativo y periodístico",
+          "Tipos de textos académicos: ensayo, artículo, tesis, TFG/TFM",
+          "El rigor académico: objetividad, verificabilidad y fundamentación",
+          "Errores comunes que debes evitar desde el principio"
+        ],
+        "duration": 12,
+        "content": {
+          "introduction": "Si alguna vez te has sentado frente a una página en blanco preguntándote cómo empezar tu TFG o tesis, este módulo es para ti. Escribir académicamente no es cuestión de talento innato - es una técnica específica que puedes dominar siguiendo pasos concretos. Aquí aprenderás a transformar tus ideas en argumentos sólidos, a usar las fuentes correctamente y a estructurar tu texto para que cualquier lector pueda seguir tu razonamiento. Al final de este módulo, tendrás las herramientas prácticas para escribir con la autoridad y claridad que exige el mundo académico.",
+          "sections": [
+            {
+              "title": "¿Qué es un texto académico?",
+              "content": "Imagina que estás en una conversación con expertos de tu campo. No puedes llegar y decir 'creo que esto es así porque se me ocurre'. Necesitas datos, necesitas mostrar que has hecho tu tarea, y necesitas construir tu argumento paso a paso. Eso es exactamente lo que hace un texto académico: participa en una conversación intelectual seria usando las reglas del juego académico.\n\nLa diferencia clave está en cómo tratas cada afirmación. En una conversación casual podrías decir 'las redes sociales son adictivas'. En un texto académico escribirías: 'Estudios recientes sugieren que el uso excesivo de redes sociales presenta patrones similares a comportamientos adictivos (Smith, 2023), particularmente en usuarios de 16-25 años, donde el 34% reporta dificultades para controlar su uso diario (González et al., 2022)'. ¿Ves la diferencia? Cada palabra tiene un propósito y un respaldo.\n\nTu lenguaje debe ser tu herramienta más precisa. Evita palabras como 'muy', 'bastante', 'mucho' - son vagas. En lugar de 'muchos estudiantes tienen problemas', escribe 'el 67% de los estudiantes encuestados reportó dificultades'. En lugar de 'es muy importante', explica exactamente por qué es relevante para tu investigación.\n\nLa estructura no es opcional, es tu mapa de ruta. Cada párrafo debe tener una idea central clara, cada sección debe conectar con la siguiente, y tu lector nunca debe perderse preguntándose 'y esto para qué sirve'. Piensa en tu texto como un edificio: necesitas cimientos sólidos (introducción), paredes bien construidas (desarrollo) y un techo que cierre todo (conclusiones).\n\nLa objetividad académica no significa eliminar tu voz, significa fundamentar cada punto que haces. Puedes tener una perspectiva, pero debe estar construida sobre evidencia sólida, no sobre preferencias personales. Tu trabajo es guiar al lector a través de los datos y el análisis hasta llegar a conclusiones bien fundamentadas.",
+              "example": "Compara estos dos enfoques:\n\nNo académico: 'Pienso que la educación online es mejor porque es más flexible y los estudiantes pueden aprender a su ritmo.'\n\nAcadémico: 'Los modelos de educación en línea han demostrado ventajas significativas en términos de flexibilidad temporal y personalización del aprendizaje. Un estudio longitudinal de tres años (Rodriguez & Martinez, 2022) encontró que el 78% de estudiantes en modalidades híbridas reportó mayor satisfacción con la gestión de tiempo académico, mientras que los sistemas adaptativos de aprendizaje mostraron una mejora del 23% en retención de contenidos comparado con metodologías presenciales tradicionales (Instituto de Educación Digital, 2023).'"
+            },
+            {
+              "title": "Tipos de Textos Académicos",
+              "content": "Cada tipo de texto académico tiene su personalidad y sus reglas específicas. Es como elegir la herramienta correcta para cada trabajo - no usarías un martillo para atornillar. Entender estas diferencias te ahorrará horas de reescritura y te ayudará a enfocar tu energía correctamente desde el inicio.\n\nEl ensayo académico es tu espacio para desarrollar un argumento sofisticado. No es una lista de puntos ni un resumen de fuentes - es tu oportunidad de tomar una posición y defenderla magistralmente. Empieza con una tesis controvertida pero defendible, algo que valga la pena argumentar. Por ejemplo, en lugar de 'la contaminación es mala', podrías argumentar 'las políticas actuales de reducción de emisiones en España son insuficientes para cumplir los objetivos del Acuerdo de París, requiriendo una reestructuración fundamental del sector energético'. Cada párrafo debe agregar una capa a tu argumento.\n\nEl artículo científico sigue una lógica implacable: problema-método-resultados-interpretación. Tu introducción debe convencer al lector de que tu pregunta de investigación vale la pena. Tu metodología debe ser tan detallada que otro investigador pueda replicar exactamente lo que hiciste. Tus resultados deben presentarse sin interpretación (solo los hechos), y tu discusión es donde conectas tus hallazgos con el panorama más amplio de tu campo.\n\nTu TFG o tesis es tu momento de brillar como investigador independiente. No es solo un trabajo más largo - es la demostración de que puedes identificar un problema real, diseñar una metodología apropiada, ejecutar la investigación rigurosamente y contribuir algo nuevo al conocimiento de tu campo. La clave está en encontrar el equilibrio entre ambición y factibilidad.\n\nLos informes técnicos son la traducción del conocimiento académico al mundo aplicado. Aquí tu audiencia necesita saber qué hacer con tu información. Estructura todo pensando en la utilidad práctica: resumen ejecutivo (para quien toma decisiones), metodología (para quien necesita replicar), resultados (datos claros) y recomendaciones específicas (pasos concretos a seguir).\n\nRecuerda que independientemente del tipo de texto, tu lector debe poder seguir tu lógica sin esfuerzo. Si tienes que explicar tu texto después de que alguien lo lee, necesitas reescribirlo.",
+              "example": "Estructura de párrafo en ensayo académico:\n\n'La implementación de tecnologías de inteligencia artificial en procesos educativos presenta desafíos éticos significativos que requieren marcos regulatorios específicos [oración tema]. Algoritmos de evaluación automatizada han mostrado sesgos sistemáticos contra estudiantes de minorías étnicas, con diferencias de hasta 15 puntos porcentuales en calificaciones similares (Chen et al., 2023) [evidencia]. Estos sesgos se amplifican cuando los sistemas de IA determinan acceso a programas académicos avanzados, perpetuando desigualdades educativas existentes [análisis]. La ausencia de transparencia algorítmica impide que estudiantes y educadores comprendan los criterios de evaluación, violando principios básicos de equidad educativa [consecuencias]. Por tanto, la adopción de IA educativa debe subordinarse al desarrollo de protocolos de auditoría algorítmica y marcos de transparencia [conclusión del párrafo].'"
+            }
+          ],
+          "keyTakeaways": [
+            "Cada afirmación necesita evidencia específica y citable - nunca hagas generalizaciones sin datos",
+            "Tu estructura es tu aliada: una idea central por párrafo, transiciones claras entre secciones",
+            "Usa números y datos concretos en lugar de palabras vagas como 'mucho' o 'poco'",
+            "Cita mientras escribes, no al final - evitarás pesadillas de referencias perdidas",
+            "Lee tu texto en voz alta: si suena confuso hablado, necesitas simplificar la escritura",
+            "Cada párrafo debe conectar claramente con tu argumento principal - elimina todo lo que no aporte"
+          ],
+          "commonMistakes": [
+            "Escribir párrafos que parecen listas de fuentes sin análisis propio",
+            "Usar 'algunos autores dicen' en lugar de citas específicas con nombres y fechas",
+            "Empezar párrafos sin conectar con la idea anterior",
+            "Hacer conclusiones que no se derivan de la evidencia presentada",
+            "Cambiar de tercera a primera persona inconsistentemente",
+            "Incluir información irrelevante solo porque 'es interesante'"
+          ],
+          "professorTip": "Antes de escribir cualquier párrafo, pregúntate: '¿Qué punto específico estoy tratando de probar aquí?' Si no puedes responder en una oración clara, todavía no estás listo para escribir ese párrafo.",
+          "applyToYourWork": "Toma el último párrafo que escribiste para tu TFG/tesis. ¿Tiene una oración tema clara? ¿Cada oración siguiente apoya esa idea? ¿Terminaste el párrafo conectando de vuelta a tu argumento principal? Si alguna respuesta es no, reescríbelo ahora mismo."
+        }
+      }
+    }
+  },
+  "planificacion": {
+    "title": "Planificación",
+    "chapters": {
+      "antes-de-escribir": {
+        "id": "antes-de-escribir",
+        "title": "Planificación y Estructura",
+        "topics": [
+          "Las tres fases de la escritura: planificación, redacción y revisión",
+          "Cómo delimitar tu tema: de lo general a lo específico",
+          "Crear un esquema de trabajo efectivo",
+          "Organizar tus fuentes y materiales",
+          "Gestión del tiempo: cronograma realista para tu trabajo"
+        ],
+        "duration": 14,
+        "content": {
+          "introduction": "¿Te has quedado alguna vez paralizado frente a la página en blanco de tu TFG? ¿O has empezado a escribir directamente y luego te has dado cuenta de que has perdido el hilo? Te entiendo perfectamente. La diferencia entre un trabajo académico que fluye y uno que se convierte en una pesadilla no está en el talento, sino en la estrategia. Como tu tutor, te voy a enseñar un método probado que convierte la escritura académica de un caos en un proceso predecible y manejable. Miles de estudiantes han salvado sus TFG siguiendo estos pasos.",
+          "sections": [
+            {
+              "title": "Las tres fases de la escritura académica: Planificación, Redacción y Revisión",
+              "content": "Déjame contarte algo que he observado en 15 años dirigiendo tesis: los estudiantes que planifican terminan sus trabajos en la mitad del tiempo y con el doble de calidad. Pero atención, porque aquí viene el secreto que nadie te explica: cada fase requiere un estado mental completamente diferente, y mezclarlas es la receta perfecta para el bloqueo del escritor.\n\n**FASE 1: PLANIFICACIÓN (El detective)**\nEn esta fase eres un detective reuniendo pistas. Tu misión es clara: definir qué vas a investigar, cómo lo vas a hacer y qué estructura seguirá tu texto. Dedica el 30% de tu tiempo total a esta fase. Si tu TFG te va a llevar 6 meses, invierte casi 2 meses solo en planificar. Sé que suena mucho, pero créeme, luego me darás las gracias.\n\nEmpezarás definiendo tu pregunta de investigación con precisión quirúrgica. No vale 'Voy a hablar de inteligencia artificial'. Necesitas algo como: '¿Cómo están transformando los chatbots de IA la experiencia del cliente en el sector bancario español entre 2020-2024?' ¿Ves la diferencia? La segunda pregunta ya te está diciendo qué estudiar, dónde, cuándo y cómo.\n\nLuego, crearás tu esquema. No un índice bonito, sino una estructura que responda a tu pregunta paso a paso. Cada apartado debe tener un propósito claro en tu argumentación. Piensa en tu esquema como los planos de una casa: cada habitación tiene una función específica.\n\n**FASE 2: REDACCIÓN (El constructor)**\nAhora cambias de sombrero. Olvídate de la perfección, de buscar la palabra exacta o de que cada frase suene académica. Tu única misión es construir, poner ladrillos sobre el plano que ya tienes. Escribe rápido, escribe mal si es necesario, pero escribe. Esta fase debe representar el 50% de tu tiempo.\n\nUn truco que enseño a todos mis estudiantes: empieza cada sesión de escritura repasando lo que escribiste el día anterior. Te ayudará a retomar el hilo y mantener la coherencia. Y usa marcadores como [AMPLIAR AQUÍ] o [BUSCAR CITA] cuando sepas que necesitas algo pero no quieras interrumpir tu flujo de escritura.\n\n**FASE 3: REVISIÓN (El editor implacable)**\nAquí te conviertes en tu crítico más duro. Esta fase consume el 20% restante de tu tiempo, pero es donde tu trabajo pasa de amateur a profesional. Revisa en capas: primero la estructura general (¿responde mi texto a la pregunta inicial?), luego la argumentación (¿cada párrafo aporta algo a mi tesis?), después el estilo (¿suena académico pero comprensible?) y finalmente los errores de forma.\n\nLa clave del éxito es la disciplina de no mezclar estas fases. Cuando estés planificando, resiste la tentación de escribir párrafos completos. Cuando estés redactando, ignora los errores de ortografía. Y cuando revises, no añadas contenido nuevo sin replantearte toda la estructura.",
+              "example": "**Ejemplo real de planificación de un TFG en Psicología:**\n\n**Pregunta de investigación:** ¿Cómo influye el uso de Instagram en los niveles de ansiedad social de estudiantes universitarias de 18-22 años en Madrid?\n\n**Esquema argumentativo:**\n1. **Introducción** (¿Por qué es relevante este problema ahora?)\n   - Datos sobre uso de Instagram en universitarios\n   - Aumento de ansiedad social post-pandemia\n   - Pregunta e hipótesis\n\n2. **Marco teórico** (¿Qué sabemos ya sobre esto?)\n   2.1 Teorías de la comparación social en redes sociales\n   2.2 Ansiedad social: definición y medición\n   2.3 Estudios previos sobre Instagram y bienestar mental\n\n3. **Metodología** (¿Cómo lo voy a estudiar?)\n   3.1 Enfoque cuantitativo: encuestas validadas\n   3.2 Muestra: 200 estudiantes de 3 universidades madrileñas\n   3.3 Variables e instrumentos de medida\n\n4. **Resultados** (¿Qué he encontrado?)\n   4.1 Correlaciones entre tiempo de uso e indicadores de ansiedad\n   4.2 Análisis por tipo de contenido consumido\n\n5. **Discusión** (¿Qué significa esto?)\n   - Interpretación de resultados\n   - Limitaciones del estudio\n   - Implicaciones prácticas\n\n**Cronograma real:**\n- Meses 1-2: Revisión bibliográfica y diseño metodológico\n- Mes 3: Recogida de datos\n- Mes 4: Análisis de datos\n- Mes 5: Redacción completa\n- Mes 6: Revisión y formato final"
+            }
+          ],
+          "keyTakeaways": [
+            "Dedica el 30% de tu tiempo a planificar, 50% a redactar y 20% a revisar - esta proporción salvará tu TFG",
+            "Define tu pregunta de investigación con precisión: debe indicar qué, cómo, dónde y cuándo estudias",
+            "Cada apartado de tu esquema debe tener una función clara en tu argumentación global",
+            "En la fase de redacción, prioriza el flujo sobre la perfección - los errores se corrigen después",
+            "Revisa en capas: primero estructura, luego argumentación, después estilo y finalmente forma",
+            "No mezcles fases: cuando planificas, solo planificas; cuando escribes, solo escribes; cuando revisas, solo revisas"
+          ],
+          "commonMistakes": [
+            "Empezar a escribir la introducción sin tener claro el argumento completo del trabajo",
+            "Revisar cada párrafo mientras escribes - esto mata tu flujo creativo y ralentiza todo el proceso",
+            "Planificar de forma demasiado rígida sin dejar espacio para hallazgos inesperados durante la investigación",
+            "Confundir 'hacer el índice' con planificar - el esquema debe mostrar tu argumentación, no solo los temas",
+            "Saltarse la revisión estructural y centrarse solo en corregir errores de ortografía"
+          ],
+          "professorTip": "Aquí tienes mi truco secreto para estudiantes bloqueados: en tu esquema inicial, escribe después de cada apartado una frase que empiece por 'En esta sección demuestro que...' Si no puedes completar esa frase, es que ese apartado no tiene función clara en tu trabajo. Este simple ejercicio ha salvado cientos de TFG de convertirse en trabajos divagantes sin rumbo fijo.",
+          "applyToYourWork": "EJERCICIO PRÁCTICO para esta semana: Toma tu tema de TFG y dedica exactamente 3 horas a crear tu esquema argumentativo. Paso 1 (30 min): Convierte tu tema en una pregunta específica. Paso 2 (90 min): Crea un esquema de 4-5 apartados principales, escribiendo después de cada uno 'En esta sección demuestro que...' Paso 3 (60 min): Busca 10 fuentes preliminares y asígnalas a cada apartado. Al final de estas 3 horas tendrás el 80% de la planificación hecha. Compártelo con tu tutor antes de escribir una sola línea del trabajo final."
+        }
+      }
+    }
+  },
+  "introduccion": {
+    "title": "Introducción",
+    "chapters": {
+      "como-empezar": {
+        "id": "como-empezar",
+        "title": "La Introducción Perfecta",
+        "topics": [
+          "Los componentes esenciales de una introducción académica",
+          "Estrategias de apertura que captan la atención",
+          "Cómo presentar el problema o pregunta de investigación",
+          "Definir objetivos claros y alcanzables",
+          "El \"mapa\" del texto: anticipar la estructura al lector"
+        ],
+        "duration": 13,
+        "content": {
+          "introduction": "Tu introducción académica es el momento decisivo donde tu lector decide si tu investigación vale la pena. No es solo el primer párrafo: es tu oportunidad de demostrar que dominas tu tema y que tu trabajo aporta algo valioso. En los próximos minutos, aprenderás las técnicas específicas que usan los investigadores experimentados para crear introducciones que realmente enganchen y convenzan. Vas a transformar esos párrafos iniciales vagos en una presentación sólida de tu trabajo.",
+          "sections": [
+            {
+              "title": "Anatomía de una Introducción Académica Efectiva",
+              "content": "Tu introducción debe funcionar como un embudo inteligente: empiezas con el panorama amplio y gradualmente enfocas hacia tu contribución específica. Piénsalo como una conversación donde primero estableces el contexto ('Sabes que existe este problema importante...') y luego justificas tu trabajo ('Pues bien, yo voy a resolverlo de esta manera específica').\n\nEmpiezas con 2-3 oraciones que ubican tu tema en el mundo real. No hagas una revisión histórica completa; simplemente establece por qué tu área de estudio importa ahora. Por ejemplo, si estudias procrastinación académica, no necesitas explicar toda la historia de la psicología educativa.\n\nLuego identificas el vacío específico. Aquí usas frases como 'Sin embargo, pocos estudios han examinado...' o 'A pesar de estos avances, permanece unclear...'. Esta es tu oportunidad de oro: demostrar que encontraste un hueco real en el conocimiento.\n\nDespués presentas tu pregunta de investigación de forma directa. No la escondas en párrafos largos. Una oración clara que diga exactamente qué vas a investigar. Algunos profesores prefieren que sea una pregunta literal ('¿Cómo afecta la música de fondo al rendimiento en tareas de memoria?'), otros prefieren una declaración ('Este estudio examina el efecto de...').\n\nFinalmente, adelantas tu contribución principal. En una o dos oraciones, explica qué van a encontrar en tu trabajo y por qué eso importa. No reveles todos tus resultados, pero sí indica el tipo de respuesta que vas a ofrecer.\n\nLa extensión ideal para una introducción de TFG es 1-2 páginas. Para una tesis doctoral, puede llegar a 3-4 páginas. Si tu introducción ocupa más del 10% de tu trabajo total, probablemente está demasiado larga.",
+              "example": "Ejemplo real de introducción efectiva:\n\n'Los microplásticos representan una amenaza emergente para los ecosistemas marinos, con concentraciones que han aumentado exponencialmente en las últimas dos décadas (Thompson et al., 2020). Estudios recientes documentan su presencia en más de 180 especies marinas, alterando procesos fisiológicos fundamentales (García-López, 2021). Sin embargo, los mecanismos específicos de bioacumulación en peces pelágicos del Mediterráneo permanecen insuficientemente caracterizados, particularmente en especies de importancia comercial. Este estudio analiza los patrones de acumulación de microplásticos en tres especies representativas del litoral catalán, cuantificando su distribución tisular y evaluando los biomarcadores de estrés oxidativo asociados.'"
+            },
+            {
+              "title": "Estructurando Objetivos que Realmente Funcionen",
+              "content": "Tus objetivos son la promesa que haces al lector sobre qué va a encontrar en tu trabajo. Si están mal redactados, toda tu investigación parecerá confusa, incluso si es brillante. La clave está en usar verbos que indiquen acciones específicas y medibles.\n\nEvita verbos como 'conocer', 'estudiar', 'investigar' o 'comprender'. Son demasiado vagos. En su lugar, usa verbos que indiquen exactamente qué vas a hacer: 'cuantificar', 'comparar', 'identificar', 'evaluar', 'analizar', 'determinar', 'caracterizar', 'establecer'.\n\nTu objetivo general debe ser ambicioso pero realizable en el tiempo y con los recursos que tienes. Una buena prueba: ¿puedes explicar en una oración cómo vas a medir si lo lograste? Si no puedes, necesitas ser más específico.\n\nLos objetivos específicos son los pasos metodológicos para alcanzar el general. Cada uno debe corresponder con una sección principal de tu trabajo. Si tienes tres objetivos específicos, probablemente tendrás tres capítulos de resultados. Esta coherencia estructura-objetivos es lo que buscan los evaluadores.\n\nUn truco profesional: redacta primero los objetivos específicos y después construye el general que los englobe. Esto garantiza coherencia interna.\n\nRevisa que tus objetivos sigan una secuencia lógica. Por ejemplo: primero 'identificar', después 'analizar', finalmente 'evaluar'. El orden debe reflejar tu proceso de investigación real.\n\nPara objetivos cuantitativos, incluye el nivel de precisión: '...con un margen de error del 5%' o '...en una muestra de 200 participantes'. Para objetivos cualitativos, especifica el tipo de análisis: '...mediante análisis temático' o '...utilizando teoría fundamentada'.",
+              "example": "Ejemplo real de objetivos bien estructurados (TFG en Psicología):\n\nObjetivo General: Evaluar la efectividad de un programa de mindfulness en la reducción de ansiedad académica en estudiantes universitarios de primer año.\n\nObjetivos Específicos:\n1. Medir los niveles de ansiedad académica previa y posterior a la intervención mediante la escala AMAS en una muestra de 80 estudiantes\n2. Comparar los resultados del grupo experimental con un grupo control que recibió técnicas de relajación tradicionales\n3. Identificar los componentes específicos del programa que los participantes perciben como más efectivos mediante entrevistas semiestructuradas\n4. Determinar la persistencia de los efectos del programa mediante seguimiento a los 3 meses post-intervención"
+            }
+          ],
+          "keyTakeaways": [
+            "Construye tu introducción como un embudo: panorama amplio → vacío específico → tu contribución",
+            "Usa verbos de acción precisos: 'cuantificar', 'comparar', 'evaluar' en lugar de 'conocer' o 'estudiar'",
+            "Cada objetivo específico debe corresponder con una sección de resultados",
+            "Tu pregunta de investigación debe ser visible, no escondida en párrafos largos",
+            "La introducción no debe ocupar más del 10% de tu trabajo total",
+            "Adelanta tu contribución sin revelar todos los resultados"
+          ],
+          "commonMistakes": [
+            "Hacer revisión histórica exhaustiva en lugar de contextualizar el problema actual",
+            "Objetivos que no se pueden medir ('comprender mejor...', 'profundizar en...')",
+            "Desconexión entre número de objetivos específicos y estructura de resultados",
+            "Esconder la pregunta de investigación en párrafos densos",
+            "Justificación genérica ('es importante porque afecta a muchas personas')"
+          ],
+          "professorTip": "Escribe tu introducción dos veces: una versión preliminar antes de empezar y otra definitiva al final. La primera te ayuda a mantener el rumbo; la segunda, con el conocimiento completo de lo que encontraste, será mucho más precisa y convincente.",
+          "applyToYourWork": "Toma tu introducción actual y aplica la 'prueba del embudo': ¿empiezas amplio y te enfocas gradualmente? ¿Tu pregunta de investigación es visible en el primer párrafo o está escondida? Reescribe solo el párrafo donde presentas tu pregunta de investigación, haciéndola más directa y específica."
+        }
+      }
+    }
+  },
+  "desarrollo": {
+    "title": "Desarrollo",
+    "chapters": {
+      "cuerpo-argumentacion": {
+        "id": "cuerpo-argumentacion",
+        "title": "Desarrollo y Argumentación",
+        "topics": [
+          "La estructura del párrafo académico: oración tópica y desarrollo",
+          "Tipos de argumentos: autoridad, ejemplificación, analogía, datos",
+          "Conectores y marcadores del discurso académico",
+          "Progresión temática: cómo avanzar sin repetirte",
+          "Equilibrio entre tus ideas y las fuentes consultadas"
+        ],
+        "duration": 15,
+        "content": {
+          "introduction": "Cuando revisas tu borrador y sientes que tus ideas están ahí pero no logran convencer, el problema casi siempre está en cómo construyes tus párrafos. Un párrafo académico débil puede arruinar el mejor argumento, mientras que uno bien estructurado puede hacer brillar incluso ideas complejas. En este módulo no solo aprenderás la teoría de la construcción de párrafos, sino que desarrollarás las habilidades prácticas para transformar tus borradores actuales en textos académicos sólidos y persuasivos que realmente comuniquen el valor de tu investigación.",
+          "sections": [
+            {
+              "title": "Anatomía del Párrafo Académico: Construcción Paso a Paso",
+              "content": "Piensa en tu párrafo como una conversación estructurada con tu lector. Cada elemento tiene un propósito específico que puedes dominar con práctica deliberada. La oración tópica es tu declaración de intenciones: debe ser lo suficientemente específica para guiar el párrafo completo, pero lo suficientemente amplia para desarrollarla en 150-200 palabras. Por ejemplo, en lugar de escribir 'Las redes sociales son importantes', prueba con 'El uso de Instagram como herramienta de marketing político transformó las estrategias electorales en América Latina durante 2018-2022'. Esta segunda versión te da una ruta clara para desarrollar.\n\nAhora viene el desarrollo: cada oración posterior debe responder a una pregunta implícita que genera la oración tópica. Si dices que Instagram transformó las estrategias, el lector se pregunta ¿cómo?, ¿cuándo?, ¿con qué efectos? Tu trabajo es anticipar estas preguntas y responderlas sistemáticamente. La evidencia no debe ser decorativa, sino funcional. Cada dato, cita o ejemplo debe servir para fortalecer tu argumento principal.\n\nEl cierre del párrafo es crucial pero a menudo descuidado. No se trata de repetir lo ya dicho, sino de consolidar el argumento y preparar el terreno para el siguiente párrafo. Una técnica efectiva es el 'puente temático': una oración que conecta la idea que acabas de desarrollar con la que desarrollarás después. Por ejemplo: 'Esta transformación en las estrategias de comunicación política generó, a su vez, cambios significativos en los patrones de participación ciudadana'.\n\nLa coherencia interna del párrafo se logra con conectores precisos y progresión temática clara. Cada oración debe retomar un elemento de la anterior y añadir información nueva. Si saltas de una idea a otra sin conexión evidente, pierdes al lector y debilitas tu argumento.",
+              "example": "Párrafo de una tesis en Educación: 'La implementación de metodologías activas en la enseñanza universitaria de ciencias exactas presenta desafíos específicos que requieren adaptaciones pedagógicas particulares. Según el estudio longitudinal de Martínez et al. (2022), el 73% de los docentes de matemáticas reporta dificultades para integrar el aprendizaje basado en problemas debido a la estructura secuencial del currículum. Esta resistencia estructural se manifiesta especialmente en cursos introductorios, donde la carga conceptual impide la implementación de dinámicas colaborativas extensas (López-García, 2021, p. 45). Sin embargo, las experiencias piloto desarrolladas en tres universidades públicas demuestran que la adaptación gradual de estas metodologías genera mejoras significativas en la comprensión conceptual después del segundo semestre de implementación. Estos resultados sugieren que el éxito de la innovación pedagógica depende menos de la metodología elegida que de la estrategia de implementación institucional.'"
+            },
+            {
+              "title": "Tipos de Argumentos en la Escritura Académica",
+              "content": "Dominar los tipos de argumentos te permitirá construir párrafos más convincentes y variados. Pero la clave no está en memorizarlos, sino en saber cuándo y cómo usar cada uno para fortalecer tu caso específico.\n\nEl argumento de autoridad funciona cuando citas fuentes reconocidas, pero debe ir más allá de la simple mención. Introduce la fuente, presenta su credencial relevante y explica por qué su perspectiva es significativa para tu argumento. En lugar de escribir 'Según García (2020)', prueba con 'García (2020), cuya investigación longitudinal sobre políticas educativas en contextos rurales abarca quince años de trabajo de campo, sostiene que...'. Esta contextualización le da peso real a la cita.\n\nLos argumentos empíricos requieren interpretación activa de tu parte. Los datos por sí solos no argumentan nada; tú debes explicar qué significan en el contexto de tu investigación. Si presentas una estadística, dedica al menos dos oraciones a interpretarla: una para explicar qué muestra el dato y otra para conectarlo con tu argumento mayor.\n\nLa analogía es poderosa pero peligrosa. Funciona cuando las similitudes son realmente significativas y ayudan a clarificar conceptos complejos. Pero puede debilitar tu argumento si la comparación es forzada o superficial. Usa analogías para explicar, no para probar.\n\nLos argumentos lógicos son la columna vertebral de tu texto académico. Se basan en cadenas de razonamiento donde cada paso se sigue del anterior. La clave está en hacer explícitos los vínculos lógicos. Usa conectores como 'por tanto', 'en consecuencia', 'dado que', 'si... entonces' para guiar al lector a través de tu razonamiento.\n\nLa combinación estratégica es lo que distingue un texto académico maduro. No uses todos los tipos en cada párrafo, sino selecciona los más apropiados para cada punto específico. Un párrafo puede comenzar con un argumento de autoridad, desarrollarse con evidencia empírica y cerrar con una conexión lógica hacia el siguiente punto.",
+              "example": "Párrafo de una investigación en Sociología que combina argumentos: 'El fenómeno de gentrificación en barrios históricos de América Latina responde a dinámicas globales pero se manifiesta con características locales específicas. Harvey (2019), reconocido teórico urbano cuyo trabajo sobre geografía del capitalismo es referencia mundial, identifica tres mecanismos centrales de desplazamiento residencial en contextos de renovación urbana. Los datos del censo 2018-2022 en cinco capitales latinoamericanas confirman esta tendencia: el incremento promedio del 340% en valores de arriendo coincide temporalmente con la llegada de inversiones inmobiliarias internacionales (Instituto de Estudios Urbanos, 2023). Este patrón replica lo observado en ciudades europeas durante los años noventa, donde la secuencia renovación-valorización-desplazamiento se completó en períodos similares de cuatro a seis años. Por tanto, los indicadores actuales sugieren que estamos ante la fase inicial de un proceso de transformación urbana que requerirá intervención política específica para proteger a las comunidades vulnerables.'"
+            }
+          ],
+          "keyTakeaways": [
+            "Tu oración tópica debe ser lo suficientemente específica para guiar todo el párrafo",
+            "Cada párrafo necesita entre 3-4 tipos de oraciones: tópica, desarrollo, evidencia y cierre",
+            "Los conectores no son decorativos: úsalos para mostrar relaciones lógicas específicas",
+            "Combina tipos de argumentos estratégicamente, no uses todos en cada párrafo",
+            "El cierre del párrafo debe preparar el terreno para el siguiente punto",
+            "La evidencia siempre necesita tu interpretación explícita"
+          ],
+          "commonMistakes": [
+            "Párrafos de una sola idea sin desarrollo: escribir la tesis y pasar al siguiente punto",
+            "Citas huérfanas: presentar fuentes sin explicar por qué son relevantes o creíbles",
+            "Datos sin interpretación: mostrar estadísticas sin explicar qué significan para tu argumento",
+            "Saltos temáticos: cambiar de idea sin conectores o transiciones claras",
+            "Párrafos demasiado largos: intentar desarrollar múltiples ideas en un solo bloque",
+            "Argumentos circulares: repetir la misma idea con palabras diferentes en lugar de desarrollarla"
+          ],
+          "professorTip": "Antes de escribir cada párrafo, hazte tres preguntas: ¿Qué quiero que el lector entienda al final de este párrafo? ¿Qué evidencia necesito para convencerlo? ¿Cómo conecta esto con mi argumento general? Si no puedes responder claramente, no estás listo para escribir ese párrafo.",
+          "applyToYourWork": "Toma el capítulo que estás escribiendo ahora y elige tres párrafos consecutivos. En cada uno, identifica: 1) La oración tópica (¿está realmente ahí?), 2) El tipo de argumento principal que usas, 3) La conexión con el párrafo siguiente. Reescribe las transiciones entre párrafos hasta que un lector externo pueda seguir tu razonamiento sin saltos lógicos. Luego aplica la misma técnica al resto del capítulo."
+        }
+      }
+    }
+  },
+  "conclusiones": {
+    "title": "Conclusiones",
+    "chapters": {
+      "cerrar-bien": {
+        "id": "cerrar-bien",
+        "title": "Conclusiones Efectivas",
+        "topics": [
+          "Qué debe contener una conclusión académica",
+          "Diferencia entre resumen y conclusión",
+          "Tipos de cierre: síntesis, proyección, reflexión crítica",
+          "Cómo retomar la tesis inicial sin repetirte",
+          "Abrir nuevas líneas de investigación"
+        ],
+        "duration": 11,
+        "content": {
+          "introduction": "Escribir conclusiones efectivas no es un requisito burocrático, es tu última oportunidad para impactar al lector y demostrar el valor real de tu investigación. En este módulo aprenderás a transformar las conclusiones de simples resúmenes a verdaderos momentos de cierre académico que sinteticen, proyecten y resignifiquen tu trabajo.",
+          "sections": [
+            {
+              "title": "Qué debe contener una conclusión académica",
+              "content": "Piensa en tu conclusión como una conversación inteligente con alguien que acaba de leer tu trabajo completo. No necesita que le repitas todo, pero sí que le muestres qué significa realmente lo que descubriste. Una conclusión académica efectiva debe contener cuatro elementos fundamentales que trabajarás en párrafos separados:\n\n**Párrafo 1: Tu respuesta directa** - Comienza retomando tu pregunta de investigación original, pero ahora desde la posición de alguien que ya tiene la respuesta. En lugar de 'Este trabajo se propuso investigar si...', escribe 'La investigación realizada demuestra que...' o 'Los hallazgos revelan que...'. Este párrafo debe ser contundente y claro.\n\n**Párrafo 2: El significado más profundo** - Aquí interpretas tus resultados en un contexto más amplio. ¿Qué implican tus hallazgos para la disciplina? ¿Cómo se conectan con debates teóricos existentes? ¿Qué confirman, cuestionan o amplían del conocimiento actual? Este es el párrafo más analítico de tu conclusión.\n\n**Párrafo 3: Limitaciones y proyecciones** - Reconoce honestamente las limitaciones de tu investigación, pero no como una debilidad, sino como una invitación a futuras investigaciones. Identifica qué preguntas surgieron durante tu proceso que no pudiste responder, qué aspectos merecen profundización o qué nuevas líneas de investigación se abren.\n\n**Párrafo 4: Impacto y relevancia** - Cierra reflexionando sobre las implicaciones prácticas, teóricas o metodológicas de tu trabajo. ¿Por qué debería importarle a alguien fuera de tu círculo académico inmediato?\n\nLa extensión ideal varía: 1-2 páginas para TFG, 2-4 páginas para tesis de maestría, y hasta 6-8 páginas para tesis doctorales. Más importante que la longitud es la densidad conceptual: cada oración debe aportar valor analítico, no solo ocupar espacio.",
+              "example": "Ejemplo de párrafo inicial de conclusión efectiva (TFG en Psicología Educativa):\n\n\"Los resultados obtenidos confirman que la implementación de técnicas de mindfulness en el aula no solo reduce los niveles de ansiedad académica en estudiantes universitarios, sino que genera cambios significativos en sus estrategias de autorregulación emocional. Contrario a nuestra hipótesis inicial, que planteaba efectos principalmente a nivel sintomatológico, los hallazgos revelan transformaciones más profundas en la percepción que los estudiantes tienen sobre su capacidad de agencia frente al estrés académico. Esta investigación demuestra que las intervenciones contemplativas en contextos educativos operan tanto a nivel conductual como cognitivo, generando recursos psicológicos que trascienden la situación específica de aprendizaje.\""
+            },
+            {
+              "title": "Cómo retomar la tesis sin repetirte",
+              "content": "El mayor desafío de escribir conclusiones es retomar tu planteamiento inicial sin sonar repetitivo. La clave está en entender que ahora tienes una perspectiva diferente: ya no eres alguien que se pregunta, sino alguien que responde desde el conocimiento adquirido.\n\n**Estrategia 1: Cambio de temporalidad verbal** - En lugar de 'Este trabajo se propone demostrar...', escribe 'La investigación realizada demuestra...'. En lugar de 'Hipotetizamos que...', utiliza 'Los hallazgos confirman que...' o 'Los resultados revelan que...'. Este cambio temporal marca la diferencia entre plantear una pregunta y ofrecer una respuesta fundamentada.\n\n**Estrategia 2: Ampliación del contexto** - Si en la introducción dijiste 'Las redes sociales influyen en la autoestima adolescente', en la conclusión puedes escribir 'Los hallazgos revelan que la relación entre redes sociales y autoestima adolescente es más compleja de lo que sugieren los enfoques deterministas, mostrando patrones diferenciados según...' Amplías el marco interpretativo.\n\n**Estrategia 3: Uso de verbos analíticos** - Reemplaza verbos neutros como 'mostrar', 'demostrar', 'comprobar' por verbos que implican profundidad analítica: 'revelar', 'evidenciar', 'problematizar', 'complejizar', 'cuestionar', 'resignificar'. Estos verbos transmiten que no solo confirmaste algo, sino que aportaste una nueva comprensión.\n\n**Estrategia 4: La técnica del zoom-out** - Imagínate ajustando una cámara: en la introducción enfocaste un problema específico, en la conclusión alejas la cámara para mostrar cómo tu hallazgo específico se conecta con panoramas más amplios de conocimiento.\n\n**Estrategia 5: Mostrar la evolución de tu pensamiento** - Reconoce explícitamente cómo tu comprensión evolucionó durante la investigación. Frases como 'Inicialmente planteamos... sin embargo, los hallazgos sugieren una interpretación más matizada...' o 'Si bien la hipótesis original se confirmó parcialmente, emergieron dimensiones no contempladas inicialmente...' muestran reflexividad y profundidad intelectual.\n\nEvita completamente frases como 'Como se dijo anteriormente...', 'Tal como se mencionó...', o reproducciones literales de párrafos de la introducción. Tu conclusión debe sonar como una conversación nueva, informada por todo el proceso investigativo.",
+              "example": "Comparación práctica:\n\n**Introducción original:** 'Esta investigación analiza el impacto de las metodologías activas en el rendimiento académico de estudiantes de ingeniería, partiendo de la hipótesis de que la implementación de aprendizaje basado en problemas mejorará significativamente los resultados de aprendizaje.'\n\n**Conclusión mejorada:** 'Los hallazgos obtenidos confirman que la implementación de metodologías activas, específicamente el aprendizaje basado en problemas, transforma no solo los indicadores cuantitativos de rendimiento académico, sino fundamentalmente la relación que los estudiantes de ingeniería establecen con el conocimiento. Más allá de la mejora estadísticamente significativa en las calificaciones, esta investigación revela que las metodologías activas generan competencias metacognitivas que preparan a los futuros ingenieros para enfrentar problemas complejos en contextos profesionales reales.'"
+            }
+          ],
+          "keyTakeaways": [
+            "Estructura tu conclusión en párrafos específicos: respuesta directa, significado amplio, limitaciones y proyecciones, impacto",
+            "Cambia la temporalidad verbal: de 'se propone' a 'se demuestra'",
+            "Usa verbos analíticos que muestren profundidad: revelar, problematizar, complejizar",
+            "Aplica la técnica del zoom-out: conecta tus hallazgos específicos con debates más amplios",
+            "Muestra la evolución de tu pensamiento durante la investigación"
+          ],
+          "commonMistakes": [
+            "Copiar y pegar párrafos completos de la introducción cambiando solo el tiempo verbal",
+            "Introducir datos nuevos o referencias no mencionadas en el desarrollo",
+            "Limitarse a enumerar resultados sin interpretarlos analíticamente",
+            "Usar frases de relleno como 'Como se dijo anteriormente' o 'Tal como se mencionó'",
+            "Terminar abruptamente sin proyectar el valor o impacto de la investigación"
+          ],
+          "professorTip": "Lee tu introducción y tu conclusión seguidas, como si fueran párrafos consecutivos. Si suenan redundantes o repetitivas, necesitas reescribir la conclusión. La mejor conclusión es la que podría funcionar como un abstract independiente de tu investigación, pero que claramente proviene de alguien que ya completó el trabajo, no de alguien que apenas lo está planteando.",
+          "applyToYourWork": "Toma tu conclusión actual y reescribe el primer párrafo aplicando estas estrategias: 1) Cambia todos los verbos a tiempo pasado o presente definitivo, 2) Amplía el contexto interpretativo de tus hallazgos, 3) Usa al menos dos verbos analíticos (revelar, evidenciar, problematizar). Después compara ambas versiones y evalúa cuál suena más como una respuesta fundamentada que como una repetición de preguntas."
+        }
+      }
+    }
+  },
+  "citas": {
+    "title": "Citas y Referencias",
+    "chapters": {
+      "citar-correctamente": {
+        "id": "citar-correctamente",
+        "title": "Citas y Referencias",
+        "topics": [
+          "Por qué citar: ética académica y evitar el plagio",
+          "Cita textual vs paráfrasis: cuándo usar cada una",
+          "Sistemas de citación: APA 7, MLA, Chicago, Vancouver",
+          "Cómo construir la bibliografía paso a paso",
+          "Herramientas de gestión bibliográfica: Zotero, Mendeley"
+        ],
+        "duration": 16,
+        "content": {
+          "introduction": "Bienvenido al capítulo \"Citas y Referencias\". En esta sección aprenderás pautas prácticas sobre por qué citar: ética académica y evitar el plagio.",
+          "sections": [
+            {
+              "title": "Por qué citar: ética académica y evitar el plagio",
+              "content": "Esta sección aborda por qué citar: ética académica y evitar el plagio. El contenido detallado se está generando...",
+              "example": "Ejemplo en desarrollo."
+            },
+            {
+              "title": "Cita textual vs paráfrasis: cuándo usar cada una",
+              "content": "Esta sección aborda cita textual vs paráfrasis: cuándo usar cada una. El contenido detallado se está generando...",
+              "example": "Ejemplo en desarrollo."
+            },
+            {
+              "title": "Sistemas de citación: APA 7, MLA, Chicago, Vancouver",
+              "content": "Esta sección aborda sistemas de citación: apa 7, mla, chicago, vancouver. El contenido detallado se está generando...",
+              "example": "Ejemplo en desarrollo."
+            },
+            {
+              "title": "Cómo construir la bibliografía paso a paso",
+              "content": "Esta sección aborda cómo construir la bibliografía paso a paso. El contenido detallado se está generando...",
+              "example": "Ejemplo en desarrollo."
+            },
+            {
+              "title": "Herramientas de gestión bibliográfica: Zotero, Mendeley",
+              "content": "Esta sección aborda herramientas de gestión bibliográfica: zotero, mendeley. El contenido detallado se está generando...",
+              "example": "Ejemplo en desarrollo."
+            }
+          ],
+          "keyTakeaways": [
+            "Pauta en desarrollo",
+            "Aplicación práctica",
+            "Consejo útil"
+          ],
+          "commonMistakes": [
+            "Error común 1",
+            "Error común 2",
+            "Error común 3"
+          ],
+          "professorTip": "Consejo de profesor en desarrollo.",
+          "applyToYourWork": "Tarea práctica en desarrollo."
+        }
+      }
+    }
+  },
+  "resumen": {
+    "title": "Resumen",
+    "chapters": {
+      "sintesis-abstract": {
+        "id": "sintesis-abstract",
+        "title": "El Resumen Académico",
+        "topics": [
+          "Qué es un abstract y para qué sirve",
+          "Estructura del resumen: objetivo, método, resultados, conclusión",
+          "Técnicas de síntesis: identificar ideas principales",
+          "Extensión adecuada: la regla del 10%",
+          "Palabras clave: cómo seleccionarlas para indexación"
+        ],
+        "duration": 12,
+        "content": {
+          "introduction": "El abstract de tu TFG o tesis es la puerta de entrada a tu investigación. En 200 palabras o menos, debes convencer a tu tribunal, supervisor y futuros lectores de que tu trabajo vale la pena. No es solo un resumen: es tu oportunidad de vender tu investigación. Piensa en las últimas veces que buscaste artículos académicos, ¿leíste completos aquellos cuyo abstract no te convenció en los primeros 30 segundos? Exactamente. Por eso dominar esta técnica no es opcional, es fundamental para que tu esfuerzo de meses se traduzca en impacto real.",
+          "sections": [
+            {
+              "title": "Qué es un abstract y su función estratégica",
+              "content": "Tu abstract es como el elevator pitch de tu investigación: tienes 30 segundos (150-250 palabras) para enganchar a alguien que tiene cientos de trabajos por revisar. No cometas el error de verlo como 'el párrafo que va al principio'. Es una herramienta de marketing académico.\n\nCuando escribas tu abstract, pregúntate: '¿Por qué alguien debería invertir 2 horas leyendo mi TFG completo?' La respuesta debe estar clara en esas primeras líneas. Un evaluador experimentado puede predecir la calidad de una tesis leyendo solo su abstract, así de importante es.\n\nLos elementos que NUNCA pueden faltar son: el problema específico que abordas (no 'la educación en España' sino 'el impacto del uso de tablets en la comprensión lectora de estudiantes de 4º de primaria'), tu metodología concreta ('entrevistas a 25 docentes' no 'metodología cualitativa'), tus resultados más llamativos con números específicos, y qué significa esto para tu campo de estudio.\n\nAquí está el secreto: tu abstract debe funcionar como un documento independiente. Alguien que solo lea esto debe entender qué hiciste, cómo lo hiciste, qué encontraste y por qué importa. Si necesita leer otra sección para entender tu abstract, has fallado.\n\nLa función estratégica real del abstract es ser tu embajador cuando tú no estás presente. Bases de datos académicas lo indexarán, investigadores lo usarán para decidir si citar tu trabajo, y empleadores futuros lo leerán para evaluar tu capacidad investigativa.",
+              "example": "Ejemplo de abstract efectivo (TFG en Psicología):\n\n'Este estudio examina la relación entre el uso de redes sociales y los niveles de ansiedad en estudiantes universitarios españoles de 18-22 años. Mediante una encuesta validada aplicada a 312 estudiantes de cuatro universidades madrileñas durante octubre-noviembre 2023, se midió el tiempo diario en redes sociales, tipos de uso y niveles de ansiedad mediante la escala GAD-7. Los resultados revelan una correlación positiva significativa (r=0.67, p<0.001) entre el uso pasivo de redes sociales (scroll sin interacción) y ansiedad, mientras que el uso activo (comentarios, publicaciones) no mostró correlación significativa. Estos hallazgos sugieren que no es el tiempo total en redes sociales, sino el tipo de uso, lo que influye en el bienestar psicológico, con implicaciones importantes para programas de salud mental universitaria.'\n\nNota cómo cada frase aporta datos concretos: población específica, fechas, números, herramientas de medición, y resultados cuantificados."
+            },
+            {
+              "title": "Estructura y composición del resumen académico",
+              "content": "Te voy a dar la fórmula exacta que funciona. Son cuatro párrafos cortos (2-3 oraciones cada uno) que siguen este patrón:\n\nPárrafo 1 - Contexto + Problema: '¿Qué falta saber y por qué es importante?' No escribas 'La educación es importante'. Escribe: 'Aunque el 78% de los colegios españoles han implementado tecnología digital, se desconoce su impacto específico en...' Ves la diferencia? Datos concretos, problema específico.\n\nPárrafo 2 - Objetivo + Metodología: Usa verbos decisivos: 'Este estudio analiza/examina/evalúa...' Luego especifica HOW: 'mediante análisis estadístico de datos de 200 empresas', 'a través de entrevistas semiestructuradas con 15 expertos', 'utilizando un diseño cuasiexperimental con grupo control'. Nada de 'se realizó una investigación cualitativa' - eso no dice nada.\n\nPárrafo 3 - Resultados: Aquí es donde diferencias un TFG mediocre de uno excelente. Incluye números específicos, porcentajes, correlaciones. 'Los resultados mostraron diferencias significativas' vs 'El grupo experimental mejoró un 23% en comprensión lectora (p<0.05) comparado con el control'. La segunda opción demuestra rigor.\n\nPárrafo 4 - Conclusiones e Implicaciones: No repitas los resultados. Explica qué SIGNIFICA esto para tu campo. '¿Qué debería cambiar después de tu investigación?' 'Estos hallazgos sugieren la necesidad de revisar las políticas actuales de...' o 'Los resultados proporcionan evidencia para implementar...'\n\nReglas de oro para cada párrafo: máximo 50 palabras por párrafo, verbos en pasado ('se analizó', 'se encontró'), cero adjetivos subjetivos ('interesante', 'relevante' - deja que los datos hablen), y cada oración debe poder defenderse ante un tribunal exigente.",
+              "example": "Ejemplo de estructura párrafo por párrafo (TFG en Marketing):\n\nPárrafo 1: 'Las pequeñas empresas españolas destinan solo el 3.2% de su presupuesto a marketing digital, muy por debajo de la media europea (7.8%), limitando su competitividad en mercados globalizados.'\n\nPárrafo 2: 'Esta investigación analiza las barreras que enfrentan las PYMES españolas para adoptar estrategias de marketing digital, mediante entrevistas en profundidad con 28 gerentes de empresas de 10-50 empleados en Andalucía durante marzo-mayo 2024.'\n\nPárrafo 3: 'Se identificaron cuatro barreras principales: limitaciones presupuestarias (89% de encuestados), falta de conocimiento técnico (71%), resistencia al cambio (54%) y desconfianza en ROI digital (43%).'\n\nPárrafo 4: 'Los resultados evidencian la necesidad de programas gubernamentales de capacitación digital específicos para PYMES, que aborden tanto aspectos técnicos como de mentalidad empresarial para mejorar la competitividad del tejido empresarial español.'"
+            }
+          ],
+          "keyTakeaways": [
+            "Escribe tu abstract DESPUÉS de terminar todo tu TFG - necesitas conocer tus resultados reales para resumirlos efectivamente",
+            "Incluye números específicos en cada párrafo: muestras, porcentajes, fechas, correlaciones - los datos concretos dan credibilidad",
+            "Usa el 'test del extraño': alguien de otro campo debe entender de qué va tu investigación solo leyendo el abstract",
+            "Cada oración debe aportar información nueva - si puedes eliminar una frase sin perder contenido, elimínala",
+            "Termina siempre con implicaciones prácticas: ¿qué debería cambiar después de tu investigación?"
+          ],
+          "commonMistakes": [
+            "Empezar con generalidades ('La educación es fundamental...') - ve directo al problema específico que abordas",
+            "Usar metodología vaga ('se realizó una investigación') - especifica técnicas, muestras y procedimientos exactos",
+            "Presentar resultados sin números ('se encontraron diferencias') - siempre cuantifica tus hallazgos",
+            "Escribir conclusiones obvias ('se necesita más investigación') - propón acciones concretas basadas en tus resultados",
+            "Exceder 250 palabras - los evaluadores no leerán más, así de simple"
+          ],
+          "professorTip": "Aquí tienes mi truco de 20 años evaluando TFGs: después de escribir tu abstract, dáselo a leer a tu abuela, tu vecino o alguien totalmente ajeno a tu tema. Si pueden explicarte en sus palabras de qué va tu investigación, has triunfado. Si ponen cara de confusión, reescribe. Un abstract que solo entienden los expertos en tu tema muy específico es un abstract que fallará en su propósito de comunicar.",
+          "applyToYourWork": "EJERCICIO INMEDIATO: Toma tu TFG actual y escribe cuatro oraciones siguiendo esta fórmula exacta: 1) 'Aunque [dato conocido], se desconoce [tu problema específico]' 2) 'Este estudio [verbo de acción] mediante [metodología específica + números]' 3) 'Los resultados revelan [hallazgo 1 con números] y [hallazgo 2 con números]' 4) 'Estos hallazgos sugieren [implicación práctica específica]'. Tienes tu primer borrador de abstract en 10 minutos."
+        }
+      }
+    }
+  },
+  "resena": {
+    "title": "Reseña",
+    "chapters": {
+      "analizar-textos": {
+        "id": "analizar-textos",
+        "title": "La Reseña Crítica",
+        "topics": [
+          "Qué es una reseña y diferencia con el resumen",
+          "Estructura de la reseña: presentación, exposición, valoración",
+          "Cómo hacer un análisis crítico constructivo",
+          "El equilibrio entre objetividad y opinión fundamentada",
+          "Errores comunes al escribir reseñas académicas"
+        ],
+        "duration": 13,
+        "content": {
+          "introduction": "Cuando te enfrentes a una reseña académica, no estás simplemente resumiendo un texto, sino dialogando críticamente con él. La reseña es tu oportunidad de demostrar comprensión profunda, análisis riguroso y capacidad de evaluación académica. Dominar esta habilidad no solo mejorará tus calificaciones, sino que será fundamental en tu desarrollo profesional e investigativo.",
+          "sections": [
+            {
+              "title": "¿Qué es una Reseña Crítica?",
+              "content": "Una reseña crítica académica es tu análisis profesional de un trabajo de investigación, donde demuestras que puedes leer como un experto en tu campo. Te guío paso a paso para que entiendas la diferencia práctica entre resumir y reseñar.\n\nCuando solo resumes, dices: \"El autor afirma que la pobreza urbana ha aumentado en las últimas décadas.\" Cuando reseñas críticamente, escribes: \"Aunque Pérez documenta el incremento de la pobreza urbana con datos convincentes de censos nacionales, su análisis se limita a variables cuantitativas y no considera factores cualitativos como las redes de apoyo comunitario que varios estudios recientes han identificado como determinantes.\"\n\n¿Ves la diferencia? En la reseña crítica:\n- Reconoces los méritos (\"datos convincentes\")\n- Identificas las fuentes (\"censos nacionales\")\n- Señalas limitaciones específicas (\"solo variables cuantitativas\")\n- Conectas con el campo de conocimiento (\"estudios recientes\")\n\nPara desarrollar este enfoque crítico, pregúntate mientras lees:\n1. ¿Qué evidencias presenta el autor y qué tan sólidas son?\n2. ¿Qué perspectivas o enfoques alternativos no está considerando?\n3. ¿Cómo se relaciona este trabajo con otros que he leído?\n4. ¿Qué preguntas importantes quedan sin responder?\n\nTu tarea no es atacar el trabajo, sino evaluarlo profesionalmente. Un cirujano no odia el cuerpo que opera; simplemente identifica con precisión qué está funcionando bien y qué necesita atención. Así debes abordar tu reseña crítica.\n\nRecuerda: estás entrenándote para ser un investigador que puede evaluar la calidad académica. Esta habilidad será crucial cuando escribas tu marco teórico, cuando evalúes fuentes para tu tesis, y cuando participes en debates académicos profesionales.",
+              "example": "Ejemplo de evolución de resumen a reseña crítica:\n\nRESUMEN: \"Rodríguez, M. (2023). Impacto de las redes sociales en la educación universitaria. Editorial Académica, Madrid, 320 págs. El autor examina cómo Facebook e Instagram afectan el rendimiento estudiantil.\"\n\nRESEÑA CRÍTICA: \"Rodríguez, M. (2023). Impacto de las redes sociales en la educación universitaria. Editorial Académica, Madrid, 320 págs. Aunque Rodríguez ofrece un análisis cuantitativo riguroso del uso de Facebook e Instagram entre estudiantes universitarios, basado en una muestra de 1,200 participantes, su estudio presenta limitaciones metodológicas significativas al excluir plataformas emergentes como TikTok y al no considerar variables socioeconómicas que la literatura reciente (Davis, 2022; Chen et al., 2023) ha identificado como determinantes en los patrones de uso digital.\""
+            },
+            {
+              "title": "Estructura de la Reseña Académica",
+              "content": "Te voy a enseñar la arquitectura de una reseña que impresionará a cualquier evaluador académico. Cada sección tiene un propósito específico y te muestro exactamente cómo escribirla.\n\n**1. INTRODUCCIÓN (Tu gancho profesional)**\nNo empieces con \"En este trabajo se va a reseñar...\". Eso es amateur. Engancha desde la primera línea:\n\n\"La pregunta sobre si la inteligencia artificial puede reemplazar la creatividad humana cobra nueva relevancia con la propuesta de Thompson (2023) en 'Algoritmos y Arte: Una revolución creativa', donde argumenta que la IA no solo imita, sino que genuinamente crea.\"\n\nEn tu introducción debes:\n- Presentar el tema de forma atractiva\n- Ubicar al autor en su contexto académico\n- Adelantar tu valoración general (sin revelar todo)\n\n**2. DESCRIPCIÓN DEL CONTENIDO (Tu demostración de comprensión)**\nAquí demuestras que entendiste perfectamente el trabajo. Estructura esta sección así:\n- Tesis central del autor\n- Argumentos principales (máximo 3-4)\n- Metodología utilizada\n- Conclusiones centrales\n\nEjemplo práctico: \"Thompson estructura su argumento en tres pilares: primero, que la creatividad es esencialmente combinatoria (capítulos 1-2); segundo, que los algoritmos pueden generar combinaciones genuinamente novedosas (capítulos 3-5); y tercero, que la evaluación estética es independiente del origen humano o artificial de la obra (capítulos 6-7). Su metodología combina análisis filosófico con estudios de caso de obras generadas por IA.\"\n\n**3. ANÁLISIS CRÍTICO (Tu expertise en acción)**\nEsta es la sección que marca la diferencia entre una reseña promedio y una excepcional. Evalúa sistemáticamente:\n\n*Fortalezas específicas:* \"La principal contribución de Thompson radica en su marco teórico integrador, que supera la falsa dicotomía entre creatividad humana y artificial presente en trabajos anteriores como los de Mitchell (2019) y García (2021).\"\n\n*Limitaciones metodológicas:* \"Sin embargo, el análisis se ve limitado por la ausencia de perspectivas neurociencia cognitiva contemporáneas, particularmente los hallazgos de Bennet et al. (2022) sobre los mecanismos neuronales específicos de la creatividad.\"\n\n*Contexto académico:* \"El trabajo dialoga productivamente con la tradición filosófica de Boden (1994) sobre creatividad, aunque no aborda las críticas recientes de la escuela fenomenológica (Varela, 2020).\"\n\n**4. VALORACIÓN FINAL (Tu veredicto profesional)**\nConcluye con una evaluación equilibrada que muestre tu criterio académico maduro. No digas simplemente \"es un buen libro\". Sé específico sobre su contribución, limitaciones y relevancia para diferentes audiencias.",
+              "example": "Ejemplo de transición fluida entre secciones:\n\n\"[Final de descripción] ...concluyendo que la IA alcanzará paridad creativa con humanos en la próxima década.\n\n[Inicio de análisis crítico] Esta predicción temporal, aunque provocativa, revela una de las principales debilidades del análisis de Thompson: la ausencia de criterios operacionales claros para medir la 'paridad creativa'. Mientras que su marco teórico es sólido...\"\n\nObserva cómo la transición conecta las ideas y introduce el análisis de forma natural, no abrupta."
+            }
+          ],
+          "keyTakeaways": [
+            "Tu reseña crítica debe demostrar que puedes leer como un experto: identifica fortalezas, limitaciones y contexto académico",
+            "Estructura cada párrafo con propósito específico: descripción objetiva primero, análisis crítico después",
+            "Conecta siempre el trabajo reseñado con otros estudios del campo para mostrar tu conocimiento contextual",
+            "Usa un tono profesional pero accesible: riguroso sin ser pedante, crítico sin ser destructivo",
+            "Equilibra reconocimiento de méritos con señalamiento de limitaciones específicas y fundamentadas"
+          ],
+          "commonMistakes": [
+            "Escribir solo un resumen extendido sin análisis crítico real",
+            "Hacer críticas vagas como 'el autor no profundiza lo suficiente' sin especificar qué falta exactamente",
+            "Emitir juicios personales ('no me gustó') en lugar de evaluaciones académicas fundamentadas",
+            "No contextualizar el trabajo dentro del campo de conocimiento relevante",
+            "Usar un tono demasiado informal o demasiado agresivo en lugar del registro académico apropiado"
+          ],
+          "professorTip": "El secreto de una reseña excepcional está en mostrar que conoces el campo académico. Cuando escribas 'Aunque el análisis de X es valioso, no considera los hallazgos recientes de Y y Z que cuestionan esta perspectiva', estás demostrando que no solo leíste un texto, sino que entiendes el panorama completo de investigación. Esa es la diferencia entre un estudiante y un futuro investigador.",
+          "applyToYourWork": "EJERCICIO PRÁCTICO INMEDIATO: Toma un artículo clave de tu marco teórico y escribe solo el primer párrafo de una reseña crítica. Debe enganchar, contextualizar y adelantar tu valoración en máximo 100 palabras. Luego pregúntate: ¿Un experto en mi área se sentiría intrigado por seguir leyendo? Si la respuesta es no, reescribe hasta que lo sea. Este párrafo es tu carta de presentación como investigador."
+        }
+      }
+    }
+  },
+  "coherencia": {
+    "title": "Coherencia",
+    "chapters": {
+      "fluir-bien": {
+        "id": "fluir-bien",
+        "title": "Coherencia y Cohesión",
+        "topics": [
+          "Coherencia: la unidad temática de tu texto",
+          "Cohesión: los mecanismos que conectan las ideas",
+          "Tipos de conectores: aditivos, adversativos, causales, temporales",
+          "Progresión temática: tema-rema y sus variantes",
+          "Detectar y corregir problemas de coherencia"
+        ],
+        "duration": 14,
+        "content": {
+          "introduction": "Imagina que tu lector es un detective siguiendo las pistas de tu argumentación. Si esas pistas no lo llevan claramente de un punto al siguiente, abandonará el caso. La coherencia es exactamente eso: el hilo conductor que permite que tus ideas fluyan de manera lógica y comprensible. En este módulo, no solo aprenderás qué es la coherencia, sino que dominarás las técnicas específicas para construir textos académicos que mantengan a tu lector enganchado desde la primera línea hasta la conclusión.",
+          "sections": [
+            {
+              "title": "¿Qué es la coherencia y cómo detectar cuando tu texto la pierde?",
+              "content": "La coherencia es la cualidad que hace que tu texto se lea como una conversación inteligente, no como ideas sueltas pegadas con cinta adhesiva. Pero aquí está el problema: cuando escribes, tú sabes lo que quieres decir, así que tu cerebro 'rellena' automáticamente los vacíos lógicos. Por eso, muchos estudiantes entregan trabajos que para ellos tienen sentido, pero que para el profesor son un laberinto sin salida.\n\n¿Cómo detectar si tu texto pierde coherencia? Aplica la 'prueba del extraño': dale tu texto a alguien que no conozca el tema. Si se confunde o hace preguntas como '¿cómo llegaste a esa conclusión?' o '¿qué tiene que ver esto con lo anterior?', tu texto tiene problemas de coherencia.\n\nLa coherencia opera en tres niveles que debes dominar:\n\n1. **Coherencia global**: Tu texto completo debe responder a una pregunta central y cada capítulo debe contribuir a esa respuesta. Si tu TFG habla de marketing digital, no puedes dedicar tres páginas a la historia general del comercio sin conectarlo claramente con tu tema.\n\n2. **Coherencia local**: Cada párrafo debe desarrollar una idea específica que se relacione lógicamente con el anterior y el siguiente. Piensa en cada párrafo como un escalón: debe estar firmemente conectado al anterior para que puedas subir al siguiente.\n\n3. **Coherencia lineal**: Cada oración dentro del párrafo debe seguir naturalmente a la anterior. No saltes de idea en idea como un conejo asustado.\n\nUn truco práctico: lee tu texto en voz alta. Cuando encuentres un punto donde piensas '¿eh?, ¿cómo llegué aquí?', marca ese lugar. Ahí perdiste la coherencia.\n\nLa coherencia también significa ser consistente con tu nivel de formalidad, tu terminología y tu perspectiva. Si empiezas escribiendo en tercera persona ('el investigador considera que...'), no cambies repentinamente a primera persona ('yo creo que...'). Si defines un término de una manera, úsalo consistentemente a lo largo del texto.",
+              "example": "**Ejemplo de párrafo coherente en una introducción de TFG sobre redes sociales:**\n\n'La transformación de las redes sociales de espacios de interacción personal a plataformas de marketing empresarial ha generado nuevos desafíos en la gestión de la privacidad de los usuarios. Este cambio de paradigma no solo afecta la manera en que las empresas recolectan datos, sino que también modifica las expectativas de privacidad de los consumidores digitales. El presente estudio analiza cómo estas dinámicas contradictorias impactan en la confianza del usuario hacia las marcas en el entorno digital español durante el período 2020-2023.'\n\n**¿Por qué funciona?** Cada oración conecta lógicamente con la siguiente: transformación → desafíos → cambio de paradigma → expectativas → estudio específico. No hay saltos temáticos ni información irrelevante."
+            },
+            {
+              "title": "Técnicas infalibles para construir coherencia paso a paso",
+              "content": "Construir coherencia no es magia, es técnica. Aquí tienes el sistema que uso con mis estudiantes para transformar textos caóticos en argumentaciones sólidas:\n\n**Técnica 1: La regla de la cadena lógica**\nAntes de escribir cualquier párrafo, hazte estas tres preguntas: ¿Qué estableció el párrafo anterior? ¿Qué nueva información aporto aquí? ¿Cómo preparo el párrafo siguiente? Si no puedes responder claramente, tu párrafo será un huérfano en medio del texto.\n\n**Técnica 2: El mapeado de conectores**\nLos conectores no son decoración, son GPS para tu lector. Pero usar 'además' cuando deberías usar 'sin embargo' es como dar direcciones equivocadas. Aquí tienes la guía de uso real:\n- 'Asimismo' / 'Del mismo modo': cuando das un ejemplo similar o refuerzas la idea anterior\n- 'No obstante' / 'Sin embargo': cuando introduces una limitación o contraste\n- 'Por consiguiente' / 'En consecuencia': cuando muestras resultado o efecto\n- 'Cabe destacar que': cuando introduces información especialmente relevante\n\n**Técnica 3: La estructura de problema-desarrollo-cierre**\nCada párrafo académico necesita esta estructura:\n- **Oración problema**: Presenta la idea central del párrafo\n- **Oraciones desarrollo**: Explican, ejemplifican o argumentan esa idea\n- **Oración cierre**: Conecta con el siguiente párrafo o refuerza la idea central\n\n**Técnica 4: La revisión de 'palabras clave'**\nIdentifica las 5-7 palabras clave de tu trabajo. Estas deben aparecer distribuidas a lo largo del texto, creando una red semántica que mantiene la unidad temática. Si en tu TFG sobre 'inteligencia artificial en educación' no aparecen consistentemente ambos términos, tu texto se dispersará.\n\n**Técnica 5: El test de los títulos**\nEscribe un título de 5-8 palabras para cada párrafo. Luego, léelos en secuencia. ¿Cuentan una historia lógica? ¿Hay saltos inexplicables? Esta técnica revela inmediatamente los problemas de coherencia global.\n\n**Técnica 6: La técnica del 'zoom'**\nAlterna entre párrafos de 'zoom out' (contexto general, panorama amplio) y 'zoom in' (detalles específicos, ejemplos concretos). Esta variación mantiene el interés y ayuda a la comprensión, pero siempre dentro de tu línea argumentativa principal.\n\nRecuerda: la coherencia se construye en la reescritura, no en el primer borrador. Tu primera versión será siempre caótica porque tu cerebro está explorando ideas. La coherencia aparece cuando revisas, reorganizas y pulés.",
+              "example": "**Antes (sin coherencia):**\n'Las redes sociales tienen millones de usuarios. Facebook cambió sus políticas de privacidad en 2021. Los jóvenes prefieren Instagram. La privacidad es importante para las empresas. Los datos se venden a terceros.'\n\n**Después (con técnicas de coherencia):**\n'El crecimiento exponencial de usuarios en redes sociales ha intensificado las preocupaciones sobre privacidad digital. En este contexto, la modificación de las políticas de privacidad de Facebook en 2021 ejemplifica cómo las plataformas adaptan sus estrategias de recolección de datos. Sin embargo, esta adaptación genera una paradoja: mientras las empresas necesitan información de usuarios para personalizar servicios, los consumidores—especialmente los jóvenes usuarios de Instagram—demandan mayor control sobre sus datos personales.'\n\n**¿Qué cambió?** Usé conectores específicos ('En este contexto', 'Sin embargo'), creé relaciones causales claras, y unifiqué toda la información bajo un tema central: la tensión entre uso de datos y privacidad."
+            }
+          ],
+          "keyTakeaways": [
+            "Aplica la 'prueba del extraño': si alguien ajeno al tema no entiende tu texto, tienes problemas de coherencia",
+            "Usa la regla de tres preguntas por párrafo: ¿qué estableció el anterior?, ¿qué aporto aquí?, ¿cómo preparo el siguiente?",
+            "Los conectores son GPS para tu lector: 'además' suma, 'sin embargo' contrasta, 'por tanto' concluye",
+            "Cada párrafo necesita problema-desarrollo-cierre, no solo información suelta",
+            "Identifica tus 5-7 palabras clave y distribúyelas consistentemente por todo el texto",
+            "La coherencia se construye en la reescritura, no en el primer borrador"
+          ],
+          "commonMistakes": [
+            "Usar conectores al azar ('además' cuando debería ser 'sin embargo')",
+            "Escribir párrafos que no se conectan lógicamente con el anterior ni el siguiente",
+            "Cambiar de registro (formal/informal) o perspectiva (primera/tercera persona) sin razón",
+            "Incluir información relevante pero que no contribuye al argumento central",
+            "No revisar si cada párrafo aporta algo nuevo o solo repite ideas anteriores",
+            "Asumir que el lector conoce el contexto de tus ideas sin explicar las conexiones"
+          ],
+          "professorTip": "Aquí tienes mi truco de 20 años corrigiendo tesis: imprime tu texto, recorta cada párrafo por separado y mézclalos. Luego intenta reordenarlos sin mirar el original. Si no puedes, tu texto no tiene coherencia suficiente. Los párrafos coherentes contienen pistas claras sobre su lugar en la argumentación general.",
+          "applyToYourWork": "Toma el capítulo que estás escribiendo ahora. Subraya la primera oración de cada párrafo y léelas en secuencia, ignorando el resto. ¿Cuentan una historia lógica? ¿Hay saltos que confundirían a tu lector? Donde encuentres un salto, ahí necesitas un párrafo de transición o mejor conexión. Este ejercicio te tomará 10 minutos y puede salvar tu calificación."
+        }
+      }
+    }
+  },
+  "estilo": {
+    "title": "Estilo",
+    "chapters": {
+      "tono-academico": {
+        "id": "tono-academico",
+        "title": "Estilo y Registro Académico",
+        "topics": [
+          "Características del registro académico formal",
+          "Objetividad e impersonalidad: cuándo usar \"se\" vs primera persona",
+          "Precisión léxica: evitar ambigüedades y vaguedades",
+          "Economía del lenguaje: decir más con menos",
+          "Errores de estilo frecuentes y cómo evitarlos"
+        ],
+        "duration": 13,
+        "content": {
+          "introduction": "La redacción académica es tu herramienta más poderosa para comunicar conocimiento con credibilidad. No se trata de impresionar con palabras complejas, sino de construir argumentos sólidos que convenzan a tu lector desde la primera línea. En este módulo, te guiaré paso a paso para transformar tu escritura en un texto que refleje el rigor de tu investigación. Cada técnica que aprenderás aquí puedes aplicarla inmediatamente a tu TFG o tesis.",
+          "sections": [
+            {
+              "title": "Características del Registro Académico Formal",
+              "content": "El registro académico se construye como una conversación intelectual entre expertos, donde cada palabra cuenta y cada frase debe aportar valor. Tu objetivo no es escribir de manera pomposa, sino comunicar ideas complejas con la precisión de un cirujano y la claridad de un buen profesor.\n\nEmpecemos con el vocabulario. Cada disciplina tiene su lenguaje técnico, pero esto no significa usar jerga innecesaria. En lugar de escribir 'las cosas que pasan en la economía', escribe 'los fenómenos económicos observados'. En vez de 'el problema es muy importante', utiliza 'esta problemática presenta implicaciones significativas para...' La diferencia está en la especificidad: cada término debe ser el más preciso posible para lo que quieres expresar.\n\nLa estructura sintáctica académica requiere equilibrio. Las oraciones deben ser lo suficientemente complejas para expresar ideas sofisticadas, pero no tanto que pierdan claridad. Observa esta progresión:\n\nVersión básica: 'Los estudiantes no rinden bien. Hay muchos factores. Algunos son sociales.'\nVersión académica: 'El rendimiento académico estudiantil se ve influenciado por múltiples variables, entre las cuales los factores socioeconómicos presentan una correlación estadísticamente significativa.'\n\nPero cuidado con la versión sobrecargada: 'La performance académica de los educandos experimenta fluctuaciones debido a la multicausalidad de variables intervinientes de naturaleza socioeconómica que establecen correlaciones de significatividad estadística.' Esta última versión es académicamente pomposa, no rigurosa.\n\nUn truco práctico: lee tu texto en voz alta. Si te quedas sin aliento en una oración, probablemente sea demasiado larga. Si suena como si estuvieras hablando con un amigo en el café, necesitas mayor formalidad. El punto dulce está en el medio: suenas como un experto explicando su campo a otro experto.\n\nPara el tono neutro, elimina marcadores emocionales innecesarios. En lugar de 'es increíble que...', usa 'resulta notable que...'. En vez de 'obviamente', emplea 'como se puede observar'. Tu pasión por el tema debe transmitirse a través de la solidez de tus argumentos, no de adjetivos emotivos.",
+              "example": "Compara estos dos enfoques del mismo tema:\n\nVersión informal: 'Hoy en día todo el mundo usa redes sociales y eso está cambiando cómo nos comunicamos de una manera brutal.'\n\nVersión académica: 'El uso generalizado de las plataformas de redes sociales ha generado transformaciones sustanciales en los patrones de comunicación interpersonal, modificando tanto los códigos lingüísticos como las dinámicas de interacción social (Smith, 2023).'"
+            },
+            {
+              "title": "Objetividad e Impersonalidad",
+              "content": "La impersonalidad académica no significa borrar tu voz, sino canalizar tu autoridad intelectual a través de la evidencia y el análisis riguroso. Tu lector debe confiar en tus conclusiones porque están sólidamente fundamentadas, no porque tú se lo pidas.\n\nLa estrategia más efectiva es el 'se' impersonal, que funciona como un zoom que enfoca la acción o el proceso, no el actor. Observa estas transformaciones:\n\n'Yo analicé los datos durante tres meses' → 'Se analizaron los datos durante un período de tres meses'\n'Creo que estos resultados son importantes' → 'Estos resultados sugieren implicaciones significativas para...'\n'En mi opinión, la teoría de X es incorrecta' → 'Los hallazgos obtenidos cuestionan los postulados de la teoría de X'\n\nLa voz pasiva es tu aliada cuando quieres enfatizar el proceso o el resultado por encima del investigador. 'Realicé entrevistas a 30 participantes' se convierte en 'Se realizaron entrevistas semiestructuradas a 30 participantes'. La diferencia es sutil pero poderosa: el foco está en la metodología, no en ti.\n\nSin embargo, no abuses de la voz pasiva porque puede volver tu texto lento y confuso. Alterna entre construcciones impersonales y voz activa con sujetos académicos: 'Los datos revelan...', 'La evidencia sugiere...', 'Los resultados indican...'.\n\nCuando presentes tu propia contribución intelectual, puedes usar la primera persona del plural ('nosotros') o construcciones como 'el presente estudio', 'esta investigación'. Por ejemplo: 'En este trabajo se propone un modelo alternativo...' o 'Los resultados de esta investigación permiten concluir...'\n\nUn consejo práctico: cada vez que escribas 'yo pienso', 'creo', 'me parece', detente y pregúntate: ¿qué evidencia tengo para esta afirmación? Luego reformula: 'Los datos sugieren...', 'La evidencia indica...', 'Los resultados permiten inferir...'. Tu credibilidad no viene de tu opinión, sino de tu capacidad para interpretar evidencia.\n\nPara verificar tu nivel de objetividad, aplica la prueba del escéptico: ¿podría un lector inteligente pero crítico cuestionar esta afirmación? Si la respuesta es sí por falta de evidencia, refuerza tu argumento. Si es no porque está bien fundamentada, has logrado la objetividad académica.",
+              "example": "Observa cómo un mismo hallazgo se presenta con diferente nivel de objetividad:\n\nSubjetivo: 'Después de revisar las entrevistas, me di cuenta de que los participantes estaban claramente frustrados con el sistema.'\n\nObjetivo: 'El análisis de las transcripciones reveló un patrón recurrente de expresiones asociadas con frustración hacia el sistema institucional, evidenciado en el 78% de los participantes entrevistados.'"
+            }
+          ],
+          "keyTakeaways": [
+            "Sustituye verbos genéricos (hacer, tener, ser) por verbos específicos de tu disciplina",
+            "Cada oración debe aportar información nueva y verificable",
+            "Usa conectores lógicos (sin embargo, por tanto, en consecuencia) para construir argumentos sólidos",
+            "Reemplaza 'yo pienso/creo' por 'los datos sugieren/la evidencia indica'",
+            "Lee cada párrafo y pregúntate: ¿qué evidencia concreta estoy aportando aquí?"
+          ],
+          "commonMistakes": [
+            "Escribir 'como ya mencioné anteriormente' en lugar de referencias específicas",
+            "Usar 'obviamente' o 'claramente' cuando algo requiere demostración",
+            "Mezclar registro coloquial ('un montón de', 'súper importante') con académico",
+            "Construir párrafos sin oración temática clara",
+            "Presentar opiniones personales como si fueran conclusiones científicas"
+          ],
+          "professorTip": "Imagínate explicando tu investigación a un colega experto pero escéptico. Cada afirmación debe estar respaldada, cada conclusión debe seguirse lógicamente de la evidencia. Tu texto debe convencer por su rigor, no por su retórica.",
+          "applyToYourWork": "Toma el párrafo de introducción de tu trabajo actual. Subraya cada verbo genérico y sustitúyelo por uno específico. Identifica cada opinión personal y reformúlala como análisis basado en evidencia. Finalmente, lee el párrafo en voz alta: debe sonar como la explicación clara de un experto, no como una charla informal ni como un texto artificialmente complicado."
+        }
+      }
+    }
+  },
+  "revision": {
+    "title": "Revisión",
+    "chapters": {
+      "pulir-texto": {
+        "id": "pulir-texto",
+        "title": "Revisión y Edición",
+        "topics": [
+          "La importancia de la revisión en la escritura académica",
+          "Estrategias de autorrevision: leer en voz alta, dejar reposar",
+          "Checklist de revisión: contenido, estructura, estilo, formato",
+          "Errores ortográficos y gramaticales más frecuentes",
+          "Cuándo pedir feedback y cómo incorporarlo"
+        ],
+        "duration": 12,
+        "content": {
+          "introduction": "Te voy a enseñar algo que transformará completamente la calidad de tu TFG o tesis: cómo revisar como un verdadero profesional. La diferencia entre un trabajo que aprueba y uno que destaca no está en escribir más, sino en revisar mejor. Después de supervisar cientos de trabajos académicos, puedo asegurarte que los estudiantes que siguen un proceso sistemático de revisión obtienen calificaciones significativamente más altas. En las próximas líneas aprenderás las técnicas exactas que uso para transformar borradores ordinarios en textos académicos sólidos y convincentes.",
+          "sections": [
+            {
+              "title": "Estrategias de Autorrevisión Sistemática",
+              "content": "Aquí está la técnica que cambió mi forma de revisar textos académicos: el método de las 'cinco lecturas'. Cada lectura tiene un propósito específico y nunca debes mezclarlos, porque tu cerebro no puede procesar todo al mismo tiempo.\n\nPrimero, déjame contarte algo crucial: nunca revises el mismo día que escribes. Tu cerebro 'lee' lo que cree que escribió, no lo que realmente está en el papel. Espera mínimo 48 horas, idealmente una semana. Si tienes prisa, al menos duerme una noche antes de revisar.\n\nAhora, las cinco lecturas:\n\n**Primera lectura - Vista de pájaro:** Lee todo de corrido, sin detenerte. Pregúntate solo: '¿Este texto responde realmente a mi pregunta de investigación?' Si tu TFG pregunta sobre el impacto de las redes sociales en adolescentes, cada párrafo debe contribuir a responder eso. Marca con una X los párrafos que se desvían del tema.\n\n**Segunda lectura - Arquitectura argumentativa:** Aquí examinas la columna vertebral de tu texto. Escribe en una hoja aparte la idea principal de cada párrafo en una oración. Si no puedes resumir un párrafo en una oración clara, ese párrafo tiene problemas. Si las ideas no fluyen lógicamente de una a otra, necesitas reordenar o agregar transiciones.\n\n**Tercera lectura - Evidencia y fuentes:** Revisa cada afirmación que haces. Pregúntate: '¿Cómo sé que esto es verdad?' Si no tienes una cita que lo respalde, o es tu opinión personal sin fundamento académico, márcalo en rojo. En textos académicos, casi cada oración debe tener respaldo bibliográfico o ser una conclusión lógica derivada de evidencia previa.\n\n**Cuarta lectura - Claridad y precisión:** Lee cada oración y pregúntate: '¿Un estudiante de primer año de mi carrera entendería esto?' Si usas jerga innecesaria o construcciones rebuscadas, simplifícalas. La academia valora la precisión, no la complejidad artificial.\n\n**Quinta lectura - Detalles técnicos:** Solo aquí te ocupas de ortografía, puntuación y formato. Usa el corrector, pero no confíes ciegamente en él. Lee palabra por palabra, especialmente términos técnicos y nombres propios.",
+              "example": "Te muestro un párrafo real de una tesis sobre educación digital, antes y después de aplicar estas cinco lecturas:\n\n**Antes:** 'La implementación de tecnologías digitales en el ámbito educativo contemporáneo presenta múltiples desafíos y oportunidades que deben ser considerados desde una perspectiva holística e integral, tomando en cuenta diversos factores que influyen en el proceso de enseñanza-aprendizaje en la era digital actual.'\n\n**Después (tras las cinco lecturas):** 'La integración de herramientas digitales en las aulas genera tres desafíos principales: la brecha tecnológica entre estudiantes (Pérez, 2022), la resistencia docente al cambio (García & López, 2021) y la falta de infraestructura adecuada (Ministerio de Educación, 2023). Sin embargo, los estudios demuestran que cuando estos obstáculos se superan, el rendimiento académico mejora hasta un 23% (Silva et al., 2022).'\n\nNota cómo el párrafo revisado: 1) Elimina palabrería innecesaria, 2) Presenta datos específicos, 3) Incluye citas concretas, 4) Es más fácil de leer pero igualmente académico."
+            },
+            {
+              "title": "Checklist de Revisión Definitivo",
+              "content": "Después de años perfeccionando este proceso, he creado un checklist que uso con cada texto que reviso. No es solo una lista de verificación, es una hoja de ruta hacia la excelencia académica. Imprímelo y úsalo cada vez.\n\n**NIVEL 1: ESTRUCTURA GLOBAL (haz esto primero)**\n□ Mi introducción presenta claramente: problema → objetivos → hipótesis/pregunta → metodología → estructura del trabajo\n□ Cada capítulo tiene un propósito específico que puedo explicar en una oración\n□ Las conclusiones retoman directamente los objetivos planteados en la introducción\n□ El título refleja exactamente el contenido del trabajo\n□ Existe coherencia temporal: si escribo en presente sobre teorías actuales y en pasado sobre mi investigación\n\n**NIVEL 2: PÁRRAFOS Y ARGUMENTACIÓN (después del nivel 1)**\n□ Cada párrafo desarrolla UNA idea principal\n□ La primera oración de cada párrafo indica el tema a tratar\n□ Uso conectores apropiados entre oraciones: 'sin embargo', 'por tanto', 'además', 'en contraste'\n□ No hay párrafos de una sola oración (excepto transiciones)\n□ No hay párrafos de más de 8 oraciones (divídelos)\n□ Cada afirmación tiene respaldo: cita, dato, ejemplo o razonamiento lógico\n\n**NIVEL 3: FUENTES Y CITACIÓN (crucial para la credibilidad)**\n□ Todas las citas en el texto aparecen en las referencias finales\n□ Todas las referencias finales se citan en el texto\n□ Uso citas directas solo cuando las palabras exactas del autor son irreemplazables\n□ Las citas directas de más de 40 palabras están en párrafo independiente\n□ Diferencio claramente entre mis ideas y las de otros autores\n□ Uso fuentes actualizadas: mínimo 70% de los últimos 5 años\n□ Incluyo fuentes primarias, no solo libros de texto\n\n**NIVEL 4: LENGUAJE ACADÉMICO (pulir hasta brillar)**\n□ Evito contracciones: 'no es' en lugar de 'no es'\n□ Uso tercera persona: 'se observa' en lugar de 'observamos'\n□ Elimino muletillas: 'muy', 'bastante', 'un poco'\n□ Reemplazo verbos genéricos: 'realizar' → 'implementar', 'analizar', 'ejecutar'\n□ Uso vocabulario preciso de mi disciplina\n□ Evito repetir la misma palabra en párrafos consecutivos\n\n**NIVEL 5: FORMATO TÉCNICO (la presentación importa)**\n□ Márgenes, tipo de letra y espaciado según normas institucionales\n□ Numeración correcta de páginas, capítulos y subcapítulos\n□ Tablas y figuras numeradas y referenciadas en el texto\n□ Títulos y subtítulos con formato consistente\n□ Referencias en formato exacto según norma (APA, Vancouver, etc.)\n\nCada nivel debe completarse antes de pasar al siguiente. No intentes hacerlo todo en una sola sesión.",
+              "example": "Ejemplo de cómo aplicar el checklist a una introducción real:\n\n**ANTES DE CHECKLIST:**\n'Este trabajo habla sobre el estrés laboral. Es un problema muy importante hoy en día. Vamos a ver qué pasa con los empleados y como les afecta.'\n\n**DESPUÉS DE APLICAR CHECKLIST:**\n'El estrés laboral afecta al 68% de los trabajadores españoles, generando costes empresariales de 20.000 millones de euros anuales (INE, 2023). Esta investigación analiza la relación entre las demandas laborales excesivas y el síndrome de burnout en empleados del sector servicios. El objetivo principal es identificar factores predictores del estrés laboral para desarrollar estrategias preventivas específicas. Mediante un estudio cuantitativo con 340 participantes de cinco empresas madrileñas, se examinarán las variables: carga de trabajo, autonomía laboral y apoyo organizacional. El trabajo se estructura en cuatro capítulos: marco teórico, metodología, resultados y propuesta de intervención.'\n\nObserva cómo el párrafo revisado cumple todos los puntos del checklist: presenta el problema con datos, define objetivos claros, explica la metodología y anticipa la estructura."
+            }
+          ],
+          "keyTakeaways": [
+            "Aplica el método de cinco lecturas separadas: nunca revises todo al mismo tiempo",
+            "Espera mínimo 48 horas entre escribir y revisar para ganar objetividad",
+            "Usa el checklist por niveles: completa uno antes de pasar al siguiente",
+            "Lee tu texto en voz alta para detectar problemas de fluidez que el ojo no ve",
+            "Cada párrafo debe poder resumirse en una oración clara",
+            "Busca feedback de un compañero antes de la entrega final"
+          ],
+          "commonMistakes": [
+            "Revisar el mismo día que escribes: tu cerebro lee lo que 'cree' que escribió",
+            "Empezar revisando ortografía en lugar de estructura: es como pintar una casa con cimientos rotos",
+            "Confiar solo en el corrector automático: no detecta errores de coherencia ni precisión académica",
+            "No contrastar cada párrafo con tu pregunta de investigación: causa desviaciones del tema",
+            "Revisar todo al mismo tiempo: sobrecarga cognitiva que reduce la efectividad"
+          ],
+          "professorTip": "El secreto de una revisión profesional está en la paciencia y la metodología. He visto estudiantes transformar trabajos mediocres en excelentes simplemente aplicando este proceso sistemático. La clave no es revisar más veces, sino revisar de forma más inteligente. Recuerda: un texto bien revisado hace invisible el esfuerzo de escritura, permitiendo que el lector se concentre completamente en tus ideas.",
+          "applyToYourWork": "Toma el capítulo más importante de tu TFG o tesis (probablemente la introducción o el primer capítulo teórico) y aplica ahora mismo el método de cinco lecturas. Dedica 30 minutos a cada lectura, con descansos de 15 minutos entre cada una. Después usa el checklist nivel por nivel. Te garantizo que verás mejoras inmediatas y significativas en la calidad de tu texto."
+        }
+      }
+    }
+  },
+  "proyecto-final": {
+    "title": "Proyecto Final",
+    "chapters": {
+      "tu-primer-texto": {
+        "id": "tu-primer-texto",
+        "title": "Tu Primer Texto Académico",
+        "topics": [
+          "Checklist completo antes de entregar tu trabajo",
+          "Formato y presentación: márgenes, tipografía, espaciado",
+          "Los últimos retoques: portada, índice, anexos",
+          "Consejos de última hora de profesores y evaluadores",
+          "Recursos adicionales para seguir mejorando"
+        ],
+        "duration": 10,
+        "content": {
+          "introduction": "Llegamos al momento crucial de tu trabajo académico: la etapa final de preparación y revisión. Lo que harás en los próximos minutos puede marcar la diferencia entre un trabajo correcto y uno verdaderamente excelente. No se trata solo de cumplir requisitos, sino de presentar un documento que refleje tu rigor académico y profesionalismo.",
+          "sections": [
+            {
+              "title": "Checklist definitivo antes de entregar tu trabajo",
+              "content": "La revisión final no es un mero trámite, es tu última oportunidad para elevar la calidad de tu trabajo. Te voy a guiar a través de un sistema de revisión en cuatro etapas que he perfeccionado después de supervisar cientos de trabajos académicos.\n\n**Primera etapa: Coherencia argumentativa**\nImprime tu trabajo y lee cada párrafo en voz alta. Si te quedas sin aire antes de terminar una oración, está demasiado larga. Si un párrafo ocupa más de media página, divídelo. Ahora, toma un marcador y subraya la idea principal de cada párrafo. Si no puedes identificarla en los primeros 15 segundos, ese párrafo necesita reescritura.\n\nVerifica las transiciones entre párrafos usando esta técnica: lee la última oración del párrafo A y la primera del párrafo B. ¿Existe una conexión lógica? Si no, añade conectores como 'Por consiguiente', 'Sin embargo', 'De manera similar' o reescribe una de las oraciones.\n\n**Segunda etapa: Verificación de fuentes**\nAbre tu documento en una pantalla y tu lista de referencias en otra. Ve párrafo por párrafo verificando que cada afirmación que no sea de conocimiento común tenga su cita correspondiente. Usa la función 'Buscar' de tu procesador de texto para localizar cada autor de tu bibliografía en el cuerpo del texto. Si un autor aparece en la bibliografía pero no en el texto, elimínalo. Si aparece en el texto pero no en la bibliografía, añádelo inmediatamente.\n\n**Tercera etapa: Estructura y flujo**\nCrea un 'mapa' de tu trabajo escribiendo en una hoja separada el tema de cada párrafo en una sola línea. Este ejercicio te revelará si tu argumentación progresa lógicamente o si hay saltos conceptuales. Un trabajo bien estructurado debería leerse como una escalera: cada escalón (párrafo) te lleva naturalmente al siguiente.\n\n**Cuarta etapa: Precisión lingüística**\nElimina muletillas académicas innecesarias. Busca y reemplaza frases vagas como 'es importante mencionar que', 'cabe destacar que', 'resulta interesante que' por afirmaciones directas. Convierte la voz pasiva en activa siempre que sea posible: en lugar de 'fueron analizados los datos', escribe 'analizamos los datos'.",
+              "example": "**Ejemplo de párrafo ANTES de la revisión:**\n\n\"Es importante mencionar que la tecnología digital ha transformado de manera significativa los procesos educativos en las instituciones de educación superior, lo que ha generado nuevos desafíos y oportunidades que deben ser considerados por los administradores educativos y docentes.\"\n\n**El MISMO párrafo DESPUÉS de aplicar nuestras técnicas:**\n\n\"La transformación digital ha redefinido la educación superior en tres dimensiones fundamentales: la personalización del aprendizaje, la democratización del acceso al conocimiento y la necesidad de competencias digitales docentes (García-Ruiz, 2023). Esta investigación analiza cómo 15 universidades latinoamericanas han gestionado esta transición durante 2020-2023.\""
+            },
+            {
+              "title": "Formato y presentación impecable",
+              "content": "La presentación de tu trabajo es tu carta de presentación profesional. Un documento mal formateado distrae al lector de tu contenido y puede costarte puntos valiosos. Aquí te explico cómo conseguir una presentación impecable paso a paso.\n\n**Configuración básica que nunca falla**\nAbre tu procesador de texto y configura estos parámetros ANTES de hacer cualquier ajuste manual: márgenes de 2.5 cm en todos los lados, fuente Times New Roman 12pt para texto normal, interlineado 1.5, alineación justificada. Esta configuración es universalmente aceptada y facilita la lectura.\n\n**Jerarquía visual clara**\nTus títulos deben crear una jerarquía visual evidente. Usa el sistema de estilos de tu procesador (no formato manual): Título 1 en negrita, 14pt, centrado o alineado a la izquierda según tu institución; Título 2 en negrita, 12pt, alineado a la izquierda; Título 3 en negrita cursiva, 12pt. Nunca uses más de tres niveles de títulos en un trabajo de grado.\n\n**Paginación y numeración profesional**\nLa portada nunca se numera, pero sí cuenta. La página de contenidos, agradecimientos y resumen van con números romanos (i, ii, iii). El cuerpo del trabajo comienza con el número 1 arábigo. Coloca los números en la esquina superior derecha, fuente 10pt. Si tu trabajo supera las 100 páginas, incluye también el número de capítulo en el encabezado.\n\n**Tablas y figuras que suman puntos**\nCada tabla debe tener un número consecutivo y un título ANTES de la tabla: 'Tabla 1. Distribución de la muestra por género y edad'. Cada figura debe tener número y título DESPUÉS de la imagen: 'Figura 3. Evolución de matrículas 2019-2023'. Usa el mismo formato para todos: negrita para el número, normal para el título, tamaño 11pt.\n\n**Control de calidad final**\nAntes de enviar, exporta tu documento a PDF y ábrelo en otro dispositivo (tablet, otro ordenador). Los errores de formato son más visibles en un entorno diferente. Revisa especialmente las páginas donde termina un capítulo: evita que queden líneas huérfanas (una línea sola al final de la página) o viudas (una línea sola al inicio de la página).\n\n**Detalles que marcan la diferencia**\nLas citas largas (más de 40 palabras) van en párrafo aparte, con sangría de 1.25 cm a ambos lados, sin comillas, interlineado sencillo. Los números del 1 al 10 se escriben en letras, del 11 en adelante en cifras, excepto si inician una oración. Las referencias bibliográficas van con sangría francesa (primera línea sin sangría, siguientes con 1.25 cm).",
+              "example": "**Ejemplo de formato correcto para una tabla académica:**\n\n---\n\n**Tabla 2. Comparación de metodologías didácticas en educación superior**\n\n| Metodología | Participantes | Satisfacción (%) | Rendimiento académico | Significancia estadística |\n|-------------|---------------|------------------|----------------------|---------------------------|\n| Clase magistral | 124 | 68.2 | 7.3 ± 1.2 | - |\n| Aprendizaje activo | 118 | 84.7 | 8.1 ± 0.9 | p < 0.001 |\n| Método híbrido | 97 | 79.4 | 7.8 ± 1.1 | p < 0.05 |\n\n*Nota.* Los datos de rendimiento académico se presentan como media ± desviación estándar en escala de 0-10. La significancia se calculó respecto al grupo control (clase magistral).\n\n*Fuente:* Elaboración propia basada en López-Martínez et al. (2023).\n\n---\n\n**Ejemplo de cita larga correctamente formateada:**\n\n    La transformación de la educación superior trasciende lo meramente tecnológico para convertirse en un cambio paradigmático que afecta la esencia misma del proceso educativo. Como señala Castells (2019), esta transformación implica repensar no solo los medios, sino los fines de la educación universitaria en la sociedad del conocimiento. (p. 247)"
+            }
+          ],
+          "keyTakeaways": [
+            "Lee cada párrafo en voz alta para detectar problemas de fluidez y longitud",
+            "Crea un 'mapa' de tu trabajo escribiendo el tema de cada párrafo en una línea",
+            "Usa la función 'Buscar' para verificar que cada autor citado aparezca en la bibliografía",
+            "Configura los estilos de título en tu procesador antes de formatear manualmente",
+            "Exporta a PDF y revisa en otro dispositivo para detectar errores de formato",
+            "Elimina muletillas académicas y convierte voz pasiva en activa",
+            "Numera y titula consistentemente todas las tablas y figuras"
+          ],
+          "commonMistakes": [
+            "Párrafos que ocupan más de media página sin división lógica",
+            "Ausencia de conectores entre párrafos (por tanto, sin embargo, además)",
+            "Citas en el texto sin su correspondiente referencia bibliográfica",
+            "Uso de formato manual en lugar de estilos predefinidos",
+            "Tablas y figuras sin numeración consecutiva o títulos descriptivos",
+            "Mezcla de criterios de numeración (a veces en letras, a veces en cifras)",
+            "Referencias bibliográficas sin sangría francesa",
+            "Líneas huérfanas o viudas al final/inicio de página"
+          ],
+          "professorTip": "Imprime las primeras cinco páginas de tu trabajo y dáselas a un familiar para que las lea. Si te dice 'no entiendo de qué trata', tu introducción necesita reescritura. Un trabajo académico debe ser comprensible para un lector inteligente aunque no sea especialista en tu tema.",
+          "applyToYourWork": "Programa dos sesiones de revisión separadas por al menos 24 horas. En la primera, enfócate en contenido y estructura. En la segunda, en formato y detalles. Tu cerebro necesita ese descanso para detectar errores que antes pasó por alto. Usa la técnica del 'párrafo por párrafo': nunca revises más de 10 párrafos seguidos sin hacer una pausa."
+        }
+      }
+    }
+  },
+  "glosario": {
+    "title": "Glosario",
+    "chapters": {
+      "terminos-clave": {
+        "id": "terminos-clave",
+        "title": "Glosario de Términos Académicos",
+        "topics": [
+          "Términos de estructura: abstract, introducción, desarrollo, conclusión",
+          "Términos de citación: paráfrasis, cita textual, bibliografía, referencia",
+          "Términos de coherencia: cohesión, conectores, progresión temática",
+          "Términos de estilo: registro, objetividad, precisión léxica",
+          "Términos de evaluación: rúbrica, criterios, retroalimentación"
+        ],
+        "duration": 8,
+        "content": {
+          "introduction": "Este glosario reúne los términos fundamentales de la redacción académica que todo estudiante universitario debe dominar. Los conceptos están organizados por categorías temáticas para facilitar su consulta y comprensión durante el proceso de escritura de trabajos académicos.",
+          "categories": [
+            {
+              "name": "Estructura del Texto",
+              "terms": [
+                {
+                  "term": "Abstract",
+                  "definition": "Resumen conciso del trabajo académico que presenta el tema, metodología, resultados principales y conclusiones en 150-300 palabras.",
+                  "example": "El abstract de un TFG debe incluir el problema de investigación, la metodología empleada y los hallazgos más relevantes."
+                },
+                {
+                  "term": "Introducción",
+                  "definition": "Sección inicial que presenta el tema, justifica su relevancia, establece objetivos y anticipa la estructura del trabajo.",
+                  "example": "Una buena introducción debe captar el interés del lector y contextualizar el problema de investigación desde lo general a lo específico."
+                },
+                {
+                  "term": "Marco Teórico",
+                  "definition": "Sección que presenta y analiza las teorías, conceptos y estudios previos relevantes para fundamentar la investigación.",
+                  "example": "El marco teórico de una tesis sobre educación digital debe incluir teorías del aprendizaje y estudios sobre tecnología educativa."
+                },
+                {
+                  "term": "Metodología",
+                  "definition": "Apartado que describe detalladamente los métodos, técnicas e instrumentos utilizados para realizar la investigación.",
+                  "example": "La metodología debe especificar si se utilizó un enfoque cualitativo, cuantitativo o mixto, y justificar esta elección."
+                },
+                {
+                  "term": "Desarrollo",
+                  "definition": "Cuerpo principal del texto donde se exponen, analizan y discuten los argumentos e información relacionada con el tema.",
+                  "example": "El desarrollo de un ensayo académico debe presentar los argumentos de forma lógica y respaldados con evidencia."
+                },
+                {
+                  "term": "Conclusiones",
+                  "definition": "Sección final que sintetiza los hallazgos principales, responde a los objetivos planteados y sugiere líneas futuras de investigación.",
+                  "example": "Las conclusiones no deben introducir información nueva, sino integrar y evaluar lo expuesto en el desarrollo."
+                },
+                {
+                  "term": "Anexos",
+                  "definition": "Material complementario que apoya el texto principal pero que no es esencial para su comprensión (tablas, gráficos, encuestas, etc.).",
+                  "example": "Los cuestionarios completos utilizados en la investigación suelen incluirse como anexos al final del documento."
+                },
+                {
+                  "term": "Índice",
+                  "definition": "Lista organizada de los contenidos del documento con las páginas correspondientes, que facilita la navegación del texto.",
+                  "example": "El índice debe reflejar la estructura jerárquica del trabajo, diferenciando claramente entre capítulos, secciones y subsecciones."
+                },
+                {
+                  "term": "Epígrafe",
+                  "definition": "Título breve y descriptivo que encabeza cada sección o subsección del trabajo académico.",
+                  "example": "Los epígrafes deben ser informativos y específicos: 'Análisis de resultados' es mejor que simplemente 'Resultados'."
+                },
+                {
+                  "term": "Estado de la Cuestión",
+                  "definition": "Revisión crítica de la literatura existente sobre el tema que identifica vacíos de conocimiento y justifica la investigación.",
+                  "example": "El estado de la cuestión debe mostrar qué se ha investigado previamente y qué aspectos quedan por explorar."
+                }
+              ]
+            },
+            {
+              "name": "Citación y Referencias",
+              "terms": [
+                {
+                  "term": "Paráfrasis",
+                  "definition": "Reformulación de las ideas de otro autor con palabras propias, manteniendo el sentido original y citando la fuente.",
+                  "example": "Según García (2020), la educación virtual presenta desafíos metodológicos significativos para los docentes."
+                },
+                {
+                  "term": "Cita Textual",
+                  "definition": "Reproducción exacta de las palabras de otro autor, entrecomillada y con referencia específica a la fuente.",
+                  "example": "Como afirma Pérez (2019): 'La investigación cualitativa permite comprender fenómenos complejos desde la perspectiva de los participantes' (p. 45)."
+                },
+                {
+                  "term": "Bibliografía",
+                  "definition": "Lista completa de todas las fuentes consultadas y citadas en el trabajo, organizadas según un formato específico.",
+                  "example": "La bibliografía debe incluir todos los libros, artículos y recursos digitales mencionados en el texto, siguiendo APA, MLA u otro estilo."
+                },
+                {
+                  "term": "Plagio",
+                  "definition": "Apropiación indebida de ideas, palabras o trabajos ajenos sin reconocer la autoría correspondiente.",
+                  "example": "Copiar párrafos de internet sin citar la fuente constituye plagio y puede tener consecuencias académicas graves."
+                },
+                {
+                  "term": "Referencia",
+                  "definition": "Información bibliográfica completa de una fuente, que permite al lector localizar y verificar el material citado.",
+                  "example": "Una referencia APA incluye: Autor, A. A. (año). Título del trabajo. Editorial."
+                },
+                {
+                  "term": "Nota a Pie de Página",
+                  "definition": "Comentario explicativo o referencia bibliográfica ubicada en la parte inferior de la página.",
+                  "example": "Las notas al pie se utilizan para aclaraciones que interrumpirían el flujo del texto principal."
+                },
+                {
+                  "term": "Ibídem",
+                  "definition": "Expresión latina que significa 'en el mismo lugar', utilizada para referirse a la fuente citada inmediatamente antes.",
+                  "example": "Si se cita el mismo libro en dos notas consecutivas, se puede usar 'Ibídem' en la segunda."
+                },
+                {
+                  "term": "Op. cit.",
+                  "definition": "Abreviatura de 'opus citatum' (obra citada), utilizada para referenciar una obra ya mencionada anteriormente.",
+                  "example": "García, op. cit., p. 67, se usa cuando ya se citó completamente esa obra de García en una nota previa."
+                },
+                {
+                  "term": "Et al.",
+                  "definition": "Expresión latina que significa 'y otros', utilizada cuando una obra tiene múltiples autores.",
+                  "example": "En trabajos con más de tres autores, se cita el primero seguido de 'et al.': Martínez et al. (2021)."
+                },
+                {
+                  "term": "Fuente Primaria",
+                  "definition": "Documento o testimonio original que proporciona evidencia directa sobre el tema de investigación.",
+                  "example": "Los documentos históricos, entrevistas originales y datos experimentales son fuentes primarias."
+                }
+              ]
+            },
+            {
+              "name": "Coherencia y Cohesión",
+              "terms": [
+                {
+                  "term": "Conectores Lógicos",
+                  "definition": "Palabras o expresiones que establecen relaciones semánticas entre ideas, oraciones o párrafos.",
+                  "example": "Conectores como 'sin embargo', 'por tanto', 'además' y 'en consecuencia' articulan el discurso académico."
+                },
+                {
+                  "term": "Progresión Temática",
+                  "definition": "Desarrollo ordenado y lógico de las ideas a lo largo del texto, manteniendo la continuidad conceptual.",
+                  "example": "Una buena progresión temática evita saltos abruptos entre ideas y mantiene el hilo argumentativo."
+                },
+                {
+                  "term": "Cohesión Léxica",
+                  "definition": "Relación entre palabras del texto mediante sinónimos, hiperónimos, repeticiones y campos semánticos.",
+                  "example": "Usar 'estudiantes', 'alumnos' y 'discentes' en el mismo texto crea cohesión léxica por sinonimia."
+                },
+                {
+                  "term": "Anáfora",
+                  "definition": "Mecanismo de cohesión que consiste en hacer referencia a un elemento mencionado previamente en el texto.",
+                  "example": "El pronombre 'este' en 'Este fenómeno' refiere anafóricamente a un concepto explicado anteriormente."
+                },
+                {
+                  "term": "Catáfora",
+                  "definition": "Referencia a un elemento que aparecerá posteriormente en el texto.",
+                  "example": "'Lo siguiente es fundamental: la metodología debe ser rigurosa' - 'lo siguiente' anticipa la información que viene."
+                },
+                {
+                  "term": "Isotopía",
+                  "definition": "Recurrencia de elementos semánticos que dotan de coherencia temática al texto.",
+                  "example": "En un texto sobre educación, la isotopía se mantiene con términos como 'enseñanza', 'aprendizaje', 'pedagógico'."
+                },
+                {
+                  "term": "Párrafo de Transición",
+                  "definition": "Párrafo que conecta dos secciones del texto, resumiendo lo anterior e introduciendo lo siguiente.",
+                  "example": "'Después de analizar las causas del problema, examinaremos ahora las posibles soluciones.'"
+                },
+                {
+                  "term": "Marcadores Discursivos",
+                  "definition": "Elementos que organizan el discurso y guían la interpretación del lector sobre las relaciones entre ideas.",
+                  "example": "'En primer lugar', 'por un lado', 'finalmente' son marcadores que estructuran la argumentación."
+                },
+                {
+                  "term": "Elipsis",
+                  "definition": "Omisión de elementos del discurso que se sobreentienden por el contexto, evitando repeticiones innecesarias.",
+                  "example": "'Juan estudia medicina y María, derecho' - se omite 'estudia' en la segunda parte de la oración."
+                },
+                {
+                  "term": "Tema y Rema",
+                  "definition": "Estructura informativa donde el tema es la información conocida y el rema aporta información nueva.",
+                  "example": "'La educación online (tema) presenta nuevos desafíos pedagógicos (rema).'"
+                }
+              ]
+            },
+            {
+              "name": "Estilo Académico",
+              "terms": [
+                {
+                  "term": "Registro Formal",
+                  "definition": "Nivel de lengua caracterizado por el uso de vocabulario técnico, estructuras complejas y tono impersonal.",
+                  "example": "En lugar de 'creemos que', es preferible 'se considera que' o 'los datos sugieren que'."
+                },
+                {
+                  "term": "Objetividad",
+                  "definition": "Presentación imparcial de la información, evitando juicios de valor y opiniones personales no fundamentadas.",
+                  "example": "En lugar de 'es obvio que', usar 'los resultados indican que' o 'la evidencia sugiere que'."
+                },
+                {
+                  "term": "Precisión Léxica",
+                  "definition": "Uso exacto y específico del vocabulario, eligiendo términos que expresen con exactitud el concepto deseado.",
+                  "example": "Distinguir entre 'método', 'técnica' y 'procedimiento' según el contexto específico de la investigación."
+                },
+                {
+                  "term": "Concisión",
+                  "definition": "Expresión clara y directa de las ideas, eliminando palabras innecesarias sin perder precisión.",
+                  "example": "En lugar de 'debido al hecho de que', simplemente usar 'porque' o 'dado que'."
+                },
+                {
+                  "term": "Impersonalidad",
+                  "definition": "Evitación de referencias directas al autor mediante el uso de construcciones impersonales.",
+                  "example": "Preferir 'se observa que' o 'los datos muestran' en lugar de 'yo observé' o 'nosotros encontramos'."
+                },
+                {
+                  "term": "Modalización",
+                  "definition": "Expresión del grado de certeza o posibilidad mediante verbos, adverbios y expresiones modales.",
+                  "example": "'Posiblemente', 'es probable que', 'los datos sugieren' expresan diferentes grados de certeza."
+                },
+                {
+                  "term": "Nominalización",
+                  "definition": "Conversión de verbos y adjetivos en sustantivos para crear un estilo más formal y denso informativamente.",
+                  "example": "Transformar 'cuando se aplica' en 'la aplicación de' o 'analizar' en 'el análisis de'."
+                },
+                {
+                  "term": "Tecnolecto",
+                  "definition": "Vocabulario especializado de una disciplina académica o científica específica.",
+                  "example": "Términos como 'paradigma', 'epistemología' o 'hermenéutica' forman parte del tecnolecto académico."
+                },
+                {
+                  "term": "Hedging",
+                  "definition": "Estrategia discursiva para expresar cautela o incertidumbre en las afirmaciones académicas.",
+                  "example": "'Parece que', 'tiende a', 'en cierta medida' son expresiones de hedging que matizan las afirmaciones."
+                },
+                {
+                  "term": "Intertextualidad",
+                  "definition": "Relación explícita entre el texto propio y otros textos mediante citas, referencias y alusiones.",
+                  "example": "Un trabajo académico establece intertextualidad al dialogar con teorías y estudios previos sobre el tema."
+                }
+              ]
+            },
+            {
+              "name": "Tipos de Textos",
+              "terms": [
+                {
+                  "term": "Ensayo Académico",
+                  "definition": "Texto argumentativo que desarrolla un punto de vista personal sobre un tema, respaldado con evidencia académica.",
+                  "example": "Un ensayo sobre la influencia de las redes sociales en la educación debe presentar argumentos fundamentados en investigación."
+                },
+                {
+                  "term": "Artículo Científico",
+                  "definition": "Publicación que comunica resultados originales de investigación siguiendo un formato estandarizado.",
+                  "example": "Un artículo científico típicamente incluye resumen, introducción, metodología, resultados, discusión y conclusiones."
+                },
+                {
+                  "term": "Tesis Doctoral",
+                  "definition": "Investigación original y extensiva que contribuye al conocimiento en una disciplina específica.",
+                  "example": "Una tesis doctoral debe demostrar dominio del campo de estudio y aportar conocimiento nuevo y significativo."
+                },
+                {
+                  "term": "TFG (Trabajo de Fin de Grado)",
+                  "definition": "Proyecto académico que sintetiza y aplica los conocimientos adquiridos durante los estudios de grado.",
+                  "example": "Un TFG puede consistir en una investigación empírica, una revisión teórica o un proyecto de intervención."
+                },
+                {
+                  "term": "TFM (Trabajo de Fin de Máster)",
+                  "definition": "Trabajo de investigación más especializado que demuestra competencias avanzadas en el área de estudio.",
+                  "example": "Un TFM suele requerir mayor profundidad metodológica y teórica que un TFG."
+                },
+                {
+                  "term": "Reseña Crítica",
+                  "definition": "Texto que analiza y evalúa críticamente una obra académica, destacando sus contribuciones y limitaciones.",
+                  "example": "Una reseña de libro debe resumir el contenido, evaluar la metodología y situar la obra en su contexto académico."
+                },
+                {
+                  "term": "Monografía",
+                  "definition": "Estudio detallado y exhaustivo sobre un tema específico, basado en investigación documental.",
+                  "example": "Una monografía sobre la Guerra Civil española analizaría múltiples fuentes para ofrecer una visión comprehensiva."
+                },
+                {
+                  "term": "Informe de Investigación",
+                  "definition": "Documento que presenta los resultados de una investigación de manera sistemática y objetiva.",
+                  "example": "Un informe de investigación de mercado incluye metodología, hallazgos, análisis y recomendaciones."
+                },
+                {
+                  "term": "Paper",
+                  "definition": "Artículo académico breve que presenta resultados de investigación o reflexiones teóricas sobre un tema específico.",
+                  "example": "Un paper para un congreso académico suele tener entre 8-12 páginas y seguir un formato específico."
+                },
+                {
+                  "term": "Revisión Sistemática",
+                  "definition": "Síntesis rigurosa y exhaustiva de la literatura existente sobre un tema, siguiendo una metodología explícita.",
+                  "example": "Una revisión sistemática sobre efectividad de tratamientos debe incluir criterios de selección y análisis de calidad."
+                }
+              ]
+            },
+            {
+              "name": "Evaluación",
+              "terms": [
+                {
+                  "term": "Rúbrica",
+                  "definition": "Instrumento de evaluación que especifica criterios y niveles de desempeño para valorar trabajos académicos.",
+                  "example": "Una rúbrica para ensayos puede evaluar argumentación, uso de fuentes, estructura y expresión escrita."
+                },
+                {
+                  "term": "Criterios de Evaluación",
+                  "definition": "Estándares específicos utilizados para juzgar la calidad de un trabajo académico.",
+                  "example": "Los criterios pueden incluir originalidad, rigor metodológico, claridad expositiva y relevancia del tema."
+                },
+                {
+                  "term": "Retroalimentación",
+                  "definition": "Comentarios específicos sobre el trabajo del estudiante que orientan la mejora del desempeño académico.",
+                  "example": "La retroalimentación efectiva señala fortalezas y áreas de mejora con sugerencias concretas."
+                },
+                {
+                  "term": "Evaluación Formativa",
+                  "definition": "Valoración continua del proceso de aprendizaje que permite ajustar y mejorar el trabajo en desarrollo.",
+                  "example": "La revisión de borradores y la discusión de avances constituyen evaluación formativa."
+                },
+                {
+                  "term": "Evaluación Sumativa",
+                  "definition": "Valoración final del producto académico terminado para asignar una calificación.",
+                  "example": "La defensa de tesis es un ejemplo de evaluación sumativa que determina la aprobación del trabajo."
+                },
+                {
+                  "term": "Peer Review",
+                  "definition": "Proceso de evaluación por pares académicos que valoran la calidad de trabajos de investigación.",
+                  "example": "Los artículos científicos pasan por peer review antes de ser publicados en revistas especializadas."
+                },
+                {
+                  "term": "Originalidad",
+                  "definition": "Grado de novedad y aportación personal que presenta un trabajo académico respecto al conocimiento existente.",
+                  "example": "La originalidad se evalúa considerando el planteamiento del problema, la metodología y las conclusiones."
+                },
+                {
+                  "term": "Rigor Académico",
+                  "definition": "Aplicación sistemática y precisa de métodos de investigación y normas académicas establecidas.",
+                  "example": "El rigor académico se evidencia en la fundamentación teórica, metodología apropiada y análisis consistente."
+                },
+                {
+                  "term": "Autoría",
+                  "definition": "Reconocimiento de la responsabilidad intelectual sobre un trabajo académico y sus contribuciones específicas.",
+                  "example": "En trabajos colaborativos, se debe especificar la contribución de cada autor claramente."
+                },
+                {
+                  "term": "Defensa Oral",
+                  "definition": "Presentación y argumentación oral del trabajo académico ante un tribunal evaluador.",
+                  "example": "La defensa de tesis incluye exposición del trabajo, respuesta a preguntas y discusión con el tribunal."
+                }
+              ]
+            }
+          ],
+          "tip": "Utiliza este glosario como referencia constante durante tu proceso de escritura. Marca los términos que te resulten más desafiantes y revísalos regularmente para incorporarlos gradualmente a tu vocabulario académico activo."
+        }
+      }
+    }
+  }
+}

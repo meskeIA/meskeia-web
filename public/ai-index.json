@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 151,
-  "updated": "2025-12-08",
+  "total_tools": 152,
+  "updated": "2025-12-09",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -135,7 +135,8 @@
         { "name": "Curso de Empresa Familiar", "slug": "curso-empresa-familiar", "url": "https://meskeia.com/curso-empresa-familiar/", "description": "Gestión de empresas familiares: gobierno, sucesión, profesionalización" },
         { "name": "Curso de Negociación Exitosa", "slug": "curso-negociacion", "url": "https://meskeia.com/curso-negociacion/", "description": "Domina BATNA, ZOPA, tácticas de persuasión y cierre de acuerdos" },
         { "name": "Curso de Pensamiento Sistémico", "slug": "curso-pensamiento-sistemico", "url": "https://meskeia.com/curso-pensamiento-sistemico/", "description": "Aprende a entender el mundo como sistemas interconectados: redes, retroalimentación, emergencia, antifragilidad. 20 capítulos" },
-        { "name": "Curso de Estrategia Empresarial", "slug": "curso-estrategia-empresarial", "url": "https://meskeia.com/curso-estrategia-empresarial/", "description": "Pensamiento estratégico para la era de la incertidumbre: Porter actualizado, nuevos moats, experimentación vs planificación. 10 capítulos" }
+        { "name": "Curso de Estrategia Empresarial", "slug": "curso-estrategia-empresarial", "url": "https://meskeia.com/curso-estrategia-empresarial/", "description": "Pensamiento estratégico para la era de la incertidumbre: Porter actualizado, nuevos moats, experimentación vs planificación. 10 capítulos" },
+        { "name": "Curso de Redacción Académica", "slug": "curso-redaccion-academica", "url": "https://meskeia.com/curso-redaccion-academica/", "description": "Guía práctica para escribir textos académicos: TFG, TFM, tesis, artículos. Citas APA, coherencia, estilo. 13 capítulos" }
       ]
     },
     {

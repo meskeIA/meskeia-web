@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 153+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 154+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 153,
-  "last_updated": "2025-12-08",
+  "total_tools": 154,
+  "last_updated": "2025-12-09",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 13
+      "tool_count": 14
     },
     {
       "id": "impuestos",
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 60
+      "tool_count": 61
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 45
+      "tool_count": 46
     },
     {
       "id": "casa",
@@ -1869,6 +1869,33 @@
         "autenticacion"
       ],
       "icon": "🔐"
+    },
+    {
+      "slug": "curso-redaccion-academica",
+      "name": "Curso de Redacción Académica",
+      "url": "https://meskeia.com/curso-redaccion-academica/",
+      "description": "Guía práctica para escribir textos académicos: estructura tu TFG, TFM, tesis o artículo con pautas aplicables desde el primer día. Citas APA, coherencia, estilo y más. 13 capítulos",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "redaccion academica",
+        "tfg",
+        "tfm",
+        "tesis",
+        "articulo cientifico",
+        "citas apa",
+        "bibliografia",
+        "abstract",
+        "introduccion",
+        "conclusiones",
+        "coherencia",
+        "estilo academico",
+        "escritura"
+      ],
+      "icon": "📝"
     },
     {
       "slug": "simulador-irpf",
