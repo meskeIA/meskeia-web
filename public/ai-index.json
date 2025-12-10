@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 153,
-  "updated": "2025-12-09",
+  "total_tools": 154,
+  "updated": "2025-12-10",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -151,7 +151,8 @@
         { "name": "Calculadora de Sucesiones - Cataluña", "slug": "calculadora-sucesiones-cataluna", "url": "https://meskeia.com/calculadora-sucesiones-cataluna/", "description": "Impuesto de sucesiones normativa catalana" },
         { "name": "Calculadora de Sucesiones - Nacional", "slug": "calculadora-sucesiones-nacional", "url": "https://meskeia.com/calculadora-sucesiones-nacional/", "description": "Impuesto de sucesiones 14 CCAA" },
         { "name": "Calculadora Plusvalías IRPF", "slug": "calculadora-plusvalias-irpf", "url": "https://meskeia.com/calculadora-plusvalias-irpf/", "description": "IRPF de plusvalías: acciones, fondos, cripto" },
-        { "name": "Guía Tramitación Herencias", "slug": "guia-tramitacion-herencias", "url": "https://meskeia.com/guia-tramitacion-herencias/", "description": "Guía paso a paso: checklist documentos, orden gestiones, plazos y costes notaría/registro" }
+        { "name": "Guía Tramitación Herencias", "slug": "guia-tramitacion-herencias", "url": "https://meskeia.com/guia-tramitacion-herencias/", "description": "Guía paso a paso: checklist documentos, orden gestiones, plazos y costes notaría/registro" },
+        { "name": "Herencias Paso a Paso", "slug": "herencias-paso-a-paso", "url": "https://meskeia.com/herencias-paso-a-paso/", "description": "Curso práctico de 9 capítulos para gestionar una herencia en España: primeros pasos, herederos, impuestos y trámites finales. Incluye glosario legal" }
       ]
     },
     {

@@ -1,0 +1,598 @@
+{
+  "primeros-pasos": {
+    "title": "Primeros Pasos",
+    "chapters": {
+      "que-hacer-primero": {
+        "id": "que-hacer-primero",
+        "title": "¿Qué Hacer en los Primeros Días?",
+        "topics": [
+          "Las primeras 48 horas tras el fallecimiento",
+          "Documentos urgentes a obtener",
+          "Certificado de defunción",
+          "A quién avisar y en qué orden"
+        ],
+        "duration": 10,
+        "linkedTools": [],
+        "content": {
+          "introduction": "Perder a un ser querido es doloroso, y enfrentarse a trámites burocráticos en estos momentos puede resultar abrumador. Este capítulo te guiará paso a paso por las primeras acciones necesarias tras un fallecimiento, para que sepas exactamente qué hacer y en qué orden, permitiéndote centrarte en lo verdaderamente importante.",
+          "sections": [
+            {
+              "title": "Las primeras 48 horas: lo más urgente",
+              "content": "Cuando alguien fallece, el reloj comienza a correr para ciertos trámites legales. No te agobies: tienes tiempo suficiente, pero es importante conocer las prioridades. En primer lugar, si el fallecimiento ocurre en casa, debes llamar al médico de cabecera o al 112 para que certifique la defunción. Si sucede en el hospital, el personal médico se encarga de esto automáticamente.\n\nDentro de las primeras 24 horas, necesitas contactar con una funeraria. Ellos te ayudarán con muchos trámites iniciales, pero recuerda que eres tú quien toma las decisiones. No te sientas presionado a contratar servicios adicionales si no los deseas. La funeraria puede ayudarte a obtener algunos documentos básicos, pero hay gestiones que solo puede hacer la familia.\n\nEs fundamental localizar cuanto antes el DNI del fallecido y, si existe, el testamento. Pregunta a familiares cercanos si saben dónde se guardaban estos documentos. Si no encuentras el testamento, no te preocupes: más adelante te explicaremos cómo averiguar si existe uno.",
+              "tip": "Haz una lista de las tareas urgentes y repártelas entre familiares cercanos. No tienes que gestionarlo todo tú solo, y delegar te ayudará a reducir el estrés."
+            },
+            {
+              "title": "El certificado de defunción: tu documento clave",
+              "content": "El certificado de defunción es el documento más importante que necesitarás para todos los trámites posteriores. Existen dos tipos: el certificado médico de defunción (que certifica la causa médica del fallecimiento) y el certificado literal de defunción del Registro Civil (el documento oficial que necesitas para las herencias).\n\nPara obtener el certificado literal, debes acudir al Registro Civil donde se inscribió la defunción, normalmente el del lugar donde ocurrió el fallecimiento. Necesitarás llevar tu DNI y, si eres familiar directo (cónyuge, hijos, padres, hermanos), podrás solicitarlo sin problemas. Si no eres familiar directo, necesitarás una autorización o poder notarial.\n\nPide varias copias desde el principio (recomendamos al menos 5-6 copias). Cada entidad que contactes (bancos, seguros, notario, etc.) te pedirá una copia, y si solo tienes una, tendrás que volver al Registro Civil múltiples veces. El coste por copia es mínimo (alrededor de 4 euros), pero te ahorrará muchas molestias posteriores.\n\nEl certificado literal contiene información esencial: datos personales del fallecido, fecha y lugar de defunción, estado civil y, muy importante, si estaba casado en régimen de gananciales o separación de bienes.",
+              "tip": "Solicita el certificado literal de defunción en papel oficial con código seguro de verificación. Algunos trámites no aceptan fotocopias, y este formato te garantiza que será válido en todas las gestiones."
+            },
+            {
+              "title": "A quién avisar y en qué orden de prioridad",
+              "content": "Una vez que tengas el certificado de defunción, es momento de avisar a las diferentes instituciones. Existe un orden lógico que te facilitará las gestiones posteriores. Primero, contacta con el banco principal del fallecido. Necesitan saber del fallecimiento para bloquear las cuentas y evitar problemas. Lleva el certificado de defunción y tu DNI como familiar.\n\nSegundo, avisa a la compañía de seguros si el fallecido tenía seguro de vida o decesos. Estos seguros suelen tener plazos para reclamar, y es mejor iniciar el proceso cuanto antes. La mayoría de compañías tienen teléfonos gratuitos de atención 24 horas para estos casos.\n\nTercero, comunica el fallecimiento a Hacienda si el fallecido tenía obligaciones tributarias pendientes, y a la Seguridad Social para gestionar pensiones y prestaciones. La Seguridad Social también te informará sobre posibles pensiones de viudedad u orfandad.\n\nCuarto, contacta con empresas de suministros (luz, gas, agua, teléfono) para cambiar la titularidad o dar de baja los servicios. Algunos permiten hacerlo por teléfono, otros requieren acudir presencialmente.\n\nFinalmente, avisa a otros organismos como el ayuntamiento (para temas de IBI y tasas municipales), compañías de seguros de hogar y vehículos, y entidades donde el fallecido tuviera contratos o servicios activos.",
+              "warning": "No canceles inmediatamente todos los servicios del domicilio del fallecido. Si la vivienda va a tardar en venderse o heredarse, necesitarás mantener servicios básicos como luz y agua para conservarla en buen estado."
+            }
+          ],
+          "keyIdeas": [
+            "Las primeras 48 horas son cruciales, pero tienes tiempo suficiente si organizas las prioridades",
+            "El certificado literal de defunción es tu documento clave: solicita varias copias desde el principio",
+            "Contacta primero con bancos y seguros, después con administraciones públicas y por último con empresas de servicios",
+            "No tienes que gestionarlo todo solo: reparte tareas entre familiares y acepta ayuda"
+          ],
+          "reflectionQuestions": [
+            "¿Has localizado ya el DNI del fallecido y sabes dónde buscar un posible testamento?",
+            "¿Tienes claro cuál es el banco principal del fallecido y qué seguros tenía contratados?"
+          ],
+          "curiosity": "En España, el Registro Civil guarda los certificados de defunción durante 100 años. Después de este tiempo, se trasladan al Archivo Histórico Provincial, donde se conservan indefinidamente para futuras investigaciones genealógicas."
+        }
+      },
+      "existe-testamento": {
+        "id": "existe-testamento",
+        "title": "¿Existe Testamento?",
+        "topics": [
+          "Cómo averiguar si hay testamento",
+          "El certificado de últimas voluntades",
+          "Tipos de testamento: abierto, cerrado, ológrafo",
+          "Qué pasa si no hay testamento (abintestato)"
+        ],
+        "duration": 12,
+        "linkedTools": [],
+        "content": {
+          "introduction": "Una de las primeras dudas que surge cuando fallece un familiar es si dejó testamento o no. Esta información es fundamental porque determinará cómo se reparte la herencia y qué pasos debemos seguir. La buena noticia es que averiguarlo es más sencillo de lo que parece.",
+          "sections": [
+            {
+              "title": "Cómo averiguar si hay testamento",
+              "content": "Para saber si el fallecido hizo testamento, debes solicitar el Certificado de Últimas Voluntades en el Registro General de Actos de Última Voluntad. Este registro centraliza información sobre todos los testamentos otorgados en España desde 1944. Puedes pedirlo en cualquier Gerencia Territorial del Ministerio de Justicia, por correo postal o de forma online si tienes certificado digital. Necesitarás el certificado de defunción, tu DNI y pagar una tasa de unos 4 euros. Es importante esperar al menos 15 días desde el fallecimiento, ya que los notarios tienen ese plazo para comunicar al registro si se ha otorgado testamento. El certificado te dirá si existe testamento y ante qué notario se hizo, pero no el contenido del mismo. Si aparece testamento, deberás acudir a esa notaría con el certificado de defunción para obtener una copia autorizada y conocer las disposiciones del fallecido.",
+              "tip": "Guarda siempre el certificado de últimas voluntades original, incluso si no hay testamento, ya que lo necesitarás para tramitar la herencia intestada"
+            },
+            {
+              "title": "Tipos de testamento: entendiendo las diferencias",
+              "content": "En España existen tres tipos principales de testamento. El testamento abierto es el más común y sencillo: el testador declara su voluntad ante notario, quien redacta el documento y lo firma junto con el testador. Es como una conversación formal donde expresas tus deseos y el notario se encarga de darles forma legal. El testamento cerrado es menos frecuente: el testador entrega un sobre cerrado al notario declarando que contiene su testamento, pero el notario no conoce el contenido hasta el momento de la apertura tras el fallecimiento. Por último, el testamento ológrafo debe escribirse completamente a mano por el testador, fecharse y firmarse. Tras el fallecimiento, los herederos deben protocolizarlo ante notario en un plazo de cinco años. Este tipo genera más complicaciones porque hay que demostrar que la letra y firma son auténticas del fallecido, lo que puede requerir peritajes caligráficos y generar conflictos familiares.",
+              "tip": "Si encuentras un testamento manuscrito en casa, no lo manipules demasiado y acude cuanto antes a un notario para protocolizarlo, ya que tienes un plazo de 5 años que no se puede prorrogar"
+            },
+            {
+              "title": "Qué pasa si no hay testamento: la herencia intestada",
+              "content": "Cuando no existe testamento, se abre lo que se llama sucesión intestada o abintestato. En este caso, la ley determina quién hereda y en qué proporción, siguiendo un orden estricto. Primero heredan los hijos a partes iguales (y sus descendientes si algún hijo ha fallecido antes). Si no hay hijos, heredan los padres, y si no viven, los hermanos. El cónyuge superviviente tiene derecho a usufructo: puede usar y disfrutar los bienes pero no disponer libremente de ellos. Por ejemplo, si Juan fallece sin testamento dejando esposa e hijos, los hijos heredarán la propiedad pero la esposa tendrá derecho a vivir en la casa y usar los bienes hasta su fallecimiento. Si no hay familia directa, pueden heredar abuelos, tíos, primos, y en último caso, el Estado. El proceso es más complejo que cuando hay testamento porque requiere declaración de herederos abintestato ante notario, aportando documentos que prueben el parentesco y la inexistencia de otros herederos con mejor derecho.",
+              "warning": "La herencia intestada puede generar sorpresas: si no hay testamento, los hijos extramatrimoniales no reconocidos legalmente no heredan, pero sí pueden reclamar si demuestran la filiación"
+            }
+          ],
+          "keyIdeas": [
+            "El Certificado de Últimas Voluntades te dice si hay testamento y dónde se hizo",
+            "Hay tres tipos de testamento: abierto (ante notario), cerrado (sobre sellado) y ológrafo (manuscrito)",
+            "Si no hay testamento, la ley decide quién hereda siguiendo un orden: hijos, padres, hermanos...",
+            "El cónyuge superviviente tiene derecho a usufructo aunque no herede la propiedad"
+          ],
+          "reflectionQuestions": [
+            "¿Has solicitado ya el certificado de últimas voluntades del fallecido?",
+            "Si hay testamento manuscrito en casa, ¿sabes que tienes 5 años para protocolizarlo ante notario?"
+          ],
+          "curiosity": "En España, hasta 1944 no existía un registro centralizado de testamentos. Antes, cada notaría guardaba sus propios archivos, lo que hacía muy difícil localizar un testamento si no se sabía exactamente dónde se había hecho."
+        }
+      }
+    }
+  },
+  "herederos": {
+    "title": "Los Herederos",
+    "chapters": {
+      "quienes-heredan": {
+        "id": "quienes-heredan",
+        "title": "¿Quiénes Son los Herederos?",
+        "topics": [
+          "Herederos con testamento vs sin testamento",
+          "Orden de sucesión legal",
+          "La legítima: qué es y a quién corresponde",
+          "Derechos del cónyuge viudo"
+        ],
+        "duration": 12,
+        "linkedTools": [],
+        "content": {
+          "introduction": "Una de las primeras preguntas que surge cuando fallece un familiar es: ¿quién tiene derecho a heredar? Es normal sentirse confundido ante esta situación, especialmente cuando hay que tomar decisiones importantes en un momento emocionalmente difícil. La buena noticia es que la ley española tiene reglas claras que determinan quiénes son los herederos, y en este capítulo te ayudaremos a entenderlas de forma sencilla.",
+          "sections": [
+            {
+              "title": "Con Testamento vs Sin Testamento: Las Dos Situaciones Básicas",
+              "content": "La primera distinción fundamental es si el fallecido dejó testamento o no. Cuando hay testamento, el proceso es más claro porque la persona expresó por escrito cuáles eran sus deseos. Sin embargo, incluso con testamento, no todo vale: la ley protege a ciertos familiares cercanos reservándoles una parte de la herencia llamada 'legítima'.\n\nCuando no hay testamento, hablamos de 'sucesión intestada' o 'abintestato'. En este caso, la ley determina automáticamente quiénes son los herederos siguiendo un orden muy específico. Es como si la ley escribiera un testamento estándar basado en los lazos familiares más cercanos.\n\nImaginemos el caso de María, que falleció dejando un piso y algunos ahorros. Si María hizo testamento dejando todo a su hija Ana, esta será la heredera principal. Pero si María tenía más hijos, estos tendrán derecho a su parte legítima aunque el testamento no los mencione. Si María no hizo testamento y tenía dos hijos, Ana y Pedro, ambos heredarán por partes iguales automáticamente.",
+              "tip": "Si encuentras un testamento entre los documentos del fallecido, guárdalo en lugar seguro y comunícaselo inmediatamente al notario. Incluso si parece que te perjudica, es fundamental respetarlo y seguir el procedimiento legal."
+            },
+            {
+              "title": "El Orden de Sucesión Legal: Quién Hereda Cuando No Hay Testamento",
+              "content": "Cuando no hay testamento, la ley establece un orden de prelación muy lógico, basado en los vínculos familiares más estrechos. Es como una fila ordenada donde los primeros en la cola tienen preferencia absoluta sobre los que vienen después.\n\nPrimer lugar: Los descendientes (hijos, nietos, bisnietos...). Los hijos heredan por partes iguales, y si alguno ha fallecido, sus hijos (los nietos del fallecido) ocupan su lugar. Por ejemplo, si Juan tenía tres hijos pero uno falleció dejando dos nietos, la herencia se divide en tres partes: una para cada hijo vivo y una tercera parte que se reparte entre los dos nietos.\n\nSegundo lugar: Los ascendientes (padres, abuelos...), pero solo si no hay descendientes. Los padres heredan por partes iguales, y si solo vive uno, este hereda todo.\n\nTercer lugar: El cónyuge, cuando no hay descendientes ni ascendientes. Cuarto lugar: Los hermanos y sobrinos. Quinto lugar: Otros parientes hasta el cuarto grado (primos, tíos...). Si no hay ningún familiar hasta el cuarto grado, hereda el Estado.\n\nEs importante recordar que el cónyuge separado legalmente no hereda, pero el divorciado tampoco. Sin embargo, la pareja de hecho puede tener derechos según la legislación de cada comunidad autónoma.",
+              "tip": "Si no estás seguro del grado de parentesco que te une con el fallecido, haz un árbol genealógico sencillo. Esto te ayudará a determinar si tienes derechos hereditarios y te será útil cuando vayas al notario."
+            },
+            {
+              "title": "La Legítima: La Parte Sagrada de la Herencia",
+              "content": "La legítima es uno de los conceptos más importantes del derecho sucesorio español. Es la parte de la herencia que la ley reserva obligatoriamente a determinados familiares, sin importar lo que diga el testamento. Es decir, aunque el testamento diga otra cosa, estos familiares tienen derecho garantizado a su porción.\n\n¿Quiénes son los 'legitimarios'? En primer lugar, los hijos y descendientes, que tienen derecho a dos tercios de la herencia. Si no hay descendientes, los padres y ascendientes tienen derecho a la mitad de la herencia. El cónyuge viudo también tiene derechos legitimarios que varían según quién más concurra a la herencia.\n\nPongamos un ejemplo práctico: Pedro falleció dejando una herencia de 300.000 euros y un testamento en el que dejaba todo a una ONG. Sin embargo, Pedro tenía dos hijas. Las hijas tienen derecho a la legítima, que son dos tercios de 300.000 euros, es decir, 200.000 euros (100.000 euros para cada una). La ONG solo recibiría el tercio restante: 100.000 euros.\n\nEsto significa que nadie puede desheredar completamente a sus hijos o padres sin una causa muy grave y específica prevista en la ley. La legítima protege los vínculos familiares más estrechos y garantiza que la familia no quede desprotegida.",
+              "warning": "Si eres legitimario y el testamento no respeta tu legítima, no renuncies a tus derechos por desconocimiento. Tienes un plazo de 4 años desde la muerte para reclamar tu legítima. Consulta con un abogado especializado antes de firmar cualquier documento."
+            },
+            {
+              "title": "Derechos Especiales del Cónyuge Viudo",
+              "content": "El cónyuge viudo tiene una situación especial en las herencias españolas, con derechos que varían según quién más concurra a heredar. Estos derechos están pensados para proteger al viudo y garantizar que pueda mantener un nivel de vida digno tras la pérdida de su pareja.\n\nCuando concurre con hijos: el cónyuge viudo tiene derecho al usufructo (uso y disfrute) de un tercio de la herencia. Esto significa que puede vivir en la casa familiar, cobrar los alquileres de las propiedades, o recibir los intereses de los ahorros, pero no puede vender estos bienes. La propiedad será de los hijos.\n\nCuando concurre con padres del fallecido: el cónyuge viudo tiene derecho al usufructo de la mitad de la herencia. Cuando no hay ni descendientes ni ascendientes: el cónyuge hereda dos tercios de la herencia en plena propiedad, además del ajuar doméstico.\n\nPor ejemplo, si Ana enviudó y su marido dejó una casa valorada en 200.000 euros y dos hijos, Ana podrá seguir viviendo en la casa (usufructo de un tercio = 66.666 euros de valor), mientras que los hijos serán los propietarios. Si Ana quiere vender la casa, necesitará el acuerdo de los hijos.\n\nUn derecho adicional importante es el del ajuar doméstico: muebles, electrodomésticos, ropa, objetos personales... todo esto corresponde al cónyuge viudo sin que compute para el cálculo de la herencia.",
+              "tip": "Si eres cónyuge viudo, es recomendable hacer un inventario detallado del ajuar doméstico (muebles, electrodomésticos, objetos personales) al inicio del proceso. Estos bienes te corresponden automáticamente y no tienes que compartirlos con otros herederos."
+            }
+          ],
+          "keyIdeas": [
+            "Con testamento o sin él, siempre existen herederos con derechos garantizados por la ley (legitimarios)",
+            "Cuando no hay testamento, la ley establece un orden claro: primero hijos, luego padres, después cónyuge, hermanos, y otros parientes",
+            "La legítima es la parte de la herencia que no se puede quitar a ciertos familiares, sin importar lo que diga el testamento",
+            "El cónyuge viudo tiene derechos especiales de usufructo y derecho al ajuar doméstico completo"
+          ],
+          "reflectionQuestions": [
+            "¿Sabías si tu familiar fallecido había hecho testamento? ¿Has buscado entre sus documentos o preguntado a su notario habitual?",
+            "Según el orden de sucesión legal, ¿en qué posición te encuentras tú como posible heredero?",
+            "Si hay testamento, ¿crees que respeta la legítima de todos los legitimarios o podría haber problemas?"
+          ],
+          "curiosity": "En España, a diferencia de otros países como Reino Unido o Estados Unidos, no puedes desheredar completamente a tus hijos. Nuestro sistema de legítimas tiene raíces en el derecho romano y protege los vínculos familiares de forma muy estricta. Incluso los Reyes de España están sujetos a estas normas para sus herencias personales."
+        }
+      },
+      "aceptar-renunciar": {
+        "id": "aceptar-renunciar",
+        "title": "Aceptar o Renunciar a la Herencia",
+        "topics": [
+          "Diferencia entre aceptar y renunciar",
+          "Aceptación pura vs beneficio de inventario",
+          "Cuándo conviene renunciar",
+          "Plazos y formalidades"
+        ],
+        "duration": 10,
+        "linkedTools": [],
+        "content": {
+          "introduction": "Te han nombrado heredero y ahora te enfrentas a una decisión importante: ¿aceptar o renunciar a la herencia? Esta elección no es tan obvia como parece, y tomarla sin información puede traerte consecuencias inesperadas. Tranquilo, vamos a explicarte todo lo que necesitas saber para decidir con seguridad.",
+          "sections": [
+            {
+              "title": "Aceptar o renunciar: entendiendo las opciones",
+              "content": "Cuando eres heredero, la ley te da tres opciones principales. Primera opción: aceptar la herencia de forma pura y simple, lo que significa que recibes tanto los bienes como las deudas del fallecido, y responderás con tu propio patrimonio si las deudas superan los bienes. Segunda opción: aceptar a beneficio de inventario, donde solo respondes de las deudas hasta el valor de los bienes heredados, protegiendo tu patrimonio personal. Tercera opción: renunciar completamente a la herencia, rechazando tanto bienes como deudas.\n\nPiénsalo como si te ofrecieran una caja cerrada: la aceptación pura es cogerla sin mirar, el beneficio de inventario es abrirla primero para ver qué contiene antes de decidir si te quedas con todo, y renunciar es no coger la caja. Cada opción tiene sus ventajas e inconvenientes, y la decisión correcta depende de tu situación particular y del estado financiero de la herencia.",
+              "tip": "Nunca tomes esta decisión con prisas. Tienes derecho a solicitar un plazo para deliberar de hasta 30 días, durante el cual puedes investigar el verdadero estado de la herencia."
+            },
+            {
+              "title": "Cuándo conviene renunciar a una herencia",
+              "content": "Renunciar puede ser la decisión más inteligente en varias situaciones. Si el fallecido tenía más deudas que bienes, aceptar la herencia significaría que tú tendrías que pagar esas deudas con tu propio dinero. Por ejemplo, si heredas una casa valorada en 100.000 euros pero viene con deudas de 150.000 euros, al aceptar de forma pura quedarías debiendo 50.000 euros de tu bolsillo.\n\nTambién conviene renunciar cuando los gastos de tramitación superan el valor de los bienes, como ocurre a veces con propiedades muy deterioradas o con cargas importantes. Otros motivos válidos incluyen: evitar conflictos familiares irreconciliables, cuando no tienes medios económicos para afrontar los gastos del proceso, o simplemente cuando prefieres que otros herederos reciban tu parte.\n\nRecuerda que la renuncia es irrevocable: una vez que renuncias, no puedes cambiar de opinión. Tu parte se distribuirá entre los demás herederos o pasará a los siguientes en el orden de sucesión legal.",
+              "warning": "Ten cuidado con las deudas ocultas. Algunas deudas pueden no aparecer inmediatamente, como reclamaciones de Hacienda o deudas con entidades financieras que surgen después."
+            },
+            {
+              "title": "El beneficio de inventario: la opción más segura",
+              "content": "La aceptación a beneficio de inventario es como tener un seguro: puedes quedarte con los bienes pero tu responsabilidad por las deudas se limita al valor de lo heredado. Es la opción más prudente cuando no tienes claro el estado financiero real de la herencia.\n\nEl proceso requiere hacer un inventario detallado de todos los bienes y deudas ante notario. Aunque esto supone un coste adicional (normalmente entre 300-600 euros), te protege de sorpresas desagradables. Por ejemplo, si heredas bienes por valor de 80.000 euros pero aparecen deudas por 100.000 euros, solo responderás hasta los 80.000 euros del valor de los bienes, no del exceso.\n\nEsta modalidad es especialmente recomendable cuando el fallecido era empresario, tenía negocios o su situación financiera era compleja. También es útil cuando hay varios herederos y quieres evitar conflictos sobre quién debe pagar qué deudas. El inventario proporciona transparencia y seguridad jurídica para todos.",
+              "tip": "Si tienes la más mínima duda sobre las deudas del fallecido, elige siempre el beneficio de inventario. Es mejor pagar un poco más en notario que arriesgar tu patrimonio personal."
+            },
+            {
+              "title": "Plazos y trámites: cómo formalizar tu decisión",
+              "content": "La ley no establece un plazo fijo para aceptar o renunciar, pero sí hay situaciones que pueden presionarte. Cualquier persona con interés legítimo (otros herederos, acreedores) puede pedirte judicialmente que decidas en un plazo máximo de 30 días. Mientras no decidas, sigues siendo heredero con todas las consecuencias.\n\nLa aceptación puede ser expresa (firmando un documento) o tácita (comportándote como heredero, por ejemplo, vendiendo bienes de la herencia). La renuncia siempre debe ser expresa y hacerse ante notario o judicialmente. Cuesta aproximadamente entre 60-150 euros en notario.\n\nSi aceptas a beneficio de inventario, debes manifestarlo expresamente ante notario antes de hacer el inventario. Este inventario debe completarse en un plazo de 60 días prorrogables. Durante este período, no puedes disponer de los bienes salvo para gastos necesarios de conservación.\n\nRecuerda que si eres menor de edad o incapacitado, la decisión la tomará tu representante legal, pero necesitará autorización judicial para renunciar.",
+              "tip": "Documenta bien todos los pasos. Guarda copias de todos los documentos y mantén un registro de fechas, porque en las herencias los plazos son importantes y pueden tener consecuencias económicas."
+            }
+          ],
+          "keyIdeas": [
+            "Tienes tres opciones: aceptar pura y simplemente, aceptar a beneficio de inventario, o renunciar por completo",
+            "El beneficio de inventario limita tu responsabilidad por deudas al valor de los bienes heredados",
+            "Conviene renunciar cuando las deudas superan claramente a los bienes o cuando los gastos no compensan",
+            "La renuncia es irrevocable y debe hacerse siempre ante notario o judicialmente"
+          ],
+          "reflectionQuestions": [
+            "¿Conoces realmente la situación financiera de la persona fallecida y tienes información completa sobre posibles deudas?",
+            "¿Tienes capacidad económica para asumir los gastos de tramitación y posibles deudas ocultas que puedan aparecer?"
+          ],
+          "curiosity": "En España, puedes renunciar a una herencia incluso después de haberla aceptado, pero solo en casos muy excepcionales, como cuando aparecen testamentos posteriores desconocidos o se demuestra que la aceptación se hizo por error o engaño."
+        }
+      }
+    }
+  },
+  "inventario": {
+    "title": "El Inventario",
+    "chapters": {
+      "bienes-deudas": {
+        "id": "bienes-deudas",
+        "title": "Inventario de Bienes y Deudas",
+        "topics": [
+          "Qué incluir en el inventario",
+          "Cómo valorar los bienes",
+          "Investigar deudas del fallecido",
+          "El ajuar doméstico"
+        ],
+        "duration": 12,
+        "linkedTools": [
+          {
+            "name": "Guía Tramitación Herencias",
+            "url": "/guia-tramitacion-herencias/",
+            "icon": "📋",
+            "desc": "Checklist completo de documentos"
+          }
+        ],
+        "content": {
+          "introduction": "Hacer el inventario de una herencia puede parecer una tarea abrumadora, especialmente cuando estás lidiando con la pérdida de un ser querido. Sin embargo, es un paso fundamental que te permitirá conocer exactamente qué bienes y deudas forman parte de la herencia, y así tomar decisiones informadas sobre si aceptarla o no.",
+          "sections": [
+            {
+              "title": "Qué incluir en el inventario: Todo cuenta, aunque parezca poco",
+              "content": "El inventario debe incluir absolutamente todos los bienes y derechos que tenía el fallecido en el momento de su muerte. Esto significa que no solo debes anotar lo evidente como la casa, el coche o la cuenta del banco, sino también elementos que podrían pasar desapercibidos.\n\nEmpecemos por los bienes inmuebles: viviendas, locales, garajes, trasteros, parcelas o cualquier terreno. Aunque la casa esté hipotecada, sigue siendo parte del patrimonio. También incluye los bienes muebles: coches, motos, embarcaciones, joyas, obras de arte, antigüedades, electrodomésticos de valor, o incluso colecciones de monedas o sellos.\n\nNo olvides los bienes intangibles: cuentas bancarias, depósitos, acciones, bonos, participaciones en empresas, derechos de autor, patentes, o dinero que le debían al fallecido (por ejemplo, si había prestado dinero a alguien). También revisa si tenía seguros de vida, planes de pensiones o fondos de inversión.\n\nIncluso las pertenencias aparentemente sin valor pueden tener importancia legal o sentimental. Un consejo práctico: haz fotos de todo y guarda recibos, facturas o certificados que demuestren la propiedad de los bienes.",
+              "tip": "Revisa cajones, armarios y documentos personales. A menudo se encuentran pólizas de seguro olvidadas o cuentas bancarias en entidades diferentes a la principal."
+            },
+            {
+              "title": "Cómo valorar los bienes: El arte de poner precio justo",
+              "content": "Una vez que sepas qué hay en la herencia, necesitas darle un valor económico a cada bien. Esta valoración es crucial porque determinará el importe de los impuestos que tendrás que pagar y la parte que corresponde a cada heredero.\n\nPara los inmuebles, lo más recomendable es contratar a un tasador oficial. Aunque supone un coste (entre 300-600 euros normalmente), te dará una valoración objetiva y respaldada profesionalmente. También puedes consultar el valor catastral en la página web del Catastro, aunque ten en cuenta que suele ser inferior al valor real de mercado.\n\nLos vehículos se pueden valorar consultando páginas especializadas como Coches.net o pidiendo una tasación en un concesionario oficial de la marca. Para otros bienes como joyas, obras de arte o antigüedades, es necesario acudir a expertos o casas de subastas que emitan certificados de valoración.\n\nLas cuentas bancarias y inversiones tienen su valor a fecha de fallecimiento, que puedes solicitar al banco mediante un certificado de saldos. Para bienes cotidianos como muebles o electrodomésticos, puedes hacer una estimación razonable basándote en su estado y antigüedad, consultando precios de segunda mano en portales como Wallapop o Milanuncios.",
+              "tip": "Guarda todos los certificados de valoración y justificantes. Hacienda puede pedirte que demuestres cómo llegaste a esas cifras, especialmente si los valores parecen bajos."
+            },
+            {
+              "title": "Investigar deudas del fallecido: Lo que debes y no debes heredar",
+              "content": "Las deudas también se heredan, por eso es fundamental hacer una investigación exhaustiva antes de decidir si aceptar la herencia. Recuerda que si las deudas superan a los bienes, puedes renunciar a la herencia o aceptarla 'a beneficio de inventario'.\n\nComienza pidiendo un informe de la Central de Información de Riesgos del Banco de España (CIRBE), que te dirá si el fallecido tenía préstamos o créditos pendientes. También solicita certificados de deudas a Hacienda y a la Seguridad Social, ya que las deudas con las administraciones públicas son muy comunes.\n\nRevisa extractos bancarios de los últimos meses para identificar pagos recurrentes: recibos de luz, agua, gas, teléfono, seguros, comunidad de propietarios, préstamos personales o hipotecas. Contacta con estas empresas para conocer el saldo pendiente exacto.\n\nNo olvides deudas menos evidentes como multas de tráfico impagadas, deudas con particulares (que pueden aparecer en forma de pagarés o contratos), cuotas de colegios profesionales, o incluso deudas derivadas de ser avalista de terceros. Pregunta a familiares cercanos si conocían algún compromiso económico del fallecido.\n\nSi aparecen acreedores reclamando dinero después de aceptar la herencia, no entres en pánico. Tienes derecho a exigir que demuestren la existencia y legitimidad de la deuda.",
+              "warning": "Ten cuidado con acreedores que aparecen de forma inesperada reclamando cantidades muy altas sin documentación clara. Algunos intentan aprovecharse del desconocimiento de los herederos."
+            },
+            {
+              "title": "El ajuar doméstico: Esos objetos que también cuentan",
+              "content": "El ajuar doméstico incluye todos los bienes muebles de uso ordinario del hogar: muebles, ropa, electrodomésticos, libros, utensilios de cocina, productos de limpieza, y en general todo lo que servía para el uso personal y doméstico del fallecido.\n\nLa ley española establece que el ajuar doméstico se valora, salvo prueba en contrario, en el 3% del valor del resto de los bienes de la herencia. Esto significa que si la herencia vale 200.000 euros (sin contar el ajuar), automáticamente se añaden 6.000 euros más en concepto de ajuar doméstico.\n\nSin embargo, puedes demostrar que el ajuar vale menos del 3% si haces una relación detallada y valorada de todos los objetos. Esto puede merecer la pena si los muebles y enseres son antiguos, de poco valor, o si la casa estaba prácticamente vacía.\n\nPor el contrario, si hay objetos de especial valor (como joyas, obras de arte, antigüedades o colecciones), no forman parte del ajuar doméstico sino que deben inventariarse y valorarse por separado como bienes específicos.\n\nUn aspecto importante: el ajuar doméstico suele repartirse entre los herederos de común acuerdo, pero si hay conflictos, puede ser necesario hacer lotes o incluso vender los objetos y repartir el dinero. La ropa y objetos de uso muy personal normalmente se entregan a los familiares más cercanos sin valoración económica.",
+              "tip": "Si hay objetos con valor sentimental pero no económico, como fotos familiares o recuerdos personales, acordad su reparto antes de hacer el inventario oficial para evitar conflictos posteriores."
+            }
+          ],
+          "keyIdeas": [
+            "El inventario debe incluir todos los bienes y deudas, por pequeños que parezcan",
+            "Una valoración correcta te protege ante Hacienda y asegura un reparto justo",
+            "Las deudas también se heredan: investigarlas a fondo te evitará sorpresas desagradables",
+            "El ajuar doméstico se valora automáticamente al 3%, pero puedes demostrar un valor diferente"
+          ],
+          "reflectionQuestions": [
+            "¿Has revisado ya todos los documentos personales y correspondencia del fallecido en busca de bienes o deudas que podrían pasar desapercibidos?",
+            "¿Tienes claro qué bienes necesitan valoración profesional y cuáles puedes estimar tú mismo de forma razonable?"
+          ],
+          "curiosity": "En España, si encuentras dinero en efectivo guardado en casa del fallecido, legalmente forma parte de la herencia y debe declararse. Hacienda puede investigar el origen de cantidades importantes, especialmente si no coinciden con los ingresos declarados del fallecido en años anteriores."
+        }
+      }
+    }
+  },
+  "impuestos": {
+    "title": "Los Impuestos",
+    "chapters": {
+      "impuesto-sucesiones": {
+        "id": "impuesto-sucesiones",
+        "title": "El Impuesto de Sucesiones",
+        "topics": [
+          "Qué es y cuándo se paga",
+          "Plazos: los 6 meses críticos",
+          "Diferencias entre comunidades autónomas",
+          "Bonificaciones y reducciones principales"
+        ],
+        "duration": 15,
+        "linkedTools": [
+          {
+            "name": "Calculadora Sucesiones Nacional",
+            "url": "/calculadora-sucesiones-nacional/",
+            "icon": "🇪🇸",
+            "desc": "Calcula el impuesto en 14 CCAA"
+          },
+          {
+            "name": "Calculadora Sucesiones Cataluña",
+            "url": "/calculadora-sucesiones-cataluna/",
+            "icon": "🏴",
+            "desc": "Normativa específica catalana"
+          }
+        ],
+        "content": {
+          "introduction": "Si has heredado, además de la gestión emocional y familiar que conlleva esta situación, te enfrentas a obligaciones fiscales que pueden generar cierta preocupación. El Impuesto de Sucesiones es uno de los tributos más complejos del sistema español, pero entenderlo te ayudará a cumplir con tus obligaciones sin sorpresas desagradables.",
+          "sections": [
+            {
+              "title": "Qué es el Impuesto de Sucesiones y cuándo se paga",
+              "content": "El Impuesto de Sucesiones es el tributo que debes pagar cuando recibes bienes por herencia. Piénsalo como el 'peaje' que cobra Hacienda por el hecho de que unos bienes pasen del fallecido a ti. Este impuesto grava el valor de todo lo que heredas: la casa, el dinero del banco, las joyas, el coche, las acciones... todo cuenta.\n\nNo importa si quieres o no esos bienes; desde el momento en que el familiar fallece, la ley considera que has adquirido tu parte correspondiente de la herencia. Es como si fuera una compraventa automática donde el 'precio' que pagas es este impuesto.\n\nEl impuesto se calcula sobre el valor real de los bienes en el momento del fallecimiento, no sobre lo que costaron originalmente. Por ejemplo, si tu padre compró una casa por 60.000 euros en 1985, pero ahora vale 200.000 euros, el impuesto se calcula sobre los 200.000 euros actuales. Por eso es fundamental hacer una valoración correcta de todos los bienes de la herencia.",
+              "tip": "Guarda todos los documentos que demuestren el valor de los bienes heredados: tasaciones, facturas recientes, extractos bancarios. Te servirán tanto para calcular el impuesto como para justificarte ante Hacienda."
+            },
+            {
+              "title": "Los 6 meses críticos: plazos que no puedes ignorar",
+              "content": "Tienes exactamente 6 meses desde el fallecimiento para presentar y pagar el Impuesto de Sucesiones. Este plazo es inflexible y empieza a contar desde el día siguiente al fallecimiento, no desde que te enteres o desde que se haga el testamento.\n\nPor ejemplo, si tu familiar falleció el 15 de marzo, tienes hasta el 15 de septiembre para cumplir con Hacienda. Si el último día cae en festivo, se prorroga al siguiente día hábil, pero no te confíes.\n\n¿Qué pasa si no llegas a tiempo? Hacienda te aplicará recargos e intereses que pueden ser muy costosos. El recargo mínimo es del 5% si te retrasas hasta 3 meses, pero puede llegar al 20% si el retraso es mayor. Además, se añaden intereses de demora que se calculan día a día.\n\nSi prevés que no vas a llegar al plazo, puedes solicitar una prórroga de 6 meses más, pero debes pedirla dentro de los primeros 5 meses y pagar un interés del 5% anual. Es mucho más barato que el recargo por retraso, así que no dudes en solicitarla si la necesitas.",
+              "warning": "El plazo de 6 meses NO se detiene por estar tramitando la herencia o esperando documentos. Empieza a preparar la declaración desde el primer día, aunque no tengas todos los papeles completos."
+            },
+            {
+              "title": "Un país, diecisiete impuestos diferentes",
+              "content": "Aunque el Impuesto de Sucesiones es estatal, cada comunidad autónoma puede establecer sus propias bonificaciones, reducciones y tipos de gravamen. Esto significa que heredar en Madrid es completamente diferente a hacerlo en Andalucía o Cataluña.\n\nPor ejemplo, en Madrid existe una bonificación del 99% para cónyuges, descendientes y ascendientes, lo que significa que prácticamente no pagas impuesto. En cambio, en Andalucía las bonificaciones son menores y en Cataluña el sistema es diferente. Estas diferencias pueden suponer miles de euros de diferencia en el impuesto final.\n\n¿Qué comunidad autónoma aplica? Generalmente, donde tenía su residencia habitual el fallecido durante los últimos 5 años. Pero hay excepciones: si el heredero reside en el extranjero, se aplica la normativa estatal, que suele ser menos favorable.\n\nUn caso especial son los no residentes en España. Si heredas siendo residente en Francia, Reino Unido o cualquier otro país, las normas pueden ser diferentes y, en algunos casos, más gravosas. En estos casos es especialmente importante asesorarse bien.",
+              "tip": "Antes de calcular tu impuesto, averigua exactamente qué normativa te aplica. No asumas que será la de la comunidad donde están los bienes; puede que te corresponda otra más favorable."
+            },
+            {
+              "title": "Bonificaciones y reducciones que pueden aliviarte",
+              "content": "La ley establece varias reducciones que pueden disminuir significativamente tu impuesto, y es fundamental conocerlas para no pagar de más. Las más importantes son las reducciones por parentesco: los cónyuges e hijos menores de 21 años tienen reducciones de hasta 47.858 euros, los hijos mayores y cónyuges de 15.956 euros, y otros familiares cantidades menores.\n\nExiste una reducción especial muy importante para la vivienda habitual: si heredas la casa donde vivía el fallecido y mantienes la propiedad durante 10 años, puedes aplicar una reducción del 95% de su valor, hasta un máximo de 122.606 euros por heredero.\n\nPara empresas familiares y negocios, hay reducciones del 95% si cumples ciertos requisitos, como mantener la actividad empresarial durante 10 años. Esta reducción es clave para evitar que los herederos tengan que vender la empresa familiar para pagar impuestos.\n\nLas personas con discapacidad tienen reducciones adicionales que pueden llegar hasta 47.858 euros extra, dependiendo del grado de discapacidad. También hay reducciones por seguros de vida, pensiones y planes de jubilación, aunque con límites específicos.",
+              "tip": "Revisa cuidadosamente todos los requisitos de las reducciones. Algunos, como el de la vivienda habitual, requieren comprometerte a mantener la propiedad durante 10 años. Si vendes antes, deberás devolver la reducción aplicada."
+            }
+          ],
+          "keyIdeas": [
+            "El Impuesto de Sucesiones se paga sobre el valor actual de todos los bienes heredados, no sobre su precio de compra original",
+            "Tienes exactamente 6 meses desde el fallecimiento para presentar y pagar el impuesto, sin excepciones",
+            "Cada comunidad autónoma tiene sus propias bonificaciones, creando grandes diferencias en el impuesto final",
+            "Las reducciones por parentesco, vivienda habitual y empresas familiares pueden reducir significativamente el impuesto a pagar"
+          ],
+          "reflectionQuestions": [
+            "¿En qué comunidad autónoma tenía su residencia habitual el fallecido durante los últimos 5 años?",
+            "¿Qué tipo de bienes has heredado y tienes una idea aproximada de su valor actual?",
+            "¿Cumples los requisitos para aplicar alguna de las reducciones principales, especialmente la de vivienda habitual?"
+          ],
+          "curiosity": "España es uno de los pocos países europeos que mantiene un impuesto de sucesiones significativo. Países como Suecia o Italia lo eliminaron completamente, mientras que en Alemania solo se paga a partir de herencias muy elevadas. Sin embargo, las diferencias entre comunidades autónomas españolas son tan grandes que es como tener 17 países diferentes dentro del mismo territorio."
+        }
+      },
+      "plusvalia-otros": {
+        "id": "plusvalia-otros",
+        "title": "Plusvalía Municipal y Otros Gastos",
+        "topics": [
+          "Qué es la plusvalía municipal",
+          "Cuándo se paga y cómo calcularla",
+          "Costes de notaría y registro",
+          "Gastos de gestoría (opcional)"
+        ],
+        "duration": 12,
+        "linkedTools": [
+          {
+            "name": "Guía Tramitación Herencias",
+            "url": "/guia-tramitacion-herencias/",
+            "icon": "💰",
+            "desc": "Costes orientativos"
+          }
+        ],
+        "content": {
+          "introduction": "Ya hemos visto los principales impuestos de la herencia, pero aún quedan algunos gastos importantes por conocer. La plusvalía municipal suele ser una sorpresa desagradable para muchos herederos, y los gastos notariales también pueden generar dudas sobre su importe real.",
+          "sections": [
+            {
+              "title": "Qué es la plusvalía municipal y por qué la pagas",
+              "content": "La plusvalía municipal, técnicamente llamada 'Impuesto sobre el Incremento de Valor de los Terrenos de Naturaleza Urbana', es un tributo que grava el aumento teórico del valor del suelo urbano cuando se produce una transmisión. En palabras sencillas: cuando heredas una vivienda o terreno urbano, el ayuntamiento considera que ese suelo ha aumentado de valor desde que lo adquirió el fallecido, y te cobra un impuesto por ese incremento.\n\nEs importante entender que este impuesto no mide el incremento real del valor. No importa si la casa vale ahora más o menos que cuando la compró tu familiar. El ayuntamiento aplica unos coeficientes fijos según los años que han pasado y el valor catastral del suelo. Por ejemplo, si tu padre compró una casa hace 15 años, el ayuntamiento calculará automáticamente que el suelo ha tenido un incremento de valor, aunque la vivienda esté ahora en peores condiciones.\n\nEste impuesto solo afecta a bienes inmuebles urbanos: casas, pisos, locales, garajes, terrenos urbanos. Si heredas una finca rústica en el campo, normalmente no pagarás plusvalía municipal. Cada heredero debe pagar la parte proporcional según su porcentaje de herencia.",
+              "tip": "Si la herencia incluye varios inmuebles en municipios diferentes, tendrás que pagar la plusvalía en cada ayuntamiento por separado. Organiza bien los papeles por municipios para no confundirte."
+            },
+            {
+              "title": "Cuándo y cómo se paga la plusvalía municipal",
+              "content": "Tienes un plazo de 6 meses desde el fallecimiento para presentar y pagar la plusvalía municipal en el ayuntamiento donde esté ubicado el inmueble. Este plazo puede prorrogarse otros 6 meses si presentas una solicitud motivada antes de que expire el primer plazo.\n\nPara calcular el importe necesitarás: el valor catastral del suelo (aparece desglosado en el recibo del IBI), el número de años que transcurrieron desde que el fallecido adquirió el inmueble hasta su muerte, y los coeficientes y tipos de gravamen que aplica cada ayuntamiento. Cada municipio tiene sus propios porcentajes, por lo que el mismo inmueble puede generar plusvalías muy diferentes según dónde esté ubicado.\n\nEl cálculo es complejo, pero la mayoría de ayuntamientos ofrecen calculadoras online en sus webs o ventanillas de información. También puedes pedirle a una gestoría que lo calcule por ti. Un ejemplo: una casa con valor catastral del suelo de 20.000€, adquirida hace 10 años, en un municipio con coeficientes medios, puede generar una plusvalía de entre 800 y 1.500€.\n\nRecuerda que desde 2021, si puedes demostrar que no hubo incremento real de valor (con una tasación, por ejemplo), puedes solicitar la exención del pago.",
+              "tip": "Algunos ayuntamientos ofrecen bonificaciones para herencias familiares directas o cuando el heredero es mayor de cierta edad. Pregunta en el ayuntamiento si existen estas ventajas fiscales."
+            },
+            {
+              "title": "Gastos de notaría, registro y gestoría",
+              "content": "Los gastos notariales para la herencia no son fijos, sino que dependen de varios factores: el valor de los bienes, el número de herederos y la complejidad del caso. Para una herencia estándar con un inmueble valorado en 200.000€, los honorarios notariales suelen rondar entre 600 y 1.200€. El notario cobra por la escritura de herencia, las copias autorizadas que necesites, y otros trámites como la declaración de herederos si no hay testamento.\n\nLos gastos del Registro de la Propiedad son más predecibles. Rondan el 0,1-0,2% del valor de los inmuebles, con un mínimo de unos 100€ por finca. Si heredas una casa valorada en 150.000€, el registro costará aproximadamente 150-300€.\n\nLa gestoría es opcional, pero muchas familias la contratan por comodidad. Una gestoría se encarga de preparar todos los papeles, hacer las liquidaciones de impuestos, y acompañarte en los trámites. Sus honorarios varían mucho según la zona y la complejidad: desde 800€ para casos sencillos hasta 2.500€ o más para herencias complicadas. Antes de contratar, pide un presupuesto detallado y asegúrate de que incluye todos los trámites que necesitas.\n\nSi decides hacerlo tú mismo, es perfectamente posible. Solo necesitarás más tiempo y paciencia para recopilar documentos y entender los formularios de cada organismo.",
+              "warning": "Cuidado con las gestorías que piden pagos por adelantado sin explicar claramente qué servicios incluyen. Un presupuesto serio debe detallar cada concepto y sus honorarios específicos."
+            }
+          ],
+          "keyIdeas": [
+            "La plusvalía municipal se paga siempre que se hereden inmuebles urbanos, independientemente de si han ganado valor real",
+            "Tienes 6 meses para pagar la plusvalía, prorrogables otros 6 meses si lo solicitas a tiempo",
+            "Los gastos de notario y registro son obligatorios, pero la gestoría es opcional aunque puede ahorrarte tiempo y complicaciones",
+            "Desde 2021 puedes reclamar la exención de plusvalía si demuestras que no hubo incremento real de valor del inmueble"
+          ],
+          "reflectionQuestions": [
+            "¿Tienes clara la ubicación de todos los inmuebles de la herencia para saber en qué ayuntamientos debes pagar plusvalía?",
+            "¿Prefieres gestionar tú mismo todos los trámites o contratar una gestoría para que te ayude con el papeleo?"
+          ],
+          "curiosity": "Aunque se llame 'plusvalía municipal', este impuesto no tiene nada que ver con las plusvalías que se pagan al vender una vivienda. Son tributos completamente diferentes, con normativas y cálculos distintos, que pueden coexistir si heredas y luego vendes el inmueble."
+        }
+      }
+    }
+  },
+  "tramites-finales": {
+    "title": "Trámites Finales",
+    "chapters": {
+      "escritura-registro": {
+        "id": "escritura-registro",
+        "title": "La Escritura y el Registro",
+        "topics": [
+          "Escritura de aceptación y adjudicación",
+          "Qué documentos llevar al notario",
+          "Inscripción en el Registro de la Propiedad",
+          "Cambio de titularidad en bancos y vehículos"
+        ],
+        "duration": 12,
+        "linkedTools": [
+          {
+            "name": "Guía Tramitación Herencias",
+            "url": "/guia-tramitacion-herencias/",
+            "icon": "📝",
+            "desc": "Orden de gestiones paso a paso"
+          }
+        ],
+        "content": {
+          "introduction": "Has llegado al momento final del proceso: la escritura pública y los cambios de titularidad. Después de todo lo que has hecho hasta ahora, este último paso puede parecer abrumador, pero en realidad es más sencillo de lo que imaginas. Piénsalo como el acto de 'mudanza' legal donde todo pasa oficialmente a tu nombre.",
+          "sections": [
+            {
+              "title": "La Escritura de Aceptación y Adjudicación: El Gran Final",
+              "content": "La escritura de aceptación y adjudicación es el documento que oficializa que tú y los demás herederos aceptáis la herencia y os repartís los bienes según corresponda. Es como el acta de una reunión muy importante, pero hecha ante notario.\n\nEn esta escritura se detalla qué se queda cada heredero. Por ejemplo, si había una casa, dos cuentas bancarias y un coche, la escritura dirá claramente: 'María se queda la casa, Juan la cuenta del banco A y el coche, y ambos se reparten al 50% la cuenta del banco B'.\n\nEl notario leerá todo el documento, te explicará las partes importantes y te preguntará si estás de acuerdo. No tengas miedo de interrumpir si algo no te queda claro. El notario está ahí para ayudarte, no para juzgarte. Una vez que todos los herederos firmen, ya habréis aceptado oficialmente la herencia.\n\nRecuerda que una vez firmada la escritura, ya no hay vuelta atrás en cuanto a la aceptación de la herencia. Por eso es importante que llegues a esta cita con las ideas claras sobre qué estás heredando (bienes y deudas).",
+              "tip": "Llega a la notaría con 10-15 minutos de antelación para estar tranquilo. Es normal sentirse nervioso, pero recuerda que el notario ha hecho esto miles de veces y te guiará en todo momento."
+            },
+            {
+              "title": "Qué Documentos Llevar al Notario: Tu Kit de Supervivencia",
+              "content": "Ir al notario sin los documentos correctos es como ir al médico sin la tarjeta sanitaria: posible, pero complicado. Aquí tienes la lista definitiva de lo que necesitas llevar:\n\nPrimero, los documentos de identificación: tu DNI original (no fotocopia) y el de todos los herederos que vayan a firmar. Si algún heredero no puede ir, necesitarás un poder notarial suyo.\n\nSegundo, todos los documentos que has ido recopilando: el certificado de defunción, el de últimas voluntades, el testamento o la declaración de herederos abintestato, los certificados del Registro Civil de familia, y por supuesto, la liquidación del impuesto de sucesiones ya pagada.\n\nTercero, documentos de los bienes: escrituras de propiedades, certificados de participaciones bancarias, documentación de vehículos, seguros de vida, etc. Básicamente, todo lo que demuestre qué bienes tenía el fallecido.\n\nCuarto, si hay menores o incapacitados entre los herederos, necesitarás las autorizaciones judiciales correspondientes.\n\nEl notario te habrá dado una lista específica cuando concertaste la cita, pero es mejor llevar algo de más que quedarse corto.",
+              "tip": "Haz una carpeta con todos los documentos ordenados y lleva fotocopias de todo. Algunos notarios se quedan con las copias para su archivo, y así no te quedarás sin originales importantes."
+            },
+            {
+              "title": "Inscripción en el Registro de la Propiedad: Hacer Oficial lo Oficial",
+              "content": "Una vez firmada la escritura, necesitas inscribir las propiedades inmobiliarias (casas, locales, terrenos) en el Registro de la Propiedad. Esto es fundamental porque hasta que no se haga esta inscripción, legalmente no puedes vender o hipotecar esas propiedades.\n\nEste trámite puedes hacerlo tú mismo o encargárselo a un gestor. Si decides hacerlo tú, necesitas llevar al Registro la escritura original de aceptación y adjudicación junto con la liquidación del impuesto de sucesiones pagada. El registrador revisará todo y, si está correcto, inscribirá la propiedad a tu nombre.\n\nEl proceso suele tardar entre 15 y 30 días hábiles, dependiendo de la carga de trabajo del Registro. Te cobrarán unas tasas que varían según el valor de la propiedad, pero suelen rondar los 60-150 euros por cada inmueble.\n\nUna vez inscrita la propiedad, recibirás una nota simple actualizada donde aparecerás como propietario. Guarda este documento como oro en paño, porque es la prueba definitiva de que eres el dueño legal de la propiedad.",
+              "warning": "Sin la inscripción en el Registro de la Propiedad no puedes vender la casa, ni hipotecarla, ni hacer ninguna operación importante con ella. Es un paso imprescindible, no opcional."
+            },
+            {
+              "title": "Cambio de Titularidad en Bancos y Vehículos: Los Pequeños Grandes Detalles",
+              "content": "Con la escritura firmada ya puedes cambiar la titularidad de cuentas bancarias, vehículos y otros bienes. Para las cuentas bancarias, cada banco tiene sus propios procedimientos, pero generalmente necesitarás: copia autorizada de la escritura, tu DNI, y los documentos que te pida cada entidad específica.\n\nLo más práctico es llamar primero al banco y preguntar exactamente qué necesitan y si puedes hacer el trámite por internet, teléfono o tienes que ir en persona. Algunos bancos son más ágiles que otros, pero en general el proceso es sencillo una vez que tienes la documentación correcta.\n\nPara los vehículos, debes ir a Tráfico (DGT) con la escritura, el DNI, el permiso de circulación del vehículo, la ficha técnica y pagar la tasa correspondiente (unos 55 euros). Si el coche tiene más de 10 años, también necesitarás pasar la ITV si no la tiene en vigor.\n\nPara otros bienes como seguros de vida, planes de pensiones, acciones, etc., cada entidad tiene sus propios requisitos, pero el documento base siempre será la escritura de aceptación y adjudicación junto con tu identificación.",
+              "tip": "Haz una lista de todos los bancos, aseguradoras y organismos donde necesitas cambiar titularidades, y ve tachandolos según los vayas completando. Así no se te olvidará ninguno y tendrás sensación de progreso."
+            }
+          ],
+          "keyIdeas": [
+            "La escritura de aceptación y adjudicación es el documento final que oficializa tu condición de heredero",
+            "Necesitas inscribir las propiedades en el Registro de la Propiedad para poder disponer de ellas legalmente",
+            "Cada banco y organismo tiene sus propios requisitos para el cambio de titularidad, pero todos necesitarán la escritura",
+            "Una vez completados estos trámites, ya eres oficialmente el propietario de los bienes heredados"
+          ],
+          "reflectionQuestions": [
+            "¿Tienes clara la lista de todos los bancos y organismos donde debes cambiar titularidades?",
+            "¿Has verificado con el notario qué documentos específicos necesitas llevar a la firma?"
+          ],
+          "curiosity": "En España, algunas propiedades muy antiguas aún no están inscritas en el Registro de la Propiedad. Si heredas una de estas propiedades, tendrás que hacer primero una 'inmatriculación' para que aparezca por primera vez en el Registro, un proceso que puede ser más complejo pero que un buen profesional puede resolver."
+        }
+      }
+    }
+  },
+  "glosario": {
+    "title": "Glosario y Recursos",
+    "chapters": {
+      "glosario-herencias": {
+        "id": "glosario-herencias",
+        "title": "Glosario de Términos",
+        "topics": [
+          "Términos legales explicados de forma sencilla",
+          "Abintestato, legítima, usufructo...",
+          "Documentos más habituales",
+          "Preguntas frecuentes"
+        ],
+        "duration": 10,
+        "linkedTools": [
+          {
+            "name": "Guía Tramitación Herencias",
+            "url": "/guia-tramitacion-herencias/",
+            "icon": "📋",
+            "desc": "Herramienta interactiva completa"
+          },
+          {
+            "name": "Calculadora Sucesiones Nacional",
+            "url": "/calculadora-sucesiones-nacional/",
+            "icon": "🇪🇸",
+            "desc": "Impuesto en 14 CCAA"
+          },
+          {
+            "name": "Calculadora Sucesiones Cataluña",
+            "url": "/calculadora-sucesiones-cataluna/",
+            "icon": "🏴",
+            "desc": "Normativa catalana"
+          }
+        ],
+        "content": {
+          "introduction": "A lo largo de este curso hemos utilizado términos legales que pueden resultar poco familiares. En este capítulo final, encontrarás un glosario completo con las definiciones explicadas de forma sencilla, además de respuestas a las preguntas más frecuentes sobre herencias.",
+          "sections": [
+            {
+              "title": "Glosario de Términos",
+              "content": "Consulta este glosario siempre que encuentres un término que no comprendas. Están ordenados alfabéticamente para facilitar su búsqueda.",
+              "terms": [
+                {
+                  "termino": "Abintestato",
+                  "definicion": "Herencia sin testamento. La ley determina quiénes heredan."
+                },
+                {
+                  "termino": "Aceptación a beneficio de inventario",
+                  "definicion": "Aceptar la herencia limitando la responsabilidad por deudas al valor de los bienes heredados."
+                },
+                {
+                  "termino": "Acta de notoriedad",
+                  "definicion": "Documento notarial que declara quiénes son los herederos cuando no hay testamento."
+                },
+                {
+                  "termino": "Ajuar doméstico",
+                  "definicion": "Bienes muebles de uso personal y del hogar. Se valora en un 3% del caudal hereditario."
+                },
+                {
+                  "termino": "Base imponible",
+                  "definicion": "Valor sobre el que se calcula el impuesto, tras aplicar ciertas deducciones."
+                },
+                {
+                  "termino": "Caudal hereditario",
+                  "definicion": "Conjunto de bienes, derechos y obligaciones que componen la herencia."
+                },
+                {
+                  "termino": "Causante",
+                  "definicion": "Persona fallecida que deja la herencia."
+                },
+                {
+                  "termino": "Certificado de defunción",
+                  "definicion": "Documento oficial que acredita el fallecimiento."
+                },
+                {
+                  "termino": "Certificado de últimas voluntades",
+                  "definicion": "Documento que indica si existe testamento y ante qué notario se otorgó."
+                },
+                {
+                  "termino": "Cuaderno particional",
+                  "definicion": "Documento donde se detalla el reparto de la herencia entre los herederos."
+                },
+                {
+                  "termino": "Heredero forzoso",
+                  "definicion": "Persona que tiene derecho a una parte de la herencia por ley (hijos, ascendientes, cónyuge)."
+                },
+                {
+                  "termino": "Heredero universal",
+                  "definicion": "Persona que hereda la totalidad o una parte proporcional del patrimonio."
+                },
+                {
+                  "termino": "Legatario",
+                  "definicion": "Persona que recibe un bien concreto por testamento, sin asumir deudas."
+                },
+                {
+                  "termino": "Legítima",
+                  "definicion": "Parte de la herencia que la ley reserva a los herederos forzosos."
+                },
+                {
+                  "termino": "Nuda propiedad",
+                  "definicion": "Derecho a ser propietario de un bien, pero sin poder usarlo ni disfrutarlo."
+                },
+                {
+                  "termino": "Plusvalía municipal",
+                  "definicion": "Impuesto sobre el incremento de valor de terrenos urbanos al transmitirse."
+                },
+                {
+                  "termino": "Testamento abierto",
+                  "definicion": "Testamento otorgado ante notario, quien conserva el original."
+                },
+                {
+                  "termino": "Testamento ológrafo",
+                  "definicion": "Testamento escrito de puño y letra por el testador, sin notario."
+                },
+                {
+                  "termino": "Usufructo",
+                  "definicion": "Derecho a usar y disfrutar un bien ajeno sin ser propietario."
+                },
+                {
+                  "termino": "Usufructo viudal",
+                  "definicion": "Derecho del cónyuge viudo a usar y disfrutar parte de la herencia."
+                }
+              ]
+            },
+            {
+              "title": "Preguntas Frecuentes",
+              "content": "Recopilamos las dudas más habituales de las personas que se enfrentan a tramitar una herencia.",
+              "faqs": [
+                {
+                  "pregunta": "¿Cuánto tiempo tengo para tramitar la herencia?",
+                  "respuesta": "El plazo crítico es de 6 meses para el Impuesto de Sucesiones y la Plusvalía Municipal. Sin embargo, la herencia en sí no prescribe."
+                },
+                {
+                  "pregunta": "¿Necesito abogado obligatoriamente?",
+                  "respuesta": "No es obligatorio por ley, pero es muy recomendable en herencias complejas, con conflictos entre herederos o bienes en varios países."
+                },
+                {
+                  "pregunta": "¿Puedo acceder al dinero del fallecido para pagar el entierro?",
+                  "respuesta": "Los bancos suelen permitir disponer de cantidades limitadas para gastos de sepelio previa presentación de facturas, pero el resto queda bloqueado hasta la adjudicación."
+                },
+                {
+                  "pregunta": "¿Qué pasa si hay más deudas que bienes?",
+                  "respuesta": "Puedes renunciar a la herencia o aceptarla a beneficio de inventario, lo que limita tu responsabilidad al valor de lo heredado."
+                },
+                {
+                  "pregunta": "¿Puedo heredar si vivo fuera de España?",
+                  "respuesta": "Sí, aunque los trámites pueden complicarse. Es recomendable otorgar poder notarial a alguien de confianza en España."
+                }
+              ]
+            },
+            {
+              "title": "Herramientas de meskeIA para Ayudarte",
+              "content": "En meskeIA hemos creado varias herramientas gratuitas para facilitar la tramitación de tu herencia. Úsalas para calcular impuestos, consultar documentación necesaria y seguir los pasos en orden.",
+              "isToolsSection": true
+            }
+          ],
+          "keyIdeas": [
+            "Este glosario te ayudará a entender la terminología legal",
+            "Consulta las preguntas frecuentes ante cualquier duda",
+            "Usa las herramientas de meskeIA para calcular impuestos",
+            "Ante dudas complejas, consulta siempre con un profesional"
+          ],
+          "reflectionQuestions": [],
+          "curiosity": "En España se tramitan más de 400.000 herencias cada año. La mayoría se resuelven sin conflictos cuando los herederos están bien informados."
+        }
+      }
+    }
+  }
+}

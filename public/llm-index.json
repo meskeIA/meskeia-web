@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 155+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 156+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 155,
-  "last_updated": "2025-12-09",
+  "total_tools": 156,
+  "last_updated": "2025-12-10",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -63,7 +63,7 @@
       "name": "Impuestos y Fiscalidad",
       "icon": "📋",
       "description": "IRPF, sucesiones, donaciones y normativa fiscal española",
-      "tool_count": 7
+      "tool_count": 8
     },
     {
       "id": "juegos",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 46
+      "tool_count": 47
     },
     {
       "id": "casa",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 31
+      "tool_count": 32
     },
     {
       "id": "creando",
@@ -2066,6 +2066,32 @@
         "abintestato"
       ],
       "icon": "📋"
+    },
+    {
+      "slug": "herencias-paso-a-paso",
+      "name": "Herencias Paso a Paso",
+      "url": "https://meskeia.com/herencias-paso-a-paso/",
+      "description": "Curso práctico de 9 capítulos para gestionar una herencia en España: desde los primeros pasos hasta la escritura final. Incluye glosario legal y enlaces a calculadoras de impuestos",
+      "category": "Impuestos y Fiscalidad",
+      "contexts": [
+        "estudio",
+        "dinero"
+      ],
+      "keywords": [
+        "herencia",
+        "curso",
+        "sucesion",
+        "testamento",
+        "herederos",
+        "impuesto sucesiones",
+        "plusvalia",
+        "notario",
+        "registro",
+        "aceptar herencia",
+        "renunciar herencia",
+        "glosario legal"
+      ],
+      "icon": "📜"
     },
     {
       "slug": "test-velocidad-escritura",
