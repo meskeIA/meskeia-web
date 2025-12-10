@@ -54,7 +54,7 @@ export default function Home() {
               Biblioteca de Aplicaciones Web Gratuitas
             </h1>
             <p className={styles.subtitle}>
-              {TOTAL_IMPLEMENTED_APPS} herramientas online para facilitar tu día a día. Sin registro, sin anuncios.
+              {TOTAL_IMPLEMENTED_APPS} Apps online para facilitar tu día a día. Sin registro, sin anuncios.
             </p>
           </div>
         </header>
@@ -139,7 +139,7 @@ export default function Home() {
                       {category.description}
                     </p>
                     <span className={styles.categoryCount}>
-                      {apps.length} {apps.length === 1 ? 'herramienta' : 'herramientas'}
+                      {apps.length} {apps.length === 1 ? 'App' : 'Apps'}
                     </span>
                   </div>
                 </div>

@@ -16,13 +16,9 @@ export default function AcercaPage() {
         {/* Introducción */}
         <div className={styles.intro}>
           <p>
-            <strong>meskeIA</strong> es una plataforma gratuita que ofrece <strong>aplicaciones web especializadas</strong>
-            en finanzas, matemáticas, productividad, creatividad y mucho más. Todas las herramientas son
-            <strong> 100% gratuitas</strong>, funcionan <strong>sin registro</strong> y están <strong>completamente en español</strong>.
-          </p>
-          <p>
-            Nuestro objetivo es democratizar el acceso a herramientas útiles y profesionales,
-            eliminando barreras como el coste, el registro obligatorio o la necesidad de conexión a internet.
+            <strong>meskeIA</strong> es una biblioteca de <strong>aplicaciones web gratuitas</strong> en español.
+            Apps de finanzas, matemáticas, productividad, creatividad y mucho más.
+            Todas funcionan <strong>sin registro</strong>, <strong>sin anuncios</strong> y <strong>100% en español</strong>.
           </p>
 
           <div className={styles.stats}>
@@ -125,7 +121,13 @@ export default function AcercaPage() {
         <h2 className={styles.sectionTitle}>Nuestra Filosofía</h2>
         <div className={styles.section}>
           <p>
-            En meskeIA creemos que <strong>el acceso a herramientas útiles debe ser universal</strong>.
+            <strong>En meskeIA creemos que el conocimiento debe ser un bien compartido y gratuito.</strong>
+          </p>
+          <p>
+            Resolver un cálculo, entender un concepto o simplificar una tarea tiene que estar al alcance
+            de todas las personas, sin depender de su capacidad de pago.
+          </p>
+          <p>
             Por eso, todas nuestras aplicaciones son:
           </p>
           <ul className={styles.ventajas}>

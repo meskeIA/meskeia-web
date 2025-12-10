@@ -8,7 +8,7 @@ import { categories, applicationsDatabase } from '@/data/applications';
 import { isAppImplemented, TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import styles from './page.module.css';
 
-export default function HerramientasPage() {
+export default function AppsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // Filtrar solo apps implementadas y ordenar alfabéticamente
@@ -38,7 +38,7 @@ export default function HerramientasPage() {
       <main className={styles.container}>
         {/* Header */}
         <header className={styles.pageHeader}>
-          <h1 className={styles.pageTitle}>Catálogo Completo de Herramientas</h1>
+          <h1 className={styles.pageTitle}>Catálogo Completo de Apps</h1>
           <p className={styles.pageSubtitle}>
             Aplicaciones web gratuitas organizadas por categorías. Sin registro, sin anuncios.
           </p>
@@ -47,7 +47,7 @@ export default function HerramientasPage() {
           <div className={styles.stats}>
             <div className={styles.statItem}>
               <span className={styles.statNumber}>{totalApps}</span>
-              <span className={styles.statLabel}>Herramientas</span>
+              <span className={styles.statLabel}>Apps</span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statNumber}>{totalCategories}</span>
@@ -103,16 +103,16 @@ export default function HerramientasPage() {
         {/* Mensaje si no hay resultados (no debería pasar) */}
         {filteredApps.length === 0 && (
           <div className={styles.noResults}>
-            <p>No se encontraron herramientas en esta categoría.</p>
+            <p>No se encontraron Apps en esta categoría.</p>
           </div>
         )}
 
         {/* CTA */}
         <div className={styles.ctaSection}>
           <h2>¿Buscas algo específico?</h2>
-          <p>Usa nuestro buscador para encontrar la herramienta perfecta</p>
+          <p>Usa nuestro buscador para encontrar la App perfecta</p>
           <Link href="/" className={styles.ctaButton}>
-            🔍 Buscar Herramientas
+            🔍 Buscar Apps
           </Link>
         </div>
       </main>

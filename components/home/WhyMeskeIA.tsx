@@ -20,12 +20,12 @@ export default function WhyMeskeIA() {
     {
       icon: '🌍',
       title: 'En Español',
-      description: 'Todas las herramientas en español con formato europeo (fechas, moneda, decimales)'
+      description: 'Todas las Apps en español con formato europeo (fechas, moneda, decimales)'
     },
     {
       icon: '📚',
       title: 'Educación',
-      description: 'Cada herramienta incluye guías educativas y casos de uso prácticos reales'
+      description: 'Cada App incluye guías educativas y casos de uso prácticos reales'
     },
     {
       icon: '🎨',

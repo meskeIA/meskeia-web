@@ -24,8 +24,8 @@ export default function HomeFooter() {
 
         {/* Enlaces de navegación */}
         <nav className={styles.links}>
-          <Link href="/herramientas" className={styles.link}>
-            Herramientas
+          <Link href="/apps" className={styles.link}>
+            Apps
           </Link>
           <span className={styles.dot}>•</span>
           <Link href="/acerca" className={styles.link}>

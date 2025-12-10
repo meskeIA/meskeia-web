@@ -66,7 +66,7 @@ export default function Footer({ appName }: FooterProps) {
             type="button"
             onClick={compartirApp}
             className={styles.shareButton}
-            title="Compartir esta herramienta"
+            title="Compartir esta App"
           >
             🔗 Compártela
           </button>
