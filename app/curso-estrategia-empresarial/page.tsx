@@ -43,6 +43,15 @@ export default function CursoEstrategiaEmpresarialPage() {
           hasta las nuevas realidades de la IA y la disrupción continua. Un curso honesto sobre
           qué funciona y qué ha dejado de funcionar.
         </p>
+        <a
+          href="/videos/curso-estrategia-empresarial.mp4"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.videoButton}
+        >
+          <span className={styles.videoIcon}>▶️</span>
+          Ver introducción en video
+        </a>
       </header>
 
       {/* Stats Grid */}

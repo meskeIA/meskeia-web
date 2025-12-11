@@ -42,6 +42,15 @@ export default function CursoNegociacionPage() {
           Domina el arte de negociar: desde la preparación estratégica hasta el cierre de acuerdos.
           Aprende BATNA, ZOPA, técnicas de persuasión, gestión de conflictos y negociación multicultural.
         </p>
+        <a
+          href="/videos/curso-negociacion.mp4"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.videoButton}
+        >
+          <span className={styles.videoIcon}>▶️</span>
+          Ver introducción en video
+        </a>
       </header>
 
       {/* Stats Grid */}

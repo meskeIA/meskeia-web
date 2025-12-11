@@ -47,6 +47,15 @@ export default function CursoEmpresaFamiliarPage() {
           sucesión generacional y modelos de profesionalización. Casos reales de Inditex,
           Mercadona y El Corte Inglés.
         </p>
+        <a
+          href="/videos/curso-empresa-familiar.mp4"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.videoButton}
+        >
+          <span className={styles.videoIcon}>▶️</span>
+          Ver introducción en video
+        </a>
       </header>
 
       {/* Stats Grid */}

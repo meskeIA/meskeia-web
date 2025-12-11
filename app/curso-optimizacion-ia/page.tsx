@@ -46,6 +46,15 @@ export default function CursoOptimizacionIAPage() {
           Domina GEO y AEO: el nuevo paradigma del posicionamiento digital.
           Aprende cómo funcionan ChatGPT, Perplexity y Gemini, y optimiza tu contenido para que las IAs lo citen.
         </p>
+        <a
+          href="/videos/curso-optimizacion-ia.mp4"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.videoButton}
+        >
+          <span className={styles.videoIcon}>▶️</span>
+          Ver introducción en video
+        </a>
       </header>
 
       {/* Stats Grid */}

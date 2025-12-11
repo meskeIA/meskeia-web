@@ -77,6 +77,15 @@ export default function HerenciasPasoPasoPage() {
           Guía práctica para tramitar una herencia en España. Aprende qué hacer, en qué orden,
           y qué impuestos pagar. Explicado de forma sencilla para que puedas gestionarlo con confianza.
         </p>
+        <a
+          href="/videos/herencias-paso-a-paso.mp4"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.videoButton}
+        >
+          <span className={styles.videoIcon}>▶️</span>
+          Ver introducción en video
+        </a>
       </header>
 
       {/* Stats Grid */}

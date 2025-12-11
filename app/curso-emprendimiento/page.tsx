@@ -22,6 +22,15 @@ export default function CursoEmprendimientoPage() {
           Aprende a crear, validar y lanzar tu idea de negocio con metodología práctica.
           6 capítulos + herramientas interactivas para convertir tu idea en realidad.
         </p>
+        <a
+          href="/videos/curso-emprendimiento.mp4"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.videoButton}
+        >
+          <span className={styles.videoIcon}>▶️</span>
+          Ver introducción en video
+        </a>
       </header>
 
       {/* Stats */}

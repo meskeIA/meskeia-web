@@ -27,6 +27,15 @@ export default function CursoDecisionesInversionPage() {
           contenido práctico, herramientas interactivas y casos reales para construir
           y gestionar tu cartera de inversión.
         </p>
+        <a
+          href="/videos/curso-decisiones-inversion.mp4"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.videoButton}
+        >
+          <span className={styles.videoIcon}>▶️</span>
+          Ver introducción en video
+        </a>
       </header>
 
       {/* Stats */}
