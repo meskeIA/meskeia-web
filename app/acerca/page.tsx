@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import FixedHeader from '@/components/FixedHeader';
 import Footer from '@/components/Footer';
+import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import styles from './page.module.css';
 
 export default function AcercaPage() {
@@ -23,12 +24,8 @@ export default function AcercaPage() {
 
           <div className={styles.stats}>
             <div className={styles.stat}>
-              <span className={styles.statNumber}>28</span>
+              <span className={styles.statNumber}>{TOTAL_IMPLEMENTED_APPS}</span>
               <span className={styles.statLabel}>Aplicaciones</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statNumber}>12</span>
-              <span className={styles.statLabel}>Categorías</span>
             </div>
             <div className={styles.stat}>
               <span className={styles.statNumber}>100%</span>
@@ -90,31 +87,6 @@ export default function AcercaPage() {
             <li><strong>Código Abierto:</strong> Disponible en GitHub para transparencia y colaboración.</li>
             <li><strong>Actualizaciones Continuas:</strong> Añadimos nuevas aplicaciones y mejoras regularmente.</li>
           </ul>
-        </div>
-
-        {/* Categorías */}
-        <h2 className={styles.sectionTitle}>Catálogo de Aplicaciones</h2>
-        <div className={styles.section}>
-          <p>Explora nuestras <strong>aplicaciones</strong> organizadas en <strong>12 categorías</strong>:</p>
-
-          <div className={styles.categorias}>
-            <span className={styles.categoriaTag}>💰 Finanzas y Fiscalidad</span>
-            <span className={styles.categoriaTag}>🧮 Calculadoras y Utilidades</span>
-            <span className={styles.categoriaTag}>📊 Matemáticas y Estadística</span>
-            <span className={styles.categoriaTag}>⚗️ Física y Química</span>
-            <span className={styles.categoriaTag}>⏱️ Herramientas de Productividad</span>
-            <span className={styles.categoriaTag}>🎨 Creatividad y Diseño</span>
-            <span className={styles.categoriaTag}>🎮 Juegos y Entretenimiento</span>
-            <span className={styles.categoriaTag}>📚 Campus Digital</span>
-            <span className={styles.categoriaTag}>🏥 Salud & Bienestar</span>
-            <span className={styles.categoriaTag}>🌐 Herramientas Web y Tecnología</span>
-            <span className={styles.categoriaTag}>📝 Texto y Documentos</span>
-            <span className={styles.categoriaTag}>🚀 Emprendimiento y Negocios</span>
-          </div>
-
-          <div className={styles.ctaContainer}>
-            <Link href="/" className={styles.ctaButton}>Ver Catálogo Completo</Link>
-          </div>
         </div>
 
         {/* Filosofía */}
