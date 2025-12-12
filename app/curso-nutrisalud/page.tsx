@@ -38,6 +38,15 @@ function ConsentModal() {
           <p className={styles.consentSubtitle}>
             Información importante sobre el Curso de Nutrición
           </p>
+          <a
+            href="/videos/curso-nutrisalud.mp4"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.videoButton}
+          >
+            <span className={styles.videoIcon}>▶️</span>
+            Ver introducción en video
+          </a>
         </div>
 
         <div className={styles.consentBody}>
