@@ -135,6 +135,8 @@ export const implementedAppsUrls = [
   "/generador-utm/",
   "/validador-regex/",
   "/conversor-imagenes/",
+  "/compresor-imagenes/",       // Compresor de imágenes por lotes sin límites
+  "/recortador-audio/",        // Recortador de audio con fade in/out
   "/generador-iconos/",
 
   // Creatividad y Diseño (7 implementadas)
