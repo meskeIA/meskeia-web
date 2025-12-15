@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 165+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 166+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 165,
+  "total_tools": 166,
   "last_updated": "2025-12-15",
   "features": {
     "all_free": true,
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Optimiza tu tiempo y organización",
-      "tool_count": 15
+      "tool_count": 16
     },
     {
       "id": "salud",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 67
+      "tool_count": 68
     },
     {
       "id": "estudio",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 23
+      "tool_count": 24
     }
   ],
   "tools": [
@@ -3018,6 +3018,30 @@
         "grabar voz"
       ],
       "icon": "🎙️"
+    },
+    {
+      "slug": "mi-ip",
+      "name": "Mi IP y Conexión",
+      "url": "https://meskeia.com/mi-ip/",
+      "description": "Descubre tu IP pública, ubicación aproximada, proveedor de internet, tipo de conexión y velocidad. Historial de IPs",
+      "category": "Productividad",
+      "contexts": [
+        "trabajo",
+        "curiosidad"
+      ],
+      "keywords": [
+        "mi ip",
+        "ip publica",
+        "cual es mi ip",
+        "direccion ip",
+        "isp",
+        "proveedor internet",
+        "geolocalización",
+        "ipv4",
+        "ipv6",
+        "conexion"
+      ],
+      "icon": "🌐"
     },
     {
       "slug": "calculadora-imc",

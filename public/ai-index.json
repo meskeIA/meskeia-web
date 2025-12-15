@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 163,
+  "total_tools": 164,
   "updated": "2025-12-15",
   "features": {
     "all_free": true,
@@ -217,7 +217,8 @@
         { "name": "Lista de Equipaje", "slug": "lista-equipaje", "url": "https://meskeia.com/lista-equipaje/", "description": "Genera lista de equipaje según tipo de viaje" },
         { "name": "Generador de Actas de Reunión", "slug": "generador-actas", "url": "https://meskeia.com/generador-actas/", "description": "Crea actas profesionales con plantillas, asistentes, orden del día y tareas" },
         { "name": "Prueba de Cámara Web", "slug": "prueba-camara", "url": "https://meskeia.com/prueba-camara/", "description": "Prueba tu webcam antes de videollamadas, ajusta configuración y toma fotos" },
-        { "name": "Prueba de Micrófono", "slug": "prueba-microfono", "url": "https://meskeia.com/prueba-microfono/", "description": "Prueba tu micrófono, visualiza niveles de audio y graba tu voz" }
+        { "name": "Prueba de Micrófono", "slug": "prueba-microfono", "url": "https://meskeia.com/prueba-microfono/", "description": "Prueba tu micrófono, visualiza niveles de audio y graba tu voz" },
+        { "name": "Mi IP y Conexión", "slug": "mi-ip", "url": "https://meskeia.com/mi-ip/", "description": "Descubre tu IP pública, ubicación aproximada, proveedor de internet, tipo de conexión y velocidad" }
       ]
     },
     {
