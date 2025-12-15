@@ -139,6 +139,7 @@ export const implementedAppsUrls = [
   "/recortador-audio/",        // Recortador de audio con fade in/out
   "/generador-ondas/",         // Generador de ondas y visualizador de audio
   "/generador-iconos/",
+  "/editor-exif/",             // Editor EXIF: visualiza y elimina metadatos de fotos
 
   // Creatividad y Diseño (7 implementadas)
   "/calculadora-aspectos/",

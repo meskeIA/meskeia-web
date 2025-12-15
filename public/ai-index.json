@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 157,
+  "total_tools": 158,
   "updated": "2025-12-15",
   "features": {
     "all_free": true,
@@ -72,7 +72,8 @@
         { "name": "Recortador de Audio", "slug": "recortador-audio", "url": "https://meskeia.com/recortador-audio/", "description": "Recorta y edita audio MP3, WAV, OGG con fade in/out sin límites ni marcas de agua" },
         { "name": "Generador de Ondas y Visualizador", "slug": "generador-ondas", "url": "https://meskeia.com/generador-ondas/", "description": "Genera ondas sonoras (senoidal, cuadrada, triangular, sierra) y visualiza audio de archivos. Herramienta educativa de física del sonido" },
         { "name": "Generador de Enlaces UTM", "slug": "generador-utm", "url": "https://meskeia.com/generador-utm/", "description": "Genera enlaces UTM para Google Analytics" },
-        { "name": "Creador de Thumbnails YouTube", "slug": "creador-thumbnails", "url": "https://meskeia.com/creador-thumbnails/", "description": "Diseña miniaturas profesionales para YouTube con texto, imágenes, formas y exportación PNG 1280x720" }
+        { "name": "Creador de Thumbnails YouTube", "slug": "creador-thumbnails", "url": "https://meskeia.com/creador-thumbnails/", "description": "Diseña miniaturas profesionales para YouTube con texto, imágenes, formas y exportación PNG 1280x720" },
+        { "name": "Editor EXIF", "slug": "editor-exif", "url": "https://meskeia.com/editor-exif/", "description": "Visualiza y elimina metadatos EXIF de tus fotos: GPS, cámara, fecha, dispositivo. Protege tu privacidad" }
       ]
     },
     {

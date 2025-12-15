@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 159+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 160+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 159,
+  "total_tools": 160,
   "last_updated": "2025-12-15",
   "features": {
     "all_free": true,
@@ -35,7 +35,7 @@
       "name": "Diseño Web",
       "icon": "🎨",
       "description": "Colores, tipografías y herramientas para diseñadores",
-      "tool_count": 16
+      "tool_count": 17
     },
     {
       "id": "emprendimiento",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 46
+      "tool_count": 47
     },
     {
       "id": "dinero",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 40
+      "tool_count": 41
     },
     {
       "id": "relax",
@@ -933,6 +933,31 @@
         "notas musicales"
       ],
       "icon": "🔊"
+    },
+    {
+      "slug": "editor-exif",
+      "name": "Editor EXIF",
+      "url": "https://meskeia.com/editor-exif/",
+      "description": "Visualiza y elimina metadatos EXIF de tus fotos: GPS, cámara, fecha, dispositivo. Protege tu privacidad antes de compartir imágenes online",
+      "category": "Diseño Web",
+      "contexts": [
+        "creando",
+        "casa"
+      ],
+      "keywords": [
+        "exif",
+        "metadatos",
+        "fotos",
+        "privacidad",
+        "gps",
+        "ubicacion",
+        "camara",
+        "eliminar",
+        "limpiar",
+        "seguridad",
+        "imagen"
+      ],
+      "icon": "📷"
     },
     {
       "slug": "calculadora-tarifa-freelance",
