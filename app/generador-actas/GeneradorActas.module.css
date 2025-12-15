@@ -1,0 +1,1194 @@
+/* Variables CSS - Paleta meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+  margin-top: 80px;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-xs);
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  opacity: 0.95;
+  margin: 0;
+}
+
+/* Barra de acciones */
+.actionsBar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+}
+
+.actionsLeft,
+.actionsRight {
+  display: contents;
+}
+
+.btnAction {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btnAction:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnAction.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Panel de borradores/historial */
+.draftsPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.draftsPanel h3 {
+  font-size: 1.1rem;
+  margin: 0 0 var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.emptyMessage {
+  color: var(--text-muted);
+  text-align: center;
+  padding: var(--spacing-lg);
+}
+
+.draftsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.draftItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+}
+
+.draftInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.draftInfo strong {
+  color: var(--text-primary);
+}
+
+.draftInfo span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.draftActions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.btnSmall {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.8rem;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSmall:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btnSmallDanger {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.8rem;
+  border: 1px solid var(--error);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--error);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSmallDanger:hover {
+  background: var(--error);
+  color: white;
+}
+
+/* Steps Container */
+.stepsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.stepButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.stepButton:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.stepButton.stepActive {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+.stepButton.stepCompleted {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.stepIcon {
+  font-size: 1.25rem;
+}
+
+.stepLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Main Content */
+.mainContent {
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Form Section */
+.formSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg);
+}
+
+/* Template Selector */
+.templateSelector {
+  margin-bottom: var(--spacing-xl);
+}
+
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+
+.templateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.templateCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.templateCard.templateActive {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.templateIcon {
+  font-size: 2rem;
+}
+
+.templateName {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* Form Grid */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+/* Input Group */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.input,
+.select,
+.textarea {
+  padding: var(--spacing-md);
+  font-size: 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Navigation Buttons */
+.navigationButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+}
+
+.btnPrimary {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btnSecondary {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSecondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Asistentes Section */
+.asistentesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.helperText {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+  flex: 1;
+}
+
+.btnAdd {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAdd:hover {
+  background: var(--primary);
+  border-style: solid;
+  color: white;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-muted);
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.emptyState p {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Asistentes List */
+.asistentesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.asistenteCard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--hover);
+  border-radius: var(--radius);
+}
+
+.asistenteNumber {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.asistenteFields {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+
+.presente {
+  color: var(--success);
+  font-weight: 500;
+}
+
+.ausente {
+  color: var(--error);
+  font-weight: 500;
+}
+
+.btnRemove {
+  padding: var(--spacing-sm);
+  font-size: 1rem;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--error);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnRemove:hover {
+  background: var(--error);
+  color: white;
+}
+
+/* Puntos List */
+.puntosList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.puntoCard {
+  padding: var(--spacing-lg);
+  background: var(--hover);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--primary);
+}
+
+.puntoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.puntoNumber {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.puntoFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Tareas List */
+.tareasList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.tareaCard {
+  padding: var(--spacing-lg);
+  background: var(--hover);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--secondary);
+}
+
+.tareaHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.tareaNumber {
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+.tareaFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.tareaRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 150px;
+  gap: var(--spacing-md);
+}
+
+/* Extra Fields */
+.extraFields {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Preview Actions */
+.previewActions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Documento del Acta */
+.actaDocument {
+  background: white;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-md);
+  color: #1A1A1A;
+}
+
+.actaHeader {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-xl);
+  border-bottom: 2px solid var(--primary);
+}
+
+.actaLogo {
+  margin-bottom: var(--spacing-md);
+}
+
+.actaLogoIcon {
+  font-size: 3rem;
+}
+
+.actaTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--primary);
+}
+
+.actaSubtitle {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Acta Sections */
+.actaSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.actaSectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid #E5E5E5;
+}
+
+/* Info Grid */
+.actaInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.actaInfoItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.actaInfoItem strong {
+  font-size: 0.85rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.actaInfoItem span {
+  font-size: 1rem;
+  color: #1A1A1A;
+}
+
+/* Acta Table */
+.actaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.actaTable th,
+.actaTable td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.actaTable th {
+  background: #F5F5F5;
+  font-weight: 600;
+  color: #666;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.actaTable td {
+  color: #1A1A1A;
+}
+
+/* Puntos del Acta */
+.actaPunto {
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: #FAFAFA;
+  border-radius: var(--radius);
+  border-left: 3px solid var(--primary);
+}
+
+.actaPuntoTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-sm);
+  color: #1A1A1A;
+}
+
+.actaPuntoDesc {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0 0 var(--spacing-md);
+  font-style: italic;
+}
+
+.actaPuntoContent {
+  margin-bottom: var(--spacing-md);
+}
+
+.actaPuntoContent strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.actaPuntoContent p {
+  margin: 0;
+  color: #1A1A1A;
+  line-height: 1.6;
+}
+
+/* Prioridades */
+.prioridadAlta {
+  color: var(--error);
+  font-weight: 500;
+}
+
+.prioridadMedia {
+  color: var(--warning);
+  font-weight: 500;
+}
+
+.prioridadBaja {
+  color: var(--success);
+  font-weight: 500;
+}
+
+/* Observaciones y próxima reunión */
+.actaObservaciones,
+.actaProxima {
+  background: #F5F5F5;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  color: #1A1A1A;
+  line-height: 1.6;
+}
+
+/* Footer del Acta */
+.actaFooter {
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-xl);
+  border-top: 2px solid var(--primary);
+}
+
+.actaSignatures {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: var(--spacing-xl);
+}
+
+.actaSignature {
+  text-align: center;
+  min-width: 200px;
+}
+
+.signatureLine {
+  width: 100%;
+  height: 1px;
+  background: #1A1A1A;
+  margin-bottom: var(--spacing-sm);
+}
+
+.actaSignature p {
+  margin: 0;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.actaSignature small {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.actaGeneratedBy {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #999;
+  margin: 0;
+}
+
+/* Educational Section */
+.guideSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.guideSection h2 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md);
+}
+
+.introParagraph {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-lg);
+}
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.benefitCard {
+  background: var(--hover);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--primary);
+}
+
+.benefitIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.benefitCard h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.benefitCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.structureList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.structureItem {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.structureNumber {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.structureItem h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.structureItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.tipCard h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.tipCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 70px;
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .actionsBar {
+    flex-direction: column;
+  }
+
+  .actionsLeft,
+  .actionsRight {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stepsContainer {
+    gap: var(--spacing-xs);
+  }
+
+  .stepButton {
+    padding: var(--spacing-sm);
+    min-width: auto;
+  }
+
+  .stepLabel {
+    display: none;
+  }
+
+  .asistenteFields {
+    grid-template-columns: 1fr;
+  }
+
+  .tareaRow {
+    grid-template-columns: 1fr;
+  }
+
+  .actaDocument {
+    padding: var(--spacing-lg);
+  }
+
+  .actaSignatures {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* ==========================================
+   ESTILOS DE IMPRESIÓN
+   ==========================================
+   Estos estilos se aplican al imprimir o
+   exportar a PDF desde el navegador
+   ========================================== */
+
+/* Clase para ocultar elementos en impresión - no afecta display normal */
+.noPrint {
+  /* No establecer display aquí - cada elemento mantiene su display original */
+}
+
+@media print {
+  /* Ocultar elementos de UI */
+  .noPrint {
+    display: none !important;
+  }
+
+  /* Container ajustado para impresión */
+  .container {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    background: white;
+  }
+
+  /* Documento del acta en impresión */
+  .actaDocument {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 20mm;
+    background: white;
+    color: black;
+    font-size: 11pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Cabecera del acta */
+  .actaHeader {
+    margin-bottom: 15mm;
+    padding-bottom: 10mm;
+    border-bottom: 2pt solid #2E86AB;
+  }
+
+  .actaLogoIcon {
+    font-size: 24pt;
+  }
+
+  .actaTitle {
+    font-size: 16pt;
+    color: #2E86AB;
+  }
+
+  .actaSubtitle {
+    font-size: 11pt;
+  }
+
+  /* Secciones */
+  .actaSection {
+    margin-bottom: 10mm;
+    page-break-inside: avoid;
+  }
+
+  .actaSectionTitle {
+    font-size: 12pt;
+    color: #2E86AB;
+    margin-bottom: 5mm;
+    padding-bottom: 2mm;
+    border-bottom: 0.5pt solid #E5E5E5;
+  }
+
+  /* Info Grid */
+  .actaInfoGrid {
+    gap: 5mm;
+  }
+
+  .actaInfoItem strong {
+    font-size: 8pt;
+  }
+
+  .actaInfoItem span {
+    font-size: 10pt;
+  }
+
+  /* Tablas */
+  .actaTable {
+    font-size: 10pt;
+  }
+
+  .actaTable th,
+  .actaTable td {
+    padding: 2mm 3mm;
+  }
+
+  .actaTable th {
+    background: #F5F5F5 !important;
+  }
+
+  /* Puntos */
+  .actaPunto {
+    margin-bottom: 5mm;
+    padding: 3mm;
+    background: #FAFAFA !important;
+    border-left: 2pt solid #2E86AB;
+    page-break-inside: avoid;
+  }
+
+  .actaPuntoTitle {
+    font-size: 11pt;
+  }
+
+  .actaPuntoDesc {
+    font-size: 9pt;
+  }
+
+  .actaPuntoContent {
+    font-size: 10pt;
+  }
+
+  .actaPuntoContent strong {
+    font-size: 9pt;
+    color: #2E86AB;
+  }
+
+  /* Observaciones */
+  .actaObservaciones,
+  .actaProxima {
+    background: #F5F5F5 !important;
+    padding: 3mm;
+    font-size: 10pt;
+  }
+
+  /* Footer */
+  .actaFooter {
+    margin-top: 15mm;
+    padding-top: 10mm;
+    border-top: 2pt solid #2E86AB;
+  }
+
+  .actaSignatures {
+    margin-bottom: 10mm;
+  }
+
+  .actaSignature {
+    min-width: 60mm;
+  }
+
+  .signatureLine {
+    height: 0.5pt;
+    background: black;
+  }
+
+  .actaSignature p {
+    font-size: 10pt;
+  }
+
+  .actaSignature small {
+    font-size: 8pt;
+  }
+
+  .actaGeneratedBy {
+    font-size: 8pt;
+    color: #999;
+  }
+
+  /* Evitar cortes de página en elementos importantes */
+  .actaPunto,
+  .actaSection,
+  .actaTable tr {
+    page-break-inside: avoid;
+  }
+
+  /* Márgenes de página */
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  /* Primera página sin margen superior extra */
+  @page :first {
+    margin-top: 15mm;
+  }
+}

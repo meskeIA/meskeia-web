@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 160+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 161+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 160,
+  "total_tools": 161,
   "last_updated": "2025-12-15",
   "features": {
     "all_free": true,
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Optimiza tu tiempo y organización",
-      "tool_count": 12
+      "tool_count": 13
     },
     {
       "id": "salud",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 63
+      "tool_count": 64
     },
     {
       "id": "estudio",
@@ -2906,6 +2906,28 @@
         "empacar"
       ],
       "icon": "🧳"
+    },
+    {
+      "slug": "generador-actas",
+      "name": "Generador de Actas de Reunión",
+      "url": "https://meskeia.com/generador-actas/",
+      "description": "Crea actas de reunión profesionales con plantillas, gestión de asistentes, orden del día y seguimiento de tareas. Exporta a PDF",
+      "category": "Productividad",
+      "contexts": [
+        "trabajo"
+      ],
+      "keywords": [
+        "actas",
+        "reunion",
+        "minuta",
+        "acuerdos",
+        "tareas",
+        "asistentes",
+        "junta",
+        "comite",
+        "orden del dia"
+      ],
+      "icon": "📋"
     },
     {
       "slug": "calculadora-imc",

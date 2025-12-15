@@ -239,7 +239,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora Teoría de Colas", category: "Matemáticas y Estadística", contexts: ["estudio", "trabajo"], icon: "📐", description: "Calcula métricas de sistemas de colas M/M/1: utilización, tiempos de espera y simulación", url: "/calculadora-teoria-colas/", keywords: ["teoria colas", "mm1", "sistema espera", "utilizacion", "little", "poisson"] },
 
   // ============================================
-  // 10. Productividad (12)
+  // 10. Productividad (13)
   // ============================================
   { name: "Notas", category: "Productividad", contexts: ["trabajo", "estudio", "casa"], icon: "📝", description: "Guarda tus notas, ideas y apuntes organizados por categorías con guardado automático local", url: "/notas/", keywords: ["notas", "apuntes", "ideas", "texto", "escribir", "guardar", "categorias"] },
   { name: "Temporizador Pomodoro", category: "Productividad", contexts: ["trabajo", "estudio"], icon: "🍅", description: "Técnica Pomodoro con sesiones configurables, estadísticas de productividad y sonidos. Mejora tu concentración", url: "/temporizador-pomodoro/", keywords: ["pomodoro", "temporizador", "productividad", "concentracion", "tecnica pomodoro", "timer", "enfoque", "trabajo", "estudio"] },
@@ -254,6 +254,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Time Tracker", category: "Productividad", contexts: ["trabajo"], icon: "⏱️", description: "Registra tiempo por proyecto y cliente. Informes de horas trabajadas, exportación y tarifa por hora para freelancers", url: "/time-tracker/", keywords: ["time tracker", "horas", "proyecto", "cliente", "freelance", "registro tiempo", "facturacion"] },
   { name: "Conversor de Unidades", category: "Productividad", contexts: ["estudio", "casa", "trabajo"], icon: "🧪", description: "Conversor científico avanzado: 13 categorías incluyendo química, presión, energía, fuerza y potencia", url: "/conversor-unidades/", keywords: ["conversion", "unidades", "medidas", "fisica", "quimica"] },
   { name: "Lista de Equipaje", category: "Productividad", contexts: ["casa", "curiosidad"], icon: "🧳", description: "Genera una lista de equipaje personalizada según tipo de viaje, clima y duración. Checklist interactivo", url: "/lista-equipaje/", keywords: ["equipaje", "maleta", "viaje", "checklist", "vacaciones", "viajar", "empacar"] },
+  { name: "Generador de Actas de Reunión", category: "Productividad", contexts: ["trabajo"], icon: "📋", description: "Crea actas de reunión profesionales con plantillas, gestión de asistentes, orden del día y seguimiento de tareas. Exporta a PDF", url: "/generador-actas/", keywords: ["actas", "reunion", "minuta", "acuerdos", "tareas", "asistentes", "junta", "comite", "orden del dia"] },
 
   // ============================================
   // 11. Salud y Bienestar (15)
