@@ -91,7 +91,7 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Cuida tu salud con herramientas especializadas",
-      "tool_count": 15
+      "tool_count": 16
     },
     {
       "id": "texto",
@@ -2007,7 +2007,7 @@
       "name": "Guía Cuidado de Mascotas",
       "url": "https://meskeia.com/guia-cuidado-mascota/",
       "description": "Todo lo que necesitas saber para cuidar a tu perro o gato: alimentación, salud, parásitos, crecimiento, emergencias y herramientas útiles. 8 capítulos fáciles y cercanos",
-      "category": "Vida Cotidiana",
+      "category": "Salud y Bienestar",
       "contexts": [
         "casa",
         "curiosidad"

@@ -6,13 +6,20 @@ import type { FuseResult } from 'fuse.js';
 import { Application, applicationsDatabase, moments } from '@/data/applications';
 import styles from './SearchBar.module.css';
 
-export default function SearchBar() {
+interface SearchBarProps {
+  large?: boolean;
+}
+
+export default function SearchBar({ large = false }: SearchBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<FuseResult<Application>[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [showDropdown, setShowDropdown] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchInputLargeRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const inlineContainerRef = useRef<HTMLDivElement>(null);
 
   // Configurar Fuse.js
   const fuse = useRef(
@@ -33,39 +40,60 @@ export default function SearchBar() {
   // Atajo de teclado Ctrl+K o Cmd+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+K o Cmd+K para abrir búsqueda
+      // Ctrl+K o Cmd+K para enfocar búsqueda
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
-        openSearch();
+        if (large) {
+          searchInputLargeRef.current?.focus();
+        } else {
+          openSearch();
+        }
       }
 
       // ESC para cerrar
       if (e.key === 'Escape') {
-        closeSearch();
+        if (large) {
+          setShowDropdown(false);
+          setQuery('');
+          setResults([]);
+          searchInputLargeRef.current?.blur();
+        } else {
+          closeSearch();
+        }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [large]);
 
-  // Cerrar al hacer clic fuera
+  // Cerrar dropdown inline al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      // Para modo modal
       if (
+        !large &&
         searchContainerRef.current &&
         !searchContainerRef.current.contains(e.target as Node)
       ) {
         closeSearch();
       }
+      // Para modo inline
+      if (
+        large &&
+        inlineContainerRef.current &&
+        !inlineContainerRef.current.contains(e.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
     };
 
-    if (isOpen) {
+    if (isOpen || showDropdown) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, showDropdown, large]);
 
   const openSearch = () => {
     setIsOpen(true);
@@ -85,12 +113,14 @@ export default function SearchBar() {
     if (!searchQuery || searchQuery.trim().length < 2) {
       setResults([]);
       setSelectedIndex(-1);
+      if (large) setShowDropdown(false);
       return;
     }
 
     const searchResults = fuse.current.search(searchQuery.trim());
-    setResults(searchResults.slice(0, 5)); // Máximo 5 resultados
+    setResults(searchResults.slice(0, 6)); // Máximo 6 resultados
     setSelectedIndex(-1);
+    if (large) setShowDropdown(true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -115,19 +145,139 @@ export default function SearchBar() {
     }
   };
 
+  const handleResultClick = () => {
+    if (large) {
+      setShowDropdown(false);
+      setQuery('');
+      setResults([]);
+    } else {
+      closeSearch();
+    }
+  };
+
+  // Renderizar resultados (compartido entre modal e inline)
+  const renderResults = () => (
+    <>
+      {results.length === 0 ? (
+        <div className={styles.noResults}>
+          <div className={styles.noResultsIcon}>🔍</div>
+          <p>No se encontraron aplicaciones</p>
+          <p className={styles.noResultsHint}>
+            Intenta con otras palabras clave
+          </p>
+        </div>
+      ) : (
+        results.map((result, index) => {
+          const appMoments = result.item.contexts?.map(contextId =>
+            moments.find(m => m.id === contextId)
+          ).filter(Boolean) || [];
+
+          return (
+            <a
+              key={index}
+              href={result.item.url}
+              className={`${styles.resultItem} ${
+                index === selectedIndex ? styles.selected : ''
+              }`}
+              onClick={handleResultClick}
+            >
+              <div className={styles.resultIcon}>{result.item.icon}</div>
+              <div className={styles.resultContent}>
+                <div className={styles.resultTitle}>
+                  {result.item.name}
+                </div>
+                <div className={styles.resultDescription}>
+                  {result.item.description}
+                </div>
+                <div className={styles.resultMeta}>
+                  <span className={styles.resultCategory}>
+                    {result.item.category}
+                  </span>
+                  {appMoments.length > 0 && (
+                    <span className={styles.resultMoments}>
+                      {appMoments.map(m => m?.icon).join(' ')}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </a>
+          );
+        })
+      )}
+    </>
+  );
+
   return (
     <>
-      {/* Botón de búsqueda (solo visible cuando está cerrado) */}
-      {!isOpen && (
-        <button className={styles.searchToggle} onClick={openSearch}>
+      {/* ===== VERSIÓN GRANDE (INLINE) ===== */}
+      {large && (
+        <div className={styles.inlineSearchWrapper} ref={inlineContainerRef}>
+          <div className={`${styles.searchLarge} ${showDropdown ? styles.searchLargeActive : ''}`}>
+            <span className={styles.searchLargeIcon}>🔍</span>
+            <input
+              ref={searchInputLargeRef}
+              type="text"
+              className={styles.searchLargeInput}
+              placeholder="Buscar aplicaciones..."
+              value={query}
+              onChange={(e) => performSearch(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => query.length >= 2 && setShowDropdown(true)}
+            />
+            {query.length > 0 ? (
+              <button
+                className={styles.searchLargeClear}
+                onClick={() => {
+                  setQuery('');
+                  setResults([]);
+                  setShowDropdown(false);
+                  searchInputLargeRef.current?.focus();
+                }}
+                aria-label="Limpiar búsqueda"
+              >
+                ✕
+              </button>
+            ) : (
+              <kbd className={styles.searchLargeKbd}>Ctrl+K</kbd>
+            )}
+          </div>
+
+          {/* Dropdown de resultados inline */}
+          {showDropdown && query.length >= 2 && (
+            <div className={styles.inlineDropdown}>
+              <div className={styles.inlineResults}>
+                {renderResults()}
+              </div>
+              <div className={styles.inlineFooter}>
+                <div className={styles.searchHints}>
+                  <span>
+                    <kbd>↑</kbd>
+                    <kbd>↓</kbd> navegar
+                  </span>
+                  <span>
+                    <kbd>Enter</kbd> seleccionar
+                  </span>
+                  <span>
+                    <kbd>Esc</kbd> cerrar
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ===== VERSIÓN PEQUEÑA (MODAL) ===== */}
+      {!large && !isOpen && (
+        <button type="button" className={styles.searchToggle} onClick={openSearch}>
           <span className={styles.searchIcon}>🔍</span>
           <span className={styles.searchHint}>Buscar</span>
           <kbd className={styles.searchKbd}>Ctrl+K</kbd>
         </button>
       )}
 
-      {/* Contenedor de búsqueda */}
-      {isOpen && (
+      {/* Modal de búsqueda (solo para versión pequeña) */}
+      {!large && isOpen && (
         <div className={styles.searchOverlay}>
           <div className={styles.searchContainer} ref={searchContainerRef}>
             <div className={styles.searchHeader}>
@@ -141,7 +291,7 @@ export default function SearchBar() {
                 onChange={(e) => performSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
               />
-              <button className={styles.searchClose} onClick={closeSearch}>
+              <button type="button" className={styles.searchClose} onClick={closeSearch}>
                 ✕
               </button>
             </div>
@@ -149,53 +299,7 @@ export default function SearchBar() {
             {/* Resultados */}
             {query.length >= 2 && (
               <div className={styles.searchResults}>
-                {results.length === 0 ? (
-                  <div className={styles.noResults}>
-                    <div className={styles.noResultsIcon}>🔍</div>
-                    <p>No se encontraron aplicaciones</p>
-                    <p className={styles.noResultsHint}>
-                      Intenta con otras palabras clave
-                    </p>
-                  </div>
-                ) : (
-                  results.map((result, index) => {
-                    // Obtener los momentos de la app
-                    const appMoments = result.item.contexts?.map(contextId =>
-                      moments.find(m => m.id === contextId)
-                    ).filter(Boolean) || [];
-
-                    return (
-                      <a
-                        key={index}
-                        href={result.item.url}
-                        className={`${styles.resultItem} ${
-                          index === selectedIndex ? styles.selected : ''
-                        }`}
-                        onClick={closeSearch}
-                      >
-                        <div className={styles.resultIcon}>{result.item.icon}</div>
-                        <div className={styles.resultContent}>
-                          <div className={styles.resultTitle}>
-                            {result.item.name}
-                          </div>
-                          <div className={styles.resultDescription}>
-                            {result.item.description}
-                          </div>
-                          <div className={styles.resultMeta}>
-                            <span className={styles.resultCategory}>
-                              {result.item.category}
-                            </span>
-                            {appMoments.length > 0 && (
-                              <span className={styles.resultMoments}>
-                                {appMoments.map(m => m?.icon).join(' ')}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </a>
-                    );
-                  })
-                )}
+                {renderResults()}
               </div>
             )}
 

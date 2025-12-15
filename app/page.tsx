@@ -1,25 +1,86 @@
 'use client';
 
-import { useState } from 'react';
-import FixedHeader from '@/components/FixedHeader';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Sidebar, SidebarMobile, DailyApps, MeskeiaLogo } from '@/components';
+import SearchBar from '@/components/SearchBar';
+import HomeFooter from '@/components/home/HomeFooter';
 import WhyMeskeIA from '@/components/home/WhyMeskeIA';
 import FAQ from '@/components/home/FAQ';
-import HomeFooter from '@/components/home/HomeFooter';
 import { categories, applicationsDatabase, moments, MomentType } from '@/data/applications';
 import { isAppImplemented, TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
+import { addRecentApp } from '@/lib/recentApps';
 import styles from './page.module.css';
 
-export default function Home() {
-  const [openCategory, setOpenCategory] = useState<string | null>(null);
+// Tipos de vista para el área principal
+type MainView = 'home' | 'momentos' | 'categorias' | 'porquemeskeia' | 'faq';
+
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const [currentView, setCurrentView] = useState<MainView>('home');
   const [selectedMoment, setSelectedMoment] = useState<MomentType | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const toggleCategory = (categoryId: string) => {
-    setOpenCategory(openCategory === categoryId ? null : categoryId);
-  };
+  // Leer parámetros de URL para filtros
+  useEffect(() => {
+    const momentParam = searchParams.get('momento') as MomentType | null;
+    const categoriaParam = searchParams.get('categoria');
+    const vistaParam = searchParams.get('vista') as MainView | null;
 
-  const toggleMoment = (momentId: MomentType) => {
-    setSelectedMoment(selectedMoment === momentId ? null : momentId);
-  };
+    if (vistaParam) {
+      setCurrentView(vistaParam);
+    } else if (momentParam && moments.some(m => m.id === momentParam)) {
+      setCurrentView('momentos');
+      setSelectedMoment(momentParam);
+    } else if (categoriaParam) {
+      setCurrentView('categorias');
+      const category = categories.find(c => c.name === categoriaParam);
+      if (category) {
+        setSelectedCategory(category.id);
+      }
+    }
+  }, [searchParams]);
+
+  // Escuchar cambio de sidebar colapsado
+  useEffect(() => {
+    const savedCollapsed = localStorage.getItem('meskeia_sidebar_collapsed');
+    if (savedCollapsed) {
+      setSidebarCollapsed(savedCollapsed === 'true');
+    }
+
+    const handleStorageChange = () => {
+      const collapsed = localStorage.getItem('meskeia_sidebar_collapsed');
+      setSidebarCollapsed(collapsed === 'true');
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    const checkSidebarState = () => {
+      const collapsed = localStorage.getItem('meskeia_sidebar_collapsed');
+      setSidebarCollapsed(collapsed === 'true');
+    };
+
+    const interval = setInterval(checkSidebarState, 100);
+    setTimeout(() => clearInterval(interval), 2000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Escuchar eventos del sidebar para cambiar vista
+  useEffect(() => {
+    const handleViewChange = (e: CustomEvent<{ view: MainView }>) => {
+      setCurrentView(e.detail.view);
+      setSelectedMoment(null);
+      setSelectedCategory(null);
+    };
+
+    window.addEventListener('changeMainView' as any, handleViewChange);
+    return () => window.removeEventListener('changeMainView' as any, handleViewChange);
+  }, []);
 
   // Filtrar solo apps implementadas y ordenar alfabéticamente
   const getAppsByCategory = (categoryName: string) => {
@@ -42,133 +103,187 @@ export default function Home() {
     return getAppsByMoment(momentId).length;
   };
 
-  return (
-    <>
-      <FixedHeader />
+  // Manejar click en app (añadir a recientes)
+  const handleAppClick = useCallback((url: string) => {
+    addRecentApp(url);
+  }, []);
 
-      <main className={styles.container}>
-        {/* Header */}
-        <header className={styles.header}>
-          <div className={styles.headerContent}>
-            <h1 className={styles.title}>
-              Biblioteca de Aplicaciones Web Gratuitas
-            </h1>
-            <p className={styles.subtitle}>
-              {TOTAL_IMPLEMENTED_APPS} Apps online para facilitar tu día a día. Sin registro, sin anuncios.
-            </p>
-          </div>
-        </header>
+  // Volver a home
+  const goHome = () => {
+    setCurrentView('home');
+    setSelectedMoment(null);
+    setSelectedCategory(null);
+  };
 
-        {/* Sección Momentos */}
-        <section className={styles.momentsSection}>
-          <h2 className={styles.momentsSectionTitle}>¿Qué estás haciendo?</h2>
-
-          <div className={styles.momentsGrid}>
-            {moments.map((moment) => {
-              const count = getMomentCount(moment.id);
-              const isActive = selectedMoment === moment.id;
-
-              return (
-                <button
-                  type="button"
-                  key={moment.id}
-                  className={`${styles.momentButton} ${isActive ? styles.active : ''}`}
-                  onClick={() => toggleMoment(moment.id)}
-                  title={moment.description}
-                >
-                  <span className={styles.momentIcon}>{moment.icon}</span>
-                  <span className={styles.momentName}>{moment.name}</span>
-                  <span className={styles.momentCount}>{count} apps</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Panel expandido con apps del momento seleccionado */}
-          {selectedMoment && (
-            <div className={styles.momentAppsPanel}>
-              <div className={styles.momentAppsHeader}>
-                <h3 className={styles.momentAppsTitle}>
-                  <span>{moments.find(m => m.id === selectedMoment)?.icon}</span>
-                  <span>{moments.find(m => m.id === selectedMoment)?.name}</span>
-                </h3>
-                <button
-                  type="button"
-                  className={styles.momentCloseBtn}
-                  onClick={() => setSelectedMoment(null)}
-                  aria-label="Cerrar panel"
-                >
-                  ×
-                </button>
-              </div>
-              <ul className={styles.momentAppsList}>
-                {getAppsByMoment(selectedMoment).map((app, index) => (
-                  <li key={index} className={styles.momentAppItem}>
-                    <span className={styles.momentAppIcon}>{app.icon}</span>
-                    <a href={app.url} title={app.description}>
-                      {app.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+  // Renderizar contenido según la vista
+  const renderMainContent = () => {
+    switch (currentView) {
+      case 'momentos':
+        return (
+          <section className={styles.viewSection}>
+            <div className={styles.viewHeader}>
+              <button onClick={goHome} className={styles.backButton}>← Volver</button>
+              <h2 className={styles.viewTitle}>✨ ¿Qué estás haciendo?</h2>
             </div>
-          )}
-        </section>
+            <div className={styles.momentsGrid}>
+              {moments.map((moment) => {
+                const count = getMomentCount(moment.id);
+                const isActive = selectedMoment === moment.id;
 
-        {/* Separador */}
-        <div className={styles.sectionDivider}>
-          o explora por categoría
-        </div>
+                return (
+                  <button
+                    type="button"
+                    key={moment.id}
+                    className={`${styles.momentButton} ${isActive ? styles.active : ''}`}
+                    onClick={() => setSelectedMoment(isActive ? null : moment.id)}
+                    title={moment.description}
+                  >
+                    <span className={styles.momentIcon}>{moment.icon}</span>
+                    <span className={styles.momentName}>{moment.name}</span>
+                    <span className={styles.momentCount}>{count} apps</span>
+                  </button>
+                );
+              })}
+            </div>
 
-        {/* Categorías */}
-        <section className={styles.categoriesGrid}>
-          {categories.map((category) => {
-            const apps = getAppsByCategory(category.name);
-            const isOpen = openCategory === category.id;
-
-            return (
-              <div key={category.id} className={styles.categoryCard}>
-                <div
-                  className={styles.categoryHeader}
-                  onClick={() => toggleCategory(category.id)}
-                >
-                  <div className={styles.categoryIcon}>{category.icon}</div>
-                  <div>
-                    <h2 className={styles.categoryTitle}>{category.name}</h2>
-                    <p className={styles.categoryDescription}>
-                      {category.description}
-                    </p>
-                    <span className={styles.categoryCount}>
-                      {apps.length} {apps.length === 1 ? 'App' : 'Apps'}
-                    </span>
-                  </div>
+            {selectedMoment && (
+              <div className={styles.appsPanel}>
+                <div className={styles.appsPanelHeader}>
+                  <h3>
+                    <span>{moments.find(m => m.id === selectedMoment)?.icon}</span>
+                    {moments.find(m => m.id === selectedMoment)?.name}
+                  </h3>
+                  <button onClick={() => setSelectedMoment(null)} className={styles.closeBtn}>×</button>
                 </div>
-
-                {isOpen && (
-                  <ul className={styles.categoryTools}>
-                    {apps.map((app, index) => (
-                      <li key={index}>
-                        <a
-                          href={app.url}
-                          onClick={(e) => e.stopPropagation()}
-                          title={app.description}
-                        >
-                          {app.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <ul className={styles.appsList}>
+                  {getAppsByMoment(selectedMoment).map((app, index) => (
+                    <li key={index} className={styles.appItem}>
+                      <a href={app.url} onClick={() => handleAppClick(app.url)} title={app.description}>
+                        <span className={styles.appItemIcon}>{app.icon}</span>
+                        {app.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            );
-          })}
-        </section>
+            )}
+          </section>
+        );
 
+      case 'categorias':
+        return (
+          <section className={styles.viewSection}>
+            <div className={styles.viewHeader}>
+              <button onClick={goHome} className={styles.backButton}>← Volver</button>
+              <h2 className={styles.viewTitle}>📂 Categorías</h2>
+            </div>
+            <div className={styles.categoriesGrid}>
+              {categories.map((category) => {
+                const apps = getAppsByCategory(category.name);
+                const isOpen = selectedCategory === category.id;
+
+                return (
+                  <div key={category.id} className={`${styles.categoryCard} ${isOpen ? styles.categoryCardOpen : ''}`}>
+                    <div
+                      className={styles.categoryHeader}
+                      onClick={() => setSelectedCategory(isOpen ? null : category.id)}
+                    >
+                      <div className={styles.categoryIcon}>{category.icon}</div>
+                      <div className={styles.categoryInfo}>
+                        <h3 className={styles.categoryTitle}>{category.name}</h3>
+                        <span className={styles.categoryCount}>{apps.length} Apps</span>
+                      </div>
+                    </div>
+
+                    {isOpen && (
+                      <ul className={styles.categoryApps}>
+                        {apps.map((app, index) => (
+                          <li key={index}>
+                            <a href={app.url} onClick={() => handleAppClick(app.url)} title={app.description}>
+                              <span>{app.icon}</span>
+                              {app.name}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+
+      case 'porquemeskeia':
+        return (
+          <section className={styles.viewSection}>
+            <div className={styles.viewHeader}>
+              <button onClick={goHome} className={styles.backButton}>← Volver</button>
+            </div>
+            <WhyMeskeIA />
+          </section>
+        );
+
+      case 'faq':
+        return (
+          <section className={styles.viewSection}>
+            <div className={styles.viewHeader}>
+              <button onClick={goHome} className={styles.backButton}>← Volver</button>
+            </div>
+            <FAQ />
+          </section>
+        );
+
+      default: // home
+        return (
+          <>
+            {/* Header con logo */}
+            <header className={styles.header}>
+              <div className={styles.headerContent}>
+                <MeskeiaLogo disableLink inline />
+                <p className={styles.subtitle}>
+                  {TOTAL_IMPLEMENTED_APPS} aplicaciones web gratuitas para tu día a día
+                </p>
+              </div>
+            </header>
+
+            {/* Búsqueda central grande */}
+            <div className={styles.searchSection}>
+              <div className={styles.searchWrapper}>
+                <SearchBar large />
+              </div>
+            </div>
+
+            {/* Apps del día */}
+            <section className={styles.dailySection}>
+              <DailyApps count={4} />
+            </section>
+          </>
+        );
+    }
+  };
+
+  return (
+    <div className={styles.pageWrapper}>
+      {/* Sidebar Desktop */}
+      <Sidebar onViewChange={setCurrentView} currentView={currentView} />
+
+      {/* Sidebar Mobile (hamburger) */}
+      <SidebarMobile onViewChange={setCurrentView} currentView={currentView} />
+
+      {/* Contenido principal */}
+      <main className={`${styles.mainContent} ${sidebarCollapsed ? styles.mainContentExpanded : ''}`}>
+        {renderMainContent()}
+        <HomeFooter />
       </main>
+    </div>
+  );
+}
 
-      <WhyMeskeIA />
-      <FAQ />
-      <HomeFooter />
-    </>
+export default function Home() {
+  return (
+    <Suspense fallback={<div className={styles.loading}>Cargando...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

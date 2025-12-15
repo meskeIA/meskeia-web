@@ -25,6 +25,23 @@
   box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
 }
 
+/* Versión inline (no fixed, para usar dentro de contenedores) */
+.logoInline {
+  position: relative;
+  top: auto;
+  left: auto;
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.logoInline:hover {
+  box-shadow: none;
+}
+
 .logoIcon {
   width: 40px;
   height: 40px;

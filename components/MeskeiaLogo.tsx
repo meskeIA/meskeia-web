@@ -3,17 +3,25 @@
  *
  * Logo oficial reutilizable en todas las aplicaciones
  * Compatible con diseño meskeIA
+ *
+ * Props:
+ * - disableLink: Si true, el logo no tiene enlace (para página principal)
+ * - inline: Si true, el logo no es fixed (para usar dentro de contenedores)
  */
 
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import styles from './MeskeiaLogo.module.css';
 
-export default function MeskeiaLogo() {
-  return (
-    <Link href="/" className={styles.logoContainer}>
+interface MeskeiaLogoProps {
+  disableLink?: boolean;
+  inline?: boolean;
+}
+
+export default function MeskeiaLogo({ disableLink = false, inline = false }: MeskeiaLogoProps) {
+  const content = (
+    <>
       <div className={styles.logoIcon}>
         <div className={styles.neuralNetwork}>
           <div className={styles.neuralDot}></div>
@@ -26,6 +34,18 @@ export default function MeskeiaLogo() {
         <span className={styles.meske}>meske</span>
         <span className={styles.ia}>IA</span>
       </div>
+    </>
+  );
+
+  const containerClass = `${styles.logoContainer} ${inline ? styles.logoInline : ''}`;
+
+  if (disableLink) {
+    return <div className={containerClass}>{content}</div>;
+  }
+
+  return (
+    <Link href="/" className={containerClass}>
+      {content}
     </Link>
   );
 }

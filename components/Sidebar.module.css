@@ -1,0 +1,562 @@
+/* ============================================
+   Sidebar meskeIA - Estilos Desktop
+   ============================================ */
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 280px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: width 0.3s ease, transform 0.3s ease;
+  overflow: hidden;
+}
+
+.sidebarCollapsed {
+  width: 60px;
+}
+
+/* Header del sidebar */
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  min-height: 60px;
+}
+
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.logoWrapper:hover {
+  opacity: 0.9;
+}
+
+/* Logo icono solo (cuando colapsado) */
+.logoIconOnly {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoIconSmall {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.logoIconSmall::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+}
+
+.logoIconSmall .neuralDot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+}
+
+.logoIconSmall .neuralDot:nth-child(1) {
+  top: 6px;
+  left: 8px;
+}
+
+.logoIconSmall .neuralDot:nth-child(2) {
+  bottom: 8px;
+  right: 6px;
+}
+
+/* Toggle row separada */
+.toggleRow {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebarCollapsed .toggleRow {
+  justify-content: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.toggleButton {
+  background: var(--hover);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  color: var(--text-secondary);
+  border-radius: var(--radius);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.toggleButton:hover {
+  background: var(--focus);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Contenido del sidebar */
+.sidebarContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md) 0;
+}
+
+/* Contador de apps */
+.appCounter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin: 0 var(--spacing-md) var(--spacing-md);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius);
+  color: white;
+}
+
+.appCounterNumber {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.appCounterText {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.sidebarCollapsed .appCounter {
+  flex-direction: column;
+  padding: var(--spacing-sm);
+  margin: 0 8px var(--spacing-md);
+  gap: 0;
+}
+
+.sidebarCollapsed .appCounterNumber {
+  font-size: 1.1rem;
+}
+
+.sidebarCollapsed .appCounterText {
+  display: none;
+}
+
+/* Botones de navegación principal */
+.navButtons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: 0 var(--spacing-md);
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.navButton:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--hover);
+}
+
+.navButtonActive {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--focus);
+}
+
+.navButtonHome {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.navButtonHome:hover {
+  opacity: 0.9;
+  color: white;
+  border-color: transparent;
+}
+
+/* navButtonSearch usa el mismo estilo que los demás botones de navegación */
+
+.navButtonIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.navButtonText {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebarCollapsed .navButtons {
+  padding: 0 8px;
+}
+
+.sidebarCollapsed .navButton {
+  justify-content: center;
+  padding: var(--spacing-sm);
+}
+
+.sidebarCollapsed .navButtonText {
+  display: none;
+}
+
+/* Links informativos */
+.infoLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: 0 var(--spacing-md);
+}
+
+.infoLink {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+  border-radius: var(--radius);
+}
+
+.infoLink:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.infoLinkActive {
+  background: var(--focus);
+  color: var(--primary);
+}
+
+.sidebarCollapsed .infoLinks {
+  padding: 0 8px;
+}
+
+.sidebarCollapsed .infoLink {
+  justify-content: center;
+  padding: var(--spacing-sm);
+}
+
+.sidebarCollapsed .infoLink span:not(.navButtonIcon) {
+  display: none;
+}
+
+/* Secciones */
+.section {
+  margin-bottom: var(--spacing-sm);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+}
+
+.sectionHeader:hover {
+  color: var(--text-primary);
+}
+
+.sectionIcon {
+  font-size: 1rem;
+  margin-right: var(--spacing-sm);
+}
+
+.sectionTitle {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sectionArrow {
+  font-size: 0.75rem;
+  transition: transform 0.2s;
+}
+
+.sectionArrowOpen {
+  transform: rotate(180deg);
+}
+
+.sidebarCollapsed .sectionTitle,
+.sidebarCollapsed .sectionArrow {
+  display: none;
+}
+
+.sidebarCollapsed .sectionHeader {
+  justify-content: center;
+  padding: var(--spacing-sm);
+}
+
+/* Lista de items */
+.sectionContent {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.sectionContentClosed {
+  max-height: 0;
+}
+
+.sectionContentOpen {
+  max-height: 500px;
+}
+
+.sidebarCollapsed .sectionContent {
+  display: none;
+}
+
+/* Items de navegación */
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) calc(var(--spacing-md) + var(--spacing-lg));
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.navItem:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.navItemActive {
+  background: var(--focus);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.navItemIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.navItemText {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navItemCount {
+  font-size: 0.75rem;
+  background: var(--hover);
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: var(--text-muted);
+}
+
+/* Apps recientes */
+.recentApps {
+  padding: 0 var(--spacing-md);
+}
+
+.recentApp {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.recentApp:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.recentAppIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.recentAppName {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.noRecentApps {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.sidebarCollapsed .recentApps,
+.sidebarCollapsed .noRecentApps {
+  display: none;
+}
+
+/* Links simples (Por qué meskeIA, FAQ) */
+.simpleLink {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.simpleLink:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.sidebarCollapsed .simpleLink span:not(.navItemIcon) {
+  display: none;
+}
+
+.sidebarCollapsed .simpleLink {
+  justify-content: center;
+}
+
+/* Footer del sidebar (dark mode) */
+.sidebarFooter {
+  border-top: 1px solid var(--border);
+  padding: var(--spacing-md);
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  border-radius: var(--radius);
+  transition: background 0.2s;
+}
+
+.themeToggle:hover {
+  background: var(--hover);
+}
+
+.themeToggleLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.themeToggleSwitch {
+  width: 44px;
+  height: 24px;
+  background: var(--border);
+  border-radius: 12px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.themeToggleSwitchActive {
+  background: var(--primary);
+}
+
+.themeToggleKnob {
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.themeToggleSwitchActive .themeToggleKnob {
+  transform: translateX(20px);
+}
+
+.sidebarCollapsed .themeToggleLabel span {
+  display: none;
+}
+
+.sidebarCollapsed .themeToggle {
+  justify-content: center;
+}
+
+.sidebarCollapsed .themeToggleSwitch {
+  display: none;
+}
+
+/* Separador */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: var(--spacing-md) var(--spacing-md);
+}
+
+.sidebarCollapsed .divider {
+  margin: var(--spacing-md) var(--spacing-sm);
+}
+
+/* Ocultar en móvil (se usa SidebarMobile) */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}

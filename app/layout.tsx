@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { generateBaseMetadata } from '@/lib/metadata';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import ThemeToggle from '@/components/ThemeToggle';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import DynamicThemeColor from '@/components/DynamicThemeColor';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -77,7 +76,6 @@ export default function RootLayout({
             <DynamicThemeColor />
             <ServiceWorkerRegister />
             {children}
-            <ThemeToggle />
           </ErrorBoundary>
         </ThemeProvider>
       </body>
