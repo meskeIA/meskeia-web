@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 161+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 165+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 161,
+  "total_tools": 165,
   "last_updated": "2025-12-15",
   "features": {
     "all_free": true,
@@ -70,7 +70,7 @@
       "name": "Juegos y Entretenimiento",
       "icon": "🎮",
       "description": "Diviértete mientras aprendes",
-      "tool_count": 12
+      "tool_count": 14
     },
     {
       "id": "matematicas",
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Optimiza tu tiempo y organización",
-      "tool_count": 13
+      "tool_count": 15
     },
     {
       "id": "salud",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 64
+      "tool_count": 67
     },
     {
       "id": "estudio",
@@ -142,14 +142,14 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 15
+      "tool_count": 17
     },
     {
       "id": "curiosidad",
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 21
+      "tool_count": 23
     }
   ],
   "tools": [
@@ -2429,6 +2429,52 @@
       "icon": "🏃"
     },
     {
+      "slug": "ruleta-aleatoria",
+      "name": "Ruleta Aleatoria",
+      "url": "https://meskeia.com/ruleta-aleatoria/",
+      "description": "Ruleta personalizable para sorteos, decisiones y selección al azar. Añade opciones, gira y elige ganador",
+      "category": "Juegos y Entretenimiento",
+      "contexts": [
+        "relax",
+        "trabajo",
+        "curiosidad"
+      ],
+      "keywords": [
+        "ruleta",
+        "sorteo",
+        "aleatorio",
+        "wheel of names",
+        "decision",
+        "elegir",
+        "azar",
+        "girar"
+      ],
+      "icon": "🎡"
+    },
+    {
+      "slug": "generador-loteria",
+      "name": "Generador de Lotería",
+      "url": "https://meskeia.com/generador-loteria/",
+      "description": "Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo y Lototurf. Combinaciones al azar y favoritos",
+      "category": "Juegos y Entretenimiento",
+      "contexts": [
+        "relax",
+        "curiosidad"
+      ],
+      "keywords": [
+        "loteria",
+        "primitiva",
+        "euromillones",
+        "bonoloto",
+        "numeros",
+        "sorteo",
+        "gordo",
+        "suerte",
+        "combinacion"
+      ],
+      "icon": "🎲"
+    },
+    {
       "slug": "calculadora-probabilidad",
       "name": "Calculadora de Probabilidad",
       "url": "https://meskeia.com/calculadora-probabilidad/",
@@ -2928,6 +2974,50 @@
         "orden del dia"
       ],
       "icon": "📋"
+    },
+    {
+      "slug": "prueba-camara",
+      "name": "Prueba de Cámara Web",
+      "url": "https://meskeia.com/prueba-camara/",
+      "description": "Prueba tu webcam antes de videollamadas. Verifica resolución, ajusta brillo/contraste y toma fotos. 100% privado",
+      "category": "Productividad",
+      "contexts": [
+        "trabajo"
+      ],
+      "keywords": [
+        "camara",
+        "webcam",
+        "videollamada",
+        "zoom",
+        "meet",
+        "teams",
+        "probar camara",
+        "test webcam",
+        "foto"
+      ],
+      "icon": "📷"
+    },
+    {
+      "slug": "prueba-microfono",
+      "name": "Prueba de Micrófono",
+      "url": "https://meskeia.com/prueba-microfono/",
+      "description": "Prueba tu micrófono antes de videollamadas. Visualiza niveles de audio, graba y reproduce. Sin registro, 100% privado",
+      "category": "Productividad",
+      "contexts": [
+        "trabajo"
+      ],
+      "keywords": [
+        "microfono",
+        "audio",
+        "videollamada",
+        "zoom",
+        "meet",
+        "teams",
+        "probar micro",
+        "test audio",
+        "grabar voz"
+      ],
+      "icon": "🎙️"
     },
     {
       "slug": "calculadora-imc",

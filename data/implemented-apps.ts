@@ -60,7 +60,7 @@ export const implementedAppsUrls = [
   "/calculadora-algebra-abstracta/",
   "/calculadora-teoria-colas/",
 
-  // Herramientas de Productividad (13 implementadas)
+  // Herramientas de Productividad (15 implementadas)
   "/time-tracker/",
   "/notas/",
   "/generador-contrasenas/",
@@ -74,6 +74,8 @@ export const implementedAppsUrls = [
   "/generador-firma-email/",
   "/lista-equipaje/",              // Checklist personalizado de viaje
   "/generador-actas/",             // Generador de actas de reunión profesionales
+  "/prueba-camara/",               // Test de webcam con captura de fotos
+  "/prueba-microfono/",            // Test de micrófono con grabación de audio
 
   // Texto y Documentos (13 implementadas)
   "/contador-palabras/",
@@ -99,7 +101,7 @@ export const implementedAppsUrls = [
   "/generador-hashes/",         // MD5, SHA-256, SHA-512
   "/codificador-base64/",       // Base64, URL encode, Hexadecimal
 
-  // Juegos y Entretenimiento (12 implementadas)
+  // Juegos y Entretenimiento (14 implementadas)
   "/test-velocidad-escritura/",
   "/juego-piedra-papel-tijera/",
   "/juego-tres-en-raya/",
@@ -112,6 +114,8 @@ export const implementedAppsUrls = [
   "/juego-asteroids/",          // Arcade clásico espacial
   "/juego-space-invaders/",     // Arcade clásico de invasores
   "/juego-platform-runner/",    // Juego de plataformas
+  "/ruleta-aleatoria/",         // Ruleta personalizable para sorteos
+  "/generador-loteria/",        // Números para Primitiva, Euromillones, Bonoloto
 
   // Salud y Bienestar (14 implementadas)
   "/calculadora-imc/",
