@@ -530,6 +530,70 @@
   max-height: 300px;
 }
 
+/* ICO Section */
+.icoSection {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.icoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.icoInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.icoIcon {
+  font-size: 2.5rem;
+}
+
+.icoInfo h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-xs);
+  color: var(--text-primary);
+}
+
+.icoInfo p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.btnIcoDownload {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btnIcoDownload:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.icoHint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: var(--spacing-md) 0 0;
+  font-style: italic;
+}
+
 /* Info Section */
 .infoSection {
   background: var(--bg-card);

@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 156+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 159+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 156,
-  "last_updated": "2025-12-12",
+  "total_tools": 159,
+  "last_updated": "2025-12-15",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -35,7 +35,7 @@
       "name": "Diseño Web",
       "icon": "🎨",
       "description": "Colores, tipografías y herramientas para diseñadores",
-      "tool_count": 13
+      "tool_count": 16
     },
     {
       "id": "emprendimiento",
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 61
+      "tool_count": 63
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 47
+      "tool_count": 48
     },
     {
       "id": "casa",
@@ -135,21 +135,21 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 37
+      "tool_count": 40
     },
     {
       "id": "relax",
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 14
+      "tool_count": 15
     },
     {
       "id": "curiosidad",
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 20
+      "tool_count": 21
     }
   ],
   "tools": [
@@ -835,6 +835,58 @@
       "icon": "💻"
     },
     {
+      "slug": "compresor-imagenes",
+      "name": "Compresor de Imágenes por Lotes",
+      "url": "https://meskeia.com/compresor-imagenes/",
+      "description": "Comprime múltiples imágenes a la vez sin límites ni marcas de agua. Reduce el tamaño de JPG, PNG, WebP manteniendo la calidad",
+      "category": "Diseño Web",
+      "contexts": [
+        "creando",
+        "trabajo"
+      ],
+      "keywords": [
+        "compresor",
+        "imagenes",
+        "comprimir",
+        "lotes",
+        "batch",
+        "optimizar",
+        "reducir",
+        "peso",
+        "fotos",
+        "webp",
+        "jpg",
+        "png"
+      ],
+      "icon": "🗜️"
+    },
+    {
+      "slug": "recortador-audio",
+      "name": "Recortador de Audio",
+      "url": "https://meskeia.com/recortador-audio/",
+      "description": "Recorta y edita archivos de audio online gratis. Corta MP3, WAV, OGG sin límites ni marcas de agua. Fade in/out y ajuste de volumen",
+      "category": "Diseño Web",
+      "contexts": [
+        "creando",
+        "trabajo",
+        "relax"
+      ],
+      "keywords": [
+        "recortador",
+        "audio",
+        "cortar",
+        "mp3",
+        "wav",
+        "ogg",
+        "trim",
+        "editar",
+        "tonos",
+        "fade",
+        "volumen"
+      ],
+      "icon": "✂️"
+    },
+    {
       "slug": "generador-utm",
       "name": "Generador de Enlaces UTM",
       "url": "https://meskeia.com/generador-utm/",
@@ -853,6 +905,34 @@
         "enlaces"
       ],
       "icon": "💻"
+    },
+    {
+      "slug": "generador-ondas",
+      "name": "Generador de Ondas y Visualizador",
+      "url": "https://meskeia.com/generador-ondas/",
+      "description": "Genera ondas sonoras (senoidal, cuadrada, triangular, sierra) y visualiza audio de archivos. Herramienta educativa de física del sonido con frecuencias y notas musicales",
+      "category": "Diseño Web",
+      "contexts": [
+        "estudio",
+        "creando",
+        "curiosidad"
+      ],
+      "keywords": [
+        "ondas",
+        "waveform",
+        "senoidal",
+        "cuadrada",
+        "triangular",
+        "frecuencia",
+        "hz",
+        "audio",
+        "visualizador",
+        "sonido",
+        "osciloscopio",
+        "generador tonos",
+        "notas musicales"
+      ],
+      "icon": "🔊"
     },
     {
       "slug": "calculadora-tarifa-freelance",

@@ -137,6 +137,7 @@ export const implementedAppsUrls = [
   "/conversor-imagenes/",
   "/compresor-imagenes/",       // Compresor de imágenes por lotes sin límites
   "/recortador-audio/",        // Recortador de audio con fade in/out
+  "/generador-ondas/",         // Generador de ondas y visualizador de audio
   "/generador-iconos/",
 
   // Creatividad y Diseño (7 implementadas)

@@ -11,6 +11,7 @@ interface GeneratedIcon {
   url: string;
   fileName: string;
   sizeKB: string;
+  pngData?: Uint8Array; // Para generar ICO
 }
 
 interface IconPreset {
@@ -32,6 +33,12 @@ const ICON_PRESETS: IconPreset[] = [
     sizes: [16, 32, 48, 64, 128, 256],
     description: 'Iconos para navegadores',
     icon: '🌐'
+  },
+  {
+    name: 'Favicon ICO',
+    sizes: [16, 32, 48],
+    description: 'Multi-resolución en .ico',
+    icon: '🎯'
   },
   {
     name: 'Apple Touch',
@@ -59,6 +66,82 @@ const ICON_PRESETS: IconPreset[] = [
   }
 ];
 
+/**
+ * Genera un archivo ICO multi-resolución a partir de imágenes PNG
+ * Formato ICO: https://en.wikipedia.org/wiki/ICO_(file_format)
+ */
+const generateIcoFile = async (icons: GeneratedIcon[]): Promise<Blob> => {
+  // Filtrar solo tamaños válidos para ICO (máx 256px)
+  const validIcons = icons.filter(icon => icon.size <= 256 && icon.pngData);
+
+  if (validIcons.length === 0) {
+    throw new Error('No hay iconos válidos para generar ICO (máx 256px)');
+  }
+
+  const numImages = validIcons.length;
+
+  // Calcular tamaños
+  // Header: 6 bytes
+  // Directory entries: 16 bytes cada uno
+  const headerSize = 6;
+  const directorySize = 16 * numImages;
+  let dataOffset = headerSize + directorySize;
+
+  // Preparar datos de cada imagen
+  const imageEntries: { size: number; data: Uint8Array; offset: number }[] = [];
+
+  for (const icon of validIcons) {
+    if (!icon.pngData) continue;
+    imageEntries.push({
+      size: icon.size,
+      data: icon.pngData,
+      offset: dataOffset
+    });
+    dataOffset += icon.pngData.length;
+  }
+
+  // Calcular tamaño total del archivo
+  const totalSize = dataOffset;
+  const buffer = new ArrayBuffer(totalSize);
+  const view = new DataView(buffer);
+  const uint8 = new Uint8Array(buffer);
+
+  // Escribir header ICO
+  view.setUint16(0, 0, true);       // Reserved (0)
+  view.setUint16(2, 1, true);       // Type (1 = ICO)
+  view.setUint16(4, numImages, true); // Number of images
+
+  // Escribir directory entries
+  let entryOffset = 6;
+  for (const entry of imageEntries) {
+    // Width (0 = 256)
+    view.setUint8(entryOffset, entry.size === 256 ? 0 : entry.size);
+    // Height (0 = 256)
+    view.setUint8(entryOffset + 1, entry.size === 256 ? 0 : entry.size);
+    // Color palette (0 = no palette)
+    view.setUint8(entryOffset + 2, 0);
+    // Reserved
+    view.setUint8(entryOffset + 3, 0);
+    // Color planes (1 para ICO)
+    view.setUint16(entryOffset + 4, 1, true);
+    // Bits per pixel (32 para RGBA)
+    view.setUint16(entryOffset + 6, 32, true);
+    // Size of image data
+    view.setUint32(entryOffset + 8, entry.data.length, true);
+    // Offset to image data
+    view.setUint32(entryOffset + 12, entry.offset, true);
+
+    entryOffset += 16;
+  }
+
+  // Escribir datos de imágenes PNG
+  for (const entry of imageEntries) {
+    uint8.set(entry.data, entry.offset);
+  }
+
+  return new Blob([buffer], { type: 'image/x-icon' });
+};
+
 type OutputFormat = 'png' | 'webp' | 'jpeg';
 type PreviewShape = 'square' | 'rounded' | 'circle';
 
@@ -73,6 +156,9 @@ export default function GeneradorIconosPage() {
   const [generatedIcons, setGeneratedIcons] = useState<GeneratedIcon[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [manifestCode, setManifestCode] = useState<string>('');
+  const [icoUrl, setIcoUrl] = useState<string>('');
+  const [icoSizeKB, setIcoSizeKB] = useState<string>('');
+  const [canGenerateIco, setCanGenerateIco] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -112,6 +198,8 @@ export default function GeneradorIconosPage() {
 
     setIsGenerating(true);
     setGeneratedIcons([]);
+    setIcoUrl('');
+    setIcoSizeKB('');
 
     const icons: GeneratedIcon[] = [];
     const qualityValue = quality / 100;
@@ -139,15 +227,41 @@ export default function GeneradorIconosPage() {
         }
       });
 
+      // Siempre generar PNG data para ICO (si el tamaño es válido)
+      let pngData: Uint8Array | undefined;
+      if (size <= 256) {
+        const pngBlob = await new Promise<Blob>((resolve) => {
+          canvas.toBlob((b) => resolve(b!), 'image/png');
+        });
+        pngData = new Uint8Array(await pngBlob.arrayBuffer());
+      }
+
       const url = URL.createObjectURL(blob);
       const fileName = `icon-${size}x${size}.${outputFormat}`;
       const sizeKB = (blob.size / 1024).toFixed(1);
 
-      icons.push({ size, blob, url, fileName, sizeKB });
+      icons.push({ size, blob, url, fileName, sizeKB, pngData });
     }
 
     setGeneratedIcons(icons);
     generateManifestCode(icons);
+
+    // Verificar si se puede generar ICO (al menos un tamaño ≤256px)
+    const hasValidIcoSizes = icons.some(icon => icon.size <= 256 && icon.pngData);
+    setCanGenerateIco(hasValidIcoSizes);
+
+    // Auto-generar ICO si hay tamaños válidos
+    if (hasValidIcoSizes) {
+      try {
+        const icoBlob = await generateIcoFile(icons);
+        const url = URL.createObjectURL(icoBlob);
+        setIcoUrl(url);
+        setIcoSizeKB((icoBlob.size / 1024).toFixed(1));
+      } catch {
+        setCanGenerateIco(false);
+      }
+    }
+
     setIsGenerating(false);
   }, [originalImage, selectedPreset, outputFormat, quality]);
 
@@ -184,12 +298,23 @@ export default function GeneradorIconosPage() {
     navigator.clipboard.writeText(manifestCode);
   };
 
+  const downloadIco = () => {
+    if (!icoUrl) return;
+    const link = document.createElement('a');
+    link.href = icoUrl;
+    link.download = 'favicon.ico';
+    link.click();
+  };
+
   const clearImage = () => {
     setOriginalImage(null);
     setPreviewUrl('');
     setImageInfo('');
     setGeneratedIcons([]);
     setManifestCode('');
+    setIcoUrl('');
+    setIcoSizeKB('');
+    setCanGenerateIco(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -360,6 +485,7 @@ export default function GeneradorIconosPage() {
                   <span className={styles.iconKB}>{icon.sizeKB} KB</span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => downloadIcon(icon)}
                   className={styles.btnDownload}
                 >
@@ -368,6 +494,27 @@ export default function GeneradorIconosPage() {
               </div>
             ))}
           </div>
+
+          {/* Descargar archivo ICO multi-resolución */}
+          {canGenerateIco && icoUrl && (
+            <div className={styles.icoSection}>
+              <div className={styles.icoHeader}>
+                <div className={styles.icoInfo}>
+                  <span className={styles.icoIcon}>🎯</span>
+                  <div>
+                    <h3>Archivo favicon.ico</h3>
+                    <p>Multi-resolución ({generatedIcons.filter(i => i.size <= 256).map(i => i.size).join(', ')}px) • {icoSizeKB} KB</p>
+                  </div>
+                </div>
+                <button type="button" onClick={downloadIco} className={styles.btnIcoDownload}>
+                  📥 Descargar favicon.ico
+                </button>
+              </div>
+              <p className={styles.icoHint}>
+                El archivo .ico contiene múltiples resoluciones en un solo archivo, ideal para navegadores legacy.
+              </p>
+            </div>
+          )}
 
           {/* Código manifest.json */}
           <div className={styles.manifestSection}>
