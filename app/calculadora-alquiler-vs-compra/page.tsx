@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraAlquilerVsCompra.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 export default function CalculadoraAlquilerVsCompraPage() {
   // Datos de la vivienda
@@ -557,6 +559,8 @@ export default function CalculadoraAlquilerVsCompraPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('calculadora-alquiler-vs-compra')} />
 
       <Footer appName="calculadora-alquiler-vs-compra" />
     </div>

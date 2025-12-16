@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraDescuentos.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface DiscountResult {
   precioOriginal: number;
@@ -192,6 +193,8 @@ export default function CalculadoraDescuentosPage() {
           </div>
         </div>
       </section>
+
+      <RelatedApps apps={getRelatedApps('calculadora-descuentos')} />
 
       <Footer appName="calculadora-descuentos" />
     </div>

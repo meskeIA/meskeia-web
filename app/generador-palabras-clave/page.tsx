@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorPalabrasClave.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Modificadores para generar variaciones
 const MODIFICADORES = {
@@ -403,6 +405,8 @@ export default function GeneradorPalabrasClavePage() {
           </section>
         </div>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('generador-palabras-clave')} />
 
       <Footer appName="generador-palabras-clave" />
     </div>

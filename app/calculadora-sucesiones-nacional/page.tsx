@@ -2,7 +2,8 @@
 
 import { useState, useMemo, ChangeEvent } from 'react';
 import styles from './CalculadoraSucesionesNacional.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import Link from 'next/link';
 
@@ -1288,6 +1289,12 @@ export default function CalculadoraSucesionesNacionalPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps
+        apps={getRelatedApps('calculadora-sucesiones-nacional')}
+        title="Herramientas para herencias"
+        icon="⚖️"
+      />
 
       <Footer appName="calculadora-sucesiones-nacional" />
     </div>

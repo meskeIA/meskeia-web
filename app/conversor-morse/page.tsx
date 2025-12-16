@@ -2,7 +2,8 @@
 
 import { useState, useRef, useCallback } from 'react';
 import styles from './ConversorMorse.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Diccionario Morse internacional
 const MORSE_CODE: Record<string, string> = {
@@ -266,6 +267,8 @@ export default function ConversorMorsePage() {
           </div>
         </div>
       </section>
+
+      <RelatedApps apps={getRelatedApps('conversor-morse')} />
 
       <Footer appName="conversor-morse" />
     </div>

@@ -4,6 +4,8 @@ import { useState } from 'react';
 import styles from './CalculadoraPorciones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface PortionMethod {
   id: string;
@@ -354,6 +356,8 @@ export default function CalculadoraPorcionesPage() {
           Para un plan nutricional personalizado, consulta con un dietista-nutricionista.
         </p>
       </div>
+
+      <RelatedApps apps={getRelatedApps('calculadora-porciones')} />
 
       <Footer appName="calculadora-porciones" />
     </div>

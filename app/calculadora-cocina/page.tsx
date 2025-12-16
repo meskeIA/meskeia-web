@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCocina.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TabActiva = 'conversor' | 'escalador' | 'tiempos' | 'sustitutos';
 
@@ -735,6 +736,8 @@ export default function CalculadoraCocinaPage() {
           </section>
         </div>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-cocina')} />
 
       <Footer appName="calculadora-cocina" />
     </div>

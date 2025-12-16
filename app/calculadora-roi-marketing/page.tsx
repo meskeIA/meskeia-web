@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraROIMarketing.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber, formatPercentage } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface CanalMarketing {
   id: string;
@@ -429,6 +430,8 @@ export default function CalculadoraROIMarketingPage() {
           </ul>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-roi-marketing')} />
 
       <Footer appName="calculadora-roi-marketing" />
     </div>

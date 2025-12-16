@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import styles from './GuiaCuidadoMascota.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
 import { CourseProvider, useCourse, COURSE_MODULES } from './CourseContext';
+import { getRelatedApps } from '@/data/app-relations';
 
 function GuideContent() {
   const { isCompleted, getProgressPercentage, getCompletedCount, getTotalChapters, getTotalDuration } = useCourse();
@@ -127,6 +128,8 @@ function GuideContent() {
           Empezar la Guía
         </Link>
       </section>
+
+      <RelatedApps apps={getRelatedApps('guia-cuidado-mascota')} />
 
       <Footer appName="guia-cuidado-mascota" />
     </div>

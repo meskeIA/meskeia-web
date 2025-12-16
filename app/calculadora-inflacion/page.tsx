@@ -4,8 +4,10 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraInflacion.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Datos IPC España (INE) - Base 2021 = 100
 // Fuente: Instituto Nacional de Estadística (INE)
@@ -345,6 +347,8 @@ export default function CalculadoraInflacionPage() {
           </section>
         </div>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-inflacion')} />
 
       <Footer appName="calculadora-inflacion" />
     </div>

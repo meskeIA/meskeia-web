@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react';
 import styles from './ContrasteColores.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface ContrastResult {
   ratio: number;
@@ -319,6 +321,8 @@ export default function ContrasteColoresPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('contraste-colores')} />
 
       <Footer appName="contraste-colores" />
     </div>

@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorHashes.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type AlgoritmoType = 'MD5' | 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512';
 type ModoType = 'texto' | 'archivo' | 'comparar';
@@ -444,6 +445,8 @@ export default function GeneradorHashesPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('generador-hashes')} />
 
       <Footer appName="generador-hashes" />
     </div>

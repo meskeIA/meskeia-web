@@ -4,7 +4,8 @@ import { useState } from 'react';
 import styles from './GeneradorSchemaMarkup.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type SchemaType = 'article' | 'product' | 'faq' | 'localbusiness' | 'recipe';
 
@@ -825,6 +826,8 @@ export default function GeneradorSchemaMarkupPage() {
           </section>
         </div>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('generador-schema-markup')} />
 
       <Footer appName="generador-schema-markup" />
     </div>

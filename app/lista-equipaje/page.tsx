@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import styles from './ListaEquipaje.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoViaje = 'playa' | 'montana' | 'ciudad' | 'negocios' | 'aventura';
 type Clima = 'calido' | 'templado' | 'frio';
@@ -392,6 +394,8 @@ export default function ListaEquipajePage() {
           )}
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('lista-equipaje')} />
 
       <Footer appName="lista-equipaje" />
     </div>

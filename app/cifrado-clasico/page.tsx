@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import styles from './CifradoClasico.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'cifrar' | 'descifrar';
 type MetodoType = 'cesar' | 'rot13' | 'atbash';
@@ -337,6 +338,7 @@ export default function CifradoClasicoPage() {
         </section>
       </EducationalSection>
 
+      <RelatedApps apps={getRelatedApps('cifrado-clasico')} />
       <Footer appName="cifrado-clasico" />
     </div>
   );

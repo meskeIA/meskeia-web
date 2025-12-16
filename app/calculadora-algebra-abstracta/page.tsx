@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraAlgebraAbstracta.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'grupos' | 'anillos' | 'cayley' | 'propiedades';
 
@@ -655,6 +656,8 @@ export default function CalculadoraAlgebraAbstractaPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-algebra-abstracta')} />
 
       <Footer appName="calculadora-algebra-abstracta" />
     </div>

@@ -4,6 +4,8 @@ import { useState } from 'react';
 import styles from './TestHabitos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface Question {
   id: string;
@@ -622,6 +624,8 @@ export default function TestHabitosPage() {
           </div>
         </div>
       )}
+
+      <RelatedApps apps={getRelatedApps('test-habitos')} />
 
       <Footer appName="test-habitos" />
     </div>

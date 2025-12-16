@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoAsteroids.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Vector {
@@ -907,6 +908,8 @@ export default function JuegoAsteroidsPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('juego-asteroids')} />
 
       <Footer appName="juego-asteroids" />
     </div>

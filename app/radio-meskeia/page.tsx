@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './RadioMeskeia.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface Emisora {
   id: string;
@@ -337,6 +339,8 @@ export default function RadioMeskeiaPage() {
           )}
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('radio-meskeia')} />
 
       <Footer appName="radio-meskeia" />
     </div>

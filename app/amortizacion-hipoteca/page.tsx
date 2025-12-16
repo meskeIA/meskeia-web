@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import styles from './AmortizacionHipoteca.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
 interface ResultadoAmortizacion {
@@ -440,6 +441,7 @@ export default function AmortizacionHipotecaPage() {
         </p>
       </div>
 
+      <RelatedApps apps={getRelatedApps('amortizacion-hipoteca')} />
       <Footer appName="amortizacion-hipoteca" />
     </div>
   );

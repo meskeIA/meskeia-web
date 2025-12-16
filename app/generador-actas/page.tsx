@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './GeneradorActas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Asistente {
@@ -1118,6 +1119,8 @@ export default function GeneradorActasPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('generador-actas')} />
 
       <Footer appName="generador-actas" />
     </div>

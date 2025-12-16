@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CifradoTransposicion.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type MetodoType = 'columnas' | 'railfence' | 'escitala';
 type ModoType = 'cifrar' | 'descifrar';
@@ -536,6 +537,8 @@ export default function CifradoTransposicionPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('cifrado-transposicion')} />
 
       <Footer appName="cifrado-transposicion" />
     </div>

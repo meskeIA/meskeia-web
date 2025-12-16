@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraTarifaFreelance.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface GastoItem {
   id: string;
@@ -540,6 +541,8 @@ export default function CalculadoraTarifaFreelancePage() {
           </ul>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-tarifa-freelance')} />
 
       <Footer appName="calculadora-tarifa-freelance" />
     </div>

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './TemporizadorPomodoro.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type SessionType = 'work' | 'shortBreak' | 'longBreak';
 
@@ -703,6 +704,12 @@ export default function TemporizadorPomodoroPage() {
           </ul>
         </section>
       </EducationalSection>
+
+      <RelatedApps
+        apps={getRelatedApps('temporizador-pomodoro')}
+        title="Herramientas de productividad"
+        icon="⏱️"
+      />
 
       <Footer appName="temporizador-pomodoro" />
     </div>

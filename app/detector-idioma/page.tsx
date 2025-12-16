@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import styles from './DetectorIdioma.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Patrones de palabras frecuentes por idioma
 const PATRONES_IDIOMAS: Record<string, { palabras: string[]; nombre: string; bandera: string }> = {
@@ -221,6 +222,8 @@ export default function DetectorIdiomaPage() {
           ))}
         </div>
       </section>
+
+      <RelatedApps apps={getRelatedApps('detector-idioma')} />
 
       <Footer appName="detector-idioma" />
     </div>

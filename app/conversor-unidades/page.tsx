@@ -4,8 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './ConversorUnidades.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de categorías
 type Categoria = 'longitud' | 'masa' | 'temperatura' | 'area' | 'volumen' | 'tiempo' | 'velocidad' | 'datos' | 'quimica' | 'presion' | 'energia' | 'fuerza' | 'potencia';
@@ -459,6 +460,8 @@ export default function ConversorUnidadesPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('conversor-unidades')} />
 
       <Footer appName="conversor-unidades" />
     </div>

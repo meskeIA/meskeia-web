@@ -4,6 +4,8 @@ import { useState } from 'react';
 import styles from './PlanificadorMenu.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type DayOfWeek = 'lunes' | 'martes' | 'miercoles' | 'jueves' | 'viernes' | 'sabado' | 'domingo';
 type MealType = 'desayuno' | 'almuerzo' | 'cena';
@@ -353,6 +355,7 @@ export default function PlanificadorMenuPage() {
         </p>
       </div>
 
+      <RelatedApps apps={getRelatedApps('planificador-menu')} />
       <Footer appName="planificador-menu" />
     </div>
   );

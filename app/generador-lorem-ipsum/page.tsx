@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import styles from './GeneradorLoremIpsum.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Párrafos de Lorem Ipsum clásicos
 const loremIpsumParrafos = [
@@ -247,6 +248,8 @@ export default function GeneradorLoremIpsumPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('generador-lorem-ipsum')} />
 
       <Footer appName="generador-lorem-ipsum" />
     </div>

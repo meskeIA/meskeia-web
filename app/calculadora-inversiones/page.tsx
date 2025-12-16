@@ -4,8 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraInversiones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type PerfilInversor = 'conservador' | 'moderado' | 'equilibrado' | 'dinamico' | 'agresivo';
 
@@ -463,6 +464,8 @@ export default function CalculadoraInversionesPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-inversiones')} />
 
       <Footer appName="calculadora-inversiones" />
     </div>

@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import styles from './SimuladorPrestamos.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type Sistema = 'frances' | 'aleman' | 'americano';
 
@@ -433,6 +434,8 @@ export default function SimuladorPrestamosPage() {
           Consulta siempre con un profesional antes de contratar cualquier producto financiero.
         </p>
       </div>
+
+      <RelatedApps apps={getRelatedApps('simulador-prestamos')} />
 
       <Footer appName="simulador-prestamos" />
     </div>

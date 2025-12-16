@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './GeneradorHorarios.module.css';
-import MeskeiaLogo from '@/components/MeskeiaLogo';
-import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Asignatura {
@@ -621,6 +620,12 @@ export default function GeneradorHorariosPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps
+        apps={getRelatedApps('generador-horarios-estudio')}
+        title="Mejora tu rendimiento académico"
+        icon="📚"
+      />
 
       <Footer appName="generador-horarios-estudio" />
     </div>

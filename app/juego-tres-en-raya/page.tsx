@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoTresEnRaya.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type Casilla = 'X' | 'O' | null;
 type Tablero = Casilla[];
@@ -332,6 +334,8 @@ export default function JuegoTresEnRayaPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('juego-tres-en-raya')} />
 
       <Footer appName="juego-tres-en-raya" />
     </div>

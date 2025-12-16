@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import styles from './ListaCompras.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
 
@@ -465,6 +466,8 @@ export default function ListaComprasPage() {
           </section>
         )}
       </main>
+
+      <RelatedApps apps={getRelatedApps('lista-compras')} />
 
       <Footer appName="lista-compras" />
     </div>

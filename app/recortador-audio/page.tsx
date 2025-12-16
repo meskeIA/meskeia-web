@@ -2,8 +2,9 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './RecortadorAudio.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type OutputFormat = 'mp3' | 'wav' | 'ogg';
@@ -856,6 +857,8 @@ export default function RecortadorAudioPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('recortador-audio')} />
 
       <Footer appName="recortador-audio" />
     </div>

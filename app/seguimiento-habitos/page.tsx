@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './SeguimientoHabitos.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Habito {
@@ -885,6 +886,8 @@ export default function SeguimientoHabitosPage() {
           </div>
         </div>
       )}
+
+      <RelatedApps apps={getRelatedApps('seguimiento-habitos')} />
 
       <Footer appName="seguimiento-habitos" />
     </div>

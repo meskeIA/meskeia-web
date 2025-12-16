@@ -4,6 +4,8 @@ import { useState, useCallback } from 'react';
 import styles from './ConversorMarkdown.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Ejemplos predefinidos
 const EJEMPLOS = {
@@ -117,6 +119,7 @@ npm install @meskeia/markdown-converter
 
 \`\`\`javascript
 import { convert } from '@meskeia/markdown-converter';
+import { getRelatedApps } from '@/data/app-relations';
 
 const html = convert('# Hola Mundo');
 console.log(html); // <h1>Hola Mundo</h1>
@@ -561,6 +564,8 @@ console.log('Hola mundo');
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('conversor-markdown-html')} />
 
       <Footer appName="conversor-markdown-html" />
     </div>

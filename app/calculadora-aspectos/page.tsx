@@ -4,6 +4,8 @@ import { useState, useCallback, useMemo } from 'react';
 import styles from './CalculadoraAspectos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface AspectPreset {
   name: string;
@@ -310,6 +312,8 @@ export default function CalculadoraAspectosPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('calculadora-aspectos')} />
 
       <Footer appName="calculadora-aspectos" />
     </div>

@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraMcdMcm.module.css';
-import { MeskeiaLogo, Footer, ResultCard } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, RelatedApps} from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface Resultado {
   mcd: number;
@@ -311,6 +312,8 @@ export default function CalculadoraMcdMcmPage() {
           </div>
         </div>
       </section>
+
+      <RelatedApps apps={getRelatedApps('calculadora-mcd-mcm')} />
 
       <Footer appName="calculadora-mcd-mcm" />
     </div>

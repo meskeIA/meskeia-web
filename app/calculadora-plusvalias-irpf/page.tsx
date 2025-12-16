@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraPlusvalias.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Componente Input reutilizable - FUERA del componente principal para evitar re-renders
 interface InputCampoProps {
@@ -465,6 +466,8 @@ export default function CalculadoraPlusvaliasIrpfPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-plusvalias-irpf')} />
 
       <Footer appName="calculadora-plusvalias-irpf" />
     </div>

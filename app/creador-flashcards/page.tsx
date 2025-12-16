@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './CreadorFlashcards.module.css';
-import MeskeiaLogo from '@/components/MeskeiaLogo';
-import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Tarjeta {
@@ -785,6 +784,12 @@ export default function CreadorFlashcardsPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps
+        apps={getRelatedApps('creador-flashcards')}
+        title="Más herramientas para estudiar"
+        icon="📚"
+      />
 
       <Footer appName="creador-flashcards" />
     </div>

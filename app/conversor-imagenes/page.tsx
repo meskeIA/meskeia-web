@@ -4,6 +4,8 @@ import { useState, useCallback, useRef } from 'react';
 import styles from './ConversorImagenes.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type OutputFormat = 'jpeg' | 'png' | 'webp';
 
@@ -376,6 +378,8 @@ export default function ConversorImagenesPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('conversor-imagenes')} />
 
       <Footer appName="conversor-imagenes" />
     </div>

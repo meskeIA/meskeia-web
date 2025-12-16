@@ -4,7 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './GeneradorFacturas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
 import { formatCurrency, formatDate } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface DatosEmisor {
@@ -850,6 +852,8 @@ export default function GeneradorFacturasPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('generador-facturas')} />
 
       <Footer appName="generador-facturas" />
 

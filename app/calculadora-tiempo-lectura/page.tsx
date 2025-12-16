@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import styles from './CalculadoraTiempoLectura.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Velocidades de lectura por defecto
 const VELOCIDADES = {
@@ -399,6 +400,8 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
           </section>
         </div>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-tiempo-lectura')} />
 
       <Footer appName="calculadora-tiempo-lectura" />
     </div>

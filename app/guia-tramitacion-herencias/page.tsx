@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './GuiaTramitacionHerencias.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
 import Link from 'next/link';
+import { getRelatedApps } from '@/data/app-relations';
 
 // ===== TIPOS =====
 interface Respuestas {
@@ -932,6 +933,8 @@ export default function GuiaTramitacionHerenciasPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('guia-tramitacion-herencias')} />
 
       <Footer appName="guia-tramitacion-herencias" />
     </div>

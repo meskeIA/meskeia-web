@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraCalculo.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'derivadas' | 'integrales' | 'limites' | 'series';
 
@@ -601,6 +602,8 @@ export default function CalculadoraCalculoPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-calculo')} />
 
       <Footer appName="calculadora-calculo" />
     </div>

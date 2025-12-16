@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './SimuladorGastosDeducibles.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Base de datos de gastos deducibles
 const gastosDB = {
@@ -491,6 +492,8 @@ export default function SimuladorGastosDeduciblesPage() {
           </ul>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('simulador-gastos-deducibles')} />
 
       <Footer appName="simulador-gastos-deducibles" />
     </div>

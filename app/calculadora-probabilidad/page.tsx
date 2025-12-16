@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraProbabilidad.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'simple' | 'combinaciones' | 'permutaciones' | 'binomial' | 'condicional';
 
@@ -558,6 +559,8 @@ export default function CalculadoraProbabilidadPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-probabilidad')} />
 
       <Footer appName="calculadora-probabilidad" />
     </div>

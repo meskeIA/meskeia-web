@@ -4,8 +4,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './TimeTracker.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface TimeEntry {
   id: string;
@@ -535,6 +537,8 @@ export default function TimeTrackerPage() {
           </section>
         </div>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('time-tracker')} />
 
       <Footer appName="time-tracker" />
     </div>

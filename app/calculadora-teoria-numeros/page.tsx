@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraTeoriaNumeros.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'primos' | 'factorizacion' | 'mcdmcm' | 'divisores' | 'modular';
 
@@ -700,6 +701,8 @@ export default function CalculadoraTeoriaNumerosPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-teoria-numeros')} />
 
       <Footer appName="calculadora-teoria-numeros" />
     </div>

@@ -4,8 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraMovimiento.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoMovimiento = 'mru' | 'mrua' | 'caida' | 'parabolico';
 
@@ -468,6 +469,8 @@ export default function CalculadoraMovimientoPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-movimiento')} />
 
       <Footer appName="calculadora-movimiento" />
     </div>

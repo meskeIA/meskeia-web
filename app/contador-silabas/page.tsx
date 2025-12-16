@@ -4,6 +4,8 @@ import { useState } from 'react';
 import styles from './ContadorSilabas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Algoritmo de silabeo en español
 const separarSilabas = (palabra: string): string[] => {
@@ -285,6 +287,8 @@ export default function ContadorSilabasPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('contador-silabas')} />
 
       <Footer appName="contador-silabas" />
     </div>

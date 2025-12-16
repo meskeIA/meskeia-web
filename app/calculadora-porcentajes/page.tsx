@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraPorcentajes.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps} from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type CalculationType = 'percentOf' | 'whatPercent' | 'increase' | 'decrease' | 'variation';
 
@@ -232,6 +233,8 @@ export default function CalculadoraPorcentajesPage() {
           )}
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('calculadora-porcentajes')} />
 
       <Footer appName="calculadora-porcentajes" />
     </div>

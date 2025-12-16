@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraDonacionesNacional.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 
 // ===== TIPOS =====
@@ -839,6 +840,12 @@ export default function CalculadoraDonacionesNacionalPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps
+        apps={getRelatedApps('calculadora-donaciones-nacional')}
+        title="Herramientas fiscales"
+        icon="⚖️"
+      />
 
       <Footer appName="calculadora-donaciones-nacional" />
     </div>

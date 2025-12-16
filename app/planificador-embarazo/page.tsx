@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import styles from './PlanificadorEmbarazo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type TabType = 'calculadora' | 'checklist' | 'compras' | 'vacunas';
@@ -940,6 +942,8 @@ export default function CalculadoraFechaPartoPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('planificador-embarazo')} />
 
       <Footer appName="planificador-embarazo" />
     </div>

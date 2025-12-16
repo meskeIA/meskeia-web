@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CifradoPlayfair.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'cifrar' | 'descifrar';
 
@@ -350,6 +351,8 @@ export default function CifradoPlayfairPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('cifrado-playfair')} />
 
       <Footer appName="cifrado-playfair" />
     </div>

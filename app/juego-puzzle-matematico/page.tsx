@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './JuegoPuzzleMatematico.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type Modo = 'suma' | 'resta' | 'multiplicacion' | 'division' | 'mixto';
 type Pantalla = 'inicio' | 'juego' | 'resultado';
@@ -442,6 +444,8 @@ export default function JuegoPuzzleMatematicoPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('juego-puzzle-matematico')} />
 
       <Footer appName="juego-puzzle-matematico" />
     </div>

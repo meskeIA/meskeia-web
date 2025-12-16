@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './Juego2048.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type Tablero = number[][];
 type Direccion = 'up' | 'down' | 'left' | 'right';
@@ -349,6 +351,8 @@ export default function Juego2048Page() {
           <p>📱 En móvil, <strong>desliza</strong> en cualquier dirección</p>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('juego-2048')} />
 
       <Footer appName="juego-2048" />
     </div>

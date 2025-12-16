@@ -4,7 +4,9 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraRoommates.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
 import { formatCurrency } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Compañero {
@@ -593,6 +595,8 @@ export default function CalculadoraRoommatesPage() {
           </div>
         </div>
       )}
+
+      <RelatedApps apps={getRelatedApps('calculadora-roommates')} />
 
       <Footer appName="calculadora-roommates" />
     </div>

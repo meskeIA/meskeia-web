@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency } from '@/lib/formatters';
 import { jsonLd } from './metadata';
 import styles from './CalculadoraPropinas.module.css';
+import { getRelatedApps } from '@/data/app-relations';
 
 export default function CalculadoraPropinas() {
   // Estados
@@ -321,6 +322,7 @@ export default function CalculadoraPropinas() {
       </main>
 
       {/* Footer meskeIA */}
+      <RelatedApps apps={getRelatedApps('Calculadora de Propinas')} />
       <Footer appName="Calculadora de Propinas" />
     </>
   );

@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorAnagramas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Diccionario español básico (palabras comunes de 2-8 letras)
 // En producción se podría cargar un diccionario más extenso
@@ -265,6 +267,8 @@ export default function GeneradorAnagramasPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('generador-anagramas')} />
 
       <Footer appName="generador-anagramas" />
     </div>

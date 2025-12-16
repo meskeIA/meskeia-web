@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './GeneradorTipografias.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface FontInfo {
   name: string;
@@ -387,6 +389,8 @@ text-align: ${textAlign};`;
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('generador-tipografias')} />
 
       <Footer appName="generador-tipografias" />
     </div>

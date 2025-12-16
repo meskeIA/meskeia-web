@@ -4,6 +4,8 @@ import { useState, useRef, useCallback } from 'react';
 import styles from './GeneradorIconos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface GeneratedIcon {
   size: number;
@@ -550,6 +552,8 @@ export default function GeneradorIconosPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('generador-iconos')} />
 
       <Footer appName="generador-iconos" />
     </div>

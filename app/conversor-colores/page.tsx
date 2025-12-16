@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect } from 'react';
 import styles from './ConversorColores.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface ColorValues {
   hex: string;
@@ -476,6 +478,7 @@ export default function ConvertidorColoresPage() {
         </div>
       </div>
 
+      <RelatedApps apps={getRelatedApps('conversor-colores')} />
       <Footer appName="conversor-colores" />
     </div>
   );

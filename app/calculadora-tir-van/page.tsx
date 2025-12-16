@@ -4,8 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraTIRVAN.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface FlujosCaja {
   ano: number;
@@ -504,6 +505,8 @@ export default function CalculadoraTIRVANPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-tir-van')} />
 
       <Footer appName="calculadora-tir-van" />
     </div>

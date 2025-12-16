@@ -4,6 +4,8 @@ import { useState } from 'react';
 import styles from './CalculadoraPercentiles.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type Sexo = 'nino' | 'nina';
 
@@ -327,6 +329,8 @@ export default function CalculadoraPercentilesPage() {
           &quot;normal&quot; no indica necesariamente un problema. Consulta siempre con tu pediatra.
         </p>
       </div>
+
+      <RelatedApps apps={getRelatedApps('calculadora-percentiles')} />
 
       <Footer appName="calculadora-percentiles" />
     </div>

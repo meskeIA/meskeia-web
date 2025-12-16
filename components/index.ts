@@ -13,6 +13,8 @@ export { default as NumberInput } from './NumberInput';
 export { default as ResultCard } from './ResultCard';
 export { default as EducationalSection } from './EducationalSection';
 export { default as TextToSpeech } from './TextToSpeech';
+export { default as RelatedApps } from './RelatedApps';
+export type { RelatedApp } from './RelatedApps';
 
 // Nuevos componentes de navegación
 export { default as Sidebar } from './Sidebar';

@@ -4,7 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './ControlGastos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 
 // Categorías de gastos
@@ -436,6 +437,7 @@ export default function ControlGastosPage() {
         </section>
       </EducationalSection>
 
+      <RelatedApps apps={getRelatedApps('control-gastos')} />
       <Footer appName="control-gastos" />
     </div>
   );

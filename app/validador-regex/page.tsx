@@ -4,6 +4,8 @@ import { useState, useCallback, useMemo } from 'react';
 import styles from './ValidadorRegex.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 interface Match {
   text: string;
@@ -280,6 +282,8 @@ export default function ValidadorRegexPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('validador-regex')} />
 
       <Footer appName="validador-regex" />
     </div>

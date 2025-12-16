@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback } from 'react';
 import styles from './CreadorPaletas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type HarmonyType = 'complementary' | 'analogous' | 'triadic' | 'tetradic' | 'split-complementary' | 'monochromatic';
 
@@ -375,6 +377,8 @@ export default function CreadorPaletasPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('creador-paletas')} />
 
       <Footer appName="creador-paletas" />
     </div>

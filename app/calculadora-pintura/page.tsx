@@ -4,7 +4,9 @@ import { useState } from 'react';
 import styles from './CalculadoraPintura.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoSuperficie = 'lisa' | 'gotele' | 'rugosa' | 'porosa';
 
@@ -289,6 +291,8 @@ export default function CalculadoraPinturaPage() {
           )}
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('calculadora-pintura')} />
 
       <Footer appName="calculadora-pintura" />
     </div>

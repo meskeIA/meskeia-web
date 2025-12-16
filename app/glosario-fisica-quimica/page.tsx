@@ -4,7 +4,8 @@ import { useState, useMemo } from 'react';
 import styles from './GlosarioFisicaQuimica.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type Categoria = 'fisica' | 'quimica' | 'todos';
 type Nivel = 'basico' | 'intermedio' | 'avanzado' | 'todos';
@@ -336,6 +337,8 @@ export default function GlosarioFisicaQuimicaPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('glosario-fisica-quimica')} />
 
       <Footer appName="glosario-fisica-quimica" />
     </div>

@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraSuscripciones.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
 import { formatCurrency } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Suscripcion {
@@ -450,6 +451,8 @@ export default function CalculadoraSuscripcionesPage() {
           </div>
         </div>
       </section>
+
+      <RelatedApps apps={getRelatedApps('calculadora-suscripciones')} />
 
       <Footer appName="calculadora-suscripciones" />
     </div>

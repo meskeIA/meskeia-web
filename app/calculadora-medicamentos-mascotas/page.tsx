@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraMedicamentosMascotas.module.css';
-import MeskeiaLogo from '@/components/MeskeiaLogo';
-import Footer from '@/components/Footer';
-import EducationalSection from '@/components/EducationalSection';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 type TabType = 'antiparasitarios' | 'frecuencia' | 'sintomas';
@@ -500,32 +499,11 @@ export default function CalculadoraMedicamentosMascotasPage() {
         </p>
       </div>
 
-      {/* Apps relacionadas */}
-      <div className={styles.appsRelacionadas}>
-        <h3>🐾 Más herramientas para tu mascota</h3>
-        <div className={styles.appsGrid}>
-          <a href="/planificador-mascota/" className={styles.appCard}>
-            <span className={styles.appIcon}>📋</span>
-            <span className={styles.appName}>Planificador de Mascota</span>
-            <span className={styles.appDesc}>Checklist completo para nuevos dueños</span>
-          </a>
-          <a href="/calculadora-alimentacion-mascotas/" className={styles.appCard}>
-            <span className={styles.appIcon}>🍖</span>
-            <span className={styles.appName}>Calculadora de Alimentación</span>
-            <span className={styles.appDesc}>Cuánto debe comer tu mascota</span>
-          </a>
-          <a href="/calculadora-tamano-adulto-perro/" className={styles.appCard}>
-            <span className={styles.appIcon}>📏</span>
-            <span className={styles.appName}>Tamaño Adulto Cachorro</span>
-            <span className={styles.appDesc}>Predice cuánto pesará de adulto</span>
-          </a>
-          <a href="/calculadora-edad-mascotas/" className={styles.appCard}>
-            <span className={styles.appIcon}>🎂</span>
-            <span className={styles.appName}>Calculadora de Edad</span>
-            <span className={styles.appDesc}>Edad en años humanos</span>
-          </a>
-        </div>
-      </div>
+      <RelatedApps
+        apps={getRelatedApps('calculadora-medicamentos-mascotas')}
+        title="Más herramientas para tu mascota"
+        icon="🐾"
+      />
 
       <EducationalSection
         title="📚 ¿Quieres aprender más sobre parásitos en mascotas?"

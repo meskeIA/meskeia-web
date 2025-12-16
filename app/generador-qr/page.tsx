@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './GeneradorQR.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoQR = 'texto' | 'url' | 'wifi' | 'contacto' | 'email' | 'telefono';
 
@@ -566,6 +568,8 @@ export default function GeneradorQRPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('generador-qr')} />
 
       <Footer appName="generador-qr" />
     </div>

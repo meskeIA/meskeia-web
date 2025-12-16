@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorLoteria.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type LotteryType = 'primitiva' | 'euromillones' | 'bonoloto' | 'gordo' | 'lototurf';
 
@@ -374,6 +375,8 @@ export default function GeneradorLoteriaPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('generador-loteria')} />
 
       <Footer appName="generador-loteria" />
     </div>

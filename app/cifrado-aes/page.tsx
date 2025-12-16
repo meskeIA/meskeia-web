@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import styles from './CifradoAES.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'cifrar' | 'descifrar';
 type AlgoritmoType = 'AES-GCM' | 'AES-CBC';
@@ -443,6 +444,8 @@ export default function CifradoAESPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('cifrado-aes')} />
 
       <Footer appName="cifrado-aes" />
     </div>

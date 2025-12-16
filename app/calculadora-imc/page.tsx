@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import styles from './CalculadoraIMC.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps, getRelatedAppsTitle } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
 type Clasificacion = {
@@ -251,16 +251,6 @@ export default function CalculadoraIMCPage() {
                 </table>
               </div>
 
-              {/* Sugerencia: Calculadora de Calorías */}
-              <div className={styles.sugerenciaBox}>
-                <h4>🔥 ¿Quieres calcular tus calorías diarias recomendadas?</h4>
-                <p>
-                  Conoce cuántas calorías necesitas según tu edad, peso, altura y nivel de actividad física.
-                </p>
-                <Link href="/calculadora-calorias-ejercicio/" className={styles.sugerenciaLink}>
-                  Ir a Calculadora de Calorías →
-                </Link>
-              </div>
             </>
           ) : (
             <div className={styles.placeholder}>
@@ -366,6 +356,12 @@ export default function CalculadoraIMCPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps
+        apps={getRelatedApps('calculadora-imc')}
+        title={getRelatedAppsTitle('calculadora-imc').title}
+        icon={getRelatedAppsTitle('calculadora-imc').icon}
+      />
 
       <Footer appName="calculadora-imc" />
     </div>

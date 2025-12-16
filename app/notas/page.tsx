@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import styles from './Notas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Categorías disponibles
 const CATEGORIAS = [
@@ -422,6 +424,8 @@ export default function NotasPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('notas')} />
 
       <Footer appName="notas" />
     </div>

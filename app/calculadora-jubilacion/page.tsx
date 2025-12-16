@@ -4,8 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraJubilacion.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type Escenario = 'conservador' | 'moderado' | 'agresivo';
 
@@ -444,6 +445,8 @@ export default function CalculadoraJubilacionPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-jubilacion')} />
 
       <Footer appName="calculadora-jubilacion" />
     </div>

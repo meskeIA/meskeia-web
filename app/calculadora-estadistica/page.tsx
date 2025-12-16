@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraEstadistica.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 export default function CalculadoraEstadisticaPage() {
   const [datos, setDatos] = useState('');
@@ -401,6 +402,8 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-estadistica')} />
 
       <Footer appName="calculadora-estadistica" />
     </div>

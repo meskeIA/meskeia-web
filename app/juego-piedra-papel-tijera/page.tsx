@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import styles from './JuegoPiedraPapelTijera.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type Opcion = 'piedra' | 'papel' | 'tijera';
 type Resultado = 'ganaste' | 'perdiste' | 'empate' | null;
@@ -306,6 +308,8 @@ export default function JuegoPiedraPapelTijeraPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('juego-piedra-papel-tijera')} />
 
       <Footer appName="juego-piedra-papel-tijera" />
     </div>

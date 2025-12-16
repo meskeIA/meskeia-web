@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import styles from './ConversorTexto.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 export default function ConversorTextoPage() {
   const [textoEntrada, setTextoEntrada] = useState('');
@@ -262,6 +263,8 @@ export default function ConversorTextoPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('conversor-texto')} />
 
       <Footer appName="conversor-texto" />
     </div>

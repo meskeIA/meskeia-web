@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './PlanificadorCashFlow.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
@@ -636,6 +637,8 @@ export default function PlanificadorCashFlowPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('planificador-cashflow')} />
 
       <Footer appName="planificador-cashflow" />
     </div>

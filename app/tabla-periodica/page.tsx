@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import styles from './TablaPeriodica.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
 import { elementos, elementosPorSimbolo, FAMILIAS, ESTADOS, Elemento } from './elementos-data';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Posiciones especiales en el grid de la tabla periódica
 const getPosicion = (elemento: Elemento): { fila: number; columna: number } => {
@@ -419,6 +420,8 @@ export default function TablaPerodicaPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('tabla-periodica')} />
 
       <Footer appName="tabla-periodica" />
     </div>

@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './TestVelocidadEscritura.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 const TEXTOS_ESPANOL = [
   'El sol brillaba sobre las montañas mientras el viento suave acariciaba las hojas de los árboles. Era un día perfecto para caminar por el bosque y disfrutar de la naturaleza.',
@@ -302,6 +303,8 @@ export default function TestVelocidadEscrituraPage() {
           </button>
         </div>
       )}
+
+      <RelatedApps apps={getRelatedApps('test-velocidad-escritura')} />
 
       <Footer appName="test-velocidad-escritura" />
     </div>

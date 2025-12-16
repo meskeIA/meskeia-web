@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import styles from './HerenciasPasoPaso.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
 import { useCourse } from './CourseContext';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Iconos y colores por módulo
 const MODULE_ICONS: Record<string, string> = {
@@ -240,6 +241,8 @@ export default function HerenciasPasoPasoPage() {
           ))}
         </div>
       </section>
+
+      <RelatedApps apps={getRelatedApps('herencias-paso-a-paso')} />
 
       <Footer appName="herencias-paso-a-paso" />
     </div>

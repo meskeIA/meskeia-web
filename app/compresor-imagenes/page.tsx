@@ -2,8 +2,9 @@
 
 import { useState, useCallback, useRef } from 'react';
 import styles from './CompresorImagenes.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipo para formato de salida
 type OutputFormat = 'original' | 'webp' | 'jpeg';
@@ -635,6 +636,8 @@ export default function CompresorImagenesPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('compresor-imagenes')} />
 
       <Footer appName="compresor-imagenes" />
     </div>

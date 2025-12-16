@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import styles from './CalculadoraSucesionesCataluna.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import Link from 'next/link';
 
@@ -727,6 +728,12 @@ export default function CalculadoraSucesionesCatalunaPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps
+        apps={getRelatedApps('calculadora-sucesiones-cataluna')}
+        title="Herramientas para herencias"
+        icon="⚖️"
+      />
 
       <Footer appName="calculadora-sucesiones-cataluna" />
     </div>

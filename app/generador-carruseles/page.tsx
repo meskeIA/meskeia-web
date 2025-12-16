@@ -2,7 +2,8 @@
 
 import { useState, useRef, useCallback } from 'react';
 import styles from './GeneradorCarruseles.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Slide {
@@ -488,6 +489,8 @@ export default function GeneradorCarruselesPage() {
           </div>
         </div>
       </section>
+
+      <RelatedApps apps={getRelatedApps('generador-carruseles')} />
 
       <Footer appName="generador-carruseles" />
     </div>

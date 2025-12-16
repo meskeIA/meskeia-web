@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraMatematica.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoOperacion = 'matrices' | 'fracciones' | 'potencias' | 'raices' | 'logaritmos';
 
@@ -621,6 +622,8 @@ export default function CalculadoraMatematicaPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-matematica')} />
 
       <Footer appName="calculadora-matematica" />
     </div>

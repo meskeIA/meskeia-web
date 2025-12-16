@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import styles from './CodificadorBase64.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'texto' | 'archivo';
 type FormatoType = 'base64' | 'url' | 'hex';
@@ -326,6 +327,8 @@ export default function CodificadorBase64Page() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('codificador-base64')} />
 
       <Footer appName="codificador-base64" />
     </div>

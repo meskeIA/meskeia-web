@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import styles from './CalculadoraLegibilidad.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Función para contar sílabas en español
 function contarSilabas(palabra: string): number {
@@ -466,6 +467,8 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
           </section>
         </div>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-legibilidad')} />
 
       <Footer appName="calculadora-legibilidad" />
     </div>

@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraHidratacion.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
 type NivelActividad = 'sedentario' | 'ligero' | 'moderado' | 'activo' | 'muy_activo';
@@ -378,6 +379,7 @@ export default function CalculadoraHidratacionPage() {
         </section>
       </EducationalSection>
 
+      <RelatedApps apps={getRelatedApps('calculadora-hidratacion')} />
       <Footer appName="calculadora-hidratacion" />
     </div>
   );

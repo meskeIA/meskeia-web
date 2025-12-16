@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorCodigosBarras.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCodigoBarras = 'EAN13' | 'EAN8' | 'UPCA' | 'CODE128' | 'CODE39' | 'ITF14';
 
@@ -553,6 +555,8 @@ export default function GeneradorCodigosBarrasPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('generador-codigos-barras')} />
 
       <Footer appName="generador-codigos-barras" />
     </div>

@@ -2,8 +2,9 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './GeneradorOndas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type WaveType = 'sine' | 'square' | 'triangle' | 'sawtooth';
@@ -800,6 +801,8 @@ export default function GeneradorOndasPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('generador-ondas')} />
 
       <Footer appName="generador-ondas" />
     </div>

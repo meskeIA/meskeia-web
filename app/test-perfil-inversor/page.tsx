@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './TestPerfilInversor.module.css';
-import { MeskeiaLogo, Footer, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Definición de preguntas con puntuaciones
 interface Option {
@@ -440,6 +441,8 @@ export default function TestPerfilInversorPage() {
             </div>
           </section>
         </EducationalSection>
+
+        <RelatedApps apps={getRelatedApps('test-perfil-inversor')} />
 
         <Footer appName="test-perfil-inversor" />
       </div>

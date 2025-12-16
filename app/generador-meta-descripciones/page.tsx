@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorMetaDescripciones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
+import { getRelatedApps } from '@/data/app-relations';
 
 const PLANTILLAS = {
   producto: {
@@ -355,6 +357,8 @@ export default function GeneradorMetaDescripcionesPage() {
           </section>
         </div>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('generador-meta-descripciones')} />
 
       <Footer appName="generador-meta-descripciones" />
     </div>

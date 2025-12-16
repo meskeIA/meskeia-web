@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './PlanificadorBoda.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface ChecklistItem {
@@ -786,6 +787,8 @@ export default function PlanificadorBodaPage() {
           </ul>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('planificador-boda')} />
 
       <Footer appName="planificador-boda" />
     </div>

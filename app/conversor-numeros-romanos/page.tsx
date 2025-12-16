@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import styles from './ConversorNumerosRomanos.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'arabigo-romano' | 'romano-arabigo';
 
@@ -236,6 +237,8 @@ export default function ConversorNumerosRomanosPage() {
           </div>
         </div>
       </section>
+
+      <RelatedApps apps={getRelatedApps('conversor-numeros-romanos')} />
 
       <Footer appName="conversor-numeros-romanos" />
     </div>

@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorTextos.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
 import { formatNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
 
@@ -357,6 +358,8 @@ Nueva línea agregada
           </div>
         </div>
       </section>
+
+      <RelatedApps apps={getRelatedApps('comparador-textos')} />
 
       <Footer appName="comparador-textos" />
     </div>

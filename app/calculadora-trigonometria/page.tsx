@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraTrigonometria.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'funciones' | 'triangulo' | 'conversiones' | 'identidades';
 type UnidadAngulo = 'grados' | 'radianes';
@@ -670,6 +671,8 @@ export default function CalculadoraTrigonometriaPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('calculadora-trigonometria')} />
 
       <Footer appName="calculadora-trigonometria" />
     </div>

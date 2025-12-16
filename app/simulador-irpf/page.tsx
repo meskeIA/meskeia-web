@@ -4,8 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './SimuladorIRPF.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection } from '@/components';
+import { EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Tramos IRPF 2024 (Base General - Estatal + Autonómico estándar)
 const TRAMOS_IRPF_2024 = [
@@ -582,6 +583,8 @@ export default function SimuladorIRPFPage() {
           </div>
         </section>
       </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('simulador-irpf')} />
 
       <Footer appName="simulador-irpf" />
     </div>

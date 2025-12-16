@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoMemoria.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type Dificultad = 'facil' | 'medio' | 'dificil';
 
@@ -273,6 +275,8 @@ export default function JuegoMemoriaPage() {
           </div>
         )}
       </div>
+
+      <RelatedApps apps={getRelatedApps('juego-memoria')} />
 
       <Footer appName="juego-memoria" />
     </div>

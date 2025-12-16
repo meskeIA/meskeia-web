@@ -4,6 +4,8 @@ import { useState } from 'react';
 import styles from './ConversorBraille.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 // Alfabeto Braille español (Unicode)
 const textToBraille: { [key: string]: string } = {
@@ -375,6 +377,8 @@ export default function ConversorBraillePage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('conversor-braille')} />
 
       <Footer appName="conversor-braille" />
     </div>

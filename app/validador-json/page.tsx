@@ -4,6 +4,8 @@ import { useState, useCallback } from 'react';
 import styles from './ValidadorJSON.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import { RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 
 type TabType = 'json' | 'xml';
 
@@ -321,6 +323,8 @@ export default function ValidadorJSONPage() {
           </div>
         </div>
       </div>
+
+      <RelatedApps apps={getRelatedApps('validador-json')} />
 
       <Footer appName="validador-json" />
     </div>
