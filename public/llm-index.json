@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 166+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 168+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 166,
+  "total_tools": 168,
   "last_updated": "2025-12-16",
   "features": {
     "all_free": true,
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Optimiza tu tiempo y organización",
-      "tool_count": 16
+      "tool_count": 18
     },
     {
       "id": "salud",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 68
+      "tool_count": 69
     },
     {
       "id": "estudio",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 41
+      "tool_count": 43
     },
     {
       "id": "relax",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 24
+      "tool_count": 25
     }
   ],
   "tools": [
@@ -3018,6 +3018,53 @@
         "grabar voz"
       ],
       "icon": "🎙️"
+    },
+    {
+      "slug": "luxometro",
+      "name": "Luxómetro / Fotómetro",
+      "url": "https://meskeia.com/luxometro/",
+      "description": "Mide la intensidad de luz en lux con tu dispositivo. Ideal para fotógrafos: incluye recomendaciones de ISO, apertura y velocidad",
+      "category": "Productividad",
+      "contexts": [
+        "trabajo",
+        "creando"
+      ],
+      "keywords": [
+        "luxometro",
+        "fotometro",
+        "luz",
+        "lux",
+        "fotografia",
+        "exposicion",
+        "iso",
+        "apertura",
+        "iluminacion",
+        "medir luz"
+      ],
+      "icon": "💡"
+    },
+    {
+      "slug": "golden-hour",
+      "name": "Golden Hour - Hora Dorada",
+      "url": "https://meskeia.com/golden-hour/",
+      "description": "Calcula las horas de luz dorada y azul para fotografía. Amanecer, atardecer y crepúsculos según tu ubicación",
+      "category": "Productividad",
+      "contexts": [
+        "creando",
+        "curiosidad"
+      ],
+      "keywords": [
+        "golden hour",
+        "hora dorada",
+        "hora azul",
+        "blue hour",
+        "amanecer",
+        "atardecer",
+        "fotografia",
+        "crepusculo",
+        "luz natural"
+      ],
+      "icon": "🌅"
     },
     {
       "slug": "mi-ip",

@@ -76,6 +76,8 @@ export const implementedAppsUrls = [
   "/generador-actas/",             // Generador de actas de reunión profesionales
   "/prueba-camara/",               // Test de webcam con captura de fotos
   "/prueba-microfono/",            // Test de micrófono con grabación de audio
+  "/luxometro/",                   // Luxómetro/fotómetro para medir intensidad de luz
+  "/golden-hour/",                 // Calculadora hora dorada y azul para fotografía
   "/mi-ip/",                       // IP pública, geolocalización, ISP, conexión
 
   // Texto y Documentos (13 implementadas)
