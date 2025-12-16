@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 169+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 170+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 169,
+  "total_tools": 170,
   "last_updated": "2025-12-16",
   "features": {
     "all_free": true,
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Optimiza tu tiempo y organización",
-      "tool_count": 19
+      "tool_count": 20
     },
     {
       "id": "salud",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 48
+      "tool_count": 49
     },
     {
       "id": "casa",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 43
+      "tool_count": 44
     },
     {
       "id": "relax",
@@ -3088,6 +3088,30 @@
         "microfono"
       ],
       "icon": "🔊"
+    },
+    {
+      "slug": "metronomo",
+      "name": "Metrónomo Online",
+      "url": "https://meskeia.com/metronomo/",
+      "description": "Metrónomo online con tempo ajustable (40-220 BPM), tap tempo, múltiples compases y visualización del pulso. Ideal para práctica musical",
+      "category": "Productividad",
+      "contexts": [
+        "creando",
+        "estudio"
+      ],
+      "keywords": [
+        "metronomo",
+        "tempo",
+        "bpm",
+        "musica",
+        "practica musical",
+        "compas",
+        "tap tempo",
+        "ritmo",
+        "musicos",
+        "beats"
+      ],
+      "icon": "🎵"
     },
     {
       "slug": "mi-ip",

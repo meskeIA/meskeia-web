@@ -1,0 +1,497 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Main Content */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Section Title */
+.sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+/* Metronome Panel */
+.metronomePanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl);
+}
+
+/* Beat Display */
+.beatDisplay {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+}
+
+.beatDot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.1s ease;
+}
+
+.beatDot.accent {
+  border: 3px solid var(--primary);
+}
+
+.beatDot.active {
+  background: var(--primary);
+  transform: scale(1.3);
+  box-shadow: 0 0 15px rgba(46, 134, 171, 0.5);
+}
+
+.beatDot.active.accent {
+  background: var(--secondary);
+  box-shadow: 0 0 20px rgba(72, 169, 166, 0.6);
+}
+
+/* BPM Display */
+.bpmDisplay {
+  text-align: center;
+}
+
+.bpmValue {
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  display: block;
+}
+
+.bpmLabel {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.tempoName {
+  display: block;
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: var(--spacing-sm);
+}
+
+/* Slider Container */
+.sliderContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  max-width: 400px;
+}
+
+.bpmAdjust {
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bpmAdjust:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.bpmSlider {
+  flex: 1;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bpmSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.bpmSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.bpmSlider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.playButton {
+  padding: var(--spacing-md) var(--spacing-2xl);
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.playButton:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.playButton.playing {
+  background: #ef4444;
+}
+
+.playButton.playing:hover {
+  background: #dc2626;
+}
+
+.tapButton {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tapButton:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tapButton:active {
+  transform: scale(0.95);
+  background: var(--hover);
+}
+
+/* Config Panel */
+.configPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.configRow {
+  margin-bottom: var(--spacing-lg);
+}
+
+.configRow:last-child {
+  margin-bottom: 0;
+}
+
+.configLabel {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Time Signatures */
+.timeSignatures {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.tsButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 50px;
+}
+
+.tsButton:hover {
+  border-color: var(--primary);
+}
+
+.tsButton.selected {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Toggle Button */
+.toggleButton {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleButton.on {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+/* Volume Slider */
+.volumeSlider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--secondary);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.volumeSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--secondary);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* Presets */
+.presets {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.presetButton {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--hover);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.presetButton:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--focus);
+}
+
+/* Educational content */
+.guideSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.guideSection h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.introParagraph {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.contentCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.contentCard h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.contentCard ul {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+.contentCard li {
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    padding: var(--spacing-xl) var(--spacing-md);
+    margin-top: 70px;
+  }
+
+  .heroIcon {
+    font-size: 2.5rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .bpmValue {
+    font-size: 4rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .playButton,
+  .tapButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .timeSignatures {
+    justify-content: center;
+  }
+
+  .presets {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .bpmValue {
+    font-size: 3.5rem;
+  }
+
+  .beatDot {
+    width: 18px;
+    height: 18px;
+  }
+
+  .sliderContainer {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .bpmSlider {
+    width: 100%;
+  }
+}
