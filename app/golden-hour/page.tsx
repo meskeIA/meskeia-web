@@ -587,6 +587,7 @@ export default function GoldenHourPage() {
                     <span className={styles.timeRange}>
                       {formatTime(sunTimes.civilDawn)} - {formatTime(sunTimes.sunrise)}
                     </span>
+                    <span className={styles.colorTemp}>🌡️ 9.000K - 12.000K</span>
                   </div>
                 </div>
               )}
@@ -600,6 +601,7 @@ export default function GoldenHourPage() {
                     <span className={styles.timeRange}>
                       {formatTime(sunTimes.sunrise)} - {formatTime(sunTimes.goldenHourMorningEnd)}
                     </span>
+                    <span className={styles.colorTemp}>🌡️ 3.000K - 4.000K</span>
                   </div>
                 </div>
               )}
@@ -627,6 +629,7 @@ export default function GoldenHourPage() {
                     <span className={styles.timeRange}>
                       {formatTime(sunTimes.goldenHourEveningStart)} - {formatTime(sunTimes.sunset)}
                     </span>
+                    <span className={styles.colorTemp}>🌡️ 2.500K - 3.500K</span>
                   </div>
                 </div>
               )}
@@ -647,6 +650,7 @@ export default function GoldenHourPage() {
                     <span className={styles.timeRange}>
                       {formatTime(sunTimes.sunset)} - {formatTime(sunTimes.civilDusk)}
                     </span>
+                    <span className={styles.colorTemp}>🌡️ 9.000K - 12.000K</span>
                   </div>
                 </div>
               )}
