@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 168+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 169+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 168,
+  "total_tools": 169,
   "last_updated": "2025-12-16",
   "features": {
     "all_free": true,
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Optimiza tu tiempo y organización",
-      "tool_count": 18
+      "tool_count": 19
     },
     {
       "id": "salud",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 69
+      "tool_count": 70
     },
     {
       "id": "estudio",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 47
+      "tool_count": 48
     },
     {
       "id": "dinero",
@@ -3065,6 +3065,29 @@
         "luz natural"
       ],
       "icon": "🌅"
+    },
+    {
+      "slug": "sonometro",
+      "name": "Sonómetro / Decibelímetro",
+      "url": "https://meskeia.com/sonometro/",
+      "description": "Mide el nivel de ruido en decibelios (dB) con tu micrófono. Ideal para documentar ruido, verificar ambientes de trabajo o medir contaminación acústica",
+      "category": "Productividad",
+      "contexts": [
+        "trabajo",
+        "casa"
+      ],
+      "keywords": [
+        "sonometro",
+        "decibelimetro",
+        "ruido",
+        "decibelios",
+        "db",
+        "medir ruido",
+        "contaminacion acustica",
+        "nivel sonoro",
+        "microfono"
+      ],
+      "icon": "🔊"
     },
     {
       "slug": "mi-ip",

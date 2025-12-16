@@ -78,6 +78,7 @@ export const implementedAppsUrls = [
   "/prueba-microfono/",            // Test de micrófono con grabación de audio
   "/luxometro/",                   // Luxómetro/fotómetro para medir intensidad de luz
   "/golden-hour/",                 // Calculadora hora dorada y azul para fotografía
+  "/sonometro/",                   // Sonómetro/decibelímetro para medir nivel de ruido
   "/mi-ip/",                       // IP pública, geolocalización, ISP, conexión
 
   // Texto y Documentos (13 implementadas)
