@@ -253,6 +253,10 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: color 0.2s;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
 }
 
 .sectionHeader:hover {

@@ -29,6 +29,7 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
   const [mounted, setMounted] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [recentApps, setRecentApps] = useState<RecentApp[]>([]);
+  const [recentAppsCollapsed, setRecentAppsCollapsed] = useState(false);
 
   // Cargar estado inicial
   useEffect(() => {
@@ -38,6 +39,12 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
     const savedCollapsed = localStorage.getItem('meskeia_sidebar_collapsed');
     if (savedCollapsed) {
       setIsCollapsed(savedCollapsed === 'true');
+    }
+
+    // Cargar preferencia de apps recientes colapsadas
+    const savedRecentCollapsed = localStorage.getItem('meskeia_recent_apps_collapsed');
+    if (savedRecentCollapsed) {
+      setRecentAppsCollapsed(savedRecentCollapsed === 'true');
     }
 
     // Cargar apps recientes (máximo 8)
@@ -57,6 +64,13 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
     setIsCollapsed(newState);
     localStorage.setItem('meskeia_sidebar_collapsed', String(newState));
   }, [isCollapsed]);
+
+  // Toggle para apps recientes
+  const toggleRecentApps = useCallback(() => {
+    const newState = !recentAppsCollapsed;
+    setRecentAppsCollapsed(newState);
+    localStorage.setItem('meskeia_recent_apps_collapsed', String(newState));
+  }, [recentAppsCollapsed]);
 
   // Manejar cambio de vista
   const handleViewChange = useCallback((view: MainView) => {
@@ -120,25 +134,36 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
         {/* Apps visitadas (recientes) */}
         {recentApps.length > 0 && (
           <div className={styles.section}>
-            <div className={styles.sectionHeader}>
+            <button
+              type="button"
+              className={styles.sectionHeader}
+              onClick={toggleRecentApps}
+              aria-expanded={recentAppsCollapsed ? 'false' : 'true'}
+              aria-label={recentAppsCollapsed ? 'Expandir apps visitadas' : 'Colapsar apps visitadas'}
+            >
               <span className={styles.sectionIcon}>🕐</span>
               <span className={styles.sectionTitle}>Apps visitadas</span>
-            </div>
-            <div className={styles.recentApps}>
-              {recentApps.map((recent) => {
-                const app = getAppByUrl(recent.url);
-                if (!app) return null;
-                return (
-                  <Link
-                    key={recent.url}
-                    href={recent.url}
-                    className={`${styles.recentApp} ${pathname === recent.url ? styles.navItemActive : ''}`}
-                  >
-                    <span className={styles.recentAppIcon}>{app.icon}</span>
-                    <span className={styles.recentAppName}>{app.name}</span>
-                  </Link>
-                );
-              })}
+              <span className={`${styles.sectionArrow} ${!recentAppsCollapsed ? styles.sectionArrowOpen : ''}`}>
+                ▼
+              </span>
+            </button>
+            <div className={`${styles.sectionContent} ${recentAppsCollapsed ? styles.sectionContentClosed : styles.sectionContentOpen}`}>
+              <div className={styles.recentApps}>
+                {recentApps.map((recent) => {
+                  const app = getAppByUrl(recent.url);
+                  if (!app) return null;
+                  return (
+                    <Link
+                      key={recent.url}
+                      href={recent.url}
+                      className={`${styles.recentApp} ${pathname === recent.url ? styles.navItemActive : ''}`}
+                    >
+                      <span className={styles.recentAppIcon}>{app.icon}</span>
+                      <span className={styles.recentAppName}>{app.name}</span>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}

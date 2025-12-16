@@ -29,11 +29,18 @@ export default function SidebarMobile({ onViewChange, currentView = 'home' }: Si
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [recentApps, setRecentApps] = useState<RecentApp[]>([]);
+  const [recentAppsCollapsed, setRecentAppsCollapsed] = useState(false);
 
   // Cargar estado inicial
   useEffect(() => {
     setMounted(true);
     setRecentApps(getRecentApps().slice(0, 8));
+
+    // Cargar preferencia de apps recientes colapsadas
+    const savedRecentCollapsed = localStorage.getItem('meskeia_recent_apps_collapsed');
+    if (savedRecentCollapsed) {
+      setRecentAppsCollapsed(savedRecentCollapsed === 'true');
+    }
   }, []);
 
   // Actualizar apps recientes cuando cambia la ruta
@@ -75,6 +82,13 @@ export default function SidebarMobile({ onViewChange, currentView = 'home' }: Si
       onViewChange(view);
     }
   }, [onViewChange]);
+
+  // Toggle para apps recientes
+  const toggleRecentApps = useCallback(() => {
+    const newState = !recentAppsCollapsed;
+    setRecentAppsCollapsed(newState);
+    localStorage.setItem('meskeia_recent_apps_collapsed', String(newState));
+  }, [recentAppsCollapsed]);
 
   // Evitar hidratación incorrecta
   if (!mounted) {
@@ -134,26 +148,37 @@ export default function SidebarMobile({ onViewChange, currentView = 'home' }: Si
           {/* Apps visitadas (recientes) */}
           {recentApps.length > 0 && (
             <div className={styles.section}>
-              <div className={styles.sectionHeader}>
+              <button
+                type="button"
+                className={styles.sectionHeader}
+                onClick={toggleRecentApps}
+                aria-expanded={recentAppsCollapsed ? 'false' : 'true'}
+                aria-label={recentAppsCollapsed ? 'Expandir apps visitadas' : 'Colapsar apps visitadas'}
+              >
                 <span className={styles.sectionIcon}>🕐</span>
                 <span className={styles.sectionTitle}>Apps visitadas</span>
-              </div>
-              <div className={styles.recentApps}>
-                {recentApps.map((recent) => {
-                  const app = getAppByUrl(recent.url);
-                  if (!app) return null;
-                  return (
-                    <Link
-                      key={recent.url}
-                      href={recent.url}
-                      className={`${styles.recentApp} ${pathname === recent.url ? styles.navItemActive : ''}`}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span className={styles.recentAppIcon}>{app.icon}</span>
-                      <span className={styles.recentAppName}>{app.name}</span>
-                    </Link>
-                  );
-                })}
+                <span className={`${styles.sectionArrow} ${!recentAppsCollapsed ? styles.sectionArrowOpen : ''}`}>
+                  ▼
+                </span>
+              </button>
+              <div className={`${styles.sectionContent} ${recentAppsCollapsed ? styles.sectionContentClosed : styles.sectionContentOpen}`}>
+                <div className={styles.recentApps}>
+                  {recentApps.map((recent) => {
+                    const app = getAppByUrl(recent.url);
+                    if (!app) return null;
+                    return (
+                      <Link
+                        key={recent.url}
+                        href={recent.url}
+                        className={`${styles.recentApp} ${pathname === recent.url ? styles.navItemActive : ''}`}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <span className={styles.recentAppIcon}>{app.icon}</span>
+                        <span className={styles.recentAppName}>{app.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}
