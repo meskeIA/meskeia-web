@@ -81,6 +81,8 @@ export const implementedAppsUrls = [
   "/sonometro/",                   // Sonómetro/decibelímetro para medir nivel de ruido
   "/metronomo/",                   // Metrónomo online con tap tempo
   "/mi-ip/",                       // IP pública, geolocalización, ISP, conexión
+  "/analizador-espectro/",         // Analizador de espectro de audio FFT
+  "/nivel-burbuja/",               // Nivel de burbuja digital + inclinómetro
 
   // Texto y Documentos (13 implementadas)
   "/contador-palabras/",

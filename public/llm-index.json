@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 170+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 172+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 170,
+  "total_tools": 172,
   "last_updated": "2025-12-16",
   "features": {
     "all_free": true,
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Optimiza tu tiempo y organización",
-      "tool_count": 20
+      "tool_count": 22
     },
     {
       "id": "salud",
@@ -107,21 +107,21 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 70
+      "tool_count": 71
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 49
+      "tool_count": 50
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 48
+      "tool_count": 49
     },
     {
       "id": "dinero",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 44
+      "tool_count": 45
     },
     {
       "id": "relax",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 25
+      "tool_count": 26
     }
   ],
   "tools": [
@@ -3136,6 +3136,54 @@
         "conexion"
       ],
       "icon": "🌐"
+    },
+    {
+      "slug": "analizador-espectro",
+      "name": "Analizador de Espectro",
+      "url": "https://meskeia.com/analizador-espectro/",
+      "description": "Visualiza las frecuencias de audio en tiempo real con FFT. Muestra bandas de frecuencia, nota dominante y espectrograma. Ideal para músicos y técnicos de sonido",
+      "category": "Productividad",
+      "contexts": [
+        "creando",
+        "estudio",
+        "curiosidad"
+      ],
+      "keywords": [
+        "analizador espectro",
+        "fft",
+        "frecuencias",
+        "audio",
+        "espectrograma",
+        "visualizador",
+        "musica",
+        "sonido",
+        "hertz",
+        "bandas frecuencia"
+      ],
+      "icon": "📊"
+    },
+    {
+      "slug": "nivel-burbuja",
+      "name": "Nivel de Burbuja Digital",
+      "url": "https://meskeia.com/nivel-burbuja/",
+      "description": "Nivel de burbuja digital con inclinómetro. Mide ángulos y pendientes con los sensores de tu móvil. Ideal para bricolaje, colgar cuadros y medir rampas",
+      "category": "Productividad",
+      "contexts": [
+        "casa",
+        "trabajo"
+      ],
+      "keywords": [
+        "nivel burbuja",
+        "inclinometro",
+        "nivel digital",
+        "medir angulos",
+        "pendiente",
+        "bricolaje",
+        "colgar cuadros",
+        "clinometro",
+        "spirit level"
+      ],
+      "icon": "📐"
     },
     {
       "slug": "calculadora-imc",

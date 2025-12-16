@@ -1,0 +1,831 @@
+/* Variables CSS - Paleta meskeIA */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Main Content */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Level Panel */
+.levelPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+/* Mode Selector */
+.modeSelector {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  background: var(--border);
+  border-radius: var(--radius);
+  padding: 3px;
+  margin-bottom: var(--spacing-xl);
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.modeBtn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: none;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modeBtn.active {
+  background: var(--bg-card);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.modeBtn:hover:not(.active) {
+  color: var(--text-primary);
+}
+
+/* Bubble Container */
+.bubbleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-lg);
+}
+
+/* Circular Level */
+.circularLevel {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+  border: 4px solid var(--border);
+  box-shadow:
+    inset 0 4px 20px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+[data-theme='dark'] .circularLevel {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+}
+
+.circularLevel.levelOk {
+  border-color: #22c55e;
+  box-shadow:
+    inset 0 4px 20px rgba(0, 0, 0, 0.1),
+    0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+/* Reference Circles */
+.referenceCircle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px dashed var(--border);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Center Cross */
+.centerCross {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
+.crossHorizontal,
+.crossVertical {
+  position: absolute;
+  background: var(--border);
+}
+
+.crossHorizontal {
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.crossVertical {
+  left: 50%;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+/* Bubble */
+.bubble {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow:
+    inset 0 -3px 6px rgba(0, 0, 0, 0.2),
+    inset 0 3px 6px rgba(255, 255, 255, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease;
+}
+
+.bubble.centered {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(calc(-50%), calc(-50%)) scale(1); }
+  50% { transform: translate(calc(-50%), calc(-50%)) scale(1.05); }
+}
+
+/* Linear Levels */
+.linearLevels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+  max-width: 400px;
+}
+
+.linearLevel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.linearLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.linearTrack {
+  flex: 1;
+  height: 24px;
+  background: linear-gradient(to bottom, #e0e0e0, #f0f0f0);
+  border-radius: 12px;
+  position: relative;
+  border: 2px solid var(--border);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .linearTrack {
+  background: linear-gradient(to bottom, #1a1a1a, #2a2a2a);
+}
+
+.linearCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background: var(--text-muted);
+  transform: translate(-50%, -50%);
+}
+
+.linearBubble {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  transition: left 0.1s ease-out;
+}
+
+.linearValue {
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'SF Mono', Monaco, monospace;
+  width: 60px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Inclinometer Container */
+.inclinometerContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-lg);
+}
+
+/* Gauge */
+.inclinometerGauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.gaugeBackground {
+  position: relative;
+  width: 300px;
+  height: 160px;
+  border-bottom: 3px solid var(--border);
+  overflow: hidden;
+}
+
+/* Gauge Marks */
+.gaugeMark {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  height: 140px;
+  transform-origin: bottom center;
+}
+
+.gaugeMark::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 15px;
+  background: var(--border);
+  transform: translateX(-50%);
+}
+
+.gaugeMarkLabel {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) rotate(calc(-1 * var(--rotation, 0deg)));
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Gauge Needle */
+.gaugeNeedle {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  height: 120px;
+  background: linear-gradient(to top, var(--primary), #ef4444);
+  transform-origin: bottom center;
+  transition: transform 0.1s ease-out;
+  border-radius: 2px 2px 0 0;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  margin-left: -2px;
+}
+
+.gaugeNeedle::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 12px solid #ef4444;
+}
+
+.gaugeCenter {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  background: var(--text-primary);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Inclinometer Reading */
+.inclinometerReading {
+  text-align: center;
+}
+
+.readingValue {
+  font-size: 3rem;
+  font-weight: 700;
+  font-family: 'SF Mono', Monaco, monospace;
+  display: block;
+}
+
+.readingUnit {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  display: block;
+  margin-top: var(--spacing-xs);
+}
+
+.readingDirection {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  display: block;
+  margin-top: var(--spacing-sm);
+}
+
+/* Slope Info */
+.slopeInfo {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+.slopeCard {
+  background: var(--bg-primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius);
+  text-align: center;
+  min-width: 100px;
+}
+
+.slopeLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+.slopeValue {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* Status Indicator */
+.statusIndicator {
+  text-align: center;
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  transition: all 0.3s ease;
+}
+
+.statusIndicator.levelOk {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  font-weight: 600;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+}
+
+.btnStart,
+.btnStop,
+.btnCalibrate,
+.btnReset {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.btnStart {
+  background: var(--primary);
+  color: white;
+}
+
+.btnStart:hover:not(:disabled) {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnStart:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnStop {
+  background: #ef4444;
+  color: white;
+}
+
+.btnStop:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+.btnCalibrate {
+  background: var(--secondary);
+  color: white;
+}
+
+.btnCalibrate:hover {
+  background: #3d9391;
+  transform: translateY(-2px);
+}
+
+.btnCalibrate.calibrating {
+  animation: calibratePulse 0.5s ease;
+}
+
+@keyframes calibratePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.btnReset {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.btnReset:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+/* Options */
+.options {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+}
+
+.optionLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.toggleButtons {
+  display: flex;
+  gap: 2px;
+  background: var(--border);
+  border-radius: var(--radius);
+  padding: 2px;
+}
+
+.toggleBtn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: none;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleBtn.active {
+  background: var(--bg-card);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Messages */
+.errorMessage {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  text-align: center;
+  margin-top: var(--spacing-md);
+}
+
+[data-theme='dark'] .errorMessage {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.warningMessage {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #b45309;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  text-align: center;
+  margin-top: var(--spacing-md);
+}
+
+[data-theme='dark'] .warningMessage {
+  background: rgba(252, 211, 77, 0.1);
+  border-color: rgba(252, 211, 77, 0.3);
+  color: #fcd34d;
+}
+
+.infoMessage {
+  background: rgba(46, 134, 171, 0.1);
+  border: 1px solid rgba(46, 134, 171, 0.3);
+  color: var(--primary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  text-align: center;
+  margin-top: var(--spacing-md);
+}
+
+/* Info Panel */
+.infoPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.tipContent h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.tipContent p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Disclaimer */
+.disclaimer {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.disclaimer h3 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: #856404;
+  font-size: 1.1rem;
+}
+
+.disclaimer p {
+  margin: 0;
+  color: #856404;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .disclaimer {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+[data-theme='dark'] .disclaimer h3,
+[data-theme='dark'] .disclaimer p {
+  color: #ffc107;
+}
+
+/* Educational Section Styles */
+.guideSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.guideSection h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.introParagraph {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-lg);
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.contentCard {
+  background: var(--bg-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.contentCard h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.contentCard p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.contentCard ul {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+.contentCard li {
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 70px;
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+
+  .heroIcon {
+    font-size: 2.5rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .circularLevel {
+    width: 220px;
+    height: 220px;
+  }
+
+  .bubble {
+    width: 32px;
+    height: 32px;
+  }
+
+  .gaugeBackground {
+    width: 250px;
+    height: 140px;
+  }
+
+  .gaugeNeedle {
+    height: 100px;
+  }
+
+  .readingValue {
+    font-size: 2.5rem;
+  }
+
+  .slopeInfo {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .slopeCard {
+    width: 100%;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btnStart,
+  .btnStop,
+  .btnCalibrate,
+  .btnReset {
+    justify-content: center;
+  }
+
+  .options {
+    flex-direction: column;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .circularLevel {
+    width: 180px;
+    height: 180px;
+  }
+
+  .linearLevels {
+    gap: var(--spacing-md);
+  }
+
+  .linearLabel {
+    width: 70px;
+    font-size: 0.75rem;
+  }
+
+  .linearValue {
+    width: 50px;
+    font-size: 0.9rem;
+  }
+}
