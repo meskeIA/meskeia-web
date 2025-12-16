@@ -32,6 +32,7 @@
   text-align: center;
   padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-xl);
   background: var(--bg-primary);
+  animation: viewFadeIn 0.3s ease-out;
 }
 
 .headerContent {
@@ -507,6 +508,9 @@
 .searchSection {
   padding: var(--spacing-2xl) var(--spacing-xl);
   background: var(--bg-primary);
+  animation: viewFadeIn 0.3s ease-out 0.1s both;
+  position: relative;
+  z-index: 100;
 }
 
 .searchWrapper {
@@ -519,6 +523,7 @@
   padding: var(--spacing-xl);
   max-width: 1200px;
   margin: 0 auto;
+  animation: viewFadeIn 0.3s ease-out 0.2s both;
 }
 
 /* ===== VISTAS DE CONTENIDO ===== */
@@ -527,6 +532,19 @@
   max-width: 1200px;
   margin: 0 auto;
   min-height: calc(100vh - 200px);
+  animation: viewFadeIn 0.3s ease-out;
+}
+
+/* Animación de entrada para transiciones entre vistas */
+@keyframes viewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .viewHeader {

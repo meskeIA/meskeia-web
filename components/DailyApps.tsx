@@ -21,10 +21,10 @@ export default function DailyApps({ count = 4 }: DailyAppsProps) {
     setDailyApps(apps);
   }, [count]);
 
-  // Skeleton loader mientras carga
+  // Skeleton loader mientras carga (efecto shimmer)
   if (!mounted) {
     return (
-      <section className={styles.dailyAppsSection}>
+      <section className={styles.dailyAppsSection} aria-busy="true" aria-label="Cargando apps del día">
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>
             <span className={styles.titleIcon}>✨</span>
@@ -36,11 +36,14 @@ export default function DailyApps({ count = 4 }: DailyAppsProps) {
         </div>
         <div className={styles.appsGrid}>
           {[...Array(count)].map((_, i) => (
-            <div key={i} className={styles.cardSkeleton}>
-              <div className={styles.skeletonIcon} />
-              <div className={styles.skeletonTitle} />
+            <div key={i} className={styles.cardSkeleton} aria-hidden="true">
+              <div className={styles.skeletonHeader}>
+                <div className={styles.skeletonIcon} />
+                <div className={styles.skeletonTitle} />
+              </div>
               <div className={styles.skeletonDescription} />
               <div className={styles.skeletonDescription} />
+              <div className={styles.skeletonCategory} />
             </div>
           ))}
         </div>

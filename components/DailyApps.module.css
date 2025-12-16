@@ -149,13 +149,47 @@
   to { transform: rotate(360deg); }
 }
 
-/* Placeholder mientras carga */
+/* Placeholder mientras carga - Skeleton con shimmer */
 .cardSkeleton {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-large);
   padding: var(--spacing-lg);
-  animation: pulse 1.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.cardSkeleton::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+[data-theme='dark'] .cardSkeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+}
+
+.skeletonHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
 }
 
 .skeletonIcon {
@@ -163,15 +197,14 @@
   height: 48px;
   background: var(--hover);
   border-radius: var(--radius);
-  margin-bottom: var(--spacing-sm);
+  flex-shrink: 0;
 }
 
 .skeletonTitle {
   height: 20px;
   background: var(--hover);
   border-radius: 4px;
-  margin-bottom: var(--spacing-sm);
-  width: 80%;
+  width: 70%;
 }
 
 .skeletonDescription {
@@ -181,13 +214,32 @@
   margin-bottom: 8px;
 }
 
-.skeletonDescription:last-child {
-  width: 60%;
+.skeletonDescription:last-of-type {
+  width: 50%;
+  margin-bottom: var(--spacing-sm);
 }
 
+.skeletonCategory {
+  height: 24px;
+  width: 100px;
+  background: var(--hover);
+  border-radius: 12px;
+  margin-top: auto;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Fallback pulse para navegadores antiguos */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.6; }
 }
 
 /* Responsive */

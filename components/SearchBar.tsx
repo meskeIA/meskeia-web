@@ -10,6 +10,52 @@ interface SearchBarProps {
   large?: boolean;
 }
 
+// Stopwords en español - palabras comunes que no aportan valor a la búsqueda
+const STOPWORDS = new Set([
+  // Artículos
+  'el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas',
+  // Preposiciones
+  'a', 'ante', 'bajo', 'con', 'contra', 'de', 'del', 'desde', 'en', 'entre',
+  'hacia', 'hasta', 'para', 'por', 'sin', 'sobre', 'tras',
+  // Conjunciones
+  'y', 'e', 'o', 'u', 'ni', 'que', 'si', 'como', 'pero', 'aunque',
+  // Pronombres
+  'yo', 'tu', 'el', 'ella', 'nosotros', 'vosotros', 'ellos', 'ellas',
+  'me', 'te', 'se', 'nos', 'os', 'lo', 'le', 'les',
+  // Verbos comunes
+  'ser', 'estar', 'tener', 'hacer', 'poder', 'querer', 'ir', 'ver', 'dar',
+  'es', 'son', 'soy', 'está', 'están', 'estoy', 'tengo', 'tiene', 'tienen',
+  'hago', 'hace', 'hacen', 'puedo', 'puede', 'pueden', 'quiero', 'quiere',
+  'voy', 'va', 'van', 'doy', 'da', 'dan', 'hay',
+  // Adverbios y otros
+  'no', 'si', 'muy', 'más', 'menos', 'ya', 'también', 'solo', 'sólo',
+  'bien', 'mal', 'aquí', 'ahí', 'allí', 'donde', 'cuando', 'como', 'cual',
+  // Palabras de búsqueda comunes
+  'busco', 'buscar', 'buscame', 'búscame', 'necesito', 'quiero', 'dame',
+  'encuentra', 'encontrar', 'mostrar', 'muestra', 'enseña', 'ver',
+  'herramienta', 'herramientas', 'aplicación', 'aplicacion', 'app', 'apps',
+  'algo', 'alguna', 'alguno', 'algunas', 'algunos', 'todo', 'toda', 'todos', 'todas',
+  'este', 'esta', 'estos', 'estas', 'ese', 'esa', 'esos', 'esas',
+  'mi', 'mis', 'tu', 'tus', 'su', 'sus', 'nuestro', 'nuestra',
+]);
+
+// Función para limpiar y extraer palabras clave relevantes
+const extractKeywords = (text: string): string => {
+  const words = text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos para comparación
+    .split(/\s+/)
+    .filter(word => word.length >= 2 && !STOPWORDS.has(word));
+
+  // Si después de filtrar no quedan palabras, devolver el texto original
+  if (words.length === 0) {
+    return text.trim();
+  }
+
+  return words.join(' ');
+};
+
 export default function SearchBar({ large = false }: SearchBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -117,7 +163,18 @@ export default function SearchBar({ large = false }: SearchBarProps) {
       return;
     }
 
-    const searchResults = fuse.current.search(searchQuery.trim());
+    // Extraer palabras clave relevantes (filtrar stopwords)
+    const keywords = extractKeywords(searchQuery);
+
+    // Si no quedan keywords válidas después del filtro, no buscar
+    if (keywords.length < 2) {
+      setResults([]);
+      setSelectedIndex(-1);
+      if (large) setShowDropdown(false);
+      return;
+    }
+
+    const searchResults = fuse.current.search(keywords);
     setResults(searchResults.slice(0, 6)); // Máximo 6 resultados
     setSelectedIndex(-1);
     if (large) setShowDropdown(true);
@@ -153,6 +210,13 @@ export default function SearchBar({ large = false }: SearchBarProps) {
     } else {
       closeSearch();
     }
+  };
+
+  // Mensaje para aria-live (accesibilidad)
+  const getAriaMessage = () => {
+    if (query.length < 2) return '';
+    if (results.length === 0) return 'No se encontraron aplicaciones';
+    return `${results.length} ${results.length === 1 ? 'aplicación encontrada' : 'aplicaciones encontradas'}`;
   };
 
   // Renderizar resultados (compartido entre modal e inline)
@@ -209,11 +273,21 @@ export default function SearchBar({ large = false }: SearchBarProps) {
 
   return (
     <>
+      {/* Región aria-live para anunciar resultados a lectores de pantalla */}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className={styles.srOnly}
+      >
+        {getAriaMessage()}
+      </div>
+
       {/* ===== VERSIÓN GRANDE (INLINE) ===== */}
       {large && (
         <div className={styles.inlineSearchWrapper} ref={inlineContainerRef}>
           <div className={`${styles.searchLarge} ${showDropdown ? styles.searchLargeActive : ''}`}>
-            <span className={styles.searchLargeIcon}>🔍</span>
+            <span className={styles.searchLargeIcon} aria-hidden="true">🔍</span>
             <input
               ref={searchInputLargeRef}
               type="text"
@@ -226,6 +300,7 @@ export default function SearchBar({ large = false }: SearchBarProps) {
             />
             {query.length > 0 ? (
               <button
+                type="button"
                 className={styles.searchLargeClear}
                 onClick={() => {
                   setQuery('');
