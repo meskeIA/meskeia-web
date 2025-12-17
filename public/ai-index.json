@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 168,
+  "total_tools": 169,
   "updated": "2025-12-17",
   "features": {
     "all_free": true,
@@ -143,7 +143,8 @@
         { "name": "Curso de Estrategia Empresarial", "slug": "curso-estrategia-empresarial", "url": "https://meskeia.com/curso-estrategia-empresarial/", "description": "Pensamiento estratégico para la era de la incertidumbre: Porter actualizado, nuevos moats, experimentación vs planificación. 10 capítulos" },
         { "name": "Curso de Redacción Académica", "slug": "curso-redaccion-academica", "url": "https://meskeia.com/curso-redaccion-academica/", "description": "Guía práctica para escribir textos académicos: TFG, TFM, tesis, artículos. Citas APA, coherencia, estilo. 13 capítulos" },
         { "name": "Guía Cuidado de Mascotas", "slug": "guia-cuidado-mascota", "url": "https://meskeia.com/guia-cuidado-mascota/", "description": "Todo sobre cuidado de perros y gatos: alimentación, salud, parásitos, emergencias. 8 capítulos fáciles y cercanos" },
-        { "name": "Minerales del Mundo", "slug": "minerales-del-mundo", "url": "https://meskeia.com/minerales-del-mundo/", "description": "Guía de 50 minerales esenciales: composición química, dureza Mohs, sistema cristalino, brillo, usos industriales y curiosidades. Incluye escala Mohs y sistemas cristalinos" }
+        { "name": "Minerales del Mundo", "slug": "minerales-del-mundo", "url": "https://meskeia.com/minerales-del-mundo/", "description": "Guía de 50 minerales esenciales: composición química, dureza Mohs, sistema cristalino, brillo, usos industriales y curiosidades. Incluye escala Mohs y sistemas cristalinos" },
+        { "name": "Huesos del Cuerpo Humano", "slug": "huesos-cuerpo-humano", "url": "https://meskeia.com/huesos-cuerpo-humano/", "description": "Guía completa de los 206 huesos del esqueleto humano: nombre latino, tipo de hueso, región, articulaciones, función y curiosidades. Ideal para estudiantes de medicina y anatomía" }
       ]
     },
     {

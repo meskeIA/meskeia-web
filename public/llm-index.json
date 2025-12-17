@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 174+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 175+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 174,
+  "total_tools": 175,
   "last_updated": "2025-12-17",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 15
+      "tool_count": 16
     },
     {
       "id": "impuestos",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 52
+      "tool_count": 53
     },
     {
       "id": "casa",
@@ -3802,6 +3802,29 @@
         "oxidos"
       ],
       "icon": "💎"
+    },
+    {
+      "slug": "huesos-cuerpo-humano",
+      "name": "Huesos del Cuerpo Humano",
+      "url": "https://meskeia.com/huesos-cuerpo-humano/",
+      "description": "Guía completa de los 206 huesos del esqueleto humano: nombre latino, tipo, región, articulaciones, función y curiosidades",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "huesos",
+        "esqueleto",
+        "anatomia",
+        "medicina",
+        "craneo",
+        "vertebras",
+        "femur",
+        "humero",
+        "costillas",
+        "articulaciones"
+      ],
+      "icon": "🦴"
     }
   ],
   "llm_instructions": {

@@ -550,8 +550,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'minerales-del-mundo': [
     { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' },
     { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Física-Química', description: 'Términos científicos' },
+    { url: '/huesos-cuerpo-humano/', icon: '🦴', name: 'Huesos del Cuerpo', description: 'Anatomía humana' },
     { url: '/paises-del-mundo/', icon: '🌍', name: 'Países del Mundo', description: 'Geografía mundial' },
-    { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, peso, etc.' },
+  ],
+  'huesos-cuerpo-humano': [
+    { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice de masa corporal' },
+    { url: '/calculadora-calorias-ejercicio/', icon: '🔥', name: 'Calorías Ejercicio', description: 'Gasto calórico' },
+    { url: '/minerales-del-mundo/', icon: '💎', name: 'Minerales del Mundo', description: '50 minerales esenciales' },
+    { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' },
   ],
 };
 
