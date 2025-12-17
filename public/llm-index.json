@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 176+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 177+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 176,
+  "total_tools": 177,
   "last_updated": "2025-12-17",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 17
+      "tool_count": 18
     },
     {
       "id": "impuestos",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 54
+      "tool_count": 55
     },
     {
       "id": "casa",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 29
+      "tool_count": 30
     }
   ],
   "tools": [
@@ -3849,6 +3849,30 @@
         "cosmos"
       ],
       "icon": "🌌"
+    },
+    {
+      "slug": "instrumentos-musicales",
+      "name": "Instrumentos Musicales",
+      "url": "https://meskeia.com/instrumentos-musicales/",
+      "description": "Guía de 45 instrumentos musicales del mundo: cuerda, viento, percusión, teclado y electrónicos con origen, materiales y curiosidades",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio",
+        "curiosidad"
+      ],
+      "keywords": [
+        "instrumentos",
+        "musica",
+        "violin",
+        "guitarra",
+        "piano",
+        "bateria",
+        "flauta",
+        "trompeta",
+        "orquesta",
+        "percusion"
+      ],
+      "icon": "🎵"
     }
   ],
   "llm_instructions": {

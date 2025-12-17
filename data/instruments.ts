@@ -1,0 +1,751 @@
+// Base de datos de instrumentos musicales - meskeIA
+// ~45 instrumentos más conocidos organizados por familia
+
+export interface Instrument {
+  id: string;
+  nombre: string;
+  nombreIngles: string;
+  familia: InstrumentFamily;
+  subfamilia: string;
+  origen: InstrumentOrigin;
+  epocaOrigen: string;
+  registro: Register;
+  materiales: string[];
+  descripcion: string;
+  curiosidad: string;
+}
+
+export type InstrumentFamily = 'Cuerda' | 'Viento-Madera' | 'Viento-Metal' | 'Percusión' | 'Teclado' | 'Electrónico';
+
+export type InstrumentOrigin = 'Europa' | 'Asia' | 'África' | 'América' | 'Oceanía' | 'Universal';
+
+export type Register = 'Grave' | 'Medio' | 'Agudo' | 'Amplio';
+
+export const FAMILIAS: InstrumentFamily[] = ['Cuerda', 'Viento-Madera', 'Viento-Metal', 'Percusión', 'Teclado', 'Electrónico'];
+
+export const ORIGENES: InstrumentOrigin[] = ['Europa', 'Asia', 'África', 'América', 'Oceanía', 'Universal'];
+
+export const REGISTROS: Register[] = ['Grave', 'Medio', 'Agudo', 'Amplio'];
+
+// Emojis por familia
+export const FAMILIA_EMOJI: Record<InstrumentFamily, string> = {
+  'Cuerda': '🎻',
+  'Viento-Madera': '🎷',
+  'Viento-Metal': '🎺',
+  'Percusión': '🥁',
+  'Teclado': '🎹',
+  'Electrónico': '🎸',
+};
+
+// Emojis por origen
+export const ORIGEN_EMOJI: Record<InstrumentOrigin, string> = {
+  'Europa': '🇪🇺',
+  'Asia': '🌏',
+  'África': '🌍',
+  'América': '🌎',
+  'Oceanía': '🏝️',
+  'Universal': '🌐',
+};
+
+export const INSTRUMENTS: Instrument[] = [
+  // ═══════════════════════════════════════════════════════════════
+  // CUERDA FROTADA (5)
+  // ═══════════════════════════════════════════════════════════════
+  {
+    id: 'violin',
+    nombre: 'Violín',
+    nombreIngles: 'Violin',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda frotada',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XVI (Italia)',
+    registro: 'Agudo',
+    materiales: ['Madera de arce', 'Abeto', 'Ébano', 'Cuerdas de tripa o metal'],
+    descripcion: 'El instrumento más agudo de la familia del violín. Tiene 4 cuerdas afinadas en quintas (Sol-Re-La-Mi) y se toca con arco.',
+    curiosidad: 'Los violines Stradivarius, fabricados entre 1700-1720, pueden valer millones de euros. Su sonido único sigue siendo un misterio científico.',
+  },
+  {
+    id: 'viola',
+    nombre: 'Viola',
+    nombreIngles: 'Viola',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda frotada',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XVI (Italia)',
+    registro: 'Medio',
+    materiales: ['Madera de arce', 'Abeto', 'Ébano'],
+    descripcion: 'Similar al violín pero más grande y con sonido más grave. Afinada una quinta más baja (Do-Sol-Re-La).',
+    curiosidad: 'Mozart, Beethoven y Bach tocaban la viola. Es el único instrumento de cuerda que usa la clave de Do en tercera línea.',
+  },
+  {
+    id: 'violonchelo',
+    nombre: 'Violonchelo',
+    nombreIngles: 'Cello',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda frotada',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XVI (Italia)',
+    registro: 'Medio',
+    materiales: ['Madera de arce', 'Abeto', 'Ébano'],
+    descripcion: 'Instrumento de cuerda frotada que se toca sentado, apoyado en el suelo con una pica. Su registro es similar a la voz humana.',
+    curiosidad: 'El violonchelo más caro del mundo es el "Duport" Stradivarius de 1711, valorado en 20 millones de dólares.',
+  },
+  {
+    id: 'contrabajo',
+    nombre: 'Contrabajo',
+    nombreIngles: 'Double Bass',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda frotada',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XVI',
+    registro: 'Grave',
+    materiales: ['Madera de arce', 'Abeto', 'Ébano'],
+    descripcion: 'El instrumento más grande y grave de la familia del violín. Puede tocarse con arco o pizzicato (pulsando las cuerdas).',
+    curiosidad: 'Es el único instrumento de cuerda frotada que también es fundamental en el jazz, donde se toca casi exclusivamente en pizzicato.',
+  },
+  {
+    id: 'erhu',
+    nombre: 'Erhu',
+    nombreIngles: 'Erhu (Chinese violin)',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda frotada',
+    origen: 'Asia',
+    epocaOrigen: 'Siglo X (China)',
+    registro: 'Medio',
+    materiales: ['Madera', 'Piel de serpiente', 'Seda o nylon'],
+    descripcion: 'Violín chino de dos cuerdas con caja de resonancia cubierta de piel de serpiente. El arco pasa entre las dos cuerdas.',
+    curiosidad: 'El erhu puede imitar el sonido de la voz humana con tal precisión que en chino se le llama "el instrumento que habla".',
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // CUERDA PULSADA (8)
+  // ═══════════════════════════════════════════════════════════════
+  {
+    id: 'guitarra-clasica',
+    nombre: 'Guitarra Clásica',
+    nombreIngles: 'Classical Guitar',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda pulsada',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XV (España)',
+    registro: 'Medio',
+    materiales: ['Cedro', 'Palisandro', 'Ébano', 'Cuerdas de nylon'],
+    descripcion: 'Guitarra de 6 cuerdas de nylon, con mástil ancho y cuerpo hueco. Base del repertorio clásico y flamenco.',
+    curiosidad: 'Antonio de Torres (1817-1892) diseñó la guitarra clásica moderna. Sus proporciones siguen siendo el estándar actual.',
+  },
+  {
+    id: 'guitarra-acustica',
+    nombre: 'Guitarra Acústica',
+    nombreIngles: 'Acoustic Guitar',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda pulsada',
+    origen: 'América',
+    epocaOrigen: 'Siglo XIX (Estados Unidos)',
+    registro: 'Medio',
+    materiales: ['Abeto', 'Caoba', 'Palisandro', 'Cuerdas de acero'],
+    descripcion: 'Guitarra con cuerdas de acero y cuerpo más grande que la clásica. Sonido más brillante, ideal para folk, country y pop.',
+    curiosidad: 'La forma "dreadnought", creada por Martin en 1916, es hoy el diseño de guitarra acústica más popular del mundo.',
+  },
+  {
+    id: 'arpa',
+    nombre: 'Arpa',
+    nombreIngles: 'Harp',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda pulsada',
+    origen: 'Universal',
+    epocaOrigen: 'Antigüedad (3000 a.C.)',
+    registro: 'Amplio',
+    materiales: ['Madera de arce', 'Abeto', 'Cuerdas de tripa, nylon o metal'],
+    descripcion: 'Instrumento de cuerdas verticales pulsadas con los dedos. El arpa de concierto tiene 47 cuerdas y 7 pedales para alteraciones.',
+    curiosidad: 'El arpa es uno de los instrumentos más antiguos. Aparece en pinturas egipcias de hace 5.000 años.',
+  },
+  {
+    id: 'banjo',
+    nombre: 'Banjo',
+    nombreIngles: 'Banjo',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda pulsada',
+    origen: 'América',
+    epocaOrigen: 'Siglo XVII (origen africano)',
+    registro: 'Agudo',
+    materiales: ['Madera', 'Parche de plástico o piel', 'Cuerdas de metal'],
+    descripcion: 'Instrumento con cuerpo circular cubierto de parche, típico del bluegrass y country. Tiene 4-6 cuerdas.',
+    curiosidad: 'El banjo desciende de instrumentos africanos llevados a América por esclavos. Es esencial en el bluegrass estadounidense.',
+  },
+  {
+    id: 'ukelele',
+    nombre: 'Ukelele',
+    nombreIngles: 'Ukulele',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda pulsada',
+    origen: 'Oceanía',
+    epocaOrigen: 'Siglo XIX (Hawái)',
+    registro: 'Agudo',
+    materiales: ['Koa', 'Caoba', 'Abeto', 'Cuerdas de nylon'],
+    descripcion: 'Pequeño instrumento de 4 cuerdas originario de Hawái. Fácil de aprender y muy portátil.',
+    curiosidad: '"Ukulele" significa "pulga saltarina" en hawaiano, por el movimiento rápido de los dedos al tocarlo.',
+  },
+  {
+    id: 'mandolina',
+    nombre: 'Mandolina',
+    nombreIngles: 'Mandolin',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda pulsada',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XVII (Italia)',
+    registro: 'Agudo',
+    materiales: ['Madera de arce', 'Abeto', 'Cuerdas de metal'],
+    descripcion: 'Instrumento de 8 cuerdas (4 pares) con cuerpo en forma de lágrima. Se toca con púa usando técnica de trémolo.',
+    curiosidad: 'Vivaldi compuso conciertos para mandolina. Hoy es fundamental en la música bluegrass y folk italiana.',
+  },
+  {
+    id: 'sitar',
+    nombre: 'Sitar',
+    nombreIngles: 'Sitar',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda pulsada',
+    origen: 'Asia',
+    epocaOrigen: 'Siglo XIII (India)',
+    registro: 'Amplio',
+    materiales: ['Calabaza seca', 'Madera de teca', 'Cuerdas de metal'],
+    descripcion: 'Instrumento indio con cuerdas melódicas y simpáticas. Tiene trastes móviles curvos que permiten los característicos "bends".',
+    curiosidad: 'Ravi Shankar popularizó el sitar en Occidente. George Harrison de los Beatles estudió con él e introdujo el sitar en el rock.',
+  },
+  {
+    id: 'laud',
+    nombre: 'Laúd',
+    nombreIngles: 'Lute',
+    familia: 'Cuerda',
+    subfamilia: 'Cuerda pulsada',
+    origen: 'Europa',
+    epocaOrigen: 'Edad Media (del oud árabe)',
+    registro: 'Medio',
+    materiales: ['Madera de arce', 'Abeto', 'Ébano', 'Cuerdas de tripa'],
+    descripcion: 'Instrumento renacentista con cuerpo en forma de pera y clavijero doblado hacia atrás. Precursor de la guitarra.',
+    curiosidad: 'El laúd europeo deriva del "oud" árabe, cuyo nombre significa "madera". La palabra "laúd" viene del árabe "al-oud".',
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // VIENTO-MADERA (9)
+  // ═══════════════════════════════════════════════════════════════
+  {
+    id: 'flauta-traversa',
+    nombre: 'Flauta Travesera',
+    nombreIngles: 'Flute',
+    familia: 'Viento-Madera',
+    subfamilia: 'Bisel',
+    origen: 'Europa',
+    epocaOrigen: 'Antigüedad (forma moderna: siglo XIX)',
+    registro: 'Agudo',
+    materiales: ['Plata', 'Oro', 'Platino', 'Madera'],
+    descripcion: 'Instrumento de viento sin lengüeta. El sonido se produce soplando sobre un orificio. Hoy se fabrica en metal.',
+    curiosidad: 'Aunque es de metal, se clasifica como "madera" porque originalmente se hacía de madera y no usa boquilla metálica.',
+  },
+  {
+    id: 'clarinete',
+    nombre: 'Clarinete',
+    nombreIngles: 'Clarinet',
+    familia: 'Viento-Madera',
+    subfamilia: 'Lengüeta simple',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XVIII (Alemania)',
+    registro: 'Amplio',
+    materiales: ['Granadillo (madera negra)', 'Ébano', 'Plástico ABS'],
+    descripcion: 'Instrumento de lengüeta simple con tubo cilíndrico. Tiene el registro más amplio de los vientos de madera (casi 4 octavas).',
+    curiosidad: 'Mozart adoraba el clarinete y compuso su Concierto para Clarinete K.622 poco antes de morir. Es una de las obras más bellas del repertorio.',
+  },
+  {
+    id: 'oboe',
+    nombre: 'Oboe',
+    nombreIngles: 'Oboe',
+    familia: 'Viento-Madera',
+    subfamilia: 'Lengüeta doble',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XVII (Francia)',
+    registro: 'Agudo',
+    materiales: ['Granadillo', 'Lengüeta de caña doble'],
+    descripcion: 'Instrumento de lengüeta doble con tubo cónico. Su timbre penetrante y expresivo lo hace ideal para solos orquestales.',
+    curiosidad: 'El oboe da el "La" de afinación a toda la orquesta porque su tono es muy estable y difícil de modificar.',
+  },
+  {
+    id: 'fagot',
+    nombre: 'Fagot',
+    nombreIngles: 'Bassoon',
+    familia: 'Viento-Madera',
+    subfamilia: 'Lengüeta doble',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XVI (Italia)',
+    registro: 'Grave',
+    materiales: ['Madera de arce', 'Lengüeta de caña doble'],
+    descripcion: 'Instrumento grave de lengüeta doble. Su tubo mide 2,5 metros plegado en forma de "U". Voz baja de los vientos de madera.',
+    curiosidad: 'El tubo del fagot desenrollado mide casi 3 metros. "Fagot" viene del italiano "fagotto" (haz de leña) por su forma.',
+  },
+  {
+    id: 'saxofon',
+    nombre: 'Saxofón',
+    nombreIngles: 'Saxophone',
+    familia: 'Viento-Madera',
+    subfamilia: 'Lengüeta simple',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XIX (1846, Bélgica)',
+    registro: 'Amplio',
+    materiales: ['Latón', 'Lengüeta de caña'],
+    descripcion: 'Instrumento de lengüeta simple inventado por Adolphe Sax. Aunque es de metal, se clasifica como madera por su lengüeta.',
+    curiosidad: 'Adolphe Sax patentó el saxofón en 1846 buscando un instrumento con la potencia del metal y la agilidad de la madera.',
+  },
+  {
+    id: 'flauta-dulce',
+    nombre: 'Flauta Dulce',
+    nombreIngles: 'Recorder',
+    familia: 'Viento-Madera',
+    subfamilia: 'Bisel',
+    origen: 'Europa',
+    epocaOrigen: 'Edad Media',
+    registro: 'Agudo',
+    materiales: ['Madera de boj', 'Arce', 'Plástico'],
+    descripcion: 'Flauta de pico con 8 agujeros. Instrumento fundamental del Renacimiento y Barroco, hoy usado en educación musical.',
+    curiosidad: 'Bach, Vivaldi y Telemann compusieron obras maestras para flauta dulce. En el siglo XX casi desapareció, hoy ha renacido.',
+  },
+  {
+    id: 'gaita',
+    nombre: 'Gaita',
+    nombreIngles: 'Bagpipes',
+    familia: 'Viento-Madera',
+    subfamilia: 'Lengüeta doble con reservorio',
+    origen: 'Europa',
+    epocaOrigen: 'Antigüedad',
+    registro: 'Medio',
+    materiales: ['Madera', 'Piel de oveja o cabra', 'Caña'],
+    descripcion: 'Instrumento con odre de aire y varios tubos: uno melódico (chanter) y otros de acompañamiento (bordones/drones).',
+    curiosidad: 'Existen gaitas en toda Europa y Asia. La gaita escocesa (Great Highland Bagpipe) es la más conocida mundialmente.',
+  },
+  {
+    id: 'didgeridoo',
+    nombre: 'Didgeridoo',
+    nombreIngles: 'Didgeridoo',
+    familia: 'Viento-Madera',
+    subfamilia: 'Aerófono de tubo',
+    origen: 'Oceanía',
+    epocaOrigen: 'Hace 1.500+ años (Australia)',
+    registro: 'Grave',
+    materiales: ['Eucalipto ahuecado por termitas', 'Bambú', 'PVC'],
+    descripcion: 'Tubo largo aborigen australiano. Se toca con respiración circular, produciendo un zumbido continuo hipnótico.',
+    curiosidad: 'Es uno de los instrumentos de viento más antiguos del mundo. Los aborígenes lo usan en ceremonias desde hace más de 1.500 años.',
+  },
+  {
+    id: 'harmonica',
+    nombre: 'Armónica',
+    nombreIngles: 'Harmonica',
+    familia: 'Viento-Madera',
+    subfamilia: 'Lengüeta libre',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XIX (Alemania)',
+    registro: 'Medio',
+    materiales: ['Metal', 'Madera', 'Plástico'],
+    descripcion: 'Pequeño instrumento con lengüetas metálicas libres. Se toca soplando y aspirando en diferentes celdas.',
+    curiosidad: 'Es el instrumento más vendido del mundo. Bob Dylan, Neil Young y Stevie Wonder la han convertido en icono del blues y folk.',
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // VIENTO-METAL (6)
+  // ═══════════════════════════════════════════════════════════════
+  {
+    id: 'trompeta',
+    nombre: 'Trompeta',
+    nombreIngles: 'Trumpet',
+    familia: 'Viento-Metal',
+    subfamilia: 'Metal con pistones',
+    origen: 'Universal',
+    epocaOrigen: 'Antigüedad (forma moderna: siglo XIX)',
+    registro: 'Agudo',
+    materiales: ['Latón', 'Plata', 'Oro'],
+    descripcion: 'Instrumento agudo de metal con 3 pistones. Protagonista en jazz, música clásica, fanfarrias y bandas.',
+    curiosidad: 'Las trompetas antiguas no tenían válvulas y solo podían tocar notas naturales. Los pistones se inventaron hacia 1820.',
+  },
+  {
+    id: 'trombon',
+    nombre: 'Trombón',
+    nombreIngles: 'Trombone',
+    familia: 'Viento-Metal',
+    subfamilia: 'Metal con vara',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XV',
+    registro: 'Medio',
+    materiales: ['Latón', 'Níquel'],
+    descripcion: 'Único instrumento de metal que usa vara deslizante en lugar de pistones. Permite glissandos característicos.',
+    curiosidad: 'El trombón apenas ha cambiado desde el siglo XV. Es el mismo diseño que usaban en el Renacimiento.',
+  },
+  {
+    id: 'tuba',
+    nombre: 'Tuba',
+    nombreIngles: 'Tuba',
+    familia: 'Viento-Metal',
+    subfamilia: 'Metal con pistones',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XIX (1835, Alemania)',
+    registro: 'Grave',
+    materiales: ['Latón'],
+    descripcion: 'El instrumento más grave de la familia del metal. Proporciona el fundamento armónico en orquestas y bandas.',
+    curiosidad: 'El tubo de una tuba desenrollado puede medir hasta 5,5 metros. Es el instrumento de viento más grande de la orquesta.',
+  },
+  {
+    id: 'trompa',
+    nombre: 'Trompa',
+    nombreIngles: 'French Horn',
+    familia: 'Viento-Metal',
+    subfamilia: 'Metal con rotores',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XVII (de la trompa de caza)',
+    registro: 'Amplio',
+    materiales: ['Latón', 'Níquel'],
+    descripcion: 'Instrumento de tubo cónico enrollado con campana ancha. Tiene el registro más amplio de los metales (4 octavas).',
+    curiosidad: 'Se considera el instrumento más difícil de tocar bien. Su tubo desenrollado mide casi 4 metros.',
+  },
+  {
+    id: 'corneta',
+    nombre: 'Corneta',
+    nombreIngles: 'Cornet',
+    familia: 'Viento-Metal',
+    subfamilia: 'Metal con pistones',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XIX (Francia)',
+    registro: 'Agudo',
+    materiales: ['Latón'],
+    descripcion: 'Similar a la trompeta pero con tubo más cónico, produciendo un sonido más suave y dulce.',
+    curiosidad: 'Fue el instrumento estrella del jazz temprano en Nueva Orleans. Louis Armstrong comenzó tocando corneta antes de la trompeta.',
+  },
+  {
+    id: 'sousafon',
+    nombre: 'Sousáfono',
+    nombreIngles: 'Sousaphone',
+    familia: 'Viento-Metal',
+    subfamilia: 'Metal con pistones',
+    origen: 'América',
+    epocaOrigen: 'Siglo XIX (1893, Estados Unidos)',
+    registro: 'Grave',
+    materiales: ['Latón', 'Fibra de vidrio'],
+    descripcion: 'Tuba diseñada para tocar marchando, con el tubo enrollado alrededor del cuerpo y campana frontal.',
+    curiosidad: 'Lleva el nombre de John Philip Sousa, el "Rey de las Marchas", quien encargó su diseño para sus bandas militares.',
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // PERCUSIÓN (12)
+  // ═══════════════════════════════════════════════════════════════
+  {
+    id: 'bateria',
+    nombre: 'Batería',
+    nombreIngles: 'Drum Kit',
+    familia: 'Percusión',
+    subfamilia: 'Membranófono/Idiófono',
+    origen: 'América',
+    epocaOrigen: 'Siglo XX (Estados Unidos)',
+    registro: 'Amplio',
+    materiales: ['Madera de arce', 'Abedul', 'Metal', 'Parches de plástico'],
+    descripcion: 'Conjunto de tambores y platillos tocados por un solo músico. Base rítmica del rock, jazz, pop y música moderna.',
+    curiosidad: 'La batería moderna nació en Nueva Orleans cuando músicos combinaron varios tambores para que uno solo pudiera tocarlos.',
+  },
+  {
+    id: 'timbales',
+    nombre: 'Timbales',
+    nombreIngles: 'Timpani',
+    familia: 'Percusión',
+    subfamilia: 'Membranófono afinado',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XV (del Medio Oriente)',
+    registro: 'Grave',
+    materiales: ['Cobre', 'Fibra de vidrio', 'Parche de plástico o piel'],
+    descripcion: 'Tambores grandes hemisféricos con pedal para cambiar la afinación. Únicos tambores de la orquesta con notas definidas.',
+    curiosidad: 'Un timbalero de orquesta profesional puede cambiar la nota del timbal con el pedal en menos de un segundo.',
+  },
+  {
+    id: 'xilofono',
+    nombre: 'Xilófono',
+    nombreIngles: 'Xylophone',
+    familia: 'Percusión',
+    subfamilia: 'Idiófono de láminas',
+    origen: 'Universal',
+    epocaOrigen: 'Antigüedad (Asia y África)',
+    registro: 'Agudo',
+    materiales: ['Madera de palisandro', 'Madera sintética'],
+    descripcion: 'Instrumento de láminas de madera ordenadas como un teclado. Se golpea con baquetas duras produciendo un sonido brillante.',
+    curiosidad: 'El nombre viene del griego "xylon" (madera) y "phoné" (sonido). Su origen se disputan Asia y África.',
+  },
+  {
+    id: 'marimba',
+    nombre: 'Marimba',
+    nombreIngles: 'Marimba',
+    familia: 'Percusión',
+    subfamilia: 'Idiófono de láminas',
+    origen: 'África',
+    epocaOrigen: 'Antigüedad (evolucionó en América)',
+    registro: 'Amplio',
+    materiales: ['Madera de palisandro', 'Tubos resonadores de aluminio'],
+    descripcion: 'Similar al xilófono pero más grande, con tubos resonadores y sonido más cálido. Se toca con baquetas blandas.',
+    curiosidad: 'Es el instrumento nacional de Guatemala. La palabra "marimba" viene de lenguas bantúes africanas.',
+  },
+  {
+    id: 'vibrafono',
+    nombre: 'Vibráfono',
+    nombreIngles: 'Vibraphone',
+    familia: 'Percusión',
+    subfamilia: 'Idiófono de láminas',
+    origen: 'América',
+    epocaOrigen: 'Siglo XX (1921, Estados Unidos)',
+    registro: 'Medio',
+    materiales: ['Aluminio', 'Tubos resonadores con ventiladores'],
+    descripcion: 'Láminas de metal con tubos resonadores que contienen ventiladores giratorios, creando el característico vibrato.',
+    curiosidad: 'Lionel Hampton fue pionero del vibráfono en jazz. El pedal permite sostener las notas como un piano.',
+  },
+  {
+    id: 'tambor',
+    nombre: 'Tambor',
+    nombreIngles: 'Snare Drum',
+    familia: 'Percusión',
+    subfamilia: 'Membranófono',
+    origen: 'Universal',
+    epocaOrigen: 'Antigüedad',
+    registro: 'Medio',
+    materiales: ['Madera', 'Metal', 'Parche de plástico', 'Bordones de metal'],
+    descripcion: 'Tambor con bordones metálicos en la parte inferior que vibran produciendo su sonido característico crepitante.',
+    curiosidad: 'El tambor militar (caja) ha sido usado en ejércitos durante siglos para comunicar órdenes en batalla.',
+  },
+  {
+    id: 'bongos',
+    nombre: 'Bongós',
+    nombreIngles: 'Bongos',
+    familia: 'Percusión',
+    subfamilia: 'Membranófono',
+    origen: 'América',
+    epocaOrigen: 'Siglo XIX (Cuba)',
+    registro: 'Agudo',
+    materiales: ['Madera', 'Parches de cuero o plástico'],
+    descripcion: 'Par de tambores pequeños unidos, de diferentes tamaños (macho y hembra). Se tocan con las manos entre las rodillas.',
+    curiosidad: 'Los bongós nacieron en Cuba oriental en el siglo XIX. Son esenciales en la música afrocubana y el latin jazz.',
+  },
+  {
+    id: 'congas',
+    nombre: 'Congas',
+    nombreIngles: 'Congas',
+    familia: 'Percusión',
+    subfamilia: 'Membranófono',
+    origen: 'América',
+    epocaOrigen: 'Siglo XIX (Cuba)',
+    registro: 'Medio',
+    materiales: ['Madera de roble', 'Fibra de vidrio', 'Parche de cuero'],
+    descripcion: 'Tambores altos de origen afrocubano, típicamente en juegos de 2-4. Se tocan de pie con las manos.',
+    curiosidad: 'Derivadas de tambores africanos, las congas se llaman así por la "conga", una danza cubana de carnaval.',
+  },
+  {
+    id: 'cajon-flamenco',
+    nombre: 'Cajón Flamenco',
+    nombreIngles: 'Cajón',
+    familia: 'Percusión',
+    subfamilia: 'Idiófono',
+    origen: 'América',
+    epocaOrigen: 'Siglo XVIII (Perú)',
+    registro: 'Medio',
+    materiales: ['Madera de cedro', 'Contrachapado'],
+    descripcion: 'Caja de madera sobre la que se sienta el músico, golpeando la tapa frontal con las manos.',
+    curiosidad: 'Nació en Perú cuando los esclavos usaban cajas de transporte como tambores. Paco de Lucía lo llevó al flamenco en los 70.',
+  },
+  {
+    id: 'djembe',
+    nombre: 'Djembé',
+    nombreIngles: 'Djembe',
+    familia: 'Percusión',
+    subfamilia: 'Membranófono',
+    origen: 'África',
+    epocaOrigen: 'Siglo XII (África Occidental)',
+    registro: 'Amplio',
+    materiales: ['Madera de lenke', 'Piel de cabra'],
+    descripcion: 'Tambor africano en forma de copa, tallado de un solo tronco. Produce graves profundos y agudos cortantes.',
+    curiosidad: 'En Mali dicen que el djembé contiene tres espíritus: el del árbol, el del animal y el del que lo toca.',
+  },
+  {
+    id: 'gong',
+    nombre: 'Gong',
+    nombreIngles: 'Gong',
+    familia: 'Percusión',
+    subfamilia: 'Idiófono',
+    origen: 'Asia',
+    epocaOrigen: 'Siglo VI a.C. (China)',
+    registro: 'Grave',
+    materiales: ['Bronce', 'Latón'],
+    descripcion: 'Gran disco metálico suspendido que se golpea con una maza. Produce un sonido profundo y sostenido.',
+    curiosidad: 'En las orquestas se usa el "tam-tam", un gong grande sin nota definida que puede sonar durante más de un minuto.',
+  },
+  {
+    id: 'triangulo',
+    nombre: 'Triángulo',
+    nombreIngles: 'Triangle',
+    familia: 'Percusión',
+    subfamilia: 'Idiófono',
+    origen: 'Europa',
+    epocaOrigen: 'Edad Media',
+    registro: 'Agudo',
+    materiales: ['Acero'],
+    descripcion: 'Barra de acero doblada en forma triangular, abierta en una esquina. Se golpea con varilla metálica.',
+    curiosidad: 'Aunque parece simple, el triángulo es muy difícil de tocar bien en una orquesta. Su sonido penetra toda la orquesta.',
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // TECLADO (5)
+  // ═══════════════════════════════════════════════════════════════
+  {
+    id: 'piano',
+    nombre: 'Piano',
+    nombreIngles: 'Piano',
+    familia: 'Teclado',
+    subfamilia: 'Cuerda percutida',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XVIII (1700, Italia)',
+    registro: 'Amplio',
+    materiales: ['Madera', 'Hierro fundido', 'Fieltro', 'Cuerdas de acero'],
+    descripcion: 'Instrumento de 88 teclas donde martillos golpean cuerdas. El nombre viene de "pianoforte" (suave-fuerte).',
+    curiosidad: 'Bartolomeo Cristofori lo inventó en 1700. Un piano de cola puede tener más de 12.000 piezas individuales.',
+  },
+  {
+    id: 'organo',
+    nombre: 'Órgano',
+    nombreIngles: 'Organ',
+    familia: 'Teclado',
+    subfamilia: 'Aerófono',
+    origen: 'Europa',
+    epocaOrigen: 'Antigüedad (siglo III a.C.)',
+    registro: 'Amplio',
+    materiales: ['Madera', 'Metal', 'Cuero'],
+    descripcion: 'Instrumento de viento con teclados y pedales que controlan flujo de aire a miles de tubos de diferentes tamaños.',
+    curiosidad: 'El órgano de la catedral de Atlantic City tiene 33.114 tubos y 7 teclados manuales. Es el más grande del mundo.',
+  },
+  {
+    id: 'clavecin',
+    nombre: 'Clavecín',
+    nombreIngles: 'Harpsichord',
+    familia: 'Teclado',
+    subfamilia: 'Cuerda pulsada',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XV',
+    registro: 'Medio',
+    materiales: ['Madera', 'Cuerdas de metal', 'Plectros de pluma'],
+    descripcion: 'Precursor del piano donde las cuerdas son pulsadas por plectros en lugar de golpeadas por martillos.',
+    curiosidad: 'A diferencia del piano, el clavecín no puede variar el volumen según la fuerza de la pulsación. Bach lo adoraba.',
+  },
+  {
+    id: 'acordeon',
+    nombre: 'Acordeón',
+    nombreIngles: 'Accordion',
+    familia: 'Teclado',
+    subfamilia: 'Lengüeta libre',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XIX (1822, Austria)',
+    registro: 'Amplio',
+    materiales: ['Madera', 'Metal', 'Cartón', 'Cuero'],
+    descripcion: 'Instrumento portátil con fuelle, teclado de piano y botones de bajos. El aire hace vibrar lengüetas metálicas.',
+    curiosidad: 'Es el instrumento nacional de varios países. En Argentina es esencial para el tango, en Francia para la musette.',
+  },
+  {
+    id: 'celesta',
+    nombre: 'Celesta',
+    nombreIngles: 'Celesta',
+    familia: 'Teclado',
+    subfamilia: 'Idiófono',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XIX (1886, Francia)',
+    registro: 'Agudo',
+    materiales: ['Madera', 'Láminas de acero'],
+    descripcion: 'Parece un piano pequeño pero sus martillos golpean láminas metálicas, produciendo un sonido etéreo y cristalino.',
+    curiosidad: 'Tchaikovsky usó la celesta en "El Cascanueces" (Danza del Hada de Azúcar). Mantuvo el instrumento en secreto hasta el estreno.',
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // ELECTRÓNICOS (4)
+  // ═══════════════════════════════════════════════════════════════
+  {
+    id: 'guitarra-electrica',
+    nombre: 'Guitarra Eléctrica',
+    nombreIngles: 'Electric Guitar',
+    familia: 'Electrónico',
+    subfamilia: 'Cordófono electrificado',
+    origen: 'América',
+    epocaOrigen: 'Siglo XX (1931, Estados Unidos)',
+    registro: 'Medio',
+    materiales: ['Madera sólida', 'Pastillas electromagnéticas', 'Cuerdas de acero'],
+    descripcion: 'Guitarra con cuerpo sólido cuyas vibraciones son captadas por pastillas electromagnéticas y amplificadas.',
+    curiosidad: 'La Fender Telecaster (1950) y la Gibson Les Paul (1952) definieron los dos diseños principales que siguen dominando hoy.',
+  },
+  {
+    id: 'bajo-electrico',
+    nombre: 'Bajo Eléctrico',
+    nombreIngles: 'Electric Bass',
+    familia: 'Electrónico',
+    subfamilia: 'Cordófono electrificado',
+    origen: 'América',
+    epocaOrigen: 'Siglo XX (1951, Estados Unidos)',
+    registro: 'Grave',
+    materiales: ['Madera sólida', 'Pastillas electromagnéticas', 'Cuerdas de acero'],
+    descripcion: 'Versión electrificada del contrabajo, generalmente con 4 cuerdas. Proporciona el fundamento rítmico y armónico.',
+    curiosidad: 'Leo Fender creó el Precision Bass en 1951. Revolutionó la música al hacer el bajo portátil y más fácil de afinar.',
+  },
+  {
+    id: 'theremin',
+    nombre: 'Theremin',
+    nombreIngles: 'Theremin',
+    familia: 'Electrónico',
+    subfamilia: 'Electrófono',
+    origen: 'Europa',
+    epocaOrigen: 'Siglo XX (1920, Rusia)',
+    registro: 'Amplio',
+    materiales: ['Circuitos electrónicos', 'Antenas metálicas'],
+    descripcion: 'Único instrumento que se toca sin tocarlo. Dos antenas detectan la posición de las manos controlando tono y volumen.',
+    curiosidad: 'León Theremin lo inventó accidentalmente mientras investigaba sensores de proximidad para el ejército soviético.',
+  },
+  {
+    id: 'sintetizador',
+    nombre: 'Sintetizador',
+    nombreIngles: 'Synthesizer',
+    familia: 'Electrónico',
+    subfamilia: 'Electrófono',
+    origen: 'América',
+    epocaOrigen: 'Siglo XX (1960s)',
+    registro: 'Amplio',
+    materiales: ['Circuitos electrónicos', 'Teclado'],
+    descripcion: 'Instrumento electrónico que genera y modifica sonidos mediante osciladores, filtros y moduladores.',
+    curiosidad: 'El Moog Minimoog (1970) fue el primer sintetizador portátil. Revolucionó la música electrónica y el rock progresivo.',
+  },
+];
+
+/**
+ * Función de búsqueda de instrumentos
+ */
+export function searchInstruments(
+  query: string,
+  familia?: InstrumentFamily,
+  origen?: InstrumentOrigin
+): Instrument[] {
+  return INSTRUMENTS.filter(instrument => {
+    const matchesQuery = query === '' ||
+      instrument.nombre.toLowerCase().includes(query.toLowerCase()) ||
+      instrument.nombreIngles.toLowerCase().includes(query.toLowerCase()) ||
+      instrument.subfamilia.toLowerCase().includes(query.toLowerCase()) ||
+      instrument.materiales.some(m => m.toLowerCase().includes(query.toLowerCase()));
+
+    const matchesFamilia = !familia || instrument.familia === familia;
+    const matchesOrigen = !origen || instrument.origen === origen;
+
+    return matchesQuery && matchesFamilia && matchesOrigen;
+  });
+}
+
+/**
+ * Obtener instrumentos por familia
+ */
+export function getInstrumentsByFamily(familia: InstrumentFamily): Instrument[] {
+  return INSTRUMENTS.filter(i => i.familia === familia);
+}
+
+/**
+ * Obtener instrumentos por origen
+ */
+export function getInstrumentsByOrigin(origen: InstrumentOrigin): Instrument[] {
+  return INSTRUMENTS.filter(i => i.origen === origen);
+}

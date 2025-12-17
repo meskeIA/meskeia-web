@@ -210,11 +210,12 @@ export const implementedAppsUrls = [
   "/generador-schema-markup/",
   "/analizador-geo/",                // Optimización contenido para IAs (GEO/AEO)
 
-  // Referencia y Cultura General (4 implementadas)
+  // Referencia y Cultura General (5 implementadas)
   "/paises-del-mundo/",             // Buscador de países: banderas, capitales, monedas, idiomas
   "/minerales-del-mundo/",          // Guía de 50 minerales: composición, dureza, usos, curiosidades
   "/huesos-cuerpo-humano/",         // Guía de 206 huesos: nombre latino, tipo, región, articulaciones
   "/constelaciones-del-cielo/",     // Guía de 32 constelaciones: zodiaco, estrellas, mitología
+  "/instrumentos-musicales/",       // Guía de 45 instrumentos: cuerda, viento, percusión, teclado
 ];
 
 /**
