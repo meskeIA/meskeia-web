@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 175+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 176+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 175,
+  "total_tools": 176,
   "last_updated": "2025-12-17",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 16
+      "tool_count": 17
     },
     {
       "id": "impuestos",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 53
+      "tool_count": 54
     },
     {
       "id": "casa",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 28
+      "tool_count": 29
     }
   ],
   "tools": [
@@ -3825,6 +3825,30 @@
         "articulaciones"
       ],
       "icon": "🦴"
+    },
+    {
+      "slug": "constelaciones-del-cielo",
+      "name": "Constelaciones del Cielo",
+      "url": "https://meskeia.com/constelaciones-del-cielo/",
+      "description": "Guía de 32 constelaciones famosas: zodiacales, boreales y australes con estrellas principales, mitología griega y curiosidades",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio",
+        "curiosidad"
+      ],
+      "keywords": [
+        "constelaciones",
+        "astronomia",
+        "estrellas",
+        "zodiaco",
+        "orion",
+        "osa mayor",
+        "mitologia",
+        "cielo",
+        "planetas",
+        "cosmos"
+      ],
+      "icon": "🌌"
     }
   ],
   "llm_instructions": {
