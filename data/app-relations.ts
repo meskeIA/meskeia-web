@@ -91,6 +91,7 @@ const saludApps: RelatedApp[] = [
   { url: '/calculadora-calorias-ejercicio/', icon: '🔥', name: 'Calorías Diarias', description: 'Necesidades calóricas' },
   { url: '/calculadora-hidratacion/', icon: '💧', name: 'Hidratación', description: 'Agua recomendada' },
   { url: '/planificador-menu/', icon: '🍽️', name: 'Planificador Menú', description: 'Dieta mediterránea' },
+  { url: '/vitaminas-minerales/', icon: '🥗', name: 'Vitaminas y Minerales', description: '30 nutrientes esenciales' },
 ];
 
 const saludHabitosApps: RelatedApp[] = [
@@ -376,6 +377,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-hidratacion': saludApps.filter(a => a.url !== '/calculadora-hidratacion/'),
   'planificador-menu': [...saludApps.filter(a => a.url !== '/planificador-menu/').slice(0, 2), ...cocinaApps.slice(0, 2)],
   'calculadora-porciones': [...cocinaApps.filter(a => a.url !== '/calculadora-porciones/').slice(0, 2), ...saludApps.slice(0, 2)],
+  'vitaminas-minerales': saludApps.filter(a => a.url !== '/vitaminas-minerales/'),
   'seguimiento-habitos': saludHabitosApps.filter(a => a.url !== '/seguimiento-habitos/'),
   'test-habitos': saludHabitosApps.filter(a => a.url !== '/test-habitos/'),
   'calculadora-sueno': saludHabitosApps.filter(a => a.url !== '/calculadora-sueno/'),

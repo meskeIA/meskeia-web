@@ -1,0 +1,660 @@
+/* Vitaminas y Minerales - meskeIA */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Buscador y Filtros */
+.searchSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.searchBox {
+  position: relative;
+  margin-bottom: var(--spacing-lg);
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  opacity: 0.6;
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 3rem;
+  font-size: 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.clearButton {
+  position: absolute;
+  right: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--text-muted);
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.clearButton:hover {
+  background: var(--text-secondary);
+}
+
+.filters {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.filterLabel {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.filterSelect {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  min-width: 160px;
+  transition: all 0.3s ease;
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.resultsCount {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Grid de Nutrientes */
+.nutrientsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Card de Nutriente */
+.nutrientCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nutrientCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.nutrientCard.expanded {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.cardTitle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+}
+
+.typeEmoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.nutrientName {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.scientificName {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: var(--spacing-xs) 0 0 0;
+  font-style: italic;
+}
+
+.expandIcon {
+  font-size: 1.5rem;
+  color: var(--primary);
+  font-weight: 300;
+  line-height: 1;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* Badges */
+.cardBasicInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.badge[data-type="vitamina"] {
+  background: rgba(233, 30, 99, 0.15);
+  color: #e91e63;
+}
+
+.badge[data-type="mineral"] {
+  background: rgba(63, 81, 181, 0.15);
+  color: #3f51b5;
+}
+
+.badge[data-subtype="hidrosoluble"] {
+  background: rgba(3, 169, 244, 0.15);
+  color: #03a9f4;
+}
+
+.badge[data-subtype="liposoluble"] {
+  background: rgba(139, 195, 74, 0.15);
+  color: #7cb342;
+}
+
+.badge[data-subtype="macromineral"] {
+  background: rgba(121, 85, 72, 0.15);
+  color: #795548;
+}
+
+.badge[data-subtype="oligoelemento"] {
+  background: rgba(255, 193, 7, 0.15);
+  color: #f9a825;
+}
+
+.cdrBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(46, 134, 171, 0.15);
+  color: var(--primary);
+}
+
+.functionPreview {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Detalles expandidos */
+.cardDetails {
+  border-top: 1px solid var(--border);
+  padding-top: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.detailSection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.detailSection:last-child {
+  margin-bottom: 0;
+}
+
+.detailSection h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.detailSection p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Lista de fuentes */
+.sourcesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.sourceTag {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.cdrValue {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  display: inline-block;
+}
+
+/* Grid de detalles deficiencia/exceso */
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.detailBox {
+  background: var(--bg-primary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.detailBox h3 {
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.detailBox p {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Grupos de riesgo */
+.riskGroups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.riskTag {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(255, 152, 0, 0.1);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  color: #ff9800;
+  border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.curiosity {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08) 0%, rgba(72, 169, 166, 0.08) 100%);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--primary);
+}
+
+/* Sin resultados */
+.noResults {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+}
+
+.noResultsIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.noResults p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.resetButton {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.resetButton:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+/* Sección Educativa */
+.guideSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.guideSection h2 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--primary);
+}
+
+.introParagraph {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-lg);
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.contentCard {
+  background: var(--bg-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.contentCard h4 {
+  font-size: 1.1rem;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.contentCard p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.tipsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tipsList li {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-secondary);
+  border-left: 3px solid var(--secondary);
+  line-height: 1.6;
+}
+
+.tipsList li strong {
+  color: var(--text-primary);
+}
+
+/* Dark Mode */
+[data-theme='dark'] .nutrientCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .searchSection {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .badge[data-type="vitamina"] {
+  background: rgba(233, 30, 99, 0.2);
+  color: #f48fb1;
+}
+
+[data-theme='dark'] .badge[data-type="mineral"] {
+  background: rgba(63, 81, 181, 0.2);
+  color: #9fa8da;
+}
+
+[data-theme='dark'] .badge[data-subtype="hidrosoluble"] {
+  background: rgba(3, 169, 244, 0.2);
+  color: #4fc3f7;
+}
+
+[data-theme='dark'] .badge[data-subtype="liposoluble"] {
+  background: rgba(139, 195, 74, 0.2);
+  color: #aed581;
+}
+
+[data-theme='dark'] .badge[data-subtype="macromineral"] {
+  background: rgba(121, 85, 72, 0.25);
+  color: #bcaaa4;
+}
+
+[data-theme='dark'] .badge[data-subtype="oligoelemento"] {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffd54f;
+}
+
+[data-theme='dark'] .cdrBadge {
+  background: rgba(46, 134, 171, 0.2);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .sourceTag {
+  background: rgba(76, 175, 80, 0.15);
+  color: #81c784;
+  border-color: rgba(76, 175, 80, 0.25);
+}
+
+[data-theme='dark'] .riskTag {
+  background: rgba(255, 152, 0, 0.15);
+  color: #ffb74d;
+  border-color: rgba(255, 152, 0, 0.25);
+}
+
+[data-theme='dark'] .detailBox {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .curiosity {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.15) 0%, rgba(72, 169, 166, 0.15) 100%);
+}
+
+[data-theme='dark'] .contentCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .tipsList li {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .noResults {
+  background: var(--bg-card);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 70px;
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .heroIcon {
+    font-size: 3rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .nutrientsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .filterGroup {
+    width: 100%;
+  }
+
+  .filterSelect {
+    flex: 1;
+  }
+
+  .cardTitle {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .typeEmoji {
+    font-size: 1.5rem;
+  }
+
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    margin-top: 60px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .nutrientName {
+    font-size: 1.1rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}

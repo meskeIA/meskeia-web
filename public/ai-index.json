@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 171,
+  "total_tools": 172,
   "updated": "2025-12-17",
   "features": {
     "all_free": true,
@@ -247,7 +247,8 @@
         { "name": "Calculadora de Alimentación Mascotas", "slug": "calculadora-alimentacion-mascotas", "url": "https://meskeia.com/calculadora-alimentacion-mascotas/", "description": "Cantidad diaria de comida para perros y gatos, alimentos tóxicos y guía de transición de pienso" },
         { "name": "Calculadora de Medicamentos Mascotas", "slug": "calculadora-medicamentos-mascotas", "url": "https://meskeia.com/calculadora-medicamentos-mascotas/", "description": "Dosis de antiparasitarios para perros y gatos según peso, frecuencia y síntomas" },
         { "name": "Calculadora Tamaño Adulto Cachorro", "slug": "calculadora-tamano-adulto-perro", "url": "https://meskeia.com/calculadora-tamano-adulto-perro/", "description": "Predice el peso adulto de tu cachorro según edad, peso actual y tamaño de raza" },
-        { "name": "Calculadora Percentiles Infantiles", "slug": "calculadora-percentiles", "url": "https://meskeia.com/calculadora-percentiles/", "description": "Percentil de peso y talla según tablas OMS" }
+        { "name": "Calculadora Percentiles Infantiles", "slug": "calculadora-percentiles", "url": "https://meskeia.com/calculadora-percentiles/", "description": "Percentil de peso y talla según tablas OMS" },
+        { "name": "Vitaminas y Minerales", "slug": "vitaminas-minerales", "url": "https://meskeia.com/vitaminas-minerales/", "description": "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso" }
       ]
     },
     {

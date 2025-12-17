@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 177+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 178+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 177,
+  "total_tools": 178,
   "last_updated": "2025-12-17",
   "features": {
     "all_free": true,
@@ -91,7 +91,7 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Cuida tu salud con herramientas especializadas",
-      "tool_count": 16
+      "tool_count": 17
     },
     {
       "id": "texto",
@@ -114,14 +114,14 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 55
+      "tool_count": 56
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 49
+      "tool_count": 50
     },
     {
       "id": "dinero",
@@ -3873,6 +3873,32 @@
         "percusion"
       ],
       "icon": "🎵"
+    },
+    {
+      "slug": "vitaminas-minerales",
+      "name": "Vitaminas y Minerales",
+      "url": "https://meskeia.com/vitaminas-minerales/",
+      "description": "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso",
+      "category": "Salud y Bienestar",
+      "contexts": [
+        "casa",
+        "estudio"
+      ],
+      "keywords": [
+        "vitaminas",
+        "minerales",
+        "nutrientes",
+        "b12",
+        "vitamina d",
+        "hierro",
+        "calcio",
+        "magnesio",
+        "zinc",
+        "nutricion",
+        "deficiencia",
+        "suplementos"
+      ],
+      "icon": "🥗"
     }
   ],
   "llm_instructions": {
