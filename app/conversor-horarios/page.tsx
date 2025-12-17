@@ -5,6 +5,9 @@ import styles from './ConversorHorarios.module.css';
 import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
+// Importar estilos de flag-icons
+import 'flag-icons/css/flag-icons.min.css';
+
 // ==================== TIPOS ====================
 
 interface ZonaHoraria {
@@ -12,47 +15,70 @@ interface ZonaHoraria {
   nombre: string;
   zona: string;
   pais: string;
-  emoji: string;
+  code: string; // Código ISO 3166-1 alpha-2 para flag-icons
   acronimo?: string; // Acrónimo común (CET, EST, etc.)
+}
+
+// Componente Flag que usa flag-icons
+interface FlagProps {
+  code: string;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+function Flag({ code, size = 'md', className = '' }: FlagProps) {
+  const sizeClasses = {
+    sm: styles.flagSm,
+    md: styles.flagMd,
+    lg: styles.flagLg,
+  };
+
+  return (
+    <span
+      className={`fi fi-${code} ${sizeClasses[size]} ${className}`}
+      role="img"
+      aria-label={`Bandera de ${code.toUpperCase()}`}
+    />
+  );
 }
 
 // ==================== DATOS ====================
 
 const zonasHorarias: ZonaHoraria[] = [
   // Europa
-  { id: 'madrid', nombre: 'Madrid', zona: 'Europe/Madrid', pais: 'España', emoji: '🇪🇸', acronimo: 'CET/CEST' },
-  { id: 'londres', nombre: 'Londres', zona: 'Europe/London', pais: 'Reino Unido', emoji: '🇬🇧', acronimo: 'GMT/BST' },
-  { id: 'paris', nombre: 'París', zona: 'Europe/Paris', pais: 'Francia', emoji: '🇫🇷', acronimo: 'CET/CEST' },
-  { id: 'berlin', nombre: 'Berlín', zona: 'Europe/Berlin', pais: 'Alemania', emoji: '🇩🇪', acronimo: 'CET/CEST' },
-  { id: 'roma', nombre: 'Roma', zona: 'Europe/Rome', pais: 'Italia', emoji: '🇮🇹', acronimo: 'CET/CEST' },
-  { id: 'amsterdam', nombre: 'Ámsterdam', zona: 'Europe/Amsterdam', pais: 'Países Bajos', emoji: '🇳🇱', acronimo: 'CET/CEST' },
-  { id: 'moscu', nombre: 'Moscú', zona: 'Europe/Moscow', pais: 'Rusia', emoji: '🇷🇺', acronimo: 'MSK' },
-  { id: 'estambul', nombre: 'Estambul', zona: 'Europe/Istanbul', pais: 'Turquía', emoji: '🇹🇷', acronimo: 'TRT' },
+  { id: 'madrid', nombre: 'Madrid', zona: 'Europe/Madrid', pais: 'España', code: 'es', acronimo: 'CET/CEST' },
+  { id: 'londres', nombre: 'Londres', zona: 'Europe/London', pais: 'Reino Unido', code: 'gb', acronimo: 'GMT/BST' },
+  { id: 'paris', nombre: 'París', zona: 'Europe/Paris', pais: 'Francia', code: 'fr', acronimo: 'CET/CEST' },
+  { id: 'berlin', nombre: 'Berlín', zona: 'Europe/Berlin', pais: 'Alemania', code: 'de', acronimo: 'CET/CEST' },
+  { id: 'roma', nombre: 'Roma', zona: 'Europe/Rome', pais: 'Italia', code: 'it', acronimo: 'CET/CEST' },
+  { id: 'amsterdam', nombre: 'Ámsterdam', zona: 'Europe/Amsterdam', pais: 'Países Bajos', code: 'nl', acronimo: 'CET/CEST' },
+  { id: 'moscu', nombre: 'Moscú', zona: 'Europe/Moscow', pais: 'Rusia', code: 'ru', acronimo: 'MSK' },
+  { id: 'estambul', nombre: 'Estambul', zona: 'Europe/Istanbul', pais: 'Turquía', code: 'tr', acronimo: 'TRT' },
   // América
-  { id: 'nueva_york', nombre: 'Nueva York', zona: 'America/New_York', pais: 'EE.UU.', emoji: '🇺🇸', acronimo: 'EST/EDT' },
-  { id: 'los_angeles', nombre: 'Los Ángeles', zona: 'America/Los_Angeles', pais: 'EE.UU.', emoji: '🇺🇸', acronimo: 'PST/PDT' },
-  { id: 'chicago', nombre: 'Chicago', zona: 'America/Chicago', pais: 'EE.UU.', emoji: '🇺🇸', acronimo: 'CST/CDT' },
-  { id: 'mexico', nombre: 'Ciudad de México', zona: 'America/Mexico_City', pais: 'México', emoji: '🇲🇽', acronimo: 'CST' },
-  { id: 'bogota', nombre: 'Bogotá', zona: 'America/Bogota', pais: 'Colombia', emoji: '🇨🇴', acronimo: 'COT' },
-  { id: 'lima', nombre: 'Lima', zona: 'America/Lima', pais: 'Perú', emoji: '🇵🇪', acronimo: 'PET' },
-  { id: 'buenos_aires', nombre: 'Buenos Aires', zona: 'America/Argentina/Buenos_Aires', pais: 'Argentina', emoji: '🇦🇷', acronimo: 'ART' },
-  { id: 'santiago', nombre: 'Santiago', zona: 'America/Santiago', pais: 'Chile', emoji: '🇨🇱', acronimo: 'CLT/CLST' },
-  { id: 'sao_paulo', nombre: 'São Paulo', zona: 'America/Sao_Paulo', pais: 'Brasil', emoji: '🇧🇷', acronimo: 'BRT' },
+  { id: 'nueva_york', nombre: 'Nueva York', zona: 'America/New_York', pais: 'EE.UU.', code: 'us', acronimo: 'EST/EDT' },
+  { id: 'los_angeles', nombre: 'Los Ángeles', zona: 'America/Los_Angeles', pais: 'EE.UU.', code: 'us', acronimo: 'PST/PDT' },
+  { id: 'chicago', nombre: 'Chicago', zona: 'America/Chicago', pais: 'EE.UU.', code: 'us', acronimo: 'CST/CDT' },
+  { id: 'mexico', nombre: 'Ciudad de México', zona: 'America/Mexico_City', pais: 'México', code: 'mx', acronimo: 'CST' },
+  { id: 'bogota', nombre: 'Bogotá', zona: 'America/Bogota', pais: 'Colombia', code: 'co', acronimo: 'COT' },
+  { id: 'lima', nombre: 'Lima', zona: 'America/Lima', pais: 'Perú', code: 'pe', acronimo: 'PET' },
+  { id: 'buenos_aires', nombre: 'Buenos Aires', zona: 'America/Argentina/Buenos_Aires', pais: 'Argentina', code: 'ar', acronimo: 'ART' },
+  { id: 'santiago', nombre: 'Santiago', zona: 'America/Santiago', pais: 'Chile', code: 'cl', acronimo: 'CLT/CLST' },
+  { id: 'sao_paulo', nombre: 'São Paulo', zona: 'America/Sao_Paulo', pais: 'Brasil', code: 'br', acronimo: 'BRT' },
   // Asia
-  { id: 'tokio', nombre: 'Tokio', zona: 'Asia/Tokyo', pais: 'Japón', emoji: '🇯🇵', acronimo: 'JST' },
-  { id: 'pekin', nombre: 'Pekín', zona: 'Asia/Shanghai', pais: 'China', emoji: '🇨🇳', acronimo: 'CST (China)' },
-  { id: 'hong_kong', nombre: 'Hong Kong', zona: 'Asia/Hong_Kong', pais: 'Hong Kong', emoji: '🇭🇰', acronimo: 'HKT' },
-  { id: 'singapur', nombre: 'Singapur', zona: 'Asia/Singapore', pais: 'Singapur', emoji: '🇸🇬', acronimo: 'SGT' },
-  { id: 'seul', nombre: 'Seúl', zona: 'Asia/Seoul', pais: 'Corea del Sur', emoji: '🇰🇷', acronimo: 'KST' },
-  { id: 'dubai', nombre: 'Dubái', zona: 'Asia/Dubai', pais: 'EAU', emoji: '🇦🇪', acronimo: 'GST' },
-  { id: 'mumbai', nombre: 'Bombay', zona: 'Asia/Kolkata', pais: 'India', emoji: '🇮🇳', acronimo: 'IST' },
-  { id: 'bangkok', nombre: 'Bangkok', zona: 'Asia/Bangkok', pais: 'Tailandia', emoji: '🇹🇭', acronimo: 'ICT' },
+  { id: 'tokio', nombre: 'Tokio', zona: 'Asia/Tokyo', pais: 'Japón', code: 'jp', acronimo: 'JST' },
+  { id: 'pekin', nombre: 'Pekín', zona: 'Asia/Shanghai', pais: 'China', code: 'cn', acronimo: 'CST (China)' },
+  { id: 'hong_kong', nombre: 'Hong Kong', zona: 'Asia/Hong_Kong', pais: 'Hong Kong', code: 'hk', acronimo: 'HKT' },
+  { id: 'singapur', nombre: 'Singapur', zona: 'Asia/Singapore', pais: 'Singapur', code: 'sg', acronimo: 'SGT' },
+  { id: 'seul', nombre: 'Seúl', zona: 'Asia/Seoul', pais: 'Corea del Sur', code: 'kr', acronimo: 'KST' },
+  { id: 'dubai', nombre: 'Dubái', zona: 'Asia/Dubai', pais: 'EAU', code: 'ae', acronimo: 'GST' },
+  { id: 'mumbai', nombre: 'Bombay', zona: 'Asia/Kolkata', pais: 'India', code: 'in', acronimo: 'IST' },
+  { id: 'bangkok', nombre: 'Bangkok', zona: 'Asia/Bangkok', pais: 'Tailandia', code: 'th', acronimo: 'ICT' },
   // Oceanía
-  { id: 'sydney', nombre: 'Sídney', zona: 'Australia/Sydney', pais: 'Australia', emoji: '🇦🇺', acronimo: 'AEST/AEDT' },
-  { id: 'auckland', nombre: 'Auckland', zona: 'Pacific/Auckland', pais: 'Nueva Zelanda', emoji: '🇳🇿', acronimo: 'NZST/NZDT' },
+  { id: 'sydney', nombre: 'Sídney', zona: 'Australia/Sydney', pais: 'Australia', code: 'au', acronimo: 'AEST/AEDT' },
+  { id: 'auckland', nombre: 'Auckland', zona: 'Pacific/Auckland', pais: 'Nueva Zelanda', code: 'nz', acronimo: 'NZST/NZDT' },
   // África
-  { id: 'cairo', nombre: 'El Cairo', zona: 'Africa/Cairo', pais: 'Egipto', emoji: '🇪🇬', acronimo: 'EET' },
-  { id: 'johannesburgo', nombre: 'Johannesburgo', zona: 'Africa/Johannesburg', pais: 'Sudáfrica', emoji: '🇿🇦', acronimo: 'SAST' },
+  { id: 'cairo', nombre: 'El Cairo', zona: 'Africa/Cairo', pais: 'Egipto', code: 'eg', acronimo: 'EET' },
+  { id: 'johannesburgo', nombre: 'Johannesburgo', zona: 'Africa/Johannesburg', pais: 'Sudáfrica', code: 'za', acronimo: 'SAST' },
 ];
 
 // Datos para la sección de referencia de acrónimos
@@ -255,7 +281,7 @@ export default function ConversorHorariosPage() {
                 >
                   {zonasHorarias.map(zona => (
                     <option key={zona.id} value={zona.id}>
-                      {zona.emoji} {zona.nombre} ({zona.pais})
+                      {zona.nombre} ({zona.pais})
                     </option>
                   ))}
                 </select>
@@ -304,7 +330,7 @@ export default function ConversorHorariosPage() {
               {horasConvertidas.map((resultado) => resultado && (
                 <div key={resultado.id} className={styles.resultadoCard}>
                   <div className={styles.resultadoHeader}>
-                    <span className={styles.resultadoEmoji}>{resultado.emoji}</span>
+                    <Flag code={resultado.code} size="lg" className={styles.resultadoFlag} />
                     <div className={styles.resultadoInfo}>
                       <span className={styles.resultadoCiudad}>{resultado.nombre}</span>
                       <span className={styles.resultadoPais}>{resultado.pais}</span>
@@ -349,7 +375,7 @@ export default function ConversorHorariosPage() {
                   disabled={zonasSeleccionadas.length >= 6}
                   title={`${zona.acronimo || ''} - ${obtenerOffsetUTC(zona.zona, horaActual)}`}
                 >
-                  {zona.emoji} {zona.nombre}
+                  <Flag code={zona.code} size="sm" /> {zona.nombre}
                   <span className={styles.zonaBtnOffset}>{obtenerOffsetUTC(zona.zona, horaActual)}</span>
                 </button>
               ))}
@@ -367,7 +393,7 @@ export default function ConversorHorariosPage() {
               zonasHorarias.find(z => z.id === 'tokio'),
             ].filter(Boolean).map(zona => zona && (
               <div key={zona.id} className={styles.relojItem}>
-                <span className={styles.relojCiudad}>{zona.emoji} {zona.nombre}</span>
+                <span className={styles.relojCiudad}><Flag code={zona.code} size="sm" /> {zona.nombre}</span>
                 <span className={styles.relojHora}>{obtenerHoraEnZona(zona.zona, horaActual)}</span>
               </div>
             ))}

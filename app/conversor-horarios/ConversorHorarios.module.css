@@ -1,3 +1,19 @@
+/* Tamaños de banderas (flag-icons) */
+.flagSm {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.flagMd {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.flagLg {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
 .container {
   max-width: 900px;
   margin: 0 auto;
@@ -155,8 +171,9 @@
   margin-bottom: 12px;
 }
 
-.resultadoEmoji {
+.resultadoFlag {
   font-size: 1.5rem;
+  flex-shrink: 0;
 }
 
 .resultadoInfo {
