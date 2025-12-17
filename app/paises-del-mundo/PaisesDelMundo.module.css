@@ -28,6 +28,9 @@
   background: var(--bg-primary);
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Hero Section */
@@ -66,6 +69,9 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--spacing-xl);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* Search Panel */
@@ -75,11 +81,18 @@
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .searchContainer {
   position: relative;
   margin-bottom: var(--spacing-lg);
+  width: 100%;
+  min-width: 0;
 }
 
 .searchInputWrapper {
@@ -220,6 +233,8 @@
 /* Filter Container */
 .filterContainer {
   margin-bottom: var(--spacing-lg);
+  width: 100%;
+  min-width: 0;
 }
 
 .filterLabel {
@@ -233,6 +248,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-xs);
+  width: 100%;
+  min-width: 0;
 }
 
 .filterButton {
@@ -271,11 +288,14 @@
   gap: var(--spacing-lg) var(--spacing-xl);
   padding-top: var(--spacing-lg);
   border-top: 1px solid var(--border);
+  width: 100%;
+  min-width: 0;
 }
 
 .statItem {
   text-align: center;
   min-width: 80px;
+  flex-shrink: 1;
 }
 
 .statNumber {
@@ -502,6 +522,10 @@
     font-size: 1rem;
   }
 
+  .searchPanel {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
   .stats {
     gap: var(--spacing-md) var(--spacing-lg);
   }
@@ -540,11 +564,65 @@
   }
 
   .filterButtons {
-    justify-content: center;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: var(--spacing-xs);
+  }
+
+  .filterButtons::-webkit-scrollbar {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
+  .searchPanel {
+    padding: var(--spacing-md);
+    max-width: calc(100vw - 32px);
+  }
+
+  .filterButtons {
+    gap: 4px;
+  }
+
+  .filterButton {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .stats {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: var(--spacing-xs);
+    max-width: 100%;
+    width: auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .statItem {
+    min-width: 0;
+    flex: 1 1 0;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .statNumber {
+    font-size: 1.1rem;
+  }
+
+  .statLabel {
+    font-size: 0.6rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .gridList {
     grid-template-columns: repeat(2, 1fr);
   }
