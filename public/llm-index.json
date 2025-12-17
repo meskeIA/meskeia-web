@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 173+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 174+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 173,
+  "total_tools": 174,
   "last_updated": "2025-12-17",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 14
+      "tool_count": 15
     },
     {
       "id": "impuestos",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 51
+      "tool_count": 52
     },
     {
       "id": "casa",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 27
+      "tool_count": 28
     }
   ],
   "tools": [
@@ -3778,6 +3778,30 @@
         "continentes"
       ],
       "icon": "🌍"
+    },
+    {
+      "slug": "minerales-del-mundo",
+      "name": "Minerales del Mundo",
+      "url": "https://meskeia.com/minerales-del-mundo/",
+      "description": "Guía de 50 minerales esenciales con composición química, dureza Mohs, sistema cristalino, usos y curiosidades",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio",
+        "curiosidad"
+      ],
+      "keywords": [
+        "minerales",
+        "geologia",
+        "mineralogia",
+        "cristales",
+        "mohs",
+        "cuarzo",
+        "diamante",
+        "pirita",
+        "silicatos",
+        "oxidos"
+      ],
+      "icon": "💎"
     }
   ],
   "llm_instructions": {

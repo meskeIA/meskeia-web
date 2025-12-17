@@ -1,0 +1,668 @@
+/* Minerales del Mundo - meskeIA */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.95;
+  margin: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Filtros */
+.filtersSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  margin-bottom: var(--spacing-lg);
+  transition: border-color 0.2s ease;
+}
+
+.searchBox:focus-within {
+  border-color: var(--primary);
+}
+
+.searchIcon {
+  font-size: 1.2rem;
+  opacity: 0.6;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.clearButton {
+  background: var(--border);
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.clearButton:hover {
+  background: var(--text-muted);
+  color: white;
+}
+
+.categoriesWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.categoryButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.categoryButton:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.categoryButton.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.categoryCount {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.categoryButton.active .categoryCount {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Contador de resultados */
+.resultsCount {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Grid de minerales */
+.mineralsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Card de mineral */
+.mineralCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mineralCard:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.mineralCard.expanded {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.cardHeaderLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.categoryEmoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.mineralName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.formula {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-family: 'Courier New', monospace;
+}
+
+.hardnessBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  min-width: 50px;
+}
+
+.hardnessValue {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.hardnessLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.cardPreview {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.previewItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.previewLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.previewValue {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.colorsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.colorTag {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.expandHint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: var(--spacing-sm);
+}
+
+/* Contenido expandido */
+.expandedContent {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 2px solid var(--border);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.detailSection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.detailTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.propertiesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.propertyItem {
+  background: var(--bg-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+}
+
+.propertyLabel {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.propertyValue {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.allColors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.colorTagLarge {
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.usesList {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+.usesList li {
+  margin-bottom: 4px;
+}
+
+.curiositySection {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08), rgba(72, 169, 166, 0.08));
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  border-left: 4px solid var(--primary);
+}
+
+.curiosityText {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Sin resultados */
+.noResults {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  border: 2px dashed var(--border);
+}
+
+.noResultsIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.noResults p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.resetButton {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resetButton:hover {
+  background: #256a8a;
+}
+
+/* Sección educativa */
+.guideSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.guideSection h2 {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--border);
+}
+
+.introParagraph {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Escala de Mohs */
+.mohsScale {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.mohsItem {
+  display: grid;
+  grid-template-columns: 40px 120px 1fr;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.mohsNumber {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.mohsRef {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Sistemas cristalinos */
+.crystalSystems {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.crystalCard {
+  background: var(--bg-card);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.crystalCard h4 {
+  color: var(--primary);
+  margin: 0 0 var(--spacing-xs);
+  font-size: 1rem;
+}
+
+.crystalCard p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Categorías explicación */
+.categoryExplanations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.categoryExplain {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.catEmoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.categoryExplain h4 {
+  margin: 0 0 4px;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.categoryExplain p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Datos curiosos */
+.funFacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.funFact {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05), rgba(72, 169, 166, 0.05));
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.factIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.funFact p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Dark mode */
+[data-theme='dark'] .searchBox {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .categoryButton {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .mohsItem {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .crystalCard,
+[data-theme='dark'] .categoryExplain {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .colorTag,
+[data-theme='dark'] .colorTagLarge {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .propertyItem {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .curiositySection {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.15), rgba(72, 169, 166, 0.15));
+}
+
+[data-theme='dark'] .funFact {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1), rgba(72, 169, 166, 0.1));
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 70px;
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .heroIcon {
+    font-size: 3rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .mineralsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .propertiesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .categoriesWrapper {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: var(--spacing-sm);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .categoryButton {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .mohsItem {
+    grid-template-columns: 40px 1fr;
+  }
+
+  .mohsRef {
+    grid-column: 2;
+    margin-top: -4px;
+  }
+
+  .cardPreview {
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .cardHeader {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .hardnessBadge {
+    align-self: flex-start;
+  }
+}

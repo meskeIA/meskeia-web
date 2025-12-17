@@ -210,8 +210,9 @@ export const implementedAppsUrls = [
   "/generador-schema-markup/",
   "/analizador-geo/",                // Optimización contenido para IAs (GEO/AEO)
 
-  // Referencia y Cultura General (1 implementada)
+  // Referencia y Cultura General (2 implementadas)
   "/paises-del-mundo/",             // Buscador de países: banderas, capitales, monedas, idiomas
+  "/minerales-del-mundo/",          // Guía de 50 minerales: composición, dureza, usos, curiosidades
 ];
 
 /**
