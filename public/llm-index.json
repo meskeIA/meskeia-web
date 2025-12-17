@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 178+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 179+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 178,
+  "total_tools": 179,
   "last_updated": "2025-12-17",
   "features": {
     "all_free": true,
@@ -21,7 +21,7 @@
       "name": "Calculadoras Prácticas",
       "icon": "🧮",
       "description": "Herramientas de cálculo para el día a día",
-      "tool_count": 14
+      "tool_count": 15
     },
     {
       "id": "criptografia",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 50
+      "tool_count": 51
     },
     {
       "id": "dinero",
@@ -446,6 +446,27 @@
         "timeline boda"
       ],
       "icon": "💒"
+    },
+    {
+      "slug": "planificador-mudanzas",
+      "name": "Planificador de Mudanzas",
+      "url": "https://meskeia.com/planificador-mudanzas/",
+      "description": "Organiza tu mudanza con checklist de tareas por fases, inventario de objetos por habitación y control de presupuesto estimado vs real",
+      "category": "Calculadoras Prácticas",
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "mudanza",
+        "mudarse",
+        "inventario",
+        "presupuesto mudanza",
+        "checklist mudanza",
+        "tareas mudanza",
+        "organizar mudanza",
+        "traslado"
+      ],
+      "icon": "📦"
     },
     {
       "slug": "cifrado-clasico",

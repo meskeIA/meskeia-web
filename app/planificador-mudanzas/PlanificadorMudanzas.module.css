@@ -1,0 +1,1110 @@
+/* ==================== VARIABLES ==================== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+}
+
+/* ==================== HERO ==================== */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.95;
+}
+
+/* ==================== MAIN CONTENT ==================== */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* ==================== HEADER PANEL ==================== */
+.headerPanel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+}
+
+.nombreMudanza {
+  flex: 1;
+}
+
+.tituloMudanza {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.tituloMudanza:hover {
+  color: var(--primary);
+}
+
+.editIcon {
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
+.inputNombre {
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  width: 100%;
+  max-width: 400px;
+}
+
+.fechaContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+}
+
+.inputFecha {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+/* ==================== TABS ==================== */
+.tabs {
+  display: flex;
+  gap: var(--spacing-sm);
+  background: var(--bg-card);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.tabActiva {
+  background: var(--primary);
+  color: white;
+}
+
+.tabActiva:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.tabIcon {
+  font-size: 1.2rem;
+}
+
+.tabText {
+  display: block;
+}
+
+.tabBadge {
+  font-size: 0.85rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tabActiva .tabBadge {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ==================== TAB CONTENT ==================== */
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ==================== PROGRESO ==================== */
+.progresoPanel {
+  background: var(--bg-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+}
+
+.progresoBar {
+  height: 12px;
+  background: var(--hover);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.progresoTexto {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  display: block;
+}
+
+/* ==================== FILTROS ==================== */
+.filtrosPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.filtroLabel {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.filtrosBotones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.filtroBtn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filtroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filtroBtn.activo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.checkboxLabel input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+
+/* ==================== ADD PANEL ==================== */
+.addPanel {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+}
+
+.inputAdd,
+.inputConcepto {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.inputAdd:focus,
+.inputConcepto:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.selectFase {
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  min-width: 180px;
+}
+
+.inputEstimado {
+  width: 120px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.btnAdd {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btnAdd:hover {
+  background: #256a8a;
+  transform: translateY(-1px);
+}
+
+/* ==================== ADD PANEL INVENTARIO ==================== */
+.addPanelInventario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+}
+
+.addRow {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.inputNombreObjeto {
+  flex: 2;
+  min-width: 200px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.inputCantidad {
+  width: 80px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.selectHabitacion,
+.selectEstado {
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  min-width: 140px;
+}
+
+.inputValor {
+  width: 100px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+/* ==================== LISTA PANEL ==================== */
+.listaPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.listaVacia {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+}
+
+.iconVacio {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.listaVacia p {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.hint {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: var(--spacing-sm);
+}
+
+/* ==================== GRUPO TAREAS ==================== */
+.grupoTareas,
+.grupoInventario {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.grupoHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.grupoEmoji {
+  font-size: 1.3rem;
+}
+
+.grupoCount {
+  margin-left: auto;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* ==================== TAREAS LISTA ==================== */
+.tareasLista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tareaItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
+}
+
+.tareaItem:last-child {
+  border-bottom: none;
+}
+
+.tareaItem:hover {
+  background: var(--hover);
+}
+
+.tareaItem.completada {
+  opacity: 0.6;
+}
+
+.tareaItem.completada .tareaTexto {
+  text-decoration: line-through;
+}
+
+.checkBtn {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tareaItem.completada .checkBtn {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+.tareaTexto {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.badgePersonalizada {
+  margin-left: var(--spacing-sm);
+  font-size: 0.9rem;
+}
+
+.deleteBtn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.tareaItem:hover .deleteBtn,
+.objetoCard:hover .deleteBtn,
+.gastoRow:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* ==================== RESUMEN PANEL ==================== */
+.resumenPanel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.resumenCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.resumenIcon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.resumenValor {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.resumenLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+/* ==================== OBJETOS GRID ==================== */
+.objetosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+}
+
+.objetoCard {
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.objetoCard:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.objetoCard.noLlevar {
+  opacity: 0.6;
+  background: var(--hover);
+}
+
+.objetoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-sm);
+}
+
+.objetoNombre {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.objetoDetalles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.objetoDetalles span {
+  background: var(--hover);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.btnLlevar {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnLlevar.llevar {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.btnLlevar.noLlevar {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+/* ==================== PRESUPUESTO ==================== */
+.resumenPresupuesto {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.resumenPresupuesto .resumenCard.estimado .resumenValor {
+  color: var(--text-secondary);
+}
+
+.resumenPresupuesto .resumenCard.real .resumenValor {
+  color: var(--primary);
+}
+
+.resumenPresupuesto .resumenCard.positivo .resumenValor {
+  color: #22c55e;
+}
+
+.resumenPresupuesto .resumenCard.negativo .resumenValor {
+  color: #ef4444;
+}
+
+.gastosPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.gastoRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+
+.gastoRow.pagado {
+  opacity: 0.7;
+}
+
+.gastoInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 200px;
+}
+
+.gastoConcepto {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.btnPagado {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.btnPagado.pagadoActivo {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.gastoInputs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.gastoInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gastoInputGroup label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.inputGasto {
+  width: 100px;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  text-align: right;
+}
+
+.inputGasto:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ==================== ACCIONES ==================== */
+.accionesPanel {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btnAccion {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnAccion:hover {
+  background: #256a8a;
+  transform: translateY(-1px);
+}
+
+.btnAccionSecundario {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnAccionSecundario:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ==================== MUDANZAS GUARDADAS ==================== */
+.mudanzasGuardadasPanel {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+}
+
+.seccionTitulo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.mudanzasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.mudanzaCard {
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.mudanzaCard:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.mudanzaCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.mudanzaNombre {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mudanzaFecha {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.mudanzaResumen {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.mudanzaCardAcciones {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.btnCargar {
+  flex: 1;
+  padding: var(--spacing-sm);
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnCargar:hover {
+  background: #256a8a;
+}
+
+.btnEliminar {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid #ef4444;
+  border-radius: var(--radius);
+  background: transparent;
+  color: #ef4444;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnEliminar:hover {
+  background: #fef2f2;
+}
+
+/* ==================== DARK MODE ==================== */
+[data-theme='dark'] .headerPanel,
+[data-theme='dark'] .tabs,
+[data-theme='dark'] .progresoPanel,
+[data-theme='dark'] .filtrosPanel,
+[data-theme='dark'] .addPanel,
+[data-theme='dark'] .addPanelInventario,
+[data-theme='dark'] .listaVacia,
+[data-theme='dark'] .grupoTareas,
+[data-theme='dark'] .grupoInventario,
+[data-theme='dark'] .resumenCard,
+[data-theme='dark'] .gastoRow,
+[data-theme='dark'] .mudanzasGuardadasPanel {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .inputNombre,
+[data-theme='dark'] .inputFecha,
+[data-theme='dark'] .inputAdd,
+[data-theme='dark'] .inputConcepto,
+[data-theme='dark'] .inputEstimado,
+[data-theme='dark'] .inputNombreObjeto,
+[data-theme='dark'] .inputCantidad,
+[data-theme='dark'] .inputValor,
+[data-theme='dark'] .inputGasto,
+[data-theme='dark'] .selectFase,
+[data-theme='dark'] .selectHabitacion,
+[data-theme='dark'] .selectEstado {
+  background: var(--bg-primary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .filtroBtn {
+  background: var(--bg-primary);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .filtroBtn.activo {
+  background: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .objetoCard,
+[data-theme='dark'] .mudanzaCard {
+  background: var(--bg-primary);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .objetoDetalles span {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .btnLlevar {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .btnLlevar.llevar {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
+  color: #4ade80;
+}
+
+[data-theme='dark'] .btnLlevar.noLlevar {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #f87171;
+}
+
+[data-theme='dark'] .btnPagado {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .btnPagado.pagadoActivo {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+[data-theme='dark'] .deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+[data-theme='dark'] .btnAccionSecundario {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .btnEliminar {
+  border-color: #f87171;
+  color: #f87171;
+}
+
+[data-theme='dark'] .btnEliminar:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+[data-theme='dark'] .checkBtn {
+  background: var(--bg-primary);
+  border-color: var(--border);
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .resumenPanel,
+  .resumenPresupuesto {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+
+  .hero {
+    padding: var(--spacing-xl) var(--spacing-md);
+    margin-top: 70px;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .headerPanel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fechaContainer {
+    justify-content: flex-start;
+  }
+
+  .tabs {
+    flex-direction: column;
+  }
+
+  .tabText {
+    display: inline;
+  }
+
+  .addPanel {
+    flex-direction: column;
+  }
+
+  .selectFase {
+    width: 100%;
+  }
+
+  .addRow {
+    flex-direction: column;
+  }
+
+  .inputNombreObjeto,
+  .inputCantidad,
+  .selectHabitacion,
+  .selectEstado,
+  .inputValor {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .resumenPanel,
+  .resumenPresupuesto {
+    grid-template-columns: 1fr;
+  }
+
+  .gastoRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .gastoInfo {
+    min-width: unset;
+  }
+
+  .gastoInputs {
+    flex-wrap: wrap;
+  }
+
+  .gastoInputGroup {
+    flex: 1;
+    min-width: 80px;
+  }
+
+  .inputGasto {
+    width: 100%;
+  }
+
+  .accionesPanel {
+    flex-direction: column;
+  }
+
+  .btnAccion,
+  .btnAccionSecundario {
+    width: 100%;
+  }
+
+  .objetosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .filtrosPanel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtrosBotones {
+    justify-content: center;
+  }
+
+  .mudanzasGrid {
+    grid-template-columns: 1fr;
+  }
+}

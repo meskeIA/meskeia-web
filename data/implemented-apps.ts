@@ -46,6 +46,7 @@ export const implementedAppsUrls = [
   "/calculadora-combustible/",       // Consumo L/100km y coste viajes
   "/calculadora-edad-mascotas/",     // Edad perros/gatos en años humanos
   "/planificador-boda/",             // Wedding planner: checklist, presupuesto, timeline
+  "/planificador-mudanzas/",         // Mudanza: tareas, inventario, presupuesto
 
   // Matemáticas y Estadística (11 implementadas)
   "/algebra-ecuaciones/",            // Calculadora de Ecuaciones

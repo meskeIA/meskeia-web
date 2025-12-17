@@ -322,6 +322,7 @@ const hogarApps: RelatedApp[] = [
   { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios' },
   { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
   { url: '/planificador-boda/', icon: '💒', name: 'Planificador Boda', description: 'Wedding planner' },
+  { url: '/planificador-mudanzas/', icon: '📦', name: 'Planificador Mudanzas', description: 'Organiza tu mudanza' },
 ];
 
 // ==========================================
@@ -514,7 +515,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'lista-compras': cocinaApps.filter(a => a.url !== '/lista-compras/'),
   'calculadora-pintura': hogarApps.filter(a => a.url !== '/calculadora-pintura/'),
   'calculadora-gasto-energetico': hogarApps.filter(a => a.url !== '/calculadora-gasto-energetico/'),
-  'planificador-boda': [...hogarApps.filter(a => a.url !== '/planificador-boda/'), ...productividadApps.slice(0, 2)],
+  'planificador-boda': [...hogarApps.filter(a => a.url !== '/planificador-boda/'), ...productividadApps.slice(0, 1)],
+  'planificador-mudanzas': [
+    { url: '/lista-compras/', icon: '🛒', name: 'Lista Compras', description: 'Organiza tu compra' },
+    { url: '/lista-tareas/', icon: '✅', name: 'Lista Tareas', description: 'Gestiona tus pendientes' },
+    { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros de pintura' },
+    { url: '/control-gastos/', icon: '💳', name: 'Control Gastos', description: 'Gestiona presupuesto' },
+  ],
 
   // FAMILIA
   'planificador-embarazo': familiaApps.filter(a => a.url !== '/planificador-embarazo/'),
