@@ -267,13 +267,15 @@
 .stats {
   display: flex;
   justify-content: center;
-  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: var(--spacing-lg) var(--spacing-xl);
   padding-top: var(--spacing-lg);
   border-top: 1px solid var(--border);
 }
 
 .statItem {
   text-align: center;
+  min-width: 80px;
 }
 
 .statNumber {
@@ -501,11 +503,19 @@
   }
 
   .stats {
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md) var(--spacing-lg);
+  }
+
+  .statItem {
+    min-width: 70px;
   }
 
   .statNumber {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+  }
+
+  .statLabel {
+    font-size: 0.8rem;
   }
 
   .cardHeader {
