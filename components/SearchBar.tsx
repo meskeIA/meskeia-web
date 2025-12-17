@@ -62,10 +62,22 @@ export default function SearchBar({ large = false }: SearchBarProps) {
   const [results, setResults] = useState<FuseResult<Application>[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchInputLargeRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const inlineContainerRef = useRef<HTMLDivElement>(null);
+
+  // Detectar si es móvil
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Configurar Fuse.js
   const fuse = useRef(
@@ -219,6 +231,32 @@ export default function SearchBar({ large = false }: SearchBarProps) {
     return `${results.length} ${results.length === 1 ? 'aplicación encontrada' : 'aplicaciones encontradas'}`;
   };
 
+  // Renderizar resultados compactos para móvil (solo icono + nombre)
+  const renderResultsCompact = () => (
+    <>
+      {results.length === 0 ? (
+        <div className={styles.noResultsCompact}>
+          <span>🔍</span>
+          <span>Sin resultados</span>
+        </div>
+      ) : (
+        results.map((result, index) => (
+          <a
+            key={index}
+            href={result.item.url}
+            className={`${styles.resultItemCompact} ${
+              index === selectedIndex ? styles.selected : ''
+            }`}
+            onClick={handleResultClick}
+          >
+            <span className={styles.resultIconCompact}>{result.item.icon}</span>
+            <span className={styles.resultTitleCompact}>{result.item.name}</span>
+          </a>
+        ))
+      )}
+    </>
+  );
+
   // Renderizar resultados (compartido entre modal e inline)
   const renderResults = () => (
     <>
@@ -286,7 +324,7 @@ export default function SearchBar({ large = false }: SearchBarProps) {
       {/* ===== VERSIÓN GRANDE (INLINE) ===== */}
       {large && (
         <div className={styles.inlineSearchWrapper} ref={inlineContainerRef}>
-          <div className={`${styles.searchLarge} ${showDropdown ? styles.searchLargeActive : ''}`}>
+          <div className={`${styles.searchLarge} ${showDropdown ? styles.searchLargeActive : ''} ${isMobile && showDropdown ? styles.searchLargeMobileActive : ''}`}>
             <span className={styles.searchLargeIcon} aria-hidden="true">🔍</span>
             <input
               ref={searchInputLargeRef}
@@ -296,7 +334,9 @@ export default function SearchBar({ large = false }: SearchBarProps) {
               value={query}
               onChange={(e) => performSearch(e.target.value)}
               onKeyDown={handleKeyDown}
-              onFocus={() => query.length >= 2 && setShowDropdown(true)}
+              onFocus={() => {
+                if (query.length >= 2) setShowDropdown(true);
+              }}
             />
             {query.length > 0 ? (
               <button
@@ -317,26 +357,28 @@ export default function SearchBar({ large = false }: SearchBarProps) {
             )}
           </div>
 
-          {/* Dropdown de resultados inline */}
+          {/* Dropdown de resultados - hacia abajo en desktop, hacia arriba en móvil */}
           {showDropdown && query.length >= 2 && (
-            <div className={styles.inlineDropdown}>
-              <div className={styles.inlineResults}>
-                {renderResults()}
+            <div className={`${styles.inlineDropdown} ${isMobile ? styles.inlineDropdownMobile : ''}`}>
+              <div className={`${styles.inlineResults} ${isMobile ? styles.inlineResultsMobile : ''}`}>
+                {isMobile ? renderResultsCompact() : renderResults()}
               </div>
-              <div className={styles.inlineFooter}>
-                <div className={styles.searchHints}>
-                  <span>
-                    <kbd>↑</kbd>
-                    <kbd>↓</kbd> navegar
-                  </span>
-                  <span>
-                    <kbd>Enter</kbd> seleccionar
-                  </span>
-                  <span>
-                    <kbd>Esc</kbd> cerrar
-                  </span>
+              {!isMobile && (
+                <div className={styles.inlineFooter}>
+                  <div className={styles.searchHints}>
+                    <span>
+                      <kbd>↑</kbd>
+                      <kbd>↓</kbd> navegar
+                    </span>
+                    <span>
+                      <kbd>Enter</kbd> seleccionar
+                    </span>
+                    <span>
+                      <kbd>Esc</kbd> cerrar
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </div>
