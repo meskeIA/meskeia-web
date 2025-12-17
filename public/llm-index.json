@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 172+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 173+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 172,
+  "total_tools": 173,
   "last_updated": "2025-12-17",
   "features": {
     "all_free": true,
@@ -98,7 +98,7 @@
       "name": "Texto y Conversores",
       "icon": "📝",
       "description": "Procesa, formatea y convierte texto",
-      "tool_count": 13
+      "tool_count": 14
     }
   ],
   "moments": [
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 50
+      "tool_count": 51
     },
     {
       "id": "casa",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 26
+      "tool_count": 27
     }
   ],
   "tools": [
@@ -3755,6 +3755,29 @@
         "ortografia"
       ],
       "icon": "📝"
+    },
+    {
+      "slug": "paises-del-mundo",
+      "name": "Países del Mundo",
+      "url": "https://meskeia.com/paises-del-mundo/",
+      "description": "Buscador de 195 países con capitales, banderas, monedas, idiomas, población y prefijos telefónicos",
+      "category": "Texto y Conversores",
+      "contexts": [
+        "curiosidad",
+        "estudio"
+      ],
+      "keywords": [
+        "paises",
+        "capitales",
+        "banderas",
+        "monedas",
+        "idiomas",
+        "geografia",
+        "mundo",
+        "atlas",
+        "continentes"
+      ],
+      "icon": "🌍"
     }
   ],
   "llm_instructions": {

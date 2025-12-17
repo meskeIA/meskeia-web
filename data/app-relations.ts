@@ -539,6 +539,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-inflacion': finanzasPersonalesApps,
   'analizador-espectro': [{ url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' }],
   'nivel-burbuja': [{ url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud y ángulos' }, { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }],
+
+  // REFERENCIA Y CULTURA GENERAL
+  'paises-del-mundo': [
+    { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, peso, etc.' },
+    { url: '/conversor-horarios/', icon: '🕐', name: 'Conversor Horarios', description: 'Zonas horarias' },
+    { url: '/calculadora-fechas/', icon: '📅', name: 'Calculadora Fechas', description: 'Días entre fechas' },
+    { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' },
+  ],
 };
 
 /**
@@ -618,6 +626,9 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     // Web
     'validador-json': { title: 'Herramientas para desarrolladores', icon: '💻' },
     'conversor-imagenes': { title: 'Edita tus imágenes', icon: '🖼️' },
+
+    // Referencia
+    'paises-del-mundo': { title: 'Más herramientas de referencia', icon: '🌍' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };

@@ -302,6 +302,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Anagramas", category: "Texto y Conversores", contexts: ["relax", "curiosidad"], icon: "🔤", description: "Encuentra todas las palabras que puedes formar con tus letras. Ideal para Wordle, Scrabble y crucigramas", url: "/generador-anagramas/", keywords: ["anagramas", "palabras", "wordle", "scrabble", "crucigrama", "letras", "juego palabras"] },
   { name: "Generador Lorem Ipsum", category: "Texto y Conversores", contexts: ["creando"], icon: "📄", description: "Genera texto Lorem Ipsum de 1 a 10 párrafos. Ideal para diseño, maquetación y desarrollo web", url: "/generador-lorem-ipsum/", keywords: ["lorem ipsum", "texto prueba", "placeholder", "maquetacion", "diseño", "dummy text"] },
   { name: "Contador de Sílabas", category: "Texto y Conversores", contexts: ["estudio", "creando"], icon: "📝", description: "Cuenta y separa las sílabas de cualquier palabra o texto en español. Útil para poesía y ortografía", url: "/contador-silabas/", keywords: ["silabas", "separar", "silabeador", "division silabica", "poesia", "metrica", "ortografia"] },
+  { name: "Países del Mundo", category: "Texto y Conversores", contexts: ["curiosidad", "estudio"], icon: "🌍", description: "Buscador de 195 países con capitales, banderas, monedas, idiomas, población y prefijos telefónicos", url: "/paises-del-mundo/", keywords: ["paises", "capitales", "banderas", "monedas", "idiomas", "geografia", "mundo", "atlas", "continentes"] },
 ];
 
 // ============================================

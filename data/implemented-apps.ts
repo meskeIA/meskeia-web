@@ -209,6 +209,9 @@ export const implementedAppsUrls = [
   "/calculadora-tiempo-lectura/",
   "/generador-schema-markup/",
   "/analizador-geo/",                // Optimización contenido para IAs (GEO/AEO)
+
+  // Referencia y Cultura General (1 implementada)
+  "/paises-del-mundo/",             // Buscador de países: banderas, capitales, monedas, idiomas
 ];
 
 /**
