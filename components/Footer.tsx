@@ -3,14 +3,14 @@
  *
  * Footer unificado con glassmorphism (formato oficial nov 2025)
  * Incluye botón de compartir integrado
- * Incluye AnalyticsScript para registro de uso
+ * Incluye AnalyticsTracker v3.0 para registro de uso (Turso)
  */
 
 'use client';
 
 import React, { useState } from 'react';
 import styles from './Footer.module.css';
-import AnalyticsScript from './AnalyticsScript';
+import AnalyticsTracker from './AnalyticsTracker';
 
 interface FooterProps {
   appName?: string; // Nombre de la app para compartir (opcional)
@@ -57,7 +57,7 @@ export default function Footer({ appName }: FooterProps) {
   return (
     <>
       {/* Analytics: Registra uso de la app en producción */}
-      {appName && <AnalyticsScript appName={appName} />}
+      {appName && <AnalyticsTracker appName={appName} />}
 
       <footer className={styles.footer}>
         <div className={styles.shareSection}>
