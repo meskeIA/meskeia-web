@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './DashboardAnalytics.module.css';
 import { MeskeiaLogo } from '@/components';
 
@@ -99,59 +99,21 @@ export default function DashboardAnalyticsPage() {
   const [ipConfig, setIPConfig] = useState<IPConfig | null>(null);
   const [actualizandoIP, setActualizandoIP] = useState(false);
 
-  // Cargar configuración de IP
-  const cargarConfigIP = useCallback(async () => {
-    try {
-      const response = await fetch('/api/analytics/ip-filter');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status === 'success') {
-          setIPConfig(data.data);
-          setFiltroIPActivo(data.data.activo);
-        }
-      }
-    } catch (err) {
-      console.error('Error al cargar config IP:', err);
-    }
-  }, []);
+  // Ref para evitar múltiples cargas iniciales
+  const iniciado = useRef(false);
+  const filtroIPRef = useRef(filtroIPActivo);
 
-  // Guardar IP actual como excluida
-  const guardarMiIP = async () => {
-    setActualizandoIP(true);
-    try {
-      const response = await fetch('/api/analytics/ip-filter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ activo: filtroIPActivo }),
-      });
-      const data = await response.json();
-      if (data.status === 'success') {
-        setIPConfig((prev) => prev ? { ...prev, ip_excluida: data.data.ip_excluida } : null);
-        alert(`✅ IP guardada: ${data.data.ip_excluida}\n\nTus pruebas ya no se registrarán.`);
-        // Recargar datos con el nuevo filtro
-        cargarDatos();
-      }
-    } catch {
-      alert('❌ Error al guardar IP');
-    } finally {
-      setActualizandoIP(false);
-    }
-  };
+  // Mantener ref sincronizada
+  useEffect(() => {
+    filtroIPRef.current = filtroIPActivo;
+  }, [filtroIPActivo]);
 
-  // Toggle filtro IP
-  const toggleFiltroIP = () => {
-    const nuevoEstado = !filtroIPActivo;
-    setFiltroIPActivo(nuevoEstado);
-    // Guardar preferencia y recargar
-    localStorage.setItem('filtroMiIPActivo', nuevoEstado.toString());
-    cargarDatos(nuevoEstado);
-  };
-
+  // Función para cargar datos (usa ref para evitar dependencias)
   const cargarDatos = useCallback(async (excluirIP?: boolean) => {
     setLoading(true);
     setError(null);
 
-    const usarFiltro = excluirIP !== undefined ? excluirIP : filtroIPActivo;
+    const usarFiltro = excluirIP !== undefined ? excluirIP : filtroIPRef.current;
 
     try {
       const url = `/api/analytics/stats?limite=500${usarFiltro ? '&excluir_mi_ip=true' : ''}`;
@@ -179,14 +141,73 @@ export default function DashboardAnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  }, [filtroIPActivo]);
+  }, []);
 
+  // Cargar configuración de IP
+  const cargarConfigIP = useCallback(async () => {
+    try {
+      const response = await fetch('/api/analytics/ip-filter');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status === 'success') {
+          setIPConfig(data.data);
+          // Solo actualizar si es diferente para evitar renders
+          if (data.data.activo !== filtroIPRef.current) {
+            setFiltroIPActivo(data.data.activo);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error al cargar config IP:', err);
+    }
+  }, []);
+
+  // Guardar IP actual como excluida
+  const guardarMiIP = async () => {
+    setActualizandoIP(true);
+    try {
+      const response = await fetch('/api/analytics/ip-filter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activo: filtroIPActivo }),
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        setIPConfig((prev) => prev ? { ...prev, ip_excluida: data.data.ip_excluida } : null);
+        alert(`✅ IP guardada: ${data.data.ip_excluida}\n\nTus pruebas ya no se registrarán.`);
+        // Recargar datos con el nuevo filtro
+        cargarDatos(filtroIPActivo);
+      }
+    } catch {
+      alert('❌ Error al guardar IP');
+    } finally {
+      setActualizandoIP(false);
+    }
+  };
+
+  // Toggle filtro IP
+  const toggleFiltroIP = () => {
+    const nuevoEstado = !filtroIPActivo;
+    setFiltroIPActivo(nuevoEstado);
+    // Guardar preferencia y recargar
+    localStorage.setItem('filtroMiIPActivo', nuevoEstado.toString());
+    cargarDatos(nuevoEstado);
+  };
+
+  // Efecto de inicialización (solo una vez)
   useEffect(() => {
+    if (iniciado.current) return;
+    iniciado.current = true;
+
     // Cargar preferencia de localStorage
     const prefLocal = localStorage.getItem('filtroMiIPActivo');
     if (prefLocal !== null) {
-      setFiltroIPActivo(prefLocal === 'true');
+      const prefValue = prefLocal === 'true';
+      setFiltroIPActivo(prefValue);
+      filtroIPRef.current = prefValue;
     }
+
+    // Cargar config IP y datos
     cargarConfigIP();
     cargarDatos();
   }, [cargarConfigIP, cargarDatos]);
