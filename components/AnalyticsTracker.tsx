@@ -8,10 +8,12 @@ interface AnalyticsTrackerProps {
 }
 
 /**
- * Componente Analytics v2.1 para meskeIA
+ * Componente Analytics v3.0 para meskeIA (Turso)
  *
  * IMPORTANTE: Desactivado en subdominios de desarrollo (next.meskeia.com)
  * Solo registra analytics en producción (meskeia.com)
+ *
+ * Ahora usa API Routes de Next.js + Turso (SQLite en la nube)
  */
 export default function AnalyticsTracker({ applicationName, appName }: AnalyticsTrackerProps) {
   const finalAppName = applicationName || appName || 'unknown';
@@ -25,6 +27,10 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
         return;
       }
     }
+
+    // URL base para API (relativa, funciona en cualquier dominio)
+    const API_BASE = '/api/analytics';
+
     // Generar ID único de sesión
     const sessionId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -61,16 +67,16 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       sesion_id: sessionId,
     };
 
-    // Registrar entrada
+    // Registrar entrada (nueva API Turso)
     const registerEntry = async () => {
       try {
-        await fetch('https://meskeia.com/api/v1/guardar-uso.php', {
+        await fetch(`${API_BASE}/track`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(entryData),
           keepalive: true,
         });
-        console.log('✅ Uso registrado en meskeIA Analytics v2.1');
+        console.log('✅ Uso registrado en meskeIA Analytics v3.0 (Turso)');
       } catch (error) {
         console.error('❌ Error al registrar uso:', error);
       }
@@ -94,13 +100,13 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
         // Se envía aunque el navegador esté cerrando la página
         if (navigator.sendBeacon) {
           const blob = new Blob([data], { type: 'application/json' });
-          const sent = navigator.sendBeacon('https://meskeia.com/api/v1/guardar-duracion.php', blob);
+          const sent = navigator.sendBeacon(`${API_BASE}/duration`, blob);
           if (sent) {
             console.log(`✅ Duración registrada (sendBeacon): ${durationSeconds}s`);
           }
         } else {
           // Fallback para navegadores sin sendBeacon
-          fetch('https://meskeia.com/api/v1/guardar-duracion.php', {
+          fetch(`${API_BASE}/duration`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: data,

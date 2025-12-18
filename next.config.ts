@@ -8,27 +8,30 @@ const withBundleAnalyzer = bundleAnalyzer({
 /**
  * Configuración de Next.js 16.0.3 para meskeIA
  *
- * Deployment: Static Site Generation (SSG) en subdominio next.meskeia.com
- * Hosting: Webempresa (Apache, sin Node.js)
+ * Deployment: Vercel (híbrido - SSG + API Routes serverless)
+ * Anteriormente: Static Export para Webempresa (Apache)
  *
- * NOTA: Sin basePath - el subdominio sirve directamente desde raíz
+ * CAMBIO 18/12/2025: Migración a Vercel
+ * - Eliminado output: 'export' para soportar API Routes (Analytics Turso)
+ * - Las páginas estáticas se generan en build (ISR)
+ * - Las API Routes se ejecutan como Edge Functions
  */
 const nextConfig: NextConfig = {
   // ============================================================================
-  // STATIC EXPORT - Compatible con hosting estático (sin servidor Node.js)
+  // NOTA: output: 'export' ELIMINADO
+  // Vercel soporta modo híbrido: páginas estáticas + API Routes dinámicas
   // ============================================================================
-  output: 'export',
 
   // ============================================================================
-  // SERVIDOR WEB - Optimizaciones para Apache
+  // SERVIDOR WEB - URLs con trailing slash para compatibilidad
   // ============================================================================
-  trailingSlash: true, // URLs terminan con / para mejor compatibilidad Apache
+  trailingSlash: true,
 
   // ============================================================================
-  // IMÁGENES - Sin optimización (requeriría servidor Node.js)
+  // IMÁGENES - Sin optimización por ahora (puede habilitarse en Vercel)
   // ============================================================================
   images: {
-    unoptimized: true, // Servir imágenes sin procesamiento dinámico
+    unoptimized: true,
   },
 
   // ============================================================================
@@ -36,7 +39,6 @@ const nextConfig: NextConfig = {
   // ============================================================================
   // IMPORTANTE: Las apps nuevas NO tienen errores TypeScript
   // Errores existentes SOLO en guías auto-generadas (atributos HTML legacy)
-  // TODO: Revisar manualmente guías después de migrar las apps principales
   typescript: {
     ignoreBuildErrors: true,
   },

@@ -14,6 +14,7 @@
     "analyze": "set ANALYZE=true && npm run build"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.15",
     "algebrite": "^1.4.0",
     "chart.js": "^4.5.1",
     "flag-icons": "^7.5.0",
