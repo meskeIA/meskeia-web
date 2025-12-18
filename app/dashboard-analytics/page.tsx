@@ -213,6 +213,19 @@ export default function DashboardAnalyticsPage() {
     cargarDatos();
   }, [cargarConfigIP, cargarDatos]);
 
+  // Función helper para parsear timestamp español (DD/MM/YYYY, HH:MM:SS)
+  const parsearTimestamp = (timestamp: string): Date | null => {
+    const fechaMatch = timestamp.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (!fechaMatch) return null;
+
+    const [, dia, mes, anio] = fechaMatch;
+    return new Date(
+      parseInt(anio, 10),
+      parseInt(mes, 10) - 1,
+      parseInt(dia, 10)
+    );
+  };
+
   // Calcular usos de hoy
   const calcularUsosHoy = () => {
     if (!datos?.data) return 0;
@@ -221,15 +234,11 @@ export default function DashboardAnalyticsPage() {
     hoy.setHours(0, 0, 0, 0);
 
     return datos.data.filter((registro) => {
-      // Parsear fecha española DD/MM/YYYY HH:MM:SS
-      const partes = registro.timestamp.split(' ');
-      if (partes.length !== 2) return false;
+      const fechaRegistro = parsearTimestamp(registro.timestamp || '');
+      if (!fechaRegistro) return false;
 
-      const [fecha] = partes;
-      const [dia, mes, anio] = fecha.split('/');
-      const fechaRegistro = new Date(`${anio}-${mes}-${dia}`);
-
-      return fechaRegistro >= hoy;
+      fechaRegistro.setHours(0, 0, 0, 0);
+      return fechaRegistro.getTime() === hoy.getTime();
     }).length;
   };
 
@@ -270,12 +279,8 @@ export default function DashboardAnalyticsPage() {
     const usosPorDia: { [key: string]: number } = {};
 
     datos.data.forEach((registro) => {
-      const partes = registro.timestamp.split(' ');
-      if (partes.length !== 2) return;
-
-      const [fecha] = partes;
-      const [dia, mes, anio] = fecha.split('/');
-      const fechaObj = new Date(`${anio}-${mes}-${dia}`);
+      const fechaObj = parsearTimestamp(registro.timestamp || '');
+      if (!fechaObj) return;
 
       if (fechaObj >= hace30Dias) {
         const diaKey = fechaObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
