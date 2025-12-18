@@ -798,6 +798,7 @@ export default function DashboardAnalyticsPage() {
                     <th>Fecha/Hora</th>
                     <th>Duración</th>
                     <th>País</th>
+                    <th>Ciudad</th>
                     <th>Dispositivo</th>
                   </tr>
                 </thead>
@@ -815,6 +816,7 @@ export default function DashboardAnalyticsPage() {
                           : '-'}
                       </td>
                       <td>{registro.pais || '-'}</td>
+                      <td>{registro.ciudad || '-'}</td>
                       <td>{registro.tipo_dispositivo === 'movil' ? '📱' : '🖥️'}</td>
                     </tr>
                   ))}
