@@ -85,7 +85,7 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <div className={styles.logoWrapper}>
-            <MeskeiaLogo inline />
+            <MeskeiaLogo inline showThemeToggle={false} />
           </div>
         </div>
       </aside>
@@ -106,7 +106,7 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
               </div>
             </div>
           ) : (
-            <MeskeiaLogo inline />
+            <MeskeiaLogo inline showThemeToggle={false} />
           )}
         </div>
       </div>

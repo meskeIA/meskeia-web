@@ -1,9 +1,27 @@
 /* Logo meskeIA - Estilos del componente */
 
-.logoContainer {
+/* Barra superior que contiene logo + toggle */
+.headerBar {
   position: fixed;
-  top: 20px;
-  left: 20px;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  pointer-events: none; /* Permite click-through en áreas vacías */
+}
+
+.headerBar > * {
+  pointer-events: auto; /* Restaura eventos en hijos */
+}
+
+.logoContainer {
+  position: relative;
+  top: auto;
+  left: auto;
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -138,10 +156,59 @@
   border-radius: 1px;
 }
 
+/* Toggle de tema */
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+  transition: all 0.3s ease;
+}
+
+.themeToggle:hover {
+  transform: scale(1.05);
+  border-color: var(--primary, #2E86AB);
+  box-shadow: 0 6px 25px rgba(46, 134, 171, 0.15);
+}
+
+.themeToggle:active {
+  transform: scale(0.95);
+}
+
+.themeIcon {
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Dark mode */
+[data-theme='dark'] .themeToggle {
+  background: rgba(42, 42, 42, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .themeToggle:hover {
+  border-color: var(--primary, #2E86AB);
+}
+
 @media (max-width: 768px) {
+  .headerBar {
+    padding: 10px 15px;
+  }
+
   .logoContainer {
-    top: 10px;
-    left: 10px;
     padding: 6px 12px;
     gap: 8px;
   }
@@ -167,5 +234,14 @@
 
   .logoText {
     font-size: 1rem;
+  }
+
+  .themeToggle {
+    width: 38px;
+    height: 38px;
+  }
+
+  .themeIcon {
+    font-size: 1.1rem;
   }
 }

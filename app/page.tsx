@@ -240,7 +240,7 @@ function HomeContent() {
             {/* Header con logo */}
             <header className={styles.header}>
               <div className={styles.headerContent}>
-                <MeskeiaLogo disableLink inline />
+                <MeskeiaLogo disableLink inline showThemeToggle={false} />
                 <p className={styles.subtitle}>
                   {TOTAL_IMPLEMENTED_APPS} aplicaciones web gratuitas para tu día a día
                 </p>

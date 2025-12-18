@@ -126,7 +126,7 @@ export default function SidebarMobile({ onViewChange, currentView = 'home' }: Si
         {/* Header */}
         <div className={styles.sidebarHeader}>
           <div className={styles.logoWrapper} onClick={() => handleViewChange('home')}>
-            <MeskeiaLogo inline />
+            <MeskeiaLogo inline showThemeToggle={false} />
           </div>
           <button
             className={styles.closeButton}
