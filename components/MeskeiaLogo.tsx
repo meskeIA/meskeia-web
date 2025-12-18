@@ -64,15 +64,24 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
     </button>
   );
 
+  // Si es inline sin toggle, no necesita el wrapper headerBar
+  const logoElement = disableLink ? (
+    <div className={containerClass}>{logoContent}</div>
+  ) : (
+    <Link href="/" className={containerClass}>
+      {logoContent}
+    </Link>
+  );
+
+  // Si es inline y no muestra toggle, devolver solo el logo sin wrapper
+  if (inline && !showThemeToggle) {
+    return logoElement;
+  }
+
+  // En otros casos, usar el headerBar wrapper
   return (
     <div className={styles.headerBar}>
-      {disableLink ? (
-        <div className={containerClass}>{logoContent}</div>
-      ) : (
-        <Link href="/" className={containerClass}>
-          {logoContent}
-        </Link>
-      )}
+      {logoElement}
       {themeToggle}
     </div>
   );
