@@ -92,7 +92,8 @@ export default function DashboardAnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [ultimaActualizacion, setUltimaActualizacion] = useState<string>('');
-  const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'registros'>('general');
+  const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros'>('general');
+  const [appSeleccionada, setAppSeleccionada] = useState<string>('');
 
   // Estado para filtro de IP
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
@@ -522,6 +523,12 @@ export default function DashboardAnalyticsPage() {
           🏆 Ranking Apps
         </button>
         <button
+          className={`${styles.tabButton} ${tabActiva === 'aplicacion' ? styles.active : ''}`}
+          onClick={() => setTabActiva('aplicacion')}
+        >
+          🔍 Por Aplicación
+        </button>
+        <button
           className={`${styles.tabButton} ${tabActiva === 'registros' ? styles.active : ''}`}
           onClick={() => setTabActiva('registros')}
         >
@@ -780,6 +787,156 @@ export default function DashboardAnalyticsPage() {
                 </tbody>
               </table>
             </div>
+          </section>
+        </div>
+      )}
+
+      {/* Tab: Por Aplicación */}
+      {tabActiva === 'aplicacion' && datos && (
+        <div className={styles.tabContent}>
+          <section className={styles.section}>
+            <h2>🔍 Estadísticas por Aplicación</h2>
+
+            {/* Selector de aplicación */}
+            <div className={styles.appSelector}>
+              <label htmlFor="app-select">Selecciona una aplicación:</label>
+              <select
+                id="app-select"
+                value={appSeleccionada}
+                onChange={(e) => setAppSeleccionada(e.target.value)}
+                className={styles.selectApp}
+              >
+                <option value="">-- Todas las aplicaciones --</option>
+                {datos.ranking_aplicaciones.map((app) => (
+                  <option key={app.aplicacion} value={app.aplicacion}>
+                    {app.aplicacion} ({app.total_usos} usos)
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Estadísticas de la app seleccionada */}
+            {appSeleccionada ? (
+              <>
+                {(() => {
+                  const appData = datos.ranking_aplicaciones.find(a => a.aplicacion === appSeleccionada);
+                  const registrosApp = datos.data.filter(r => r.aplicacion === appSeleccionada);
+                  const registrosHoy = registrosApp.filter(r => {
+                    const partes = r.timestamp.split(' ');
+                    if (partes.length !== 2) return false;
+                    const [fecha] = partes;
+                    const [dia, mes, anio] = fecha.split('/');
+                    const fechaRegistro = new Date(`${anio}-${mes}-${dia}`);
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    return fechaRegistro >= hoy;
+                  });
+
+                  const dispositivosApp = {
+                    movil: registrosApp.filter(r => r.tipo_dispositivo === 'movil').length,
+                    escritorio: registrosApp.filter(r => r.tipo_dispositivo === 'escritorio').length,
+                  };
+
+                  return (
+                    <>
+                      <div className={styles.statsGrid}>
+                        <div className={styles.statCard}>
+                          <div className={styles.statIcon}>📊</div>
+                          <div className={styles.statContent}>
+                            <h3>{formatearNumero(appData?.total_usos || 0)}</h3>
+                            <p>Total de Usos</p>
+                          </div>
+                        </div>
+                        <div className={`${styles.statCard} ${styles.highlight}`}>
+                          <div className={styles.statIcon}>🔥</div>
+                          <div className={styles.statContent}>
+                            <h3>{formatearNumero(registrosHoy.length)}</h3>
+                            <p>Usos de Hoy</p>
+                          </div>
+                        </div>
+                        <div className={styles.statCard}>
+                          <div className={styles.statIcon}>⏱️</div>
+                          <div className={styles.statContent}>
+                            <h3>{appData?.duracion_promedio_formato || '0s'}</h3>
+                            <p>Duración Promedio</p>
+                          </div>
+                        </div>
+                        <div className={styles.statCard}>
+                          <div className={styles.statIcon}>📅</div>
+                          <div className={styles.statContent}>
+                            <h3>{appData?.ultimo_uso?.split(' ')[0] || '-'}</h3>
+                            <p>Último Uso</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Dispositivos para esta app */}
+                      <div className={styles.deviceStats}>
+                        <div className={styles.deviceCard}>
+                          <span className={styles.deviceIcon}>📱</span>
+                          <div>
+                            <strong>{formatearNumero(dispositivosApp.movil)}</strong>
+                            <span>Móvil ({registrosApp.length > 0 ? Math.round((dispositivosApp.movil / registrosApp.length) * 100) : 0}%)</span>
+                          </div>
+                          <div
+                            className={styles.progressBar}
+                            style={{ '--progress': `${registrosApp.length > 0 ? (dispositivosApp.movil / registrosApp.length) * 100 : 0}%` } as React.CSSProperties}
+                          ></div>
+                        </div>
+                        <div className={styles.deviceCard}>
+                          <span className={styles.deviceIcon}>🖥️</span>
+                          <div>
+                            <strong>{formatearNumero(dispositivosApp.escritorio)}</strong>
+                            <span>Escritorio ({registrosApp.length > 0 ? Math.round((dispositivosApp.escritorio / registrosApp.length) * 100) : 0}%)</span>
+                          </div>
+                          <div
+                            className={styles.progressBar}
+                            style={{ '--progress': `${registrosApp.length > 0 ? (dispositivosApp.escritorio / registrosApp.length) * 100 : 0}%` } as React.CSSProperties}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {/* Últimos registros de esta app */}
+                      <h3 className={styles.appRegistrosTitle}>📋 Últimos 20 registros de {appSeleccionada}</h3>
+                      <div className={styles.tableContainer}>
+                        <table className={styles.table}>
+                          <thead>
+                            <tr>
+                              <th>ID</th>
+                              <th>Fecha/Hora</th>
+                              <th>Duración</th>
+                              <th>País</th>
+                              <th>Ciudad</th>
+                              <th>Dispositivo</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {registrosApp.slice(0, 20).map((registro) => (
+                              <tr key={registro.id}>
+                                <td>{registro.id}</td>
+                                <td>{registro.timestamp}</td>
+                                <td>
+                                  {registro.duracion_segundos
+                                    ? `${Math.floor(registro.duracion_segundos / 60)}m ${registro.duracion_segundos % 60}s`
+                                    : '-'}
+                                </td>
+                                <td>{registro.pais || '-'}</td>
+                                <td>{registro.ciudad || '-'}</td>
+                                <td>{registro.tipo_dispositivo === 'movil' ? '📱' : '🖥️'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  );
+                })()}
+              </>
+            ) : (
+              <div className={styles.noAppSelected}>
+                <p>👆 Selecciona una aplicación del menú para ver sus estadísticas detalladas.</p>
+              </div>
+            )}
           </section>
         </div>
       )}
