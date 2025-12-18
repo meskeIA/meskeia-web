@@ -4,9 +4,43 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './DashboardAnalytics.module.css';
 import { MeskeiaLogo } from '@/components';
 
+// Importar Chart.js
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
+
+// Registrar componentes de Chart.js
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
 interface EstadisticasData {
   status: string;
   version: string;
+  filtros: {
+    excluir_mi_ip: boolean;
+    ip_excluida: string | null;
+  };
   estadisticas: {
     total_usos: number;
     total_aplicaciones: number;
@@ -41,7 +75,16 @@ interface EstadisticasData {
     pais: string | null;
     ciudad: string | null;
     tipo_dispositivo: string | null;
+    navegador: string | null;
+    sistema_operativo: string | null;
+    resolucion: string | null;
   }>;
+}
+
+interface IPConfig {
+  ip_actual: string;
+  ip_excluida: string;
+  activo: boolean;
 }
 
 export default function DashboardAnalyticsPage() {
@@ -49,14 +92,70 @@ export default function DashboardAnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [ultimaActualizacion, setUltimaActualizacion] = useState<string>('');
-  const [tabActiva, setTabActiva] = useState<'general' | 'ranking' | 'registros'>('general');
+  const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'registros'>('general');
 
-  const cargarDatos = useCallback(async () => {
+  // Estado para filtro de IP
+  const [filtroIPActivo, setFiltroIPActivo] = useState(true);
+  const [ipConfig, setIPConfig] = useState<IPConfig | null>(null);
+  const [actualizandoIP, setActualizandoIP] = useState(false);
+
+  // Cargar configuración de IP
+  const cargarConfigIP = useCallback(async () => {
+    try {
+      const response = await fetch('/api/analytics/ip-filter');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status === 'success') {
+          setIPConfig(data.data);
+          setFiltroIPActivo(data.data.activo);
+        }
+      }
+    } catch (err) {
+      console.error('Error al cargar config IP:', err);
+    }
+  }, []);
+
+  // Guardar IP actual como excluida
+  const guardarMiIP = async () => {
+    setActualizandoIP(true);
+    try {
+      const response = await fetch('/api/analytics/ip-filter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activo: filtroIPActivo }),
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        setIPConfig((prev) => prev ? { ...prev, ip_excluida: data.data.ip_excluida } : null);
+        alert(`✅ IP guardada: ${data.data.ip_excluida}\n\nTus pruebas ya no se registrarán.`);
+        // Recargar datos con el nuevo filtro
+        cargarDatos();
+      }
+    } catch {
+      alert('❌ Error al guardar IP');
+    } finally {
+      setActualizandoIP(false);
+    }
+  };
+
+  // Toggle filtro IP
+  const toggleFiltroIP = () => {
+    const nuevoEstado = !filtroIPActivo;
+    setFiltroIPActivo(nuevoEstado);
+    // Guardar preferencia y recargar
+    localStorage.setItem('filtroMiIPActivo', nuevoEstado.toString());
+    cargarDatos(nuevoEstado);
+  };
+
+  const cargarDatos = useCallback(async (excluirIP?: boolean) => {
     setLoading(true);
     setError(null);
 
+    const usarFiltro = excluirIP !== undefined ? excluirIP : filtroIPActivo;
+
     try {
-      const response = await fetch('/api/analytics/stats?limite=100');
+      const url = `/api/analytics/stats?limite=500${usarFiltro ? '&excluir_mi_ip=true' : ''}`;
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status}`);
       }
@@ -80,11 +179,17 @@ export default function DashboardAnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [filtroIPActivo]);
 
   useEffect(() => {
+    // Cargar preferencia de localStorage
+    const prefLocal = localStorage.getItem('filtroMiIPActivo');
+    if (prefLocal !== null) {
+      setFiltroIPActivo(prefLocal === 'true');
+    }
+    cargarConfigIP();
     cargarDatos();
-  }, [cargarDatos]);
+  }, [cargarConfigIP, cargarDatos]);
 
   // Calcular usos de hoy
   const calcularUsosHoy = () => {
@@ -110,6 +215,184 @@ export default function DashboardAnalyticsPage() {
     return num.toLocaleString('es-ES');
   };
 
+  // Extraer navegador del User Agent
+  const extraerNavegador = (userAgent: string | null): string => {
+    if (!userAgent) return 'Desconocido';
+    if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) return 'Chrome';
+    if (userAgent.includes('Edg')) return 'Edge';
+    if (userAgent.includes('Firefox')) return 'Firefox';
+    if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) return 'Safari';
+    if (userAgent.includes('Opera') || userAgent.includes('OPR')) return 'Opera';
+    return 'Otro';
+  };
+
+  // Extraer SO
+  const extraerSO = (platform: string | null): string => {
+    if (!platform) return 'Desconocido';
+    if (platform.includes('Win')) return 'Windows';
+    if (platform.includes('Mac')) return 'macOS';
+    if (platform.includes('Linux')) return 'Linux';
+    if (platform.includes('Android')) return 'Android';
+    if (platform.includes('iPhone') || platform.includes('iPad')) return 'iOS';
+    return 'Otro';
+  };
+
+  // Datos para gráfico de tendencia (últimos 30 días)
+  const getTendenciaData = () => {
+    if (!datos?.data) return null;
+
+    const hoy = new Date();
+    const hace30Dias = new Date(hoy);
+    hace30Dias.setDate(hoy.getDate() - 30);
+
+    const usosPorDia: { [key: string]: number } = {};
+
+    datos.data.forEach((registro) => {
+      const partes = registro.timestamp.split(' ');
+      if (partes.length !== 2) return;
+
+      const [fecha] = partes;
+      const [dia, mes, anio] = fecha.split('/');
+      const fechaObj = new Date(`${anio}-${mes}-${dia}`);
+
+      if (fechaObj >= hace30Dias) {
+        const diaKey = fechaObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+        usosPorDia[diaKey] = (usosPorDia[diaKey] || 0) + 1;
+      }
+    });
+
+    // Generar array de últimos 30 días
+    const labels: string[] = [];
+    const valores: number[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const fecha = new Date(hoy);
+      fecha.setDate(hoy.getDate() - i);
+      const dia = fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+      labels.push(dia);
+      valores.push(usosPorDia[dia] || 0);
+    }
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Usos por Día',
+          data: valores,
+          borderColor: '#2E86AB',
+          backgroundColor: 'rgba(46, 134, 171, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.3,
+        },
+      ],
+    };
+  };
+
+  // Datos para gráfico de navegadores
+  const getNavegadoresData = () => {
+    if (!datos?.data) return null;
+
+    const navegadores: { [key: string]: number } = {};
+    datos.data.forEach((registro) => {
+      const nav = extraerNavegador(registro.navegador);
+      navegadores[nav] = (navegadores[nav] || 0) + 1;
+    });
+
+    const sorted = Object.entries(navegadores)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    return {
+      labels: sorted.map(([nombre]) => nombre),
+      datasets: [
+        {
+          data: sorted.map(([, count]) => count),
+          backgroundColor: ['#2E86AB', '#48A9A6', '#7FB3D3', '#A6D4E0', '#C6E5ED'],
+        },
+      ],
+    };
+  };
+
+  // Datos para gráfico de SO
+  const getSOData = () => {
+    if (!datos?.data) return null;
+
+    const sistemas: { [key: string]: number } = {};
+    datos.data.forEach((registro) => {
+      const so = extraerSO(registro.sistema_operativo);
+      sistemas[so] = (sistemas[so] || 0) + 1;
+    });
+
+    const sorted = Object.entries(sistemas)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    return {
+      labels: sorted.map(([nombre]) => nombre),
+      datasets: [
+        {
+          data: sorted.map(([, count]) => count),
+          backgroundColor: ['#2E86AB', '#48A9A6', '#7FB3D3', '#A6D4E0', '#C6E5ED'],
+        },
+      ],
+    };
+  };
+
+  // Datos para gráfico de resoluciones
+  const getResolucionesData = () => {
+    if (!datos?.data) return null;
+
+    const resoluciones: { [key: string]: number } = {};
+    datos.data.forEach((registro) => {
+      if (registro.resolucion) {
+        resoluciones[registro.resolucion] = (resoluciones[registro.resolucion] || 0) + 1;
+      }
+    });
+
+    const sorted = Object.entries(resoluciones)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    return {
+      labels: sorted.map(([res]) => res),
+      datasets: [
+        {
+          label: 'Usos',
+          data: sorted.map(([, count]) => count),
+          backgroundColor: 'rgba(72, 169, 166, 0.7)',
+          borderColor: '#48A9A6',
+          borderWidth: 2,
+        },
+      ],
+    };
+  };
+
+  // Datos para gráfico de dispositivos
+  const getDispositivosData = () => {
+    if (!datos?.estadisticas) return null;
+
+    const { dispositivos } = datos.estadisticas;
+    const data = [];
+    const labels = [];
+    const colors = [];
+
+    if (dispositivos.movil.total > 0) {
+      labels.push('Móvil');
+      data.push(dispositivos.movil.total);
+      colors.push('#2E86AB');
+    }
+    if (dispositivos.escritorio.total > 0) {
+      labels.push('Escritorio');
+      data.push(dispositivos.escritorio.total);
+      colors.push('#48A9A6');
+    }
+
+    return {
+      labels,
+      datasets: [{ data, backgroundColor: colors }],
+    };
+  };
+
   if (loading && !datos) {
     return (
       <div className={styles.container}>
@@ -130,13 +413,19 @@ export default function DashboardAnalyticsPage() {
           <span className={styles.errorIcon}>❌</span>
           <h2>Error al cargar datos</h2>
           <p>{error}</p>
-          <button onClick={cargarDatos} className={styles.btnPrimary}>
+          <button onClick={() => cargarDatos()} className={styles.btnPrimary}>
             Reintentar
           </button>
         </div>
       </div>
     );
   }
+
+  const tendenciaData = getTendenciaData();
+  const navegadoresData = getNavegadoresData();
+  const soData = getSOData();
+  const resolucionesData = getResolucionesData();
+  const dispositivosData = getDispositivosData();
 
   return (
     <div className={styles.container}>
@@ -149,15 +438,45 @@ export default function DashboardAnalyticsPage() {
           <span className={styles.versionBadge}>v3.0 Turso</span>
         </h1>
         <p className={styles.subtitle}>Sistema de métricas de uso de aplicaciones web</p>
+
         <div className={styles.headerControls}>
           <button
-            onClick={cargarDatos}
+            onClick={() => cargarDatos()}
             className={styles.btnRefresh}
             disabled={loading}
           >
             <span className={loading ? styles.spinning : ''}>↻</span>
             {loading ? 'Actualizando...' : 'Actualizar Datos'}
           </button>
+
+          {/* Filtro de IP */}
+          <div className={styles.ipFilter}>
+            <label className={styles.filterToggle}>
+              <input
+                type="checkbox"
+                checked={filtroIPActivo}
+                onChange={toggleFiltroIP}
+              />
+              <span>🧪 Excluir mi IP de desarrollo</span>
+            </label>
+            <div className={styles.ipInfo}>
+              <span className={styles.ipText}>
+                {ipConfig?.ip_excluida
+                  ? `IP: ${ipConfig.ip_excluida.substring(0, 15)}${ipConfig.ip_excluida.length > 15 ? '...' : ''}`
+                  : ipConfig?.ip_actual
+                  ? `Tu IP: ${ipConfig.ip_actual.substring(0, 15)}...`
+                  : 'IP: No configurada'}
+              </span>
+              <button
+                onClick={guardarMiIP}
+                className={styles.btnUpdateIP}
+                disabled={actualizandoIP}
+                title="Guardar mi IP actual para excluirla"
+              >
+                {actualizandoIP ? '...' : '🔄 Actualizar IP'}
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -168,6 +487,12 @@ export default function DashboardAnalyticsPage() {
           onClick={() => setTabActiva('general')}
         >
           📊 Visión General
+        </button>
+        <button
+          className={`${styles.tabButton} ${tabActiva === 'tecnico' ? styles.active : ''}`}
+          onClick={() => setTabActiva('tecnico')}
+        >
+          💻 Análisis Técnico
         </button>
         <button
           className={`${styles.tabButton} ${tabActiva === 'ranking' ? styles.active : ''}`}
@@ -229,6 +554,24 @@ export default function DashboardAnalyticsPage() {
             </div>
           </section>
 
+          {/* Gráfico de Tendencia */}
+          {tendenciaData && (
+            <section className={styles.section}>
+              <h2>📈 Tendencia de Uso (Últimos 30 Días)</h2>
+              <div className={styles.chartContainer}>
+                <Line
+                  data={tendenciaData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+                  }}
+                />
+              </div>
+            </section>
+          )}
+
           {/* Dispositivos */}
           <section className={styles.section}>
             <h2>📱 Distribución por Dispositivo</h2>
@@ -273,6 +616,111 @@ export default function DashboardAnalyticsPage() {
               </div>
             </section>
           )}
+        </div>
+      )}
+
+      {/* Tab: Análisis Técnico */}
+      {tabActiva === 'tecnico' && datos && (
+        <div className={styles.tabContent}>
+          {/* Stats de dispositivos */}
+          <section className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}>📱</div>
+              <div className={styles.statContent}>
+                <h3>{formatearNumero(datos.estadisticas.dispositivos.movil.total)}</h3>
+                <p>Móvil ({datos.estadisticas.dispositivos.movil.porcentaje}%)</p>
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}>🖥️</div>
+              <div className={styles.statContent}>
+                <h3>{formatearNumero(datos.estadisticas.dispositivos.escritorio.total)}</h3>
+                <p>Escritorio ({datos.estadisticas.dispositivos.escritorio.porcentaje}%)</p>
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}>🆕</div>
+              <div className={styles.statContent}>
+                <h3>{formatearNumero(datos.estadisticas.usuarios.nuevos.total)}</h3>
+                <p>Nuevos Usuarios</p>
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}>🔁</div>
+              <div className={styles.statContent}>
+                <h3>{formatearNumero(datos.estadisticas.usuarios.recurrentes.total)}</h3>
+                <p>Usuarios Recurrentes</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Gráficos técnicos */}
+          <div className={styles.chartsGrid}>
+            {dispositivosData && (
+              <section className={styles.chartSection}>
+                <h2>📱 Tipo de Dispositivo</h2>
+                <div className={styles.chartContainerSmall}>
+                  <Doughnut
+                    data={dispositivosData}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: { legend: { position: 'bottom' } },
+                    }}
+                  />
+                </div>
+              </section>
+            )}
+
+            {navegadoresData && (
+              <section className={styles.chartSection}>
+                <h2>🌐 Navegadores</h2>
+                <div className={styles.chartContainerSmall}>
+                  <Doughnut
+                    data={navegadoresData}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: { legend: { position: 'bottom' } },
+                    }}
+                  />
+                </div>
+              </section>
+            )}
+
+            {soData && (
+              <section className={styles.chartSection}>
+                <h2>💻 Sistemas Operativos</h2>
+                <div className={styles.chartContainerSmall}>
+                  <Doughnut
+                    data={soData}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: { legend: { position: 'bottom' } },
+                    }}
+                  />
+                </div>
+              </section>
+            )}
+
+            {resolucionesData && (
+              <section className={styles.chartSection}>
+                <h2>📐 Resoluciones</h2>
+                <div className={styles.chartContainerSmall}>
+                  <Bar
+                    data={resolucionesData}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: { legend: { display: false } },
+                      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+                    }}
+                  />
+                </div>
+              </section>
+            )}
+          </div>
         </div>
       )}
 
@@ -333,7 +781,7 @@ export default function DashboardAnalyticsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {datos.data.map((registro) => (
+                  {datos.data.slice(0, 100).map((registro) => (
                     <tr key={registro.id}>
                       <td>{registro.id}</td>
                       <td>
@@ -361,6 +809,9 @@ export default function DashboardAnalyticsPage() {
         <span className={loading ? styles.statusLoading : styles.statusSuccess}>
           {loading ? '⏳ Cargando...' : '✅ Conectado'}
         </span>
+        {filtroIPActivo && ipConfig?.ip_excluida && (
+          <span className={styles.filterActive}>🧪 Filtro IP activo</span>
+        )}
         <span className={styles.lastUpdate}>
           Última actualización: {ultimaActualizacion || '-'}
         </span>

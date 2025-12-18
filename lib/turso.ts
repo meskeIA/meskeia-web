@@ -74,6 +74,18 @@ export async function initializeDatabase() {
   await client.execute(
     'CREATE INDEX IF NOT EXISTS idx_created_at ON uso_aplicaciones(created_at)'
   );
+  await client.execute(
+    'CREATE INDEX IF NOT EXISTS idx_ip_address ON uso_aplicaciones(ip_address)'
+  );
+
+  // Tabla de configuración (para IP excluida, etc.)
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS analytics_config (
+      clave TEXT PRIMARY KEY,
+      valor TEXT,
+      actualizado TEXT DEFAULT (datetime('now', 'localtime'))
+    )
+  `);
 
   return true;
 }

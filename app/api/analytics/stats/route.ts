@@ -38,8 +38,25 @@ export async function GET(request: NextRequest) {
     const desde = searchParams.get('desde');
     const hasta = searchParams.get('hasta');
     const limite = parseInt(searchParams.get('limite') || '100', 10);
+    const excluirMiIP = searchParams.get('excluir_mi_ip') === 'true';
 
     const client = getTursoClient();
+
+    // Obtener IP excluida si el filtro está activo
+    let ipExcluida = '';
+    if (excluirMiIP) {
+      try {
+        const configResult = await client.execute({
+          sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+          args: [],
+        });
+        if (configResult.rows.length > 0) {
+          ipExcluida = String(configResult.rows[0].valor);
+        }
+      } catch {
+        // Ignorar error si la tabla no existe aún
+      }
+    }
 
     // Construir query con filtros
     let sql = 'SELECT * FROM uso_aplicaciones WHERE 1=1';
@@ -56,6 +73,10 @@ export async function GET(request: NextRequest) {
     if (hasta) {
       sql += ' AND timestamp <= ?';
       args.push(hasta);
+    }
+    if (ipExcluida) {
+      sql += ' AND (ip_address IS NULL OR ip_address != ?)';
+      args.push(ipExcluida);
     }
 
     sql += ' ORDER BY id DESC LIMIT ?';
@@ -97,6 +118,10 @@ export async function GET(request: NextRequest) {
       sqlStats += ' AND timestamp <= ?';
       statsArgs.push(hasta);
     }
+    if (ipExcluida) {
+      sqlStats += ' AND (ip_address IS NULL OR ip_address != ?)';
+      statsArgs.push(ipExcluida);
+    }
 
     const statsResult = await client.execute({ sql: sqlStats, args: statsArgs });
     const stats = statsResult.rows[0];
@@ -112,17 +137,24 @@ export async function GET(request: NextRequest) {
     const porcentajeEscritorio = total > 0 ? Math.round((totalEscritorio / total) * 1000) / 10 : 0;
     const porcentajeRecurrentes = total > 0 ? Math.round((totalRecurrentes / total) * 1000) / 10 : 0;
 
-    // Ranking de aplicaciones
-    const rankingResult = await client.execute(`
+    // Ranking de aplicaciones (con filtro de IP si está activo)
+    let rankingSql = `
       SELECT
         aplicacion,
         COUNT(*) as total_usos,
         MAX(timestamp) as ultimo_uso,
         AVG(CASE WHEN duracion_segundos IS NOT NULL THEN duracion_segundos END) as duracion_promedio_segundos
       FROM uso_aplicaciones
-      GROUP BY aplicacion
-      ORDER BY total_usos DESC
-    `);
+      WHERE 1=1
+    `;
+    const rankingArgs: string[] = [];
+    if (ipExcluida) {
+      rankingSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+      rankingArgs.push(ipExcluida);
+    }
+    rankingSql += ' GROUP BY aplicacion ORDER BY total_usos DESC';
+
+    const rankingResult = await client.execute({ sql: rankingSql, args: rankingArgs });
 
     const rankingAplicaciones = rankingResult.rows.map((app) => {
       const usos = Number(app.total_usos);
@@ -142,34 +174,44 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // Estadísticas geográficas
-    const paisesResult = await client.execute(`
+    // Estadísticas geográficas (con filtro de IP si está activo)
+    let paisesSql = `
       SELECT pais, COUNT(*) as total
       FROM uso_aplicaciones
       WHERE pais IS NOT NULL AND pais != ''
-      GROUP BY pais
-      ORDER BY total DESC
-      LIMIT 10
-    `);
+    `;
+    const paisesArgs: string[] = [];
+    if (ipExcluida) {
+      paisesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+      paisesArgs.push(ipExcluida);
+    }
+    paisesSql += ' GROUP BY pais ORDER BY total DESC LIMIT 10';
+    const paisesResult = await client.execute({ sql: paisesSql, args: paisesArgs });
 
-    const ciudadesResult = await client.execute(`
+    let ciudadesSql = `
       SELECT ciudad, COUNT(*) as total
       FROM uso_aplicaciones
       WHERE ciudad IS NOT NULL AND ciudad != ''
-      GROUP BY ciudad
-      ORDER BY total DESC
-      LIMIT 10
-    `);
+    `;
+    const ciudadesArgs: string[] = [];
+    if (ipExcluida) {
+      ciudadesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+      ciudadesArgs.push(ipExcluida);
+    }
+    ciudadesSql += ' GROUP BY ciudad ORDER BY total DESC LIMIT 10';
+    const ciudadesResult = await client.execute({ sql: ciudadesSql, args: ciudadesArgs });
 
     return NextResponse.json(
       {
         status: 'success',
-        version: 'v2.1-turso',
+        version: 'v3.0-turso',
         filtros: {
           aplicacion,
           desde,
           hasta,
           limite,
+          excluir_mi_ip: excluirMiIP,
+          ip_excluida: ipExcluida || null,
         },
         estadisticas: {
           total_usos: total,
