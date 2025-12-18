@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 173,
-  "updated": "2025-12-17",
+  "total_tools": 174,
+  "updated": "2025-12-18",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -194,6 +194,7 @@
         { "name": "Calculadora de Probabilidad", "slug": "calculadora-probabilidad", "url": "https://meskeia.com/calculadora-probabilidad/", "description": "Probabilidades con teoría y simulaciones" },
         { "name": "Calculadora MCD y MCM", "slug": "calculadora-mcd-mcm", "url": "https://meskeia.com/calculadora-mcd-mcm/", "description": "Máximo Común Divisor y Mínimo Común Múltiplo" },
         { "name": "Calculadora Estadística", "slug": "calculadora-estadistica", "url": "https://meskeia.com/calculadora-estadistica/", "description": "Media, mediana, desviación estándar" },
+        { "name": "Estadística Avanzada", "slug": "estadistica-avanzada", "url": "https://meskeia.com/estadistica-avanzada/", "description": "Tests t-Student, Chi², regresión, correlación, intervalos de confianza" },
         { "name": "Calculadora Matemática Avanzada", "slug": "calculadora-matematica", "url": "https://meskeia.com/calculadora-matematica/", "description": "Ecuaciones, matrices, derivadas e integrales" },
         { "name": "Calculadora de Ecuaciones", "slug": "algebra-ecuaciones", "url": "https://meskeia.com/algebra-ecuaciones/", "description": "Ecuaciones lineales, cuadráticas y sistemas" },
         { "name": "Calculadora de Geometría", "slug": "calculadora-geometria", "url": "https://meskeia.com/calculadora-geometria/", "description": "Áreas, perímetros y volúmenes" },

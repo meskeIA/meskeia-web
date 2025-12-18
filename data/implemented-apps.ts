@@ -53,6 +53,7 @@ export const implementedAppsUrls = [
   "/calculadora-mcd-mcm/",
   "/calculadora-probabilidad/",
   "/calculadora-estadistica/",
+  "/estadistica-avanzada/",
   "/calculadora-matematica/",
   "/calculadora-geometria/",
   "/calculadora-calculo/",

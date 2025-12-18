@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 179+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 180+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 179,
+  "total_tools": 180,
   "last_updated": "2025-12-18",
   "features": {
     "all_free": true,
@@ -77,7 +77,7 @@
       "name": "Matemáticas y Estadística",
       "icon": "📐",
       "description": "Álgebra, cálculo, probabilidad y análisis de datos",
-      "tool_count": 11
+      "tool_count": 12
     },
     {
       "id": "productividad",
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 71
+      "tool_count": 72
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 56
+      "tool_count": 57
     },
     {
       "id": "casa",
@@ -2550,6 +2550,30 @@
         "datos"
       ],
       "icon": "📐"
+    },
+    {
+      "slug": "estadistica-avanzada",
+      "name": "Estadística Avanzada",
+      "url": "https://meskeia.com/estadistica-avanzada/",
+      "description": "Tests de hipótesis (t-Student, Chi²), regresión lineal, correlación Pearson/Spearman, intervalos de confianza y análisis de normalidad",
+      "category": "Matemáticas y Estadística",
+      "contexts": [
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "estadistica avanzada",
+        "test t",
+        "chi cuadrado",
+        "regresion",
+        "correlacion",
+        "pearson",
+        "spearman",
+        "intervalo confianza",
+        "normalidad",
+        "hipotesis"
+      ],
+      "icon": "📊"
     },
     {
       "slug": "calculadora-matematica",
