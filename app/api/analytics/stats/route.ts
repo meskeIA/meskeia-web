@@ -201,10 +201,96 @@ export async function GET(request: NextRequest) {
     ciudadesSql += ' GROUP BY ciudad ORDER BY total DESC LIMIT 10';
     const ciudadesResult = await client.execute({ sql: ciudadesSql, args: ciudadesArgs });
 
+    // ============================================
+    // COMPARATIVA TEMPORAL (nuevo en v3.1)
+    // ============================================
+
+    // Función helper para obtener fecha en formato español DD/MM/YYYY
+    const formatoEspanol = (fecha: Date): string => {
+      const dia = String(fecha.getDate()).padStart(2, '0');
+      const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+      const anio = fecha.getFullYear();
+      return `${dia}/${mes}/${anio}`;
+    };
+
+    const ahora = new Date();
+    const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+    const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+    const hace7Dias = new Date(hoy); hace7Dias.setDate(hoy.getDate() - 7);
+    const hace14Dias = new Date(hoy); hace14Dias.setDate(hoy.getDate() - 14);
+    const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const inicioMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+    const finMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+
+    // Función para contar registros en un rango de fechas (formato español DD/MM/YYYY)
+    const contarEnRango = async (fechaInicio: Date, fechaFin: Date): Promise<number> => {
+      // El timestamp en la DB está en formato "DD/MM/YYYY, HH:MM:SS"
+      // Necesitamos filtrar comparando la parte de fecha
+      let sqlCount = `
+        SELECT COUNT(*) as total
+        FROM uso_aplicaciones
+        WHERE substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) >= ?
+          AND substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) <= ?
+      `;
+      const argsCount: string[] = [
+        `${fechaInicio.getFullYear()}${String(fechaInicio.getMonth() + 1).padStart(2, '0')}${String(fechaInicio.getDate()).padStart(2, '0')}`,
+        `${fechaFin.getFullYear()}${String(fechaFin.getMonth() + 1).padStart(2, '0')}${String(fechaFin.getDate()).padStart(2, '0')}`,
+      ];
+
+      if (ipExcluida) {
+        sqlCount += ' AND (ip_address IS NULL OR ip_address != ?)';
+        argsCount.push(ipExcluida);
+      }
+
+      const result = await client.execute({ sql: sqlCount, args: argsCount });
+      return Number(result.rows[0]?.total) || 0;
+    };
+
+    // Calcular métricas comparativas
+    const usosHoy = await contarEnRango(hoy, hoy);
+    const usosAyer = await contarEnRango(ayer, ayer);
+    const usosUltimos7Dias = await contarEnRango(hace7Dias, hoy);
+    const usosSemanaAnterior = await contarEnRango(hace14Dias, hace7Dias);
+    const usosMesActual = await contarEnRango(inicioMesActual, hoy);
+    const usosMesAnterior = await contarEnRango(inicioMesAnterior, finMesAnterior);
+
+    // Calcular variaciones porcentuales
+    const calcularVariacion = (actual: number, anterior: number): { porcentaje: number; tendencia: 'up' | 'down' | 'neutral' } => {
+      if (anterior === 0) {
+        return { porcentaje: actual > 0 ? 100 : 0, tendencia: actual > 0 ? 'up' : 'neutral' };
+      }
+      const porcentaje = Math.round(((actual - anterior) / anterior) * 100);
+      const tendencia = porcentaje > 0 ? 'up' : porcentaje < 0 ? 'down' : 'neutral';
+      return { porcentaje: Math.abs(porcentaje), tendencia };
+    };
+
+    const comparativa = {
+      hoy: {
+        usos: usosHoy,
+        comparacion: calcularVariacion(usosHoy, usosAyer),
+        etiqueta: 'vs ayer',
+      },
+      semana: {
+        usos: usosUltimos7Dias,
+        comparacion: calcularVariacion(usosUltimos7Dias, usosSemanaAnterior),
+        etiqueta: 'vs semana anterior',
+      },
+      mes: {
+        usos: usosMesActual,
+        comparacion: calcularVariacion(usosMesActual, usosMesAnterior),
+        etiqueta: 'vs mes anterior',
+      },
+      detalles: {
+        ayer: usosAyer,
+        semanaAnterior: usosSemanaAnterior,
+        mesAnterior: usosMesAnterior,
+      },
+    };
+
     return NextResponse.json(
       {
         status: 'success',
-        version: 'v3.0-turso',
+        version: 'v3.1-turso',
         filtros: {
           aplicacion,
           desde,
@@ -233,6 +319,7 @@ export async function GET(request: NextRequest) {
             ciudades: ciudadesResult.rows,
           },
         },
+        comparativa,
         registros_mostrados: registros.length,
         ranking_aplicaciones: rankingAplicaciones,
         data: registros,

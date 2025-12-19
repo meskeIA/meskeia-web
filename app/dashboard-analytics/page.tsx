@@ -34,6 +34,15 @@ ChartJS.register(
   Filler
 );
 
+interface ComparativaItem {
+  usos: number;
+  comparacion: {
+    porcentaje: number;
+    tendencia: 'up' | 'down' | 'neutral';
+  };
+  etiqueta: string;
+}
+
 interface EstadisticasData {
   status: string;
   version: string;
@@ -58,6 +67,16 @@ interface EstadisticasData {
     geografia: {
       paises: Array<{ pais: string; total: number }>;
       ciudades: Array<{ ciudad: string; total: number }>;
+    };
+  };
+  comparativa?: {
+    hoy: ComparativaItem;
+    semana: ComparativaItem;
+    mes: ComparativaItem;
+    detalles: {
+      ayer: number;
+      semanaAnterior: number;
+      mesAnterior: number;
     };
   };
   ranking_aplicaciones: Array<{
@@ -224,22 +243,6 @@ export default function DashboardAnalyticsPage() {
       parseInt(mes, 10) - 1,
       parseInt(dia, 10)
     );
-  };
-
-  // Calcular usos de hoy
-  const calcularUsosHoy = () => {
-    if (!datos?.data) return 0;
-
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-
-    return datos.data.filter((registro) => {
-      const fechaRegistro = parsearTimestamp(registro.timestamp || '');
-      if (!fechaRegistro) return false;
-
-      fechaRegistro.setHours(0, 0, 0, 0);
-      return fechaRegistro.getTime() === hoy.getTime();
-    }).length;
   };
 
   const formatearNumero = (num: number) => {
@@ -544,21 +547,96 @@ export default function DashboardAnalyticsPage() {
       {/* Tab: Visión General */}
       {tabActiva === 'general' && datos && (
         <div className={styles.tabContent}>
-          {/* Stats Cards */}
+          {/* Comparativa Temporal con Alertas Visuales */}
+          {datos.comparativa && (
+            <section className={styles.comparativaSection}>
+              <h2 className={styles.sectionTitle}>📈 Comparativa Temporal</h2>
+              <div className={styles.comparativaGrid}>
+                {/* Hoy vs Ayer */}
+                <div className={`${styles.comparativaCard} ${styles.cardHoy}`}>
+                  <div className={styles.comparativaHeader}>
+                    <span className={styles.comparativaIcon}>🔥</span>
+                    <span className={styles.comparativaLabel}>Hoy</span>
+                  </div>
+                  <div className={styles.comparativaValor}>
+                    {formatearNumero(datos.comparativa.hoy.usos)}
+                  </div>
+                  <div className={`${styles.comparativaTendencia} ${styles[datos.comparativa.hoy.comparacion.tendencia]}`}>
+                    <span className={styles.tendenciaIcono}>
+                      {datos.comparativa.hoy.comparacion.tendencia === 'up' ? '↑' : datos.comparativa.hoy.comparacion.tendencia === 'down' ? '↓' : '→'}
+                    </span>
+                    <span className={styles.tendenciaPorcentaje}>
+                      {datos.comparativa.hoy.comparacion.porcentaje}%
+                    </span>
+                    <span className={styles.tendenciaEtiqueta}>
+                      {datos.comparativa.hoy.etiqueta}
+                    </span>
+                  </div>
+                  <div className={styles.comparativaDetalle}>
+                    Ayer: {formatearNumero(datos.comparativa.detalles.ayer)}
+                  </div>
+                </div>
+
+                {/* Esta semana vs Semana anterior */}
+                <div className={`${styles.comparativaCard} ${styles.cardSemana}`}>
+                  <div className={styles.comparativaHeader}>
+                    <span className={styles.comparativaIcon}>📅</span>
+                    <span className={styles.comparativaLabel}>Últimos 7 días</span>
+                  </div>
+                  <div className={styles.comparativaValor}>
+                    {formatearNumero(datos.comparativa.semana.usos)}
+                  </div>
+                  <div className={`${styles.comparativaTendencia} ${styles[datos.comparativa.semana.comparacion.tendencia]}`}>
+                    <span className={styles.tendenciaIcono}>
+                      {datos.comparativa.semana.comparacion.tendencia === 'up' ? '↑' : datos.comparativa.semana.comparacion.tendencia === 'down' ? '↓' : '→'}
+                    </span>
+                    <span className={styles.tendenciaPorcentaje}>
+                      {datos.comparativa.semana.comparacion.porcentaje}%
+                    </span>
+                    <span className={styles.tendenciaEtiqueta}>
+                      {datos.comparativa.semana.etiqueta}
+                    </span>
+                  </div>
+                  <div className={styles.comparativaDetalle}>
+                    Semana anterior: {formatearNumero(datos.comparativa.detalles.semanaAnterior)}
+                  </div>
+                </div>
+
+                {/* Este mes vs Mes anterior */}
+                <div className={`${styles.comparativaCard} ${styles.cardMes}`}>
+                  <div className={styles.comparativaHeader}>
+                    <span className={styles.comparativaIcon}>📆</span>
+                    <span className={styles.comparativaLabel}>Este mes</span>
+                  </div>
+                  <div className={styles.comparativaValor}>
+                    {formatearNumero(datos.comparativa.mes.usos)}
+                  </div>
+                  <div className={`${styles.comparativaTendencia} ${styles[datos.comparativa.mes.comparacion.tendencia]}`}>
+                    <span className={styles.tendenciaIcono}>
+                      {datos.comparativa.mes.comparacion.tendencia === 'up' ? '↑' : datos.comparativa.mes.comparacion.tendencia === 'down' ? '↓' : '→'}
+                    </span>
+                    <span className={styles.tendenciaPorcentaje}>
+                      {datos.comparativa.mes.comparacion.porcentaje}%
+                    </span>
+                    <span className={styles.tendenciaEtiqueta}>
+                      {datos.comparativa.mes.etiqueta}
+                    </span>
+                  </div>
+                  <div className={styles.comparativaDetalle}>
+                    Mes anterior: {formatearNumero(datos.comparativa.detalles.mesAnterior)}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Stats Cards (métricas generales) */}
           <section className={styles.statsGrid}>
             <div className={styles.statCard}>
               <div className={styles.statIcon}>📊</div>
               <div className={styles.statContent}>
                 <h3>{formatearNumero(datos.estadisticas.total_usos)}</h3>
                 <p>Total de Usos</p>
-              </div>
-            </div>
-
-            <div className={`${styles.statCard} ${styles.highlight}`}>
-              <div className={styles.statIcon}>🔥</div>
-              <div className={styles.statContent}>
-                <h3>{formatearNumero(calcularUsosHoy())}</h3>
-                <p>Usos de Hoy</p>
               </div>
             </div>
 

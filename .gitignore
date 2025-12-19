@@ -54,3 +54,6 @@ desktop.ini
 # scripts de generación de cursos (uso local)
 scripts/generate-curso.js
 scripts/cursos-generados/
+
+# Documentos estratégicos privados (no subir al repo público)
+_private/
