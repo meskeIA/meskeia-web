@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 175,
+  "total_tools": 177,
   "updated": "2025-12-19",
   "features": {
     "all_free": true,
@@ -202,7 +202,9 @@
         { "name": "Calculadora de Trigonometría", "slug": "calculadora-trigonometria", "url": "https://meskeia.com/calculadora-trigonometria/", "description": "Funciones trigonométricas" },
         { "name": "Calculadora Teoría de Números", "slug": "calculadora-teoria-numeros", "url": "https://meskeia.com/calculadora-teoria-numeros/", "description": "Números primos y factorización" },
         { "name": "Calculadora Álgebra Abstracta", "slug": "calculadora-algebra-abstracta", "url": "https://meskeia.com/calculadora-algebra-abstracta/", "description": "Grupos, anillos y campos" },
-        { "name": "Calculadora Teoría de Colas", "slug": "calculadora-teoria-colas", "url": "https://meskeia.com/calculadora-teoria-colas/", "description": "Métricas de sistemas de colas M/M/1" }
+        { "name": "Calculadora Teoría de Colas", "slug": "calculadora-teoria-colas", "url": "https://meskeia.com/calculadora-teoria-colas/", "description": "Métricas de sistemas de colas M/M/1" },
+        { "name": "Calculadora de Distribuciones", "slug": "calculadora-distribuciones", "url": "https://meskeia.com/calculadora-distribuciones/", "description": "Calcula probabilidades con distribuciones Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t-Student" },
+        { "name": "Inferencia Bayesiana", "slug": "inferencia-bayesiana", "url": "https://meskeia.com/inferencia-bayesiana/", "description": "Teorema de Bayes paso a paso: prior, likelihood, posterior y tests diagnósticos" }
       ]
     },
     {

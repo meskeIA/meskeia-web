@@ -48,12 +48,14 @@ export const implementedAppsUrls = [
   "/planificador-boda/",             // Wedding planner: checklist, presupuesto, timeline
   "/planificador-mudanzas/",         // Mudanza: tareas, inventario, presupuesto
 
-  // Matemáticas y Estadística (11 implementadas)
+  // Matemáticas y Estadística (13 implementadas)
   "/algebra-ecuaciones/",            // Calculadora de Ecuaciones
   "/calculadora-mcd-mcm/",
   "/calculadora-probabilidad/",
   "/calculadora-estadistica/",
   "/estadistica-avanzada/",
+  "/calculadora-distribuciones/",    // Distribuciones: Normal, Poisson, Exponencial, etc.
+  "/inferencia-bayesiana/",          // Teorema de Bayes, tests diagnósticos
   "/calculadora-matematica/",
   "/calculadora-geometria/",
   "/calculadora-calculo/",

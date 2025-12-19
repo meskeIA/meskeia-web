@@ -227,7 +227,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Generador de Lotería", category: "Juegos y Entretenimiento", contexts: ["relax", "curiosidad"], icon: "🎲", description: "Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo y Lototurf. Combinaciones al azar y favoritos", url: "/generador-loteria/", keywords: ["loteria", "primitiva", "euromillones", "bonoloto", "numeros", "sorteo", "gordo", "suerte", "combinacion"] },
 
   // ============================================
-  // 9. Matemáticas y Estadística (11)
+  // 9. Matemáticas y Estadística (13)
   // ============================================
   { name: "Calculadora de Probabilidad", category: "Matemáticas y Estadística", contexts: ["estudio"], icon: "📐", description: "Calculadora completa de probabilidades con teoría y simulaciones", url: "/calculadora-probabilidad/", keywords: ["probabilidad", "estadistica", "azar", "combinatoria", "permutaciones"] },
   { name: "Calculadora MCD y MCM", category: "Matemáticas y Estadística", contexts: ["estudio"], icon: "📐", description: "Calcula el Máximo Común Divisor y Mínimo Común Múltiplo de hasta 5 números con explicación paso a paso", url: "/calculadora-mcd-mcm/", keywords: ["mcd", "mcm", "maximo comun divisor", "minimo comun multiplo", "factorizacion", "primos"] },
@@ -241,6 +241,8 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora Teoría de Números", category: "Matemáticas y Estadística", contexts: ["estudio", "curiosidad"], icon: "📐", description: "Números primos, factorización y teoría de números", url: "/calculadora-teoria-numeros/", keywords: ["primos", "factorizacion", "divisores", "numeros"] },
   { name: "Calculadora Álgebra Abstracta", category: "Matemáticas y Estadística", contexts: ["estudio"], icon: "📐", description: "Grupos, anillos, campos y estructuras algebraicas", url: "/calculadora-algebra-abstracta/", keywords: ["grupos", "anillos", "campos", "abstracta"] },
   { name: "Calculadora Teoría de Colas", category: "Matemáticas y Estadística", contexts: ["estudio", "trabajo"], icon: "📐", description: "Calcula métricas de sistemas de colas M/M/1: utilización, tiempos de espera y simulación", url: "/calculadora-teoria-colas/", keywords: ["teoria colas", "mm1", "sistema espera", "utilizacion", "little", "poisson"] },
+  { name: "Calculadora de Distribuciones", category: "Matemáticas y Estadística", contexts: ["estudio", "trabajo"], icon: "📊", description: "Calcula probabilidades con distribuciones Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t-Student. PDF, CDF y cuantiles", url: "/calculadora-distribuciones/", keywords: ["distribucion", "normal", "poisson", "exponencial", "gaussiana", "binomial", "gamma", "beta", "student", "pdf", "cdf", "cuantiles", "probabilidad"] },
+  { name: "Inferencia Bayesiana", category: "Matemáticas y Estadística", contexts: ["estudio", "trabajo"], icon: "🧠", description: "Aplica el teorema de Bayes paso a paso. Calcula probabilidades posteriores, múltiples hipótesis, actualización secuencial y tests diagnósticos", url: "/inferencia-bayesiana/", keywords: ["bayes", "bayesiano", "prior", "posterior", "likelihood", "verosimilitud", "test diagnostico", "probabilidad condicional", "hipotesis"] },
 
   // ============================================
   // 10. Productividad (13)
