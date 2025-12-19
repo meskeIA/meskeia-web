@@ -151,6 +151,16 @@ const textoExtraApps: RelatedApp[] = [
 ];
 
 // ==========================================
+// FAMILIA: CONVERSIÓN DE DATOS
+// ==========================================
+const conversionDatosApps: RelatedApp[] = [
+  { url: '/conversor-formatos/', icon: '🔄', name: 'Conversor Formatos', description: 'JSON, CSV, Excel, XML' },
+  { url: '/codificador-base64/', icon: '🔐', name: 'Base64', description: 'Codifica/decodifica' },
+  { url: '/conversor-markdown-html/', icon: '📄', name: 'Markdown a HTML', description: 'Convierte formatos' },
+  { url: '/generador-json/', icon: '📋', name: 'Generador JSON', description: 'Crea estructuras JSON' },
+];
+
+// ==========================================
 // FAMILIA: CRIPTOGRAFÍA
 // ==========================================
 const criptografiaClasicaApps: RelatedApp[] = [
@@ -422,6 +432,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'cifrado-aes': criptografiaModernaApps.filter(a => a.url !== '/cifrado-aes/'),
   'generador-hashes': criptografiaModernaApps.filter(a => a.url !== '/generador-hashes/'),
   'codificador-base64': criptografiaModernaApps.filter(a => a.url !== '/codificador-base64/'),
+
+  // CONVERSIÓN DE DATOS
+  'conversor-formatos': conversionDatosApps.filter(a => a.url !== '/conversor-formatos/'),
 
   // DISEÑO
   'conversor-colores': disenoColoresApps.filter(a => a.url !== '/conversor-colores/'),
