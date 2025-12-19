@@ -2,26 +2,31 @@
 
 import { useState, useCallback, useRef } from 'react';
 import styles from './CompresorImagenes.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
-// Tipo para formato de salida
-type OutputFormat = 'original' | 'webp' | 'jpeg';
-
-// Tipo para preset de calidad
-type QualityPreset = 'max' | 'balanced' | 'high';
+// Tipos
+type OutputFormat = 'original' | 'webp' | 'jpeg' | 'png';
+type QualityPreset = 'smart' | 'max' | 'balanced' | 'high';
+type ResizeOption = 'none' | '2048' | '1920' | '1280' | '1024' | '800' | 'custom';
 
 // Interface para imagen procesada
 interface ProcessedImage {
   id: string;
   file: File;
   originalSize: number;
+  originalWidth: number;
+  originalHeight: number;
   compressedSize: number | null;
+  compressedWidth: number | null;
+  compressedHeight: number | null;
   compressedBlob: Blob | null;
   compressedUrl: string | null;
+  originalUrl: string;
   status: 'pending' | 'processing' | 'done' | 'error';
   error?: string;
+  autoQuality?: number;
 }
 
 // Función para generar ID único
@@ -36,18 +41,68 @@ const formatSize = (bytes: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 };
 
+// Función para detectar tipo de imagen y sugerir calidad
+const detectImageType = (file: File): 'photo' | 'graphic' | 'screenshot' => {
+  const name = file.name.toLowerCase();
+
+  // Screenshots suelen tener estos patrones
+  if (name.includes('screenshot') || name.includes('captura') || name.includes('screen')) {
+    return 'screenshot';
+  }
+
+  // Gráficos/logos suelen ser PNG pequeños
+  if (file.type === 'image/png' && file.size < 500 * 1024) {
+    return 'graphic';
+  }
+
+  // Por defecto, asumir fotografía
+  return 'photo';
+};
+
+// Calidad sugerida según tipo
+const getSuggestedQuality = (type: 'photo' | 'graphic' | 'screenshot'): number => {
+  switch (type) {
+    case 'photo': return 82;
+    case 'graphic': return 92;
+    case 'screenshot': return 75;
+    default: return 80;
+  }
+};
+
 export default function CompresorImagenesPage() {
+  // Estados principales
   const [images, setImages] = useState<ProcessedImage[]>([]);
   const [quality, setQuality] = useState(80);
   const [outputFormat, setOutputFormat] = useState<OutputFormat>('original');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
+  // Estados de nuevas funcionalidades
+  const [resizeOption, setResizeOption] = useState<ResizeOption>('none');
+  const [customWidth, setCustomWidth] = useState('1600');
+  const [qualityPreset, setQualityPreset] = useState<QualityPreset>('balanced');
+  const [selectedImage, setSelectedImage] = useState<ProcessedImage | null>(null);
+  const [showComparison, setShowComparison] = useState(false);
+  const [comparisonSlider, setComparisonSlider] = useState(50);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Presets de calidad
+  // Obtener ancho máximo según opción
+  const getMaxWidth = (): number | null => {
+    switch (resizeOption) {
+      case 'none': return null;
+      case 'custom': return parseInt(customWidth) || null;
+      default: return parseInt(resizeOption);
+    }
+  };
+
+  // Aplicar preset de calidad
   const applyPreset = (preset: QualityPreset) => {
+    setQualityPreset(preset);
     switch (preset) {
+      case 'smart':
+        // No cambiar calidad, se calculará por imagen
+        break;
       case 'max':
         setQuality(60);
         break;
@@ -55,30 +110,54 @@ export default function CompresorImagenesPage() {
         setQuality(80);
         break;
       case 'high':
-        setQuality(90);
+        setQuality(92);
         break;
     }
   };
 
+  // Cargar dimensiones de una imagen
+  const loadImageDimensions = (file: File): Promise<{ width: number; height: number; url: string }> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        resolve({ width: img.width, height: img.height, url });
+      };
+      img.onerror = () => {
+        resolve({ width: 0, height: 0, url });
+      };
+      img.src = url;
+    });
+  };
+
   // Manejar selección de archivos
-  const handleFileSelect = useCallback((files: FileList | null) => {
+  const handleFileSelect = useCallback(async (files: FileList | null) => {
     if (!files) return;
 
     const newImages: ProcessedImage[] = [];
 
-    Array.from(files).forEach((file) => {
+    for (const file of Array.from(files)) {
       if (file.type.startsWith('image/')) {
+        const { width, height, url } = await loadImageDimensions(file);
+        const imageType = detectImageType(file);
+
         newImages.push({
           id: generateId(),
           file,
           originalSize: file.size,
+          originalWidth: width,
+          originalHeight: height,
           compressedSize: null,
+          compressedWidth: null,
+          compressedHeight: null,
           compressedBlob: null,
           compressedUrl: null,
+          originalUrl: url,
           status: 'pending',
+          autoQuality: getSuggestedQuality(imageType),
         });
       }
-    });
+    }
 
     setImages((prev) => [...prev, ...newImages]);
   }, []);
@@ -120,13 +199,23 @@ export default function CompresorImagenesPage() {
           return;
         }
 
-        canvas.width = img.width;
-        canvas.height = img.height;
+        // Calcular dimensiones finales
+        let finalWidth = img.width;
+        let finalHeight = img.height;
+        const maxWidth = getMaxWidth();
+
+        if (maxWidth && img.width > maxWidth) {
+          const ratio = maxWidth / img.width;
+          finalWidth = maxWidth;
+          finalHeight = Math.round(img.height * ratio);
+        }
+
+        canvas.width = finalWidth;
+        canvas.height = finalHeight;
 
         // Determinar formato de salida
         let mimeType: string;
         if (outputFormat === 'original') {
-          // Mantener formato original, pero usar jpeg para gif (no soporta compresión)
           if (image.file.type === 'image/gif') {
             mimeType = 'image/jpeg';
           } else if (image.file.type === 'image/png') {
@@ -138,6 +227,8 @@ export default function CompresorImagenesPage() {
           }
         } else if (outputFormat === 'webp') {
           mimeType = 'image/webp';
+        } else if (outputFormat === 'png') {
+          mimeType = 'image/png';
         } else {
           mimeType = 'image/jpeg';
         }
@@ -148,10 +239,19 @@ export default function CompresorImagenesPage() {
           ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
-        ctx.drawImage(img, 0, 0);
+        // Usar suavizado de alta calidad para redimensionado
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, finalWidth, finalHeight);
+
+        // Determinar calidad a usar
+        let qualityToUse = quality;
+        if (qualityPreset === 'smart' && image.autoQuality) {
+          qualityToUse = image.autoQuality;
+        }
 
         // Calidad solo aplica a JPEG y WebP
-        const qualityValue = mimeType === 'image/png' ? undefined : quality / 100;
+        const qualityValue = mimeType === 'image/png' ? undefined : qualityToUse / 100;
 
         canvas.toBlob(
           (blob) => {
@@ -160,6 +260,8 @@ export default function CompresorImagenesPage() {
               resolve({
                 ...image,
                 compressedSize: blob.size,
+                compressedWidth: finalWidth,
+                compressedHeight: finalHeight,
                 compressedBlob: blob,
                 compressedUrl: url,
                 status: 'done',
@@ -177,7 +279,7 @@ export default function CompresorImagenesPage() {
         resolve({ ...image, status: 'error', error: 'Error al cargar imagen' });
       };
 
-      img.src = URL.createObjectURL(image.file);
+      img.src = image.originalUrl;
     });
   };
 
@@ -217,10 +319,10 @@ export default function CompresorImagenesPage() {
 
     const extension = outputFormat === 'original'
       ? image.file.name.split('.').pop()
-      : outputFormat === 'webp' ? 'webp' : 'jpg';
+      : outputFormat;
 
     const baseName = image.file.name.replace(/\.[^.]+$/, '');
-    const fileName = `${baseName}_compressed.${extension}`;
+    const fileName = `${baseName}_compressed.${extension === 'jpeg' ? 'jpg' : extension}`;
 
     const link = document.createElement('a');
     link.href = image.compressedUrl;
@@ -233,7 +335,6 @@ export default function CompresorImagenesPage() {
     const completedImages = images.filter((img) => img.status === 'done' && img.compressedBlob);
     if (completedImages.length === 0) return;
 
-    // Importar JSZip dinámicamente
     const JSZip = (await import('jszip')).default;
     const zip = new JSZip();
 
@@ -241,10 +342,10 @@ export default function CompresorImagenesPage() {
       if (image.compressedBlob) {
         const extension = outputFormat === 'original'
           ? image.file.name.split('.').pop()
-          : outputFormat === 'webp' ? 'webp' : 'jpg';
+          : outputFormat;
 
         const baseName = image.file.name.replace(/\.[^.]+$/, '');
-        const fileName = `${baseName}_compressed.${extension}`;
+        const fileName = `${baseName}_compressed.${extension === 'jpeg' ? 'jpg' : extension}`;
 
         zip.file(fileName, image.compressedBlob);
       }
@@ -268,18 +369,35 @@ export default function CompresorImagenesPage() {
       if (image?.compressedUrl) {
         URL.revokeObjectURL(image.compressedUrl);
       }
+      if (image?.originalUrl) {
+        URL.revokeObjectURL(image.originalUrl);
+      }
       return prev.filter((img) => img.id !== id);
     });
+    if (selectedImage?.id === id) {
+      setSelectedImage(null);
+      setShowComparison(false);
+    }
   };
 
   // Limpiar todo
   const clearAll = () => {
     images.forEach((img) => {
-      if (img.compressedUrl) {
-        URL.revokeObjectURL(img.compressedUrl);
-      }
+      if (img.compressedUrl) URL.revokeObjectURL(img.compressedUrl);
+      if (img.originalUrl) URL.revokeObjectURL(img.originalUrl);
     });
     setImages([]);
+    setSelectedImage(null);
+    setShowComparison(false);
+  };
+
+  // Abrir comparación
+  const openComparison = (image: ProcessedImage) => {
+    if (image.status === 'done') {
+      setSelectedImage(image);
+      setShowComparison(true);
+      setComparisonSlider(50);
+    }
   };
 
   // Calcular estadísticas
@@ -301,9 +419,9 @@ export default function CompresorImagenesPage() {
 
       <header className={styles.hero}>
         <span className={styles.heroIcon}>🗜️</span>
-        <h1 className={styles.title}>Compresor de Imágenes por Lotes</h1>
+        <h1 className={styles.title}>Compresor de Imágenes Avanzado</h1>
         <p className={styles.subtitle}>
-          Comprime múltiples imágenes sin límites ni marcas de agua
+          Comprime y redimensiona múltiples imágenes con vista previa y comparación
         </p>
       </header>
 
@@ -331,67 +449,135 @@ export default function CompresorImagenesPage() {
 
         {/* Controles */}
         <div className={styles.controls}>
-          <div className={styles.controlSection}>
-            <h3 className={styles.controlTitle}>Calidad: {quality}%</h3>
-            <input
-              type="range"
-              min="10"
-              max="100"
-              value={quality}
-              onChange={(e) => setQuality(parseInt(e.target.value))}
-              className={styles.slider}
-            />
-            <div className={styles.sliderLabels}>
-              <span>Menor tamaño</span>
-              <span>Mayor calidad</span>
+          {/* Fila 1: Calidad y Presets */}
+          <div className={styles.controlRow}>
+            <div className={styles.controlSection}>
+              <h3 className={styles.controlTitle}>
+                Calidad: {qualityPreset === 'smart' ? 'Auto' : `${quality}%`}
+              </h3>
+              <input
+                type="range"
+                min="10"
+                max="100"
+                value={quality}
+                onChange={(e) => {
+                  setQuality(parseInt(e.target.value));
+                  setQualityPreset('balanced'); // Desactivar smart al mover slider
+                }}
+                className={styles.slider}
+                disabled={qualityPreset === 'smart'}
+              />
+              <div className={styles.sliderLabels}>
+                <span>Menor tamaño</span>
+                <span>Mayor calidad</span>
+              </div>
+            </div>
+
+            <div className={styles.controlSection}>
+              <h3 className={styles.controlTitle}>Presets</h3>
+              <div className={styles.presetButtons}>
+                <button
+                  type="button"
+                  className={`${styles.presetBtn} ${qualityPreset === 'smart' ? styles.presetActive : ''}`}
+                  onClick={() => applyPreset('smart')}
+                  title="Ajusta automáticamente según el tipo de imagen"
+                >
+                  🧠 Inteligente
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.presetBtn} ${qualityPreset === 'max' ? styles.presetActive : ''}`}
+                  onClick={() => applyPreset('max')}
+                >
+                  🚀 Máxima
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.presetBtn} ${qualityPreset === 'balanced' ? styles.presetActive : ''}`}
+                  onClick={() => applyPreset('balanced')}
+                >
+                  ⚖️ Equilibrado
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.presetBtn} ${qualityPreset === 'high' ? styles.presetActive : ''}`}
+                  onClick={() => applyPreset('high')}
+                >
+                  💎 Alta
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className={styles.controlSection}>
-            <h3 className={styles.controlTitle}>Presets</h3>
-            <div className={styles.presetButtons}>
-              <button
-                className={`${styles.presetBtn} ${quality === 60 ? styles.presetActive : ''}`}
-                onClick={() => applyPreset('max')}
-              >
-                🚀 Máxima compresión
-              </button>
-              <button
-                className={`${styles.presetBtn} ${quality === 80 ? styles.presetActive : ''}`}
-                onClick={() => applyPreset('balanced')}
-              >
-                ⚖️ Equilibrado
-              </button>
-              <button
-                className={`${styles.presetBtn} ${quality === 90 ? styles.presetActive : ''}`}
-                onClick={() => applyPreset('high')}
-              >
-                💎 Alta calidad
-              </button>
+          {/* Fila 2: Formato y Redimensionado */}
+          <div className={styles.controlRow}>
+            <div className={styles.controlSection}>
+              <h3 className={styles.controlTitle}>Formato de salida</h3>
+              <div className={styles.formatButtons}>
+                <button
+                  type="button"
+                  className={`${styles.formatBtn} ${outputFormat === 'original' ? styles.formatActive : ''}`}
+                  onClick={() => setOutputFormat('original')}
+                >
+                  Original
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.formatBtn} ${outputFormat === 'webp' ? styles.formatActive : ''}`}
+                  onClick={() => setOutputFormat('webp')}
+                >
+                  WebP
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.formatBtn} ${outputFormat === 'jpeg' ? styles.formatActive : ''}`}
+                  onClick={() => setOutputFormat('jpeg')}
+                >
+                  JPG
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.formatBtn} ${outputFormat === 'png' ? styles.formatActive : ''}`}
+                  onClick={() => setOutputFormat('png')}
+                >
+                  PNG
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className={styles.controlSection}>
-            <h3 className={styles.controlTitle}>Formato de salida</h3>
-            <div className={styles.formatButtons}>
-              <button
-                className={`${styles.formatBtn} ${outputFormat === 'original' ? styles.formatActive : ''}`}
-                onClick={() => setOutputFormat('original')}
-              >
-                Original
-              </button>
-              <button
-                className={`${styles.formatBtn} ${outputFormat === 'webp' ? styles.formatActive : ''}`}
-                onClick={() => setOutputFormat('webp')}
-              >
-                WebP
-              </button>
-              <button
-                className={`${styles.formatBtn} ${outputFormat === 'jpeg' ? styles.formatActive : ''}`}
-                onClick={() => setOutputFormat('jpeg')}
-              >
-                JPG
-              </button>
+            <div className={styles.controlSection}>
+              <h3 className={styles.controlTitle}>Redimensionar</h3>
+              <div className={styles.resizeOptions}>
+                <select
+                  value={resizeOption}
+                  onChange={(e) => setResizeOption(e.target.value as ResizeOption)}
+                  className={styles.resizeSelect}
+                  aria-label="Opción de redimensionado"
+                >
+                  <option value="none">Sin redimensionar</option>
+                  <option value="2048">Máx. 2048px (4K)</option>
+                  <option value="1920">Máx. 1920px (Full HD)</option>
+                  <option value="1280">Máx. 1280px (HD)</option>
+                  <option value="1024">Máx. 1024px (Web)</option>
+                  <option value="800">Máx. 800px (Email)</option>
+                  <option value="custom">Personalizado...</option>
+                </select>
+                {resizeOption === 'custom' && (
+                  <input
+                    type="number"
+                    value={customWidth}
+                    onChange={(e) => setCustomWidth(e.target.value)}
+                    placeholder="Ancho máximo"
+                    className={styles.customWidthInput}
+                    min="100"
+                    max="10000"
+                    aria-label="Ancho máximo personalizado"
+                  />
+                )}
+              </div>
+              <span className={styles.resizeHint}>
+                Solo se redimensionan imágenes más anchas
+              </span>
             </div>
           </div>
         </div>
@@ -401,14 +587,16 @@ export default function CompresorImagenesPage() {
           <div className={styles.imageList}>
             <div className={styles.listHeader}>
               <h3>Imágenes ({stats.total})</h3>
-              <button onClick={clearAll} className={styles.clearBtn}>
+              <button type="button" onClick={clearAll} className={styles.clearBtn}>
                 Limpiar todo
               </button>
             </div>
 
             <div className={styles.listTable}>
               <div className={styles.tableHeader}>
+                <span className={styles.colPreview}>Vista</span>
                 <span className={styles.colName}>Archivo</span>
+                <span className={styles.colDimensions}>Dimensiones</span>
                 <span className={styles.colSize}>Original</span>
                 <span className={styles.colSize}>Comprimido</span>
                 <span className={styles.colReduction}>Reducción</span>
@@ -417,10 +605,31 @@ export default function CompresorImagenesPage() {
 
               {images.map((image) => (
                 <div key={image.id} className={styles.tableRow}>
+                  <span className={styles.colPreview}>
+                    <img
+                      src={image.compressedUrl || image.originalUrl}
+                      alt={image.file.name}
+                      className={styles.thumbnailImg}
+                      onClick={() => image.status === 'done' && openComparison(image)}
+                    />
+                  </span>
                   <span className={styles.colName} title={image.file.name}>
-                    {image.file.name.length > 25
-                      ? image.file.name.substring(0, 22) + '...'
+                    {image.file.name.length > 20
+                      ? image.file.name.substring(0, 17) + '...'
                       : image.file.name}
+                  </span>
+                  <span className={styles.colDimensions}>
+                    {image.status === 'done' && image.compressedWidth && image.compressedHeight ? (
+                      image.originalWidth !== image.compressedWidth ? (
+                        <span className={styles.dimensionsChanged}>
+                          {image.originalWidth}×{image.originalHeight} → {image.compressedWidth}×{image.compressedHeight}
+                        </span>
+                      ) : (
+                        <span>{image.originalWidth}×{image.originalHeight}</span>
+                      )
+                    ) : (
+                      <span>{image.originalWidth}×{image.originalHeight}</span>
+                    )}
                   </span>
                   <span className={styles.colSize}>{formatSize(image.originalSize)}</span>
                   <span className={styles.colSize}>
@@ -436,15 +645,27 @@ export default function CompresorImagenesPage() {
                   </span>
                   <span className={styles.colActions}>
                     {image.status === 'done' && (
-                      <button
-                        className={styles.downloadBtn}
-                        onClick={() => downloadSingle(image)}
-                        title="Descargar"
-                      >
-                        ⬇️
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          className={styles.compareBtn}
+                          onClick={() => openComparison(image)}
+                          title="Comparar antes/después"
+                        >
+                          👁️
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.downloadBtn}
+                          onClick={() => downloadSingle(image)}
+                          title="Descargar"
+                        >
+                          ⬇️
+                        </button>
+                      </>
                     )}
                     <button
+                      type="button"
                       className={styles.removeBtn}
                       onClick={() => removeImage(image.id)}
                       title="Eliminar"
@@ -479,6 +700,7 @@ export default function CompresorImagenesPage() {
             {/* Botones de acción */}
             <div className={styles.actions}>
               <button
+                type="button"
                 onClick={compressAll}
                 className={styles.btnPrimary}
                 disabled={isProcessing || images.length === 0}
@@ -486,7 +708,7 @@ export default function CompresorImagenesPage() {
                 {isProcessing ? 'Comprimiendo...' : `Comprimir ${images.filter(i => i.status !== 'done').length > 0 ? `(${images.filter(i => i.status !== 'done').length})` : 'todo'}`}
               </button>
               {stats.completed > 0 && (
-                <button onClick={downloadAllAsZip} className={styles.btnSecondary}>
+                <button type="button" onClick={downloadAllAsZip} className={styles.btnSecondary}>
                   📥 Descargar todo (ZIP)
                 </button>
               )}
@@ -494,27 +716,109 @@ export default function CompresorImagenesPage() {
           </div>
         )}
 
+        {/* Modal de comparación */}
+        {showComparison && selectedImage && (
+          <div className={styles.comparisonOverlay} onClick={() => setShowComparison(false)}>
+            <div className={styles.comparisonModal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.comparisonHeader}>
+                <h3>Comparación: {selectedImage.file.name}</h3>
+                <button
+                  type="button"
+                  className={styles.closeBtn}
+                  onClick={() => setShowComparison(false)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className={styles.comparisonContent}>
+                <div className={styles.comparisonContainer}>
+                  {/* Imagen original (fondo) */}
+                  <img
+                    src={selectedImage.originalUrl}
+                    alt="Original"
+                    className={styles.comparisonImageBg}
+                  />
+
+                  {/* Imagen comprimida (recortada) */}
+                  <div
+                    className={styles.comparisonImageFg}
+                    style={{ width: `${comparisonSlider}%` }}
+                  >
+                    <img
+                      src={selectedImage.compressedUrl || ''}
+                      alt="Comprimida"
+                    />
+                  </div>
+
+                  {/* Slider */}
+                  <div
+                    className={styles.comparisonSlider}
+                    style={{ left: `${comparisonSlider}%` }}
+                  >
+                    <div className={styles.sliderHandle}>
+                      <span>◀ ▶</span>
+                    </div>
+                  </div>
+
+                  {/* Control del slider */}
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={comparisonSlider}
+                    onChange={(e) => setComparisonSlider(parseInt(e.target.value))}
+                    className={styles.comparisonRangeInput}
+                    aria-label="Comparar original y comprimida"
+                  />
+                </div>
+
+                {/* Etiquetas */}
+                <div className={styles.comparisonLabels}>
+                  <span className={styles.labelOriginal}>
+                    Original: {formatSize(selectedImage.originalSize)}
+                    {selectedImage.originalWidth && ` (${selectedImage.originalWidth}×${selectedImage.originalHeight})`}
+                  </span>
+                  <span className={styles.labelCompressed}>
+                    Comprimida: {formatSize(selectedImage.compressedSize || 0)}
+                    {selectedImage.compressedWidth && ` (${selectedImage.compressedWidth}×${selectedImage.compressedHeight})`}
+                  </span>
+                </div>
+
+                {/* Reducción destacada */}
+                {selectedImage.compressedSize && (
+                  <div className={styles.comparisonStats}>
+                    <span className={styles.comparisonReduction}>
+                      Reducción: -{formatNumber(((selectedImage.originalSize - selectedImage.compressedSize) / selectedImage.originalSize) * 100, 1)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Características */}
         <div className={styles.features}>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>♾️</span>
-            <h4>Sin límites</h4>
-            <p>Comprime tantas imágenes como quieras, sin restricciones de cantidad ni tamaño</p>
+            <span className={styles.featureIcon}>🧠</span>
+            <h4>Modo Inteligente</h4>
+            <p>Detecta automáticamente el tipo de imagen y aplica la calidad óptima</p>
+          </div>
+          <div className={styles.featureCard}>
+            <span className={styles.featureIcon}>📐</span>
+            <h4>Redimensionado</h4>
+            <p>Reduce el tamaño de imágenes grandes automáticamente</p>
+          </div>
+          <div className={styles.featureCard}>
+            <span className={styles.featureIcon}>👁️</span>
+            <h4>Comparación Visual</h4>
+            <p>Compara antes y después con slider interactivo</p>
           </div>
           <div className={styles.featureCard}>
             <span className={styles.featureIcon}>🔒</span>
             <h4>100% Privado</h4>
-            <p>Tus imágenes se procesan en tu navegador, nunca se suben a ningún servidor</p>
-          </div>
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>⚡</span>
-            <h4>Rápido</h4>
-            <p>Procesamiento instantáneo usando la potencia de tu dispositivo</p>
-          </div>
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🚫</span>
-            <h4>Sin marca de agua</h4>
-            <p>Descarga tus imágenes limpias, sin logos ni marcas añadidas</p>
+            <p>Todo se procesa en tu navegador, nada se sube a servidores</p>
           </div>
         </div>
       </div>
@@ -605,6 +909,13 @@ export default function CompresorImagenesPage() {
 
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
+              <h4>¿Qué es el modo inteligente?</h4>
+              <p>
+                Analiza cada imagen y detecta si es una fotografía, gráfico o captura de pantalla.
+                Aplica automáticamente la calidad óptima: 82% para fotos, 92% para gráficos, 75% para capturas.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
               <h4>¿Se pierde calidad al comprimir?</h4>
               <p>
                 Depende del nivel de compresión. Con calidad al 80% la pérdida es imperceptible
@@ -612,25 +923,17 @@ export default function CompresorImagenesPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
+              <h4>¿Cuándo debo redimensionar?</h4>
+              <p>
+                Si tus imágenes son para web, raramente necesitas más de 1920px de ancho.
+                Una foto de 4000px se puede reducir a 1280px ahorrando mucho espacio sin perder calidad visible.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
               <h4>¿Mis imágenes son seguras?</h4>
               <p>
                 Sí, 100%. Todo el procesamiento ocurre en tu navegador. Tus imágenes nunca
                 salen de tu dispositivo ni se envían a ningún servidor.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Hay límite de imágenes o tamaño?</h4>
-              <p>
-                No hay límites artificiales. Puedes comprimir tantas imágenes como tu navegador
-                pueda manejar. Para lotes muy grandes (+100 imágenes), recomendamos procesarlas
-                en grupos.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Qué calidad debo usar?</h4>
-              <p>
-                Para web: 70-80%. Para redes sociales: 80-85%. Para impresión o archivo: 90-95%.
-                Usa el preset &quot;Equilibrado&quot; (80%) si no estás seguro.
               </p>
             </div>
           </div>
