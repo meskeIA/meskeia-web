@@ -86,7 +86,7 @@ export const implementedAppsUrls = [
   "/analizador-espectro/",         // Analizador de espectro de audio FFT
   "/nivel-burbuja/",               // Nivel de burbuja digital + inclinómetro
 
-  // Texto y Documentos (13 implementadas)
+  // Texto y Documentos (14 implementadas)
   "/contador-palabras/",
   "/conversor-texto/",
   "/limpiador-texto/",
@@ -100,6 +100,7 @@ export const implementedAppsUrls = [
   "/generador-anagramas/",
   "/generador-lorem-ipsum/",    // Generador de texto de prueba
   "/contador-silabas/",         // Separar y contar sílabas en español
+  "/conversor-formatos/",       // JSON, CSV, Excel, XML, YAML
 
   // Criptografía y Seguridad (7 implementadas)
   "/cifrado-clasico/",          // César + ROT13 + Atbash

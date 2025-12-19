@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 174,
-  "updated": "2025-12-18",
+  "total_tools": 175,
+  "updated": "2025-12-19",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -270,7 +270,8 @@
         { "name": "Conversor Braille", "slug": "conversor-braille", "url": "https://meskeia.com/conversor-braille/", "description": "Texto a Braille español" },
         { "name": "Generador de Anagramas", "slug": "generador-anagramas", "url": "https://meskeia.com/generador-anagramas/", "description": "Encuentra palabras con tus letras" },
         { "name": "Generador Lorem Ipsum", "slug": "generador-lorem-ipsum", "url": "https://meskeia.com/generador-lorem-ipsum/", "description": "Genera texto Lorem Ipsum" },
-        { "name": "Contador de Sílabas", "slug": "contador-silabas", "url": "https://meskeia.com/contador-silabas/", "description": "Cuenta y separa sílabas en español" }
+        { "name": "Contador de Sílabas", "slug": "contador-silabas", "url": "https://meskeia.com/contador-silabas/", "description": "Cuenta y separa sílabas en español" },
+        { "name": "Conversor de Formatos", "slug": "conversor-formatos", "url": "https://meskeia.com/conversor-formatos/", "description": "Convierte entre JSON, CSV, Excel, XML y YAML" }
       ]
     }
   ],

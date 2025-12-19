@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 180+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 181+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 180,
+  "total_tools": 181,
   "last_updated": "2025-12-19",
   "features": {
     "all_free": true,
@@ -98,7 +98,7 @@
       "name": "Texto y Conversores",
       "icon": "📝",
       "description": "Procesa, formatea y convierte texto",
-      "tool_count": 14
+      "tool_count": 15
     }
   ],
   "moments": [
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 72
+      "tool_count": 73
     },
     {
       "id": "estudio",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 45
+      "tool_count": 46
     },
     {
       "id": "relax",
@@ -3779,6 +3779,30 @@
         "dummy text"
       ],
       "icon": "📄"
+    },
+    {
+      "slug": "conversor-formatos",
+      "name": "Conversor de Formatos",
+      "url": "https://meskeia.com/conversor-formatos/",
+      "description": "Convierte archivos entre JSON, CSV, Excel, XML y YAML. 100% privado, todo se procesa en tu navegador",
+      "category": "Texto y Conversores",
+      "contexts": [
+        "trabajo",
+        "creando"
+      ],
+      "keywords": [
+        "json",
+        "csv",
+        "excel",
+        "xml",
+        "yaml",
+        "convertir",
+        "formatos",
+        "datos",
+        "exportar",
+        "importar"
+      ],
+      "icon": "🔄"
     },
     {
       "slug": "contador-silabas",
