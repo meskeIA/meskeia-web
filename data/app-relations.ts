@@ -59,7 +59,8 @@ const finanzasInversionApps: RelatedApp[] = [
   { url: '/interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Crecimiento de inversiones' },
   { url: '/calculadora-inversiones/', icon: '💹', name: 'Calculadora Inversiones', description: 'Rentabilidad y riesgo' },
   { url: '/test-perfil-inversor/', icon: '🎯', name: 'Perfil Inversor', description: 'Descubre tu perfil' },
-  { url: '/calculadora-tir-van/', icon: '📊', name: 'TIR y VAN', description: 'Análisis de proyectos' },
+  { url: '/simulador-cartera-inversion/', icon: '📊', name: 'Simulador Cartera', description: 'Monte Carlo y Sharpe' },
+  { url: '/calculadora-tir-van/', icon: '📉', name: 'TIR y VAN', description: 'Análisis de proyectos' },
 ];
 
 const finanzasHipotecaApps: RelatedApp[] = [
@@ -372,6 +373,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'interes-compuesto': finanzasInversionApps.filter(a => a.url !== '/interes-compuesto/'),
   'calculadora-inversiones': finanzasInversionApps.filter(a => a.url !== '/calculadora-inversiones/'),
   'test-perfil-inversor': finanzasInversionApps.filter(a => a.url !== '/test-perfil-inversor/'),
+  'simulador-cartera-inversion': finanzasInversionApps.filter(a => a.url !== '/simulador-cartera-inversion/'),
   'calculadora-tir-van': finanzasInversionApps.filter(a => a.url !== '/calculadora-tir-van/'),
 
   // FINANZAS - HIPOTECA

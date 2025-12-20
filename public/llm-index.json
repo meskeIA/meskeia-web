@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 186+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 187+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 186,
+  "total_tools": 187,
   "last_updated": "2025-12-20",
   "features": {
     "all_free": true,
@@ -49,7 +49,7 @@
       "name": "Finanzas Personales",
       "icon": "💰",
       "description": "Inversiones, ahorro y planificación financiera",
-      "tool_count": 14
+      "tool_count": 15
     },
     {
       "id": "academicas",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 32
+      "tool_count": 33
     },
     {
       "id": "creando",
@@ -1470,6 +1470,29 @@
         "inversion"
       ],
       "icon": "🎯"
+    },
+    {
+      "slug": "simulador-cartera-inversion",
+      "name": "Simulador de Cartera de Inversión",
+      "url": "https://meskeia.com/simulador-cartera-inversion/",
+      "description": "Simula la evolución de tu cartera con Monte Carlo. Sharpe, volatilidad, percentiles y probabilidad de alcanzar objetivos",
+      "category": "Finanzas Personales",
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "cartera",
+        "monte carlo",
+        "simulacion",
+        "sharpe",
+        "volatilidad",
+        "inversion",
+        "renta variable",
+        "renta fija",
+        "backtesting",
+        "percentiles"
+      ],
+      "icon": "📊"
     },
     {
       "slug": "control-gastos",

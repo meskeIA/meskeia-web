@@ -27,6 +27,7 @@ export const implementedAppsUrls = [
   "/calculadora-jubilacion/",
   "/calculadora-inversiones/",
   "/test-perfil-inversor/",
+  "/simulador-cartera-inversion/",    // Monte Carlo, Sharpe, volatilidad
   "/calculadora-suscripciones/",      // Control de suscripciones recurrentes
   "/calculadora-roommates/",          // División gastos piso compartido
   "/calculadora-alquiler-vs-compra/", // Análisis alquiler vs compra vivienda
