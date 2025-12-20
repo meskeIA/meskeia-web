@@ -245,6 +245,7 @@ const productividadApps: RelatedApp[] = [
   { url: '/notas/', icon: '📝', name: 'Notas', description: 'Toma notas rápidas' },
   { url: '/time-tracker/', icon: '⏱️', name: 'Time Tracker', description: 'Registra tu tiempo' },
   { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica 25/5' },
+  { url: '/planificador-turnos/', icon: '📅', name: 'Planificador Turnos', description: 'Organiza horarios' },
 ];
 
 const viajesApps: RelatedApp[] = [
@@ -480,6 +481,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'lista-tareas': productividadApps.filter(a => a.url !== '/lista-tareas/'),
   'notas': productividadApps.filter(a => a.url !== '/notas/'),
   'time-tracker': productividadApps.filter(a => a.url !== '/time-tracker/'),
+  'planificador-turnos': productividadApps.filter(a => a.url !== '/planificador-turnos/'),
   'cronometro': productividadApps,
   'lista-equipaje': viajesApps.filter(a => a.url !== '/lista-equipaje/'),
   'conversor-horarios': viajesApps.filter(a => a.url !== '/conversor-horarios/'),

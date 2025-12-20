@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 185+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 186+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 185,
+  "total_tools": 186,
   "last_updated": "2025-12-20",
   "features": {
     "all_free": true,
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Optimiza tu tiempo y organización",
-      "tool_count": 22
+      "tool_count": 23
     },
     {
       "id": "salud",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 75
+      "tool_count": 76
     },
     {
       "id": "estudio",
@@ -3052,6 +3052,29 @@
         "facturacion"
       ],
       "icon": "⏱️"
+    },
+    {
+      "slug": "planificador-turnos",
+      "name": "Planificador de Turnos",
+      "url": "https://meskeia.com/planificador-turnos/",
+      "description": "Planifica turnos de trabajo para equipos pequeños. Gestiona empleados, franjas horarias personalizables y genera horarios automáticamente",
+      "category": "Productividad",
+      "contexts": [
+        "trabajo"
+      ],
+      "keywords": [
+        "turnos",
+        "horarios",
+        "planificador",
+        "empleados",
+        "cuadrante",
+        "trabajo",
+        "restaurante",
+        "tienda",
+        "equipo",
+        "rotativo"
+      ],
+      "icon": "📅"
     },
     {
       "slug": "conversor-unidades",

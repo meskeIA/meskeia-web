@@ -65,8 +65,9 @@ export const implementedAppsUrls = [
   "/calculadora-algebra-abstracta/",
   "/calculadora-teoria-colas/",
 
-  // Herramientas de Productividad (15 implementadas)
+  // Herramientas de Productividad (16 implementadas)
   "/time-tracker/",
+  "/planificador-turnos/",
   "/notas/",
   "/generador-contrasenas/",
   "/lista-tareas/",

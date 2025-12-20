@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 179,
+  "total_tools": 180,
   "updated": "2025-12-20",
   "features": {
     "all_free": true,
@@ -224,6 +224,7 @@
         { "name": "Generador de Códigos de Barras", "slug": "generador-codigos-barras", "url": "https://meskeia.com/generador-codigos-barras/", "description": "Genera EAN-13, EAN-8, UPC-A, Code128" },
         { "name": "Generador de Firmas Email", "slug": "generador-firma-email", "url": "https://meskeia.com/generador-firma-email/", "description": "Crea firmas de email profesionales" },
         { "name": "Time Tracker", "slug": "time-tracker", "url": "https://meskeia.com/time-tracker/", "description": "Registra tiempo por proyecto y cliente" },
+        { "name": "Planificador de Turnos", "slug": "planificador-turnos", "url": "https://meskeia.com/planificador-turnos/", "description": "Planifica turnos de trabajo para equipos pequeños" },
         { "name": "Conversor de Unidades", "slug": "conversor-unidades", "url": "https://meskeia.com/conversor-unidades/", "description": "Conversor científico: 13 categorías" },
         { "name": "Lista de Equipaje", "slug": "lista-equipaje", "url": "https://meskeia.com/lista-equipaje/", "description": "Genera lista de equipaje según tipo de viaje" },
         { "name": "Generador de Actas de Reunión", "slug": "generador-actas", "url": "https://meskeia.com/generador-actas/", "description": "Crea actas profesionales con plantillas, asistentes, orden del día y tareas" },
