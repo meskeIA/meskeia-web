@@ -478,6 +478,270 @@
   opacity: 0.9;
 }
 
+/* Selector de Modo */
+.modoSelector {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.modoBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-large);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 140px;
+}
+
+.modoBtn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.modoActivo {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-color: transparent;
+  color: white;
+}
+
+.modoIcon {
+  font-size: 1.5rem;
+}
+
+.modoNombre {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Comparador Content */
+.comparadorContent {
+  margin-bottom: 2rem;
+}
+
+.comparadorIntro {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.comparadorDesc {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+/* Grid de Periodos */
+.periodosInputGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.periodoCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.periodoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid var(--primary);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.periodoHeader1 .periodoHeader {
+  border-bottom-color: #2E86AB;
+}
+
+.periodoHeader2 .periodoHeader {
+  border-bottom-color: #48A9A6;
+}
+
+.periodoHeader3 .periodoHeader {
+  border-bottom-color: #7FB3D3;
+}
+
+.periodoNumero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.periodoInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Chart Section */
+.chartSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.chartTitle {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.chartContainer {
+  height: 350px;
+  position: relative;
+}
+
+/* Cards de Resumen */
+.resumenCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.resumenCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--primary);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.resumenCard:hover {
+  transform: translateY(-3px);
+}
+
+.mejorOpcion {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border-color: var(--primary);
+}
+
+.mejorBadge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.resumenTitulo {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.resumenValor {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0.5rem 0;
+}
+
+.resumenLabel {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.resumenDetalle {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Tabla Comparativa */
+.tablaSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.tablaTitle {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tablaComparativa th,
+.tablaComparativa td {
+  padding: 0.875rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.tablaComparativa th {
+  background: var(--bg-primary);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tablaComparativa th:first-child,
+.tablaComparativa td:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+.tablaComparativa tbody tr:hover {
+  background: var(--hover);
+}
+
+.valorAlto {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .valorAlto {
+  color: #f87171;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .mainContent {
@@ -485,6 +749,14 @@
   }
 
   .dataGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .periodosInputGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resumenCards {
     grid-template-columns: 1fr;
   }
 }
@@ -522,5 +794,24 @@
 
   .timelineGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .modoSelector {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modoBtn {
+    flex-direction: row;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+  }
+
+  .chartContainer {
+    height: 280px;
+  }
+
+  .resumenValor {
+    font-size: 1.6rem;
   }
 }

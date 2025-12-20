@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import Chart from 'chart.js/auto';
 import styles from './CalculadoraInflacion.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -31,10 +32,38 @@ const YEARS = Object.keys(IPC_DATA).map(Number).sort((a, b) => a - b);
 const MIN_YEAR = YEARS[0];
 const MAX_YEAR = YEARS[YEARS.length - 1];
 
+type ModoApp = 'calculadora' | 'comparador';
+
+interface DatosPeriodo {
+  nombre: string;
+  añoInicio: number;
+  añoFin: number;
+  ipcInicio: number;
+  ipcFin: number;
+  inflacionAcumulada: number;
+  inflacionMediaAnual: number;
+  años: number;
+  datosGrafico: { año: number; ipc: number }[];
+  color: string;
+}
+
 export default function CalculadoraInflacionPage() {
   const [cantidad, setCantidad] = useState('1000');
   const [añoOrigen, setAñoOrigen] = useState(2000);
   const [añoDestino, setAñoDestino] = useState(2025);
+
+  // Estado para modo comparador
+  const [modo, setModo] = useState<ModoApp>('calculadora');
+  const [periodo1Inicio, setPeriodo1Inicio] = useState(2000);
+  const [periodo1Fin, setPeriodo1Fin] = useState(2010);
+  const [periodo2Inicio, setPeriodo2Inicio] = useState(2010);
+  const [periodo2Fin, setPeriodo2Fin] = useState(2020);
+  const [periodo3Inicio, setPeriodo3Inicio] = useState(2020);
+  const [periodo3Fin, setPeriodo3Fin] = useState(2025);
+
+  // Referencias para Chart.js
+  const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const resultado = useMemo(() => {
     const cantidadNum = parseSpanishNumber(cantidad);
@@ -73,6 +102,175 @@ export default function CalculadoraInflacionPage() {
     };
   }, [cantidad, añoOrigen, añoDestino]);
 
+  // Cálculos para el modo comparador
+  const datosComparador = useMemo((): DatosPeriodo[] => {
+    const colores = ['#2E86AB', '#48A9A6', '#7FB3D3'];
+    const periodos = [
+      { inicio: periodo1Inicio, fin: periodo1Fin, nombre: 'Periodo 1' },
+      { inicio: periodo2Inicio, fin: periodo2Fin, nombre: 'Periodo 2' },
+      { inicio: periodo3Inicio, fin: periodo3Fin, nombre: 'Periodo 3' },
+    ];
+
+    return periodos.map((p, index) => {
+      const ipcInicio = IPC_DATA[p.inicio] || 0;
+      const ipcFin = IPC_DATA[p.fin] || 0;
+      const años = Math.abs(p.fin - p.inicio);
+
+      // Inflación acumulada
+      const inflacionAcumulada = ipcInicio > 0
+        ? ((ipcFin - ipcInicio) / ipcInicio) * 100
+        : 0;
+
+      // Inflación media anual
+      const inflacionMediaAnual = años > 0 && ipcInicio > 0
+        ? (Math.pow(ipcFin / ipcInicio, 1 / años) - 1) * 100
+        : 0;
+
+      // Datos para el gráfico (IPC normalizado a base 100)
+      const datosGrafico: { año: number; ipc: number }[] = [];
+      const añoMin = Math.min(p.inicio, p.fin);
+      const añoMax = Math.max(p.inicio, p.fin);
+
+      for (let año = añoMin; año <= añoMax; año++) {
+        if (IPC_DATA[año]) {
+          // Normalizar a base 100 desde el inicio del periodo
+          const ipcNormalizado = ipcInicio > 0
+            ? (IPC_DATA[año] / ipcInicio) * 100
+            : 0;
+          datosGrafico.push({ año, ipc: ipcNormalizado });
+        }
+      }
+
+      return {
+        nombre: `${p.inicio} - ${p.fin}`,
+        añoInicio: p.inicio,
+        añoFin: p.fin,
+        ipcInicio,
+        ipcFin,
+        inflacionAcumulada,
+        inflacionMediaAnual,
+        años,
+        datosGrafico,
+        color: colores[index],
+      };
+    });
+  }, [periodo1Inicio, periodo1Fin, periodo2Inicio, periodo2Fin, periodo3Inicio, periodo3Fin]);
+
+  // Encontrar el periodo con mayor inflación
+  const periodoMayorInflacion = useMemo(() => {
+    if (datosComparador.length === 0) return null;
+    return datosComparador.reduce((max, periodo) =>
+      periodo.inflacionAcumulada > max.inflacionAcumulada ? periodo : max
+    );
+  }, [datosComparador]);
+
+  // Effect para el gráfico Chart.js
+  useEffect(() => {
+    if (modo !== 'comparador' || !chartRef.current || datosComparador.length === 0) return;
+
+    // Destruir gráfico anterior
+    if (chartInstanceRef.current) {
+      chartInstanceRef.current.destroy();
+    }
+
+    const ctx = chartRef.current.getContext('2d');
+    if (!ctx) return;
+
+    // Encontrar el rango máximo de años para el eje X
+    const todosLosAños = datosComparador.flatMap(p =>
+      p.datosGrafico.map(d => d.año)
+    );
+    const añoMinGlobal = Math.min(...todosLosAños);
+    const añoMaxGlobal = Math.max(...todosLosAños);
+
+    // Crear datasets para cada periodo
+    const datasets = datosComparador.map((periodo) => ({
+      label: periodo.nombre,
+      data: periodo.datosGrafico.map(d => ({
+        x: d.año,
+        y: d.ipc,
+      })),
+      borderColor: periodo.color,
+      backgroundColor: periodo.color + '20',
+      borderWidth: 3,
+      fill: false,
+      tension: 0.3,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+    }));
+
+    chartInstanceRef.current = new Chart(ctx, {
+      type: 'line',
+      data: { datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 20,
+              font: { size: 14 },
+            },
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            padding: 12,
+            titleFont: { size: 14 },
+            bodyFont: { size: 13 },
+            callbacks: {
+              title: (items) => `Año ${items[0].parsed.x}`,
+              label: (context) => {
+                const valor = context.parsed.y;
+                return `${context.dataset.label}: ${formatNumber(valor, 2)} (base 100)`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            type: 'linear',
+            min: añoMinGlobal,
+            max: añoMaxGlobal,
+            title: {
+              display: true,
+              text: 'Año',
+              font: { size: 14, weight: 'bold' },
+            },
+            ticks: {
+              stepSize: 1,
+              callback: (value) => Math.floor(Number(value)).toString(),
+            },
+            grid: {
+              color: 'rgba(0,0,0,0.05)',
+            },
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'IPC (Base 100 = inicio periodo)',
+              font: { size: 14, weight: 'bold' },
+            },
+            grid: {
+              color: 'rgba(0,0,0,0.05)',
+            },
+          },
+        },
+      },
+    });
+
+    return () => {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+      }
+    };
+  }, [modo, datosComparador]);
+
   const intercambiarAños = () => {
     setAñoOrigen(añoDestino);
     setAñoDestino(añoOrigen);
@@ -99,6 +297,27 @@ export default function CalculadoraInflacionPage() {
         </p>
       </header>
 
+      {/* Selector de modo */}
+      <div className={styles.modoSelector}>
+        <button
+          type="button"
+          onClick={() => setModo('calculadora')}
+          className={`${styles.modoBtn} ${modo === 'calculadora' ? styles.modoActivo : ''}`}
+        >
+          <span className={styles.modoIcon}>🧮</span>
+          <span className={styles.modoNombre}>Calculadora</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setModo('comparador')}
+          className={`${styles.modoBtn} ${modo === 'comparador' ? styles.modoActivo : ''}`}
+        >
+          <span className={styles.modoIcon}>📊</span>
+          <span className={styles.modoNombre}>Comparador</span>
+        </button>
+      </div>
+
+      {modo === 'calculadora' ? (
       <div className={styles.mainContent}>
         {/* Panel de entrada */}
         <div className={styles.inputPanel}>
@@ -122,6 +341,7 @@ export default function CalculadoraInflacionPage() {
                 value={añoOrigen}
                 onChange={(e) => setAñoOrigen(Number(e.target.value))}
                 className={styles.select}
+                title="Selecciona el año de origen"
               >
                 {YEARS.map((year) => (
                   <option key={year} value={year}>{year}</option>
@@ -143,6 +363,7 @@ export default function CalculadoraInflacionPage() {
                 value={añoDestino}
                 onChange={(e) => setAñoDestino(Number(e.target.value))}
                 className={styles.select}
+                title="Selecciona el año de destino"
               >
                 {YEARS.map((year) => (
                   <option key={year} value={year}>{year}</option>
@@ -246,6 +467,217 @@ export default function CalculadoraInflacionPage() {
           )}
         </div>
       </div>
+      ) : (
+      /* Modo Comparador */
+      <div className={styles.comparadorContent}>
+        <div className={styles.comparadorIntro}>
+          <h2 className={styles.panelTitle}>📊 Compara diferentes periodos históricos</h2>
+          <p className={styles.comparadorDesc}>
+            Selecciona 3 periodos para comparar cómo evolucionó la inflación en cada uno
+          </p>
+        </div>
+
+        {/* Selectores de periodos */}
+        <div className={styles.periodosInputGrid}>
+          {/* Periodo 1 */}
+          <div className={styles.periodoCard}>
+            <div className={styles.periodoHeader} style={{ borderColor: '#2E86AB' }}>
+              <span className={styles.periodoNumero}>1</span>
+              <span>Periodo 1</span>
+            </div>
+            <div className={styles.periodoInputs}>
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>Desde</label>
+                <select
+                  value={periodo1Inicio}
+                  onChange={(e) => setPeriodo1Inicio(Number(e.target.value))}
+                  className={styles.select}
+                  title="Año de inicio del periodo 1"
+                >
+                  {YEARS.map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>Hasta</label>
+                <select
+                  value={periodo1Fin}
+                  onChange={(e) => setPeriodo1Fin(Number(e.target.value))}
+                  className={styles.select}
+                  title="Año de fin del periodo 1"
+                >
+                  {YEARS.map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Periodo 2 */}
+          <div className={styles.periodoCard}>
+            <div className={styles.periodoHeader} style={{ borderColor: '#48A9A6' }}>
+              <span className={styles.periodoNumero}>2</span>
+              <span>Periodo 2</span>
+            </div>
+            <div className={styles.periodoInputs}>
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>Desde</label>
+                <select
+                  value={periodo2Inicio}
+                  onChange={(e) => setPeriodo2Inicio(Number(e.target.value))}
+                  className={styles.select}
+                  title="Año de inicio del periodo 2"
+                >
+                  {YEARS.map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>Hasta</label>
+                <select
+                  value={periodo2Fin}
+                  onChange={(e) => setPeriodo2Fin(Number(e.target.value))}
+                  className={styles.select}
+                  title="Año de fin del periodo 2"
+                >
+                  {YEARS.map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Periodo 3 */}
+          <div className={styles.periodoCard}>
+            <div className={styles.periodoHeader} style={{ borderColor: '#7FB3D3' }}>
+              <span className={styles.periodoNumero}>3</span>
+              <span>Periodo 3</span>
+            </div>
+            <div className={styles.periodoInputs}>
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>Desde</label>
+                <select
+                  value={periodo3Inicio}
+                  onChange={(e) => setPeriodo3Inicio(Number(e.target.value))}
+                  className={styles.select}
+                  title="Año de inicio del periodo 3"
+                >
+                  {YEARS.map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>Hasta</label>
+                <select
+                  value={periodo3Fin}
+                  onChange={(e) => setPeriodo3Fin(Number(e.target.value))}
+                  className={styles.select}
+                  title="Año de fin del periodo 3"
+                >
+                  {YEARS.map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Gráfico de evolución */}
+        <div className={styles.chartSection}>
+          <h3 className={styles.chartTitle}>📈 Evolución del IPC (Base 100 = inicio de cada periodo)</h3>
+          <div className={styles.chartContainer}>
+            <canvas ref={chartRef}></canvas>
+          </div>
+        </div>
+
+        {/* Cards de resumen */}
+        <div className={styles.resumenCards}>
+          {datosComparador.map((periodo, index) => (
+            <div
+              key={index}
+              className={`${styles.resumenCard} ${periodoMayorInflacion?.nombre === periodo.nombre ? styles.mejorOpcion : ''}`}
+              style={{ borderTopColor: periodo.color }}
+            >
+              {periodoMayorInflacion?.nombre === periodo.nombre && (
+                <span className={styles.mejorBadge}>🔥 Mayor inflación</span>
+              )}
+              <h4 className={styles.resumenTitulo}>{periodo.nombre}</h4>
+              <div className={styles.resumenValor}>
+                {formatNumber(periodo.inflacionAcumulada, 2)}%
+              </div>
+              <div className={styles.resumenLabel}>Inflación acumulada</div>
+              <div className={styles.resumenDetalle}>
+                <span>{formatNumber(periodo.inflacionMediaAnual, 2)}% anual</span>
+                <span>{periodo.años} años</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Tabla comparativa */}
+        <div className={styles.tablaSection}>
+          <h3 className={styles.tablaTitle}>📋 Comparación detallada</h3>
+          <div className={styles.tablaWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Concepto</th>
+                  {datosComparador.map((p, i) => (
+                    <th key={i} style={{ color: p.color }}>{p.nombre}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>IPC inicio</td>
+                  {datosComparador.map((p, i) => (
+                    <td key={i}>{formatNumber(p.ipcInicio, 2)}</td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>IPC fin</td>
+                  {datosComparador.map((p, i) => (
+                    <td key={i}>{formatNumber(p.ipcFin, 2)}</td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>Inflación acumulada</td>
+                  {datosComparador.map((p, i) => (
+                    <td key={i} className={p.inflacionAcumulada > 50 ? styles.valorAlto : ''}>
+                      {formatNumber(p.inflacionAcumulada, 2)}%
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>Inflación media anual</td>
+                  {datosComparador.map((p, i) => (
+                    <td key={i}>{formatNumber(p.inflacionMediaAnual, 2)}%</td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>Duración</td>
+                  {datosComparador.map((p, i) => (
+                    <td key={i}>{p.años} años</td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>100€ al inicio valdrían</td>
+                  {datosComparador.map((p, i) => (
+                    <td key={i}>{formatCurrency(100 * (1 + p.inflacionAcumulada / 100))}</td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      )}
 
       {/* Hitos históricos */}
       <div className={styles.historicalSection}>
