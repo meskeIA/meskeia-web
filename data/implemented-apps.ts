@@ -179,9 +179,10 @@ export const implementedAppsUrls = [
   "/generador-facturas/",           // Facturas para autónomos con IVA/IRPF
   "/generador-carruseles/",         // Carruseles para Instagram/LinkedIn
 
-  // Física y Química (5 implementadas)
+  // Física y Química (6 implementadas)
   "/conversor-unidades/",
   "/calculadora-movimiento/",
+  "/simulador-fisica/",            // Simulador visual: caída libre, péndulo, proyectiles, ondas, resorte
   "/calculadora-electricidad/",
   "/glosario-fisica-quimica/",
   "/tabla-periodica/",

@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 178,
+  "total_tools": 179,
   "updated": "2025-12-20",
   "features": {
     "all_free": true,
@@ -133,6 +133,7 @@
       "icon": "🎓",
       "tools": [
         { "name": "Calculadora de Movimiento", "slug": "calculadora-movimiento", "url": "https://meskeia.com/calculadora-movimiento/", "description": "Cinemática: MRU, MRUA, caída libre y tiro parabólico" },
+        { "name": "Simulador de Física", "slug": "simulador-fisica", "url": "https://meskeia.com/simulador-fisica/", "description": "Simulador interactivo con animaciones: caída libre, péndulo, proyectiles, ondas y resorte (MAS)" },
         { "name": "Tabla Periódica Interactiva", "slug": "tabla-periodica", "url": "https://meskeia.com/tabla-periodica/", "description": "118 elementos con calculadora de masa molar" },
         { "name": "Glosario de Física y Química", "slug": "glosario-fisica-quimica", "url": "https://meskeia.com/glosario-fisica-quimica/", "description": "Glosario interactivo con quizzes" },
         { "name": "Calculadora de Electricidad", "slug": "calculadora-electricidad", "url": "https://meskeia.com/calculadora-electricidad/", "description": "Ley de Ohm, potencia y circuitos" },
