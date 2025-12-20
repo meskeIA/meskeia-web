@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './CalculadoraInversiones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import Chart from 'chart.js/auto';
 
 type PerfilInversor = 'conservador' | 'moderado' | 'equilibrado' | 'dinamico' | 'agresivo';
+type ModoApp = 'calculadora' | 'comparador';
 
 interface AsignacionActivos {
   rentaVariable: number;
@@ -61,10 +63,20 @@ const PERFILES: Record<PerfilInversor, { nombre: string; icon: string; desc: str
 };
 
 export default function CalculadoraInversionesPage() {
+  const [modo, setModo] = useState<ModoApp>('calculadora');
   const [capitalInvertir, setCapitalInvertir] = useState('50000');
   const [perfil, setPerfil] = useState<PerfilInversor>('equilibrado');
   const [horizonteTemporal, setHorizonteTemporal] = useState(10);
   const [edadInversor, setEdadInversor] = useState(35);
+
+  // Estados para modo comparador (3 escenarios)
+  const [escenario1, setEscenario1] = useState('25000');
+  const [escenario2, setEscenario2] = useState('50000');
+  const [escenario3, setEscenario3] = useState('100000');
+
+  // Ref para el gráfico
+  const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const perfilActual = PERFILES[perfil];
 
@@ -159,6 +171,130 @@ export default function CalculadoraInversionesPage() {
     return recs;
   }, [perfil, perfilActual, edadInversor, horizonteTemporal, capitalInvertir, distribucion]);
 
+  // Calcular datos para modo comparador
+  const datosComparador = useMemo(() => {
+    const capitales = [
+      parseSpanishNumber(escenario1) || 0,
+      parseSpanishNumber(escenario2) || 0,
+      parseSpanishNumber(escenario3) || 0,
+    ];
+    const rentabilidad = perfilActual.rentabilidadEsperada / 100;
+
+    // Evolución año a año para cada escenario
+    const evolucionAnual: { ano: number; valores: number[] }[] = [];
+    for (let ano = 0; ano <= horizonteTemporal; ano++) {
+      evolucionAnual.push({
+        ano,
+        valores: capitales.map(cap => cap * Math.pow(1 + rentabilidad, ano)),
+      });
+    }
+
+    // Resumen final de cada escenario
+    const resumenEscenarios = capitales.map((cap, idx) => {
+      const capitalFinal = cap * Math.pow(1 + rentabilidad, horizonteTemporal);
+      const ganancia = capitalFinal - cap;
+      const porcentajeGanancia = cap > 0 ? ((capitalFinal / cap) - 1) * 100 : 0;
+      return {
+        nombre: `Escenario ${idx + 1}`,
+        capitalInicial: cap,
+        capitalFinal,
+        ganancia,
+        porcentajeGanancia,
+      };
+    });
+
+    return { evolucionAnual, resumenEscenarios };
+  }, [escenario1, escenario2, escenario3, perfilActual, horizonteTemporal]);
+
+  // Efecto para crear/actualizar el gráfico
+  useEffect(() => {
+    if (modo !== 'comparador' || !chartRef.current) return;
+
+    // Destruir gráfico anterior si existe
+    if (chartInstanceRef.current) {
+      chartInstanceRef.current.destroy();
+    }
+
+    const ctx = chartRef.current.getContext('2d');
+    if (!ctx) return;
+
+    const labels = datosComparador.evolucionAnual.map(d => `Año ${d.ano}`);
+    const colores = ['#2E86AB', '#48A9A6', '#7FB3D3'];
+
+    chartInstanceRef.current = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: `Escenario 1 (${formatCurrency(parseSpanishNumber(escenario1) || 0)})`,
+            data: datosComparador.evolucionAnual.map(d => d.valores[0]),
+            borderColor: colores[0],
+            backgroundColor: 'rgba(46, 134, 171, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+          },
+          {
+            label: `Escenario 2 (${formatCurrency(parseSpanishNumber(escenario2) || 0)})`,
+            data: datosComparador.evolucionAnual.map(d => d.valores[1]),
+            borderColor: colores[1],
+            backgroundColor: 'rgba(72, 169, 166, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+          },
+          {
+            label: `Escenario 3 (${formatCurrency(parseSpanishNumber(escenario3) || 0)})`,
+            data: datosComparador.evolucionAnual.map(d => d.valores[2]),
+            borderColor: colores[2],
+            backgroundColor: 'rgba(127, 179, 211, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              padding: 15,
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`;
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return formatCurrency(Number(value));
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return () => {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
+      }
+    };
+  }, [modo, datosComparador, escenario1, escenario2, escenario3]);
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -170,6 +306,27 @@ export default function CalculadoraInversionesPage() {
         </p>
       </header>
 
+      {/* Selector de Modo */}
+      <div className={styles.modoSelector}>
+        <button
+          type="button"
+          className={`${styles.modoBtn} ${modo === 'calculadora' ? styles.modoActivo : ''}`}
+          onClick={() => setModo('calculadora')}
+        >
+          <span className={styles.modoIcon}>🧮</span>
+          <span className={styles.modoNombre}>Calculadora</span>
+        </button>
+        <button
+          type="button"
+          className={`${styles.modoBtn} ${modo === 'comparador' ? styles.modoActivo : ''}`}
+          onClick={() => setModo('comparador')}
+        >
+          <span className={styles.modoIcon}>📊</span>
+          <span className={styles.modoNombre}>Comparador</span>
+        </button>
+      </div>
+
+      {modo === 'calculadora' ? (
       <div className={styles.mainContent}>
         {/* Panel de Configuración */}
         <div className={styles.configPanel}>
@@ -381,6 +538,155 @@ export default function CalculadoraInversionesPage() {
           </div>
         </div>
       </div>
+      ) : (
+      /* MODO COMPARADOR */
+      <div className={styles.comparadorContent}>
+        <p className={styles.modoDesc}>
+          Compara hasta 3 capitales diferentes con el perfil <strong>{perfilActual.nombre}</strong> ({formatNumber(perfilActual.rentabilidadEsperada, 1)}% anual)
+        </p>
+
+        {/* Selector de Perfil y Horizonte */}
+        <div className={styles.comparadorConfig}>
+          <div className={styles.configItem}>
+            <label className={styles.label}>Perfil de riesgo</label>
+            <div className={styles.perfilesRow}>
+              {(Object.keys(PERFILES) as PerfilInversor[]).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={`${styles.perfilBtnSmall} ${perfil === key ? styles.activo : ''}`}
+                  onClick={() => setPerfil(key)}
+                >
+                  {PERFILES[key].icon} {PERFILES[key].nombre}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className={styles.configItem}>
+            <label className={styles.label}>Horizonte: {horizonteTemporal} años</label>
+            <input
+              type="range"
+              className={styles.slider}
+              min="1"
+              max="30"
+              value={horizonteTemporal}
+              onChange={(e) => setHorizonteTemporal(parseInt(e.target.value))}
+              aria-label="Horizonte temporal en años"
+            />
+          </div>
+        </div>
+
+        {/* Inputs de Escenarios */}
+        <div className={styles.escenariosInputGrid}>
+          <div className={styles.escenarioInput}>
+            <label className={styles.escenarioLabel}>💰 Escenario 1</label>
+            <div className={styles.inputWrapper}>
+              <input
+                type="text"
+                className={styles.input}
+                value={escenario1}
+                onChange={(e) => setEscenario1(e.target.value)}
+                placeholder="25000"
+              />
+              <span className={styles.unit}>€</span>
+            </div>
+          </div>
+          <div className={styles.escenarioInput}>
+            <label className={styles.escenarioLabel}>💰 Escenario 2</label>
+            <div className={styles.inputWrapper}>
+              <input
+                type="text"
+                className={styles.input}
+                value={escenario2}
+                onChange={(e) => setEscenario2(e.target.value)}
+                placeholder="50000"
+              />
+              <span className={styles.unit}>€</span>
+            </div>
+          </div>
+          <div className={styles.escenarioInput}>
+            <label className={styles.escenarioLabel}>💰 Escenario 3</label>
+            <div className={styles.inputWrapper}>
+              <input
+                type="text"
+                className={styles.input}
+                value={escenario3}
+                onChange={(e) => setEscenario3(e.target.value)}
+                placeholder="100000"
+              />
+              <span className={styles.unit}>€</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Gráfico de Evolución */}
+        <div className={styles.graficoSection}>
+          <h3 className={styles.sectionTitle}>📈 Evolución del Capital a {horizonteTemporal} años</h3>
+          <div className={styles.chartContainer}>
+            <canvas ref={chartRef}></canvas>
+          </div>
+        </div>
+
+        {/* Cards de Resumen */}
+        <div className={styles.escenariosGrid}>
+          {datosComparador.resumenEscenarios.map((esc, idx) => (
+            <div key={idx} className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioNum}>{esc.nombre}</span>
+                <span className={styles.escenarioImporte}>{formatCurrency(esc.capitalInicial)}</span>
+              </div>
+              <div className={styles.escenarioBody}>
+                <div className={styles.escenarioRow}>
+                  <span>Capital final</span>
+                  <strong>{formatCurrency(esc.capitalFinal)}</strong>
+                </div>
+                <div className={styles.escenarioRow}>
+                  <span>Ganancia</span>
+                  <strong className={styles.positivo}>+{formatCurrency(esc.ganancia)}</strong>
+                </div>
+                <div className={styles.escenarioRow}>
+                  <span>Rentabilidad total</span>
+                  <strong className={styles.positivo}>+{formatNumber(esc.porcentajeGanancia, 1)}%</strong>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Tabla Comparativa */}
+        <div className={styles.comparativaEscenarios}>
+          <h3>📊 Tabla Comparativa</h3>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Escenario</th>
+                  <th>Capital Inicial</th>
+                  <th>Capital Final</th>
+                  <th>Ganancia</th>
+                  <th>% Rentabilidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                {datosComparador.resumenEscenarios.map((esc, idx) => {
+                  const mejorGanancia = Math.max(...datosComparador.resumenEscenarios.map(e => e.ganancia));
+                  const esMejor = esc.ganancia === mejorGanancia && esc.ganancia > 0;
+                  return (
+                    <tr key={idx} className={esMejor ? styles.mejorEscenario : ''}>
+                      <td>{esc.nombre}</td>
+                      <td>{formatCurrency(esc.capitalInicial)}</td>
+                      <td>{formatCurrency(esc.capitalFinal)}</td>
+                      <td className={styles.positivo}>+{formatCurrency(esc.ganancia)}</td>
+                      <td className={styles.positivo}>+{formatNumber(esc.porcentajeGanancia, 1)}%</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      )}
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <div className={styles.disclaimer}>
