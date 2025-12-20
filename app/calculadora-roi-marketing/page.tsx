@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './CalculadoraROIMarketing.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber, formatPercentage } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import Chart from 'chart.js/auto';
 
 interface CanalMarketing {
   id: string;
@@ -41,6 +42,12 @@ export default function CalculadoraROIMarketingPage() {
   const [valorVidaCliente, setValorVidaCliente] = useState('500');
   const [mostrarFormNuevo, setMostrarFormNuevo] = useState(false);
   const [nuevoCanal, setNuevoCanal] = useState({ nombre: '', icono: '📊' });
+
+  // Refs para gráficos
+  const chartRoiRef = useRef<HTMLCanvasElement>(null);
+  const chartRoiInstanceRef = useRef<Chart | null>(null);
+  const chartScatterRef = useRef<HTMLCanvasElement>(null);
+  const chartScatterInstanceRef = useRef<Chart | null>(null);
 
   const actualizarCanal = (id: string, campo: keyof CanalMarketing, valor: string) => {
     setCanales(prev => prev.map(c => c.id === id ? { ...c, [campo]: valor } : c));
@@ -139,6 +146,178 @@ export default function CalculadoraROIMarketingPage() {
     if (roi > 0) return { texto: 'Revisar segmentación', tipo: 'revisar' };
     return { texto: 'Considerar pausar', tipo: 'pausar' };
   }
+
+  // Gráfico de barras ROI por canal
+  useEffect(() => {
+    if (!chartRoiRef.current || calculos.ranking.length === 0) return;
+
+    // Destruir instancia anterior
+    if (chartRoiInstanceRef.current) {
+      chartRoiInstanceRef.current.destroy();
+    }
+
+    const ctx = chartRoiRef.current.getContext('2d');
+    if (!ctx) return;
+
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#E5E5E5' : '#1A1A1A';
+    const gridColor = isDark ? '#404040' : '#E5E5E5';
+
+    // Colores según ROI
+    const getBarColor = (roi: number) => {
+      if (roi > 200) return '#10B981'; // Excelente
+      if (roi > 100) return '#2E86AB'; // Bueno
+      if (roi > 0) return '#F59E0B';   // Regular
+      return '#EF4444';                 // Negativo
+    };
+
+    chartRoiInstanceRef.current = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: calculos.ranking.map(c => c.nombre),
+        datasets: [{
+          label: 'ROI (%)',
+          data: calculos.ranking.map(c => c.roi),
+          backgroundColor: calculos.ranking.map(c => getBarColor(c.roi)),
+          borderRadius: 8,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const canal = calculos.ranking[context.dataIndex];
+                return [
+                  `ROI: ${formatNumber(canal.roi, 1)}%`,
+                  `Beneficio: ${formatCurrency(canal.beneficio)}`,
+                  `CAC: ${formatCurrency(canal.cac)}`
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: gridColor },
+            ticks: { color: textColor },
+            title: {
+              display: true,
+              text: 'ROI (%)',
+              color: textColor
+            }
+          },
+          y: {
+            grid: { display: false },
+            ticks: { color: textColor }
+          }
+        }
+      }
+    });
+
+    return () => {
+      if (chartRoiInstanceRef.current) {
+        chartRoiInstanceRef.current.destroy();
+      }
+    };
+  }, [calculos.ranking]);
+
+  // Gráfico de dispersión: Inversión vs ROI
+  useEffect(() => {
+    if (!chartScatterRef.current || calculos.ranking.length === 0) return;
+
+    if (chartScatterInstanceRef.current) {
+      chartScatterInstanceRef.current.destroy();
+    }
+
+    const ctx = chartScatterRef.current.getContext('2d');
+    if (!ctx) return;
+
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#E5E5E5' : '#1A1A1A';
+    const gridColor = isDark ? '#404040' : '#E5E5E5';
+
+    // Datos para scatter
+    const scatterData = calculos.ranking.map(c => ({
+      x: c.inversion,
+      y: c.roi,
+      nombre: c.nombre,
+      icono: c.icono
+    }));
+
+    chartScatterInstanceRef.current = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Canales',
+          data: scatterData,
+          backgroundColor: '#2E86AB',
+          borderColor: '#48A9A6',
+          borderWidth: 2,
+          pointRadius: 12,
+          pointHoverRadius: 16,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const point = context.raw as { x: number; y: number; nombre: string };
+                return [
+                  point.nombre,
+                  `Inversión: ${formatCurrency(point.x)}`,
+                  `ROI: ${formatNumber(point.y, 1)}%`
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: gridColor },
+            ticks: {
+              color: textColor,
+              callback: (value) => formatCurrency(value as number)
+            },
+            title: {
+              display: true,
+              text: 'Inversión (€)',
+              color: textColor
+            }
+          },
+          y: {
+            grid: { color: gridColor },
+            ticks: {
+              color: textColor,
+              callback: (value) => `${value}%`
+            },
+            title: {
+              display: true,
+              text: 'ROI (%)',
+              color: textColor
+            }
+          }
+        }
+      }
+    });
+
+    return () => {
+      if (chartScatterInstanceRef.current) {
+        chartScatterInstanceRef.current.destroy();
+      }
+    };
+  }, [calculos.ranking]);
 
   return (
     <div className={styles.container}>
@@ -330,10 +509,114 @@ export default function CalculadoraROIMarketingPage() {
         </div>
       </section>
 
+      {/* Gráficos de Análisis */}
+      {calculos.ranking.length > 0 && (
+        <section className={styles.chartsSection}>
+          <h2>📊 Análisis Visual de Canales</h2>
+          <div className={styles.chartsGrid}>
+            <div className={styles.chartCard}>
+              <h3>ROI por Canal</h3>
+              <p className={styles.chartDescription}>Compara el retorno de inversión de cada canal</p>
+              <div className={styles.chartContainer}>
+                <canvas ref={chartRoiRef}></canvas>
+              </div>
+              <div className={styles.chartLegend}>
+                <span className={styles.legendItem}><span className={styles.legendDotExcelente}></span> Excelente (&gt;200%)</span>
+                <span className={styles.legendItem}><span className={styles.legendDotBueno}></span> Bueno (&gt;100%)</span>
+                <span className={styles.legendItem}><span className={styles.legendDotRegular}></span> Regular (0-100%)</span>
+                <span className={styles.legendItem}><span className={styles.legendDotNegativo}></span> Negativo (&lt;0%)</span>
+              </div>
+            </div>
+            <div className={styles.chartCard}>
+              <h3>Inversión vs ROI</h3>
+              <p className={styles.chartDescription}>¿Más inversión significa mejor ROI?</p>
+              <div className={styles.chartContainer}>
+                <canvas ref={chartScatterRef}></canvas>
+              </div>
+              <p className={styles.chartHint}>Los puntos en la parte superior-izquierda son los más eficientes (alto ROI con baja inversión)</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Tabla Comparativa */}
+      {calculos.ranking.length > 0 && (
+        <section className={styles.tablaSection}>
+          <h2>📋 Tabla Comparativa de Métricas</h2>
+          <div className={styles.tablaWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Canal</th>
+                  <th>Inversión</th>
+                  <th>Clientes</th>
+                  <th>Ingresos</th>
+                  <th>Beneficio</th>
+                  <th>ROI</th>
+                  <th>CAC</th>
+                  <th>ROAS</th>
+                  <th>CLV/CAC</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {calculos.ranking.map((canal, idx) => (
+                  <tr key={canal.id} className={idx === 0 ? styles.mejorFila : ''}>
+                    <td>
+                      <span className={styles.canalNombre}>
+                        <span className={styles.canalIconoTabla}>{canal.icono}</span>
+                        {canal.nombre}
+                      </span>
+                    </td>
+                    <td>{formatCurrency(canal.inversion)}</td>
+                    <td>{formatNumber(canal.clientes, 0)}</td>
+                    <td>{formatCurrency(canal.ingresosTotales)}</td>
+                    <td className={canal.beneficio >= 0 ? styles.valorPositivo : styles.valorNegativo}>
+                      {canal.beneficio >= 0 ? '+' : ''}{formatCurrency(canal.beneficio)}
+                    </td>
+                    <td className={canal.roi > 100 ? styles.valorExcelente : canal.roi > 0 ? styles.valorBueno : styles.valorMalo}>
+                      {formatNumber(canal.roi, 1)}%
+                    </td>
+                    <td>{formatCurrency(canal.cac)}</td>
+                    <td>{formatNumber(canal.roasMultiplier, 2)}x</td>
+                    <td className={canal.clvCacRatio > 3 ? styles.valorExcelente : canal.clvCacRatio > 1 ? styles.valorBueno : styles.valorMalo}>
+                      {formatNumber(canal.clvCacRatio, 1)}
+                    </td>
+                    <td>
+                      <span className={`${styles.estadoBadge} ${styles[`badge${canal.recomendacion.tipo.charAt(0).toUpperCase() + canal.recomendacion.tipo.slice(1)}`]}`}>
+                        {canal.recomendacion.texto}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr className={styles.filaTotales}>
+                  <td><strong>TOTALES</strong></td>
+                  <td><strong>{formatCurrency(calculos.inversionTotal)}</strong></td>
+                  <td><strong>{formatNumber(calculos.clientesTotal, 0)}</strong></td>
+                  <td><strong>{formatCurrency(calculos.ingresosTotal)}</strong></td>
+                  <td className={calculos.beneficioTotal >= 0 ? styles.valorPositivo : styles.valorNegativo}>
+                    <strong>{calculos.beneficioTotal >= 0 ? '+' : ''}{formatCurrency(calculos.beneficioTotal)}</strong>
+                  </td>
+                  <td className={calculos.roiTotal > 100 ? styles.valorExcelente : calculos.roiTotal > 0 ? styles.valorBueno : styles.valorMalo}>
+                    <strong>{formatNumber(calculos.roiTotal, 1)}%</strong>
+                  </td>
+                  <td><strong>{formatCurrency(calculos.cacPromedio)}</strong></td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+      )}
+
       {/* Ranking */}
       {calculos.ranking.length > 1 && (
         <section className={styles.rankingSection}>
-          <h2>Ranking de Canales por ROI</h2>
+          <h2>🏆 Ranking de Canales por ROI</h2>
           <div className={styles.rankingLista}>
             {calculos.ranking.map((canal, idx) => (
               <div key={canal.id} className={styles.rankingItem}>

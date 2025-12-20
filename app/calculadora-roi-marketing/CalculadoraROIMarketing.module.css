@@ -568,9 +568,249 @@
   color: var(--text-primary);
 }
 
+/* Charts Section */
+.chartsSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.chartsSection h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.chartsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+.chartCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.chartCard h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.chartDescription {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.chartContainer {
+  height: 280px;
+  position: relative;
+}
+
+.chartLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.legendItem span:first-child {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legendDotExcelente {
+  background: #10B981;
+}
+
+.legendDotBueno {
+  background: #2E86AB;
+}
+
+.legendDotRegular {
+  background: #F59E0B;
+}
+
+.legendDotNegativo {
+  background: #EF4444;
+}
+
+.chartHint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: var(--spacing-sm);
+  font-style: italic;
+}
+
+/* Tabla Comparativa */
+.tablaSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.tablaSection h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tablaComparativa th,
+.tablaComparativa td {
+  padding: var(--spacing-md);
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.tablaComparativa th:first-child,
+.tablaComparativa td:first-child {
+  text-align: left;
+  position: sticky;
+  left: 0;
+  background: var(--bg-card);
+  z-index: 1;
+}
+
+.tablaComparativa thead th {
+  background: var(--hover);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.tablaComparativa tbody tr:hover {
+  background: var(--hover);
+}
+
+.mejorFila {
+  background: rgba(16, 185, 129, 0.08) !important;
+}
+
+.mejorFila td:first-child::after {
+  content: ' 🏆';
+}
+
+.filaTotales {
+  background: var(--hover);
+}
+
+.filaTotales td {
+  border-top: 2px solid var(--primary);
+  font-weight: 600;
+}
+
+.canalNombre {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.canalIconoTabla {
+  font-size: 1.2rem;
+}
+
+.valorPositivo {
+  color: var(--success) !important;
+}
+
+.valorNegativo {
+  color: var(--danger) !important;
+}
+
+.estadoBadge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badgeExcelente {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.badgeBueno {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.badgeRevisar {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.badgePausar {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+[data-theme='dark'] .badgeExcelente {
+  background: #166534;
+  color: #DCFCE7;
+}
+
+[data-theme='dark'] .badgeBueno {
+  background: #1E40AF;
+  color: #DBEAFE;
+}
+
+[data-theme='dark'] .badgeRevisar {
+  background: #92400E;
+  color: #FEF3C7;
+}
+
+[data-theme='dark'] .badgePausar {
+  background: #991B1B;
+  color: #FEE2E2;
+}
+
+[data-theme='dark'] .mejorFila {
+  background: rgba(16, 185, 129, 0.15) !important;
+}
+
+[data-theme='dark'] .tablaComparativa th:first-child,
+[data-theme='dark'] .tablaComparativa td:first-child {
+  background: var(--bg-card);
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .canalesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .chartsGrid {
     grid-template-columns: 1fr;
   }
 }
