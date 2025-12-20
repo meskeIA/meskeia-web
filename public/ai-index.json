@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 177,
-  "updated": "2025-12-19",
+  "total_tools": 178,
+  "updated": "2025-12-20",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -30,6 +30,7 @@
         { "name": "Calculadora de Cocina", "slug": "calculadora-cocina", "url": "https://meskeia.com/calculadora-cocina/", "description": "Conversor de unidades de cocina, escalador de recetas" },
         { "name": "Lista de Compras", "slug": "lista-compras", "url": "https://meskeia.com/lista-compras/", "description": "Lista de compras con organización automática por categorías" },
         { "name": "Calculadora de Gasto Energético", "slug": "calculadora-gasto-energetico", "url": "https://meskeia.com/calculadora-gasto-energetico/", "description": "Calcula el consumo eléctrico y coste mensual en tu factura" },
+        { "name": "Calculadora Huella de Carbono", "slug": "calculadora-huella-carbono", "url": "https://meskeia.com/calculadora-huella-carbono/", "description": "Calcula tu huella de carbono personal anual" },
         { "name": "Calculadora de Pintura", "slug": "calculadora-pintura", "url": "https://meskeia.com/calculadora-pintura/", "description": "Calcula cuánta pintura necesitas para paredes y techos" },
         { "name": "Calculadora Consumo Combustible", "slug": "calculadora-combustible", "url": "https://meskeia.com/calculadora-combustible/", "description": "Calcula consumo en L/100km y coste de viajes" },
         { "name": "Calculadora Edad Mascotas", "slug": "calculadora-edad-mascotas", "url": "https://meskeia.com/calculadora-edad-mascotas/", "description": "Edad de perros y gatos en años humanos" },

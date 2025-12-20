@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 183+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 184+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 183,
-  "last_updated": "2025-12-19",
+  "total_tools": 184,
+  "last_updated": "2025-12-20",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 51
+      "tool_count": 52
     },
     {
       "id": "dinero",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 30
+      "tool_count": 31
     }
   ],
   "tools": [
@@ -381,6 +381,29 @@
         "pintar"
       ],
       "icon": "🎨"
+    },
+    {
+      "slug": "calculadora-huella-carbono",
+      "name": "Calculadora Huella de Carbono",
+      "url": "https://meskeia.com/calculadora-huella-carbono/",
+      "description": "Calcula tu huella de carbono personal anual. Analiza transporte, hogar, alimentacion y consumo. Compara con la media espanola y obten consejos para reducirla",
+      "category": "Calculadoras Practicas",
+      "contexts": [
+        "casa",
+        "curiosidad"
+      ],
+      "keywords": [
+        "huella carbono",
+        "CO2",
+        "emisiones",
+        "sostenibilidad",
+        "medio ambiente",
+        "carbono personal",
+        "transporte",
+        "alimentacion",
+        "consumo"
+      ],
+      "icon": "🌍"
     },
     {
       "slug": "calculadora-combustible",

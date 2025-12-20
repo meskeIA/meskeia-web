@@ -334,7 +334,7 @@ const cocinaApps: RelatedApp[] = [
 const hogarApps: RelatedApp[] = [
   { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios' },
   { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
-  { url: '/planificador-boda/', icon: '💒', name: 'Planificador Boda', description: 'Wedding planner' },
+  { url: '/calculadora-huella-carbono/', icon: '🌍', name: 'Huella de Carbono', description: 'Tu impacto ambiental' },
   { url: '/planificador-mudanzas/', icon: '📦', name: 'Planificador Mudanzas', description: 'Organiza tu mudanza' },
 ];
 
@@ -534,6 +534,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'lista-compras': cocinaApps.filter(a => a.url !== '/lista-compras/'),
   'calculadora-pintura': hogarApps.filter(a => a.url !== '/calculadora-pintura/'),
   'calculadora-gasto-energetico': hogarApps.filter(a => a.url !== '/calculadora-gasto-energetico/'),
+  'calculadora-huella-carbono': hogarApps.filter(a => a.url !== '/calculadora-huella-carbono/'),
   'planificador-boda': [...hogarApps.filter(a => a.url !== '/planificador-boda/'), ...productividadApps.slice(0, 1)],
   'planificador-mudanzas': [
     { url: '/lista-compras/', icon: '🛒', name: 'Lista Compras', description: 'Organiza tu compra' },
