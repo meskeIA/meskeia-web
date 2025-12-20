@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './SimuladorPrestamos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import Chart from 'chart.js/auto';
 
 type Sistema = 'frances' | 'aleman' | 'americano';
+type ModoApp = 'simulador' | 'comparador';
 
 interface CuotaMensual {
   mes: number;
@@ -26,7 +28,18 @@ interface ResultadoSistema {
   cuotaFinal: number;
 }
 
+// Interface para préstamo en comparador
+interface PrestamoComparador {
+  capital: string;
+  plazoMeses: string;
+  tin: string;
+}
+
 export default function SimuladorPrestamosPage() {
+  // Estado para modo
+  const [modo, setModo] = useState<ModoApp>('simulador');
+
+  // Estados modo simulador
   const [capital, setCapital] = useState('10000');
   const [plazoMeses, setPlazoMeses] = useState('36');
   const [tin, setTin] = useState('7');
@@ -35,6 +48,16 @@ export default function SimuladorPrestamosPage() {
   const [resultados, setResultados] = useState<ResultadoSistema[] | null>(null);
   const [taeCalculada, setTaeCalculada] = useState<number | null>(null);
   const [mostrarCuadro, setMostrarCuadro] = useState(false);
+
+  // Estados modo comparador (3 préstamos)
+  const [sistemaComparador, setSistemaComparador] = useState<Sistema>('frances');
+  const [prestamo1, setPrestamo1] = useState<PrestamoComparador>({ capital: '10000', plazoMeses: '24', tin: '7' });
+  const [prestamo2, setPrestamo2] = useState<PrestamoComparador>({ capital: '15000', plazoMeses: '36', tin: '6,5' });
+  const [prestamo3, setPrestamo3] = useState<PrestamoComparador>({ capital: '20000', plazoMeses: '48', tin: '6' });
+
+  // Ref para gráfico
+  const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const calcularSistemaFrances = (C: number, n: number, i: number): CuotaMensual[] => {
     // Sistema Francés: Cuota fija
@@ -176,6 +199,159 @@ export default function SimuladorPrestamosPage() {
 
   const resultadoActual = resultados?.find(r => r.sistema === sistemaSeleccionado);
 
+  // Función para calcular un préstamo según el sistema seleccionado
+  const calcularPrestamo = (C: number, n: number, tinAnual: number, sistema: Sistema) => {
+    if (isNaN(C) || isNaN(n) || isNaN(tinAnual) || C <= 0 || n <= 0 || tinAnual < 0) {
+      return null;
+    }
+    const i = tinAnual / 100 / 12;
+    let cuotas: CuotaMensual[];
+
+    if (sistema === 'frances') {
+      cuotas = calcularSistemaFrances(C, n, i);
+    } else if (sistema === 'aleman') {
+      cuotas = calcularSistemaAleman(C, n, i);
+    } else {
+      cuotas = calcularSistemaAmericano(C, n, i);
+    }
+
+    const totalPagado = cuotas.reduce((sum, c) => sum + c.cuota, 0);
+    const totalIntereses = cuotas.reduce((sum, c) => sum + c.interes, 0);
+
+    return {
+      cuotas,
+      totalPagado,
+      totalIntereses,
+      cuotaMedia: totalPagado / n,
+      cuotaInicial: cuotas[0]?.cuota || 0,
+      cuotaFinal: cuotas[cuotas.length - 1]?.cuota || 0,
+    };
+  };
+
+  // Datos para modo comparador
+  const datosComparador = useMemo(() => {
+    const prestamos = [prestamo1, prestamo2, prestamo3];
+    const resultados = prestamos.map((p, idx) => {
+      const C = parseSpanishNumber(p.capital);
+      const n = parseInt(p.plazoMeses);
+      const tinAnual = parseSpanishNumber(p.tin);
+      const resultado = calcularPrestamo(C, n, tinAnual, sistemaComparador);
+
+      if (!resultado) {
+        return {
+          nombre: `Préstamo ${idx + 1}`,
+          capital: 0,
+          plazo: 0,
+          tin: 0,
+          cuotaMedia: 0,
+          totalIntereses: 0,
+          totalPagado: 0,
+          evolucionSaldo: [],
+          valido: false,
+        };
+      }
+
+      return {
+        nombre: `Préstamo ${idx + 1}`,
+        capital: C,
+        plazo: n,
+        tin: tinAnual,
+        cuotaMedia: resultado.cuotaMedia,
+        cuotaInicial: resultado.cuotaInicial,
+        cuotaFinal: resultado.cuotaFinal,
+        totalIntereses: resultado.totalIntereses,
+        totalPagado: resultado.totalPagado,
+        evolucionSaldo: resultado.cuotas.map(c => c.saldoPendiente),
+        valido: true,
+      };
+    });
+
+    // Encontrar el plazo más largo para el gráfico
+    const maxPlazo = Math.max(...resultados.filter(r => r.valido).map(r => r.plazo));
+
+    return { resultados, maxPlazo };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prestamo1, prestamo2, prestamo3, sistemaComparador]);
+
+  // Efecto para crear/actualizar el gráfico
+  useEffect(() => {
+    if (modo !== 'comparador' || !chartRef.current) return;
+
+    if (chartInstanceRef.current) {
+      chartInstanceRef.current.destroy();
+    }
+
+    const ctx = chartRef.current.getContext('2d');
+    if (!ctx) return;
+
+    const { resultados, maxPlazo } = datosComparador;
+    const validResults = resultados.filter(r => r.valido);
+
+    if (validResults.length === 0 || maxPlazo === 0) return;
+
+    const labels = Array.from({ length: maxPlazo + 1 }, (_, i) => i === 0 ? 'Inicio' : `Mes ${i}`);
+    const colores = ['#2E86AB', '#48A9A6', '#7FB3D3'];
+
+    chartInstanceRef.current = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: validResults.map((r, idx) => {
+          // Crear array con saldo inicial + evolución
+          const data = [r.capital, ...r.evolucionSaldo];
+          // Rellenar con 0 si el plazo es menor que el máximo
+          while (data.length < maxPlazo + 1) {
+            data.push(0);
+          }
+
+          return {
+            label: `${r.nombre} (${formatCurrency(r.capital)}, ${r.plazo}m)`,
+            data,
+            borderColor: colores[idx],
+            backgroundColor: `${colores[idx]}20`,
+            fill: false,
+            tension: 0.3,
+            pointRadius: 2,
+          };
+        }),
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { usePointStyle: true, padding: 15 },
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Saldo pendiente' },
+            ticks: {
+              callback: (value) => formatCurrency(Number(value)),
+            },
+          },
+          x: {
+            title: { display: true, text: 'Tiempo' },
+          },
+        },
+      },
+    });
+
+    return () => {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
+      }
+    };
+  }, [modo, datosComparador]);
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -187,6 +363,27 @@ export default function SimuladorPrestamosPage() {
         </p>
       </header>
 
+      {/* Selector de Modo */}
+      <div className={styles.modoSelector}>
+        <button
+          type="button"
+          className={`${styles.modoBtn} ${modo === 'simulador' ? styles.modoActivo : ''}`}
+          onClick={() => setModo('simulador')}
+        >
+          <span className={styles.modoIcon}>🧮</span>
+          <span className={styles.modoNombre}>Simulador</span>
+        </button>
+        <button
+          type="button"
+          className={`${styles.modoBtn} ${modo === 'comparador' ? styles.modoActivo : ''}`}
+          onClick={() => setModo('comparador')}
+        >
+          <span className={styles.modoIcon}>📊</span>
+          <span className={styles.modoNombre}>Comparador</span>
+        </button>
+      </div>
+
+      {modo === 'simulador' ? (
       <div className={styles.mainGrid}>
         <section className={styles.inputSection}>
           <h2 className={styles.sectionTitle}>Datos del préstamo</h2>
@@ -367,6 +564,289 @@ export default function SimuladorPrestamosPage() {
           )}
         </section>
       </div>
+      ) : (
+        /* Modo Comparador */
+        <div className={styles.comparadorContent}>
+          {/* Selector de sistema de amortización */}
+          <div className={styles.sistemaSelector}>
+            <span className={styles.sistemaLabel}>Sistema de amortización:</span>
+            <div className={styles.sistemaBtns}>
+              <button
+                type="button"
+                className={`${styles.sistemaBtn} ${sistemaComparador === 'frances' ? styles.sistemaActivo : ''}`}
+                onClick={() => setSistemaComparador('frances')}
+              >
+                🇫🇷 Francés
+              </button>
+              <button
+                type="button"
+                className={`${styles.sistemaBtn} ${sistemaComparador === 'aleman' ? styles.sistemaActivo : ''}`}
+                onClick={() => setSistemaComparador('aleman')}
+              >
+                🇩🇪 Alemán
+              </button>
+              <button
+                type="button"
+                className={`${styles.sistemaBtn} ${sistemaComparador === 'americano' ? styles.sistemaActivo : ''}`}
+                onClick={() => setSistemaComparador('americano')}
+              >
+                🇺🇸 Americano
+              </button>
+            </div>
+          </div>
+
+          {/* Grid de inputs para 3 préstamos */}
+          <div className={styles.prestamosInputGrid}>
+            {/* Préstamo 1 */}
+            <div className={styles.prestamoInputCard}>
+              <h3 className={styles.prestamoInputTitle}>
+                <span className={styles.prestamoColor} style={{ background: '#2E86AB' }}></span>
+                Préstamo 1
+              </h3>
+              <div className={styles.prestamoInputGroup}>
+                <label>Capital (€)</label>
+                <input
+                  type="text"
+                  value={prestamo1.capital}
+                  onChange={(e) => setPrestamo1({ ...prestamo1, capital: e.target.value })}
+                  placeholder="10000"
+                />
+              </div>
+              <div className={styles.prestamoInputGroup}>
+                <label>Plazo (meses)</label>
+                <input
+                  type="number"
+                  value={prestamo1.plazoMeses}
+                  onChange={(e) => setPrestamo1({ ...prestamo1, plazoMeses: e.target.value })}
+                  min="1"
+                  max="360"
+                  placeholder="24"
+                />
+              </div>
+              <div className={styles.prestamoInputGroup}>
+                <label>TIN anual (%)</label>
+                <input
+                  type="text"
+                  value={prestamo1.tin}
+                  onChange={(e) => setPrestamo1({ ...prestamo1, tin: e.target.value })}
+                  placeholder="7"
+                />
+              </div>
+            </div>
+
+            {/* Préstamo 2 */}
+            <div className={styles.prestamoInputCard}>
+              <h3 className={styles.prestamoInputTitle}>
+                <span className={styles.prestamoColor} style={{ background: '#48A9A6' }}></span>
+                Préstamo 2
+              </h3>
+              <div className={styles.prestamoInputGroup}>
+                <label>Capital (€)</label>
+                <input
+                  type="text"
+                  value={prestamo2.capital}
+                  onChange={(e) => setPrestamo2({ ...prestamo2, capital: e.target.value })}
+                  placeholder="15000"
+                />
+              </div>
+              <div className={styles.prestamoInputGroup}>
+                <label>Plazo (meses)</label>
+                <input
+                  type="number"
+                  value={prestamo2.plazoMeses}
+                  onChange={(e) => setPrestamo2({ ...prestamo2, plazoMeses: e.target.value })}
+                  min="1"
+                  max="360"
+                  placeholder="36"
+                />
+              </div>
+              <div className={styles.prestamoInputGroup}>
+                <label>TIN anual (%)</label>
+                <input
+                  type="text"
+                  value={prestamo2.tin}
+                  onChange={(e) => setPrestamo2({ ...prestamo2, tin: e.target.value })}
+                  placeholder="6,5"
+                />
+              </div>
+            </div>
+
+            {/* Préstamo 3 */}
+            <div className={styles.prestamoInputCard}>
+              <h3 className={styles.prestamoInputTitle}>
+                <span className={styles.prestamoColor} style={{ background: '#7FB3D3' }}></span>
+                Préstamo 3
+              </h3>
+              <div className={styles.prestamoInputGroup}>
+                <label>Capital (€)</label>
+                <input
+                  type="text"
+                  value={prestamo3.capital}
+                  onChange={(e) => setPrestamo3({ ...prestamo3, capital: e.target.value })}
+                  placeholder="20000"
+                />
+              </div>
+              <div className={styles.prestamoInputGroup}>
+                <label>Plazo (meses)</label>
+                <input
+                  type="number"
+                  value={prestamo3.plazoMeses}
+                  onChange={(e) => setPrestamo3({ ...prestamo3, plazoMeses: e.target.value })}
+                  min="1"
+                  max="360"
+                  placeholder="48"
+                />
+              </div>
+              <div className={styles.prestamoInputGroup}>
+                <label>TIN anual (%)</label>
+                <input
+                  type="text"
+                  value={prestamo3.tin}
+                  onChange={(e) => setPrestamo3({ ...prestamo3, tin: e.target.value })}
+                  placeholder="6"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Gráfico de evolución del saldo */}
+          <div className={styles.chartSection}>
+            <h3 className={styles.chartTitle}>Evolución del Saldo Pendiente</h3>
+            <div className={styles.chartContainer}>
+              <canvas ref={chartRef}></canvas>
+            </div>
+          </div>
+
+          {/* Cards de resumen */}
+          <div className={styles.resumenCards}>
+            {datosComparador.resultados.filter(r => r.valido).map((r, idx) => {
+              const colores = ['#2E86AB', '#48A9A6', '#7FB3D3'];
+              const menorIntereses = Math.min(...datosComparador.resultados.filter(x => x.valido).map(x => x.totalIntereses));
+              const esMejor = r.totalIntereses === menorIntereses && datosComparador.resultados.filter(x => x.valido).length > 1;
+
+              return (
+                <div
+                  key={idx}
+                  className={`${styles.resumenCard} ${esMejor ? styles.mejorOpcion : ''}`}
+                  style={{ borderTopColor: colores[idx] }}
+                >
+                  {esMejor && <span className={styles.mejorBadge}>Menos intereses</span>}
+                  <h4 className={styles.resumenCardTitle}>{r.nombre}</h4>
+                  <div className={styles.resumenDatos}>
+                    <div className={styles.resumenItem}>
+                      <span>Capital</span>
+                      <strong>{formatCurrency(r.capital)}</strong>
+                    </div>
+                    <div className={styles.resumenItem}>
+                      <span>Plazo</span>
+                      <strong>{r.plazo} meses</strong>
+                    </div>
+                    <div className={styles.resumenItem}>
+                      <span>TIN</span>
+                      <strong>{formatNumber(r.tin, 2)}%</strong>
+                    </div>
+                    <div className={styles.resumenItem}>
+                      <span>Cuota media</span>
+                      <strong>{formatCurrency(r.cuotaMedia)}</strong>
+                    </div>
+                    <div className={`${styles.resumenItem} ${styles.destacado}`}>
+                      <span>Total intereses</span>
+                      <strong>{formatCurrency(r.totalIntereses)}</strong>
+                    </div>
+                    <div className={`${styles.resumenItem} ${styles.destacado}`}>
+                      <span>Total a pagar</span>
+                      <strong>{formatCurrency(r.totalPagado)}</strong>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Tabla comparativa */}
+          {datosComparador.resultados.filter(r => r.valido).length > 0 && (
+            <div className={styles.tablaComparativa}>
+              <h3 className={styles.tablaTitle}>Tabla Comparativa</h3>
+              <div className={styles.tableWrapper}>
+                <table className={styles.comparativaTableFull}>
+                  <thead>
+                    <tr>
+                      <th>Concepto</th>
+                      {datosComparador.resultados.filter(r => r.valido).map((r, idx) => (
+                        <th key={idx}>{r.nombre}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Capital</td>
+                      {datosComparador.resultados.filter(r => r.valido).map((r, idx) => (
+                        <td key={idx}>{formatCurrency(r.capital)}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td>Plazo</td>
+                      {datosComparador.resultados.filter(r => r.valido).map((r, idx) => (
+                        <td key={idx}>{r.plazo} meses ({formatNumber(r.plazo / 12, 1)} años)</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td>TIN anual</td>
+                      {datosComparador.resultados.filter(r => r.valido).map((r, idx) => (
+                        <td key={idx}>{formatNumber(r.tin, 2)}%</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td>Cuota inicial</td>
+                      {datosComparador.resultados.filter(r => r.valido).map((r, idx) => (
+                        <td key={idx}>{formatCurrency(r.cuotaInicial)}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td>Cuota final</td>
+                      {datosComparador.resultados.filter(r => r.valido).map((r, idx) => (
+                        <td key={idx}>{formatCurrency(r.cuotaFinal)}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td>Cuota media</td>
+                      {datosComparador.resultados.filter(r => r.valido).map((r, idx) => (
+                        <td key={idx}>{formatCurrency(r.cuotaMedia)}</td>
+                      ))}
+                    </tr>
+                    <tr className={styles.rowHighlight}>
+                      <td>Total intereses</td>
+                      {datosComparador.resultados.filter(r => r.valido).map((r, idx) => {
+                        const menorIntereses = Math.min(...datosComparador.resultados.filter(x => x.valido).map(x => x.totalIntereses));
+                        const esMejor = r.totalIntereses === menorIntereses && datosComparador.resultados.filter(x => x.valido).length > 1;
+                        return (
+                          <td key={idx} className={esMejor ? styles.mejorValor : ''}>
+                            {formatCurrency(r.totalIntereses)}
+                            {esMejor && <span className={styles.checkMark}> ✓</span>}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                    <tr className={styles.rowHighlight}>
+                      <td>Total a pagar</td>
+                      {datosComparador.resultados.filter(r => r.valido).map((r, idx) => {
+                        const menorTotal = Math.min(...datosComparador.resultados.filter(x => x.valido).map(x => x.totalPagado));
+                        const esMejor = r.totalPagado === menorTotal && datosComparador.resultados.filter(x => x.valido).length > 1;
+                        return (
+                          <td key={idx} className={esMejor ? styles.mejorValor : ''}>
+                            {formatCurrency(r.totalPagado)}
+                            {esMejor && <span className={styles.checkMark}> ✓</span>}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <section className={styles.infoSection}>
         <h2>Sistemas de Amortización</h2>

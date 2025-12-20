@@ -520,3 +520,360 @@
     padding: var(--spacing-sm);
   }
 }
+
+/* ============================================
+   MODO COMPARADOR - Estilos nuevos
+   ============================================ */
+
+/* Selector de Modo */
+.modoSelector {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.modoBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.modoBtn:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+
+.modoActivo {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+}
+
+.modoIcon {
+  font-size: 1.5rem;
+}
+
+.modoNombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Contenedor del Comparador */
+.comparadorContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Selector de Sistema */
+.sistemaSelector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.sistemaLabel {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sistemaBtns {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.sistemaBtn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sistemaBtn:hover {
+  border-color: var(--primary);
+}
+
+.sistemaActivo {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  color: var(--primary);
+}
+
+/* Grid de Inputs de Préstamos */
+.prestamosInputGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.prestamoInputCard {
+  background: var(--bg-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.prestamoInputTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+.prestamoColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.prestamoColor1 { background: #2E86AB; }
+.prestamoColor2 { background: #48A9A6; }
+.prestamoColor3 { background: #7FB3D3; }
+
+.prestamoInputGroup {
+  margin-bottom: var(--spacing-md);
+}
+
+.prestamoInputGroup label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.prestamoInputGroup input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.prestamoInputGroup input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Sección del Gráfico */
+.chartSection {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+}
+
+.chartTitle {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.chartContainer {
+  height: 350px;
+  position: relative;
+}
+
+/* Cards de Resumen */
+.resumenCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.resumenCard {
+  background: var(--bg-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--border);
+  position: relative;
+}
+
+.mejorOpcion {
+  border-top-color: #10B981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+}
+
+.mejorBadge {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: #10B981;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.resumenCardTitle {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.resumenDatos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.resumenItem {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.resumenItem span {
+  color: var(--text-secondary);
+}
+
+.resumenItem strong {
+  color: var(--text-primary);
+}
+
+.resumenItem.destacado {
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border);
+  margin-top: var(--spacing-xs);
+}
+
+.resumenItem.destacado strong {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+/* Tabla Comparativa Full */
+.tablaComparativa {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+}
+
+.tablaTitle {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.comparativaTableFull {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTableFull th,
+.comparativaTableFull td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.comparativaTableFull th {
+  background: var(--hover);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.comparativaTableFull th:first-child,
+.comparativaTableFull td:first-child {
+  text-align: left;
+}
+
+.comparativaTableFull td {
+  color: var(--text-primary);
+}
+
+.rowHighlight {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05) 0%, rgba(72, 169, 166, 0.05) 100%);
+}
+
+.rowHighlight td {
+  font-weight: 600;
+}
+
+.mejorValor {
+  color: #10B981 !important;
+  font-weight: 700 !important;
+}
+
+.checkMark {
+  color: #10B981;
+}
+
+/* Responsive para Comparador */
+@media (max-width: 1024px) {
+  .prestamosInputGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resumenCards {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTableFull {
+    font-size: 0.8rem;
+  }
+
+  .comparativaTableFull th,
+  .comparativaTableFull td {
+    padding: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 768px) {
+  .modoSelector {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .modoBtn {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .sistemaSelector {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .sistemaBtns {
+    justify-content: center;
+  }
+
+  .chartContainer {
+    height: 280px;
+  }
+}
