@@ -547,3 +547,407 @@
     font-size: 1.25rem;
   }
 }
+
+/* === MODO SELECTOR === */
+.modoSelector {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-sm);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.modoBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modoBtn:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.modoActivo {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.modoActivo:hover {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.modoIcon {
+  font-size: 1.25rem;
+}
+
+.modoNombre {
+  font-weight: 600;
+}
+
+/* === COMPARADOR CONTENT === */
+.comparadorContent {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-xl);
+}
+
+.comparadorIntro {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.comparadorIntro p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: var(--spacing-sm) 0 0;
+}
+
+.comparadorInputs {
+  margin-bottom: var(--spacing-xl);
+}
+
+.alturaInput {
+  max-width: 400px;
+  margin: 0 auto var(--spacing-lg);
+}
+
+.pesosInputGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.pesoInput {
+  background: var(--bg-primary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+/* === CHART SECTION === */
+.chartSection {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.chartSection h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.chartLegend {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.legendItem::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legendItem[data-color="bajo"]::before {
+  background: rgba(52, 152, 219, 0.7);
+}
+
+.legendItem[data-color="normal"]::before {
+  background: rgba(39, 174, 96, 0.7);
+}
+
+.legendItem[data-color="sobrepeso"]::before {
+  background: rgba(243, 156, 18, 0.7);
+}
+
+.legendItem[data-color="obesidad"]::before {
+  background: rgba(231, 76, 60, 0.7);
+}
+
+.chartContainer {
+  height: 200px;
+  position: relative;
+}
+
+/* === RESUMEN CARDS === */
+.resumenCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.resumenCard {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 2px solid var(--border);
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.resumenCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.cardSaludable {
+  border-color: #27ae60;
+  background: rgba(39, 174, 96, 0.05);
+}
+
+.badgeSaludable {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #27ae60;
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.resumenCard h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: var(--spacing-sm) 0;
+  color: var(--text-primary);
+}
+
+.resumenPeso {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.resumenIMC {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.resumenClasificacion {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: 50px;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.resumenDiferencia {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-sm);
+}
+
+/* === PESO IDEAL INFO === */
+.pesoIdealInfo {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.pesoIdealInfo p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+/* === TABLA COMPARATIVA === */
+.tablaComparativa {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.tablaComparativa h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.tablaComparativa table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tablaComparativa th,
+.tablaComparativa td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.tablaComparativa th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tablaComparativa td {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.tablaComparativa tr:last-child td {
+  border-bottom: none;
+}
+
+.filaSaludable {
+  background: rgba(39, 174, 96, 0.08);
+}
+
+.tagClasificacion {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 50px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* === DARK MODE COMPARADOR === */
+[data-theme='dark'] .modoSelector {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .comparadorContent {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .pesoInput {
+  background: var(--hover);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .chartSection {
+  background: var(--hover);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .resumenCard {
+  background: var(--hover);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .cardSaludable {
+  background: rgba(39, 174, 96, 0.1);
+  border-color: #27ae60;
+}
+
+[data-theme='dark'] .pesoIdealInfo {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.15) 0%, rgba(72, 169, 166, 0.15) 100%);
+}
+
+[data-theme='dark'] .tablaComparativa {
+  background: var(--hover);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .filaSaludable {
+  background: rgba(39, 174, 96, 0.12);
+}
+
+/* === RESPONSIVE COMPARADOR === */
+@media (max-width: 1024px) {
+  .pesosInputGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+  }
+
+  .resumenCards {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .modoSelector {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .modoBtn {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .pesosInputGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resumenCards {
+    grid-template-columns: 1fr;
+  }
+
+  .chartContainer {
+    height: 180px;
+  }
+
+  .chartLegend {
+    gap: var(--spacing-sm);
+  }
+
+  .legendItem {
+    font-size: 0.75rem;
+  }
+
+  .tablaComparativa {
+    overflow-x: auto;
+  }
+
+  .tablaComparativa table {
+    min-width: 500px;
+  }
+}

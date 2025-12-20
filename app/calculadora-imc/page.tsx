@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import Chart from 'chart.js/auto';
 import styles from './CalculadoraIMC.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
 import { getRelatedApps, getRelatedAppsTitle } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+
+type ModoApp = 'calculadora' | 'comparador';
 
 type Clasificacion = {
   texto: string;
@@ -69,7 +72,18 @@ function calcularPesoIdeal(alturaCm: number): { min: number; max: number } {
   };
 }
 
+type DatoPerfil = {
+  nombre: string;
+  peso: number;
+  imc: number;
+  clasificacion: Clasificacion;
+  pesoIdeal: { min: number; max: number };
+  diferencia: number;
+  esSaludable: boolean;
+};
+
 export default function CalculadoraIMCPage() {
+  // Estados modo calculadora
   const [peso, setPeso] = useState('');
   const [altura, setAltura] = useState('');
   const [resultado, setResultado] = useState<{
@@ -78,6 +92,17 @@ export default function CalculadoraIMCPage() {
     pesoIdeal: { min: number; max: number };
     diferencia: number;
   } | null>(null);
+
+  // Estados modo comparador
+  const [modo, setModo] = useState<ModoApp>('calculadora');
+  const [alturaComparador, setAlturaComparador] = useState('175');
+  const [peso1, setPeso1] = useState('60');
+  const [peso2, setPeso2] = useState('75');
+  const [peso3, setPeso3] = useState('90');
+
+  // Refs para Chart.js
+  const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const calcular = () => {
     const pesoNum = parseSpanishNumber(peso);
@@ -109,6 +134,166 @@ export default function CalculadoraIMCPage() {
     setResultado(null);
   };
 
+  // Cálculo de datos para comparador
+  const datosComparador = useMemo(() => {
+    const alturaNum = parseSpanishNumber(alturaComparador);
+    const pesos = [
+      { nombre: 'Perfil 1', valor: parseSpanishNumber(peso1) },
+      { nombre: 'Perfil 2', valor: parseSpanishNumber(peso2) },
+      { nombre: 'Perfil 3', valor: parseSpanishNumber(peso3) },
+    ];
+
+    if (alturaNum <= 0) return null;
+
+    const perfiles: DatoPerfil[] = pesos.map(({ nombre, valor }) => {
+      if (valor <= 0) {
+        return null;
+      }
+      const alturaM = alturaNum / 100;
+      const imc = valor / (alturaM * alturaM);
+      const clasificacion = obtenerClasificacion(imc);
+      const pesoIdeal = calcularPesoIdeal(alturaNum);
+
+      let diferencia = 0;
+      if (valor < pesoIdeal.min) {
+        diferencia = valor - pesoIdeal.min;
+      } else if (valor > pesoIdeal.max) {
+        diferencia = valor - pesoIdeal.max;
+      }
+
+      return {
+        nombre,
+        peso: valor,
+        imc,
+        clasificacion,
+        pesoIdeal,
+        diferencia,
+        esSaludable: imc >= 18.5 && imc < 25,
+      };
+    }).filter((p): p is DatoPerfil => p !== null);
+
+    if (perfiles.length === 0) return null;
+
+    return {
+      perfiles,
+      pesoIdealRango: calcularPesoIdeal(alturaNum),
+    };
+  }, [alturaComparador, peso1, peso2, peso3]);
+
+  // Effect para Chart.js
+  useEffect(() => {
+    if (modo !== 'comparador' || !datosComparador || !chartRef.current) {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
+      }
+      return;
+    }
+
+    if (chartInstanceRef.current) {
+      chartInstanceRef.current.destroy();
+    }
+
+    const ctx = chartRef.current.getContext('2d');
+    if (!ctx) return;
+
+    const { perfiles } = datosComparador;
+
+    // Plugin para dibujar zonas de fondo por clasificación IMC
+    const zonasPlugin = {
+      id: 'zonasIMC',
+      beforeDraw: (chart: Chart) => {
+        const { ctx, chartArea, scales } = chart;
+        if (!chartArea || !scales.x) return;
+
+        const { left, right, top, bottom } = chartArea;
+        const xScale = scales.x;
+
+        // Zonas IMC
+        const zonas = [
+          { min: 0, max: 18.5, color: 'rgba(52, 152, 219, 0.15)' },    // Bajo peso
+          { min: 18.5, max: 25, color: 'rgba(39, 174, 96, 0.15)' },    // Normal
+          { min: 25, max: 30, color: 'rgba(243, 156, 18, 0.15)' },     // Sobrepeso
+          { min: 30, max: 35, color: 'rgba(230, 126, 34, 0.15)' },     // Obesidad I
+          { min: 35, max: 40, color: 'rgba(231, 76, 60, 0.15)' },      // Obesidad II
+          { min: 40, max: 50, color: 'rgba(192, 57, 43, 0.15)' },      // Obesidad III
+        ];
+
+        zonas.forEach(zona => {
+          const xStart = Math.max(xScale.getPixelForValue(zona.min), left);
+          const xEnd = Math.min(xScale.getPixelForValue(zona.max), right);
+          if (xStart < xEnd) {
+            ctx.fillStyle = zona.color;
+            ctx.fillRect(xStart, top, xEnd - xStart, bottom - top);
+          }
+        });
+      }
+    };
+
+    chartInstanceRef.current = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: perfiles.map(p => `${p.nombre} (${formatNumber(p.peso, 0)} kg)`),
+        datasets: [{
+          label: 'IMC',
+          data: perfiles.map(p => p.imc),
+          backgroundColor: perfiles.map(p => p.clasificacion.color),
+          borderColor: perfiles.map(p => p.clasificacion.color),
+          borderWidth: 2,
+          borderRadius: 8,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const perfil = perfiles[context.dataIndex];
+                return [
+                  `IMC: ${formatNumber(perfil.imc, 1)}`,
+                  `Clasificación: ${perfil.clasificacion.texto}`,
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            min: 10,
+            max: 45,
+            title: {
+              display: true,
+              text: 'Índice de Masa Corporal (IMC)',
+            },
+            grid: {
+              display: true,
+              color: 'rgba(0, 0, 0, 0.1)',
+            }
+          },
+          y: {
+            grid: {
+              display: false,
+            }
+          }
+        }
+      },
+      plugins: [zonasPlugin]
+    });
+
+    return () => {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
+      }
+    };
+  }, [modo, datosComparador]);
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -120,6 +305,27 @@ export default function CalculadoraIMCPage() {
         </p>
       </header>
 
+      {/* Selector de modo */}
+      <div className={styles.modoSelector}>
+        <button
+          type="button"
+          className={`${styles.modoBtn} ${modo === 'calculadora' ? styles.modoActivo : ''}`}
+          onClick={() => setModo('calculadora')}
+        >
+          <span className={styles.modoIcon}>⚖️</span>
+          <span className={styles.modoNombre}>Calculadora</span>
+        </button>
+        <button
+          type="button"
+          className={`${styles.modoBtn} ${modo === 'comparador' ? styles.modoActivo : ''}`}
+          onClick={() => setModo('comparador')}
+        >
+          <span className={styles.modoIcon}>📊</span>
+          <span className={styles.modoNombre}>Comparador</span>
+        </button>
+      </div>
+
+      {modo === 'calculadora' && (
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
           <h2 className={styles.panelTitle}>Tus datos</h2>
@@ -145,10 +351,10 @@ export default function CalculadoraIMCPage() {
           />
 
           <div className={styles.buttonGroup}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular IMC
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -260,6 +466,179 @@ export default function CalculadoraIMCPage() {
           )}
         </div>
       </div>
+      )}
+
+      {/* Modo Comparador */}
+      {modo === 'comparador' && (
+        <div className={styles.comparadorContent}>
+          <div className={styles.comparadorIntro}>
+            <h2 className={styles.panelTitle}>📊 Comparador de Perfiles</h2>
+            <p>Compara cómo variaría tu IMC con diferentes pesos para una misma altura</p>
+          </div>
+
+          <div className={styles.comparadorInputs}>
+            <div className={styles.alturaInput}>
+              <NumberInput
+                value={alturaComparador}
+                onChange={setAlturaComparador}
+                label="Altura (común para los 3 perfiles)"
+                placeholder="175"
+                helperText="cm"
+                min={50}
+                max={250}
+              />
+            </div>
+
+            <div className={styles.pesosInputGrid}>
+              <div className={styles.pesoInput}>
+                <NumberInput
+                  value={peso1}
+                  onChange={setPeso1}
+                  label="Perfil 1"
+                  placeholder="60"
+                  helperText="kg"
+                  min={1}
+                  max={500}
+                />
+              </div>
+              <div className={styles.pesoInput}>
+                <NumberInput
+                  value={peso2}
+                  onChange={setPeso2}
+                  label="Perfil 2"
+                  placeholder="75"
+                  helperText="kg"
+                  min={1}
+                  max={500}
+                />
+              </div>
+              <div className={styles.pesoInput}>
+                <NumberInput
+                  value={peso3}
+                  onChange={setPeso3}
+                  label="Perfil 3"
+                  placeholder="90"
+                  helperText="kg"
+                  min={1}
+                  max={500}
+                />
+              </div>
+            </div>
+          </div>
+
+          {datosComparador && (
+            <>
+              {/* Gráfico */}
+              <div className={styles.chartSection}>
+                <h3>📈 Comparativa Visual de IMC</h3>
+                <div className={styles.chartLegend}>
+                  <span className={styles.legendItem} data-color="bajo">Bajo peso</span>
+                  <span className={styles.legendItem} data-color="normal">Normal</span>
+                  <span className={styles.legendItem} data-color="sobrepeso">Sobrepeso</span>
+                  <span className={styles.legendItem} data-color="obesidad">Obesidad</span>
+                </div>
+                <div className={styles.chartContainer}>
+                  <canvas ref={chartRef}></canvas>
+                </div>
+              </div>
+
+              {/* Cards resumen */}
+              <div className={styles.resumenCards}>
+                {datosComparador.perfiles.map((perfil, idx) => (
+                  <div
+                    key={idx}
+                    className={`${styles.resumenCard} ${perfil.esSaludable ? styles.cardSaludable : ''}`}
+                  >
+                    {perfil.esSaludable && (
+                      <span className={styles.badgeSaludable}>✅ Peso saludable</span>
+                    )}
+                    <h4>{perfil.nombre}</h4>
+                    <div className={styles.resumenPeso}>{formatNumber(perfil.peso, 0)} kg</div>
+                    <div
+                      className={styles.resumenIMC}
+                      style={{ color: perfil.clasificacion.color }}
+                    >
+                      IMC: {formatNumber(perfil.imc, 1)}
+                    </div>
+                    <div
+                      className={styles.resumenClasificacion}
+                      style={{ backgroundColor: perfil.clasificacion.color }}
+                    >
+                      {perfil.clasificacion.icono} {perfil.clasificacion.texto}
+                    </div>
+                    {perfil.diferencia !== 0 && (
+                      <div className={styles.resumenDiferencia}>
+                        {perfil.diferencia > 0
+                          ? `+${formatNumber(perfil.diferencia, 1)} kg sobre ideal`
+                          : `${formatNumber(perfil.diferencia, 1)} kg bajo ideal`
+                        }
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Info peso ideal */}
+              <div className={styles.pesoIdealInfo}>
+                <p>
+                  🎯 <strong>Peso ideal para {formatNumber(parseSpanishNumber(alturaComparador), 0)} cm:</strong>{' '}
+                  {formatNumber(datosComparador.pesoIdealRango.min, 1)} - {formatNumber(datosComparador.pesoIdealRango.max, 1)} kg
+                </p>
+              </div>
+
+              {/* Tabla comparativa */}
+              <div className={styles.tablaComparativa}>
+                <h3>📋 Tabla Comparativa</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Perfil</th>
+                      <th>Peso</th>
+                      <th>IMC</th>
+                      <th>Clasificación</th>
+                      <th>Diferencia</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {datosComparador.perfiles.map((perfil, idx) => (
+                      <tr key={idx} className={perfil.esSaludable ? styles.filaSaludable : ''}>
+                        <td>{perfil.nombre}</td>
+                        <td>{formatNumber(perfil.peso, 0)} kg</td>
+                        <td style={{ color: perfil.clasificacion.color, fontWeight: 600 }}>
+                          {formatNumber(perfil.imc, 1)}
+                        </td>
+                        <td>
+                          <span
+                            className={styles.tagClasificacion}
+                            style={{ backgroundColor: perfil.clasificacion.color }}
+                          >
+                            {perfil.clasificacion.texto}
+                          </span>
+                        </td>
+                        <td>
+                          {perfil.diferencia === 0
+                            ? '✅ Ideal'
+                            : perfil.diferencia > 0
+                              ? `+${formatNumber(perfil.diferencia, 1)} kg`
+                              : `${formatNumber(perfil.diferencia, 1)} kg`
+                          }
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {!datosComparador && (
+            <div className={styles.placeholder}>
+              <span className={styles.placeholderIcon}>📊</span>
+              <p>Introduce una altura y al menos un peso para ver la comparación</p>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className={styles.disclaimer}>
         <h3>⚠️ Aviso Importante</h3>
