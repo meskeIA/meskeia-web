@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorFacturas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -27,6 +27,148 @@ interface DatosCliente {
   codigoPostal: string;
   ciudad: string;
   provincia: string;
+}
+
+// Tipos para validación
+type ValidationStatus = 'idle' | 'validating' | 'valid' | 'invalid' | 'warning';
+
+interface ValidationState {
+  status: ValidationStatus;
+  message: string;
+  suggestion?: string;
+  details?: Record<string, string>;
+}
+
+interface ValidationStates {
+  emisorNif: ValidationState;
+  emisorEmail: ValidationState;
+  emisorTelefono: ValidationState;
+  clienteNif: ValidationState;
+}
+
+const initialValidationState: ValidationState = {
+  status: 'idle',
+  message: '',
+};
+
+// Funciones de validación con las APIs internas
+async function validarNIF(documento: string): Promise<ValidationState> {
+  if (!documento.trim()) {
+    return { status: 'idle', message: '' };
+  }
+
+  try {
+    const response = await fetch('/api/validaciones/nif', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ documento }),
+    });
+
+    const data = await response.json();
+
+    if (data.valido) {
+      const tipoEntidad = data.detalles?.tipo_entidad;
+      return {
+        status: 'valid',
+        message: tipoEntidad ? `${data.tipo} válido - ${tipoEntidad}` : data.mensaje,
+        details: { tipo: data.tipo, formateado: data.documento_formateado },
+      };
+    } else {
+      return {
+        status: 'invalid',
+        message: data.mensaje,
+        details: data.detalles,
+      };
+    }
+  } catch {
+    return { status: 'idle', message: 'Error al validar' };
+  }
+}
+
+async function validarEmail(email: string): Promise<ValidationState> {
+  if (!email.trim()) {
+    return { status: 'idle', message: '' };
+  }
+
+  try {
+    const response = await fetch('/api/validaciones/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!data.formato_valido) {
+      return {
+        status: 'invalid',
+        message: data.advertencias?.[0] || 'Formato de email inválido',
+      };
+    }
+
+    if (data.sugerencia) {
+      return {
+        status: 'warning',
+        message: `¿Quisiste decir ${data.sugerencia}?`,
+        suggestion: data.sugerencia,
+      };
+    }
+
+    if (data.es_desechable) {
+      return {
+        status: 'warning',
+        message: 'Este parece ser un email temporal',
+      };
+    }
+
+    if (data.advertencias?.length > 0) {
+      return {
+        status: 'warning',
+        message: data.advertencias[0],
+      };
+    }
+
+    return {
+      status: 'valid',
+      message: 'Email válido',
+    };
+  } catch {
+    return { status: 'idle', message: 'Error al validar' };
+  }
+}
+
+async function validarTelefono(telefono: string): Promise<ValidationState> {
+  if (!telefono.trim()) {
+    return { status: 'idle', message: '' };
+  }
+
+  try {
+    const response = await fetch('/api/validaciones/telefono', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telefono }),
+    });
+
+    const data = await response.json();
+
+    if (data.valido) {
+      const info = data.tipo === 'movil' ? 'Móvil' :
+                   data.tipo === 'fijo' ? `Fijo${data.provincia ? ` (${data.provincia})` : ''}` :
+                   data.tipo;
+      return {
+        status: 'valid',
+        message: `${info} válido`,
+        details: { formateado: data.formato_nacional },
+      };
+    } else {
+      return {
+        status: 'invalid',
+        message: data.mensaje,
+      };
+    }
+  } catch {
+    return { status: 'idle', message: 'Error al validar' };
+  }
 }
 
 interface LineaFactura {
@@ -122,6 +264,117 @@ export default function GeneradorFacturasPage() {
   // Vista previa
   const [mostrarPreview, setMostrarPreview] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Estados de validación
+  const [validations, setValidations] = useState<ValidationStates>({
+    emisorNif: initialValidationState,
+    emisorEmail: initialValidationState,
+    emisorTelefono: initialValidationState,
+    clienteNif: initialValidationState,
+  });
+
+  // Debounce refs para evitar llamadas excesivas
+  const debounceTimers = useRef<Record<string, NodeJS.Timeout>>({});
+
+  // Función para validar con debounce
+  const validateWithDebounce = useCallback((
+    field: keyof ValidationStates,
+    value: string,
+    validatorFn: (value: string) => Promise<ValidationState>
+  ) => {
+    // Limpiar timer anterior
+    if (debounceTimers.current[field]) {
+      clearTimeout(debounceTimers.current[field]);
+    }
+
+    // Si está vacío, resetear
+    if (!value.trim()) {
+      setValidations(prev => ({
+        ...prev,
+        [field]: initialValidationState,
+      }));
+      return;
+    }
+
+    // Marcar como validando
+    setValidations(prev => ({
+      ...prev,
+      [field]: { status: 'validating', message: 'Validando...' },
+    }));
+
+    // Esperar 500ms antes de validar
+    debounceTimers.current[field] = setTimeout(async () => {
+      const result = await validatorFn(value);
+      setValidations(prev => ({
+        ...prev,
+        [field]: result,
+      }));
+    }, 500);
+  }, []);
+
+  // Handlers de validación onBlur
+  const handleEmisorNifBlur = useCallback(() => {
+    validateWithDebounce('emisorNif', emisor.nif, validarNIF);
+  }, [emisor.nif, validateWithDebounce]);
+
+  const handleEmisorEmailBlur = useCallback(() => {
+    validateWithDebounce('emisorEmail', emisor.email, validarEmail);
+  }, [emisor.email, validateWithDebounce]);
+
+  const handleEmisorTelefonoBlur = useCallback(() => {
+    validateWithDebounce('emisorTelefono', emisor.telefono, validarTelefono);
+  }, [emisor.telefono, validateWithDebounce]);
+
+  const handleClienteNifBlur = useCallback(() => {
+    validateWithDebounce('clienteNif', cliente.nif, validarNIF);
+  }, [cliente.nif, validateWithDebounce]);
+
+  // Aplicar sugerencia de email
+  const aplicarSugerenciaEmail = useCallback(() => {
+    if (validations.emisorEmail.suggestion) {
+      setEmisor(prev => ({ ...prev, email: validations.emisorEmail.suggestion! }));
+      setValidations(prev => ({
+        ...prev,
+        emisorEmail: { status: 'valid', message: 'Email corregido' },
+      }));
+    }
+  }, [validations.emisorEmail.suggestion]);
+
+  // Componente para renderizar icono de validación
+  const ValidationIcon = ({ status }: { status: ValidationStatus }) => {
+    if (status === 'idle') return null;
+    if (status === 'validating') return <span className={`${styles.validationIcon} ${styles.loading}`}>⟳</span>;
+    if (status === 'valid') return <span className={`${styles.validationIcon} ${styles.valid}`}>✓</span>;
+    if (status === 'invalid') return <span className={`${styles.validationIcon} ${styles.invalid}`}>✗</span>;
+    if (status === 'warning') return <span className={`${styles.validationIcon} ${styles.invalid}`}>⚠</span>;
+    return null;
+  };
+
+  // Componente para mensaje de validación
+  const ValidationMessage = ({ validation, onSuggestionClick }: {
+    validation: ValidationState;
+    onSuggestionClick?: () => void;
+  }) => {
+    if (validation.status === 'idle' || validation.status === 'validating') return null;
+
+    const className = validation.status === 'valid' ? styles.success :
+                      validation.status === 'invalid' ? styles.error :
+                      styles.warning;
+
+    return (
+      <div className={`${styles.validationMessage} ${className}`}>
+        {validation.message}
+        {validation.suggestion && onSuggestionClick && (
+          <>
+            {' '}
+            <button type="button" onClick={onSuggestionClick} className={styles.suggestionLink}>
+              Aplicar
+            </button>
+          </>
+        )}
+      </div>
+    );
+  };
 
   // Cargar datos guardados
   useEffect(() => {
@@ -222,9 +475,17 @@ export default function GeneradorFacturasPage() {
   // Número de factura formateado
   const numeroFactura = `${config.serie}-${config.numero.toString().padStart(4, '0')}`;
 
-  // Validación
-  const esValida = emisor.nombre && emisor.nif && cliente.nombre &&
+  // Validación básica
+  const camposBasicosValidos = emisor.nombre && emisor.nif && cliente.nombre &&
     lineas.some(l => l.concepto && l.precioUnitario > 0);
+
+  // Verificar que no hay errores de validación en campos obligatorios
+  const hayErroresValidacion =
+    validations.emisorNif.status === 'invalid' ||
+    (cliente.nif && validations.clienteNif.status === 'invalid');
+
+  // Validación completa
+  const esValida = camposBasicosValidos && !hayErroresValidacion;
 
   // Guardar en historial y avanzar número
   const guardarFactura = () => {
@@ -277,6 +538,11 @@ export default function GeneradorFacturasPage() {
       notas: '',
     }));
     setMostrarPreview(false);
+    // Resetear validaciones del cliente (las del emisor se mantienen)
+    setValidations(prev => ({
+      ...prev,
+      clienteNif: initialValidationState,
+    }));
   };
 
   return (
@@ -318,14 +584,22 @@ export default function GeneradorFacturasPage() {
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="emisorNif">NIF / CIF *</label>
-                <input
-                  id="emisorNif"
-                  type="text"
-                  value={emisor.nif}
-                  onChange={e => setEmisor({ ...emisor, nif: e.target.value.toUpperCase() })}
-                  placeholder="12345678A"
-                  className={styles.input}
-                />
+                <div className={styles.inputWrapper}>
+                  <input
+                    id="emisorNif"
+                    type="text"
+                    value={emisor.nif}
+                    onChange={e => setEmisor({ ...emisor, nif: e.target.value.toUpperCase() })}
+                    onBlur={handleEmisorNifBlur}
+                    placeholder="12345678A"
+                    className={`${styles.input} ${styles.inputWithValidation} ${
+                      validations.emisorNif.status === 'valid' ? styles.valid :
+                      validations.emisorNif.status === 'invalid' ? styles.invalid : ''
+                    }`}
+                  />
+                  <ValidationIcon status={validations.emisorNif.status} />
+                </div>
+                <ValidationMessage validation={validations.emisorNif} />
               </div>
               <div className={styles.formGroup + ' ' + styles.fullWidth}>
                 <label htmlFor="emisorDireccion">Dirección</label>
@@ -362,24 +636,44 @@ export default function GeneradorFacturasPage() {
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="emisorTelefono">Teléfono</label>
-                <input
-                  id="emisorTelefono"
-                  type="tel"
-                  value={emisor.telefono}
-                  onChange={e => setEmisor({ ...emisor, telefono: e.target.value })}
-                  placeholder="600 123 456"
-                  className={styles.input}
-                />
+                <div className={styles.inputWrapper}>
+                  <input
+                    id="emisorTelefono"
+                    type="tel"
+                    value={emisor.telefono}
+                    onChange={e => setEmisor({ ...emisor, telefono: e.target.value })}
+                    onBlur={handleEmisorTelefonoBlur}
+                    placeholder="600 123 456"
+                    className={`${styles.input} ${styles.inputWithValidation} ${
+                      validations.emisorTelefono.status === 'valid' ? styles.valid :
+                      validations.emisorTelefono.status === 'invalid' ? styles.invalid : ''
+                    }`}
+                  />
+                  <ValidationIcon status={validations.emisorTelefono.status} />
+                </div>
+                <ValidationMessage validation={validations.emisorTelefono} />
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="emisorEmail">Email</label>
-                <input
-                  id="emisorEmail"
-                  type="email"
-                  value={emisor.email}
-                  onChange={e => setEmisor({ ...emisor, email: e.target.value })}
-                  placeholder="tu@email.com"
-                  className={styles.input}
+                <div className={styles.inputWrapper}>
+                  <input
+                    id="emisorEmail"
+                    type="email"
+                    value={emisor.email}
+                    onChange={e => setEmisor({ ...emisor, email: e.target.value })}
+                    onBlur={handleEmisorEmailBlur}
+                    placeholder="tu@email.com"
+                    className={`${styles.input} ${styles.inputWithValidation} ${
+                      validations.emisorEmail.status === 'valid' ? styles.valid :
+                      validations.emisorEmail.status === 'invalid' ? styles.invalid :
+                      validations.emisorEmail.status === 'warning' ? styles.invalid : ''
+                    }`}
+                  />
+                  <ValidationIcon status={validations.emisorEmail.status} />
+                </div>
+                <ValidationMessage
+                  validation={validations.emisorEmail}
+                  onSuggestionClick={validations.emisorEmail.suggestion ? aplicarSugerenciaEmail : undefined}
                 />
               </div>
             </div>
@@ -402,14 +696,22 @@ export default function GeneradorFacturasPage() {
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="clienteNif">NIF / CIF</label>
-                <input
-                  id="clienteNif"
-                  type="text"
-                  value={cliente.nif}
-                  onChange={e => setCliente({ ...cliente, nif: e.target.value.toUpperCase() })}
-                  placeholder="B12345678"
-                  className={styles.input}
-                />
+                <div className={styles.inputWrapper}>
+                  <input
+                    id="clienteNif"
+                    type="text"
+                    value={cliente.nif}
+                    onChange={e => setCliente({ ...cliente, nif: e.target.value.toUpperCase() })}
+                    onBlur={handleClienteNifBlur}
+                    placeholder="B12345678"
+                    className={`${styles.input} ${styles.inputWithValidation} ${
+                      validations.clienteNif.status === 'valid' ? styles.valid :
+                      validations.clienteNif.status === 'invalid' ? styles.invalid : ''
+                    }`}
+                  />
+                  <ValidationIcon status={validations.clienteNif.status} />
+                </div>
+                <ValidationMessage validation={validations.clienteNif} />
               </div>
               <div className={styles.formGroup + ' ' + styles.fullWidth}>
                 <label htmlFor="clienteDireccion">Dirección</label>
