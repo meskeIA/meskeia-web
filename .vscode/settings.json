@@ -1,0 +1,9 @@
+{
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "never",
+    "source.organizeImports": "never"
+  },
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "files.autoSave": "off"
+}

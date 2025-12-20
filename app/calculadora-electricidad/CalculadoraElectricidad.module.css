@@ -386,6 +386,227 @@
   line-height: 1.6;
 }
 
+/* Divisor de Tensión/Corriente */
+.divisorGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.divisorCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  text-align: center;
+}
+
+.divisorCardDestacado {
+  background: rgba(46, 134, 171, 0.1);
+  border: 2px solid var(--primary);
+}
+
+.divisorLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.divisorValor {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+}
+
+/* Circuitos Mixtos */
+.textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-family: 'Courier New', monospace;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.infoBox {
+  background: rgba(46, 134, 171, 0.1);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.infoBox p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.infoBox code {
+  background: var(--bg-card);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+}
+
+.ejemplosBox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.ejemploBtn {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+}
+
+.ejemploBtn:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+
+.errorBox {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+/* Circuitos RC/RL */
+.rcrlGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.rcrlCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  text-align: center;
+}
+
+.rcrlLabel {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.rcrlValor {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+}
+
+.rcrlUnidad {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.tiemposBox {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.tiemposBox h4 {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.tiemposGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.tiempoItem {
+  text-align: center;
+  padding: var(--spacing-sm);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+}
+
+.tiempoItem span {
+  display: block;
+}
+
+.tiempoItem span:first-child {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.tiempoItem span:last-child {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* Tabla de factores */
+.tableWrapper {
+  overflow-x: auto;
+  margin-top: var(--spacing-lg);
+}
+
+.factoresTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.factoresTable th,
+.factoresTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.factoresTable th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.factoresTable td {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+.factoresTable tr:nth-child(even) td {
+  background: var(--hover);
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .mainContent {
@@ -407,11 +628,26 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .consumoGrid {
+  .consumoGrid,
+  .divisorGrid,
+  .rcrlGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tiemposGrid {
     grid-template-columns: 1fr;
   }
 
   .resultadoValor {
     font-size: 1.8rem;
+  }
+
+  .factoresTable {
+    font-size: 0.75rem;
+  }
+
+  .factoresTable th,
+  .factoresTable td {
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
 }
