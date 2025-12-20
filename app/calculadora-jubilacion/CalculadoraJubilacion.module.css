@@ -500,13 +500,218 @@
   line-height: 1.6;
 }
 
+/* Selector de Modo */
+.modoSelector {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xs);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+}
+
+.modoBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.modoBtn:hover {
+  background: var(--hover);
+}
+
+.modoBtn.modoActivo {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: var(--primary);
+}
+
+.modoIcon {
+  font-size: 1.5rem;
+}
+
+.modoNombre {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Modo Comparador */
+.comparadorContent {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.aportacionesInputGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+.chartSection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.chartContainer {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  height: 350px;
+}
+
+.resumenCardsComparador {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.resumenCardComp {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  text-align: center;
+  border-top: 4px solid var(--primary);
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.resumenCardComp.mejorOpcion {
+  background: rgba(46, 134, 171, 0.1);
+  box-shadow: var(--shadow-md);
+}
+
+.mejorBadge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius);
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.resumenCardHeader {
+  margin-bottom: var(--spacing-sm);
+}
+
+.resumenCardAportacion {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.resumenCardCapital {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+  margin-bottom: var(--spacing-sm);
+}
+
+.resumenCardPension {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.resumenCardIntereses {
+  font-size: 0.8rem;
+  color: var(--success);
+}
+
+.infoAdicional {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.infoAdicional p {
+  margin: var(--spacing-xs) 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Tabla Comparativa */
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tablaComparativa th,
+.tablaComparativa td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.tablaComparativa th {
+  background: var(--hover);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.tablaComparativa th:first-child,
+.tablaComparativa td:first-child {
+  text-align: left;
+}
+
+.tablaComparativa .filaDestacada {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.tablaComparativa .filaPension td {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* Colores para columnas de la tabla */
+.tablaComparativa th:nth-child(2) {
+  color: #2E86AB;
+}
+
+.tablaComparativa th:nth-child(3) {
+  color: #48A9A6;
+}
+
+.tablaComparativa th:nth-child(4) {
+  color: #7FB3D3;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .mainContent {
     grid-template-columns: 1fr;
   }
 
+  .comparadorContent {
+    grid-template-columns: 1fr;
+  }
+
   .comparadorGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resumenCardsComparador {
     grid-template-columns: 1fr;
   }
 }
@@ -531,5 +736,37 @@
 
   .escenariosGrid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .modoSelector {
+    flex-direction: row;
+    gap: var(--spacing-xs);
+  }
+
+  .modoBtn {
+    flex: 1;
+    min-width: auto;
+    padding: var(--spacing-sm);
+  }
+
+  .modoNombre {
+    font-size: 0.8rem;
+  }
+
+  .chartContainer {
+    height: 280px;
+  }
+
+  .resumenCardCapital {
+    font-size: 1.2rem;
+  }
+
+  .tablaComparativa {
+    font-size: 0.75rem;
+  }
+
+  .tablaComparativa th,
+  .tablaComparativa td {
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
 }
