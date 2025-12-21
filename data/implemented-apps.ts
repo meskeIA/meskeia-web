@@ -134,6 +134,7 @@ export const implementedAppsUrls = [
   "/juego-platform-runner/",    // Juego de plataformas
   "/ruleta-aleatoria/",         // Ruleta personalizable para sorteos
   "/generador-loteria/",        // Números para Primitiva, Euromillones, Bonoloto
+  "/cara-o-cruz/",              // Lanza moneda con animación y estadísticas
 
   // Salud y Bienestar (14 implementadas)
   "/calculadora-imc/",

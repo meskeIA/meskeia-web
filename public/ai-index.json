@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 189,
+  "total_tools": 190,
   "updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -188,7 +188,8 @@
         { "name": "Juego Space Invaders", "slug": "juego-space-invaders", "url": "https://meskeia.com/juego-space-invaders/", "description": "Arcade clásico: defiende la Tierra de los invasores" },
         { "name": "Juego Platform Runner", "slug": "juego-platform-runner", "url": "https://meskeia.com/juego-platform-runner/", "description": "Plataformas: corre, salta y recolecta monedas" },
         { "name": "Ruleta Aleatoria", "slug": "ruleta-aleatoria", "url": "https://meskeia.com/ruleta-aleatoria/", "description": "Ruleta personalizable para sorteos, decisiones y selección al azar" },
-        { "name": "Generador de Lotería", "slug": "generador-loteria", "url": "https://meskeia.com/generador-loteria/", "description": "Genera números para Primitiva, Euromillones, Bonoloto, El Gordo y Lototurf" }
+        { "name": "Generador de Lotería", "slug": "generador-loteria", "url": "https://meskeia.com/generador-loteria/", "description": "Genera números para Primitiva, Euromillones, Bonoloto, El Gordo y Lototurf" },
+        { "name": "Cara o Cruz", "slug": "cara-o-cruz", "url": "https://meskeia.com/cara-o-cruz/", "description": "Lanza una moneda virtual con animación realista, historial y estadísticas de probabilidad" }
       ]
     },
     {

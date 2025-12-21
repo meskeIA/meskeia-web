@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 197+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 198+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 197,
+  "total_tools": 198,
   "last_updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -70,7 +70,7 @@
       "name": "Juegos y Entretenimiento",
       "icon": "🎮",
       "description": "Diviértete mientras aprendes",
-      "tool_count": 14
+      "tool_count": 15
     },
     {
       "id": "matematicas",
@@ -156,14 +156,14 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 17
+      "tool_count": 18
     },
     {
       "id": "curiosidad",
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 31
+      "tool_count": 32
     }
   ],
   "tools": [
@@ -2629,6 +2629,28 @@
         "combinacion"
       ],
       "icon": "🎲"
+    },
+    {
+      "slug": "cara-o-cruz",
+      "name": "Cara o Cruz",
+      "url": "https://meskeia.com/cara-o-cruz/",
+      "description": "Lanza una moneda virtual con animación realista. Incluye historial de lanzamientos, estadísticas de probabilidad y visualización de la ley de grandes números",
+      "category": "Juegos y Entretenimiento",
+      "contexts": [
+        "relax",
+        "curiosidad"
+      ],
+      "keywords": [
+        "cara",
+        "cruz",
+        "moneda",
+        "coin flip",
+        "aleatorio",
+        "probabilidad",
+        "decision",
+        "lanzar"
+      ],
+      "icon": "🪙"
     },
     {
       "slug": "calculadora-probabilidad",

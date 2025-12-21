@@ -279,6 +279,7 @@ const juegosCasualApps: RelatedApp[] = [
   { url: '/juego-piedra-papel-tijera/', icon: '✂️', name: 'Piedra Papel Tijera', description: 'Clásico' },
   { url: '/ruleta-aleatoria/', icon: '🎰', name: 'Ruleta', description: 'Sorteos' },
   { url: '/generador-loteria/', icon: '🎱', name: 'Lotería', description: 'Números aleatorios' },
+  { url: '/cara-o-cruz/', icon: '🪙', name: 'Cara o Cruz', description: 'Lanza la moneda' },
 ];
 
 // ==========================================
@@ -540,6 +541,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'juego-piedra-papel-tijera': juegosCasualApps.filter(a => a.url !== '/juego-piedra-papel-tijera/'),
   'ruleta-aleatoria': juegosCasualApps.filter(a => a.url !== '/ruleta-aleatoria/'),
   'generador-loteria': juegosCasualApps.filter(a => a.url !== '/generador-loteria/'),
+  'cara-o-cruz': juegosCasualApps.filter(a => a.url !== '/cara-o-cruz/'),
   'test-velocidad-escritura': [...productividadApps.slice(0, 2), ...juegosPuzzleApps.slice(0, 2)],
 
   // HERRAMIENTAS WEB
