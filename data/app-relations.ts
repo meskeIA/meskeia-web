@@ -296,9 +296,9 @@ const webDevApps: RelatedApp[] = [
 // ==========================================
 const informaticaApps: RelatedApp[] = [
   { url: '/visualizador-algoritmos/', icon: '📊', name: 'Visualizador Algoritmos', description: 'Ordenación paso a paso' },
+  { url: '/playground-sql/', icon: '🗃️', name: 'Playground SQL', description: 'Editor SQL interactivo' },
   { url: '/validador-json/', icon: '📦', name: 'Validador JSON', description: 'Valida y formatea' },
   { url: '/validador-regex/', icon: '🔍', name: 'Validador Regex', description: 'Prueba expresiones' },
-  { url: '/conversor-binario/', icon: '💾', name: 'Conversor Binario', description: 'Texto a binario' },
 ];
 
 // BIOMEDICINA Y CIENCIAS DE LA SALUD
@@ -648,7 +648,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // INFORMÁTICA Y PROGRAMACIÓN
   'visualizador-algoritmos': informaticaApps.filter(a => a.url !== '/visualizador-algoritmos/'),
-
+  'playground-sql': informaticaApps.filter(a => a.url !== '/playground-sql/'),
 
   // BIOMEDICINA Y CIENCIAS DE LA SALUD
   'simulador-genetica': biomedicinaApps.filter(a => a.url !== '/simulador-genetica/'),

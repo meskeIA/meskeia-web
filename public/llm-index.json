@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 194+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 195+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 194,
+  "total_tools": 195,
   "last_updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -105,7 +105,7 @@
       "name": "Informática y Programación",
       "icon": "💻",
       "description": "Algoritmos, estructuras de datos y herramientas para desarrolladores",
-      "tool_count": 1
+      "tool_count": 2
     },
     {
       "id": "biomedicina",
@@ -121,14 +121,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 78
+      "tool_count": 79
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 65
+      "tool_count": 66
     },
     {
       "id": "casa",
@@ -4267,6 +4267,31 @@
         "universidad"
       ],
       "icon": "📊"
+    },
+    {
+      "slug": "playground-sql",
+      "name": "Playground SQL",
+      "url": "https://meskeia.com/playground-sql/",
+      "description": "Editor SQL interactivo en el navegador. Practica con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada",
+      "category": "Informática y Programación",
+      "contexts": [
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "sql",
+        "base de datos",
+        "select",
+        "join",
+        "group by",
+        "sqlite",
+        "consultas",
+        "aprender sql",
+        "ejercicios sql",
+        "programacion",
+        "universidad"
+      ],
+      "icon": "🗃️"
     },
     {
       "slug": "simulador-genetica",

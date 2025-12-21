@@ -42,6 +42,19 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+
+  // ============================================================================
+  // TURBOPACK - Configuración para sql.js (WebAssembly SQLite)
+  // ============================================================================
+  // sql.js intenta importar 'fs' que no existe en el browser
+  // Esta configuración lo ignora para el bundle del cliente
+  turbopack: {
+    resolveAlias: {
+      fs: { browser: './empty-module.js' },
+      path: { browser: './empty-module.js' },
+      crypto: { browser: './empty-module.js' },
+    },
+  },
 };
 
 export default withBundleAnalyzer(nextConfig);
