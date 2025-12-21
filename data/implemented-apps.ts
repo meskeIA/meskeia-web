@@ -235,8 +235,9 @@ export const implementedAppsUrls = [
   "/visualizador-algoritmos/",      // Visualiza algoritmos de ordenación paso a paso
   "/playground-sql/",               // Editor SQL interactivo con ejercicios
 
-  // Biomedicina y Ciencias de la Salud (1 implementada)
+  // Biomedicina y Ciencias de la Salud (2 implementadas)
   "/simulador-genetica/",           // Simulador de genética mendeliana con Punnett
+  "/calculadora-estadistica-medica/", // Estadística médica: sensibilidad, especificidad, VPP, VPN, OR, RR, NNT
 
 
   // Creatividad y Diseño (1 implementada)

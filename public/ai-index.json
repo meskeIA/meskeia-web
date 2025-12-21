@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 187,
+  "total_tools": 188,
   "updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -298,7 +298,8 @@
       "description": "Genética, biología molecular y herramientas para ciencias de la salud",
       "icon": "🧬",
       "tools": [
-        { "name": "Simulador de Genética Mendeliana", "slug": "simulador-genetica", "url": "https://meskeia.com/simulador-genetica/", "description": "Simula cruces genéticos con cuadros de Punnett, herencia ligada al sexo y árboles genealógicos" }
+        { "name": "Simulador de Genética Mendeliana", "slug": "simulador-genetica", "url": "https://meskeia.com/simulador-genetica/", "description": "Simula cruces genéticos con cuadros de Punnett, herencia ligada al sexo y árboles genealógicos" },
+        { "name": "Calculadora de Estadística Médica", "slug": "calculadora-estadistica-medica", "url": "https://meskeia.com/calculadora-estadistica-medica/", "description": "Calcula sensibilidad, especificidad, VPP, VPN, razones de verosimilitud, odds ratio, riesgo relativo y NNT con intervalos de confianza" }
       ]
     }
   ],

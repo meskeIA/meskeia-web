@@ -305,6 +305,7 @@ const informaticaApps: RelatedApp[] = [
 // ==========================================
 const biomedicinaApps: RelatedApp[] = [
   { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador Genética', description: 'Cruces mendelianos' },
+  { url: '/calculadora-estadistica-medica/', icon: '🩺', name: 'Estadística Médica', description: 'Sensibilidad, VPP, NNT' },
   { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice masa corporal' },
   { url: '/vitaminas-minerales/', icon: '🥗', name: 'Vitaminas y Minerales', description: 'Guía nutrientes' },
   { url: '/huesos-cuerpo-humano/', icon: '🦴', name: 'Huesos Humanos', description: 'Anatomía esqueleto' },
@@ -652,6 +653,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // BIOMEDICINA Y CIENCIAS DE LA SALUD
   'simulador-genetica': biomedicinaApps.filter(a => a.url !== '/simulador-genetica/'),
+  'calculadora-estadistica-medica': biomedicinaApps.filter(a => a.url !== '/calculadora-estadistica-medica/'),
 
   // CREATIVIDAD Y DISEÑO EXTRA
   'generador-avatares': [

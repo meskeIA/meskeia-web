@@ -330,9 +330,10 @@ export const applicationsDatabase: Application[] = [
   { name: "Playground SQL", category: "Informática y Programación", contexts: ["estudio", "trabajo"], icon: "🗃️", description: "Editor SQL interactivo en el navegador. Practica con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada", url: "/playground-sql/", keywords: ["sql", "base de datos", "select", "join", "group by", "sqlite", "consultas", "aprender sql", "ejercicios sql", "programacion", "universidad"] },
 
   // ============================================
-  // 14. Biomedicina y Ciencias de la Salud (1)
+  // 14. Biomedicina y Ciencias de la Salud (2)
   // ============================================
   { name: "Simulador de Genética Mendeliana", category: "Biomedicina y Ciencias de la Salud", contexts: ["estudio"], icon: "🧬", description: "Simula cruces genéticos, cuadros de Punnett, herencia ligada al sexo, árboles genealógicos y simulación de poblaciones con estadísticas chi-cuadrado", url: "/simulador-genetica/", keywords: ["genetica", "mendel", "punnett", "herencia", "alelos", "genotipo", "fenotipo", "dominante", "recesivo", "cromosomas", "biologia", "universidad"] },
+  { name: "Calculadora de Estadística Médica", category: "Biomedicina y Ciencias de la Salud", contexts: ["estudio", "trabajo"], icon: "🩺", description: "Calcula sensibilidad, especificidad, VPP, VPN, razones de verosimilitud, odds ratio, riesgo relativo, NNT con intervalos de confianza. Ideal para epidemiología y pruebas diagnósticas", url: "/calculadora-estadistica-medica/", keywords: ["estadistica medica", "sensibilidad", "especificidad", "VPP", "VPN", "odds ratio", "riesgo relativo", "NNT", "epidemiologia", "pruebas diagnosticas", "medicina", "universidad"] },
 ];
 
 // ============================================
