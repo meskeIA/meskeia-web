@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Fuse from 'fuse.js';
 import type { FuseResult } from 'fuse.js';
-import { Application, applicationsDatabase, moments } from '@/data/applications';
+import { Application, applicationsDatabase, moments, suites, SuiteType } from '@/data/applications';
 import styles from './SearchBar.module.css';
 
 interface SearchBarProps {
@@ -86,7 +86,7 @@ export default function SearchBar({ large = false }: SearchBarProps) {
         { name: 'name', weight: 0.4 },
         { name: 'description', weight: 0.3 },
         { name: 'keywords', weight: 0.2 },
-        { name: 'category', weight: 0.1 },
+        { name: 'suites', weight: 0.1 },
       ],
       threshold: 0.4,
       includeScore: true,
@@ -292,8 +292,10 @@ export default function SearchBar({ large = false }: SearchBarProps) {
                   {result.item.description}
                 </div>
                 <div className={styles.resultMeta}>
-                  <span className={styles.resultCategory}>
-                    {result.item.category}
+                  <span className={styles.resultSuites}>
+                    {result.item.suites.map((suiteId: SuiteType) =>
+                      suites.find(s => s.id === suiteId)?.icon
+                    ).join(' ')}
                   </span>
                   {appMoments.length > 0 && (
                     <span className={styles.resultMoments}>

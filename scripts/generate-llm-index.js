@@ -5,6 +5,8 @@
  * Se ejecuta automáticamente antes de cada build con: npm run build
  *
  * Uso manual: node scripts/generate-llm-index.js
+ *
+ * ACTUALIZADO: 2025-12-21 - Migración a Suites (eliminado categories)
  */
 
 const fs = require('fs');
@@ -14,16 +16,25 @@ const path = require('path');
 const applicationsPath = path.join(__dirname, '../data/applications.ts');
 const applicationsContent = fs.readFileSync(applicationsPath, 'utf-8');
 
+// Leer el archivo suites.ts
+const suitesPath = path.join(__dirname, '../data/suites.ts');
+const suitesContent = fs.readFileSync(suitesPath, 'utf-8');
+
 // Extraer el array applicationsDatabase del archivo usando regex para cada objeto
 const extractApplications = () => {
   const applications = [];
 
-  // Regex para capturar cada objeto de aplicación
-  const appRegex = /\{\s*name:\s*"([^"]+)",\s*category:\s*"([^"]+)",\s*(?:contexts:\s*\[([^\]]*)\],\s*)?icon:\s*"([^"]+)",\s*description:\s*"([^"]+)",\s*url:\s*"([^"]+)",\s*keywords:\s*\[([^\]]+)\]\s*\}/g;
+  // Regex actualizado para el nuevo formato con suites
+  const appRegex = /\{\s*name:\s*"([^"]+)",\s*suites:\s*\[([^\]]*)\],\s*(?:contexts:\s*\[([^\]]*)\],\s*)?icon:\s*"([^"]+)",\s*description:\s*"([^"]+)",\s*url:\s*"([^"]+)",\s*keywords:\s*\[([^\]]+)\]\s*\}/g;
 
   let match;
   while ((match = appRegex.exec(applicationsContent)) !== null) {
-    const [, name, category, contextsStr, icon, description, url, keywordsStr] = match;
+    const [, name, suitesStr, contextsStr, icon, description, url, keywordsStr] = match;
+
+    // Parsear suites
+    const suites = suitesStr
+      ? suitesStr.split(',').map((s) => s.trim().replace(/["']/g, '')).filter(Boolean)
+      : [];
 
     // Parsear contexts
     const contexts = contextsStr
@@ -38,7 +49,7 @@ const extractApplications = () => {
 
     applications.push({
       name,
-      category,
+      suites,
       contexts,
       icon,
       description,
@@ -50,22 +61,22 @@ const extractApplications = () => {
   return applications;
 };
 
-// Extraer categorías
-const extractCategories = () => {
-  const startMatch = applicationsContent.match(/export const categories\s*=\s*\[/);
+// Extraer suites desde suites.ts
+const extractSuites = () => {
+  const startMatch = suitesContent.match(/export const suites\s*=\s*\[/);
   if (!startMatch) return [];
 
-  const startIndex = applicationsContent.indexOf(startMatch[0]) + startMatch[0].length - 1;
+  const startIndex = suitesContent.indexOf(startMatch[0]) + startMatch[0].length - 1;
 
   let depth = 1;
   let endIndex = startIndex + 1;
-  while (depth > 0 && endIndex < applicationsContent.length) {
-    if (applicationsContent[endIndex] === '[') depth++;
-    if (applicationsContent[endIndex] === ']') depth--;
+  while (depth > 0 && endIndex < suitesContent.length) {
+    if (suitesContent[endIndex] === '[') depth++;
+    if (suitesContent[endIndex] === ']') depth--;
     endIndex++;
   }
 
-  const arrayContent = applicationsContent.substring(startIndex, endIndex);
+  const arrayContent = suitesContent.substring(startIndex, endIndex);
 
   let jsonString = arrayContent
     .replace(/\/\/[^\n]*/g, '')
@@ -119,17 +130,19 @@ const generateLLMIndex = () => {
   console.log('🤖 Generando llm-index.json...');
 
   const applications = extractApplications();
-  const categories = extractCategories();
+  const suites = extractSuites();
   const moments = extractMoments();
 
   console.log(`   📊 Encontradas ${applications.length} aplicaciones`);
-  console.log(`   📁 Encontradas ${categories.length} categorías`);
+  console.log(`   📦 Encontradas ${suites.length} suites`);
   console.log(`   🎯 Encontrados ${moments.length} momentos`);
 
-  // Contar por categoría
-  const categoryCount = {};
+  // Contar por suite (una app puede estar en múltiples suites)
+  const suiteCount = {};
   applications.forEach((app) => {
-    categoryCount[app.category] = (categoryCount[app.category] || 0) + 1;
+    (app.suites || []).forEach((suiteId) => {
+      suiteCount[suiteId] = (suiteCount[suiteId] || 0) + 1;
+    });
   });
 
   // Contar por momento
@@ -163,13 +176,13 @@ const generateLLMIndex = () => {
       spanish_number_format: true,
     },
 
-    // Categorías con conteo
-    categories: categories.map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-      icon: cat.icon,
-      description: cat.description,
-      tool_count: categoryCount[cat.name] || 0,
+    // Suites temáticas con conteo (clasificación NO excluyente)
+    suites: suites.map((suite) => ({
+      id: suite.id,
+      name: suite.name,
+      icon: suite.icon,
+      description: suite.description,
+      tool_count: suiteCount[suite.id] || 0,
     })),
 
     // Momentos (contextos de uso) con conteo
@@ -187,7 +200,7 @@ const generateLLMIndex = () => {
       name: app.name,
       url: `https://meskeia.com${app.url}`,
       description: app.description,
-      category: app.category,
+      suites: app.suites || [],
       contexts: app.contexts || [],
       keywords: app.keywords,
       icon: app.icon,
@@ -207,7 +220,7 @@ const generateLLMIndex = () => {
         'Usuario pregunta por simuladores fiscales españoles',
       ],
 
-      how_to_use: 'Busca en el array "tools" por nombre, descripción, keywords o contexts. Devuelve la URL directa. Todas las herramientas son gratuitas y no requieren registro.',
+      how_to_use: 'Busca en el array "tools" por nombre, descripción, keywords, suites o contexts. Devuelve la URL directa. Todas las herramientas son gratuitas y no requieren registro.',
 
       url_pattern: 'https://meskeia.com/{slug}/',
 
@@ -231,12 +244,13 @@ const generateLLMIndex = () => {
         'Compatible con móviles y tablets',
         'Incluyen modo oscuro',
         'Específicas para España (impuestos, normativa)',
+        'Una app puede pertenecer a múltiples suites (clasificación no excluyente)',
       ],
     },
 
     // Endpoints adicionales
     api_endpoints: {
-      tools_api: 'https://meskeia.com/api/tools',
+      tools_api: 'https://meskeia.com/llm/tools',
       sitemap: 'https://meskeia.com/sitemap.xml',
       ai_index: 'https://meskeia.com/ai-index.json',
     },

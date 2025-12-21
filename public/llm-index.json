@@ -15,104 +15,90 @@
     "dark_mode": true,
     "spanish_number_format": true
   },
-  "categories": [
+  "suites": [
     {
-      "id": "calculadoras",
-      "name": "Calculadoras Prácticas",
-      "icon": "🧮",
-      "description": "Herramientas de cálculo para el día a día",
-      "tool_count": 15
+      "id": "fiscal",
+      "name": "Fiscal y Herencias",
+      "icon": "💰",
+      "description": "Impuestos, herencias, donaciones y trámites fiscales",
+      "tool_count": 13
     },
     {
-      "id": "criptografia",
-      "name": "Criptografía y Seguridad",
-      "icon": "🔐",
-      "description": "Cifrado de textos y verificación de datos",
-      "tool_count": 9
-    },
-    {
-      "id": "diseno",
-      "name": "Diseño Web",
-      "icon": "🎨",
-      "description": "Colores, tipografías y herramientas para diseñadores",
-      "tool_count": 18
-    },
-    {
-      "id": "emprendimiento",
-      "name": "Emprendimiento y SEO",
-      "icon": "💼",
-      "description": "Gestiona tu negocio y optimiza tu presencia online",
-      "tool_count": 20
+      "id": "inmobiliaria",
+      "name": "Inmobiliaria y Hogar",
+      "icon": "🏠",
+      "description": "Hipotecas, alquiler y gestión del hogar",
+      "tool_count": 17
     },
     {
       "id": "finanzas",
-      "name": "Finanzas Personales",
-      "icon": "💰",
-      "description": "Inversiones, ahorro y planificación financiera",
+      "name": "Finanzas e Inversión",
+      "icon": "📈",
+      "description": "Ahorro, inversión y planificación financiera",
+      "tool_count": 17
+    },
+    {
+      "id": "freelance",
+      "name": "Freelance y Autónomo",
+      "icon": "💼",
+      "description": "Herramientas para profesionales independientes",
       "tool_count": 15
     },
     {
-      "id": "academicas",
-      "name": "Herramientas Académicas",
-      "icon": "🎓",
-      "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 20
-    },
-    {
-      "id": "impuestos",
-      "name": "Impuestos y Fiscalidad",
-      "icon": "📋",
-      "description": "IRPF, sucesiones, donaciones y normativa fiscal española",
-      "tool_count": 9
-    },
-    {
-      "id": "juegos",
-      "name": "Juegos y Entretenimiento",
-      "icon": "🎮",
-      "description": "Diviértete mientras aprendes",
-      "tool_count": 15
-    },
-    {
-      "id": "matematicas",
-      "name": "Matemáticas y Estadística",
-      "icon": "📐",
-      "description": "Álgebra, cálculo, probabilidad y análisis de datos",
-      "tool_count": 14
-    },
-    {
-      "id": "productividad",
-      "name": "Productividad",
-      "icon": "⚡",
-      "description": "Optimiza tu tiempo y organización",
+      "id": "marketing",
+      "name": "Marketing y Contenido",
+      "icon": "📢",
+      "description": "SEO, redes sociales y creación de contenido",
       "tool_count": 24
+    },
+    {
+      "id": "diseno",
+      "name": "Diseño y Desarrollo",
+      "icon": "🎨",
+      "description": "Herramientas para diseñadores y desarrolladores",
+      "tool_count": 24
+    },
+    {
+      "id": "estudiantes",
+      "name": "Estudiantes",
+      "icon": "🎓",
+      "description": "Matemáticas, ciencias y herramientas de estudio",
+      "tool_count": 42
     },
     {
       "id": "salud",
       "name": "Salud y Bienestar",
       "icon": "🏥",
-      "description": "Cuida tu salud con herramientas especializadas",
+      "description": "Salud personal, nutrición y cuidado de mascotas",
+      "tool_count": 21
+    },
+    {
+      "id": "juegos",
+      "name": "Juegos y Ocio",
+      "icon": "🎮",
+      "description": "Diversión y entretenimiento",
       "tool_count": 17
     },
     {
-      "id": "texto",
-      "name": "Texto y Conversores",
-      "icon": "📝",
-      "description": "Procesa, formatea y convierte texto",
-      "tool_count": 16
+      "id": "cultura",
+      "name": "Cultura General",
+      "icon": "📚",
+      "description": "Conocimiento, referencias y aprendizaje",
+      "tool_count": 36
     },
     {
-      "id": "informatica",
-      "name": "Informática y Programación",
-      "icon": "💻",
-      "description": "Algoritmos, estructuras de datos y herramientas para desarrolladores",
-      "tool_count": 3
+      "id": "productividad",
+      "name": "Productividad",
+      "icon": "⚡",
+      "description": "Organización personal y herramientas del día a día",
+      "tool_count": 33
     },
     {
-      "id": "biomedicina",
-      "name": "Biomedicina y Ciencias de la Salud",
-      "icon": "🧬",
-      "description": "Genética, biología molecular y herramientas para ciencias de la salud",
-      "tool_count": 2
+      "id": "tecnicas",
+      "name": "Herramientas Técnicas",
+      "icon": "🔧",
+      "description": "Herramientas especializadas y técnicas",
+      "tool_count": 17
     }
   ],
   "moments": [
@@ -172,7 +158,10 @@
       "name": "Calculadora de Propinas",
       "url": "https://meskeia.com/calculadora-propinas/",
       "description": "Calcula propinas y divide la cuenta entre varias personas fácilmente",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "finanzas",
+        "productividad"
+      ],
       "contexts": [
         "casa",
         "relax"
@@ -191,7 +180,11 @@
       "name": "Calculadora de IVA",
       "url": "https://meskeia.com/calculadora-iva/",
       "description": "Calcula el IVA español: añade o quita IVA al 21%, 10% o 4% con un clic",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "fiscal",
+        "freelance",
+        "productividad"
+      ],
       "contexts": [
         "dinero",
         "trabajo"
@@ -212,7 +205,10 @@
       "name": "Calculadora de Descuentos",
       "url": "https://meskeia.com/calculadora-descuentos/",
       "description": "Calcula el precio final con descuento y cuánto ahorras. Soporta descuentos encadenados",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "finanzas",
+        "productividad"
+      ],
       "contexts": [
         "casa",
         "dinero"
@@ -232,7 +228,10 @@
       "name": "Calculadora de Porcentajes",
       "url": "https://meskeia.com/calculadora-porcentajes/",
       "description": "Calculadora de porcentajes completa: X% de cantidad, qué % es, aumentos, disminuciones y variaciones",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "productividad",
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "trabajo",
@@ -252,7 +251,10 @@
       "name": "Calculadora Regla de Tres",
       "url": "https://meskeia.com/calculadora-regla-de-tres/",
       "description": "Calculadora completa de regla de tres simple y compuesta con ejemplos prácticos españoles",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "productividad",
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "casa"
@@ -272,7 +274,9 @@
       "name": "Calculadora de Fechas",
       "url": "https://meskeia.com/calculadora-fechas/",
       "description": "Calcula días entre fechas, suma o resta días a cualquier fecha",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "casa"
@@ -291,7 +295,9 @@
       "name": "Conversor de Tallas",
       "url": "https://meskeia.com/conversor-tallas/",
       "description": "Convierte tallas de ropa y calzado entre sistemas EU, UK, US",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "casa",
         "curiosidad"
@@ -310,7 +316,9 @@
       "name": "Calculadora de Cocina",
       "url": "https://meskeia.com/calculadora-cocina/",
       "description": "Conversor de unidades de cocina, escalador de recetas, tiempos de cocción y sustitutos de ingredientes",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "inmobiliaria"
+      ],
       "contexts": [
         "casa"
       ],
@@ -334,7 +342,10 @@
       "name": "Lista de Compras",
       "url": "https://meskeia.com/lista-compras/",
       "description": "Lista de compras con organización automática por categorías del supermercado, guardado local y exportación",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "inmobiliaria",
+        "productividad"
+      ],
       "contexts": [
         "casa"
       ],
@@ -357,7 +368,9 @@
       "name": "Calculadora de Gasto Energético",
       "url": "https://meskeia.com/calculadora-gasto-energetico/",
       "description": "Calcula el consumo eléctrico de tus electrodomésticos y el coste mensual en tu factura de luz. Precios PVPC y mercado libre",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "inmobiliaria"
+      ],
       "contexts": [
         "casa",
         "dinero"
@@ -380,7 +393,9 @@
       "name": "Calculadora de Pintura",
       "url": "https://meskeia.com/calculadora-pintura/",
       "description": "Calcula cuánta pintura necesitas para pintar paredes y techos. Estimación de botes y coste según tipo de superficie",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "inmobiliaria"
+      ],
       "contexts": [
         "casa"
       ],
@@ -401,7 +416,10 @@
       "name": "Calculadora Huella de Carbono",
       "url": "https://meskeia.com/calculadora-huella-carbono/",
       "description": "Calcula tu huella de carbono personal anual. Analiza transporte, hogar, alimentacion y consumo. Compara con la media espanola y obten consejos para reducirla",
-      "category": "Calculadoras Practicas",
+      "suites": [
+        "cultura",
+        "inmobiliaria"
+      ],
       "contexts": [
         "casa",
         "curiosidad"
@@ -424,7 +442,10 @@
       "name": "Calculadora Consumo Combustible",
       "url": "https://meskeia.com/calculadora-combustible/",
       "description": "Calcula el consumo de combustible de tu vehículo en L/100km y el coste de tus viajes",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "inmobiliaria",
+        "finanzas"
+      ],
       "contexts": [
         "casa",
         "dinero"
@@ -446,7 +467,9 @@
       "name": "Calculadora Edad Mascotas",
       "url": "https://meskeia.com/calculadora-edad-mascotas/",
       "description": "Calcula la edad de tu perro o gato en años humanos según su tamaño. Fórmula científica actualizada",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa",
         "curiosidad"
@@ -467,7 +490,10 @@
       "name": "Planificador de Boda",
       "url": "https://meskeia.com/planificador-boda/",
       "description": "Organiza tu boda paso a paso: checklist por meses, calculadora de presupuesto, timeline del día y consejos de wedding planner",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "productividad",
+        "inmobiliaria"
+      ],
       "contexts": [
         "casa",
         "dinero"
@@ -489,7 +515,10 @@
       "name": "Planificador de Mudanzas",
       "url": "https://meskeia.com/planificador-mudanzas/",
       "description": "Organiza tu mudanza con checklist de tareas por fases, inventario de objetos por habitación y control de presupuesto estimado vs real",
-      "category": "Calculadoras Prácticas",
+      "suites": [
+        "inmobiliaria",
+        "productividad"
+      ],
       "contexts": [
         "casa"
       ],
@@ -510,7 +539,9 @@
       "name": "Cifrado Clásico",
       "url": "https://meskeia.com/cifrado-clasico/",
       "description": "Cifra textos con métodos clásicos: César, ROT13 y Atbash. Visualización del alfabeto cifrado y presets históricos",
-      "category": "Criptografía y Seguridad",
+      "suites": [
+        "cultura"
+      ],
       "contexts": [
         "curiosidad"
       ],
@@ -530,7 +561,9 @@
       "name": "Cifrado Vigenère",
       "url": "https://meskeia.com/cifrado-vigenere/",
       "description": "Cifrado polialfabético con palabra clave. Más seguro que César, usado durante siglos. Visualización de tabla Vigenère",
-      "category": "Criptografía y Seguridad",
+      "suites": [
+        "cultura"
+      ],
       "contexts": [
         "curiosidad"
       ],
@@ -549,7 +582,9 @@
       "name": "Cifrado por Transposición",
       "url": "https://meskeia.com/cifrado-transposicion/",
       "description": "Cifra reordenando letras: Columnas, Rail Fence y Escítala. Visualización interactiva de cada método",
-      "category": "Criptografía y Seguridad",
+      "suites": [
+        "cultura"
+      ],
       "contexts": [
         "curiosidad"
       ],
@@ -569,7 +604,9 @@
       "name": "Cifrado Playfair",
       "url": "https://meskeia.com/cifrado-playfair/",
       "description": "Cifrado por digramas con matriz 5x5. Usado en guerras mundiales. Visualización de matriz y proceso de cifrado",
-      "category": "Criptografía y Seguridad",
+      "suites": [
+        "cultura"
+      ],
       "contexts": [
         "curiosidad"
       ],
@@ -589,7 +626,9 @@
       "name": "Cifrado AES",
       "url": "https://meskeia.com/cifrado-aes/",
       "description": "Cifrado simétrico moderno AES-256. Modos GCM y CBC, derivación de clave PBKDF2. El estándar mundial de seguridad",
-      "category": "Criptografía y Seguridad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo"
       ],
@@ -610,7 +649,9 @@
       "name": "Generador de Hashes",
       "url": "https://meskeia.com/generador-hashes/",
       "description": "Genera hashes MD5, SHA-256, SHA-512 para verificar integridad de datos. Compara archivos y textos de forma segura",
-      "category": "Criptografía y Seguridad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -632,7 +673,9 @@
       "name": "Codificador Base64",
       "url": "https://meskeia.com/codificador-base64/",
       "description": "Codifica y decodifica texto en Base64, URL encode y Hexadecimal. Soporta archivos e imágenes",
-      "category": "Criptografía y Seguridad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -653,7 +696,9 @@
       "name": "Conversor de Colores",
       "url": "https://meskeia.com/conversor-colores/",
       "description": "Convierte entre HEX, RGB, HSL y CMYK con color picker visual y generación de paletas automáticas",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando"
       ],
@@ -674,7 +719,9 @@
       "name": "Calculadora de Contraste",
       "url": "https://meskeia.com/contraste-colores/",
       "description": "Verifica accesibilidad WCAG con ratios de contraste AA/AAA y simulación de daltonismo",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando"
       ],
@@ -694,7 +741,9 @@
       "name": "Generador de Gradientes",
       "url": "https://meskeia.com/generador-gradientes/",
       "description": "Crea gradientes CSS lineales, radiales y cónicos con presets populares y código listo para copiar",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando"
       ],
@@ -714,7 +763,9 @@
       "name": "Generador de Sombras",
       "url": "https://meskeia.com/generador-sombras/",
       "description": "Genera box-shadow y text-shadow con múltiples capas, presets de neuromorfismo y material design",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando"
       ],
@@ -733,7 +784,9 @@
       "name": "Calculadora de Aspectos",
       "url": "https://meskeia.com/calculadora-aspectos/",
       "description": "Mantiene proporciones al redimensionar, presets para redes sociales (Instagram, Facebook, YouTube)",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -755,7 +808,9 @@
       "name": "Generador de Tipografías",
       "url": "https://meskeia.com/generador-tipografias/",
       "description": "Combina Google Fonts con pairings armónicos predefinidos, previsualización en tiempo real y generación de código CSS",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando"
       ],
@@ -776,7 +831,9 @@
       "name": "Creador de Paletas",
       "url": "https://meskeia.com/creador-paletas/",
       "description": "Diseña paletas de colores profesionales para tus proyectos web",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando"
       ],
@@ -796,7 +853,10 @@
       "name": "Creador de Thumbnails YouTube",
       "url": "https://meskeia.com/creador-thumbnails/",
       "description": "Diseña miniaturas profesionales para YouTube: texto, imágenes, formas y exportación PNG 1280x720",
-      "category": "Diseño Web",
+      "suites": [
+        "marketing",
+        "diseno"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -818,7 +878,10 @@
       "name": "Validador JSON",
       "url": "https://meskeia.com/validador-json/",
       "description": "Valida, formatea y minifica código JSON y XML al instante con detección de errores",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno",
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -837,7 +900,9 @@
       "name": "Generador de Iconos PWA",
       "url": "https://meskeia.com/generador-iconos/",
       "description": "Genera todos los tamaños de iconos para PWA, favicon y apps móviles. Múltiples formatos y presets para diferentes plataformas",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -857,7 +922,10 @@
       "name": "Validador RegEx",
       "url": "https://meskeia.com/validador-regex/",
       "description": "Testa y valida expresiones regulares con resaltado de coincidencias y ejemplos prácticos",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno",
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -876,7 +944,10 @@
       "name": "Conversor de Imágenes",
       "url": "https://meskeia.com/conversor-imagenes/",
       "description": "Convierte formatos de imagen (JPG, PNG, WebP), comprime y redimensiona con control de calidad total",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno",
+        "productividad"
+      ],
       "contexts": [
         "creando",
         "trabajo",
@@ -897,7 +968,9 @@
       "name": "Compresor de Imágenes por Lotes",
       "url": "https://meskeia.com/compresor-imagenes/",
       "description": "Comprime múltiples imágenes a la vez sin límites ni marcas de agua. Reduce el tamaño de JPG, PNG, WebP manteniendo la calidad",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -923,7 +996,10 @@
       "name": "Recortador de Audio",
       "url": "https://meskeia.com/recortador-audio/",
       "description": "Recorta y edita archivos de audio online gratis. Corta MP3, WAV, OGG sin límites ni marcas de agua. Fade in/out y ajuste de volumen",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno",
+        "productividad"
+      ],
       "contexts": [
         "creando",
         "trabajo",
@@ -949,7 +1025,9 @@
       "name": "Generador de Enlaces UTM",
       "url": "https://meskeia.com/generador-utm/",
       "description": "Genera enlaces UTM para Google Analytics. Trackea campañas de marketing con parámetros utm_source, utm_medium, utm_campaign",
-      "category": "Diseño Web",
+      "suites": [
+        "marketing"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -969,7 +1047,10 @@
       "name": "Generador de Ondas y Visualizador",
       "url": "https://meskeia.com/generador-ondas/",
       "description": "Genera ondas sonoras (senoidal, cuadrada, triangular, sierra) y visualiza audio de archivos. Herramienta educativa de física del sonido con frecuencias y notas musicales",
-      "category": "Diseño Web",
+      "suites": [
+        "tecnicas",
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "creando",
@@ -997,7 +1078,10 @@
       "name": "Editor EXIF",
       "url": "https://meskeia.com/editor-exif/",
       "description": "Visualiza y elimina metadatos EXIF de tus fotos: GPS, cámara, fecha, dispositivo. Protege tu privacidad antes de compartir imágenes online",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno",
+        "tecnicas"
+      ],
       "contexts": [
         "creando",
         "casa"
@@ -1022,7 +1106,9 @@
       "name": "Generador de Avatares",
       "url": "https://meskeia.com/generador-avatares/",
       "description": "Genera avatares únicos y personalizados a partir de tu nombre o texto. 8 estilos diferentes, descarga PNG, sin subir fotos. 100% privado",
-      "category": "Diseño Web",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -1045,7 +1131,9 @@
       "name": "Calculadora Tarifa Freelance",
       "url": "https://meskeia.com/calculadora-tarifa-freelance/",
       "description": "Calcula tu tarifa freelance ideal considerando gastos, impuestos, vacaciones y margen de beneficio. Evita cobrar de menos",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "freelance"
+      ],
       "contexts": [
         "trabajo",
         "dinero"
@@ -1064,7 +1152,9 @@
       "name": "Calculadora Break-Even",
       "url": "https://meskeia.com/calculadora-break-even/",
       "description": "Calcula el punto de equilibrio de tus productos. Analiza margen de contribución, rentabilidad y escenarios de costos/precios",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "freelance"
+      ],
       "contexts": [
         "trabajo",
         "dinero"
@@ -1083,7 +1173,9 @@
       "name": "Planificador Cash Flow",
       "url": "https://meskeia.com/planificador-cashflow/",
       "description": "Proyecta tu flujo de caja a 12 meses. Identifica meses críticos, previene crisis de liquidez y simula escenarios What-If",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "freelance"
+      ],
       "contexts": [
         "trabajo",
         "dinero"
@@ -1102,7 +1194,10 @@
       "name": "Calculadora ROI Marketing",
       "url": "https://meskeia.com/calculadora-roi-marketing/",
       "description": "Calcula el ROI por canal de marketing (Google Ads, Facebook, email, SEO). Analiza CAC, CLV y optimiza tu inversión publicitaria",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "freelance",
+        "marketing"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -1122,7 +1217,10 @@
       "name": "Generador de Nombres",
       "url": "https://meskeia.com/generador-nombres-empresa/",
       "description": "Genera nombres creativos para tu empresa por sectores. Enlaces directos para verificar disponibilidad y registrar dominios .com, .es",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing",
+        "freelance"
+      ],
       "contexts": [
         "trabajo"
       ],
@@ -1141,7 +1239,10 @@
       "name": "Simulador Gastos Deducibles",
       "url": "https://meskeia.com/simulador-gastos-deducibles/",
       "description": "Calcula tu ahorro fiscal con gastos deducibles. Descubre qué gastos puedes deducir (100%, 50%, 30%) y optimiza tu declaración de IRPF e IVA",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "fiscal",
+        "freelance"
+      ],
       "contexts": [
         "trabajo",
         "dinero"
@@ -1161,7 +1262,10 @@
       "name": "Curso de Emprendimiento",
       "url": "https://meskeia.com/curso-emprendimiento/",
       "description": "Guía práctica de emprendimiento: de la idea al primer cliente con ejemplos españoles",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -1180,7 +1284,9 @@
       "name": "Generador de Meta Descripciones",
       "url": "https://meskeia.com/generador-meta-descripciones/",
       "description": "Genera meta descripciones optimizadas para SEO con contador de caracteres y vista previa de Google. Mejora tu CTR",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -1201,7 +1307,9 @@
       "name": "Analizador de Densidad SEO",
       "url": "https://meskeia.com/analizador-densidad-seo/",
       "description": "Analiza la densidad de palabras clave en tu texto. Detecta sobreoptimización y sugiere mejoras para SEO on-page",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -1221,7 +1329,9 @@
       "name": "Generador de Palabras Clave",
       "url": "https://meskeia.com/generador-palabras-clave/",
       "description": "Genera ideas de palabras clave long-tail a partir de una semilla. Variaciones, preguntas y sugerencias por categoría",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -1242,7 +1352,9 @@
       "name": "Generador de Hashtags",
       "url": "https://meskeia.com/generador-hashtags/",
       "description": "Genera hashtags relevantes para Instagram, Twitter, TikTok y LinkedIn. Categorías por nicho y tendencias",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing"
+      ],
       "contexts": [
         "creando"
       ],
@@ -1262,7 +1374,9 @@
       "name": "Analizador de Títulos SEO",
       "url": "https://meskeia.com/analizador-titulos-seo/",
       "description": "Analiza y optimiza títulos para SEO. Puntuación CTR, palabras poderosas, longitud óptima y vista previa SERP",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -1284,7 +1398,9 @@
       "name": "Calculadora de Legibilidad",
       "url": "https://meskeia.com/calculadora-legibilidad/",
       "description": "Calcula índices de legibilidad Flesch-Szigriszt, Fernández Huerta e INFLESZ. Optimiza textos para tu audiencia",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -1305,7 +1421,9 @@
       "name": "Calculadora Tiempo de Lectura",
       "url": "https://meskeia.com/calculadora-tiempo-lectura/",
       "description": "Calcula el tiempo de lectura de tu contenido. Velocidad configurable, tiempo hablado y badge para tu artículo",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing"
+      ],
       "contexts": [
         "creando"
       ],
@@ -1325,7 +1443,9 @@
       "name": "Generador de Schema Markup",
       "url": "https://meskeia.com/generador-schema-markup/",
       "description": "Genera código JSON-LD Schema.org para SEO. Artículos, productos, FAQ, negocios locales y recetas",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -1346,7 +1466,10 @@
       "name": "Generador de Facturas",
       "url": "https://meskeia.com/generador-facturas/",
       "description": "Crea facturas profesionales para autónomos. IVA automático, retención IRPF, múltiples líneas y exportación a PDF",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "fiscal",
+        "freelance"
+      ],
       "contexts": [
         "trabajo",
         "dinero"
@@ -1368,7 +1491,10 @@
       "name": "Generador de Carruseles",
       "url": "https://meskeia.com/generador-carruseles/",
       "description": "Crea carruseles profesionales para Instagram y LinkedIn. Diseña slides, elige plantillas, personaliza colores y descarga como imágenes PNG",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing",
+        "diseno"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -1390,7 +1516,9 @@
       "name": "Analizador GEO/AEO",
       "url": "https://meskeia.com/analizador-geo/",
       "description": "Analiza y optimiza tu contenido para ser citado por ChatGPT, Perplexity, Gemini y Google AI Overviews. Puntuación GEO con recomendaciones",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -1414,7 +1542,10 @@
       "name": "Simulador de Hipoteca",
       "url": "https://meskeia.com/simulador-hipoteca/",
       "description": "Calcula tu hipoteca con cuadro de amortización completo y análisis detallado",
-      "category": "Finanzas Personales",
+      "suites": [
+        "inmobiliaria",
+        "finanzas"
+      ],
       "contexts": [
         "dinero",
         "casa"
@@ -1436,7 +1567,9 @@
       "name": "Calculadora de Jubilación",
       "url": "https://meskeia.com/calculadora-jubilacion/",
       "description": "Planifica tu jubilación calculando ahorros necesarios y pensión estimada",
-      "category": "Finanzas Personales",
+      "suites": [
+        "finanzas"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -1455,7 +1588,9 @@
       "name": "Calculadora de Inversiones",
       "url": "https://meskeia.com/calculadora-inversiones/",
       "description": "Simula el crecimiento de tus inversiones con interés compuesto",
-      "category": "Finanzas Personales",
+      "suites": [
+        "finanzas"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -1474,7 +1609,9 @@
       "name": "Calculadora de Interés Compuesto",
       "url": "https://meskeia.com/interes-compuesto/",
       "description": "Calcula el interés compuesto de tus ahorros e inversiones a largo plazo",
-      "category": "Finanzas Personales",
+      "suites": [
+        "finanzas"
+      ],
       "contexts": [
         "dinero",
         "estudio"
@@ -1493,7 +1630,9 @@
       "name": "Test de Perfil Inversor",
       "url": "https://meskeia.com/test-perfil-inversor/",
       "description": "Descubre tu tolerancia al riesgo con un test de 10 preguntas y recibe recomendaciones personalizadas",
-      "category": "Finanzas Personales",
+      "suites": [
+        "finanzas"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -1513,7 +1652,9 @@
       "name": "Simulador de Cartera de Inversión",
       "url": "https://meskeia.com/simulador-cartera-inversion/",
       "description": "Simula la evolución de tu cartera con Monte Carlo. Sharpe, volatilidad, percentiles y probabilidad de alcanzar objetivos",
-      "category": "Finanzas Personales",
+      "suites": [
+        "finanzas"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -1536,7 +1677,9 @@
       "name": "Control de Gastos",
       "url": "https://meskeia.com/control-gastos/",
       "description": "Controla tus gastos e ingresos mensuales con gráficos y categorización automática",
-      "category": "Finanzas Personales",
+      "suites": [
+        "finanzas"
+      ],
       "contexts": [
         "dinero",
         "casa"
@@ -1555,7 +1698,11 @@
       "name": "Calculadora TIR-VAN",
       "url": "https://meskeia.com/calculadora-tir-van/",
       "description": "Calcula TIR y VAN para análisis de inversiones y proyectos",
-      "category": "Finanzas Personales",
+      "suites": [
+        "finanzas",
+        "freelance",
+        "estudiantes"
+      ],
       "contexts": [
         "dinero",
         "trabajo",
@@ -1576,7 +1723,10 @@
       "name": "Simulador de Préstamos",
       "url": "https://meskeia.com/simulador-prestamos/",
       "description": "Compara sistemas de amortización: francés, alemán y americano. Cuadro completo, TAE vs TIN y comisiones",
-      "category": "Finanzas Personales",
+      "suites": [
+        "inmobiliaria",
+        "finanzas"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -1598,7 +1748,10 @@
       "name": "Amortización Anticipada Hipoteca",
       "url": "https://meskeia.com/amortizacion-hipoteca/",
       "description": "Calcula el ahorro al amortizar tu hipoteca: reducir cuota vs reducir plazo. Comparativa y recomendación",
-      "category": "Finanzas Personales",
+      "suites": [
+        "inmobiliaria",
+        "finanzas"
+      ],
       "contexts": [
         "dinero",
         "casa"
@@ -1618,7 +1771,10 @@
       "name": "Calculadora de Inflación",
       "url": "https://meskeia.com/calculadora-inflacion/",
       "description": "Calcula cómo la inflación afecta tu dinero. Poder adquisitivo histórico con datos del INE desde 1961",
-      "category": "Finanzas Personales",
+      "suites": [
+        "fiscal",
+        "finanzas"
+      ],
       "contexts": [
         "dinero",
         "curiosidad"
@@ -1639,7 +1795,10 @@
       "name": "Curso Decisiones de Inversión",
       "url": "https://meskeia.com/curso-decisiones-inversion/",
       "description": "Aprende a tomar decisiones de inversión inteligentes con este curso interactivo",
-      "category": "Finanzas Personales",
+      "suites": [
+        "finanzas",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "dinero"
@@ -1658,7 +1817,10 @@
       "name": "Calculadora de Suscripciones",
       "url": "https://meskeia.com/calculadora-suscripciones/",
       "description": "Controla tus suscripciones (Netflix, Spotify, gym...). Calcula gasto mensual y anual. Detecta gastos olvidados",
-      "category": "Finanzas Personales",
+      "suites": [
+        "inmobiliaria",
+        "finanzas"
+      ],
       "contexts": [
         "dinero",
         "casa"
@@ -1679,7 +1841,10 @@
       "name": "Calculadora Roommates",
       "url": "https://meskeia.com/calculadora-roommates/",
       "description": "Divide los gastos del piso entre compañeros de forma justa. Calcula quién debe a quién automáticamente",
-      "category": "Finanzas Personales",
+      "suites": [
+        "inmobiliaria",
+        "finanzas"
+      ],
       "contexts": [
         "dinero",
         "casa"
@@ -1700,7 +1865,9 @@
       "name": "Calculadora Alquiler vs Compra",
       "url": "https://meskeia.com/calculadora-alquiler-vs-compra/",
       "description": "¿Alquilar o comprar vivienda? Análisis financiero completo con hipoteca, gastos y coste de oportunidad",
-      "category": "Finanzas Personales",
+      "suites": [
+        "inmobiliaria"
+      ],
       "contexts": [
         "dinero",
         "casa"
@@ -1720,7 +1887,9 @@
       "name": "Calculadora de Movimiento",
       "url": "https://meskeia.com/calculadora-movimiento/",
       "description": "Calculadora interactiva de cinemática con gráficos y animaciones para MRU, MRUA, caída libre y tiro parabólico",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -1740,7 +1909,9 @@
       "name": "Simulador de Física",
       "url": "https://meskeia.com/simulador-fisica/",
       "description": "Simulador interactivo con animaciones en tiempo real: caída libre, péndulo simple, tiro parabólico, ondas y movimiento armónico simple (MAS)",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -1763,7 +1934,10 @@
       "name": "Tabla Periódica Interactiva",
       "url": "https://meskeia.com/tabla-periodica/",
       "description": "Tabla periódica interactiva con 118 elementos, calculadora de masa molar y filtros avanzados",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "curiosidad"
@@ -1783,7 +1957,10 @@
       "name": "Glosario de Física y Química",
       "url": "https://meskeia.com/glosario-fisica-quimica/",
       "description": "Glosario interactivo de física y química con quizzes educativos y sistema de gamificación",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "curiosidad"
@@ -1802,7 +1979,9 @@
       "name": "Calculadora de Electricidad",
       "url": "https://meskeia.com/calculadora-electricidad/",
       "description": "Calculadora completa de electricidad: Ley de Ohm, potencia, resistencias y análisis de circuitos eléctricos",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "casa"
@@ -1822,7 +2001,9 @@
       "name": "Calculadora de Notas",
       "url": "https://meskeia.com/calculadora-notas/",
       "description": "Calcula tu media académica ponderada y nota final del curso",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -1840,7 +2021,9 @@
       "name": "Generador de Horarios de Estudio",
       "url": "https://meskeia.com/generador-horarios-estudio/",
       "description": "Genera horarios de estudio personalizados con distribución inteligente de tiempo. Técnica Pomodoro, gestión de prioridades y calendario visual",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -1858,7 +2041,9 @@
       "name": "Creador de Flashcards",
       "url": "https://meskeia.com/creador-flashcards/",
       "description": "Crea y estudia con flashcards personalizadas. Modo estudio interactivo, gestión de mazos, importa/exporta tarjetas",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -1876,7 +2061,10 @@
       "name": "Curso de Introducción a la Teoría Política",
       "url": "https://meskeia.com/curso-teoria-politica/",
       "description": "Aprende los fundamentos del pensamiento político: desde Platón y Aristóteles hasta Marx y Rawls. 9 capítulos con los grandes pensadores",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes",
+        "cultura"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -1901,7 +2089,10 @@
       "name": "Curso de Pensamiento Científico",
       "url": "https://meskeia.com/curso-pensamiento-cientifico/",
       "description": "Aprende el método científico, pensamiento crítico, falacias lógicas y cómo aplicar la ciencia en tu vida cotidiana. 12 capítulos interactivos",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes",
+        "cultura"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -1924,7 +2115,10 @@
       "name": "Curso de Pensamiento Sistémico",
       "url": "https://meskeia.com/curso-pensamiento-sistemico/",
       "description": "Aprende a entender el mundo como sistemas interconectados: redes, retroalimentación, emergencia, antifragilidad y aplicaciones prácticas. 20 capítulos",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -1948,7 +2142,10 @@
       "name": "Curso de Empresa Familiar",
       "url": "https://meskeia.com/curso-empresa-familiar/",
       "description": "Domina la gestión de empresas familiares: gobierno corporativo, protocolo familiar, sucesión, modelos de gestión. Casos Inditex, Mercadona, El Corte Inglés. 12 capítulos",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "marketing",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -1972,7 +2169,10 @@
       "name": "Curso de Negociación Exitosa",
       "url": "https://meskeia.com/curso-negociacion/",
       "description": "Domina el arte de negociar: BATNA, ZOPA, tácticas de persuasión, Cialdini, cierre de acuerdos, resolución de conflictos y negociación multicultural. 12 capítulos",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "marketing",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -1996,7 +2196,10 @@
       "name": "Curso de Optimización para IAs (GEO/AEO)",
       "url": "https://meskeia.com/curso-optimizacion-ia/",
       "description": "Aprende GEO y AEO: optimiza tu contenido para que ChatGPT, Perplexity y Gemini lo citen. LLMs, RAG, E-E-A-T, Schema Markup y estrategias por plataforma. 6 capítulos",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "trabajo",
@@ -2023,7 +2226,10 @@
       "name": "Curso de Marketing Digital 2025",
       "url": "https://meskeia.com/curso-marketing-digital/",
       "description": "Domina el marketing digital: branding, SEO, redes sociales, Meta Ads, Google Ads, automatización e IA. 30 capítulos prácticos con ejemplos reales",
-      "category": "Emprendimiento y SEO",
+      "suites": [
+        "marketing",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "trabajo",
@@ -2051,7 +2257,10 @@
       "name": "Curso de Estrategia Empresarial",
       "url": "https://meskeia.com/curso-estrategia-empresarial/",
       "description": "Pensamiento estratégico para la era de la incertidumbre: Porter actualizado, fracasos de empresas excelentes, nuevos moats, experimentación vs planificación. 10 capítulos",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "marketing",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -2078,7 +2287,10 @@
       "name": "Curso de Criptografía y Seguridad",
       "url": "https://meskeia.com/curso-criptografia-seguridad/",
       "description": "Domina la criptografía: desde cifrados históricos (César, Vigenère, Enigma) hasta técnicas modernas (AES, SHA-256, 2FA). 15 capítulos con herramientas prácticas",
-      "category": "Criptografía y Seguridad",
+      "suites": [
+        "cultura",
+        "tecnicas"
+      ],
       "contexts": [
         "estudio",
         "trabajo",
@@ -2107,7 +2319,10 @@
       "name": "Curso de Redacción Académica",
       "url": "https://meskeia.com/curso-redaccion-academica/",
       "description": "Guía práctica para escribir textos académicos: estructura tu TFG, TFM, tesis o artículo con pautas aplicables desde el primer día. Citas APA, coherencia, estilo y más. 13 capítulos",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -2134,7 +2349,10 @@
       "name": "Guía Cuidado de Mascotas",
       "url": "https://meskeia.com/guia-cuidado-mascota/",
       "description": "Todo lo que necesitas saber para cuidar a tu perro o gato: alimentación, salud, parásitos, crecimiento, emergencias y herramientas útiles. 8 capítulos fáciles y cercanos",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud",
+        "cultura"
+      ],
       "contexts": [
         "casa",
         "curiosidad"
@@ -2158,7 +2376,9 @@
       "name": "Simulador IRPF",
       "url": "https://meskeia.com/simulador-irpf/",
       "description": "Calcula tu IRPF y retenciones según la normativa fiscal española actual",
-      "category": "Impuestos y Fiscalidad",
+      "suites": [
+        "fiscal"
+      ],
       "contexts": [
         "dinero",
         "trabajo"
@@ -2178,7 +2398,9 @@
       "name": "Calculadora de Donaciones - Cataluña",
       "url": "https://meskeia.com/calculadora-donaciones-cataluna/",
       "description": "Calcula el impuesto de donaciones según la normativa catalana con tarifa reducida, primera vivienda y bonificaciones",
-      "category": "Impuestos y Fiscalidad",
+      "suites": [
+        "fiscal"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -2198,7 +2420,9 @@
       "name": "Calculadora de Donaciones - Nacional",
       "url": "https://meskeia.com/calculadora-donaciones-nacional/",
       "description": "Calcula el impuesto de donaciones para 14 comunidades autónomas con bonificaciones actualizadas 2025",
-      "category": "Impuestos y Fiscalidad",
+      "suites": [
+        "fiscal"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -2219,7 +2443,9 @@
       "name": "Calculadora de Sucesiones - Cataluña",
       "url": "https://meskeia.com/calculadora-sucesiones-cataluna/",
       "description": "Calcula el impuesto de sucesiones (herencias) con normativa catalana: bonificación cónyuge 99%, vivienda habitual 95%",
-      "category": "Impuestos y Fiscalidad",
+      "suites": [
+        "fiscal"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -2239,7 +2465,9 @@
       "name": "Calculadora de Sucesiones - Nacional",
       "url": "https://meskeia.com/calculadora-sucesiones-nacional/",
       "description": "Calcula el impuesto de sucesiones para 14 CCAA: bonificaciones desde 99% (Madrid) hasta 0% (Asturias)",
-      "category": "Impuestos y Fiscalidad",
+      "suites": [
+        "fiscal"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -2260,7 +2488,9 @@
       "name": "Calculadora de Herencias",
       "url": "https://meskeia.com/calculadora-herencias/",
       "description": "Calcula el reparto de herencia según derecho civil español. Incluye 8 regímenes: Código Civil, Cataluña, Aragón, Galicia, País Vasco, Navarra y Baleares",
-      "category": "Impuestos y Fiscalidad",
+      "suites": [
+        "fiscal"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -2289,7 +2519,9 @@
       "name": "Calculadora Plusvalías IRPF",
       "url": "https://meskeia.com/calculadora-plusvalias-irpf/",
       "description": "Calcula el IRPF de tus inversiones: plusvalías de acciones, fondos, criptomonedas, dividendos e intereses con tramos 2025",
-      "category": "Impuestos y Fiscalidad",
+      "suites": [
+        "fiscal"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -2310,7 +2542,9 @@
       "name": "Guía Tramitación Herencias",
       "url": "https://meskeia.com/guia-tramitacion-herencias/",
       "description": "Guía paso a paso para tramitar una herencia: checklist documentos, orden de gestiones, plazos críticos y costes orientativos de notaría y registro",
-      "category": "Impuestos y Fiscalidad",
+      "suites": [
+        "fiscal"
+      ],
       "contexts": [
         "dinero"
       ],
@@ -2333,7 +2567,9 @@
       "name": "Herencias Paso a Paso",
       "url": "https://meskeia.com/herencias-paso-a-paso/",
       "description": "Curso práctico de 9 capítulos para gestionar una herencia en España: desde los primeros pasos hasta la escritura final. Incluye glosario legal y enlaces a calculadoras de impuestos",
-      "category": "Impuestos y Fiscalidad",
+      "suites": [
+        "fiscal"
+      ],
       "contexts": [
         "estudio",
         "dinero"
@@ -2359,7 +2595,10 @@
       "name": "Test de Velocidad de Escritura",
       "url": "https://meskeia.com/test-velocidad-escritura/",
       "description": "Mide tu velocidad de escritura en palabras por minuto (PPM) y mejora tu mecanografía con textos en español",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos",
+        "productividad"
+      ],
       "contexts": [
         "relax",
         "trabajo",
@@ -2381,7 +2620,9 @@
       "name": "Radio meskeIA",
       "url": "https://meskeia.com/radio-meskeia/",
       "description": "Escucha miles de emisoras de radio de todo el mundo en vivo",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax",
         "casa",
@@ -2403,7 +2644,9 @@
       "name": "Juego Wordle",
       "url": "https://meskeia.com/juego-wordle/",
       "description": "Adivina la palabra del día en español con 6 intentos",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax"
       ],
@@ -2421,7 +2664,9 @@
       "name": "Juego Sudoku",
       "url": "https://meskeia.com/juego-sudoku/",
       "description": "Resuelve puzzles Sudoku con diferentes niveles de dificultad",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax"
       ],
@@ -2439,7 +2684,9 @@
       "name": "Juego Tres en Raya",
       "url": "https://meskeia.com/juego-tres-en-raya/",
       "description": "Juega al clásico tres en raya contra la computadora",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax"
       ],
@@ -2456,7 +2703,9 @@
       "name": "Juego de Memoria",
       "url": "https://meskeia.com/juego-memoria/",
       "description": "Entrena tu memoria encontrando parejas de cartas",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax"
       ],
@@ -2474,7 +2723,9 @@
       "name": "Juego Piedra Papel Tijera",
       "url": "https://meskeia.com/juego-piedra-papel-tijera/",
       "description": "Juega piedra, papel o tijera contra la computadora",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax"
       ],
@@ -2492,7 +2743,9 @@
       "name": "Juego 2048",
       "url": "https://meskeia.com/juego-2048/",
       "description": "Desliza y combina números para llegar a 2048",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax"
       ],
@@ -2510,7 +2763,10 @@
       "name": "Juego Puzzle Matemático",
       "url": "https://meskeia.com/juego-puzzle-matematico/",
       "description": "Resuelve puzzles matemáticos y ejercita tu mente",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos",
+        "estudiantes"
+      ],
       "contexts": [
         "relax",
         "estudio"
@@ -2529,7 +2785,9 @@
       "name": "Juego Asteroids",
       "url": "https://meskeia.com/juego-asteroids/",
       "description": "Juega al clásico Asteroids: controla tu nave, destruye asteroides y OVNIs en este arcade espacial",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax"
       ],
@@ -2549,7 +2807,9 @@
       "name": "Juego Space Invaders",
       "url": "https://meskeia.com/juego-space-invaders/",
       "description": "Defiende la Tierra de la invasión alienígena en el clásico Space Invaders",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax"
       ],
@@ -2569,7 +2829,9 @@
       "name": "Juego Platform Runner",
       "url": "https://meskeia.com/juego-platform-runner/",
       "description": "Corre, salta, recolecta monedas y derrota enemigos en este juego de plataformas",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax"
       ],
@@ -2589,7 +2851,9 @@
       "name": "Ruleta Aleatoria",
       "url": "https://meskeia.com/ruleta-aleatoria/",
       "description": "Ruleta personalizable para sorteos, decisiones y selección al azar. Añade opciones, gira y elige ganador",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax",
         "trabajo",
@@ -2612,7 +2876,9 @@
       "name": "Generador de Lotería",
       "url": "https://meskeia.com/generador-loteria/",
       "description": "Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo y Lototurf. Combinaciones al azar y favoritos",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax",
         "curiosidad"
@@ -2635,7 +2901,9 @@
       "name": "Cara o Cruz",
       "url": "https://meskeia.com/cara-o-cruz/",
       "description": "Lanza una moneda virtual con animación realista. Incluye historial de lanzamientos, estadísticas de probabilidad y visualización de la ley de grandes números",
-      "category": "Juegos y Entretenimiento",
+      "suites": [
+        "juegos"
+      ],
       "contexts": [
         "relax",
         "curiosidad"
@@ -2657,7 +2925,9 @@
       "name": "Calculadora de Probabilidad",
       "url": "https://meskeia.com/calculadora-probabilidad/",
       "description": "Calculadora completa de probabilidades con teoría y simulaciones",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -2675,7 +2945,9 @@
       "name": "Calculadora MCD y MCM",
       "url": "https://meskeia.com/calculadora-mcd-mcm/",
       "description": "Calcula el Máximo Común Divisor y Mínimo Común Múltiplo de hasta 5 números con explicación paso a paso",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -2694,7 +2966,9 @@
       "name": "Calculadora Estadística",
       "url": "https://meskeia.com/calculadora-estadistica/",
       "description": "Calcula media, mediana, desviación estándar y análisis estadístico completo",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -2713,7 +2987,9 @@
       "name": "Estadística Avanzada",
       "url": "https://meskeia.com/estadistica-avanzada/",
       "description": "Tests de hipótesis (t-Student, Chi²), regresión lineal, correlación Pearson/Spearman, intervalos de confianza y análisis de normalidad",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -2737,7 +3013,9 @@
       "name": "Calculadora Matemática Avanzada",
       "url": "https://meskeia.com/calculadora-matematica/",
       "description": "Resuelve ecuaciones, matrices, derivadas e integrales online",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -2755,7 +3033,9 @@
       "name": "Calculadora de Ecuaciones",
       "url": "https://meskeia.com/algebra-ecuaciones/",
       "description": "Resuelve ecuaciones lineales, cuadráticas y sistemas 2x2 con explicaciones paso a paso",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -2775,7 +3055,9 @@
       "name": "Calculadora de Geometría",
       "url": "https://meskeia.com/calculadora-geometria/",
       "description": "Calcula áreas, perímetros y volúmenes de figuras geométricas",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "casa"
@@ -2796,7 +3078,9 @@
       "name": "Calculadora de Cálculo",
       "url": "https://meskeia.com/calculadora-calculo/",
       "description": "Deriva e integra funciones, límites y análisis matemático",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -2814,7 +3098,9 @@
       "name": "Calculadora de Trigonometría",
       "url": "https://meskeia.com/calculadora-trigonometria/",
       "description": "Funciones trigonométricas, identidades y triángulos",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -2832,7 +3118,9 @@
       "name": "Calculadora Teoría de Números",
       "url": "https://meskeia.com/calculadora-teoria-numeros/",
       "description": "Números primos, factorización y teoría de números",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "curiosidad"
@@ -2850,7 +3138,9 @@
       "name": "Calculadora Álgebra Abstracta",
       "url": "https://meskeia.com/calculadora-algebra-abstracta/",
       "description": "Grupos, anillos, campos y estructuras algebraicas",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -2867,7 +3157,9 @@
       "name": "Calculadora Teoría de Colas",
       "url": "https://meskeia.com/calculadora-teoria-colas/",
       "description": "Calcula métricas de sistemas de colas M/M/1: utilización, tiempos de espera y simulación",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -2887,7 +3179,9 @@
       "name": "Calculadora de Distribuciones",
       "url": "https://meskeia.com/calculadora-distribuciones/",
       "description": "Calcula probabilidades con distribuciones Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t-Student. PDF, CDF y cuantiles",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -2914,7 +3208,9 @@
       "name": "Inferencia Bayesiana",
       "url": "https://meskeia.com/inferencia-bayesiana/",
       "description": "Aplica el teorema de Bayes paso a paso. Calcula probabilidades posteriores, múltiples hipótesis, actualización secuencial y tests diagnósticos",
-      "category": "Matemáticas y Estadística",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -2937,7 +3233,10 @@
       "name": "Notas",
       "url": "https://meskeia.com/notas/",
       "description": "Guarda tus notas, ideas y apuntes organizados por categorías con guardado automático local",
-      "category": "Productividad",
+      "suites": [
+        "freelance",
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "estudio",
@@ -2959,7 +3258,11 @@
       "name": "Temporizador Pomodoro",
       "url": "https://meskeia.com/temporizador-pomodoro/",
       "description": "Técnica Pomodoro con sesiones configurables, estadísticas de productividad y sonidos. Mejora tu concentración",
-      "category": "Productividad",
+      "suites": [
+        "freelance",
+        "productividad",
+        "estudiantes"
+      ],
       "contexts": [
         "trabajo",
         "estudio"
@@ -2982,7 +3285,10 @@
       "name": "Lista de Tareas",
       "url": "https://meskeia.com/lista-tareas/",
       "description": "Organiza tus tareas pendientes con categorías, prioridades y fechas límite",
-      "category": "Productividad",
+      "suites": [
+        "freelance",
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "casa",
@@ -3002,7 +3308,9 @@
       "name": "Cronómetro y Temporizador",
       "url": "https://meskeia.com/cronometro/",
       "description": "Cronómetro con vueltas y temporizador con cuenta regresiva y alarma sonora",
-      "category": "Productividad",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "estudio",
@@ -3027,7 +3335,10 @@
       "name": "Conversor de Horarios",
       "url": "https://meskeia.com/conversor-horarios/",
       "description": "Convierte horarios entre 25+ ciudades del mundo con reloj mundial en tiempo real",
-      "category": "Productividad",
+      "suites": [
+        "freelance",
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "curiosidad"
@@ -3048,7 +3359,9 @@
       "name": "Información del Tiempo",
       "url": "https://meskeia.com/informacion-tiempo/",
       "description": "Consulta el pronóstico del tiempo para cualquier ciudad del mundo",
-      "category": "Productividad",
+      "suites": [
+        "inmobiliaria"
+      ],
       "contexts": [
         "casa",
         "trabajo"
@@ -3067,7 +3380,9 @@
       "name": "Generador de Contraseñas",
       "url": "https://meskeia.com/generador-contrasenas/",
       "description": "Crea contraseñas seguras y personalizadas con diferentes niveles de complejidad",
-      "category": "Criptografía y Seguridad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo",
         "casa"
@@ -3086,7 +3401,10 @@
       "name": "Generador de Códigos QR",
       "url": "https://meskeia.com/generador-qr/",
       "description": "Crea códigos QR para URLs, texto, WiFi, contactos vCard, email y teléfono",
-      "category": "Productividad",
+      "suites": [
+        "marketing",
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -3106,7 +3424,10 @@
       "name": "Generador de Códigos de Barras",
       "url": "https://meskeia.com/generador-codigos-barras/",
       "description": "Genera códigos de barras EAN-13, EAN-8, UPC-A, Code128 y Code39",
-      "category": "Productividad",
+      "suites": [
+        "diseno",
+        "productividad"
+      ],
       "contexts": [
         "trabajo"
       ],
@@ -3128,7 +3449,9 @@
       "name": "Generador de Firmas Email",
       "url": "https://meskeia.com/generador-firma-email/",
       "description": "Crea firmas de email profesionales en HTML. Compatible con Gmail, Outlook, Apple Mail. Múltiples plantillas y redes sociales",
-      "category": "Productividad",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "trabajo"
       ],
@@ -3149,7 +3472,10 @@
       "name": "Time Tracker",
       "url": "https://meskeia.com/time-tracker/",
       "description": "Registra tiempo por proyecto y cliente. Informes de horas trabajadas, exportación y tarifa por hora para freelancers",
-      "category": "Productividad",
+      "suites": [
+        "freelance",
+        "productividad"
+      ],
       "contexts": [
         "trabajo"
       ],
@@ -3169,7 +3495,9 @@
       "name": "Planificador de Turnos",
       "url": "https://meskeia.com/planificador-turnos/",
       "description": "Planifica turnos de trabajo para equipos pequeños. Gestiona empleados, franjas horarias personalizables y genera horarios automáticamente",
-      "category": "Productividad",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "trabajo"
       ],
@@ -3192,7 +3520,9 @@
       "name": "Conversor de Unidades",
       "url": "https://meskeia.com/conversor-unidades/",
       "description": "Conversor científico avanzado: 13 categorías incluyendo química, presión, energía, fuerza y potencia",
-      "category": "Productividad",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "estudio",
         "casa",
@@ -3212,7 +3542,9 @@
       "name": "Conversor de Unidades RF",
       "url": "https://meskeia.com/conversor-unidades-rf/",
       "description": "Conversor especializado para radiofrecuencia: dBm↔Watts, dBµV, VSWR↔Return Loss, frecuencia↔longitud de onda. Ideal para ingenieros RF y radioaficionados",
-      "category": "Productividad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -3239,7 +3571,9 @@
       "name": "Lista de Equipaje",
       "url": "https://meskeia.com/lista-equipaje/",
       "description": "Genera una lista de equipaje personalizada según tipo de viaje, clima y duración. Checklist interactivo",
-      "category": "Productividad",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "casa",
         "curiosidad"
@@ -3260,7 +3594,9 @@
       "name": "Generador de Actas de Reunión",
       "url": "https://meskeia.com/generador-actas/",
       "description": "Crea actas de reunión profesionales con plantillas, gestión de asistentes, orden del día y seguimiento de tareas. Exporta a PDF",
-      "category": "Productividad",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "trabajo"
       ],
@@ -3282,7 +3618,9 @@
       "name": "Prueba de Cámara Web",
       "url": "https://meskeia.com/prueba-camara/",
       "description": "Prueba tu webcam antes de videollamadas. Verifica resolución, ajusta brillo/contraste y toma fotos. 100% privado",
-      "category": "Productividad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo"
       ],
@@ -3304,7 +3642,9 @@
       "name": "Prueba de Micrófono",
       "url": "https://meskeia.com/prueba-microfono/",
       "description": "Prueba tu micrófono antes de videollamadas. Visualiza niveles de audio, graba y reproduce. Sin registro, 100% privado",
-      "category": "Productividad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo"
       ],
@@ -3326,7 +3666,9 @@
       "name": "Luxómetro / Fotómetro",
       "url": "https://meskeia.com/luxometro/",
       "description": "Mide la intensidad de luz en lux con tu dispositivo. Ideal para fotógrafos: incluye recomendaciones de ISO, apertura y velocidad",
-      "category": "Productividad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -3350,7 +3692,10 @@
       "name": "Golden Hour - Hora Dorada",
       "url": "https://meskeia.com/golden-hour/",
       "description": "Calcula las horas de luz dorada y azul para fotografía. Amanecer, atardecer y crepúsculos según tu ubicación",
-      "category": "Productividad",
+      "suites": [
+        "inmobiliaria",
+        "diseno"
+      ],
       "contexts": [
         "creando",
         "curiosidad"
@@ -3373,7 +3718,9 @@
       "name": "Sonómetro / Decibelímetro",
       "url": "https://meskeia.com/sonometro/",
       "description": "Mide el nivel de ruido en decibelios (dB) con tu micrófono. Ideal para documentar ruido, verificar ambientes de trabajo o medir contaminación acústica",
-      "category": "Productividad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo",
         "casa"
@@ -3396,7 +3743,10 @@
       "name": "Metrónomo Online",
       "url": "https://meskeia.com/metronomo/",
       "description": "Metrónomo online con tempo ajustable (40-220 BPM), tap tempo, múltiples compases y visualización del pulso. Ideal para práctica musical",
-      "category": "Productividad",
+      "suites": [
+        "juegos",
+        "cultura"
+      ],
       "contexts": [
         "creando",
         "estudio"
@@ -3420,7 +3770,10 @@
       "name": "Mi IP y Conexión",
       "url": "https://meskeia.com/mi-ip/",
       "description": "Descubre tu IP pública, ubicación aproximada, proveedor de internet, tipo de conexión y velocidad. Historial de IPs",
-      "category": "Productividad",
+      "suites": [
+        "freelance",
+        "tecnicas"
+      ],
       "contexts": [
         "trabajo",
         "curiosidad"
@@ -3444,7 +3797,9 @@
       "name": "Analizador de Espectro",
       "url": "https://meskeia.com/analizador-espectro/",
       "description": "Visualiza las frecuencias de audio en tiempo real con FFT. Muestra bandas de frecuencia, nota dominante y espectrograma. Ideal para músicos y técnicos de sonido",
-      "category": "Productividad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "creando",
         "estudio",
@@ -3469,7 +3824,9 @@
       "name": "Nivel de Burbuja Digital",
       "url": "https://meskeia.com/nivel-burbuja/",
       "description": "Nivel de burbuja digital con inclinómetro. Mide ángulos y pendientes con los sensores de tu móvil. Ideal para bricolaje, colgar cuadros y medir rampas",
-      "category": "Productividad",
+      "suites": [
+        "tecnicas"
+      ],
       "contexts": [
         "casa",
         "trabajo"
@@ -3492,7 +3849,9 @@
       "name": "Calculadora IMC",
       "url": "https://meskeia.com/calculadora-imc/",
       "description": "Calcula tu Índice de Masa Corporal y conoce tu clasificación según la OMS",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3511,7 +3870,9 @@
       "name": "Calculadora de Calorías",
       "url": "https://meskeia.com/calculadora-calorias-ejercicio/",
       "description": "Calcula las calorías quemadas según tu actividad física, pasos y tiempo de ejercicio",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3529,7 +3890,9 @@
       "name": "Calculadora de Hidratación",
       "url": "https://meskeia.com/calculadora-hidratacion/",
       "description": "Calcula cuánta agua necesitas beber diariamente según tu peso, actividad física y clima",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3547,7 +3910,9 @@
       "name": "Calculadora de Sueño",
       "url": "https://meskeia.com/calculadora-sueno/",
       "description": "Calcula tus ciclos de sueño ideales y descubre a qué hora acostarte para despertar descansado",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3565,7 +3930,10 @@
       "name": "Curso de Nutrición",
       "url": "https://meskeia.com/curso-nutrisalud/",
       "description": "Curso de nutrición avanzado basado en ciencia. 15 capítulos sobre macronutrientes, micronutrientes, interacciones y aplicación práctica",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud",
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "casa"
@@ -3587,7 +3955,10 @@
       "name": "Seguimiento de Hábitos",
       "url": "https://meskeia.com/seguimiento-habitos/",
       "description": "Rastrea tus hábitos saludables con visualización de rachas y estadísticas motivadoras",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud",
+        "productividad"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3606,7 +3977,10 @@
       "name": "Planificador de Menú Semanal",
       "url": "https://meskeia.com/planificador-menu/",
       "description": "Planifica tu menú semanal de forma equilibrada con sugerencias mediterráneas y consejos de compra",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "inmobiliaria",
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3626,7 +4000,9 @@
       "name": "Calculadora de Porciones",
       "url": "https://meskeia.com/calculadora-porciones/",
       "description": "Aprende a medir porciones de alimentos usando tu mano como referencia. Método visual y práctico",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3641,11 +4017,13 @@
       "icon": "✋"
     },
     {
-      "slug": "test-habitos",
+      "slug": "test-habitos-saludables",
       "name": "Test de Hábitos Saludables",
-      "url": "https://meskeia.com/test-habitos/",
+      "url": "https://meskeia.com/test-habitos-saludables/",
       "description": "Evalúa tus hábitos de vida con un test de 21 preguntas. Perfil visual de hidratación, alimentación, actividad y descanso",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3664,7 +4042,9 @@
       "name": "Planificador Embarazo y Bebé",
       "url": "https://meskeia.com/planificador-embarazo/",
       "description": "Planifica tu embarazo: calculadora FPP, checklist por trimestre, lista de compras del bebé y calendario de vacunación España 2024",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3689,7 +4069,9 @@
       "name": "Planificador de Mascota",
       "url": "https://meskeia.com/planificador-mascota/",
       "description": "Organiza la llegada de tu cachorro o gatito: perfil, checklist por etapas, lista de compras y calendario de vacunas. Perros y gatos",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3714,7 +4096,9 @@
       "name": "Calculadora de Alimentación Mascotas",
       "url": "https://meskeia.com/calculadora-alimentacion-mascotas/",
       "description": "Calcula la cantidad diaria de comida para tu perro o gato según peso, edad y actividad. Incluye detector de alimentos tóxicos y guía de transición de pienso",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3736,7 +4120,9 @@
       "name": "Calculadora de Medicamentos Mascotas",
       "url": "https://meskeia.com/calculadora-medicamentos-mascotas/",
       "description": "Calcula la dosis de antiparasitarios y medicamentos comunes para tu mascota según su peso. Incluye frecuencia de desparasitación y recordatorios",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3754,11 +4140,13 @@
       "icon": "💊"
     },
     {
-      "slug": "calculadora-tamano-adulto-perro",
+      "slug": "calculadora-tamano-cachorro",
       "name": "Calculadora Tamaño Adulto Cachorro",
-      "url": "https://meskeia.com/calculadora-tamano-adulto-perro/",
+      "url": "https://meskeia.com/calculadora-tamano-cachorro/",
       "description": "Predice el peso adulto de tu cachorro según su edad, peso actual y tamaño de raza. Curvas de crecimiento y tabla de razas de referencia",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3774,11 +4162,13 @@
       "icon": "📏"
     },
     {
-      "slug": "calculadora-percentiles",
+      "slug": "calculadora-percentiles-infantiles",
       "name": "Calculadora Percentiles Infantiles",
-      "url": "https://meskeia.com/calculadora-percentiles/",
+      "url": "https://meskeia.com/calculadora-percentiles-infantiles/",
       "description": "Calcula el percentil de peso y talla de tu bebé o niño según las tablas de crecimiento de la OMS",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud"
+      ],
       "contexts": [
         "casa"
       ],
@@ -3797,7 +4187,10 @@
       "name": "Contador de Palabras",
       "url": "https://meskeia.com/contador-palabras/",
       "description": "Cuenta palabras, caracteres, párrafos y tiempo de lectura en tiempo real. Objetivo de palabras configurable",
-      "category": "Texto y Conversores",
+      "suites": [
+        "marketing",
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "estudio",
@@ -3817,7 +4210,9 @@
       "name": "Conversor de Texto",
       "url": "https://meskeia.com/conversor-texto/",
       "description": "Convierte texto entre MAYÚSCULAS, minúsculas, Capitalizado, Título, aLtErNaDo e iNvErTiDo",
-      "category": "Texto y Conversores",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -3836,7 +4231,9 @@
       "name": "Limpiador de Texto",
       "url": "https://meskeia.com/limpiador-texto/",
       "description": "Limpia texto eliminando espacios duplicados, líneas vacías extras, tabulaciones y caracteres especiales",
-      "category": "Texto y Conversores",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -3855,7 +4252,10 @@
       "name": "Comparador de Textos",
       "url": "https://meskeia.com/comparador-textos/",
       "description": "Compara dos textos línea por línea detectando diferencias añadidas, eliminadas y modificadas. Ideal para editores, escritores y traductores",
-      "category": "Texto y Conversores",
+      "suites": [
+        "marketing",
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -3874,7 +4274,9 @@
       "name": "Conversor Markdown-HTML",
       "url": "https://meskeia.com/conversor-markdown-html/",
       "description": "Convierte Markdown a HTML limpio con vista previa en tiempo real. Soporte completo de sintaxis: títulos, listas, enlaces, código, tablas",
-      "category": "Texto y Conversores",
+      "suites": [
+        "diseno"
+      ],
       "contexts": [
         "creando",
         "trabajo"
@@ -3889,11 +4291,13 @@
       "icon": "📝"
     },
     {
-      "slug": "conversor-morse",
+      "slug": "conversor-codigo-morse",
       "name": "Conversor de Código Morse",
-      "url": "https://meskeia.com/conversor-morse/",
+      "url": "https://meskeia.com/conversor-codigo-morse/",
       "description": "Convierte texto a código Morse y viceversa con reproducción de audio. Alfabeto completo y señales internacionales",
-      "category": "Texto y Conversores",
+      "suites": [
+        "cultura"
+      ],
       "contexts": [
         "curiosidad"
       ],
@@ -3913,7 +4317,10 @@
       "name": "Conversor Números Romanos",
       "url": "https://meskeia.com/conversor-numeros-romanos/",
       "description": "Convierte entre números arábigos y romanos con desglose paso a paso. Tabla de símbolos y reglas explicadas",
-      "category": "Texto y Conversores",
+      "suites": [
+        "cultura",
+        "estudiantes"
+      ],
       "contexts": [
         "curiosidad",
         "estudio"
@@ -3939,7 +4346,10 @@
       "name": "Detector de Idioma",
       "url": "https://meskeia.com/detector-idioma/",
       "description": "Detecta automáticamente el idioma de cualquier texto. Soporta 10+ idiomas con porcentaje de confianza",
-      "category": "Texto y Conversores",
+      "suites": [
+        "cultura",
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "curiosidad"
@@ -3960,7 +4370,10 @@
       "name": "Conversor Binario",
       "url": "https://meskeia.com/conversor-binario/",
       "description": "Convierte texto a binario y viceversa. Muestra también hexadecimal, octal y decimal con tabla ASCII",
-      "category": "Texto y Conversores",
+      "suites": [
+        "cultura",
+        "estudiantes"
+      ],
       "contexts": [
         "curiosidad",
         "estudio",
@@ -3982,7 +4395,9 @@
       "name": "Conversor Braille",
       "url": "https://meskeia.com/conversor-braille/",
       "description": "Convierte texto a Braille español y viceversa. Sistema completo con ñ, acentos, números y visualización de celdas",
-      "category": "Texto y Conversores",
+      "suites": [
+        "cultura"
+      ],
       "contexts": [
         "curiosidad"
       ],
@@ -4002,7 +4417,10 @@
       "name": "Generador de Anagramas",
       "url": "https://meskeia.com/generador-anagramas/",
       "description": "Encuentra todas las palabras que puedes formar con tus letras. Ideal para Wordle, Scrabble y crucigramas",
-      "category": "Texto y Conversores",
+      "suites": [
+        "cultura",
+        "juegos"
+      ],
       "contexts": [
         "relax",
         "curiosidad"
@@ -4023,7 +4441,10 @@
       "name": "Generador Lorem Ipsum",
       "url": "https://meskeia.com/generador-lorem-ipsum/",
       "description": "Genera texto Lorem Ipsum de 1 a 10 párrafos. Ideal para diseño, maquetación y desarrollo web",
-      "category": "Texto y Conversores",
+      "suites": [
+        "marketing",
+        "diseno"
+      ],
       "contexts": [
         "creando"
       ],
@@ -4042,7 +4463,9 @@
       "name": "Conversor de Formatos",
       "url": "https://meskeia.com/conversor-formatos/",
       "description": "Convierte archivos entre JSON, CSV, Excel, XML y YAML. 100% privado, todo se procesa en tu navegador",
-      "category": "Texto y Conversores",
+      "suites": [
+        "productividad"
+      ],
       "contexts": [
         "trabajo",
         "creando"
@@ -4066,7 +4489,10 @@
       "name": "Contador de Sílabas",
       "url": "https://meskeia.com/contador-silabas/",
       "description": "Cuenta y separa las sílabas de cualquier palabra o texto en español. Útil para poesía y ortografía",
-      "category": "Texto y Conversores",
+      "suites": [
+        "cultura",
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "creando"
@@ -4083,11 +4509,13 @@
       "icon": "📝"
     },
     {
-      "slug": "paises-del-mundo",
+      "slug": "paises-mundo",
       "name": "Países del Mundo",
-      "url": "https://meskeia.com/paises-del-mundo/",
+      "url": "https://meskeia.com/paises-mundo/",
       "description": "Buscador de 195 países con capitales, banderas, monedas, idiomas, población y prefijos telefónicos",
-      "category": "Texto y Conversores",
+      "suites": [
+        "cultura"
+      ],
       "contexts": [
         "curiosidad",
         "estudio"
@@ -4110,7 +4538,10 @@
       "name": "Conjugador de Verbos Español",
       "url": "https://meskeia.com/conjugador-verbos/",
       "description": "Conjuga cualquier verbo español en todos los tiempos: indicativo, subjuntivo e imperativo. Incluye 60+ verbos irregulares",
-      "category": "Texto y Conversores",
+      "suites": [
+        "cultura",
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -4128,11 +4559,13 @@
       "icon": "📖"
     },
     {
-      "slug": "tablas-multiplicar",
+      "slug": "entrenador-tablas-multiplicar",
       "name": "Entrenador Tablas Multiplicar",
-      "url": "https://meskeia.com/tablas-multiplicar/",
+      "url": "https://meskeia.com/entrenador-tablas-multiplicar/",
       "description": "Aprende las tablas de multiplicar jugando. Juego educativo con niveles, puntuación, rachas y medallas para niños de primaria",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -4148,11 +4581,13 @@
       "icon": "✖️"
     },
     {
-      "slug": "minerales-del-mundo",
+      "slug": "minerales-mundo",
       "name": "Minerales del Mundo",
-      "url": "https://meskeia.com/minerales-del-mundo/",
+      "url": "https://meskeia.com/minerales-mundo/",
       "description": "Guía de 50 minerales esenciales con composición química, dureza Mohs, sistema cristalino, usos y curiosidades",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "curiosidad"
@@ -4176,7 +4611,10 @@
       "name": "Huesos del Cuerpo Humano",
       "url": "https://meskeia.com/huesos-cuerpo-humano/",
       "description": "Guía completa de los 206 huesos del esqueleto humano: nombre latino, tipo, región, articulaciones, función y curiosidades",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "salud",
+        "cultura"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -4195,11 +4633,13 @@
       "icon": "🦴"
     },
     {
-      "slug": "constelaciones-del-cielo",
+      "slug": "constelaciones-cielo",
       "name": "Constelaciones del Cielo",
-      "url": "https://meskeia.com/constelaciones-del-cielo/",
+      "url": "https://meskeia.com/constelaciones-cielo/",
       "description": "Guía de 32 constelaciones famosas: zodiacales, boreales y australes con estrellas principales, mitología griega y curiosidades",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "curiosidad"
@@ -4223,7 +4663,9 @@
       "name": "Instrumentos Musicales",
       "url": "https://meskeia.com/instrumentos-musicales/",
       "description": "Guía de 45 instrumentos musicales del mundo: cuerda, viento, percusión, teclado y electrónicos con origen, materiales y curiosidades",
-      "category": "Herramientas Académicas",
+      "suites": [
+        "cultura"
+      ],
       "contexts": [
         "estudio",
         "curiosidad"
@@ -4247,7 +4689,10 @@
       "name": "Vitaminas y Minerales",
       "url": "https://meskeia.com/vitaminas-minerales/",
       "description": "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso",
-      "category": "Salud y Bienestar",
+      "suites": [
+        "salud",
+        "cultura"
+      ],
       "contexts": [
         "casa",
         "estudio"
@@ -4273,7 +4718,10 @@
       "name": "Visualizador de Algoritmos",
       "url": "https://meskeia.com/visualizador-algoritmos/",
       "description": "Visualiza paso a paso cómo funcionan los algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort con animaciones interactivas",
-      "category": "Informática y Programación",
+      "suites": [
+        "diseno",
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -4295,7 +4743,10 @@
       "name": "Playground SQL",
       "url": "https://meskeia.com/playground-sql/",
       "description": "Editor SQL interactivo en el navegador. Practica con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada",
-      "category": "Informática y Programación",
+      "suites": [
+        "diseno",
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -4320,7 +4771,10 @@
       "name": "Simulador de Puertas Lógicas",
       "url": "https://meskeia.com/simulador-puertas-logicas/",
       "description": "Simula puertas lógicas (AND, OR, NOT, NAND, NOR, XOR, XNOR), genera tablas de verdad, prueba circuitos digitales y evalúa expresiones booleanas",
-      "category": "Informática y Programación",
+      "suites": [
+        "diseno",
+        "estudiantes"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -4342,11 +4796,14 @@
       "icon": "🔌"
     },
     {
-      "slug": "simulador-genetica",
+      "slug": "simulador-genetica-mendeliana",
       "name": "Simulador de Genética Mendeliana",
-      "url": "https://meskeia.com/simulador-genetica/",
+      "url": "https://meskeia.com/simulador-genetica-mendeliana/",
       "description": "Simula cruces genéticos, cuadros de Punnett, herencia ligada al sexo, árboles genealógicos y simulación de poblaciones con estadísticas chi-cuadrado",
-      "category": "Biomedicina y Ciencias de la Salud",
+      "suites": [
+        "estudiantes",
+        "salud"
+      ],
       "contexts": [
         "estudio"
       ],
@@ -4371,7 +4828,10 @@
       "name": "Calculadora de Estadística Médica",
       "url": "https://meskeia.com/calculadora-estadistica-medica/",
       "description": "Calcula sensibilidad, especificidad, VPP, VPN, razones de verosimilitud, odds ratio, riesgo relativo, NNT con intervalos de confianza. Ideal para epidemiología y pruebas diagnósticas",
-      "category": "Biomedicina y Ciencias de la Salud",
+      "suites": [
+        "salud",
+        "estudiantes"
+      ],
       "contexts": [
         "estudio",
         "trabajo"
@@ -4404,7 +4864,7 @@
       "Usuario necesita herramientas de productividad",
       "Usuario pregunta por simuladores fiscales españoles"
     ],
-    "how_to_use": "Busca en el array \"tools\" por nombre, descripción, keywords o contexts. Devuelve la URL directa. Todas las herramientas son gratuitas y no requieren registro.",
+    "how_to_use": "Busca en el array \"tools\" por nombre, descripción, keywords, suites o contexts. Devuelve la URL directa. Todas las herramientas son gratuitas y no requieren registro.",
     "url_pattern": "https://meskeia.com/{slug}/",
     "example_queries": {
       "calcular hipoteca": "https://meskeia.com/simulador-hipoteca/",
@@ -4424,11 +4884,12 @@
       "Formato numérico español (coma decimal)",
       "Compatible con móviles y tablets",
       "Incluyen modo oscuro",
-      "Específicas para España (impuestos, normativa)"
+      "Específicas para España (impuestos, normativa)",
+      "Una app puede pertenecer a múltiples suites (clasificación no excluyente)"
     ]
   },
   "api_endpoints": {
-    "tools_api": "https://meskeia.com/api/tools",
+    "tools_api": "https://meskeia.com/llm/tools",
     "sitemap": "https://meskeia.com/sitemap.xml",
     "ai_index": "https://meskeia.com/ai-index.json"
   }

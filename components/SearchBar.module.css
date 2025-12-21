@@ -343,14 +343,10 @@
   flex-wrap: wrap;
 }
 
-.resultCategory {
-  font-size: 0.75rem;
-  color: var(--primary);
-  font-weight: 600;
+.resultSuites {
+  font-size: 1rem;
   display: inline-block;
-  padding: 0.25rem 0.5rem;
-  background: var(--focus);
-  border-radius: 4px;
+  opacity: 0.9;
 }
 
 .resultMoments {

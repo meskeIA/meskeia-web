@@ -703,6 +703,101 @@
   padding-left: var(--spacing-sm);
 }
 
+/* ===== SUITES TEMÁTICAS ===== */
+.suitesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.suiteCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.suiteCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.suiteCardOpen {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.suiteHeader {
+  padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.suiteIcon {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.suiteInfo {
+  flex: 1;
+}
+
+.suiteTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.suiteCount {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  background: var(--focus);
+  border-radius: 12px;
+  margin-top: 0.5rem;
+}
+
+.suiteApps {
+  list-style: none;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+  margin: 0;
+  border-top: 1px solid var(--border);
+  animation: fadeInDown 0.3s ease;
+}
+
+.suiteApps li {
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--hover);
+}
+
+.suiteApps li:last-child {
+  border-bottom: none;
+}
+
+.suiteApps a {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.suiteApps a:hover {
+  color: var(--primary);
+  padding-left: var(--spacing-sm);
+}
+
 /* ===== RESPONSIVE VISTAS ===== */
 @media (max-width: 768px) {
   .searchSection {

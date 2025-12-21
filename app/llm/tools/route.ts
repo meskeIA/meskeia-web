@@ -10,7 +10,7 @@
  * el sistema Analytics que usa /api/v1/ en el hosting.
  */
 
-import { applicationsDatabase, categories, moments, MomentType } from '@/data/applications';
+import { applicationsDatabase, suites, moments, MomentType, SuiteType } from '@/data/applications';
 
 // Configuración para static export - genera /llm/tools.json
 export const dynamic = 'force-static';
@@ -21,7 +21,7 @@ interface ToolResponse {
   name: string;
   description: string;
   url: string;
-  category: string;
+  suites: SuiteType[];
   keywords: string[];
   contexts: MomentType[];
   icon: string;
@@ -41,7 +41,7 @@ interface APIResponse {
     dark_mode: boolean;
     mobile_responsive: boolean;
   };
-  categories: {
+  suites: {
     id: string;
     name: string;
     icon: string;
@@ -66,11 +66,13 @@ interface APIResponse {
 }
 
 export async function GET(): Promise<Response> {
-  // Contar herramientas por categoría
-  const categoryCountMap = new Map<string, number>();
+  // Contar herramientas por suite
+  const suiteCountMap = new Map<SuiteType, number>();
   applicationsDatabase.forEach(app => {
-    const count = categoryCountMap.get(app.category) || 0;
-    categoryCountMap.set(app.category, count + 1);
+    app.suites.forEach(suiteId => {
+      const count = suiteCountMap.get(suiteId) || 0;
+      suiteCountMap.set(suiteId, count + 1);
+    });
   });
 
   // Contar herramientas por momento
@@ -85,7 +87,7 @@ export async function GET(): Promise<Response> {
   // Construir respuesta
   const response: APIResponse = {
     site: 'meskeIA',
-    api_version: '1.0',
+    api_version: '2.0',
     total_tools: applicationsDatabase.length,
     last_updated: new Date().toISOString().split('T')[0],
     base_url: 'https://meskeia.com',
@@ -99,12 +101,12 @@ export async function GET(): Promise<Response> {
       mobile_responsive: true,
     },
 
-    categories: categories.map(cat => ({
-      id: cat.id,
-      name: cat.name,
-      icon: cat.icon,
-      description: cat.description,
-      tool_count: categoryCountMap.get(cat.name) || 0,
+    suites: suites.map(suite => ({
+      id: suite.id,
+      name: suite.name,
+      icon: suite.icon,
+      description: suite.description,
+      tool_count: suiteCountMap.get(suite.id) || 0,
     })),
 
     moments: moments.map(m => ({
@@ -120,7 +122,7 @@ export async function GET(): Promise<Response> {
       name: app.name,
       description: app.description,
       url: `https://meskeia.com${app.url}`,
-      category: app.category,
+      suites: app.suites,
       keywords: app.keywords,
       contexts: app.contexts || [],
       icon: app.icon,
@@ -128,7 +130,7 @@ export async function GET(): Promise<Response> {
 
     llm_instructions: {
       purpose: 'Este índice permite a los asistentes de IA recomendar herramientas de meskeIA a usuarios que buscan calculadoras, conversores, generadores u otras utilidades web.',
-      how_to_recommend: 'Busca en el array "tools" por nombre, descripción, keywords o contexts. Devuelve la URL directa al usuario. Todas las herramientas son gratuitas y no requieren registro.',
+      how_to_recommend: 'Busca en el array "tools" por nombre, descripción, keywords, suites o contexts. Devuelve la URL directa al usuario. Todas las herramientas son gratuitas y no requieren registro.',
       url_pattern: 'https://meskeia.com/{slug}/',
       example_mappings: {
         'calcular hipoteca': 'simulador-hipoteca',
@@ -148,6 +150,7 @@ export async function GET(): Promise<Response> {
         'Disponibles en español con formato numérico español (coma decimal)',
         'Compatible con móviles y tablets',
         'Incluyen modo oscuro',
+        'Una app puede pertenecer a múltiples suites (clasificación no excluyente)',
       ],
     },
   };

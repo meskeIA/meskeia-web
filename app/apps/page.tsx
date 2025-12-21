@@ -4,12 +4,12 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import FixedHeader from '@/components/FixedHeader';
 import Footer from '@/components/Footer';
-import { categories, applicationsDatabase } from '@/data/applications';
+import { suites, applicationsDatabase, SuiteType } from '@/data/applications';
 import { isAppImplemented, TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import styles from './page.module.css';
 
 export default function AppsPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedSuite, setSelectedSuite] = useState<SuiteType | 'all'>('all');
 
   // Filtrar solo apps implementadas y ordenar alfabéticamente
   const implementedApps = useMemo(() =>
@@ -19,17 +19,17 @@ export default function AppsPage() {
     []
   );
 
-  const getAppsByCategory = (categoryName: string) => {
-    return implementedApps.filter(app => app.category === categoryName);
+  const getAppsBySuite = (suiteId: SuiteType) => {
+    return implementedApps.filter(app => app.suites.includes(suiteId));
   };
 
-  // Las apps ya están ordenadas desde implementedApps
-  const filteredApps = selectedCategory === 'all'
+  // Filtrar apps por suite seleccionada
+  const filteredApps = selectedSuite === 'all'
     ? implementedApps
-    : implementedApps.filter(app => app.category === selectedCategory);
+    : implementedApps.filter(app => app.suites.includes(selectedSuite));
 
   const totalApps = TOTAL_IMPLEMENTED_APPS;
-  const totalCategories = categories.length;
+  const totalSuites = suites.length;
 
   return (
     <>
@@ -40,7 +40,7 @@ export default function AppsPage() {
         <header className={styles.pageHeader}>
           <h1 className={styles.pageTitle}>Catálogo Completo de Apps</h1>
           <p className={styles.pageSubtitle}>
-            Aplicaciones web gratuitas organizadas por categorías. Sin registro, sin anuncios.
+            Aplicaciones web gratuitas organizadas por suites temáticas. Sin registro, sin anuncios.
           </p>
 
           {/* Estadísticas */}
@@ -50,8 +50,8 @@ export default function AppsPage() {
               <span className={styles.statLabel}>Apps</span>
             </div>
             <div className={styles.statItem}>
-              <span className={styles.statNumber}>{totalCategories}</span>
-              <span className={styles.statLabel}>Categorías</span>
+              <span className={styles.statNumber}>{totalSuites}</span>
+              <span className={styles.statLabel}>Suites</span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statNumber}>100%</span>
@@ -60,23 +60,23 @@ export default function AppsPage() {
           </div>
         </header>
 
-        {/* Filtros por categoría */}
+        {/* Filtros por suite */}
         <div className={styles.filtersContainer}>
           <button
-            className={`${styles.filterButton} ${selectedCategory === 'all' ? styles.active : ''}`}
-            onClick={() => setSelectedCategory('all')}
+            className={`${styles.filterButton} ${selectedSuite === 'all' ? styles.active : ''}`}
+            onClick={() => setSelectedSuite('all')}
           >
             📦 Todas ({totalApps})
           </button>
-          {categories.map((category) => {
-            const count = getAppsByCategory(category.name).length;
+          {suites.map((suite) => {
+            const count = getAppsBySuite(suite.id).length;
             return (
               <button
-                key={category.id}
-                className={`${styles.filterButton} ${selectedCategory === category.name ? styles.active : ''}`}
-                onClick={() => setSelectedCategory(category.name)}
+                key={suite.id}
+                className={`${styles.filterButton} ${selectedSuite === suite.id ? styles.active : ''}`}
+                onClick={() => setSelectedSuite(suite.id)}
               >
-                {category.icon} {category.name} ({count})
+                {suite.icon} {suite.name} ({count})
               </button>
             );
           })}
@@ -93,7 +93,11 @@ export default function AppsPage() {
                 </h3>
                 <p className={styles.toolDescription}>{app.description}</p>
                 <div className={styles.toolMeta}>
-                  <span className={styles.toolCategory}>{app.category}</span>
+                  <span className={styles.toolCategory}>
+                    {app.suites.map(suiteId =>
+                      suites.find(s => s.id === suiteId)?.icon
+                    ).join(' ')}
+                  </span>
                 </div>
               </div>
             </article>
@@ -103,7 +107,7 @@ export default function AppsPage() {
         {/* Mensaje si no hay resultados (no debería pasar) */}
         {filteredApps.length === 0 && (
           <div className={styles.noResults}>
-            <p>No se encontraron Apps en esta categoría.</p>
+            <p>No se encontraron Apps en esta suite.</p>
           </div>
         )}
 

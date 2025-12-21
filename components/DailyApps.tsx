@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './DailyApps.module.css';
 import { getDailyApps } from '@/lib/dailyApps';
-import type { Application } from '@/data/applications';
+import { type Application, suites } from '@/data/applications';
 
 interface DailyAppsProps {
   count?: number;
@@ -78,7 +78,7 @@ export default function DailyApps({ count = 4 }: DailyAppsProps) {
               {app.description}
             </p>
             <span className={styles.appCategory}>
-              📁 {app.category}
+              {app.suites.map(suiteId => suites.find(s => s.id === suiteId)?.icon).join(' ')}
             </span>
           </Link>
         ))}

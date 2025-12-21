@@ -7,25 +7,25 @@ import SearchBar from '@/components/SearchBar';
 import HomeFooter from '@/components/home/HomeFooter';
 import WhyMeskeIA from '@/components/home/WhyMeskeIA';
 import FAQ from '@/components/home/FAQ';
-import { categories, applicationsDatabase, moments, MomentType } from '@/data/applications';
+import { suites, SuiteType, applicationsDatabase, moments, MomentType, getAppsBySuite } from '@/data/applications';
 import { isAppImplemented, TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import { addRecentApp } from '@/lib/recentApps';
 import styles from './page.module.css';
 
 // Tipos de vista para el área principal
-type MainView = 'home' | 'momentos' | 'categorias' | 'porquemeskeia' | 'faq';
+type MainView = 'home' | 'momentos' | 'suites' | 'porquemeskeia' | 'faq';
 
 function HomeContent() {
   const searchParams = useSearchParams();
   const [currentView, setCurrentView] = useState<MainView>('home');
   const [selectedMoment, setSelectedMoment] = useState<MomentType | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSuite, setSelectedSuite] = useState<SuiteType | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Leer parámetros de URL para filtros
   useEffect(() => {
     const momentParam = searchParams.get('momento') as MomentType | null;
-    const categoriaParam = searchParams.get('categoria');
+    const suiteParam = searchParams.get('suite') as SuiteType | null;
     const vistaParam = searchParams.get('vista') as MainView | null;
 
     if (vistaParam) {
@@ -33,12 +33,9 @@ function HomeContent() {
     } else if (momentParam && moments.some(m => m.id === momentParam)) {
       setCurrentView('momentos');
       setSelectedMoment(momentParam);
-    } else if (categoriaParam) {
-      setCurrentView('categorias');
-      const category = categories.find(c => c.name === categoriaParam);
-      if (category) {
-        setSelectedCategory(category.id);
-      }
+    } else if (suiteParam && suites.some(s => s.id === suiteParam)) {
+      setCurrentView('suites');
+      setSelectedSuite(suiteParam);
     }
   }, [searchParams]);
 
@@ -75,17 +72,16 @@ function HomeContent() {
     const handleViewChange = (e: CustomEvent<{ view: MainView }>) => {
       setCurrentView(e.detail.view);
       setSelectedMoment(null);
-      setSelectedCategory(null);
+      setSelectedSuite(null);
     };
 
     window.addEventListener('changeMainView' as any, handleViewChange);
     return () => window.removeEventListener('changeMainView' as any, handleViewChange);
   }, []);
 
-  // Filtrar solo apps implementadas y ordenar alfabéticamente
-  const getAppsByCategory = (categoryName: string) => {
-    return applicationsDatabase
-      .filter(app => app.category === categoryName)
+  // Obtener apps por suite (solo implementadas) y ordenar alfabéticamente
+  const getImplementedAppsBySuite = (suiteId: SuiteType) => {
+    return getAppsBySuite(suiteId)
       .filter(app => isAppImplemented(app.url))
       .sort((a, b) => a.name.localeCompare(b.name, 'es'));
   };
@@ -112,7 +108,7 @@ function HomeContent() {
   const goHome = () => {
     setCurrentView('home');
     setSelectedMoment(null);
-    setSelectedCategory(null);
+    setSelectedSuite(null);
   };
 
   // Renderizar contenido según la vista
@@ -170,33 +166,33 @@ function HomeContent() {
           </section>
         );
 
-      case 'categorias':
+      case 'suites':
         return (
           <section className={styles.viewSection}>
             <div className={styles.viewHeader}>
               <button onClick={goHome} className={styles.backButton}>← Volver</button>
-              <h2 className={styles.viewTitle}>📂 Categorías</h2>
+              <h2 className={styles.viewTitle}>📦 Suites Temáticas</h2>
             </div>
-            <div className={styles.categoriesGrid}>
-              {categories.map((category) => {
-                const apps = getAppsByCategory(category.name);
-                const isOpen = selectedCategory === category.id;
+            <div className={styles.suitesGrid}>
+              {suites.map((suite) => {
+                const apps = getImplementedAppsBySuite(suite.id);
+                const isOpen = selectedSuite === suite.id;
 
                 return (
-                  <div key={category.id} className={`${styles.categoryCard} ${isOpen ? styles.categoryCardOpen : ''}`}>
+                  <div key={suite.id} className={`${styles.suiteCard} ${isOpen ? styles.suiteCardOpen : ''}`}>
                     <div
-                      className={styles.categoryHeader}
-                      onClick={() => setSelectedCategory(isOpen ? null : category.id)}
+                      className={styles.suiteHeader}
+                      onClick={() => setSelectedSuite(isOpen ? null : suite.id)}
                     >
-                      <div className={styles.categoryIcon}>{category.icon}</div>
-                      <div className={styles.categoryInfo}>
-                        <h3 className={styles.categoryTitle}>{category.name}</h3>
-                        <span className={styles.categoryCount}>{apps.length} Apps</span>
+                      <div className={styles.suiteIcon}>{suite.icon}</div>
+                      <div className={styles.suiteInfo}>
+                        <h3 className={styles.suiteTitle}>{suite.name}</h3>
+                        <span className={styles.suiteCount}>{apps.length} Apps</span>
                       </div>
                     </div>
 
                     {isOpen && (
-                      <ul className={styles.categoryApps}>
+                      <ul className={styles.suiteApps}>
                         {apps.map((app, index) => (
                           <li key={index}>
                             <a href={app.url} onClick={() => handleAppClick(app.url)} title={app.description}>
