@@ -618,6 +618,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // INFORMÁTICA Y PROGRAMACIÓN
   'visualizador-algoritmos': informaticaApps.filter(a => a.url !== '/visualizador-algoritmos/'),
+
+  // CREATIVIDAD Y DISEÑO EXTRA
+  'generador-avatares': [
+    { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Diseña paletas de colores' },
+    { url: '/conversor-colores/', icon: '🌈', name: 'Conversor Colores', description: 'HEX, RGB, HSL, CMYK' },
+    { url: '/generador-qr/', icon: '📱', name: 'Generador QR', description: 'Crea códigos QR' },
+    { url: '/generador-firma-email/', icon: '✉️', name: 'Firma Email', description: 'Firma profesional HTML' },
+  ],
 };
 
 /**

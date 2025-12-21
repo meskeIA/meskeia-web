@@ -229,6 +229,9 @@ export const implementedAppsUrls = [
 
   // Informática y Programación (1 implementada)
   "/visualizador-algoritmos/",      // Visualiza algoritmos de ordenación paso a paso
+
+  // Creatividad y Diseño (1 implementada)
+  "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
 ];
 
 /**

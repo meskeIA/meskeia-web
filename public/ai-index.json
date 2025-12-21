@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 13 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 180,
-  "updated": "2025-12-20",
+  "total_tools": 181,
+  "updated": "2025-12-21",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -76,7 +76,8 @@
         { "name": "Generador de Ondas y Visualizador", "slug": "generador-ondas", "url": "https://meskeia.com/generador-ondas/", "description": "Genera ondas sonoras (senoidal, cuadrada, triangular, sierra) y visualiza audio de archivos. Herramienta educativa de física del sonido" },
         { "name": "Generador de Enlaces UTM", "slug": "generador-utm", "url": "https://meskeia.com/generador-utm/", "description": "Genera enlaces UTM para Google Analytics" },
         { "name": "Creador de Thumbnails YouTube", "slug": "creador-thumbnails", "url": "https://meskeia.com/creador-thumbnails/", "description": "Diseña miniaturas profesionales para YouTube con texto, imágenes, formas y exportación PNG 1280x720" },
-        { "name": "Editor EXIF", "slug": "editor-exif", "url": "https://meskeia.com/editor-exif/", "description": "Visualiza y elimina metadatos EXIF de tus fotos: GPS, cámara, fecha, dispositivo. Protege tu privacidad" }
+        { "name": "Editor EXIF", "slug": "editor-exif", "url": "https://meskeia.com/editor-exif/", "description": "Visualiza y elimina metadatos EXIF de tus fotos: GPS, cámara, fecha, dispositivo. Protege tu privacidad" },
+        { "name": "Generador de Avatares", "slug": "generador-avatares", "url": "https://meskeia.com/generador-avatares/", "description": "Genera avatares únicos desde tu nombre. 8 estilos, descarga PNG, 100% privado" }
       ]
     },
     {

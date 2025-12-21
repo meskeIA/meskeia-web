@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 188+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 189+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 188,
+  "total_tools": 189,
   "last_updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -35,7 +35,7 @@
       "name": "Diseño Web",
       "icon": "🎨",
       "description": "Colores, tipografías y herramientas para diseñadores",
-      "tool_count": 17
+      "tool_count": 18
     },
     {
       "id": "emprendimiento",
@@ -114,7 +114,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 76
+      "tool_count": 77
     },
     {
       "id": "estudio",
@@ -142,7 +142,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 46
+      "tool_count": 47
     },
     {
       "id": "relax",
@@ -1009,6 +1009,29 @@
         "imagen"
       ],
       "icon": "📷"
+    },
+    {
+      "slug": "generador-avatares",
+      "name": "Generador de Avatares",
+      "url": "https://meskeia.com/generador-avatares/",
+      "description": "Genera avatares únicos y personalizados a partir de tu nombre o texto. 8 estilos diferentes, descarga PNG, sin subir fotos. 100% privado",
+      "category": "Diseño Web",
+      "contexts": [
+        "creando",
+        "trabajo"
+      ],
+      "keywords": [
+        "avatar",
+        "generador",
+        "perfil",
+        "identicon",
+        "imagen perfil",
+        "foto perfil",
+        "dicebear",
+        "gravatar",
+        "iniciales"
+      ],
+      "icon": "👤"
     },
     {
       "slug": "calculadora-tarifa-freelance",
