@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 184,
+  "total_tools": 185,
   "updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -150,7 +150,8 @@
         { "name": "Minerales del Mundo", "slug": "minerales-del-mundo", "url": "https://meskeia.com/minerales-del-mundo/", "description": "Guía de 50 minerales esenciales: composición química, dureza Mohs, sistema cristalino, brillo, usos industriales y curiosidades. Incluye escala Mohs y sistemas cristalinos" },
         { "name": "Huesos del Cuerpo Humano", "slug": "huesos-cuerpo-humano", "url": "https://meskeia.com/huesos-cuerpo-humano/", "description": "Guía completa de los 206 huesos del esqueleto humano: nombre latino, tipo de hueso, región, articulaciones, función y curiosidades. Ideal para estudiantes de medicina y anatomía" },
         { "name": "Constelaciones del Cielo", "slug": "constelaciones-del-cielo", "url": "https://meskeia.com/constelaciones-del-cielo/", "description": "Guía de 32 constelaciones famosas: zodiacales, boreales y australes con estrellas principales, mitología griega y curiosidades. Ideal para aficionados a la astronomía" },
-        { "name": "Instrumentos Musicales", "slug": "instrumentos-musicales", "url": "https://meskeia.com/instrumentos-musicales/", "description": "Guía de 45 instrumentos musicales del mundo: cuerda, viento, percusión, teclado y electrónicos con origen, materiales, registro y curiosidades" }
+        { "name": "Instrumentos Musicales", "slug": "instrumentos-musicales", "url": "https://meskeia.com/instrumentos-musicales/", "description": "Guía de 45 instrumentos musicales del mundo: cuerda, viento, percusión, teclado y electrónicos con origen, materiales, registro y curiosidades" },
+        { "name": "Entrenador Tablas Multiplicar", "slug": "tablas-multiplicar", "url": "https://meskeia.com/tablas-multiplicar/", "description": "Juego educativo para aprender las tablas de multiplicar: niveles, puntuación, rachas y medallas para niños" }
       ]
     },
     {

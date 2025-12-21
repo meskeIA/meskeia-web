@@ -107,6 +107,7 @@ export const implementedAppsUrls = [
   "/contador-silabas/",         // Separar y contar sílabas en español
   "/conversor-formatos/",       // JSON, CSV, Excel, XML, YAML
   "/conjugador-verbos/",        // Conjugador de verbos español con irregulares
+  "/tablas-multiplicar/",       // Entrenador tablas multiplicar gamificado
 
   // Criptografía y Seguridad (7 implementadas)
   "/cifrado-clasico/",          // César + ROT13 + Atbash

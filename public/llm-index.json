@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 192+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 193+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 192,
+  "total_tools": 193,
   "last_updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Académicas",
       "icon": "🎓",
       "description": "Ciencias, física, química y productividad de estudio",
-      "tool_count": 19
+      "tool_count": 20
     },
     {
       "id": "impuestos",
@@ -128,7 +128,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 64
+      "tool_count": 65
     },
     {
       "id": "casa",
@@ -4075,6 +4075,26 @@
         "gramatica"
       ],
       "icon": "📖"
+    },
+    {
+      "slug": "tablas-multiplicar",
+      "name": "Entrenador Tablas Multiplicar",
+      "url": "https://meskeia.com/tablas-multiplicar/",
+      "description": "Aprende las tablas de multiplicar jugando. Juego educativo con niveles, puntuación, rachas y medallas para niños de primaria",
+      "category": "Herramientas Académicas",
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "tablas multiplicar",
+        "matematicas niños",
+        "primaria",
+        "educativo",
+        "juego",
+        "aprender multiplicar",
+        "gamificado"
+      ],
+      "icon": "✖️"
     },
     {
       "slug": "minerales-del-mundo",
