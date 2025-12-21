@@ -547,6 +547,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // CONVERSORES
   'conversor-unidades': conversoresApps.filter(a => a.url !== '/conversor-unidades/'),
+  'conversor-unidades-rf': [
+    { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, peso, temperatura' },
+    { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm, potencia, circuitos' },
+    { url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'FFT y frecuencias de audio' },
+    { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Ondas y oscilaciones' },
+  ],
   'conversor-tallas': conversoresApps.filter(a => a.url !== '/conversor-tallas/'),
   'conversor-numeros-romanos': conversoresApps.filter(a => a.url !== '/conversor-numeros-romanos/'),
   'conversor-morse': [...conversoresApps.filter(a => a.url !== '/conversor-morse/').slice(0, 2), ...criptografiaClasicaApps.slice(0, 2)],

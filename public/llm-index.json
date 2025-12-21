@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 191+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 192+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 191,
+  "total_tools": 192,
   "last_updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Optimiza tu tiempo y organización",
-      "tool_count": 23
+      "tool_count": 24
     },
     {
       "id": "salud",
@@ -121,14 +121,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 77
+      "tool_count": 78
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 63
+      "tool_count": 64
     },
     {
       "id": "casa",
@@ -3155,6 +3155,33 @@
         "quimica"
       ],
       "icon": "🧪"
+    },
+    {
+      "slug": "conversor-unidades-rf",
+      "name": "Conversor de Unidades RF",
+      "url": "https://meskeia.com/conversor-unidades-rf/",
+      "description": "Conversor especializado para radiofrecuencia: dBm↔Watts, dBµV, VSWR↔Return Loss, frecuencia↔longitud de onda. Ideal para ingenieros RF y radioaficionados",
+      "category": "Productividad",
+      "contexts": [
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "conversor rf",
+        "dbm",
+        "watts",
+        "vswr",
+        "return loss",
+        "dbmv",
+        "dbuv",
+        "radiofrecuencia",
+        "antenas",
+        "longitud onda",
+        "frecuencia",
+        "radioaficionado",
+        "telecomunicaciones"
+      ],
+      "icon": "📡"
     },
     {
       "slug": "lista-equipaje",

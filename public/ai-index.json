@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 183,
+  "total_tools": 184,
   "updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -227,6 +227,7 @@
         { "name": "Time Tracker", "slug": "time-tracker", "url": "https://meskeia.com/time-tracker/", "description": "Registra tiempo por proyecto y cliente" },
         { "name": "Planificador de Turnos", "slug": "planificador-turnos", "url": "https://meskeia.com/planificador-turnos/", "description": "Planifica turnos de trabajo para equipos pequeños" },
         { "name": "Conversor de Unidades", "slug": "conversor-unidades", "url": "https://meskeia.com/conversor-unidades/", "description": "Conversor científico: 14 categorías" },
+        { "name": "Conversor de Unidades RF", "slug": "conversor-unidades-rf", "url": "https://meskeia.com/conversor-unidades-rf/", "description": "Conversor RF: dBm↔Watts, VSWR, Return Loss, frecuencia↔longitud de onda. Para ingenieros RF y radioaficionados" },
         { "name": "Lista de Equipaje", "slug": "lista-equipaje", "url": "https://meskeia.com/lista-equipaje/", "description": "Genera lista de equipaje según tipo de viaje" },
         { "name": "Generador de Actas de Reunión", "slug": "generador-actas", "url": "https://meskeia.com/generador-actas/", "description": "Crea actas profesionales con plantillas, asistentes, orden del día y tareas" },
         { "name": "Prueba de Cámara Web", "slug": "prueba-camara", "url": "https://meskeia.com/prueba-camara/", "description": "Prueba tu webcam antes de videollamadas, ajusta configuración y toma fotos" },
