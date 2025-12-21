@@ -10,14 +10,14 @@ const TERMINACIONES = {
   ar: {
     indicativo: {
       presente: ['o', 'as', 'a', 'amos', 'áis', 'an'],
-      preterito: ['é', 'aste', 'ó', 'amos', 'asteis', 'aron'],
-      imperfecto: ['aba', 'abas', 'aba', 'ábamos', 'abais', 'aban'],
-      futuro: ['aré', 'arás', 'ará', 'aremos', 'aréis', 'arán'],
-      condicional: ['aría', 'arías', 'aría', 'aríamos', 'aríais', 'arían'],
+      preterito_indefinido: ['é', 'aste', 'ó', 'amos', 'asteis', 'aron'],
+      preterito_imperfecto: ['aba', 'abas', 'aba', 'ábamos', 'abais', 'aban'],
+      futuro: ['é', 'ás', 'á', 'emos', 'éis', 'án'],
+      condicional: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
     },
     subjuntivo: {
       presente: ['e', 'es', 'e', 'emos', 'éis', 'en'],
-      imperfecto: ['ara', 'aras', 'ara', 'áramos', 'arais', 'aran'],
+      preterito_imperfecto: ['ara', 'aras', 'ara', 'áramos', 'arais', 'aran'],
     },
     imperativo: {
       afirmativo: ['', 'a', 'e', 'emos', 'ad', 'en'],
@@ -29,14 +29,14 @@ const TERMINACIONES = {
   er: {
     indicativo: {
       presente: ['o', 'es', 'e', 'emos', 'éis', 'en'],
-      preterito: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'],
-      imperfecto: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
-      futuro: ['eré', 'erás', 'erá', 'eremos', 'eréis', 'erán'],
-      condicional: ['ería', 'erías', 'ería', 'eríamos', 'eríais', 'erían'],
+      preterito_indefinido: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'],
+      preterito_imperfecto: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
+      futuro: ['é', 'ás', 'á', 'emos', 'éis', 'án'],
+      condicional: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
     },
     subjuntivo: {
       presente: ['a', 'as', 'a', 'amos', 'áis', 'an'],
-      imperfecto: ['iera', 'ieras', 'iera', 'iéramos', 'ierais', 'ieran'],
+      preterito_imperfecto: ['iera', 'ieras', 'iera', 'iéramos', 'ierais', 'ieran'],
     },
     imperativo: {
       afirmativo: ['', 'e', 'a', 'amos', 'ed', 'an'],
@@ -48,14 +48,14 @@ const TERMINACIONES = {
   ir: {
     indicativo: {
       presente: ['o', 'es', 'e', 'imos', 'ís', 'en'],
-      preterito: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'],
-      imperfecto: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
-      futuro: ['iré', 'irás', 'irá', 'iremos', 'iréis', 'irán'],
-      condicional: ['iría', 'irías', 'iría', 'iríamos', 'iríais', 'irían'],
+      preterito_indefinido: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'],
+      preterito_imperfecto: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
+      futuro: ['é', 'ás', 'á', 'emos', 'éis', 'án'],
+      condicional: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
     },
     subjuntivo: {
       presente: ['a', 'as', 'a', 'amos', 'áis', 'an'],
-      imperfecto: ['iera', 'ieras', 'iera', 'iéramos', 'ierais', 'ieran'],
+      preterito_imperfecto: ['iera', 'ieras', 'iera', 'iéramos', 'ierais', 'ieran'],
     },
     imperativo: {
       afirmativo: ['', 'e', 'a', 'amos', 'id', 'an'],
@@ -69,18 +69,18 @@ const TERMINACIONES = {
 // Pronombres personales
 export const PRONOMBRES = ['yo', 'tú', 'él/ella/Ud.', 'nosotros', 'vosotros', 'ellos/ellas/Uds.'];
 
-// Nombres de los tiempos verbales
+// Nombres de los tiempos verbales (deben coincidir con verbosIrregulares.ts)
 export const TIEMPOS = {
   indicativo: {
     presente: 'Presente',
-    preterito: 'Pretérito Indefinido',
-    imperfecto: 'Pretérito Imperfecto',
+    preterito_indefinido: 'Pretérito Indefinido',
+    preterito_imperfecto: 'Pretérito Imperfecto',
     futuro: 'Futuro Simple',
     condicional: 'Condicional Simple',
   },
   subjuntivo: {
     presente: 'Presente de Subjuntivo',
-    imperfecto: 'Imperfecto de Subjuntivo',
+    preterito_imperfecto: 'Imperfecto de Subjuntivo',
   },
   imperativo: {
     afirmativo: 'Imperativo Afirmativo',
@@ -121,14 +121,15 @@ function conjugarRegular(infinitivo: string): ConjugacionCompleta | null {
     participio: raiz + term.participio,
     indicativo: {
       presente: term.indicativo.presente.map(t => raiz + t),
-      preterito: term.indicativo.preterito.map(t => raiz + t),
-      imperfecto: term.indicativo.imperfecto.map(t => raiz + t),
-      futuro: term.indicativo.futuro.map(t => infinitivo.slice(0, -2) + t.slice(1)),
-      condicional: term.indicativo.condicional.map(t => infinitivo.slice(0, -2) + t.slice(1)),
+      preterito_indefinido: term.indicativo.preterito_indefinido.map(t => raiz + t),
+      preterito_imperfecto: term.indicativo.preterito_imperfecto.map(t => raiz + t),
+      // Futuro y condicional: infinitivo completo + terminación
+      futuro: term.indicativo.futuro.map(t => infinitivo + t),
+      condicional: term.indicativo.condicional.map(t => infinitivo + t),
     },
     subjuntivo: {
       presente: term.subjuntivo.presente.map(t => raiz + t),
-      imperfecto: term.subjuntivo.imperfecto.map(t => raiz + t),
+      preterito_imperfecto: term.subjuntivo.preterito_imperfecto.map(t => raiz + t),
     },
     imperativo: {
       afirmativo: term.imperativo.afirmativo.map((t, i) => {
