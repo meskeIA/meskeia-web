@@ -39,6 +39,7 @@ const estudiantesApps: RelatedApp[] = [
 // FAMILIA: HERENCIAS Y FISCAL
 // ==========================================
 const herenciasApps: RelatedApp[] = [
+  { url: '/calculadora-herencias/', icon: '⚖️', name: 'Calculadora Herencias', description: 'Reparto según derecho civil' },
   { url: '/calculadora-sucesiones-cataluna/', icon: '🏛️', name: 'Sucesiones Cataluña', description: 'Impuesto de sucesiones' },
   { url: '/calculadora-sucesiones-nacional/', icon: '🇪🇸', name: 'Sucesiones Nacional', description: 'Normativa estatal' },
   { url: '/guia-tramitacion-herencias/', icon: '📋', name: 'Guía Herencias', description: 'Pasos a seguir' },
@@ -386,6 +387,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-donaciones-nacional': donacionesApps.filter(a => a.url !== '/calculadora-donaciones-nacional/'),
   'guia-tramitacion-herencias': herenciasApps.filter(a => a.url !== '/guia-tramitacion-herencias/'),
   'herencias-paso-a-paso': herenciasApps.filter(a => a.url !== '/herencias-paso-a-paso/'),
+  'calculadora-herencias': herenciasApps.filter(a => a.url !== '/calculadora-herencias/'),
   'simulador-irpf': fiscalApps.filter(a => a.url !== '/simulador-irpf/'),
   'calculadora-plusvalias-irpf': fiscalApps.filter(a => a.url !== '/calculadora-plusvalias-irpf/'),
 
@@ -690,6 +692,7 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'calculadora-donaciones-cataluna': { title: 'Herramientas fiscales', icon: '⚖️' },
     'calculadora-donaciones-nacional': { title: 'Herramientas fiscales', icon: '⚖️' },
     'guia-tramitacion-herencias': { title: 'Calculadoras de herencias', icon: '⚖️' },
+    'calculadora-herencias': { title: 'Herramientas para herencias', icon: '⚖️' },
 
     // Finanzas
     'interes-compuesto': { title: 'Más herramientas de inversión', icon: '💰' },

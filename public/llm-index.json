@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 193+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 194+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 193,
+  "total_tools": 194,
   "last_updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -63,7 +63,7 @@
       "name": "Impuestos y Fiscalidad",
       "icon": "📋",
       "description": "IRPF, sucesiones, donaciones y normativa fiscal española",
-      "tool_count": 8
+      "tool_count": 9
     },
     {
       "id": "juegos",
@@ -142,7 +142,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 33
+      "tool_count": 34
     },
     {
       "id": "creando",
@@ -2254,6 +2254,35 @@
         "bonificaciones"
       ],
       "icon": "💰"
+    },
+    {
+      "slug": "calculadora-herencias",
+      "name": "Calculadora de Herencias",
+      "url": "https://meskeia.com/calculadora-herencias/",
+      "description": "Calcula el reparto de herencia según derecho civil español. Incluye 8 regímenes: Código Civil, Cataluña, Aragón, Galicia, País Vasco, Navarra y Baleares",
+      "category": "Impuestos y Fiscalidad",
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "herencia",
+        "reparto",
+        "legitima",
+        "derecho civil",
+        "foral",
+        "codigo civil",
+        "mejora",
+        "libre disposicion",
+        "usufructo",
+        "viudo",
+        "cataluna",
+        "aragon",
+        "navarra",
+        "pais vasco",
+        "galicia",
+        "baleares"
+      ],
+      "icon": "⚖️"
     },
     {
       "slug": "calculadora-plusvalias-irpf",
