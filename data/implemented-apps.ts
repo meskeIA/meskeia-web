@@ -230,6 +230,10 @@ export const implementedAppsUrls = [
   // Informática y Programación (1 implementada)
   "/visualizador-algoritmos/",      // Visualiza algoritmos de ordenación paso a paso
 
+  // Biomedicina y Ciencias de la Salud (1 implementada)
+  "/simulador-genetica/",           // Simulador de genética mendeliana con Punnett
+
+
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
 ];

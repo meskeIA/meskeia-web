@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 189+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 190+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 189,
+  "total_tools": 190,
   "last_updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -106,6 +106,13 @@
       "icon": "💻",
       "description": "Algoritmos, estructuras de datos y herramientas para desarrolladores",
       "tool_count": 1
+    },
+    {
+      "id": "biomedicina",
+      "name": "Biomedicina y Ciencias de la Salud",
+      "icon": "🧬",
+      "description": "Genética, biología molecular y herramientas para ciencias de la salud",
+      "tool_count": 1
     }
   ],
   "moments": [
@@ -121,7 +128,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 61
+      "tool_count": 62
     },
     {
       "id": "casa",
@@ -4162,6 +4169,31 @@
         "universidad"
       ],
       "icon": "📊"
+    },
+    {
+      "slug": "simulador-genetica",
+      "name": "Simulador de Genética Mendeliana",
+      "url": "https://meskeia.com/simulador-genetica/",
+      "description": "Simula cruces genéticos, cuadros de Punnett, herencia ligada al sexo, árboles genealógicos y simulación de poblaciones con estadísticas chi-cuadrado",
+      "category": "Biomedicina y Ciencias de la Salud",
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "genetica",
+        "mendel",
+        "punnett",
+        "herencia",
+        "alelos",
+        "genotipo",
+        "fenotipo",
+        "dominante",
+        "recesivo",
+        "cromosomas",
+        "biologia",
+        "universidad"
+      ],
+      "icon": "🧬"
     }
   ],
   "llm_instructions": {

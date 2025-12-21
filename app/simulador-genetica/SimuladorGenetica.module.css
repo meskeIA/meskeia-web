@@ -1,0 +1,849 @@
+/* Simulador de Genética Mendeliana - Estilos */
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+}
+
+.heroIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.95;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Selector de Organismo */
+.organismSelector {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-xl);
+}
+
+.organismButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-large);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 140px;
+}
+
+.organismButton:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.organismButton.active {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .organismButton {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .organismButton.active {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+.organismIcon {
+  font-size: 2.5rem;
+}
+
+.organismName {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Layout Principal */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Paneles */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.panelTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.panelIcon {
+  font-size: 1.5rem;
+}
+
+/* Configuración del Cruce */
+.crossConfig {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.select {
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .select {
+  background: var(--bg-card);
+}
+
+.inheritanceInfo {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Selectores de Padres */
+.parentsContainer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.parentCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+[data-theme='dark'] .parentCard {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.parentLabel {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.parentSex {
+  font-size: 1.2rem;
+}
+
+.genotypeSelect {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.genotypeSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.phenotypePreview {
+  margin-top: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.phenotypeIcon {
+  font-size: 2rem;
+}
+
+.phenotypeName {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.crossSymbol {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Botón de Cruce */
+.crossButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: var(--spacing-md);
+}
+
+.crossButton:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.crossButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Cuadro de Punnett */
+.punnettContainer {
+  overflow-x: auto;
+}
+
+.punnettTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--spacing-md) 0;
+}
+
+.punnettTable th,
+.punnettTable td {
+  border: 2px solid var(--border);
+  padding: var(--spacing-md);
+  text-align: center;
+  min-width: 80px;
+}
+
+.punnettTable th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.punnettTable th.corner {
+  background: transparent;
+  border: none;
+}
+
+.punnettCell {
+  background: var(--bg-primary);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.punnettCell:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .punnettCell {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.punnettCell.animating {
+  background: #FEF3C7;
+  animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.cellGenotype {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.cellPhenotype {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.cellIcon {
+  font-size: 1.5rem;
+  margin-top: var(--spacing-xs);
+}
+
+.cellProbability {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: var(--spacing-xs);
+}
+
+/* Controles de Animación */
+.animationControls {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.animBtn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.animBtn:hover {
+  background: #256a8a;
+}
+
+.animBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Panel de Estadísticas */
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statsSection {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .statsSection {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.statsSectionTitle {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  font-size: 1rem;
+}
+
+.ratioBar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.ratioLabel {
+  min-width: 120px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.ratioBarContainer {
+  flex: 1;
+  height: 24px;
+  background: var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.ratioBarFill {
+  height: 100%;
+  border-radius: var(--radius);
+  transition: width 0.5s ease;
+}
+
+.ratioValue {
+  min-width: 50px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.ratioSummary {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* Simulación de Población */
+.populationConfig {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.populationInput {
+  width: 100px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.simulateBtn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--secondary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.simulateBtn:hover {
+  background: #3d918e;
+}
+
+.populationGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+[data-theme='dark'] .populationGrid {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.populationIndividual {
+  font-size: 1.2rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.populationResults {
+  margin-top: var(--spacing-lg);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 600px) {
+  .populationResults {
+    grid-template-columns: 1fr;
+  }
+}
+
+.resultColumn {
+  background: var(--bg-primary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+}
+
+[data-theme='dark'] .resultColumn {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.resultTitle {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+}
+
+.resultRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.9rem;
+}
+
+.chiSquare {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: rgba(46, 134, 171, 0.1);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--primary);
+}
+
+.chiSquareTitle {
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.chiSquareValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.chiSquareInterpretation {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-sm);
+}
+
+/* Árbol Genealógico (Pedigree) */
+.pedigreeContainer {
+  padding: var(--spacing-lg);
+  overflow-x: auto;
+}
+
+.pedigreeGeneration {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  position: relative;
+}
+
+.pedigreeGenerationLabel {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.pedigreeCouple {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.pedigreeConnection {
+  width: 30px;
+  height: 2px;
+  background: var(--border);
+}
+
+.pedigreeIndividual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.pedigreeSymbol {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--text-primary);
+  font-size: 1.5rem;
+  position: relative;
+}
+
+.pedigreeSymbol.male {
+  /* Cuadrado para macho */
+}
+
+.pedigreeSymbol.female {
+  border-radius: 50%;
+}
+
+.pedigreeSymbol.affected {
+  background: var(--text-primary);
+}
+
+[data-theme='dark'] .pedigreeSymbol.affected {
+  background: var(--text-primary);
+}
+
+.pedigreeSymbol.carrier::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  right: 0;
+  background: var(--text-primary);
+  opacity: 0.5;
+}
+
+.pedigreeSymbol.female.carrier::after {
+  border-radius: 0 50% 50% 0;
+}
+
+.pedigreeGenotype {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.pedigreePhenotype {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Leyenda del Pedigree */
+.pedigreeLegend {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.legendSymbol {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legendSymbol.female {
+  border-radius: 50%;
+}
+
+.legendSymbol.affected {
+  background: var(--text-primary);
+}
+
+.legendSymbol.carrier {
+  position: relative;
+  overflow: hidden;
+}
+
+.legendSymbol.carrier::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  right: 0;
+  background: var(--text-primary);
+  opacity: 0.5;
+}
+
+/* Tipo de Cruce Toggle */
+.crossTypeToggle {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.crossTypeBtn {
+  flex: 1;
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.crossTypeBtn:hover {
+  border-color: var(--primary);
+}
+
+.crossTypeBtn.active {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .crossTypeBtn {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Mensaje de Resultado Vacío */
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-muted);
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: 1.1rem;
+}
+
+/* Sección de tabs */
+.tabsContainer {
+  margin-bottom: var(--spacing-xl);
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: var(--spacing-lg);
+}
+
+.tab {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--primary);
+}
+
+.tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .parentsContainer {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .crossSymbol {
+    font-size: 1.5rem;
+  }
+
+  .organismButton {
+    min-width: 100px;
+    padding: var(--spacing-md);
+  }
+
+  .organismIcon {
+    font-size: 2rem;
+  }
+
+  .punnettTable th,
+  .punnettTable td {
+    padding: var(--spacing-sm);
+    min-width: 60px;
+    font-size: 0.85rem;
+  }
+}

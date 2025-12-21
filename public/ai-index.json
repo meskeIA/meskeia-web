@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 13 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 181,
+  "total_tools": 182,
   "updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -226,7 +226,7 @@
         { "name": "Generador de Firmas Email", "slug": "generador-firma-email", "url": "https://meskeia.com/generador-firma-email/", "description": "Crea firmas de email profesionales" },
         { "name": "Time Tracker", "slug": "time-tracker", "url": "https://meskeia.com/time-tracker/", "description": "Registra tiempo por proyecto y cliente" },
         { "name": "Planificador de Turnos", "slug": "planificador-turnos", "url": "https://meskeia.com/planificador-turnos/", "description": "Planifica turnos de trabajo para equipos pequeños" },
-        { "name": "Conversor de Unidades", "slug": "conversor-unidades", "url": "https://meskeia.com/conversor-unidades/", "description": "Conversor científico: 13 categorías" },
+        { "name": "Conversor de Unidades", "slug": "conversor-unidades", "url": "https://meskeia.com/conversor-unidades/", "description": "Conversor científico: 14 categorías" },
         { "name": "Lista de Equipaje", "slug": "lista-equipaje", "url": "https://meskeia.com/lista-equipaje/", "description": "Genera lista de equipaje según tipo de viaje" },
         { "name": "Generador de Actas de Reunión", "slug": "generador-actas", "url": "https://meskeia.com/generador-actas/", "description": "Crea actas profesionales con plantillas, asistentes, orden del día y tareas" },
         { "name": "Prueba de Cámara Web", "slug": "prueba-camara", "url": "https://meskeia.com/prueba-camara/", "description": "Prueba tu webcam antes de videollamadas, ajusta configuración y toma fotos" },
@@ -286,6 +286,15 @@
       "icon": "💻",
       "tools": [
         { "name": "Visualizador de Algoritmos", "slug": "visualizador-algoritmos", "url": "https://meskeia.com/visualizador-algoritmos/", "description": "Visualiza paso a paso algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort" }
+      ]
+    }
+    },
+    {
+      "name": "Biomedicina y Ciencias de la Salud",
+      "description": "Genética, biología molecular y herramientas para ciencias de la salud",
+      "icon": "🧬",
+      "tools": [
+        { "name": "Simulador de Genética Mendeliana", "slug": "simulador-genetica", "url": "https://meskeia.com/simulador-genetica/", "description": "Simula cruces genéticos con cuadros de Punnett, herencia ligada al sexo y árboles genealógicos" }
       ]
     }
   ],

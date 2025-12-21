@@ -323,10 +323,15 @@ export const applicationsDatabase: Application[] = [
   // 13. Informática y Programación (1)
   // ============================================
   { name: "Visualizador de Algoritmos", category: "Informática y Programación", contexts: ["estudio"], icon: "📊", description: "Visualiza paso a paso cómo funcionan los algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort con animaciones interactivas", url: "/visualizador-algoritmos/", keywords: ["algoritmos", "ordenacion", "bubble sort", "quick sort", "merge sort", "estructuras datos", "informatica", "programacion", "universidad"] },
+
+  // ============================================
+  // 14. Biomedicina y Ciencias de la Salud (1)
+  // ============================================
+  { name: "Simulador de Genética Mendeliana", category: "Biomedicina y Ciencias de la Salud", contexts: ["estudio"], icon: "🧬", description: "Simula cruces genéticos, cuadros de Punnett, herencia ligada al sexo, árboles genealógicos y simulación de poblaciones con estadísticas chi-cuadrado", url: "/simulador-genetica/", keywords: ["genetica", "mendel", "punnett", "herencia", "alelos", "genotipo", "fenotipo", "dominante", "recesivo", "cromosomas", "biologia", "universidad"] },
 ];
 
 // ============================================
-// 13 CATEGORÍAS (orden alfabético)
+// 14 CATEGORÍAS (orden alfabético)
 // ============================================
 export const categories = [
   {
@@ -406,6 +411,12 @@ export const categories = [
     name: 'Informática y Programación',
     icon: '💻',
     description: 'Algoritmos, estructuras de datos y herramientas para desarrolladores'
+  },
+  {
+    id: 'biomedicina',
+    name: 'Biomedicina y Ciencias de la Salud',
+    icon: '🧬',
+    description: 'Genética, biología molecular y herramientas para ciencias de la salud'
   },
 ];
 

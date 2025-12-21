@@ -300,6 +300,16 @@ const informaticaApps: RelatedApp[] = [
   { url: '/conversor-binario/', icon: '💾', name: 'Conversor Binario', description: 'Texto a binario' },
 ];
 
+// BIOMEDICINA Y CIENCIAS DE LA SALUD
+// ==========================================
+const biomedicinaApps: RelatedApp[] = [
+  { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador Genética', description: 'Cruces mendelianos' },
+  { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice masa corporal' },
+  { url: '/vitaminas-minerales/', icon: '🥗', name: 'Vitaminas y Minerales', description: 'Guía nutrientes' },
+  { url: '/huesos-cuerpo-humano/', icon: '🦴', name: 'Huesos Humanos', description: 'Anatomía esqueleto' },
+];
+
+
 const imagenesApps: RelatedApp[] = [
   { url: '/conversor-imagenes/', icon: '🖼️', name: 'Conversor Imágenes', description: 'Cambia formatos' },
   { url: '/compresor-imagenes/', icon: '📦', name: 'Compresor Imágenes', description: 'Reduce tamaño' },
@@ -618,6 +628,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // INFORMÁTICA Y PROGRAMACIÓN
   'visualizador-algoritmos': informaticaApps.filter(a => a.url !== '/visualizador-algoritmos/'),
+
+
+  // BIOMEDICINA Y CIENCIAS DE LA SALUD
+  'simulador-genetica': biomedicinaApps.filter(a => a.url !== '/simulador-genetica/'),
 
   // CREATIVIDAD Y DISEÑO EXTRA
   'generador-avatares': [
