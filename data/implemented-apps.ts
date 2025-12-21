@@ -106,6 +106,7 @@ export const implementedAppsUrls = [
   "/generador-lorem-ipsum/",    // Generador de texto de prueba
   "/contador-silabas/",         // Separar y contar sílabas en español
   "/conversor-formatos/",       // JSON, CSV, Excel, XML, YAML
+  "/conjugador-verbos/",        // Conjugador de verbos español con irregulares
 
   // Criptografía y Seguridad (7 implementadas)
   "/cifrado-clasico/",          // César + ROT13 + Atbash

@@ -448,6 +448,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'generador-lorem-ipsum': textoApps,
   'generador-anagramas': textoApps,
   'detector-idioma': textoApps,
+  'conjugador-verbos': [
+    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
+    { url: '/detector-idioma/', icon: '🌍', name: 'Detector Idioma', description: 'Identifica el idioma' },
+    { url: '/contador-palabras/', icon: '🔢', name: 'Contador Palabras', description: 'Cuenta palabras y caracteres' },
+    { url: '/generador-anagramas/', icon: '🔀', name: 'Generador Anagramas', description: 'Reordena letras' },
+  ],
 
   // CRIPTOGRAFÍA
   'cifrado-clasico': criptografiaClasicaApps.filter(a => a.url !== '/cifrado-clasico/'),

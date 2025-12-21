@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 190+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 191+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 190,
+  "total_tools": 191,
   "last_updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -98,7 +98,7 @@
       "name": "Texto y Conversores",
       "icon": "📝",
       "description": "Procesa, formatea y convierte texto",
-      "tool_count": 15
+      "tool_count": 16
     },
     {
       "id": "informatica",
@@ -128,7 +128,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 62
+      "tool_count": 63
     },
     {
       "id": "casa",
@@ -4026,6 +4026,28 @@
         "continentes"
       ],
       "icon": "🌍"
+    },
+    {
+      "slug": "conjugador-verbos",
+      "name": "Conjugador de Verbos Español",
+      "url": "https://meskeia.com/conjugador-verbos/",
+      "description": "Conjuga cualquier verbo español en todos los tiempos: indicativo, subjuntivo e imperativo. Incluye 60+ verbos irregulares",
+      "category": "Texto y Conversores",
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "conjugador",
+        "verbos",
+        "español",
+        "conjugacion",
+        "indicativo",
+        "subjuntivo",
+        "imperativo",
+        "irregulares",
+        "gramatica"
+      ],
+      "icon": "📖"
     },
     {
       "slug": "minerales-del-mundo",

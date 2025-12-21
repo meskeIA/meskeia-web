@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 182,
+  "total_tools": 183,
   "updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -277,7 +277,8 @@
         { "name": "Generador de Anagramas", "slug": "generador-anagramas", "url": "https://meskeia.com/generador-anagramas/", "description": "Encuentra palabras con tus letras" },
         { "name": "Generador Lorem Ipsum", "slug": "generador-lorem-ipsum", "url": "https://meskeia.com/generador-lorem-ipsum/", "description": "Genera texto Lorem Ipsum" },
         { "name": "Contador de Sílabas", "slug": "contador-silabas", "url": "https://meskeia.com/contador-silabas/", "description": "Cuenta y separa sílabas en español" },
-        { "name": "Conversor de Formatos", "slug": "conversor-formatos", "url": "https://meskeia.com/conversor-formatos/", "description": "Convierte entre JSON, CSV, Excel, XML y YAML" }
+        { "name": "Conversor de Formatos", "slug": "conversor-formatos", "url": "https://meskeia.com/conversor-formatos/", "description": "Convierte entre JSON, CSV, Excel, XML y YAML" },
+        { "name": "Conjugador de Verbos Español", "slug": "conjugador-verbos", "url": "https://meskeia.com/conjugador-verbos/", "description": "Conjuga verbos en todos los tiempos: indicativo, subjuntivo e imperativo con 60+ irregulares" }
       ]
     },
     {
