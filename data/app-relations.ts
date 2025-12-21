@@ -290,6 +290,16 @@ const webDevApps: RelatedApp[] = [
   { url: '/generador-utm/', icon: '🔗', name: 'Generador UTM', description: 'Parámetros de campaña' },
 ];
 
+// ==========================================
+// FAMILIA: INFORMÁTICA Y PROGRAMACIÓN
+// ==========================================
+const informaticaApps: RelatedApp[] = [
+  { url: '/visualizador-algoritmos/', icon: '📊', name: 'Visualizador Algoritmos', description: 'Ordenación paso a paso' },
+  { url: '/validador-json/', icon: '📦', name: 'Validador JSON', description: 'Valida y formatea' },
+  { url: '/validador-regex/', icon: '🔍', name: 'Validador Regex', description: 'Prueba expresiones' },
+  { url: '/conversor-binario/', icon: '💾', name: 'Conversor Binario', description: 'Texto a binario' },
+];
+
 const imagenesApps: RelatedApp[] = [
   { url: '/conversor-imagenes/', icon: '🖼️', name: 'Conversor Imágenes', description: 'Cambia formatos' },
   { url: '/compresor-imagenes/', icon: '📦', name: 'Compresor Imágenes', description: 'Reduce tamaño' },
@@ -605,6 +615,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/minerales-del-mundo/', icon: '💎', name: 'Minerales del Mundo', description: '50 minerales esenciales' },
     { url: '/radio-meskeia/', icon: '📻', name: 'Radio meskeIA', description: 'Emisoras del mundo' },
   ],
+
+  // INFORMÁTICA Y PROGRAMACIÓN
+  'visualizador-algoritmos': informaticaApps.filter(a => a.url !== '/visualizador-algoritmos/'),
 };
 
 /**

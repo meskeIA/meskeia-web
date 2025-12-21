@@ -1,7 +1,7 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 137+ aplicaciones web educativas organizadas en 12 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 13 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
   "total_tools": 180,
@@ -277,6 +277,14 @@
         { "name": "Generador Lorem Ipsum", "slug": "generador-lorem-ipsum", "url": "https://meskeia.com/generador-lorem-ipsum/", "description": "Genera texto Lorem Ipsum" },
         { "name": "Contador de Sílabas", "slug": "contador-silabas", "url": "https://meskeia.com/contador-silabas/", "description": "Cuenta y separa sílabas en español" },
         { "name": "Conversor de Formatos", "slug": "conversor-formatos", "url": "https://meskeia.com/conversor-formatos/", "description": "Convierte entre JSON, CSV, Excel, XML y YAML" }
+      ]
+    },
+    {
+      "name": "Informática y Programación",
+      "description": "Algoritmos, estructuras de datos y herramientas para desarrolladores",
+      "icon": "💻",
+      "tools": [
+        { "name": "Visualizador de Algoritmos", "slug": "visualizador-algoritmos", "url": "https://meskeia.com/visualizador-algoritmos/", "description": "Visualiza paso a paso algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort" }
       ]
     }
   ],

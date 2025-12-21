@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 187+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 188+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 187,
-  "last_updated": "2025-12-20",
+  "total_tools": 188,
+  "last_updated": "2025-12-21",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -99,6 +99,13 @@
       "icon": "📝",
       "description": "Procesa, formatea y convierte texto",
       "tool_count": 15
+    },
+    {
+      "id": "informatica",
+      "name": "Informática y Programación",
+      "icon": "💻",
+      "description": "Algoritmos, estructuras de datos y herramientas para desarrolladores",
+      "tool_count": 1
     }
   ],
   "moments": [
@@ -114,7 +121,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 60
+      "tool_count": 61
     },
     {
       "id": "casa",
@@ -4110,6 +4117,28 @@
         "suplementos"
       ],
       "icon": "🥗"
+    },
+    {
+      "slug": "visualizador-algoritmos",
+      "name": "Visualizador de Algoritmos",
+      "url": "https://meskeia.com/visualizador-algoritmos/",
+      "description": "Visualiza paso a paso cómo funcionan los algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort con animaciones interactivas",
+      "category": "Informática y Programación",
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "algoritmos",
+        "ordenacion",
+        "bubble sort",
+        "quick sort",
+        "merge sort",
+        "estructuras datos",
+        "informatica",
+        "programacion",
+        "universidad"
+      ],
+      "icon": "📊"
     }
   ],
   "llm_instructions": {

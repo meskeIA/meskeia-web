@@ -1,0 +1,95 @@
+/* AlgorithmCode Styles */
+
+.codePanel {
+  background: var(--bg-card, #ffffff);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .codePanel {
+  background: #2A2A2A;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+[data-theme='dark'] .title {
+  color: #E5E5E5;
+}
+
+.codeContainer {
+  background: #1e1e2e;
+  border-radius: 12px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.codeLine {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 0.8rem;
+  transition: background 0.2s ease;
+  color: #e0e0e0;
+  border-left: 3px solid transparent;
+}
+
+.codeLine.highlighted {
+  background: rgba(46, 134, 171, 0.3);
+  border-left-color: #2E86AB;
+}
+
+.lineNumber {
+  width: 24px;
+  color: #666;
+  text-align: right;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  user-select: none;
+}
+
+.lineContent {
+  white-space: pre;
+}
+
+.stepDescription {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg-primary, #FAFAFA);
+  border-radius: 12px;
+  border-left: 3px solid #2E86AB;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+[data-theme='dark'] .stepDescription {
+  background: #333333;
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.text {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  margin: 0;
+  line-height: 1.4;
+}
+
+[data-theme='dark'] .text {
+  color: #B0B0B0;
+}

@@ -1,0 +1,49 @@
+/* MetricsPanel Styles */
+
+.metricsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.metricCard {
+  text-align: center;
+  padding: 1rem;
+  background: var(--bg-primary, #FAFAFA);
+  border-radius: 12px;
+  border: 1px solid var(--border, #E5E5E5);
+}
+
+[data-theme='dark'] .metricCard {
+  background: #333333;
+  border-color: #404040;
+}
+
+.metricValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2E86AB;
+}
+
+.metricLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted, #999999);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
+}
+
+[data-theme='dark'] .metricLabel {
+  color: #808080;
+}
+
+@media (max-width: 768px) {
+  .metricsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .metricValue {
+    font-size: 1.25rem;
+  }
+}

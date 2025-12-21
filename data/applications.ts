@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 140 aplicaciones organizadas por 12 categorías + 7 momentos
+ * Total: 141 aplicaciones organizadas por 13 categorías + 7 momentos
  * Actualizado: 2025-12-07
  *
  * CONVENCIÓN DE NOMBRES (actualizado 2025-11-26):
@@ -317,10 +317,15 @@ export const applicationsDatabase: Application[] = [
   { name: "Constelaciones del Cielo", category: "Herramientas Académicas", contexts: ["estudio", "curiosidad"], icon: "🌌", description: "Guía de 32 constelaciones famosas: zodiacales, boreales y australes con estrellas principales, mitología griega y curiosidades", url: "/constelaciones-del-cielo/", keywords: ["constelaciones", "astronomia", "estrellas", "zodiaco", "orion", "osa mayor", "mitologia", "cielo", "planetas", "cosmos"] },
   { name: "Instrumentos Musicales", category: "Herramientas Académicas", contexts: ["estudio", "curiosidad"], icon: "🎵", description: "Guía de 45 instrumentos musicales del mundo: cuerda, viento, percusión, teclado y electrónicos con origen, materiales y curiosidades", url: "/instrumentos-musicales/", keywords: ["instrumentos", "musica", "violin", "guitarra", "piano", "bateria", "flauta", "trompeta", "orquesta", "percusion"] },
   { name: "Vitaminas y Minerales", category: "Salud y Bienestar", contexts: ["casa", "estudio"], icon: "🥗", description: "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso", url: "/vitaminas-minerales/", keywords: ["vitaminas", "minerales", "nutrientes", "b12", "vitamina d", "hierro", "calcio", "magnesio", "zinc", "nutricion", "deficiencia", "suplementos"] },
+
+  // ============================================
+  // 13. Informática y Programación (1)
+  // ============================================
+  { name: "Visualizador de Algoritmos", category: "Informática y Programación", contexts: ["estudio"], icon: "📊", description: "Visualiza paso a paso cómo funcionan los algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort con animaciones interactivas", url: "/visualizador-algoritmos/", keywords: ["algoritmos", "ordenacion", "bubble sort", "quick sort", "merge sort", "estructuras datos", "informatica", "programacion", "universidad"] },
 ];
 
 // ============================================
-// 12 CATEGORÍAS (orden alfabético)
+// 13 CATEGORÍAS (orden alfabético)
 // ============================================
 export const categories = [
   {
@@ -394,6 +399,12 @@ export const categories = [
     name: 'Texto y Conversores',
     icon: '📝',
     description: 'Procesa, formatea y convierte texto'
+  },
+  {
+    id: 'informatica',
+    name: 'Informática y Programación',
+    icon: '💻',
+    description: 'Algoritmos, estructuras de datos y herramientas para desarrolladores'
   },
 ];
 

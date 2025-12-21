@@ -226,6 +226,9 @@ export const implementedAppsUrls = [
   "/constelaciones-del-cielo/",     // Guía de 32 constelaciones: zodiaco, estrellas, mitología
   "/instrumentos-musicales/",       // Guía de 45 instrumentos: cuerda, viento, percusión, teclado
   "/vitaminas-minerales/",          // Guía de 30 nutrientes: vitaminas y minerales esenciales
+
+  // Informática y Programación (1 implementada)
+  "/visualizador-algoritmos/",      // Visualiza algoritmos de ordenación paso a paso
 ];
 
 /**
