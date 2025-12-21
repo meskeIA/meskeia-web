@@ -30,13 +30,13 @@ export const suites = [
   {
     id: 'fiscal' as SuiteType,
     name: 'Fiscal y Herencias',
-    icon: '💰',
+    icon: '🏛️',
     description: 'Impuestos, herencias, donaciones y trámites fiscales'
   },
   {
     id: 'inmobiliaria' as SuiteType,
     name: 'Inmobiliaria y Hogar',
-    icon: '🏠',
+    icon: '🏘️',
     description: 'Hipotecas, alquiler y gestión del hogar'
   },
   {
@@ -66,7 +66,7 @@ export const suites = [
   {
     id: 'estudiantes' as SuiteType,
     name: 'Estudiantes',
-    icon: '🎓',
+    icon: '🧮',
     description: 'Matemáticas, ciencias y herramientas de estudio'
   },
   {
@@ -78,7 +78,7 @@ export const suites = [
   {
     id: 'juegos' as SuiteType,
     name: 'Juegos y Ocio',
-    icon: '🎮',
+    icon: '🎲',
     description: 'Diversión y entretenimiento'
   },
   {
