@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 196+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 197+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 196,
+  "total_tools": 197,
   "last_updated": "2025-12-21",
   "features": {
     "all_free": true,
@@ -105,7 +105,7 @@
       "name": "Informática y Programación",
       "icon": "💻",
       "description": "Algoritmos, estructuras de datos y herramientas para desarrolladores",
-      "tool_count": 2
+      "tool_count": 3
     },
     {
       "id": "biomedicina",
@@ -128,7 +128,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 67
+      "tool_count": 68
     },
     {
       "id": "casa",
@@ -4292,6 +4292,32 @@
         "universidad"
       ],
       "icon": "🗃️"
+    },
+    {
+      "slug": "simulador-puertas-logicas",
+      "name": "Simulador de Puertas Lógicas",
+      "url": "https://meskeia.com/simulador-puertas-logicas/",
+      "description": "Simula puertas lógicas (AND, OR, NOT, NAND, NOR, XOR, XNOR), genera tablas de verdad, prueba circuitos digitales y evalúa expresiones booleanas",
+      "category": "Informática y Programación",
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "puertas logicas",
+        "AND",
+        "OR",
+        "NOT",
+        "NAND",
+        "XOR",
+        "tabla de verdad",
+        "circuitos digitales",
+        "electronica digital",
+        "algebra booleana",
+        "half adder",
+        "full adder",
+        "universidad"
+      ],
+      "icon": "🔌"
     },
     {
       "slug": "simulador-genetica",

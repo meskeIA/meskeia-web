@@ -324,10 +324,11 @@ export const applicationsDatabase: Application[] = [
   { name: "Vitaminas y Minerales", category: "Salud y Bienestar", contexts: ["casa", "estudio"], icon: "🥗", description: "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso", url: "/vitaminas-minerales/", keywords: ["vitaminas", "minerales", "nutrientes", "b12", "vitamina d", "hierro", "calcio", "magnesio", "zinc", "nutricion", "deficiencia", "suplementos"] },
 
   // ============================================
-  // 13. Informática y Programación (2)
+  // 13. Informática y Programación (3)
   // ============================================
   { name: "Visualizador de Algoritmos", category: "Informática y Programación", contexts: ["estudio"], icon: "📊", description: "Visualiza paso a paso cómo funcionan los algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort con animaciones interactivas", url: "/visualizador-algoritmos/", keywords: ["algoritmos", "ordenacion", "bubble sort", "quick sort", "merge sort", "estructuras datos", "informatica", "programacion", "universidad"] },
   { name: "Playground SQL", category: "Informática y Programación", contexts: ["estudio", "trabajo"], icon: "🗃️", description: "Editor SQL interactivo en el navegador. Practica con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada", url: "/playground-sql/", keywords: ["sql", "base de datos", "select", "join", "group by", "sqlite", "consultas", "aprender sql", "ejercicios sql", "programacion", "universidad"] },
+  { name: "Simulador de Puertas Lógicas", category: "Informática y Programación", contexts: ["estudio"], icon: "🔌", description: "Simula puertas lógicas (AND, OR, NOT, NAND, NOR, XOR, XNOR), genera tablas de verdad, prueba circuitos digitales y evalúa expresiones booleanas", url: "/simulador-puertas-logicas/", keywords: ["puertas logicas", "AND", "OR", "NOT", "NAND", "XOR", "tabla de verdad", "circuitos digitales", "electronica digital", "algebra booleana", "half adder", "full adder", "universidad"] },
 
   // ============================================
   // 14. Biomedicina y Ciencias de la Salud (2)
