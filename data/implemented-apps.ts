@@ -32,6 +32,7 @@ export const implementedAppsUrls = [
   "/calculadora-suscripciones/",      // Control de suscripciones recurrentes
   "/calculadora-roommates/",          // División gastos piso compartido
   "/calculadora-alquiler-vs-compra/", // Análisis alquiler vs compra vivienda
+  "/simulador-compraventa-inmueble/", // Gastos compraventa: ITP, notaría, registro, plusvalía
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",

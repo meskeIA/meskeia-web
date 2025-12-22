@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 198+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 199+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 198,
-  "last_updated": "2025-12-21",
+  "total_tools": 199,
+  "last_updated": "2025-12-22",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -19,16 +19,16 @@
     {
       "id": "fiscal",
       "name": "Fiscal y Herencias",
-      "icon": "💰",
+      "icon": "🏛️",
       "description": "Impuestos, herencias, donaciones y trámites fiscales",
-      "tool_count": 13
+      "tool_count": 14
     },
     {
       "id": "inmobiliaria",
       "name": "Inmobiliaria y Hogar",
-      "icon": "🏠",
+      "icon": "🏘️",
       "description": "Hipotecas, alquiler y gestión del hogar",
-      "tool_count": 17
+      "tool_count": 18
     },
     {
       "id": "finanzas",
@@ -61,7 +61,7 @@
     {
       "id": "estudiantes",
       "name": "Estudiantes",
-      "icon": "🎓",
+      "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
       "tool_count": 42
     },
@@ -75,7 +75,7 @@
     {
       "id": "juegos",
       "name": "Juegos y Ocio",
-      "icon": "🎮",
+      "icon": "🎲",
       "description": "Diversión y entretenimiento",
       "tool_count": 17
     },
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 52
+      "tool_count": 53
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 34
+      "tool_count": 35
     },
     {
       "id": "creando",
@@ -1763,6 +1763,33 @@
         "reducir plazo",
         "ahorro intereses",
         "cancelacion parcial"
+      ],
+      "icon": "🏠"
+    },
+    {
+      "slug": "simulador-compraventa-inmueble",
+      "name": "Simulador de Compraventa Inmobiliaria",
+      "url": "https://meskeia.com/simulador-compraventa-inmueble/",
+      "description": "Calcula todos los gastos de compra y venta de vivienda: ITP/IVA por comunidad, notaría, registro, plusvalía municipal. Comprador y vendedor",
+      "suites": [
+        "inmobiliaria",
+        "fiscal"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "compraventa",
+        "vivienda",
+        "itp",
+        "iva",
+        "notario",
+        "registro",
+        "plusvalia",
+        "gastos compra piso",
+        "segunda mano",
+        "impuestos inmuebles"
       ],
       "icon": "🏠"
     },

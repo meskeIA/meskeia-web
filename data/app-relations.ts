@@ -69,6 +69,7 @@ const finanzasHipotecaApps: RelatedApp[] = [
   { url: '/amortizacion-hipoteca/', icon: '💰', name: 'Amortización Anticipada', description: 'Reducir cuota vs plazo' },
   { url: '/simulador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas' },
   { url: '/calculadora-alquiler-vs-compra/', icon: '🔑', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
+  { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos Compraventa', description: 'ITP, notaría, plusvalía' },
 ];
 
 const finanzasPersonalesApps: RelatedApp[] = [
@@ -401,11 +402,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-cartera-inversion': finanzasInversionApps.filter(a => a.url !== '/simulador-cartera-inversion/'),
   'calculadora-tir-van': finanzasInversionApps.filter(a => a.url !== '/calculadora-tir-van/'),
 
-  // FINANZAS - HIPOTECA
+  // FINANZAS - HIPOTECA / INMOBILIARIA
   'simulador-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/simulador-hipoteca/'),
   'amortizacion-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/amortizacion-hipoteca/'),
   'simulador-prestamos': finanzasHipotecaApps.filter(a => a.url !== '/simulador-prestamos/'),
   'calculadora-alquiler-vs-compra': finanzasHipotecaApps.filter(a => a.url !== '/calculadora-alquiler-vs-compra/'),
+  'simulador-compraventa-inmueble': finanzasHipotecaApps.filter(a => a.url !== '/simulador-compraventa-inmueble/'),
 
   // FINANZAS - PERSONALES
   'control-gastos': finanzasPersonalesApps.filter(a => a.url !== '/control-gastos/'),
