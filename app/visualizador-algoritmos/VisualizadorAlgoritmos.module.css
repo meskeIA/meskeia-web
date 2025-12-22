@@ -551,6 +551,23 @@
 @media (max-width: 768px) {
   .container {
     padding: var(--spacing-md);
+    overflow-x: hidden;
+  }
+
+  /* Fix para cards cortadas en Android */
+  .codePanel,
+  .complexityPanel {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .codeContainer {
+    max-width: 100%;
+  }
+
+  .lineContent {
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
   .hero {
