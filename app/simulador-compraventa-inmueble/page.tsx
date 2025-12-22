@@ -30,7 +30,6 @@ interface ResultadosComprador {
   ajd: number;
   gastosNotario: number;
   gastosRegistro: number;
-  comisionInmobiliaria: number;
   gastosGestoria: number;
   totalGastos: number;
   totalOperacion: number;
@@ -160,14 +159,15 @@ export default function SimuladorCompraventaPage() {
       porcentaje = tipoAplicable;
     }
 
-    // AJD (solo si es primera mano, ya está incluido en ITP para segunda mano)
-    const ajd = tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa) : 0;
+    // AJD: En primera mano se paga sobre la compraventa. En segunda mano, solo si hay hipoteca (sobre el préstamo)
+    // Aquí calculamos el AJD de la compraventa (primera mano) o de la escritura (segunda mano)
+    const ajd = calcularAJD(precio, ccaa);
 
     const notario = calcularNotario(precio);
     const registro = calcularRegistro(precio);
-    const comision = precio * comisionPct;
+    // Nota: La comisión inmobiliaria la paga el vendedor, no el comprador
 
-    const totalGastos = impuesto + ajd + notario + registro + comision + gestoria;
+    const totalGastos = impuesto + ajd + notario + registro + gestoria;
 
     return {
       precioInmueble: precio,
@@ -177,12 +177,11 @@ export default function SimuladorCompraventaPage() {
       ajd,
       gastosNotario: notario,
       gastosRegistro: registro,
-      comisionInmobiliaria: comision,
       gastosGestoria: gestoria,
       totalGastos,
       totalOperacion: precio + totalGastos,
     };
-  }, [precioVenta, ccaa, tipoInmueble, tipoTransmision, perfilComprador, comisionInmobiliaria, gastosGestoria]);
+  }, [precioVenta, ccaa, tipoInmueble, tipoTransmision, perfilComprador, gastosGestoria]);
 
   const resultadosVendedor = useMemo((): ResultadosVendedor | null => {
     const precioV = parseSpanishNumber(precioVenta);
@@ -394,23 +393,14 @@ export default function SimuladorCompraventaPage() {
             </div>
           )}
 
-          {/* Gastos adicionales */}
-          <div className={styles.gastosGrid}>
-            <NumberInput
-              value={comisionInmobiliaria}
-              onChange={setComisionInmobiliaria}
-              label="Comisión inmobiliaria (%)"
-              placeholder="3"
-              helperText="Típico: 3-5%"
-              min={0}
-              max={10}
-            />
+          {/* Gastos adicionales comprador */}
+          <div className={styles.inputGroup}>
             <NumberInput
               value={gastosGestoria}
               onChange={setGastosGestoria}
-              label="Gastos de gestoría (€)"
+              label="Gastos de gestoría del comprador (€)"
               placeholder="300"
-              helperText="Típico: 200-400€"
+              helperText="Típico: 200-400€ (tramitación de escrituras)"
               min={0}
             />
           </div>
@@ -483,15 +473,6 @@ export default function SimuladorCompraventaPage() {
                     icon="🏛️"
                   />
 
-                  {resultadosComprador.comisionInmobiliaria > 0 && (
-                    <ResultCard
-                      title={`Comisión inmobiliaria (${comisionInmobiliaria}%)`}
-                      value={formatCurrency(resultadosComprador.comisionInmobiliaria)}
-                      variant="default"
-                      icon="🏪"
-                    />
-                  )}
-
                   {resultadosComprador.gastosGestoria > 0 && (
                     <ResultCard
                       title="Gastos de gestoría"
@@ -561,6 +542,16 @@ export default function SimuladorCompraventaPage() {
                   placeholder="50000"
                   helperText="Aparece en el recibo del IBI (solo la parte del suelo)"
                   min={0}
+                />
+
+                <NumberInput
+                  value={comisionInmobiliaria}
+                  onChange={setComisionInmobiliaria}
+                  label="Comisión inmobiliaria (%)"
+                  placeholder="3"
+                  helperText="Típico: 3-5%. La paga el vendedor"
+                  min={0}
+                  max={10}
                 />
 
                 <div className={styles.checkboxGroup}>
