@@ -18,9 +18,12 @@ import {
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
-type TipoInmueble = 'vivienda' | 'garaje' | 'trastero';
+type TipoInmueble = 'vivienda' | 'garaje' | 'trastero' | 'local' | 'nave' | 'terreno';
 type TipoTransmision = 'segunda-mano' | 'primera-mano';
 type PerfilComprador = 'general' | 'joven' | 'familia-numerosa' | 'discapacidad' | 'vpo';
+
+// Inmuebles que pueden optar a tipos reducidos de ITP (solo residenciales)
+const INMUEBLES_RESIDENCIALES: TipoInmueble[] = ['vivienda', 'garaje', 'trastero'];
 
 interface ResultadosComprador {
   precioInmueble: number;
@@ -72,10 +75,15 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
   { value: 'melilla', label: 'Melilla' },
 ];
 
-const TIPOS_INMUEBLE: { value: TipoInmueble; label: string; icon: string }[] = [
-  { value: 'vivienda', label: 'Vivienda', icon: '🏠' },
-  { value: 'garaje', label: 'Garaje/Parking', icon: '🚗' },
-  { value: 'trastero', label: 'Trastero', icon: '📦' },
+const TIPOS_INMUEBLE: { value: TipoInmueble; label: string; icon: string; grupo: 'residencial' | 'comercial' }[] = [
+  // Residenciales (IVA 10%)
+  { value: 'vivienda', label: 'Vivienda', icon: '🏠', grupo: 'residencial' },
+  { value: 'garaje', label: 'Garaje/Parking', icon: '🚗', grupo: 'residencial' },
+  { value: 'trastero', label: 'Trastero', icon: '📦', grupo: 'residencial' },
+  // Comerciales/Industriales (IVA 21%)
+  { value: 'local', label: 'Local comercial', icon: '🏪', grupo: 'comercial' },
+  { value: 'nave', label: 'Nave industrial', icon: '🏭', grupo: 'comercial' },
+  { value: 'terreno', label: 'Terreno', icon: '🌍', grupo: 'comercial' },
 ];
 
 const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
@@ -127,18 +135,21 @@ export default function SimuladorCompraventaPage() {
     let tipoImpuesto = '';
     let porcentaje = 0;
 
+    // Determinar si es inmueble residencial (para IVA y tipos reducidos)
+    const esResidencial = INMUEBLES_RESIDENCIALES.includes(tipoInmueble);
+
     if (tipoTransmision === 'primera-mano') {
-      // IVA para vivienda nueva
-      impuesto = calcularIVA(precio, tipoInmueble);
+      // IVA: 10% residencial, 21% comercial/industrial/terrenos
       tipoImpuesto = 'IVA';
-      porcentaje = tipoInmueble === 'vivienda' || tipoInmueble === 'garaje' || tipoInmueble === 'trastero' ? 10 : 21;
+      porcentaje = esResidencial ? 10 : 21;
+      impuesto = precio * (porcentaje / 100);
     } else {
       // ITP para segunda mano
       const datosCcaa = ITP_CCAA[ccaa];
 
-      // Buscar tipo reducido si aplica
+      // Buscar tipo reducido si aplica (SOLO para inmuebles residenciales)
       let tipoAplicable = datosCcaa.tipoGeneral;
-      if (perfilComprador !== 'general' && datosCcaa.tiposReducidos.length > 0) {
+      if (esResidencial && perfilComprador !== 'general' && datosCcaa.tiposReducidos.length > 0) {
         const reducido = datosCcaa.tiposReducidos.find(r => {
           if (perfilComprador === 'joven' && r.nombre.toLowerCase().includes('joven')) return true;
           if (perfilComprador === 'familia-numerosa' && r.nombre.toLowerCase().includes('familia')) return true;
@@ -256,6 +267,7 @@ export default function SimuladorCompraventaPage() {
   }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, comisionInmobiliaria, gastosGestoria, vendedorMayor65, esViviendaHabitual]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
+  const esInmuebleResidencial = INMUEBLES_RESIDENCIALES.includes(tipoInmueble);
 
   return (
     <div className={styles.container}>
@@ -266,8 +278,8 @@ export default function SimuladorCompraventaPage() {
         <span className={styles.heroIcon}>🏠</span>
         <h1 className={styles.title}>Simulador de Compraventa Inmobiliaria</h1>
         <p className={styles.subtitle}>
-          Calcula todos los gastos de compra y venta de vivienda, garaje o trastero en España.
-          ITP/IVA por comunidad autónoma, notaría, registro y plusvalía municipal.
+          Calcula todos los gastos de compra y venta de inmuebles en España: vivienda, garaje, trastero,
+          local comercial, nave industrial y terreno. ITP/IVA por comunidad autónoma, notaría, registro y plusvalía.
         </p>
       </header>
 
@@ -280,7 +292,21 @@ export default function SimuladorCompraventaPage() {
           <div className={styles.inputGroup}>
             <label className={styles.label}>Tipo de inmueble</label>
             <div className={styles.tipoInmuebleGrid}>
-              {TIPOS_INMUEBLE.map(tipo => (
+              {/* Residenciales (IVA 10%) */}
+              {TIPOS_INMUEBLE.filter(t => t.grupo === 'residencial').map(tipo => (
+                <button
+                  key={tipo.value}
+                  className={`${styles.tipoInmuebleBtn} ${tipoInmueble === tipo.value ? styles.active : ''}`}
+                  onClick={() => setTipoInmueble(tipo.value)}
+                >
+                  <span className={styles.tipoIcon}>{tipo.icon}</span>
+                  <span>{tipo.label}</span>
+                </button>
+              ))}
+              {/* Separador */}
+              <span className={styles.tipoSeparador}>Comercial / Industrial</span>
+              {/* Comerciales (IVA 21%) */}
+              {TIPOS_INMUEBLE.filter(t => t.grupo === 'comercial').map(tipo => (
                 <button
                   key={tipo.value}
                   className={`${styles.tipoInmuebleBtn} ${tipoInmueble === tipo.value ? styles.active : ''}`}
@@ -364,8 +390,8 @@ export default function SimuladorCompraventaPage() {
             <p className={styles.infoCcaaNote}>{datosCcaaActual.notas}</p>
           </div>
 
-          {/* Perfil del comprador (solo para ITP) */}
-          {tipoTransmision === 'segunda-mano' && (
+          {/* Perfil del comprador (solo para ITP y solo inmuebles residenciales) */}
+          {tipoTransmision === 'segunda-mano' && esInmuebleResidencial && (
             <div className={styles.inputGroup}>
               <label className={styles.label}>Perfil del comprador (para tipos reducidos)</label>
               <select
@@ -701,7 +727,8 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.contentCard}>
               <h4>🆕 Primera mano → IVA + AJD</h4>
               <p>
-                Las viviendas nuevas (primera transmisión del promotor) pagan <strong>IVA al 10%</strong> (21% para locales y naves).
+                Las viviendas nuevas (primera transmisión del promotor) pagan <strong>IVA al 10%</strong>.
+                Los locales comerciales, naves industriales y terrenos pagan <strong>IVA al 21%</strong>.
               </p>
               <p>
                 Además, se paga <strong>AJD</strong> (Actos Jurídicos Documentados) que varía entre 0,5% y 1,5% según la comunidad.

@@ -122,6 +122,25 @@
   gap: var(--spacing-sm);
 }
 
+/* Separador visual entre residenciales y comerciales */
+.tipoInmuebleGrid::after {
+  content: '';
+  grid-column: 1 / -1;
+  height: 1px;
+  background: var(--border);
+  margin: var(--spacing-xs) 0;
+}
+
+.tipoSeparador {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: var(--spacing-xs) 0;
+  text-align: center;
+}
+
 .tipoInmuebleBtn {
   display: flex;
   flex-direction: column;
