@@ -5,10 +5,10 @@ import AxeBuilder from '@axe-core/playwright';
  * Testing de Accesibilidad con Playwright + axe-core
  *
  * Valida WCAG 2.1 nivel AA para las 3 apps migradas
+ *
+ * Nota: La URL base se configura en playwright.config.ts (puerto 3050)
+ * Los tests usan baseURL automáticamente.
  */
-
-// Configuración base
-const BASE_URL = 'http://localhost:3001';
 
 // Apps a probar
 const APPS = [
@@ -47,7 +47,7 @@ APPS.forEach(({ name, url, interactions }) => {
   test.describe(`Accesibilidad: ${name}`, () => {
 
     test('debe pasar validación axe-core WCAG 2.1 AA', async ({ page }) => {
-      await page.goto(`${BASE_URL}${url}`);
+      await page.goto(url);
 
       // Esperar a que la página cargue completamente
       await page.waitForLoadState('networkidle');
@@ -107,7 +107,7 @@ APPS.forEach(({ name, url, interactions }) => {
     });
 
     test('debe permitir navegación completa por teclado', async ({ page }) => {
-      await page.goto(`${BASE_URL}${url}`);
+      await page.goto(url);
       await page.waitForLoadState('networkidle');
 
       // Obtener todos los elementos interactivos
@@ -170,7 +170,7 @@ APPS.forEach(({ name, url, interactions }) => {
     });
 
     test('debe tener contraste de color adecuado', async ({ page }) => {
-      await page.goto(`${BASE_URL}${url}`);
+      await page.goto(url);
       await page.waitForLoadState('networkidle');
 
       // Ejecutar análisis solo de contraste
@@ -202,7 +202,7 @@ APPS.forEach(({ name, url, interactions }) => {
     });
 
     test('debe funcionar interacción básica con teclado', async ({ page }) => {
-      await page.goto(`${BASE_URL}${url}`);
+      await page.goto(url);
       await page.waitForLoadState('networkidle');
 
       console.log(`\n⌨️ INTERACCIÓN CON TECLADO: ${name}`);
@@ -225,7 +225,7 @@ APPS.forEach(({ name, url, interactions }) => {
     });
 
     test('debe tener estructura semántica HTML correcta', async ({ page }) => {
-      await page.goto(`${BASE_URL}${url}`);
+      await page.goto(url);
       await page.waitForLoadState('networkidle');
 
       console.log(`\n📋 ESTRUCTURA SEMÁNTICA: ${name}`);
@@ -290,7 +290,7 @@ test.describe('Resumen General de Accesibilidad', () => {
     const results = [];
 
     for (const { name, url } of APPS) {
-      await page.goto(`${BASE_URL}${url}`);
+      await page.goto(url);
       await page.waitForLoadState('networkidle');
 
       const scanResults = await new AxeBuilder({ page })
