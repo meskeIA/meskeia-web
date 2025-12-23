@@ -73,6 +73,8 @@ export const implementedAppsUrls = [
 
   // Herramientas de Productividad (16 implementadas)
   "/time-tracker/",
+  "/calculadora-productividad/",  // Productividad real: ingresos por hora efectiva
+  "/matriz-eisenhower/",          // Matriz urgente/importante para priorizar tareas
   "/planificador-turnos/",
   "/notas/",
   "/generador-contrasenas/",

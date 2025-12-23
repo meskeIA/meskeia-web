@@ -248,8 +248,10 @@ const estadisticaApps: RelatedApp[] = [
 // ==========================================
 const productividadApps: RelatedApp[] = [
   { url: '/lista-tareas/', icon: '✅', name: 'Lista de Tareas', description: 'Organiza tu día' },
+  { url: '/matriz-eisenhower/', icon: '📊', name: 'Matriz Eisenhower', description: 'Prioriza urgente/importante' },
   { url: '/notas/', icon: '📝', name: 'Notas', description: 'Toma notas rápidas' },
   { url: '/time-tracker/', icon: '⏱️', name: 'Time Tracker', description: 'Registra tu tiempo' },
+  { url: '/calculadora-productividad/', icon: '📊', name: 'Productividad', description: 'Ingresos por hora real' },
   { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica 25/5' },
   { url: '/planificador-turnos/', icon: '📅', name: 'Planificador Turnos', description: 'Organiza horarios' },
 ];
@@ -526,8 +528,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // PRODUCTIVIDAD
   'lista-tareas': productividadApps.filter(a => a.url !== '/lista-tareas/'),
+  'matriz-eisenhower': productividadApps.filter(a => a.url !== '/matriz-eisenhower/'),
   'notas': productividadApps.filter(a => a.url !== '/notas/'),
   'time-tracker': productividadApps.filter(a => a.url !== '/time-tracker/'),
+  'calculadora-productividad': [...productividadApps.filter(a => a.url !== '/calculadora-productividad/').slice(0, 2), ...freelanceApps.slice(0, 2)],
   'planificador-turnos': productividadApps.filter(a => a.url !== '/planificador-turnos/'),
   'cronometro': productividadApps,
   'lista-equipaje': viajesApps.filter(a => a.url !== '/lista-equipaje/'),

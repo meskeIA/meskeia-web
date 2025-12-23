@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 208+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 210+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 208,
+  "total_tools": 210,
   "last_updated": "2025-12-23",
   "features": {
     "all_free": true,
@@ -42,7 +42,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 15
+      "tool_count": 17
     },
     {
       "id": "marketing",
@@ -91,7 +91,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 34
+      "tool_count": 36
     },
     {
       "id": "tecnicas",
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 82
+      "tool_count": 84
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 72
+      "tool_count": 73
     },
     {
       "id": "casa",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 38
+      "tool_count": 39
     },
     {
       "id": "creando",
@@ -3580,6 +3580,55 @@
         "facturacion"
       ],
       "icon": "⏱️"
+    },
+    {
+      "slug": "calculadora-productividad",
+      "name": "Calculadora de Productividad",
+      "url": "https://meskeia.com/calculadora-productividad/",
+      "description": "Calcula tu productividad real como freelance. Analiza ingresos por hora efectiva descontando reuniones, gestión y tiempo no facturable",
+      "suites": [
+        "freelance",
+        "productividad"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "productividad",
+        "freelance",
+        "ingresos hora",
+        "eficiencia",
+        "rentabilidad",
+        "tiempo facturable",
+        "autonomo"
+      ],
+      "icon": "📊"
+    },
+    {
+      "slug": "matriz-eisenhower",
+      "name": "Matriz Eisenhower",
+      "url": "https://meskeia.com/matriz-eisenhower/",
+      "description": "Prioriza tus tareas con la matriz urgente/importante. Decide qué hacer, planificar, delegar o eliminar. Drag & drop",
+      "suites": [
+        "productividad",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "estudio"
+      ],
+      "keywords": [
+        "eisenhower",
+        "matriz",
+        "priorizar",
+        "urgente",
+        "importante",
+        "productividad",
+        "tareas",
+        "gestion tiempo"
+      ],
+      "icon": "📊"
     },
     {
       "slug": "planificador-turnos",

@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 194,
+  "total_tools": 196,
   "updated": "2025-12-23",
   "features": {
     "all_free": true,
@@ -232,6 +232,8 @@
         { "name": "Generador de Códigos de Barras", "slug": "generador-codigos-barras", "url": "https://meskeia.com/generador-codigos-barras/", "description": "Genera EAN-13, EAN-8, UPC-A, Code128" },
         { "name": "Generador de Firmas Email", "slug": "generador-firma-email", "url": "https://meskeia.com/generador-firma-email/", "description": "Crea firmas de email profesionales" },
         { "name": "Time Tracker", "slug": "time-tracker", "url": "https://meskeia.com/time-tracker/", "description": "Registra tiempo por proyecto y cliente" },
+        { "name": "Calculadora de Productividad", "slug": "calculadora-productividad", "url": "https://meskeia.com/calculadora-productividad/", "description": "Calcula tu productividad real como freelance: ingresos por hora efectiva descontando tiempo no facturable" },
+        { "name": "Matriz Eisenhower", "slug": "matriz-eisenhower", "url": "https://meskeia.com/matriz-eisenhower/", "description": "Prioriza tareas con la matriz urgente/importante. Decide qué hacer, planificar, delegar o eliminar" },
         { "name": "Planificador de Turnos", "slug": "planificador-turnos", "url": "https://meskeia.com/planificador-turnos/", "description": "Planifica turnos de trabajo para equipos pequeños" },
         { "name": "Conversor de Unidades", "slug": "conversor-unidades", "url": "https://meskeia.com/conversor-unidades/", "description": "Conversor científico: 14 categorías" },
         { "name": "Conversor de Unidades RF", "slug": "conversor-unidades-rf", "url": "https://meskeia.com/conversor-unidades-rf/", "description": "Conversor RF: dBm↔Watts, VSWR, Return Loss, frecuencia↔longitud de onda. Para ingenieros RF y radioaficionados" },
