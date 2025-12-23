@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 199+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 205+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 199,
+  "total_tools": 205,
   "last_updated": "2025-12-23",
   "features": {
     "all_free": true,
@@ -70,7 +70,7 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 21
+      "tool_count": 22
     },
     {
       "id": "juegos",
@@ -84,21 +84,21 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 36
+      "tool_count": 38
     },
     {
       "id": "productividad",
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 33
+      "tool_count": 34
     },
     {
       "id": "tecnicas",
       "name": "Herramientas Técnicas",
       "icon": "🔧",
       "description": "Herramientas especializadas y técnicas",
-      "tool_count": 17
+      "tool_count": 23
     }
   ],
   "moments": [
@@ -107,21 +107,21 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 80
+      "tool_count": 82
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 68
+      "tool_count": 72
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 53
+      "tool_count": 56
     },
     {
       "id": "dinero",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 47
+      "tool_count": 50
     },
     {
       "id": "relax",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 32
+      "tool_count": 33
     }
   ],
   "tools": [
@@ -3870,6 +3870,164 @@
         "spirit level"
       ],
       "icon": "📐"
+    },
+    {
+      "slug": "contador-manual",
+      "name": "Contador Manual (Tally Counter)",
+      "url": "https://meskeia.com/contador-manual/",
+      "description": "Contador manual digital con múltiples contadores independientes, colores personalizables, sonido y vibración. Perfecto para inventarios, asistencia o contar cualquier cosa",
+      "suites": [
+        "tecnicas",
+        "productividad"
+      ],
+      "contexts": [
+        "trabajo",
+        "estudio",
+        "casa"
+      ],
+      "keywords": [
+        "contador",
+        "tally counter",
+        "contar",
+        "clicker",
+        "inventario",
+        "asistencia",
+        "cuenta",
+        "manual",
+        "multiple"
+      ],
+      "icon": "🔢"
+    },
+    {
+      "slug": "diapason",
+      "name": "Diapasón Digital (La 440Hz)",
+      "url": "https://meskeia.com/diapason/",
+      "description": "Diapasón digital que genera el La 440Hz de referencia estándar. Incluye frecuencias alternativas (432, 442, 443 Hz), tipos de onda y control de volumen",
+      "suites": [
+        "tecnicas",
+        "cultura"
+      ],
+      "contexts": [
+        "creando",
+        "estudio"
+      ],
+      "keywords": [
+        "diapason",
+        "la 440",
+        "afinacion",
+        "referencia",
+        "tono",
+        "musica",
+        "hz",
+        "hertz",
+        "tuning fork",
+        "nota"
+      ],
+      "icon": "🎼"
+    },
+    {
+      "slug": "generador-tonos",
+      "name": "Generador de Tonos de Audio",
+      "url": "https://meskeia.com/generador-tonos/",
+      "description": "Genera tonos de audio de 20Hz a 20kHz con diferentes tipos de onda. Incluye frecuencias de barrido (sweep), presets musicales y de prueba de audio",
+      "suites": [
+        "tecnicas"
+      ],
+      "contexts": [
+        "creando",
+        "estudio",
+        "curiosidad"
+      ],
+      "keywords": [
+        "generador tonos",
+        "frecuencia",
+        "hz",
+        "audio",
+        "sine wave",
+        "onda",
+        "sweep",
+        "test audio",
+        "sonido",
+        "hertz"
+      ],
+      "icon": "🔊"
+    },
+    {
+      "slug": "afinador-instrumentos",
+      "name": "Afinador de Instrumentos",
+      "url": "https://meskeia.com/afinador-instrumentos/",
+      "description": "Afinador cromático digital que detecta la nota que tocas usando el micrófono. Incluye presets para guitarra, bajo, ukelele y violín con referencia A4 ajustable",
+      "suites": [
+        "tecnicas",
+        "cultura"
+      ],
+      "contexts": [
+        "creando",
+        "estudio"
+      ],
+      "keywords": [
+        "afinador",
+        "tuner",
+        "guitarra",
+        "bajo",
+        "ukelele",
+        "violin",
+        "cromático",
+        "nota",
+        "afinacion",
+        "pitch"
+      ],
+      "icon": "🎸"
+    },
+    {
+      "slug": "lupa-digital",
+      "name": "Lupa Digital con Cámara",
+      "url": "https://meskeia.com/lupa-digital/",
+      "description": "Lupa digital que usa la cámara trasera con zoom hasta 5x. Incluye filtros de accesibilidad (alto contraste, invertir colores), ajustes de brillo y linterna integrada",
+      "suites": [
+        "tecnicas",
+        "salud"
+      ],
+      "contexts": [
+        "casa",
+        "trabajo"
+      ],
+      "keywords": [
+        "lupa",
+        "magnificador",
+        "zoom",
+        "camara",
+        "accesibilidad",
+        "vision",
+        "ampliar",
+        "aumentar",
+        "linterna",
+        "contraste"
+      ],
+      "icon": "🔍"
+    },
+    {
+      "slug": "espejo",
+      "name": "Espejo Digital",
+      "url": "https://meskeia.com/espejo/",
+      "description": "Espejo digital que usa la cámara frontal. Imagen espejada real, ajustes de brillo y zoom, y modo pantalla completa. Tu espejo de bolsillo en el móvil",
+      "suites": [
+        "tecnicas"
+      ],
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "espejo",
+        "mirror",
+        "camara frontal",
+        "selfie",
+        "reflejo",
+        "maquillaje",
+        "retoque",
+        "verse"
+      ],
+      "icon": "🪞"
     },
     {
       "slug": "calculadora-imc",
