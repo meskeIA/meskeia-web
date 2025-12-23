@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 196,
+  "total_tools": 197,
   "updated": "2025-12-23",
   "features": {
     "all_free": true,
@@ -252,6 +252,7 @@
       "icon": "🏥",
       "tools": [
         { "name": "Calculadora IMC", "slug": "calculadora-imc", "url": "https://meskeia.com/calculadora-imc/", "description": "Índice de Masa Corporal según OMS" },
+        { "name": "Calculadora de Colesterol", "slug": "calculadora-colesterol", "url": "https://meskeia.com/calculadora-colesterol/", "description": "Analiza niveles de colesterol: ratios CT/HDL, LDL/HDL, fórmula Friedewald y riesgo cardiovascular" },
         { "name": "Calculadora de Calorías", "slug": "calculadora-calorias-ejercicio", "url": "https://meskeia.com/calculadora-calorias-ejercicio/", "description": "Calorías quemadas por actividad" },
         { "name": "Calculadora de Hidratación", "slug": "calculadora-hidratacion", "url": "https://meskeia.com/calculadora-hidratacion/", "description": "Cuánta agua necesitas diariamente" },
         { "name": "Calculadora de Sueño", "slug": "calculadora-sueno", "url": "https://meskeia.com/calculadora-sueno/", "description": "Ciclos de sueño ideales" },

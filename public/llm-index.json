@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 210+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 211+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 210,
+  "total_tools": 211,
   "last_updated": "2025-12-23",
   "features": {
     "all_free": true,
@@ -70,7 +70,7 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 22
+      "tool_count": 23
     },
     {
       "id": "juegos",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 56
+      "tool_count": 57
     },
     {
       "id": "dinero",
@@ -4162,6 +4162,30 @@
         "oms"
       ],
       "icon": "⚖️"
+    },
+    {
+      "slug": "calculadora-colesterol",
+      "name": "Calculadora de Colesterol",
+      "url": "https://meskeia.com/calculadora-colesterol/",
+      "description": "Analiza tus niveles de colesterol: ratios CT/HDL, LDL/HDL, fórmula de Friedewald y recomendaciones de riesgo cardiovascular",
+      "suites": [
+        "salud"
+      ],
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "colesterol",
+        "hdl",
+        "ldl",
+        "trigliceridos",
+        "cardiovascular",
+        "friedewald",
+        "ratio colesterol",
+        "colesterol bueno",
+        "colesterol malo"
+      ],
+      "icon": "🩺"
     },
     {
       "slug": "calculadora-calorias-ejercicio",

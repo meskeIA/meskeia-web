@@ -94,6 +94,7 @@ const fiscalApps: RelatedApp[] = [
 // ==========================================
 const saludApps: RelatedApp[] = [
   { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice de masa corporal' },
+  { url: '/calculadora-colesterol/', icon: '🩺', name: 'Calculadora Colesterol', description: 'Ratios y riesgo cardiovascular' },
   { url: '/calculadora-calorias-ejercicio/', icon: '🔥', name: 'Calorías Diarias', description: 'Necesidades calóricas' },
   { url: '/calculadora-hidratacion/', icon: '💧', name: 'Hidratación', description: 'Agua recomendada' },
   { url: '/planificador-menu/', icon: '🍽️', name: 'Planificador Menú', description: 'Dieta mediterránea' },
@@ -425,6 +426,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SALUD
   'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/'),
+  'calculadora-colesterol': saludApps.filter(a => a.url !== '/calculadora-colesterol/'),
   'calculadora-calorias-ejercicio': saludApps.filter(a => a.url !== '/calculadora-calorias-ejercicio/'),
   'calculadora-hidratacion': saludApps.filter(a => a.url !== '/calculadora-hidratacion/'),
   'planificador-menu': [...saludApps.filter(a => a.url !== '/planificador-menu/').slice(0, 2), ...cocinaApps.slice(0, 2)],

@@ -150,6 +150,7 @@ export const implementedAppsUrls = [
 
   // Salud y Bienestar (14 implementadas)
   "/calculadora-imc/",
+  "/calculadora-colesterol/",         // Colesterol: ratios, Friedewald, riesgo cardiovascular
   "/calculadora-calorias-ejercicio/",
   "/calculadora-hidratacion/",
   "/calculadora-sueno/",
