@@ -31,6 +31,9 @@ export const implementedAppsUrls = [
   "/simulador-cartera-inversion/",    // Monte Carlo, Sharpe, volatilidad
   "/calculadora-suscripciones/",      // Control de suscripciones recurrentes
   "/calculadora-roommates/",          // División gastos piso compartido
+  "/calculadora-fondo-emergencia/",   // Cuánto ahorrar como colchón de seguridad
+  "/calculadora-regla-50-30-20/",     // Distribución presupuesto 50/30/20
+  "/calculadora-fire/",               // Independencia financiera, retiro anticipado
   "/calculadora-alquiler-vs-compra/", // Análisis alquiler vs compra vivienda
   "/simulador-compraventa-inmueble/", // Gastos compraventa: ITP, notaría, registro, plusvalía
 

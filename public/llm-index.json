@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 205+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 208+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 205,
+  "total_tools": 208,
   "last_updated": "2025-12-23",
   "features": {
     "all_free": true,
@@ -35,7 +35,7 @@
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 17
+      "tool_count": 20
     },
     {
       "id": "freelance",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 35
+      "tool_count": 38
     },
     {
       "id": "creando",
@@ -1908,6 +1908,70 @@
         "coste oportunidad"
       ],
       "icon": "🏡"
+    },
+    {
+      "slug": "calculadora-fondo-emergencia",
+      "name": "Calculadora Fondo de Emergencia",
+      "url": "https://meskeia.com/calculadora-fondo-emergencia/",
+      "description": "Calcula cuánto dinero necesitas como fondo de emergencia según tu situación laboral, gastos y cargas familiares",
+      "suites": [
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "fondo emergencia",
+        "ahorro",
+        "colchon",
+        "seguridad",
+        "finanzas personales",
+        "imprevistos"
+      ],
+      "icon": "🛡️"
+    },
+    {
+      "slug": "calculadora-regla-50-30-20",
+      "name": "Calculadora Regla 50/30/20",
+      "url": "https://meskeia.com/calculadora-regla-50-30-20/",
+      "description": "Distribuye tus ingresos según la regla 50/30/20: necesidades, deseos y ahorro. Analiza si tu presupuesto está equilibrado",
+      "suites": [
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "regla 50 30 20",
+        "presupuesto",
+        "elizabeth warren",
+        "necesidades",
+        "deseos",
+        "ahorro",
+        "finanzas personales"
+      ],
+      "icon": "📊"
+    },
+    {
+      "slug": "calculadora-fire",
+      "name": "Calculadora FIRE",
+      "url": "https://meskeia.com/calculadora-fire/",
+      "description": "Calcula cuánto necesitas para alcanzar la independencia financiera (FIRE). Regla del 4% y proyección hasta tu retiro anticipado",
+      "suites": [
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "fire",
+        "independencia financiera",
+        "retiro anticipado",
+        "regla 4%",
+        "libertad financiera",
+        "jubilacion anticipada"
+      ],
+      "icon": "🔥"
     },
     {
       "slug": "calculadora-movimiento",

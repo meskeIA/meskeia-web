@@ -77,6 +77,9 @@ const finanzasPersonalesApps: RelatedApp[] = [
   { url: '/calculadora-suscripciones/', icon: '📱', name: 'Control Suscripciones', description: 'Gastos recurrentes' },
   { url: '/calculadora-roommates/', icon: '🏘️', name: 'Gastos Compartidos', description: 'División justa' },
   { url: '/calculadora-jubilacion/', icon: '👴', name: 'Calculadora Jubilación', description: 'Planifica tu retiro' },
+  { url: '/calculadora-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto ahorrar' },
+  { url: '/calculadora-regla-50-30-20/', icon: '📊', name: 'Regla 50/30/20', description: 'Distribuye tu presupuesto' },
+  { url: '/calculadora-fire/', icon: '🔥', name: 'Calculadora FIRE', description: 'Independencia financiera' },
 ];
 
 const fiscalApps: RelatedApp[] = [
@@ -414,6 +417,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-suscripciones': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-suscripciones/'),
   'calculadora-roommates': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-roommates/'),
   'calculadora-jubilacion': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-jubilacion/'),
+  'calculadora-fondo-emergencia': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-fondo-emergencia/'),
+  'calculadora-regla-50-30-20': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-regla-50-30-20/'),
+  'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/calculadora-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
 
   // SALUD
   'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/'),
