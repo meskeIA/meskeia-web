@@ -651,7 +651,7 @@
   }
 
   .comparativaGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .comparativaCard {
@@ -660,6 +660,12 @@
 
   .comparativaValor {
     font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .comparativaGrid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -680,7 +686,7 @@
 
 .comparativaGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
@@ -714,6 +720,10 @@
   background: linear-gradient(90deg, #f59e0b, #fbbf24);
 }
 
+.cardAyer::before {
+  background: linear-gradient(90deg, #f97316, #fb923c);
+}
+
 .cardSemana::before {
   background: linear-gradient(90deg, var(--primary), var(--secondary));
 }
@@ -739,6 +749,13 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.comparativaFecha {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: none;
 }
 
 .comparativaValor {

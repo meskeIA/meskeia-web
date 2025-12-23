@@ -41,6 +41,7 @@ interface ComparativaItem {
     tendencia: 'up' | 'down' | 'neutral';
   };
   etiqueta: string;
+  fecha?: string;
 }
 
 interface EstadisticasData {
@@ -71,10 +72,12 @@ interface EstadisticasData {
   };
   comparativa?: {
     hoy: ComparativaItem;
+    ayer: ComparativaItem;
     semana: ComparativaItem;
     mes: ComparativaItem;
     detalles: {
       ayer: number;
+      anteayer: number;
       semanaAnterior: number;
       mesAnterior: number;
     };
@@ -574,6 +577,34 @@ export default function DashboardAnalyticsPage() {
                   </div>
                   <div className={styles.comparativaDetalle}>
                     Ayer: {formatearNumero(datos.comparativa.detalles.ayer)}
+                  </div>
+                </div>
+
+                {/* Ayer vs Anteayer - NUEVA CARD */}
+                <div className={`${styles.comparativaCard} ${styles.cardAyer}`}>
+                  <div className={styles.comparativaHeader}>
+                    <span className={styles.comparativaIcon}>📅</span>
+                    <span className={styles.comparativaLabel}>Ayer</span>
+                    {datos.comparativa.ayer.fecha && (
+                      <span className={styles.comparativaFecha}>({datos.comparativa.ayer.fecha})</span>
+                    )}
+                  </div>
+                  <div className={styles.comparativaValor}>
+                    {formatearNumero(datos.comparativa.ayer.usos)}
+                  </div>
+                  <div className={`${styles.comparativaTendencia} ${styles[datos.comparativa.ayer.comparacion.tendencia]}`}>
+                    <span className={styles.tendenciaIcono}>
+                      {datos.comparativa.ayer.comparacion.tendencia === 'up' ? '↑' : datos.comparativa.ayer.comparacion.tendencia === 'down' ? '↓' : '→'}
+                    </span>
+                    <span className={styles.tendenciaPorcentaje}>
+                      {datos.comparativa.ayer.comparacion.porcentaje}%
+                    </span>
+                    <span className={styles.tendenciaEtiqueta}>
+                      {datos.comparativa.ayer.etiqueta}
+                    </span>
+                  </div>
+                  <div className={styles.comparativaDetalle}>
+                    Anteayer: {formatearNumero(datos.comparativa.detalles.anteayer)}
                   </div>
                 </div>
 

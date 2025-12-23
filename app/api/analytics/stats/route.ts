@@ -264,11 +264,21 @@ export async function GET(request: NextRequest) {
       return { porcentaje: Math.abs(porcentaje), tendencia };
     };
 
+    // Calcular usos de anteayer para comparar con ayer
+    const anteayer = new Date(hoy); anteayer.setDate(hoy.getDate() - 2);
+    const usosAnteayer = await contarEnRango(anteayer, anteayer);
+
     const comparativa = {
       hoy: {
         usos: usosHoy,
         comparacion: calcularVariacion(usosHoy, usosAyer),
         etiqueta: 'vs ayer',
+      },
+      ayer: {
+        usos: usosAyer,
+        comparacion: calcularVariacion(usosAyer, usosAnteayer),
+        etiqueta: 'vs anteayer',
+        fecha: formatoEspanol(ayer),
       },
       semana: {
         usos: usosUltimos7Dias,
@@ -282,6 +292,7 @@ export async function GET(request: NextRequest) {
       },
       detalles: {
         ayer: usosAyer,
+        anteayer: usosAnteayer,
         semanaAnterior: usosSemanaAnterior,
         mesAnterior: usosMesAnterior,
       },
