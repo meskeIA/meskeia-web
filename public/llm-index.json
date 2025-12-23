@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 211+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 212+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 211,
+  "total_tools": 212,
   "last_updated": "2025-12-23",
   "features": {
     "all_free": true,
@@ -42,7 +42,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 17
+      "tool_count": 18
     },
     {
       "id": "marketing",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 84
+      "tool_count": 85
     },
     {
       "id": "estudio",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 39
+      "tool_count": 40
     },
     {
       "id": "creando",
@@ -1485,6 +1485,31 @@
         "pequeña empresa"
       ],
       "icon": "🧾"
+    },
+    {
+      "slug": "calculadora-presupuestos",
+      "name": "Calculadora de Presupuestos",
+      "url": "https://meskeia.com/calculadora-presupuestos/",
+      "description": "Crea presupuestos profesionales para clientes. Servicios, horas, materiales, descuentos. Exporta a PDF. Flujo completo: presupuesto → trabajo → factura",
+      "suites": [
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "presupuesto",
+        "freelance",
+        "cotizacion",
+        "propuesta",
+        "cliente",
+        "proyecto",
+        "tarifa",
+        "autonomo",
+        "pdf"
+      ],
+      "icon": "📋"
     },
     {
       "slug": "generador-carruseles",

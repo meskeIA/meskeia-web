@@ -196,6 +196,7 @@ export const implementedAppsUrls = [
   "/planificador-cashflow/",
   "/generador-nombres-empresa/",
   "/generador-facturas/",           // Facturas para autónomos con IVA/IRPF
+  "/calculadora-presupuestos/",     // Presupuestos profesionales para clientes
   "/generador-carruseles/",         // Carruseles para Instagram/LinkedIn
 
   // Física y Química (7 implementadas)

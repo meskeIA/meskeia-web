@@ -207,8 +207,8 @@ const disenoExtraApps: RelatedApp[] = [
 const freelanceApps: RelatedApp[] = [
   { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu hora' },
   { url: '/simulador-gastos-deducibles/', icon: '✅', name: 'Gastos Deducibles', description: 'Para autónomos' },
+  { url: '/calculadora-presupuestos/', icon: '📋', name: 'Presupuestos', description: 'Propuestas a clientes' },
   { url: '/generador-facturas/', icon: '🧾', name: 'Generador Facturas', description: 'Facturas con IVA/IRPF' },
-  { url: '/calculadora-break-even/', icon: '⚖️', name: 'Punto de Equilibrio', description: 'Break-even point' },
 ];
 
 const negociosApps: RelatedApp[] = [
@@ -503,6 +503,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // FREELANCE Y NEGOCIOS
   'calculadora-tarifa-freelance': freelanceApps.filter(a => a.url !== '/calculadora-tarifa-freelance/'),
   'simulador-gastos-deducibles': freelanceApps.filter(a => a.url !== '/simulador-gastos-deducibles/'),
+  'calculadora-presupuestos': freelanceApps.filter(a => a.url !== '/calculadora-presupuestos/'),
   'generador-facturas': freelanceApps.filter(a => a.url !== '/generador-facturas/'),
   'calculadora-break-even': [...freelanceApps.filter(a => a.url !== '/calculadora-break-even/').slice(0, 2), ...negociosApps.slice(0, 2)],
   'calculadora-roi-marketing': negociosApps.filter(a => a.url !== '/calculadora-roi-marketing/'),

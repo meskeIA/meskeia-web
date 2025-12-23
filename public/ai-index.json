@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 197,
+  "total_tools": 198,
   "updated": "2025-12-23",
   "features": {
     "all_free": true,
@@ -101,6 +101,7 @@
         { "name": "Calculadora Tiempo de Lectura", "slug": "calculadora-tiempo-lectura", "url": "https://meskeia.com/calculadora-tiempo-lectura/", "description": "Calcula el tiempo de lectura de tu contenido" },
         { "name": "Generador de Schema Markup", "slug": "generador-schema-markup", "url": "https://meskeia.com/generador-schema-markup/", "description": "Genera código JSON-LD Schema.org para SEO" },
         { "name": "Generador de Facturas", "slug": "generador-facturas", "url": "https://meskeia.com/generador-facturas/", "description": "Crea facturas profesionales con IVA y exporta a PDF" },
+        { "name": "Calculadora de Presupuestos", "slug": "calculadora-presupuestos", "url": "https://meskeia.com/calculadora-presupuestos/", "description": "Crea presupuestos profesionales para clientes: servicios, horas, materiales. Exporta a PDF" },
         { "name": "Generador de Carruseles", "slug": "generador-carruseles", "url": "https://meskeia.com/generador-carruseles/", "description": "Crea carruseles para Instagram y LinkedIn, descarga como PNG" },
         { "name": "Analizador GEO/AEO", "slug": "analizador-geo", "url": "https://meskeia.com/analizador-geo/", "description": "Analiza y optimiza tu contenido para ser citado por ChatGPT, Perplexity y Gemini" },
         { "name": "Curso de Optimización para IAs (GEO/AEO)", "slug": "curso-optimizacion-ia", "url": "https://meskeia.com/curso-optimizacion-ia/", "description": "Aprende GEO/AEO: optimiza contenido para ChatGPT, Perplexity y Gemini. LLMs, RAG, E-E-A-T, Schema Markup" },
