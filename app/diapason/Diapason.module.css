@@ -1,0 +1,478 @@
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  padding: 30px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Card principal del diapasón */
+.diapasonCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+  margin-bottom: 25px;
+  box-shadow: var(--shadow-md);
+}
+
+.frecuenciaDisplay {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.frecuenciaNumero {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #2E86AB;
+  line-height: 1;
+}
+
+.frecuenciaUnidad {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.notaDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.notaNombre {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.notaOctava {
+  font-size: 1rem;
+  color: var(--text-muted);
+  background: var(--bg-primary);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* Botón diapasón */
+.btnDiapason {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 25px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 8px 25px rgba(46, 134, 171, 0.3);
+}
+
+.btnDiapason:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 35px rgba(46, 134, 171, 0.4);
+}
+
+.btnDiapason:active {
+  transform: scale(0.98);
+}
+
+.btnDiapason.activo {
+  animation: pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(46, 134, 171, 0.7);
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(46, 134, 171, 0.7); }
+  70% { box-shadow: 0 0 0 20px rgba(46, 134, 171, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(46, 134, 171, 0); }
+}
+
+.diapasonIcon {
+  font-size: 3rem;
+}
+
+.diapasonTexto {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Visualización de onda */
+.ondaVisual {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 6px;
+  height: 40px;
+  margin-bottom: 25px;
+}
+
+.ondaBarra {
+  width: 8px;
+  background: linear-gradient(to top, #2E86AB, #48A9A6);
+  border-radius: 4px;
+  animation: sound 0.4s ease infinite alternate;
+}
+
+.ondaBarra:nth-child(1) { animation-delay: 0s; }
+.ondaBarra:nth-child(2) { animation-delay: 0.1s; }
+.ondaBarra:nth-child(3) { animation-delay: 0.2s; }
+.ondaBarra:nth-child(4) { animation-delay: 0.1s; }
+.ondaBarra:nth-child(5) { animation-delay: 0s; }
+
+@keyframes sound {
+  0% { height: 10px; }
+  100% { height: 35px; }
+}
+
+/* Control de volumen */
+.volumenControl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.volumenIcon {
+  font-size: 1.2rem;
+}
+
+.volumenSlider {
+  width: 150px;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+}
+
+.volumenSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #2E86AB;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.volumenSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #2E86AB;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.volumenValor {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  min-width: 40px;
+}
+
+/* Presets */
+.presetsSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.presetsTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.presetsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.presetBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 15px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.presetBtn:hover {
+  border-color: #2E86AB;
+}
+
+.presetBtn.presetActivo {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.presetNombre {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.presetDesc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Frecuencia personalizada */
+.customSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.customTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.customControl {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.customSlider {
+  flex: 1;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, #2E86AB, #48A9A6);
+  border-radius: 4px;
+  outline: none;
+}
+
+.customSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border: 3px solid #2E86AB;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.customSlider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  background: white;
+  border: 3px solid #2E86AB;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.customInput {
+  width: 80px;
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.customInput:focus {
+  border-color: #2E86AB;
+}
+
+/* Tipo de onda */
+.ondaSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.ondaTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.ondaGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.ondaBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ondaBtn:hover {
+  border-color: #2E86AB;
+}
+
+.ondaBtn.ondaActiva {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.ondaIcono {
+  font-size: 1.3rem;
+}
+
+.ondaNombre {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Información */
+.infoSection {
+  margin-bottom: 30px;
+}
+
+.infoTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.infoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.infoCard .infoIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.infoCard h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.infoCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px 10px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .frecuenciaNumero {
+    font-size: 3rem;
+  }
+
+  .btnDiapason {
+    width: 140px;
+    height: 140px;
+  }
+
+  .diapasonIcon {
+    font-size: 2.5rem;
+  }
+
+  .presetsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ondaGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .volumenSlider {
+    width: 100px;
+  }
+}

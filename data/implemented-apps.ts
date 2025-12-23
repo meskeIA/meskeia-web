@@ -92,6 +92,12 @@ export const implementedAppsUrls = [
   "/mi-ip/",                       // IP pública, geolocalización, ISP, conexión
   "/analizador-espectro/",         // Analizador de espectro de audio FFT
   "/nivel-burbuja/",               // Nivel de burbuja digital + inclinómetro
+  "/contador-manual/",             // Tally counter digital múltiple
+  "/diapason/",                    // Diapasón digital La 440Hz
+  "/generador-tonos/",             // Generador de frecuencias de audio
+  "/afinador-instrumentos/",       // Afinador cromático para instrumentos
+  "/lupa-digital/",                // Lupa digital con zoom y filtros
+  "/espejo/",                      // Espejo digital con cámara frontal
 
   // Texto y Documentos (14 implementadas)
   "/contador-palabras/",

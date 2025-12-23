@@ -1,0 +1,498 @@
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.hero {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  padding: 30px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Panel principal del afinador */
+.afinadorPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+  margin-bottom: 25px;
+  box-shadow: var(--shadow-md);
+}
+
+/* Display de nota */
+.notaDisplay {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 25px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--bg-primary);
+  transition: all 0.3s;
+}
+
+.notaDisplay.bajo {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.notaDisplay.alto {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.notaDisplay.afinado {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.notaNombre {
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.notaOctava {
+  font-size: 2rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.notaEn {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  margin-left: 5px;
+}
+
+.notaVacia {
+  font-size: 4rem;
+  color: var(--text-muted);
+}
+
+/* Indicador de cents */
+.centsContainer {
+  margin-bottom: 25px;
+}
+
+.centsBar {
+  position: relative;
+  padding-top: 25px;
+}
+
+.centsMarcas {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.centsTrack {
+  position: relative;
+  height: 20px;
+  background: linear-gradient(to right,
+    #EF4444 0%,
+    #EF4444 20%,
+    #F59E0B 20%,
+    #F59E0B 40%,
+    #22C55E 40%,
+    #22C55E 60%,
+    #F59E0B 60%,
+    #F59E0B 80%,
+    #EF4444 80%,
+    #EF4444 100%
+  );
+  border-radius: 10px;
+}
+
+.centsIndicador {
+  position: absolute;
+  top: -5px;
+  width: 10px;
+  height: 30px;
+  background: var(--text-primary);
+  border-radius: 5px;
+  transform: translateX(-50%);
+  transition: left 0.1s ease-out;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.centsIndicador.afinado {
+  background: #22C55E;
+}
+
+.centsIndicador.bajo {
+  background: #EF4444;
+}
+
+.centsIndicador.alto {
+  background: #F59E0B;
+}
+
+.centsCentro {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 20px;
+  background: white;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+.centsValor {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Frecuencia */
+.frecuenciaInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.frecuenciaLabel {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.frecuenciaValor {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Estado de afinación */
+.estadoAfinacion {
+  display: inline-block;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  margin-bottom: 25px;
+}
+
+.estadoAfinacion.afinado {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16A34A;
+}
+
+.estadoAfinacion.bajo {
+  background: rgba(239, 68, 68, 0.15);
+  color: #DC2626;
+}
+
+.estadoAfinacion.alto {
+  background: rgba(245, 158, 11, 0.15);
+  color: #D97706;
+}
+
+/* Botón escuchar */
+.btnEscuchar {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 40px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(46, 134, 171, 0.3);
+}
+
+.btnEscuchar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.4);
+}
+
+.btnEscuchar.activo {
+  background: #EF4444;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.btnIcono {
+  font-size: 1.5rem;
+}
+
+/* Error permiso */
+.errorPermiso {
+  padding: 20px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 12px;
+  color: #DC2626;
+}
+
+.errorPermiso p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.errorSubtexto {
+  font-size: 0.85rem;
+  font-weight: 400 !important;
+  margin-top: 5px !important;
+  opacity: 0.8;
+}
+
+/* Secciones */
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Instrumentos */
+.instrumentosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.instrumentoBtn {
+  padding: 12px 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.instrumentoBtn:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.instrumentoBtn.instrumentoActivo {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+  color: #2E86AB;
+}
+
+/* Cuerdas */
+.cuerdasGrid {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.cuerdaItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 18px;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  min-width: 70px;
+}
+
+.cuerdaNumero {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.cuerdaNota {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cuerdaFrec {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Referencia A4 */
+.referenciaControl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.btnReferencia {
+  width: 45px;
+  height: 45px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnReferencia:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.referenciaValor {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2E86AB;
+  min-width: 100px;
+  text-align: center;
+}
+
+.referenciasPreset {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.referenciasPreset button {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.referenciasPreset button:hover {
+  border-color: #2E86AB;
+}
+
+.referenciasPreset .presetActivo {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+  color: #2E86AB;
+}
+
+/* Instrucciones */
+.instrucciones {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.instrucciones h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+}
+
+.instrucciones ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instrucciones li {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .estadoAfinacion.afinado {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+[data-theme='dark'] .estadoAfinacion.bajo {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+[data-theme='dark'] .estadoAfinacion.alto {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px 10px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .notaNombre {
+    font-size: 4rem;
+  }
+
+  .instrumentosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cuerdasGrid {
+    gap: 10px;
+  }
+
+  .cuerdaItem {
+    min-width: 60px;
+    padding: 10px 12px;
+  }
+
+  .referenciasPreset {
+    flex-direction: column;
+  }
+
+  .referenciasPreset button {
+    width: 100%;
+  }
+}

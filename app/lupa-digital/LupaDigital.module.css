@@ -1,0 +1,426 @@
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.hero {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  padding: 30px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Contenedor de la lupa */
+.lupaContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.lupaPlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: white;
+  text-align: center;
+}
+
+.placeholderIcon {
+  font-size: 4rem;
+}
+
+.lupaPlaceholder p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.placeholderSubtexto {
+  font-size: 0.9rem !important;
+  opacity: 0.7;
+}
+
+.lupaVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+  transition: transform 0.2s ease-out;
+}
+
+.controlesOverlay {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.zoomIndicador {
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Control principal */
+.controlPrincipal {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.btnPrincipal {
+  padding: 16px 40px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(46, 134, 171, 0.3);
+}
+
+.btnPrincipal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.4);
+}
+
+.btnPrincipal.activo {
+  background: #EF4444;
+}
+
+.btnCambiarCamara {
+  padding: 16px 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnCambiarCamara:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+/* Secciones */
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Control de zoom */
+.zoomControl {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.zoomBtn {
+  width: 45px;
+  height: 45px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.zoomBtn:hover:not(:disabled) {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.zoomBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.zoomSlider {
+  flex: 1;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, #2E86AB, #48A9A6);
+  border-radius: 4px;
+  outline: none;
+}
+
+.zoomSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border: 3px solid #2E86AB;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.zoomSlider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: white;
+  border: 3px solid #2E86AB;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.zoomPresets {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.zoomPresetBtn {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.zoomPresetBtn:hover {
+  border-color: #2E86AB;
+}
+
+.zoomPresetBtn.zoomPresetActivo {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+  color: #2E86AB;
+}
+
+/* Filtros */
+.filtrosGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.filtroBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filtroBtn:hover {
+  border-color: #2E86AB;
+}
+
+.filtroBtn.filtroActivo {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.filtroIcono {
+  font-size: 1.5rem;
+}
+
+.filtroNombre {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Ajustes */
+.ajuste {
+  margin-bottom: 20px;
+}
+
+.ajuste label {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.ajusteSlider {
+  width: 100%;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 4px;
+  outline: none;
+}
+
+.ajusteSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #2E86AB;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.ajusteSlider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #2E86AB;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.btnLinterna {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: all 0.2s;
+}
+
+.btnLinterna:hover {
+  border-color: #F59E0B;
+}
+
+.btnLinterna.linternaActiva {
+  background: #F59E0B;
+  border-color: #F59E0B;
+  color: white;
+}
+
+.btnReset {
+  width: 100%;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnReset:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+/* Usos */
+.usosSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.usosSection h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.usosGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.usoItem {
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px 10px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .controlPrincipal {
+    flex-direction: column;
+  }
+
+  .filtrosGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .usosGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .zoomPresets {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,320 @@
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.hero {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  padding: 30px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Contenedor del espejo */
+.espejoContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.espejoContainer.fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  aspect-ratio: unset;
+  border-radius: 0;
+  z-index: 9999;
+}
+
+.espejoPlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.placeholderIcon {
+  font-size: 5rem;
+}
+
+.espejoPlaceholder p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.placeholderSubtexto {
+  font-size: 0.9rem !important;
+  opacity: 0.7;
+}
+
+.espejoVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+  transition: transform 0.2s ease-out, filter 0.2s ease-out;
+}
+
+/* Controles en pantalla completa */
+.controlesFullscreen {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+.btnSalirFullscreen {
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.btnSalirFullscreen:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Control principal */
+.controlPrincipal {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.btnPrincipal {
+  padding: 16px 40px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(46, 134, 171, 0.3);
+}
+
+.btnPrincipal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.4);
+}
+
+.btnPrincipal.activo {
+  background: #EF4444;
+}
+
+/* Controles secundarios */
+.controles {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.controlBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 15px 25px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.controlBtn:hover {
+  border-color: #2E86AB;
+}
+
+.controlBtn.controlActivo {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.controlIcono {
+  font-size: 1.5rem;
+}
+
+.controlTexto {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Sección de ajustes */
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.ajuste {
+  margin-bottom: 20px;
+}
+
+.ajuste:last-of-type {
+  margin-bottom: 15px;
+}
+
+.ajuste label {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.ajusteSlider {
+  width: 100%;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 4px;
+  outline: none;
+}
+
+.ajusteSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #2E86AB;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.ajusteSlider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #2E86AB;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.btnReset {
+  width: 100%;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnReset:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+/* Info Section */
+.infoSection {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.infoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.infoIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.infoCard h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.infoCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px 10px;
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: 25px 15px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .espejoContainer {
+    aspect-ratio: 9/16;
+  }
+
+  .controles {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .controlBtn {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .infoSection {
+    grid-template-columns: 1fr;
+  }
+}
