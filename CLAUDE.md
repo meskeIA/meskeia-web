@@ -125,9 +125,47 @@ Las instrucciones detalladas de desarrollo están en:
 
 ---
 
+## Herramientas de Desarrollo
+
+### Plugins de Claude Code Instalados
+
+Plugins disponibles para mejorar el flujo de desarrollo:
+
+| Plugin | Comando | Uso |
+|--------|---------|-----|
+| `code-review` | `/code-review` | Revisión de código antes de commits/PRs |
+| `audit` | `/audit` | Auditoría de seguridad del codebase |
+| `analyze-codebase` | `/analyze-codebase` | Análisis comprehensivo del proyecto |
+| `bug-detective` | `/bug-detective` | Debugging sistemático paso a paso |
+| `debugger` | `/debugger` | Especialista en errores y fallos de tests |
+
+**Cuándo usar cada uno:**
+- **Antes de PR importante**: `/code-review` + `/audit`
+- **Error difícil de encontrar**: `/bug-detective`
+- **Onboarding o documentación**: `/analyze-codebase`
+
+### Testing de Frontend
+
+**Opción 1: Playwright MCP** (automatizado)
+- Configurado en `settings.local.json`
+- Ideal para: Tests de regresión, CI/CD, scripts repetibles
+- Herramientas: `mcp__playwright__browser_*`
+
+**Opción 2: Chrome Integration** (interactivo)
+- El usuario tiene Claude integrado en Chrome
+- Ideal para: Validación visual rápida, debugging en tiempo real, demos
+- Uso: Validar cambios de UI directamente en el navegador
+
+**Recomendación**: Usar ambos según el contexto:
+- Playwright para tests automatizados y verificaciones programáticas
+- Chrome para validación visual interactiva cuando el usuario lo solicite
+
+---
+
 ## Control de versiones de este documento
 
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
+| 1.2.0 | 2025-12-24 | Añadidos plugins de Claude Code y documentación de testing |
 | 1.1.0 | 2025-12-21 | Añadida arquitectura Suites + Momentos |
 | 1.0.0 | 2025-12-19 | Versión inicial |
