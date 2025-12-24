@@ -4,9 +4,8 @@ import { Metadata } from 'next';
 // Configuración base del sitio
 export const siteConfig = {
   name: 'meskeIA',
-  title: 'meskeIA - Más de 200 Aplicaciones Web Gratuitas',
-  description:
-    'Descubre más de 200 aplicaciones web gratuitas: calculadoras financieras, cursos educativos, herramientas de productividad, juegos y más. Todo en español, sin registro y completamente gratis.',
+  title: 'Más de 200 aplicaciones web',
+  description: 'Gratuitas y sin registro',
   url: 'https://meskeia.com',
   ogImage: 'https://meskeia.com/og-image.png',
   author: 'meskeIA',
