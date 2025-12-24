@@ -8,7 +8,7 @@ export const siteConfig = {
   description:
     'Descubre más de 200 aplicaciones web gratuitas: calculadoras financieras, cursos educativos, herramientas de productividad, juegos y más. Todo en español, sin registro y completamente gratis.',
   url: 'https://meskeia.com',
-  ogImage: 'https://meskeia.com/icon-512x512.png',
+  ogImage: 'https://meskeia.com/og-image.png',
   author: 'meskeIA',
   keywords: [
     'aplicaciones web',
