@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 212+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 215+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 212,
-  "last_updated": "2025-12-23",
+  "total_tools": 215,
+  "last_updated": "2025-12-24",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -21,7 +21,7 @@
       "name": "Fiscal y Herencias",
       "icon": "🏛️",
       "description": "Impuestos, herencias, donaciones y trámites fiscales",
-      "tool_count": 14
+      "tool_count": 15
     },
     {
       "id": "inmobiliaria",
@@ -35,14 +35,14 @@
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 20
+      "tool_count": 22
     },
     {
       "id": "freelance",
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 18
+      "tool_count": 19
     },
     {
       "id": "marketing",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 85
+      "tool_count": 86
     },
     {
       "id": "estudio",
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 57
+      "tool_count": 58
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 40
+      "tool_count": 43
     },
     {
       "id": "creando",
@@ -1487,6 +1487,37 @@
       "icon": "🧾"
     },
     {
+      "slug": "asistente-constitucion-sociedad",
+      "name": "Asistente de Constitución de Sociedad",
+      "url": "https://meskeia.com/asistente-constitucion-sociedad/",
+      "description": "Guía paso a paso para constituir SL, SLU o SA en España. Checklist interactivo, formulario de datos, calculadora de costes y documentos necesarios",
+      "suites": [
+        "fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "constituir sociedad",
+        "crear empresa",
+        "sociedad limitada",
+        "sl",
+        "slu",
+        "sociedad anonima",
+        "sa",
+        "registro mercantil",
+        "notario",
+        "escritura",
+        "capital social",
+        "estatutos",
+        "cif",
+        "emprendedor"
+      ],
+      "icon": "🏢"
+    },
+    {
       "slug": "calculadora-presupuestos",
       "name": "Calculadora de Presupuestos",
       "url": "https://meskeia.com/calculadora-presupuestos/",
@@ -1997,6 +2028,52 @@
         "jubilacion anticipada"
       ],
       "icon": "🔥"
+    },
+    {
+      "slug": "calculadora-coste-plazos",
+      "name": "Calculadora Coste Real a Plazos",
+      "url": "https://meskeia.com/calculadora-coste-plazos/",
+      "description": "Descubre el coste real de financiar productos a plazos. Calcula la TAE, los intereses ocultos y cuánto pagas de más",
+      "suites": [
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "financiacion",
+        "plazos",
+        "TAE",
+        "TIN",
+        "intereses",
+        "cuotas",
+        "credito consumo",
+        "comprar a plazos"
+      ],
+      "icon": "💳"
+    },
+    {
+      "slug": "calculadora-deuda",
+      "name": "Calculadora de Deuda",
+      "url": "https://meskeia.com/calculadora-deuda/",
+      "description": "Elimina tus deudas más rápido. Compara el método bola de nieve vs avalancha y descubre cuál te ahorra más",
+      "suites": [
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "deudas",
+        "bola de nieve",
+        "avalancha",
+        "eliminar deudas",
+        "pagar deudas",
+        "tarjetas credito",
+        "prestamos"
+      ],
+      "icon": "🎯"
     },
     {
       "slug": "calculadora-movimiento",

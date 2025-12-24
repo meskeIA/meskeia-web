@@ -38,6 +38,7 @@ export const implementedAppsUrls = [
   "/simulador-compraventa-inmueble/", // Gastos compraventa: ITP, notaría, registro, plusvalía
   "/calculadora-coste-plazos/",       // Coste real financiación a plazos, TAE oculta
   "/calculadora-deuda/",              // Método bola de nieve vs avalancha
+  "/asistente-constitucion-sociedad/", // Guía SL, SLU, SA con checklist y costes
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",
