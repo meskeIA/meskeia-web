@@ -833,6 +833,10 @@
     font-size: 1.5rem;
   }
 
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
   .formGrid {
     grid-template-columns: 1fr;
   }
@@ -842,36 +846,258 @@
     gap: var(--spacing-md);
   }
 
-  .lineaNumeros {
-    grid-template-columns: 1fr 1fr;
+  .taxOption {
+    flex-wrap: wrap;
   }
 
+  /* Botones de añadir - apilar en móvil */
+  .addButtons {
+    flex-direction: column;
+  }
+
+  .addBtn {
+    width: 100%;
+    padding: var(--spacing-md);
+    font-size: 1rem;
+  }
+
+  /* Líneas del presupuesto - diseño vertical en móvil */
+  .lineaContent {
+    padding: var(--spacing-sm);
+  }
+
+  .lineaDescripcion {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .lineaDescripcion input {
+    font-size: 1rem;
+    padding: var(--spacing-md);
+  }
+
+  .lineaNumeros {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .lineaField {
+    gap: var(--spacing-xs);
+  }
+
+  .lineaField label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .lineaField input {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 1rem;
+    min-height: 44px; /* Touch-friendly */
+  }
+
+  .lineaSubtotal {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm);
+    background: var(--focus);
+    border-radius: var(--radius);
+    margin-top: var(--spacing-xs);
+  }
+
+  .lineaSubtotal label {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .lineaSubtotal span {
+    font-size: 1.1rem;
+  }
+
+  /* Notas textarea más grande */
+  .notasTextarea {
+    font-size: 1rem;
+    min-height: 100px;
+  }
+
+  /* Totales */
+  .totalesSection {
+    padding: var(--spacing-md);
+  }
+
+  .totalRow {
+    font-size: 1rem;
+    padding: var(--spacing-xs) 0;
+  }
+
+  .totalFinal {
+    font-size: 1.2rem;
+    padding-top: var(--spacing-sm);
+  }
+
+  /* Acciones */
   .actions {
     flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    width: 100%;
+    padding: var(--spacing-md);
+    font-size: 1rem;
+    min-height: 50px;
+  }
+
+  /* Ocultar vista previa en móvil */
+  .previewPanel {
+    display: none;
+  }
+
+  /* Flujo freelance */
+  .flujoSection {
+    padding: var(--spacing-md);
+  }
+
+  .flujoSection h2 {
+    font-size: 1rem;
   }
 
   .flujoSteps {
     flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .flujoStep {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    min-width: unset;
+  }
+
+  .flujoIcon {
+    font-size: 1.5rem;
+  }
+
+  .flujoLabel {
+    flex: 1;
   }
 
   .flujoArrow {
-    transform: rotate(90deg);
+    display: none;
+  }
+
+  /* Guía educativa */
+  .guideSection {
+    padding: var(--spacing-md);
+  }
+
+  .guideSection h3 {
+    font-size: 1.1rem;
   }
 
   .guideGrid {
     grid-template-columns: 1fr;
   }
 
+  .guideCard {
+    padding: var(--spacing-md);
+  }
+
+  .tipsList li {
+    font-size: 0.9rem;
+    padding: var(--spacing-md) 0;
+  }
+
   .tiposGrid {
     grid-template-columns: 1fr;
   }
 
-  .presupuestoDoc {
-    padding: 20px;
+  .tipoCard {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
   }
 
-  .docPartes {
+  .tipoIcon {
+    font-size: 2rem;
+    margin-bottom: 0;
+  }
+
+  .tipoCard h4 {
+    margin-bottom: 2px;
+  }
+
+  /* Secciones */
+  .section {
+    padding: var(--spacing-md);
+  }
+
+  .sectionTitle {
+    font-size: 1rem;
+  }
+
+  /* Inputs táctiles */
+  .formGroup input,
+  .formGroup select,
+  .formGroupFull input {
+    font-size: 1rem;
+    padding: var(--spacing-md);
+    min-height: 48px;
+  }
+
+  .inputLarge {
+    font-size: 1rem !important;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .container {
+    padding: var(--spacing-sm);
+  }
+
+  .hero {
+    margin-top: 50px;
+    padding: var(--spacing-md);
+  }
+
+  .heroIcon {
+    font-size: 2.5rem;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .lineaNumeros {
     grid-template-columns: 1fr;
-    gap: 20px;
+  }
+
+  .lineaField {
+    background: var(--bg-card);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+
+  .lineaField input {
+    border: none;
+    background: transparent;
+    padding: var(--spacing-xs) 0;
+  }
+
+  .flujoStep {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .tipoCard {
+    flex-direction: column;
+    text-align: center;
   }
 }
