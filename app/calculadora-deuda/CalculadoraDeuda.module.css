@@ -379,6 +379,114 @@
   margin-bottom: 2px;
 }
 
+/* Mismos Resultados - Aviso */
+.mismosResultadosAviso {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-radius: var(--radius);
+  border: 2px solid #10b981;
+  margin-bottom: var(--spacing-lg);
+}
+
+[data-theme='dark'] .mismosResultadosAviso {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+  border-color: #34d399;
+}
+
+.avisoIcono {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.mismosResultadosAviso strong {
+  display: block;
+  font-size: 1rem;
+  color: #065f46;
+  margin-bottom: var(--spacing-xs);
+}
+
+[data-theme='dark'] .mismosResultadosAviso strong {
+  color: #6ee7b7;
+}
+
+.mismosResultadosAviso p {
+  font-size: 0.9rem;
+  color: #047857;
+  margin: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .mismosResultadosAviso p {
+  color: #a7f3d0;
+}
+
+/* Método Único (cuando ambos dan igual) */
+.metodoUnico {
+  background: var(--bg-primary);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+}
+
+.metodoUnico .metodoStats {
+  margin-bottom: var(--spacing-lg);
+}
+
+.metodoUnico .metodoStat {
+  padding: var(--spacing-sm) 0;
+}
+
+.metodoUnico .metodoStatLabel {
+  font-size: 0.9rem;
+}
+
+.metodoUnico .metodoStatValor {
+  font-size: 1.1rem;
+}
+
+.metodoUnico .ordenPago {
+  background: var(--bg-card);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.metodoUnico .ordenTitulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.metodoUnico .ordenLista {
+  padding-left: 0;
+  list-style: none;
+}
+
+.metodoUnico .ordenLista li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.metodoUnico .ordenLista li:last-child {
+  border-bottom: none;
+}
+
+.ordenDetalle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
 /* Veredicto */
 .veredicto {
   display: flex;
@@ -706,6 +814,25 @@
   .veredicto {
     flex-direction: column;
     text-align: center;
+  }
+
+  .mismosResultadosAviso {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .metodoUnico {
+    padding: var(--spacing-md);
+  }
+
+  .metodoUnico .ordenLista li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+
+  .ordenDetalle {
+    margin-left: 0;
   }
 }
 

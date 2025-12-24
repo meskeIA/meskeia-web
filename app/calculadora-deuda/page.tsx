@@ -182,10 +182,16 @@ export default function CalculadoraDeudaPage() {
     const mejorMetodo = totalInteresAvalancha < totalInteresBolaNieve ? 'Avalancha' : 'Bola de Nieve';
     const diferencia = Math.abs(totalInteresAvalancha - totalInteresBolaNieve);
 
+    // Verificar si ambos métodos producen el mismo orden de pago
+    const ordenBolaNieve = resultadoBolaNieve.map(d => d.nombre).join(',');
+    const ordenAvalancha = resultadoAvalancha.map(d => d.nombre).join(',');
+    const mismosResultados = ordenBolaNieve === ordenAvalancha && Math.abs(totalInteresBolaNieve - totalInteresAvalancha) < 1;
+
     return {
       metodos,
       mejorMetodo,
       diferencia,
+      mismosResultados,
       totalDeuda: deudasParsed.reduce((acc, d) => acc + d.saldo, 0),
       pagoMinimoTotal: deudasParsed.reduce((acc, d) => acc + d.minimo, 0),
       soloMinimos: {
@@ -361,79 +367,140 @@ export default function CalculadoraDeudaPage() {
 
               {/* Comparativa */}
               <section className={styles.comparativaSection}>
-                <h2 className={styles.sectionTitle}>🏆 Comparativa de Métodos</h2>
+                <h2 className={styles.sectionTitle}>
+                  {resultados.mismosResultados ? '📊 Tu Plan de Pago de Deudas' : '🏆 Comparativa de Métodos'}
+                </h2>
 
-                <div className={styles.metodosGrid}>
-                  {resultados.metodos.map((metodo) => (
-                    <div
-                      key={metodo.nombre}
-                      className={`${styles.metodoCard} ${metodo.nombre === resultados.mejorMetodo ? styles.metodoGanador : ''}`}
-                    >
-                      {metodo.nombre === resultados.mejorMetodo && (
-                        <span className={styles.metodoTag}>✨ Recomendado</span>
-                      )}
-                      <h3 className={styles.metodoNombre}>
-                        {metodo.nombre === 'Bola de Nieve' ? '⚪' : '🏔️'} {metodo.nombre}
-                      </h3>
-                      <p className={styles.metodoDesc}>{metodo.descripcion}</p>
+                {/* Cuando los resultados son idénticos, mostrar cuadro único */}
+                {resultados.mismosResultados ? (
+                  <>
+                    <div className={styles.mismosResultadosAviso}>
+                      <span className={styles.avisoIcono}>✨</span>
+                      <div>
+                        <strong>¡Buenas noticias!</strong>
+                        <p>
+                          En tu caso, ambos métodos (Bola de Nieve y Avalancha) producen exactamente
+                          el mismo resultado. Esto ocurre cuando la deuda con menor saldo también tiene
+                          el mayor interés, o cuando el orden de pago coincide en ambas estrategias.
+                        </p>
+                      </div>
+                    </div>
 
+                    <div className={styles.metodoUnico}>
                       <div className={styles.metodoStats}>
                         <div className={styles.metodoStat}>
-                          <span className={styles.metodoStatLabel}>Tiempo para liquidar</span>
+                          <span className={styles.metodoStatLabel}>Tiempo para liquidar todas las deudas</span>
                           <span className={styles.metodoStatValor}>
-                            {Math.floor(metodo.mesesTotales / 12) > 0 && `${Math.floor(metodo.mesesTotales / 12)} años `}
-                            {metodo.mesesTotales % 12} meses
+                            {Math.floor(resultados.metodos[0].mesesTotales / 12) > 0 &&
+                              `${Math.floor(resultados.metodos[0].mesesTotales / 12)} años `}
+                            {resultados.metodos[0].mesesTotales % 12} meses
                           </span>
                         </div>
                         <div className={styles.metodoStat}>
-                          <span className={styles.metodoStatLabel}>Intereses totales</span>
-                          <span className={styles.metodoStatValor}>{formatCurrency(metodo.totalIntereses)}</span>
+                          <span className={styles.metodoStatLabel}>Intereses totales a pagar</span>
+                          <span className={styles.metodoStatValor}>
+                            {formatCurrency(resultados.metodos[0].totalIntereses)}
+                          </span>
                         </div>
                         <div className={styles.metodoStat}>
-                          <span className={styles.metodoStatLabel}>Ahorro vs solo mínimos</span>
+                          <span className={styles.metodoStatLabel}>Ahorro vs solo pagar mínimos</span>
                           <span className={styles.metodoStatValorPositivo}>
-                            -{formatCurrency(metodo.ahorroVsMinimo)}
+                            -{formatCurrency(resultados.metodos[0].ahorroVsMinimo)}
                           </span>
                         </div>
                       </div>
 
                       <div className={styles.ordenPago}>
-                        <span className={styles.ordenTitulo}>Orden de pago:</span>
+                        <span className={styles.ordenTitulo}>📋 Tu orden óptimo de pago:</span>
                         <ol className={styles.ordenLista}>
-                          {metodo.deudas.map((d) => (
+                          {resultados.metodos[0].deudas.map((d, index) => (
                             <li key={d.nombre}>
-                              {d.nombre} ({formatCurrency(d.saldoInicial)})
+                              <strong>{index + 1}.</strong> {d.nombre} ({formatCurrency(d.saldoInicial)})
+                              <span className={styles.ordenDetalle}>
+                                → Liquidada en {d.mesesParaPagar} meses
+                              </span>
                             </li>
                           ))}
                         </ol>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </>
+                ) : (
+                  /* Cuando hay diferencias, mostrar comparativa normal */
+                  <>
+                    <div className={styles.metodosGrid}>
+                      {resultados.metodos.map((metodo) => (
+                        <div
+                          key={metodo.nombre}
+                          className={`${styles.metodoCard} ${metodo.nombre === resultados.mejorMetodo ? styles.metodoGanador : ''}`}
+                        >
+                          {metodo.nombre === resultados.mejorMetodo && (
+                            <span className={styles.metodoTag}>✨ Recomendado</span>
+                          )}
+                          <h3 className={styles.metodoNombre}>
+                            {metodo.nombre === 'Bola de Nieve' ? '⚪' : '🏔️'} {metodo.nombre}
+                          </h3>
+                          <p className={styles.metodoDesc}>{metodo.descripcion}</p>
 
-                {resultados.diferencia > 10 && (
-                  <div className={styles.veredicto}>
-                    <span className={styles.veredictoIcono}>💡</span>
-                    <p>
-                      El método <strong>{resultados.mejorMetodo}</strong> te ahorra{' '}
-                      <strong>{formatCurrency(resultados.diferencia)}</strong> en intereses.
-                      {resultados.mejorMetodo === 'Bola de Nieve'
-                        ? ' Aunque matemáticamente es ligeramente peor, las victorias rápidas pueden motivarte más.'
-                        : ' Es la opción matemáticamente óptima.'}
-                    </p>
-                  </div>
-                )}
+                          <div className={styles.metodoStats}>
+                            <div className={styles.metodoStat}>
+                              <span className={styles.metodoStatLabel}>Tiempo para liquidar</span>
+                              <span className={styles.metodoStatValor}>
+                                {Math.floor(metodo.mesesTotales / 12) > 0 && `${Math.floor(metodo.mesesTotales / 12)} años `}
+                                {metodo.mesesTotales % 12} meses
+                              </span>
+                            </div>
+                            <div className={styles.metodoStat}>
+                              <span className={styles.metodoStatLabel}>Intereses totales</span>
+                              <span className={styles.metodoStatValor}>{formatCurrency(metodo.totalIntereses)}</span>
+                            </div>
+                            <div className={styles.metodoStat}>
+                              <span className={styles.metodoStatLabel}>Ahorro vs solo mínimos</span>
+                              <span className={styles.metodoStatValorPositivo}>
+                                -{formatCurrency(metodo.ahorroVsMinimo)}
+                              </span>
+                            </div>
+                          </div>
 
-                {resultados.diferencia <= 10 && (
-                  <div className={styles.veredicto}>
-                    <span className={styles.veredictoIcono}>🤝</span>
-                    <p>
-                      Ambos métodos son muy similares (diferencia de solo{' '}
-                      <strong>{formatCurrency(resultados.diferencia)}</strong>).
-                      Elige <strong>Bola de Nieve</strong> si prefieres victorias rápidas,
-                      o <strong>Avalancha</strong> si quieres optimizar al máximo.
-                    </p>
-                  </div>
+                          <div className={styles.ordenPago}>
+                            <span className={styles.ordenTitulo}>Orden de pago:</span>
+                            <ol className={styles.ordenLista}>
+                              {metodo.deudas.map((d) => (
+                                <li key={d.nombre}>
+                                  {d.nombre} ({formatCurrency(d.saldoInicial)})
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {resultados.diferencia > 10 && (
+                      <div className={styles.veredicto}>
+                        <span className={styles.veredictoIcono}>💡</span>
+                        <p>
+                          El método <strong>{resultados.mejorMetodo}</strong> te ahorra{' '}
+                          <strong>{formatCurrency(resultados.diferencia)}</strong> en intereses.
+                          {resultados.mejorMetodo === 'Bola de Nieve'
+                            ? ' Aunque matemáticamente es ligeramente peor, las victorias rápidas pueden motivarte más.'
+                            : ' Es la opción matemáticamente óptima.'}
+                        </p>
+                      </div>
+                    )}
+
+                    {resultados.diferencia <= 10 && (
+                      <div className={styles.veredicto}>
+                        <span className={styles.veredictoIcono}>🤝</span>
+                        <p>
+                          Ambos métodos son muy similares (diferencia de solo{' '}
+                          <strong>{formatCurrency(resultados.diferencia)}</strong>).
+                          Elige <strong>Bola de Nieve</strong> si prefieres victorias rápidas,
+                          o <strong>Avalancha</strong> si quieres optimizar al máximo.
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
               </section>
 
