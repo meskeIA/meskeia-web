@@ -4,20 +4,20 @@ import { Metadata } from 'next';
 // Configuración base del sitio
 export const siteConfig = {
   name: 'meskeIA',
-  title: 'meskeIA - Herramientas Web Gratuitas con Inteligencia Artificial',
+  title: 'meskeIA - Más de 200 Aplicaciones Web Gratuitas',
   description:
-    'Descubre 28 herramientas web gratuitas de calidad: calculadoras financieras avanzadas, conversores, utilidades y más. Todo en español, sin registro y completamente gratis.',
+    'Descubre más de 200 aplicaciones web gratuitas: calculadoras financieras, cursos educativos, herramientas de productividad, juegos y más. Todo en español, sin registro y completamente gratis.',
   url: 'https://meskeia.com',
   ogImage: 'https://meskeia.com/icon-512x512.png',
   author: 'meskeIA',
   keywords: [
-    'herramientas online',
+    'aplicaciones web',
     'calculadoras gratis',
-    'inteligencia artificial',
+    'cursos online',
     'utilidades web',
     'conversores online',
     'generadores',
-    'herramientas educativas',
+    'aplicaciones educativas',
     'productividad',
     'español',
     'sin registro',
@@ -215,11 +215,11 @@ export function generateLegalMetadata(
   });
 }
 
-// Metadata para página de herramientas
+// Metadata para página de aplicaciones
 export function generateToolsMetadata(): Metadata {
-  const title = 'Catálogo Completo de Herramientas';
+  const title = 'Catálogo Completo de Aplicaciones';
   const description =
-    'Explora nuestro catálogo de 28 herramientas web gratuitas de alta calidad organizadas por categorías: calculadoras financieras, conversores, utilidades y más. Todo en español.';
+    'Explora nuestro catálogo de más de 200 aplicaciones web gratuitas organizadas por categorías: calculadoras financieras, cursos, herramientas de productividad, juegos y más. Todo en español.';
 
   return generateBaseMetadata({
     title,
@@ -227,8 +227,8 @@ export function generateToolsMetadata(): Metadata {
     keywords: [
       ...siteConfig.keywords,
       'catálogo',
-      'herramientas completas',
-      'lista de herramientas',
+      'aplicaciones completas',
+      'lista de aplicaciones',
       'categorías',
     ],
     openGraph: {
