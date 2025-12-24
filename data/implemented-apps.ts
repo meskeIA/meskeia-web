@@ -36,6 +36,8 @@ export const implementedAppsUrls = [
   "/calculadora-fire/",               // Independencia financiera, retiro anticipado
   "/calculadora-alquiler-vs-compra/", // Análisis alquiler vs compra vivienda
   "/simulador-compraventa-inmueble/", // Gastos compraventa: ITP, notaría, registro, plusvalía
+  "/calculadora-coste-plazos/",       // Coste real financiación a plazos, TAE oculta
+  "/calculadora-deuda/",              // Método bola de nieve vs avalancha
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",

@@ -80,6 +80,8 @@ const finanzasPersonalesApps: RelatedApp[] = [
   { url: '/calculadora-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto ahorrar' },
   { url: '/calculadora-regla-50-30-20/', icon: '📊', name: 'Regla 50/30/20', description: 'Distribuye tu presupuesto' },
   { url: '/calculadora-fire/', icon: '🔥', name: 'Calculadora FIRE', description: 'Independencia financiera' },
+  { url: '/calculadora-coste-plazos/', icon: '💳', name: 'Coste Real a Plazos', description: 'TAE e intereses ocultos' },
+  { url: '/calculadora-deuda/', icon: '🎯', name: 'Calculadora de Deuda', description: 'Bola de nieve vs avalancha' },
 ];
 
 const fiscalApps: RelatedApp[] = [
@@ -423,6 +425,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-fondo-emergencia': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-fondo-emergencia/'),
   'calculadora-regla-50-30-20': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-regla-50-30-20/'),
   'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/calculadora-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
+  'calculadora-coste-plazos': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-coste-plazos/').slice(0, 4),
+  'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-deuda/').slice(0, 4),
 
   // SALUD
   'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/'),
