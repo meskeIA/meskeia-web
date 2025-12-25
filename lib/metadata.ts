@@ -43,6 +43,10 @@ export function generateBaseMetadata(overrides?: Partial<Metadata>): Metadata {
       address: false,
       telephone: false,
     },
+    // Canonical URL - Next.js lo genera automáticamente basado en metadataBase
+    alternates: {
+      canonical: './',
+    },
     openGraph: {
       type: 'website',
       locale: siteConfig.locale,
