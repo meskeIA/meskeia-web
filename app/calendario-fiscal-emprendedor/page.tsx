@@ -10,16 +10,27 @@ import { getRelatedApps } from '@/data/app-relations';
 type TipoContribuyente = 'autonomo' | 'sociedad' | 'ambos';
 type Trimestre = 1 | 2 | 3 | 4;
 
-interface ModeloFiscal {
+// Tipo de plazo trimestral
+type TipoPlazoTrimestral = 'dia20' | 'dia30' | 'dia20_4t_enero' | 'modelo202';
+
+// Tipo de plazo anual
+type TipoPlazoAnual = 'enero30' | 'enero31' | 'febrero28' | 'julio1' | 'julio25';
+
+interface ModeloFiscalConfig {
   id: string;
   nombre: string;
   descripcion: string;
   aplicaA: ('autonomo' | 'sociedad')[];
-  periodicidad: 'trimestral' | 'anual' | 'mensual';
-  fechasTrimestre: { [key: number]: string }; // Trimestre -> Fecha límite
-  fechaAnual?: string;
+  periodicidad: 'trimestral' | 'anual';
+  tipoPlazoTrimestral?: TipoPlazoTrimestral;
+  tipoPlazoAnual?: TipoPlazoAnual;
   icon: string;
   importante: boolean;
+}
+
+interface ModeloFiscal extends ModeloFiscalConfig {
+  fechasTrimestre: { [key: number]: string };
+  fechaAnual?: string;
 }
 
 interface FechaFiscal {
@@ -30,20 +41,170 @@ interface FechaFiscal {
   descripcionPeriodo: string;
 }
 
-// Base de datos de modelos fiscales 2025
-const MODELOS_FISCALES: ModeloFiscal[] = [
+// ============================================
+// FUNCIONES DE CÁLCULO DINÁMICO DE FECHAS
+// ============================================
+
+/**
+ * Festivos nacionales fijos en España (se repiten cada año)
+ * No incluimos festivos autonómicos/locales - el usuario debe verificar
+ */
+const FESTIVOS_NACIONALES_FIJOS = [
+  { mes: 0, dia: 1 },   // 1 enero - Año Nuevo
+  { mes: 0, dia: 6 },   // 6 enero - Reyes
+  { mes: 4, dia: 1 },   // 1 mayo - Día del Trabajo
+  { mes: 7, dia: 15 },  // 15 agosto - Asunción
+  { mes: 9, dia: 12 },  // 12 octubre - Fiesta Nacional
+  { mes: 10, dia: 1 },  // 1 noviembre - Todos los Santos
+  { mes: 11, dia: 6 },  // 6 diciembre - Constitución
+  { mes: 11, dia: 8 },  // 8 diciembre - Inmaculada
+  { mes: 11, dia: 25 }, // 25 diciembre - Navidad
+];
+
+/**
+ * Verifica si una fecha es fin de semana
+ */
+const esFinDeSemana = (fecha: Date): boolean => {
+  const dia = fecha.getDay();
+  return dia === 0 || dia === 6; // Domingo = 0, Sábado = 6
+};
+
+/**
+ * Verifica si una fecha es festivo nacional fijo
+ */
+const esFestivoNacional = (fecha: Date): boolean => {
+  return FESTIVOS_NACIONALES_FIJOS.some(
+    f => f.mes === fecha.getMonth() && f.dia === fecha.getDate()
+  );
+};
+
+/**
+ * Ajusta una fecha al siguiente día hábil si cae en fin de semana o festivo
+ */
+const ajustarADiaHabil = (fecha: Date): Date => {
+  const resultado = new Date(fecha);
+  while (esFinDeSemana(resultado) || esFestivoNacional(resultado)) {
+    resultado.setDate(resultado.getDate() + 1);
+  }
+  return resultado;
+};
+
+/**
+ * Calcula la fecha límite para un trimestre dado según el tipo de plazo
+ * @param anio - Año fiscal del trimestre
+ * @param trimestre - Número de trimestre (1-4)
+ * @param tipoPlazo - Tipo de plazo aplicable
+ */
+const calcularFechaTrimestre = (
+  anio: number,
+  trimestre: Trimestre,
+  tipoPlazo: TipoPlazoTrimestral
+): Date => {
+  let fecha: Date;
+
+  switch (tipoPlazo) {
+    case 'dia20':
+      // Día 20 del mes siguiente al trimestre
+      // 1T -> 20 abril, 2T -> 20 julio, 3T -> 20 octubre, 4T -> 20 enero (año+1)
+      const mesesDia20 = [3, 6, 9, 0]; // abril=3, julio=6, octubre=9, enero=0
+      const anioTrimestre = trimestre === 4 ? anio + 1 : anio;
+      fecha = new Date(anioTrimestre, mesesDia20[trimestre - 1], 20);
+      break;
+
+    case 'dia30':
+      // Día 30 del mes siguiente al trimestre
+      // 1T -> 30 abril, 2T -> 30 julio, 3T -> 30 octubre, 4T -> 30 enero (año+1)
+      const mesesDia30 = [3, 6, 9, 0];
+      const anioTrimestre30 = trimestre === 4 ? anio + 1 : anio;
+      fecha = new Date(anioTrimestre30, mesesDia30[trimestre - 1], 30);
+      break;
+
+    case 'dia20_4t_enero':
+      // Día 20 para 1T-3T, día 20 enero para 4T
+      if (trimestre === 4) {
+        fecha = new Date(anio + 1, 0, 20); // 20 enero año siguiente
+      } else {
+        const meses = [3, 6, 9];
+        fecha = new Date(anio, meses[trimestre - 1], 20);
+      }
+      break;
+
+    case 'modelo202':
+      // Modelo 202: Abril (20), Octubre (20), Diciembre (20)
+      // Solo tiene 3 plazos, no 4
+      const meses202 = [3, 9, 11]; // abril, octubre, diciembre
+      if (trimestre <= 3) {
+        fecha = new Date(anio, meses202[trimestre - 1], 20);
+      } else {
+        // El 4T del 202 no existe, devolvemos fecha inválida que se filtrará
+        fecha = new Date(NaN);
+      }
+      break;
+
+    default:
+      fecha = new Date(anio, 3, 20); // Por defecto abril 20
+  }
+
+  return ajustarADiaHabil(fecha);
+};
+
+/**
+ * Calcula la fecha límite para una declaración anual
+ * @param anioEjercicio - Año del ejercicio fiscal que se declara
+ * @param tipoPlazo - Tipo de plazo aplicable
+ */
+const calcularFechaAnual = (anioEjercicio: number, tipoPlazo: TipoPlazoAnual): Date => {
+  let fecha: Date;
+  const anioPresentacion = anioEjercicio + 1; // Se presenta al año siguiente
+
+  switch (tipoPlazo) {
+    case 'enero30':
+      fecha = new Date(anioPresentacion, 0, 30);
+      break;
+    case 'enero31':
+      fecha = new Date(anioPresentacion, 0, 31);
+      break;
+    case 'febrero28':
+      // Último día de febrero (puede ser 28 o 29 en bisiesto)
+      fecha = new Date(anioPresentacion, 2, 0); // Día 0 de marzo = último de febrero
+      break;
+    case 'julio1':
+      fecha = new Date(anioPresentacion, 6, 1);
+      break;
+    case 'julio25':
+      fecha = new Date(anioPresentacion, 6, 25);
+      break;
+    default:
+      fecha = new Date(anioPresentacion, 0, 30);
+  }
+
+  return ajustarADiaHabil(fecha);
+};
+
+/**
+ * Formato de fecha ISO (YYYY-MM-DD)
+ */
+const formatoISO = (fecha: Date): string => {
+  if (isNaN(fecha.getTime())) return '';
+  const anio = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return `${anio}-${mes}-${dia}`;
+};
+
+// ============================================
+// CONFIGURACIÓN DE MODELOS FISCALES
+// ============================================
+
+const MODELOS_CONFIG: ModeloFiscalConfig[] = [
+  // TRIMESTRALES
   {
     id: '303',
     nombre: 'Modelo 303',
     descripcion: 'Autoliquidación IVA trimestral',
     aplicaA: ['autonomo', 'sociedad'],
     periodicidad: 'trimestral',
-    fechasTrimestre: {
-      1: '2025-04-21', // 1T: hasta 20 abril (21 por festivo)
-      2: '2025-07-21', // 2T: hasta 20 julio
-      3: '2025-10-20', // 3T: hasta 20 octubre
-      4: '2026-01-30', // 4T: hasta 30 enero año siguiente
-    },
+    tipoPlazoTrimestral: 'dia30', // 1T-3T día 20, 4T día 30 enero
     icon: '📊',
     importante: true,
   },
@@ -53,12 +214,7 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Pago fraccionado IRPF (estimación directa)',
     aplicaA: ['autonomo'],
     periodicidad: 'trimestral',
-    fechasTrimestre: {
-      1: '2025-04-21',
-      2: '2025-07-21',
-      3: '2025-10-20',
-      4: '2026-01-30',
-    },
+    tipoPlazoTrimestral: 'dia20',
     icon: '💰',
     importante: true,
   },
@@ -68,12 +224,7 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Pago fraccionado IRPF (estimación objetiva/módulos)',
     aplicaA: ['autonomo'],
     periodicidad: 'trimestral',
-    fechasTrimestre: {
-      1: '2025-04-21',
-      2: '2025-07-21',
-      3: '2025-10-20',
-      4: '2026-01-30',
-    },
+    tipoPlazoTrimestral: 'dia20',
     icon: '📋',
     importante: false,
   },
@@ -83,12 +234,7 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Retenciones e ingresos a cuenta IRPF (trabajadores, profesionales)',
     aplicaA: ['autonomo', 'sociedad'],
     periodicidad: 'trimestral',
-    fechasTrimestre: {
-      1: '2025-04-21',
-      2: '2025-07-21',
-      3: '2025-10-20',
-      4: '2026-01-20',
-    },
+    tipoPlazoTrimestral: 'dia20_4t_enero',
     icon: '👥',
     importante: true,
   },
@@ -98,12 +244,7 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Retenciones por alquiler de inmuebles',
     aplicaA: ['autonomo', 'sociedad'],
     periodicidad: 'trimestral',
-    fechasTrimestre: {
-      1: '2025-04-21',
-      2: '2025-07-21',
-      3: '2025-10-20',
-      4: '2026-01-20',
-    },
+    tipoPlazoTrimestral: 'dia20_4t_enero',
     icon: '🏢',
     importante: false,
   },
@@ -113,12 +254,7 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Retenciones sobre rendimientos de capital mobiliario',
     aplicaA: ['sociedad'],
     periodicidad: 'trimestral',
-    fechasTrimestre: {
-      1: '2025-04-21',
-      2: '2025-07-21',
-      3: '2025-10-20',
-      4: '2026-01-20',
-    },
+    tipoPlazoTrimestral: 'dia20_4t_enero',
     icon: '📈',
     importante: false,
   },
@@ -128,11 +264,7 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Pago fraccionado Impuesto de Sociedades',
     aplicaA: ['sociedad'],
     periodicidad: 'trimestral',
-    fechasTrimestre: {
-      1: '2025-04-21', // Abril
-      2: '2025-10-20', // Octubre
-      3: '2025-12-22', // Diciembre
-    },
+    tipoPlazoTrimestral: 'modelo202',
     icon: '🏛️',
     importante: true,
   },
@@ -142,24 +274,18 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Declaración recapitulativa de operaciones intracomunitarias',
     aplicaA: ['autonomo', 'sociedad'],
     periodicidad: 'trimestral',
-    fechasTrimestre: {
-      1: '2025-04-21',
-      2: '2025-07-21',
-      3: '2025-10-20',
-      4: '2026-01-30',
-    },
+    tipoPlazoTrimestral: 'dia30',
     icon: '🇪🇺',
     importante: false,
   },
-  // Anuales
+  // ANUALES
   {
     id: '390',
     nombre: 'Modelo 390',
     descripcion: 'Resumen anual IVA',
     aplicaA: ['autonomo', 'sociedad'],
     periodicidad: 'anual',
-    fechasTrimestre: {},
-    fechaAnual: '2026-01-30',
+    tipoPlazoAnual: 'enero30',
     icon: '📊',
     importante: true,
   },
@@ -169,8 +295,7 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Resumen anual retenciones alquiler inmuebles',
     aplicaA: ['autonomo', 'sociedad'],
     periodicidad: 'anual',
-    fechasTrimestre: {},
-    fechaAnual: '2026-01-31',
+    tipoPlazoAnual: 'enero31',
     icon: '🏠',
     importante: false,
   },
@@ -180,8 +305,7 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Resumen anual retenciones trabajo y actividades profesionales',
     aplicaA: ['autonomo', 'sociedad'],
     periodicidad: 'anual',
-    fechasTrimestre: {},
-    fechaAnual: '2026-01-31',
+    tipoPlazoAnual: 'enero31',
     icon: '👥',
     importante: true,
   },
@@ -191,8 +315,7 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Declaración anual de operaciones con terceros (>3.005,06€)',
     aplicaA: ['autonomo', 'sociedad'],
     periodicidad: 'anual',
-    fechasTrimestre: {},
-    fechaAnual: '2025-02-28',
+    tipoPlazoAnual: 'febrero28',
     icon: '🤝',
     importante: true,
   },
@@ -202,8 +325,7 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Declaración anual de la Renta',
     aplicaA: ['autonomo'],
     periodicidad: 'anual',
-    fechasTrimestre: {},
-    fechaAnual: '2025-07-01',
+    tipoPlazoAnual: 'julio1',
     icon: '📝',
     importante: true,
   },
@@ -213,12 +335,40 @@ const MODELOS_FISCALES: ModeloFiscal[] = [
     descripcion: 'Impuesto sobre Sociedades anual',
     aplicaA: ['sociedad'],
     periodicidad: 'anual',
-    fechasTrimestre: {},
-    fechaAnual: '2025-07-25', // 25 días naturales tras 6 meses del cierre ejercicio
+    tipoPlazoAnual: 'julio25',
     icon: '🏛️',
     importante: true,
   },
 ];
+
+/**
+ * Genera los modelos fiscales con fechas calculadas dinámicamente para un año
+ */
+const generarModelosFiscales = (anioActual: number): ModeloFiscal[] => {
+  return MODELOS_CONFIG.map(config => {
+    const modelo: ModeloFiscal = {
+      ...config,
+      fechasTrimestre: {},
+      fechaAnual: undefined,
+    };
+
+    if (config.periodicidad === 'trimestral' && config.tipoPlazoTrimestral) {
+      // Generar fechas para cada trimestre
+      for (let t = 1; t <= 4; t++) {
+        const fecha = calcularFechaTrimestre(anioActual, t as Trimestre, config.tipoPlazoTrimestral);
+        if (!isNaN(fecha.getTime())) {
+          modelo.fechasTrimestre[t] = formatoISO(fecha);
+        }
+      }
+    } else if (config.periodicidad === 'anual' && config.tipoPlazoAnual) {
+      // Generar fecha anual (para el ejercicio del año anterior)
+      const fecha = calcularFechaAnual(anioActual - 1, config.tipoPlazoAnual);
+      modelo.fechaAnual = formatoISO(fecha);
+    }
+
+    return modelo;
+  });
+};
 
 // Nombres de los meses
 const MESES = [
@@ -262,13 +412,18 @@ export default function CalendarioFiscalPage() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ tipoContribuyente }));
   }, [tipoContribuyente]);
 
+  // Generar modelos fiscales con fechas dinámicas para el año actual
+  const modelosFiscales = useMemo(() => {
+    return generarModelosFiscales(anioActual);
+  }, [anioActual]);
+
   // Filtrar modelos según tipo de contribuyente
   const modelosFiltrados = useMemo(() => {
-    return MODELOS_FISCALES.filter(modelo => {
+    return modelosFiscales.filter(modelo => {
       if (tipoContribuyente === 'ambos') return true;
       return modelo.aplicaA.includes(tipoContribuyente);
     });
-  }, [tipoContribuyente]);
+  }, [tipoContribuyente, modelosFiscales]);
 
   // Generar fechas fiscales para el año
   const fechasFiscales = useMemo((): FechaFiscal[] => {
