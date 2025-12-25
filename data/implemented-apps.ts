@@ -43,6 +43,7 @@ export const implementedAppsUrls = [
   "/calendario-fiscal-emprendedor/",   // Calendario fiscal: fechas, modelos, estimador
   "/comparador-formas-juridicas/",     // Comparador: autónomo, SL, cooperativa, asociación, CB
   "/simulador-autonomo-vs-sl/",        // Comparativa fiscal autónomo vs SL
+  "/calculadora-cuota-autonomo/",      // Cuota autónomo por tramos 2025
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",

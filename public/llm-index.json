@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 219+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 220+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 219,
+  "total_tools": 220,
   "last_updated": "2025-12-25",
   "features": {
     "all_free": true,
@@ -21,7 +21,7 @@
       "name": "Fiscal y Herencias",
       "icon": "🏛️",
       "description": "Impuestos, herencias, donaciones y trámites fiscales",
-      "tool_count": 19
+      "tool_count": 20
     },
     {
       "id": "inmobiliaria",
@@ -42,7 +42,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 23
+      "tool_count": 24
     },
     {
       "id": "marketing",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 90
+      "tool_count": 91
     },
     {
       "id": "estudio",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 47
+      "tool_count": 48
     },
     {
       "id": "creando",
@@ -1637,6 +1637,32 @@
         "emprender"
       ],
       "icon": "📊"
+    },
+    {
+      "slug": "calculadora-cuota-autonomo",
+      "name": "Calculadora Cuota de Autónomo",
+      "url": "https://meskeia.com/calculadora-cuota-autonomo/",
+      "description": "Calcula tu cuota de autónomo según tus ingresos reales. Sistema de cotización por tramos 2025, tarifa plana, bonificaciones y simulador de pagos mensuales",
+      "suites": [
+        "fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "cuota autonomo",
+        "calculadora reta",
+        "cotizacion autonomos",
+        "tarifa plana",
+        "cuota seguridad social",
+        "autonomo ingresos reales",
+        "tramos cotizacion",
+        "base cotizacion",
+        "cuota minima autonomo"
+      ],
+      "icon": "💼"
     },
     {
       "slug": "calculadora-presupuestos",
