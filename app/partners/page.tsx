@@ -272,8 +272,8 @@ ${tools.map(tool => `    <a href="https://meskeia.com${tool.url}" target="_blank
             Si tu organización necesita herramientas específicas o una integración
             más profunda, podemos crear un kit a medida para ti.
           </p>
-          <a href="mailto:hola@meskeia.com" className={styles.contactButton}>
-            📧 Contactar: hola@meskeia.com
+          <a href="mailto:meskeia24@gmail.com" className={styles.contactButton}>
+            📧 Contactar: meskeia24@gmail.com
           </a>
         </div>
       </section>
