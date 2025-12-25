@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 215+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 216+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 215,
-  "last_updated": "2025-12-24",
+  "total_tools": 216,
+  "last_updated": "2025-12-25",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -21,7 +21,7 @@
       "name": "Fiscal y Herencias",
       "icon": "🏛️",
       "description": "Impuestos, herencias, donaciones y trámites fiscales",
-      "tool_count": 15
+      "tool_count": 16
     },
     {
       "id": "inmobiliaria",
@@ -42,7 +42,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 19
+      "tool_count": 20
     },
     {
       "id": "marketing",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 86
+      "tool_count": 87
     },
     {
       "id": "estudio",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 43
+      "tool_count": 44
     },
     {
       "id": "creando",
@@ -1516,6 +1516,36 @@
         "emprendedor"
       ],
       "icon": "🏢"
+    },
+    {
+      "slug": "asistente-alta-autonomo",
+      "name": "Asistente Alta Autónomo",
+      "url": "https://meskeia.com/asistente-alta-autonomo/",
+      "description": "Guía completa para darte de alta como autónomo en España. Checklist con todos los trámites, calculadora de cuota y tarifa plana, comparativa autónomo vs SL",
+      "suites": [
+        "fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "alta autonomo",
+        "autonomo",
+        "freelance",
+        "reta",
+        "tarifa plana",
+        "modelo 036",
+        "modelo 037",
+        "cuota autonomo",
+        "iae",
+        "epigrafe",
+        "hacienda",
+        "seguridad social",
+        "emprender"
+      ],
+      "icon": "💼"
     },
     {
       "slug": "calculadora-presupuestos",

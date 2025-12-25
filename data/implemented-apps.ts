@@ -39,6 +39,7 @@ export const implementedAppsUrls = [
   "/calculadora-coste-plazos/",       // Coste real financiación a plazos, TAE oculta
   "/calculadora-deuda/",              // Método bola de nieve vs avalancha
   "/asistente-constitucion-sociedad/", // Guía SL, SLU, SA con checklist y costes
+  "/asistente-alta-autonomo/",         // Guía alta autónomo: checklist, cuota, tarifa plana
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",
