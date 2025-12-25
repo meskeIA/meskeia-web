@@ -1,0 +1,498 @@
+/* Variables CSS - Paleta meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #333333;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  margin-top: 80px;
+  padding: var(--spacing-2xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Section Titles */
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-primary);
+}
+
+/* Benefits Section */
+.benefitsSection {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.benefitCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-xl);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.benefitCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.benefitIcon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.benefitCard h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.benefitCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Sector Selector */
+.selectorSection {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.sectorButtons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+.sectorButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sectorButton:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+
+.sectorButtonActive {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.sectorIcon {
+  font-size: 2rem;
+}
+
+.sectorName {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* Preview Section */
+.previewSection {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.previewContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+}
+
+.previewPanel,
+.codePanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+}
+
+.panelTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.previewBox {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Widget Preview */
+.widgetPreview {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  width: 100%;
+  max-width: 350px;
+}
+
+.widgetHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.widgetIcon {
+  font-size: 1.75rem;
+}
+
+.widgetTitle {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.widgetSubtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+.widgetGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.widgetLink {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.8rem;
+  text-align: center;
+  transition: background 0.2s ease;
+}
+
+.widgetLink:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.widgetFooter {
+  text-align: center;
+  margin-top: var(--spacing-md);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+}
+
+/* Code Panel */
+.codePanelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.copyButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.copyButton:hover {
+  background: #256a8a;
+}
+
+.codeBox {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.75rem;
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Tools Section */
+.toolsSection {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.toolsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+.toolCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.toolCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.toolName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-xs);
+  color: var(--primary);
+}
+
+.toolDescription {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* How It Works */
+.howItWorksSection {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.stepCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-xl);
+  text-align: center;
+  position: relative;
+}
+
+.stepNumber {
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 auto var(--spacing-md);
+}
+
+.stepCard h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.stepCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Contact Section */
+.contactSection {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.contactCard {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-2xl);
+  text-align: center;
+  color: white;
+}
+
+.contactCard h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-md);
+}
+
+.contactCard p {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0 0 var(--spacing-xl);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: var(--spacing-xl);
+  line-height: 1.6;
+}
+
+.contactButton {
+  display: inline-block;
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: white;
+  color: var(--primary);
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.contactButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .benefitsGrid,
+  .sectorButtons,
+  .toolsGrid,
+  .stepsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .previewContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: var(--spacing-xl);
+    margin-top: 70px;
+  }
+
+  .heroIcon {
+    font-size: 3rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .benefitsGrid,
+  .sectorButtons,
+  .toolsGrid,
+  .stepsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionTitle {
+    font-size: 1.35rem;
+  }
+
+  .widgetGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .codeBox {
+    font-size: 0.65rem;
+  }
+}
