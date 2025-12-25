@@ -41,6 +41,7 @@ export const implementedAppsUrls = [
   "/asistente-constitucion-sociedad/", // Guía SL, SLU, SA con checklist y costes
   "/asistente-alta-autonomo/",         // Guía alta autónomo: checklist, cuota, tarifa plana
   "/calendario-fiscal-emprendedor/",   // Calendario fiscal: fechas, modelos, estimador
+  "/comparador-formas-juridicas/",     // Comparador: autónomo, SL, cooperativa, asociación, CB
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",

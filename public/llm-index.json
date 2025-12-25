@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 217+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 218+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 217,
+  "total_tools": 218,
   "last_updated": "2025-12-25",
   "features": {
     "all_free": true,
@@ -21,7 +21,7 @@
       "name": "Fiscal y Herencias",
       "icon": "🏛️",
       "description": "Impuestos, herencias, donaciones y trámites fiscales",
-      "tool_count": 17
+      "tool_count": 18
     },
     {
       "id": "inmobiliaria",
@@ -42,7 +42,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 21
+      "tool_count": 22
     },
     {
       "id": "marketing",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 88
+      "tool_count": 89
     },
     {
       "id": "estudio",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 45
+      "tool_count": 46
     },
     {
       "id": "creando",
@@ -1578,6 +1578,37 @@
         "plazos tributarios"
       ],
       "icon": "📅"
+    },
+    {
+      "slug": "comparador-formas-juridicas",
+      "name": "Comparador de Formas Jurídicas",
+      "url": "https://meskeia.com/comparador-formas-juridicas/",
+      "description": "Compara autónomo, SL, SLU, cooperativa, asociación y comunidad de bienes. Tabla comparativa, test de recomendación y ficha detallada de cada forma jurídica",
+      "suites": [
+        "fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "formas juridicas",
+        "autonomo vs sl",
+        "comparador empresas",
+        "sociedad limitada",
+        "cooperativa",
+        "asociacion",
+        "comunidad de bienes",
+        "emprender",
+        "constituir empresa",
+        "responsabilidad limitada",
+        "capital social",
+        "fiscalidad autonomo",
+        "irpf",
+        "impuesto sociedades"
+      ],
+      "icon": "⚖️"
     },
     {
       "slug": "calculadora-presupuestos",
