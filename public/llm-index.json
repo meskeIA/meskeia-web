@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 216+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 217+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 216,
+  "total_tools": 217,
   "last_updated": "2025-12-25",
   "features": {
     "all_free": true,
@@ -21,7 +21,7 @@
       "name": "Fiscal y Herencias",
       "icon": "🏛️",
       "description": "Impuestos, herencias, donaciones y trámites fiscales",
-      "tool_count": 16
+      "tool_count": 17
     },
     {
       "id": "inmobiliaria",
@@ -42,7 +42,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 20
+      "tool_count": 21
     },
     {
       "id": "marketing",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 87
+      "tool_count": 88
     },
     {
       "id": "estudio",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 44
+      "tool_count": 45
     },
     {
       "id": "creando",
@@ -1546,6 +1546,38 @@
         "emprender"
       ],
       "icon": "💼"
+    },
+    {
+      "slug": "calendario-fiscal-emprendedor",
+      "name": "Calendario Fiscal del Emprendedor",
+      "url": "https://meskeia.com/calendario-fiscal-emprendedor/",
+      "description": "Calendario fiscal 2025 para autónomos y sociedades. Fechas límite de declaraciones, modelos tributarios (303, 130, 111, 200), recordatorios y estimador de pagos",
+      "suites": [
+        "fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "calendario fiscal",
+        "fechas declaraciones",
+        "modelo 303",
+        "modelo 130",
+        "modelo 111",
+        "modelo 200",
+        "iva trimestral",
+        "irpf",
+        "impuesto sociedades",
+        "autonomo",
+        "pyme",
+        "obligaciones fiscales",
+        "hacienda",
+        "aeat",
+        "plazos tributarios"
+      ],
+      "icon": "📅"
     },
     {
       "slug": "calculadora-presupuestos",

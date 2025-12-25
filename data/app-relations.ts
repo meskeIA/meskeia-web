@@ -216,6 +216,7 @@ const freelanceApps: RelatedApp[] = [
 const emprendimientoApps: RelatedApp[] = [
   { url: '/asistente-constitucion-sociedad/', icon: '🏢', name: 'Constituir Sociedad', description: 'SL, SLU o SA paso a paso' },
   { url: '/asistente-alta-autonomo/', icon: '💼', name: 'Alta Autónomo', description: 'Darse de alta paso a paso' },
+  { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Fechas y modelos tributarios' },
   { url: '/generador-nombres-empresa/', icon: '✨', name: 'Nombres Empresa', description: 'Ideas de nombres' },
   { url: '/generador-facturas/', icon: '🧾', name: 'Generador Facturas', description: 'Facturas profesionales' },
   { url: '/calculadora-presupuestos/', icon: '📋', name: 'Presupuestos', description: 'Propuestas a clientes' },
@@ -519,6 +520,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'generador-facturas': freelanceApps.filter(a => a.url !== '/generador-facturas/'),
   'asistente-constitucion-sociedad': emprendimientoApps.filter(a => a.url !== '/asistente-constitucion-sociedad/'),
   'asistente-alta-autonomo': emprendimientoApps.filter(a => a.url !== '/asistente-alta-autonomo/'),
+  'calendario-fiscal-emprendedor': emprendimientoApps.filter(a => a.url !== '/calendario-fiscal-emprendedor/'),
   'calculadora-break-even': [...freelanceApps.filter(a => a.url !== '/calculadora-break-even/').slice(0, 2), ...negociosApps.slice(0, 2)],
   'calculadora-roi-marketing': negociosApps.filter(a => a.url !== '/calculadora-roi-marketing/'),
   'planificador-cashflow': [...negociosApps.filter(a => a.url !== '/planificador-cashflow/').slice(0, 2), ...freelanceApps.slice(0, 2)],
@@ -773,6 +775,7 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'generador-facturas': { title: 'Gestiona tu negocio', icon: '💼' },
     'asistente-constitucion-sociedad': { title: 'Herramientas para emprendedores', icon: '🚀' },
     'asistente-alta-autonomo': { title: 'Herramientas para emprendedores', icon: '💼' },
+    'calendario-fiscal-emprendedor': { title: 'Gestión fiscal', icon: '📅' },
 
     // Matemáticas
     'algebra-ecuaciones': { title: 'Más matemáticas', icon: '📐' },
