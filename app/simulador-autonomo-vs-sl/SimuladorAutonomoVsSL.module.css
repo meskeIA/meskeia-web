@@ -1,0 +1,599 @@
+/* Simulador Autónomo vs SL - meskeIA */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Input Section */
+.inputSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.inputSection h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.inputGroup label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputWrapper input {
+  width: 100%;
+  padding: var(--spacing-md);
+  padding-right: 50px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  transition: all 0.3s ease;
+}
+
+.inputWrapper input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.inputSuffix {
+  position: absolute;
+  right: var(--spacing-md);
+  color: var(--text-muted);
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.inputHint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Resultado Principal */
+.resultadoPrincipal {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.resultadoPrincipal h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.recomendacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius);
+  color: white;
+}
+
+.recomendacionIcon {
+  font-size: 2.5rem;
+}
+
+.recomendacion h3 {
+  font-size: 1.5rem;
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.recomendacion p {
+  margin: 0;
+  opacity: 0.95;
+  font-size: 1.1rem;
+}
+
+/* Comparativa */
+.comparativa {
+  margin-bottom: var(--spacing-xl);
+}
+
+.comparativa > h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.comparativaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.columna {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.columnaHeader {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: white;
+}
+
+.columna:first-child .columnaHeader {
+  background: linear-gradient(135deg, #2E86AB 0%, #256a8a 100%);
+}
+
+.columna:last-child .columnaHeader {
+  background: linear-gradient(135deg, #48A9A6 0%, #3d908d 100%);
+}
+
+.columnaIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.columnaHeader h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.columnaBody {
+  padding: var(--spacing-lg);
+}
+
+.lineaDetalle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.lineaDetalle span:first-child {
+  color: var(--text-secondary);
+}
+
+.lineaDetalle span:last-child {
+  font-weight: 600;
+}
+
+.lineaDetalle.negativo span:last-child {
+  color: #dc3545;
+}
+
+.lineaSeparador {
+  height: 1px;
+  background: var(--border);
+  margin: var(--spacing-sm) 0;
+}
+
+.tipoMedio {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.totalImpuestos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: #fff3cd;
+  border-radius: var(--radius);
+  margin-top: var(--spacing-md);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.netoFinal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius);
+  margin-top: var(--spacing-md);
+  font-weight: 700;
+  color: white;
+  font-size: 1.1rem;
+}
+
+/* Resumen Visual */
+.resumenVisual {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.resumenVisual h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.barrasComparativa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.barraContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.barraLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.barraLabel span:first-child {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.barraLabel span:last-child {
+  color: var(--text-secondary);
+}
+
+.barraFondo {
+  height: 30px;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.barra {
+  height: 100%;
+  border-radius: var(--radius);
+  transition: width 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: var(--spacing-sm);
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+  min-width: 60px;
+}
+
+.barraContainer:first-child .barra {
+  background: linear-gradient(90deg, #2E86AB 0%, #256a8a 100%);
+}
+
+.barraContainer:last-child .barra {
+  background: linear-gradient(90deg, #48A9A6 0%, #3d908d 100%);
+}
+
+/* Punto de Equilibrio */
+.puntoEquilibrio {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.puntoEquilibrio h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.puntoEquilibrio p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.puntoEquilibrio strong {
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+/* Notas */
+.notas {
+  background: #e7f5ff;
+  border: 2px solid #74c0fc;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.notas h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.notas ul {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+.notas li {
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.5;
+}
+
+/* Disclaimer */
+.disclaimer {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.disclaimer h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.disclaimer p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Guide Section (Educational) */
+.guideSection {
+  padding: var(--spacing-lg) 0;
+}
+
+.guideSection h2 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  text-align: center;
+}
+
+.guideGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.guideCard {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.guideCard h4 {
+  font-size: 1.1rem;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-sm) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.guideCard p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.guideCard ul {
+  margin: var(--spacing-sm) 0 0 0;
+  padding-left: var(--spacing-lg);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.guideCard li {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Dark Mode */
+[data-theme='dark'] .inputWrapper input {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .inputWrapper input:focus {
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .totalImpuestos {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+}
+
+[data-theme='dark'] .notas {
+  background: rgba(116, 192, 252, 0.1);
+  border-color: rgba(116, 192, 252, 0.3);
+}
+
+[data-theme='dark'] .disclaimer {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+[data-theme='dark'] .guideCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .inputGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .guideGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 70px;
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+
+  .heroIcon {
+    font-size: 2.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .inputSection,
+  .resultadoPrincipal,
+  .comparativa,
+  .resumenVisual,
+  .puntoEquilibrio {
+    padding: var(--spacing-lg);
+  }
+
+  .recomendacion {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .recomendacionIcon {
+    font-size: 2rem;
+  }
+
+  .recomendacion h3 {
+    font-size: 1.3rem;
+  }
+
+  .columnaBody {
+    padding: var(--spacing-md);
+  }
+
+  .lineaDetalle {
+    font-size: 0.85rem;
+  }
+
+  .barra {
+    font-size: 0.75rem;
+    min-width: 50px;
+  }
+}
