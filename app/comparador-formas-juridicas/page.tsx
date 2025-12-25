@@ -7,7 +7,7 @@ import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
-type FormaJuridica = 'autonomo' | 'sl' | 'slu' | 'cooperativa' | 'asociacion' | 'cb';
+type FormaJuridica = 'autonomo' | 'sl' | 'cooperativa' | 'asociacion' | 'cb';
 
 interface CaracteristicaForma {
   id: FormaJuridica;
@@ -85,65 +85,13 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
   },
   {
     id: 'sl',
-    nombre: 'Sociedad Limitada (SL)',
-    nombreCorto: 'SL',
+    nombre: 'Sociedad Limitada (SL / SLU)',
+    nombreCorto: 'SL / SLU',
     icon: '🏢',
-    descripcion: 'Sociedad mercantil con responsabilidad limitada al capital aportado',
+    descripcion: 'Sociedad mercantil con responsabilidad limitada. Con 1 socio es SLU (Unipersonal)',
     capitalMinimo: 1,
-    capitalRecomendado: '3.000€ recomendado',
+    capitalRecomendado: '3.000€ recomendado (restricciones hasta alcanzarlo)',
     socios: { min: 1, max: null },
-    responsabilidad: 'limitada',
-    responsabilidadTexto: 'Limitada al capital social',
-    fiscalidad: 'Impuesto de Sociedades',
-    tipoImpuesto: 'IS',
-    tipoGravamen: '25% (23% pymes)',
-    cotizacionSS: 'Administradores en RETA o Régimen General',
-    tramitesAlta: [
-      'Certificación negativa de denominación',
-      'Apertura cuenta bancaria y depósito capital',
-      'Estatutos sociales',
-      'Escritura pública ante notario',
-      'Liquidación ITP/AJD',
-      'Inscripción en Registro Mercantil',
-      'Alta en Hacienda (CIF)',
-      'Alta en Seguridad Social',
-    ],
-    costesConstitucion: { min: 400, max: 1000 },
-    tiempoConstitucion: '2-4 semanas',
-    contabilidad: 'Contabilidad completa (Plan General Contable)',
-    ventajas: [
-      'Responsabilidad limitada al capital',
-      'Mayor credibilidad empresarial',
-      'Tipo fijo del IS (25%)',
-      'Facilidad para incorporar socios/inversores',
-      'Posibilidad de vender participaciones',
-      'Acceso a más financiación',
-    ],
-    desventajas: [
-      'Mayor coste de constitución',
-      'Contabilidad más compleja',
-      'Obligaciones formales (juntas, cuentas anuales)',
-      'Administrador cotiza en RETA obligatoriamente',
-      'Trámites más lentos',
-    ],
-    idealPara: [
-      'Negocios con riesgo patrimonial',
-      'Proyectos con varios socios',
-      'Empresas que buscan inversores',
-      'Negocios que contratan empleados',
-      'Facturación alta (>40.000€/año)',
-    ],
-    color: '#48A9A6',
-  },
-  {
-    id: 'slu',
-    nombre: 'Sociedad Limitada Unipersonal (SLU)',
-    nombreCorto: 'SLU',
-    icon: '🏛️',
-    descripcion: 'SL con un único socio, mismas características que la SL',
-    capitalMinimo: 1,
-    capitalRecomendado: '3.000€ recomendado',
-    socios: { min: 1, max: 1 },
     responsabilidad: 'limitada',
     responsabilidadTexto: 'Limitada al capital social',
     fiscalidad: 'Impuesto de Sociedades',
@@ -159,29 +107,37 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
       'Inscripción en Registro Mercantil',
       'Alta en Hacienda (CIF)',
       'Alta en Seguridad Social',
+      '(Si SLU: inscribir unipersonalidad)',
     ],
     costesConstitucion: { min: 400, max: 1000 },
     tiempoConstitucion: '2-4 semanas',
     contabilidad: 'Contabilidad completa (Plan General Contable)',
     ventajas: [
-      'Responsabilidad limitada siendo único socio',
-      'Mismas ventajas que la SL',
-      'Puedes convertirla en SL añadiendo socios',
-      'Separación patrimonio personal/empresarial',
+      'Responsabilidad limitada al capital',
+      'Mayor credibilidad empresarial',
+      'Tipo fijo del IS (25%)',
+      'Facilidad para incorporar socios/inversores',
+      'Posibilidad de vender participaciones',
+      'Acceso a más financiación',
+      'Con 1 socio: protege patrimonio personal (SLU)',
     ],
     desventajas: [
-      'Debe indicar "Unipersonal" en documentos',
-      'Mismos costes que una SL',
-      'Contabilidad compleja para una persona',
-      'Obligación de inscribir la unipersonalidad',
+      'Mayor coste de constitución',
+      'Contabilidad más compleja',
+      'Obligaciones formales (juntas, cuentas anuales)',
+      'Administrador cotiza en RETA obligatoriamente',
+      'Trámites más lentos',
+      'Con 1€ capital: restricciones hasta 3.000€',
     ],
     idealPara: [
-      'Emprendedores que quieren proteger su patrimonio',
-      'Freelancers con facturación alta',
-      'Negocios con riesgo de responsabilidad',
-      'Quien planea incorporar socios en el futuro',
+      'Negocios con riesgo patrimonial',
+      'Proyectos con varios socios',
+      'Empresas que buscan inversores',
+      'Negocios que contratan empleados',
+      'Facturación alta (>40.000€/año)',
+      'Emprendedores solos que quieren proteger patrimonio (SLU)',
     ],
-    color: '#7FB3D3',
+    color: '#48A9A6',
   },
   {
     id: 'cooperativa',
@@ -339,7 +295,7 @@ const CRITERIOS = [
 ];
 
 export default function ComparadorFormasJuridicasPage() {
-  // Estado
+  // Estado (5 formas jurídicas disponibles)
   const [formasSeleccionadas, setFormasSeleccionadas] = useState<FormaJuridica[]>(['autonomo', 'sl']);
   const [vistaActiva, setVistaActiva] = useState<'comparador' | 'detalle' | 'test'>('comparador');
   const [formaDetalle, setFormaDetalle] = useState<FormaJuridica | null>(null);
@@ -457,7 +413,6 @@ export default function ComparadorFormasJuridicasPage() {
     let puntos: { [key in FormaJuridica]: number } = {
       autonomo: 0,
       sl: 0,
-      slu: 0,
       cooperativa: 0,
       asociacion: 0,
       cb: 0,
@@ -466,7 +421,7 @@ export default function ComparadorFormasJuridicasPage() {
     // Evaluar respuestas
     if (respuestasTest.socios === '1') {
       puntos.autonomo += 3;
-      puntos.slu += 2;
+      puntos.sl += 2; // SL/SLU también válida para 1 socio
     } else if (respuestasTest.socios === '2') {
       puntos.cb += 2;
       puntos.sl += 2;
@@ -480,11 +435,9 @@ export default function ComparadorFormasJuridicasPage() {
       puntos.autonomo += 2;
       puntos.cb += 1;
     } else if (respuestasTest.riesgo === 'medio') {
-      puntos.sl += 2;
-      puntos.slu += 2;
-    } else {
       puntos.sl += 3;
-      puntos.slu += 3;
+    } else {
+      puntos.sl += 4;
       puntos.cooperativa += 2;
     }
 
@@ -493,18 +446,15 @@ export default function ComparadorFormasJuridicasPage() {
       puntos.asociacion += 1;
     } else if (respuestasTest.ingresos === 'medio') {
       puntos.autonomo += 1;
-      puntos.sl += 2;
-      puntos.slu += 2;
-    } else {
       puntos.sl += 3;
-      puntos.slu += 2;
+    } else {
+      puntos.sl += 4;
     }
 
     if (respuestasTest.inversion === 'si') {
       puntos.sl += 3;
     } else if (respuestasTest.inversion === 'quizas') {
-      puntos.sl += 1;
-      puntos.slu += 1;
+      puntos.sl += 2;
     } else {
       puntos.autonomo += 1;
     }
@@ -517,7 +467,6 @@ export default function ComparadorFormasJuridicasPage() {
     } else {
       puntos.autonomo += 1;
       puntos.sl += 1;
-      puntos.slu += 1;
     }
 
     // Ordenar por puntuación
