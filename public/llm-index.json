@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 226+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 227+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 226,
+  "total_tools": 227,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -63,7 +63,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 43
+      "tool_count": 44
     },
     {
       "id": "salud",
@@ -98,7 +98,7 @@
       "name": "Herramientas Técnicas",
       "icon": "🔧",
       "description": "Herramientas especializadas y técnicas",
-      "tool_count": 24
+      "tool_count": 25
     }
   ],
   "moments": [
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 94
+      "tool_count": 95
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 74
+      "tool_count": 75
     },
     {
       "id": "casa",
@@ -2418,6 +2418,33 @@
         "aprender programar"
       ],
       "icon": "📖"
+    },
+    {
+      "slug": "calculadora-sistemas-numericos",
+      "name": "Calculadora de Sistemas Numéricos",
+      "url": "https://meskeia.com/calculadora-sistemas-numericos/",
+      "description": "Convierte entre binario, octal, decimal y hexadecimal con explicación paso a paso. Operaciones bit a bit: AND, OR, XOR, NOT, shifts",
+      "suites": [
+        "estudiantes",
+        "tecnicas"
+      ],
+      "contexts": [
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "binario",
+        "hexadecimal",
+        "octal",
+        "decimal",
+        "base 2",
+        "base 16",
+        "sistemas numericos",
+        "conversion",
+        "bits",
+        "arquitectura computadores"
+      ],
+      "icon": "🔢"
     },
     {
       "slug": "calculadora-electricidad",
