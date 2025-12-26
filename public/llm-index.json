@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 230+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 231+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 230,
+  "total_tools": 231,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -63,7 +63,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 47
+      "tool_count": 48
     },
     {
       "id": "salud",
@@ -98,7 +98,7 @@
       "name": "Herramientas Técnicas",
       "icon": "🔧",
       "description": "Herramientas especializadas y técnicas",
-      "tool_count": 27
+      "tool_count": 28
     }
   ],
   "moments": [
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 78
+      "tool_count": 79
     },
     {
       "id": "casa",
@@ -5633,6 +5633,34 @@
         "arquitectura computadores",
         "representacion numerica",
         "universidad"
+      ],
+      "icon": "🔢"
+    },
+    {
+      "slug": "calculadora-algebra-booleana",
+      "name": "Calculadora de Álgebra Booleana",
+      "url": "https://meskeia.com/calculadora-algebra-booleana/",
+      "description": "Simplifica expresiones booleanas usando mapas de Karnaugh de 2, 3 y 4 variables. Genera tablas de verdad, obtén la forma mínima SOP/POS y visualiza las agrupaciones",
+      "suites": [
+        "estudiantes",
+        "tecnicas"
+      ],
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "algebra booleana",
+        "karnaugh",
+        "k-map",
+        "tabla de verdad",
+        "SOP",
+        "POS",
+        "minterminos",
+        "maxterminos",
+        "logica digital",
+        "circuitos digitales",
+        "universidad",
+        "ingenieria"
       ],
       "icon": "🔢"
     },

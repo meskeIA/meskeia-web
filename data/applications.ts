@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 204 aplicaciones organizadas por 12 Suites Temáticas + 7 Momentos
+ * Total: 205 aplicaciones organizadas por 12 Suites Temáticas + 7 Momentos
  * Actualizado: 2025-12-26
  *
  * CONVENCIÓN DE NOMBRES:
@@ -369,6 +369,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora de Subredes IP", suites: ["tecnicas", "estudiantes"], contexts: ["estudio", "trabajo"], icon: "🌐", description: "Calcula subredes IP: máscara de red, CIDR, broadcast, rango de hosts, IPs disponibles. Herramienta educativa para networking con explicaciones paso a paso", url: "/calculadora-subredes/", keywords: ["subred", "ip", "cidr", "mascara de red", "broadcast", "gateway", "hosts", "ipv4", "networking", "redes", "informatica", "universidad"] },
   { name: "Visualizador de Estructuras de Datos", suites: ["estudiantes", "diseno"], contexts: ["estudio"], icon: "📦", description: "Visualiza arrays, pilas (stacks), colas (queues), listas enlazadas y árboles BST con animaciones interactivas. Operaciones paso a paso para entender cada estructura", url: "/visualizador-estructuras-datos/", keywords: ["estructuras de datos", "array", "pila", "stack", "cola", "queue", "lista enlazada", "arbol binario", "BST", "push", "pop", "enqueue", "dequeue", "programacion", "algoritmos", "universidad"] },
   { name: "Conversor IEEE 754", suites: ["estudiantes", "tecnicas"], contexts: ["estudio"], icon: "🔢", description: "Convierte decimales a formato IEEE 754 (punto flotante) y viceversa. Visualiza signo, exponente y mantisa. Precisión simple (32 bits) y doble (64 bits)", url: "/conversor-ieee754/", keywords: ["IEEE 754", "punto flotante", "float", "double", "binario", "exponente", "mantisa", "32 bits", "64 bits", "arquitectura computadores", "representacion numerica", "universidad"] },
+  { name: "Calculadora de Álgebra Booleana", suites: ["estudiantes", "tecnicas"], contexts: ["estudio"], icon: "🔢", description: "Simplifica expresiones booleanas usando mapas de Karnaugh de 2, 3 y 4 variables. Genera tablas de verdad, obtén la forma mínima SOP/POS y visualiza las agrupaciones", url: "/calculadora-algebra-booleana/", keywords: ["algebra booleana", "karnaugh", "k-map", "tabla de verdad", "SOP", "POS", "minterminos", "maxterminos", "logica digital", "circuitos digitales", "universidad", "ingenieria"] },
 
   // ============================================
   // 14. Biomedicina y Ciencias de la Salud (2)

@@ -328,6 +328,7 @@ const informaticaApps: RelatedApp[] = [
   { url: '/calculadora-subredes/', icon: '🌐', name: 'Calculadora Subredes', description: 'CIDR, máscaras IP' },
   { url: '/visualizador-estructuras-datos/', icon: '📦', name: 'Estructuras de Datos', description: 'Arrays, pilas, colas, BST' },
   { url: '/conversor-ieee754/', icon: '🔢', name: 'Conversor IEEE 754', description: 'Punto flotante 32/64 bits' },
+  { url: '/calculadora-algebra-booleana/', icon: '🔢', name: 'Álgebra Booleana', description: 'Karnaugh, SOP, POS' },
   { url: '/validador-json/', icon: '🗂️', name: 'Validador JSON', description: 'Valida y formatea' },
   { url: '/validador-regex/', icon: '🔍', name: 'Validador Regex', description: 'Prueba expresiones' },
 ];
@@ -727,6 +728,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-subredes': informaticaApps.filter(a => a.url !== '/calculadora-subredes/'),
   'visualizador-estructuras-datos': informaticaApps.filter(a => a.url !== '/visualizador-estructuras-datos/'),
   'conversor-ieee754': informaticaApps.filter(a => a.url !== '/conversor-ieee754/'),
+  'calculadora-algebra-booleana': informaticaApps.filter(a => a.url !== '/calculadora-algebra-booleana/'),
 
   // BIOMEDICINA Y CIENCIAS DE LA SALUD
   'simulador-genetica': biomedicinaApps.filter(a => a.url !== '/simulador-genetica/'),

@@ -259,7 +259,7 @@ export const implementedAppsUrls = [
   "/instrumentos-musicales/",       // Guía de 45 instrumentos: cuerda, viento, percusión, teclado
   "/vitaminas-minerales/",          // Guía de 30 nutrientes: vitaminas y minerales esenciales
 
-  // Informática y Programación (8 implementadas)
+  // Informática y Programación (9 implementadas)
   "/visualizador-algoritmos/",      // Visualiza algoritmos de ordenación paso a paso
   "/playground-sql/",               // Editor SQL interactivo con ejercicios
   "/simulador-puertas-logicas/",    // Puertas lógicas, tablas de verdad, circuitos digitales
@@ -268,6 +268,7 @@ export const implementedAppsUrls = [
   "/calculadora-subredes/",         // Subredes IP: CIDR, máscara, broadcast, rango de hosts
   "/visualizador-estructuras-datos/", // Arrays, pilas, colas, listas enlazadas, árboles BST
   "/conversor-ieee754/",            // Decimal a IEEE 754: signo, exponente, mantisa (32/64 bits)
+  "/calculadora-algebra-booleana/", // Álgebra booleana: mapas de Karnaugh, SOP/POS, tablas de verdad
 
   // Biomedicina y Ciencias de la Salud (2 implementadas)
   "/simulador-genetica/",           // Simulador de genética mendeliana con Punnett

@@ -1,0 +1,680 @@
+/* Calculadora Álgebra Booleana - meskeIA */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin: 0;
+}
+
+/* Section Title */
+.sectionTitle {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--primary);
+}
+
+/* Config Section */
+.configSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.configRow {
+  display: flex;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-lg);
+}
+
+.configGroup {
+  flex: 1;
+  min-width: 250px;
+}
+
+.configLabel {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.variableSelector,
+.modeSelector {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.variableBtn,
+.modeBtn {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.variableBtn:hover,
+.modeBtn:hover {
+  border-color: var(--primary);
+}
+
+.variableBtnActive,
+.modeBtnActive {
+  background: var(--primary) !important;
+  color: white !important;
+  border-color: var(--primary) !important;
+}
+
+.variableNames,
+.modeDesc {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.examplesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.examplesLabel {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.exampleBtn {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.exampleBtn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Main Content */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Truth Table Section */
+.truthTableSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+}
+
+.hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.truthTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+.truthTable th,
+.truthTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.truthTable th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.truthTable tr:nth-child(even) {
+  background: var(--hover);
+}
+
+.rowNumber {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.outputCell {
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.outputCell:hover {
+  background: var(--hover);
+}
+
+.outputOne {
+  background: rgba(46, 204, 113, 0.2) !important;
+  color: #27ae60;
+}
+
+.outputZero {
+  color: var(--text-muted);
+}
+
+.outputX {
+  background: rgba(241, 196, 15, 0.2) !important;
+  color: #f39c12;
+}
+
+.outputHeader {
+  background: #27ae60 !important;
+}
+
+.activeRow {
+  background: rgba(46, 204, 113, 0.1) !important;
+}
+
+.legendRow {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legendZero {
+  background: var(--text-muted);
+}
+
+.legendOne {
+  background: #27ae60;
+}
+
+.legendX {
+  background: #f39c12;
+}
+
+/* Karnaugh Section */
+.karnaughSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+}
+
+.karnaughContainer {
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.karnaughMap {
+  border-collapse: collapse;
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+.karnaughMap th,
+.karnaughMap td {
+  min-width: 60px;
+  height: 60px;
+  text-align: center;
+  border: 2px solid var(--border);
+  font-weight: 600;
+}
+
+.karnaughMap th {
+  background: var(--primary);
+  color: white;
+}
+
+.cornerCell {
+  font-size: 0.85rem;
+}
+
+.karnaughCell {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.karnaughCell:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cellValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.cellIndex {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.cellOne {
+  color: #27ae60;
+}
+
+.cellZero {
+  color: var(--text-muted);
+}
+
+.cellX {
+  color: #f39c12;
+}
+
+/* Groups Legend */
+.groupsLegend {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+}
+
+.groupsLegend h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.groupsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.groupItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+.groupColor {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.groupTerm {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.groupCells {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Result Section */
+.resultSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.resultBox {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius);
+  padding: var(--spacing-xl);
+  color: white;
+  margin-bottom: var(--spacing-lg);
+}
+
+.resultExpression {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.resultInfo {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Steps Section */
+.stepsSection {
+  margin-top: var(--spacing-lg);
+}
+
+.stepsToggle {
+  width: 100%;
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.stepsToggle:hover {
+  background: var(--border);
+}
+
+.stepsContent {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.step {
+  padding: var(--spacing-md) 0;
+  color: var(--text-secondary);
+  border-bottom: 1px dashed var(--border);
+  white-space: pre-line;
+  line-height: 1.8;
+}
+
+.step:last-child {
+  border-bottom: none;
+}
+
+.step strong {
+  color: var(--primary);
+}
+
+/* Reference Section */
+.referenceSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.referenceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.referenceCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.referenceCard h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--primary);
+}
+
+.referenceCard ul {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+}
+
+.referenceCard li {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.referenceCard code {
+  font-family: 'Monaco', 'Consolas', monospace;
+  background: var(--hover);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--primary);
+}
+
+/* Guide Section */
+.guideSection h2 {
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.guideSection h3 {
+  color: var(--primary);
+  font-size: 1.2rem;
+  margin: var(--spacing-lg) 0 var(--spacing-sm) 0;
+}
+
+.guideSection p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-md);
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.contentCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.contentCard h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--primary);
+}
+
+.contentCard p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .configSection,
+[data-theme='dark'] .truthTableSection,
+[data-theme='dark'] .karnaughSection,
+[data-theme='dark'] .resultSection,
+[data-theme='dark'] .referenceSection {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .variableBtn,
+[data-theme='dark'] .modeBtn {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .exampleBtn {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .truthTable tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .activeRow {
+  background: rgba(46, 204, 113, 0.15) !important;
+}
+
+[data-theme='dark'] .groupsLegend {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .groupItem {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .stepsToggle {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .stepsContent {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .referenceCard {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .contentCard {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .referenceCard code {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .referenceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    padding: var(--spacing-xl) var(--spacing-md);
+    margin-top: 70px;
+  }
+
+  .heroIcon {
+    font-size: 2.5rem;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .configRow {
+    flex-direction: column;
+  }
+
+  .variableSelector,
+  .modeSelector {
+    flex-direction: column;
+  }
+
+  .examplesRow {
+    justify-content: center;
+  }
+
+  .karnaughMap th,
+  .karnaughMap td {
+    min-width: 50px;
+    height: 50px;
+  }
+
+  .cellValue {
+    font-size: 1.2rem;
+  }
+
+  .resultExpression {
+    font-size: 1.3rem;
+  }
+
+  .resultInfo {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+}
