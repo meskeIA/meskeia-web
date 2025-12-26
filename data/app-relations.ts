@@ -325,6 +325,7 @@ const informaticaApps: RelatedApp[] = [
   { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales' },
   { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: '100+ términos de código' },
   { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario, hex, octal' },
+  { url: '/calculadora-subredes/', icon: '🌐', name: 'Calculadora Subredes', description: 'CIDR, máscaras IP' },
   { url: '/validador-json/', icon: '📦', name: 'Validador JSON', description: 'Valida y formatea' },
   { url: '/validador-regex/', icon: '🔍', name: 'Validador Regex', description: 'Prueba expresiones' },
 ];
@@ -721,6 +722,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-puertas-logicas': informaticaApps.filter(a => a.url !== '/simulador-puertas-logicas/'),
   'glosario-programacion': informaticaApps.filter(a => a.url !== '/glosario-programacion/'),
   'calculadora-sistemas-numericos': informaticaApps.filter(a => a.url !== '/calculadora-sistemas-numericos/'),
+  'calculadora-subredes': informaticaApps.filter(a => a.url !== '/calculadora-subredes/'),
 
   // BIOMEDICINA Y CIENCIAS DE LA SALUD
   'simulador-genetica': biomedicinaApps.filter(a => a.url !== '/simulador-genetica/'),

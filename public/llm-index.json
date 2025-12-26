@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 227+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 228+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 227,
+  "total_tools": 228,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -63,7 +63,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 44
+      "tool_count": 45
     },
     {
       "id": "salud",
@@ -98,7 +98,7 @@
       "name": "Herramientas Técnicas",
       "icon": "🔧",
       "description": "Herramientas especializadas y técnicas",
-      "tool_count": 25
+      "tool_count": 26
     }
   ],
   "moments": [
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 95
+      "tool_count": 96
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 75
+      "tool_count": 76
     },
     {
       "id": "casa",
@@ -5546,6 +5546,35 @@
         "universidad"
       ],
       "icon": "🔌"
+    },
+    {
+      "slug": "calculadora-subredes",
+      "name": "Calculadora de Subredes IP",
+      "url": "https://meskeia.com/calculadora-subredes/",
+      "description": "Calcula subredes IP: máscara de red, CIDR, broadcast, rango de hosts, IPs disponibles. Herramienta educativa para networking con explicaciones paso a paso",
+      "suites": [
+        "tecnicas",
+        "estudiantes"
+      ],
+      "contexts": [
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "subred",
+        "ip",
+        "cidr",
+        "mascara de red",
+        "broadcast",
+        "gateway",
+        "hosts",
+        "ipv4",
+        "networking",
+        "redes",
+        "informatica",
+        "universidad"
+      ],
+      "icon": "🌐"
     },
     {
       "slug": "simulador-genetica-mendeliana",

@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 201 aplicaciones organizadas por 12 Suites Temáticas + 7 Momentos
+ * Total: 202 aplicaciones organizadas por 12 Suites Temáticas + 7 Momentos
  * Actualizado: 2025-12-26
  *
  * CONVENCIÓN DE NOMBRES:
@@ -361,11 +361,12 @@ export const applicationsDatabase: Application[] = [
   { name: "Vitaminas y Minerales", suites: ["salud", "cultura"], contexts: ["casa", "estudio"], icon: "🥗", description: "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso", url: "/vitaminas-minerales/", keywords: ["vitaminas", "minerales", "nutrientes", "b12", "vitamina d", "hierro", "calcio", "magnesio", "zinc", "nutricion", "deficiencia", "suplementos"] },
 
   // ============================================
-  // 13. Informática y Programación (3)
+  // 13. Informática y Programación (4)
   // ============================================
   { name: "Visualizador de Algoritmos", suites: ["diseno", "estudiantes"], contexts: ["estudio"], icon: "📊", description: "Visualiza paso a paso cómo funcionan los algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort con animaciones interactivas", url: "/visualizador-algoritmos/", keywords: ["algoritmos", "ordenacion", "bubble sort", "quick sort", "merge sort", "estructuras datos", "informatica", "programacion", "universidad"] },
   { name: "Playground SQL", suites: ["diseno", "estudiantes"], contexts: ["estudio", "trabajo"], icon: "🗃️", description: "Editor SQL interactivo en el navegador. Practica con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada", url: "/playground-sql/", keywords: ["sql", "base de datos", "select", "join", "group by", "sqlite", "consultas", "aprender sql", "ejercicios sql", "programacion", "universidad"] },
   { name: "Simulador de Puertas Lógicas", suites: ["diseno", "estudiantes"], contexts: ["estudio"], icon: "🔌", description: "Simula puertas lógicas (AND, OR, NOT, NAND, NOR, XOR, XNOR), genera tablas de verdad, prueba circuitos digitales y evalúa expresiones booleanas", url: "/simulador-puertas-logicas/", keywords: ["puertas logicas", "AND", "OR", "NOT", "NAND", "XOR", "tabla de verdad", "circuitos digitales", "electronica digital", "algebra booleana", "half adder", "full adder", "universidad"] },
+  { name: "Calculadora de Subredes IP", suites: ["tecnicas", "estudiantes"], contexts: ["estudio", "trabajo"], icon: "🌐", description: "Calcula subredes IP: máscara de red, CIDR, broadcast, rango de hosts, IPs disponibles. Herramienta educativa para networking con explicaciones paso a paso", url: "/calculadora-subredes/", keywords: ["subred", "ip", "cidr", "mascara de red", "broadcast", "gateway", "hosts", "ipv4", "networking", "redes", "informatica", "universidad"] },
 
   // ============================================
   // 14. Biomedicina y Ciencias de la Salud (2)
