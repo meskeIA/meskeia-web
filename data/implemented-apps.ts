@@ -44,6 +44,7 @@ export const implementedAppsUrls = [
   "/comparador-formas-juridicas/",     // Comparador: autónomo, SL, cooperativa, asociación, CB
   "/simulador-autonomo-vs-sl/",        // Comparativa fiscal autónomo vs SL
   "/calculadora-cuota-autonomo/",      // Cuota autónomo por tramos 2025
+  "/asistente-constitucion-asociacion/", // Constituir asociación sin ánimo de lucro
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",

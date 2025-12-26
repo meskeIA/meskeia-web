@@ -216,6 +216,7 @@ const freelanceApps: RelatedApp[] = [
 const emprendimientoApps: RelatedApp[] = [
   { url: '/asistente-constitucion-sociedad/', icon: '🏢', name: 'Constituir Sociedad', description: 'SL, SLU o SA paso a paso' },
   { url: '/asistente-alta-autonomo/', icon: '💼', name: 'Alta Autónomo', description: 'Darse de alta paso a paso' },
+  { url: '/asistente-constitucion-asociacion/', icon: '🤝', name: 'Constituir Asociación', description: 'ASL sin ánimo de lucro' },
   { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Fechas y modelos tributarios' },
   { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Formas Jurídicas', description: 'Autónomo vs SL vs Cooperativa' },
   { url: '/simulador-autonomo-vs-sl/', icon: '📊', name: 'Autónomo vs SL', description: 'Comparativa fiscal completa' },
@@ -523,6 +524,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'generador-facturas': freelanceApps.filter(a => a.url !== '/generador-facturas/'),
   'asistente-constitucion-sociedad': emprendimientoApps.filter(a => a.url !== '/asistente-constitucion-sociedad/'),
   'asistente-alta-autonomo': emprendimientoApps.filter(a => a.url !== '/asistente-alta-autonomo/'),
+  'asistente-constitucion-asociacion': emprendimientoApps.filter(a => a.url !== '/asistente-constitucion-asociacion/'),
   'calendario-fiscal-emprendedor': emprendimientoApps.filter(a => a.url !== '/calendario-fiscal-emprendedor/'),
   'comparador-formas-juridicas': emprendimientoApps.filter(a => a.url !== '/comparador-formas-juridicas/'),
   'simulador-autonomo-vs-sl': emprendimientoApps.filter(a => a.url !== '/simulador-autonomo-vs-sl/'),

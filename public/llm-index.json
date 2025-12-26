@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 220+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 221+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 220,
-  "last_updated": "2025-12-25",
+  "total_tools": 221,
+  "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -21,7 +21,7 @@
       "name": "Fiscal y Herencias",
       "icon": "🏛️",
       "description": "Impuestos, herencias, donaciones y trámites fiscales",
-      "tool_count": 20
+      "tool_count": 21
     },
     {
       "id": "inmobiliaria",
@@ -42,7 +42,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 24
+      "tool_count": 25
     },
     {
       "id": "marketing",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 91
+      "tool_count": 92
     },
     {
       "id": "estudio",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 48
+      "tool_count": 49
     },
     {
       "id": "creando",
@@ -1663,6 +1663,34 @@
         "cuota minima autonomo"
       ],
       "icon": "💼"
+    },
+    {
+      "slug": "asistente-constitucion-asociacion",
+      "name": "Asistente Constitución de Asociación",
+      "url": "https://meskeia.com/asistente-constitucion-asociacion/",
+      "description": "Guía paso a paso para constituir una asociación sin ánimo de lucro en España. Genera Acta Fundacional, Estatutos y documentos para el Registro de Asociaciones. Ley 49/2002",
+      "suites": [
+        "fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "constituir asociacion",
+        "asociacion sin animo lucro",
+        "acta fundacional",
+        "estatutos asociacion",
+        "registro asociaciones",
+        "ley 49/2002",
+        "ong",
+        "fundadores",
+        "junta directiva",
+        "asl",
+        "entidad no lucrativa"
+      ],
+      "icon": "🤝"
     },
     {
       "slug": "calculadora-presupuestos",
