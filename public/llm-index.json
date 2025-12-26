@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 221+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 222+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 221,
+  "total_tools": 222,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -70,7 +70,7 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 23
+      "tool_count": 24
     },
     {
       "id": "juegos",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 58
+      "tool_count": 59
     },
     {
       "id": "dinero",
@@ -4483,6 +4483,31 @@
         "actividad fisica"
       ],
       "icon": "🏥"
+    },
+    {
+      "slug": "calculadora-macros",
+      "name": "Calculadora de Macros",
+      "url": "https://meskeia.com/calculadora-macros/",
+      "description": "Calcula tus macronutrientes diarios (proteínas, carbohidratos, grasas) según tu objetivo: volumen, definición o mantenimiento",
+      "suites": [
+        "salud"
+      ],
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "macros",
+        "macronutrientes",
+        "proteinas",
+        "carbohidratos",
+        "grasas",
+        "dieta",
+        "fitness",
+        "volumen",
+        "definicion",
+        "nutricion"
+      ],
+      "icon": "🥗"
     },
     {
       "slug": "calculadora-hidratacion",

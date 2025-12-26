@@ -157,10 +157,11 @@ export const implementedAppsUrls = [
   "/generador-loteria/",        // Números para Primitiva, Euromillones, Bonoloto
   "/cara-o-cruz/",              // Lanza moneda con animación y estadísticas
 
-  // Salud y Bienestar (14 implementadas)
+  // Salud y Bienestar (15 implementadas)
   "/calculadora-imc/",
   "/calculadora-colesterol/",         // Colesterol: ratios, Friedewald, riesgo cardiovascular
   "/calculadora-calorias-ejercicio/",
+  "/calculadora-macros/",             // Macronutrientes: proteínas, carbos, grasas según objetivo
   "/calculadora-hidratacion/",
   "/calculadora-sueno/",
   "/seguimiento-habitos/",
