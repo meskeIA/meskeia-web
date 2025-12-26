@@ -441,6 +441,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/calculadora-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
   'calculadora-coste-plazos': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-coste-plazos/').slice(0, 4),
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-deuda/').slice(0, 4),
+  'comparador-vehiculos': [
+    { url: '/simulador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas de amortización' },
+    { url: '/calculadora-coste-plazos/', icon: '💳', name: 'Coste Real a Plazos', description: 'TAE e intereses ocultos' },
+    { url: '/simulador-gastos-deducibles/', icon: '✅', name: 'Gastos Deducibles', description: 'Para autónomos y empresas' },
+    { url: '/calculadora-tir-van/', icon: '📉', name: 'TIR y VAN', description: 'Análisis de inversiones' },
+  ],
 
   // SALUD
   'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/'),

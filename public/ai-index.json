@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 199,
+  "total_tools": 200,
   "updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -130,7 +130,8 @@
         { "name": "Simulador Compraventa Inmobiliaria", "slug": "simulador-compraventa-inmueble", "url": "https://meskeia.com/simulador-compraventa-inmueble/", "description": "Calcula gastos de compra/venta: ITP/IVA por comunidad, notaría, registro, plusvalía municipal" },
         { "name": "Calculadora Fondo de Emergencia", "slug": "calculadora-fondo-emergencia", "url": "https://meskeia.com/calculadora-fondo-emergencia/", "description": "Calcula cuánto dinero necesitas como fondo de emergencia según tu situación" },
         { "name": "Calculadora Regla 50/30/20", "slug": "calculadora-regla-50-30-20", "url": "https://meskeia.com/calculadora-regla-50-30-20/", "description": "Distribuye tus ingresos: 50% necesidades, 30% deseos, 20% ahorro" },
-        { "name": "Calculadora FIRE", "slug": "calculadora-fire", "url": "https://meskeia.com/calculadora-fire/", "description": "Calcula tu camino a la independencia financiera con la regla del 4%" }
+        { "name": "Calculadora FIRE", "slug": "calculadora-fire", "url": "https://meskeia.com/calculadora-fire/", "description": "Calcula tu camino a la independencia financiera con la regla del 4%" },
+        { "name": "Comparador Compra Vehículos", "slug": "comparador-vehiculos", "url": "https://meskeia.com/comparador-vehiculos/", "description": "Compara las 4 formas de adquirir un coche: contado, financiación, renting y leasing. Calcula el coste total real de cada opción" }
       ]
     },
     {

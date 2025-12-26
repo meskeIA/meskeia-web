@@ -38,6 +38,7 @@ export const implementedAppsUrls = [
   "/simulador-compraventa-inmueble/", // Gastos compraventa: ITP, notaría, registro, plusvalía
   "/calculadora-coste-plazos/",       // Coste real financiación a plazos, TAE oculta
   "/calculadora-deuda/",              // Método bola de nieve vs avalancha
+  "/comparador-vehiculos/",           // Comparador: contado vs financiación vs renting vs leasing
   "/asistente-constitucion-sociedad/", // Guía SL, SLU, SA con checklist y costes
   "/asistente-alta-autonomo/",         // Guía alta autónomo: checklist, cuota, tarifa plana
   "/calendario-fiscal-emprendedor/",   // Calendario fiscal: fechas, modelos, estimador

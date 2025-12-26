@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 222+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 223+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 222,
+  "total_tools": 223,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -28,14 +28,14 @@
       "name": "Inmobiliaria y Hogar",
       "icon": "🏘️",
       "description": "Hipotecas, alquiler y gestión del hogar",
-      "tool_count": 18
+      "tool_count": 19
     },
     {
       "id": "finanzas",
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 22
+      "tool_count": 23
     },
     {
       "id": "freelance",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 49
+      "tool_count": 50
     },
     {
       "id": "creando",
@@ -2249,6 +2249,30 @@
         "prestamos"
       ],
       "icon": "🎯"
+    },
+    {
+      "slug": "comparador-vehiculos",
+      "name": "Comparador Compra Vehículos",
+      "url": "https://meskeia.com/comparador-vehiculos/",
+      "description": "Compara las 4 formas de adquirir un coche: contado, financiación, renting y leasing. Calcula el coste total real de cada opción",
+      "suites": [
+        "finanzas",
+        "inmobiliaria"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "comprar coche",
+        "financiar coche",
+        "renting",
+        "leasing",
+        "contado",
+        "comparador vehiculos",
+        "coste coche",
+        "TAE coche"
+      ],
+      "icon": "🚗"
     },
     {
       "slug": "calculadora-movimiento",
