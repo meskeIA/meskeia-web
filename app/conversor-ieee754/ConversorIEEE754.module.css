@@ -1,0 +1,596 @@
+/* Conversor IEEE 754 - meskeIA */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin: 0;
+}
+
+/* Section Title */
+.sectionTitle {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--primary);
+}
+
+/* Config Section */
+.configSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.configRow {
+  display: flex;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.configGroup {
+  flex: 1;
+  min-width: 250px;
+}
+
+.configLabel {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.modeSelector,
+.precisionSelector {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.modeBtn,
+.precisionBtn {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modeBtn:hover,
+.precisionBtn:hover {
+  border-color: var(--primary);
+}
+
+.modeBtnActive,
+.precisionBtnActive {
+  background: var(--primary) !important;
+  color: white !important;
+  border-color: var(--primary) !important;
+}
+
+.precisionBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.precisionIcon {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+.precisionName {
+  font-size: 0.85rem;
+}
+
+/* Input Section */
+.inputSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.input {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: 1.2rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.inputHint {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: var(--spacing-sm);
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  align-items: center;
+}
+
+.examplesLabel {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.exampleBtn {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.exampleBtn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Results Section */
+.resultsSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Bits Visualization */
+.bitsVisualization {
+  margin-bottom: var(--spacing-xl);
+}
+
+.bitsRow {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+}
+
+.bitGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  min-width: 60px;
+}
+
+.signBit {
+  background: #e74c3c;
+  color: white;
+  flex: 0 0 60px;
+}
+
+.exponentBits {
+  background: #3498db;
+  color: white;
+  flex: 1;
+}
+
+.mantissaBits {
+  background: #2ecc71;
+  color: white;
+  flex: 2;
+}
+
+.bitLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: var(--spacing-xs);
+}
+
+.bitValue {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  word-break: break-all;
+  text-align: center;
+}
+
+.bitCount {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  margin-top: var(--spacing-xs);
+}
+
+/* Results Grid */
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.resultCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.resultHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.resultLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.copyBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  padding: 4px;
+}
+
+.copyBtn:hover {
+  opacity: 1;
+}
+
+.resultValue {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  word-break: break-all;
+}
+
+.resultNote {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: var(--spacing-xs);
+}
+
+/* Special values styling */
+.normal { color: var(--primary); }
+.denormalized { color: #f39c12; }
+.zero { color: var(--text-muted); }
+.infinity { color: #9b59b6; }
+.nan { color: #e74c3c; }
+
+/* Full Binary Section */
+.fullBinarySection {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.fullBinaryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.fullBinaryLabel {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fullBinaryValue {
+  display: block;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--hover);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  word-break: break-all;
+  text-align: center;
+}
+
+/* Steps Section */
+.stepsSection {
+  margin-top: var(--spacing-lg);
+}
+
+.stepsToggle {
+  width: 100%;
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.stepsToggle:hover {
+  background: var(--border);
+}
+
+.stepsContent {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 0.9rem;
+}
+
+.step {
+  padding: var(--spacing-xs) 0;
+  color: var(--text-secondary);
+  border-bottom: 1px dashed var(--border);
+}
+
+.step:last-child {
+  border-bottom: none;
+}
+
+/* Reference Table */
+.referenceSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.referenceTable {
+  overflow-x: auto;
+}
+
+.referenceTable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.referenceTable th,
+.referenceTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.referenceTable th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.referenceTable tr:nth-child(even) {
+  background: var(--hover);
+}
+
+.activeRow {
+  background: rgba(46, 134, 171, 0.15) !important;
+  font-weight: 600;
+}
+
+.referenceTable td {
+  color: var(--text-primary);
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+/* Info Section */
+.infoSection {
+  padding: var(--spacing-lg) 0;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.infoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.infoCard h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.infoCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.infoCard code {
+  display: block;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 0.85rem;
+  color: var(--primary);
+  background: var(--hover);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius);
+  white-space: pre-line;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .configSection,
+[data-theme='dark'] .inputSection,
+[data-theme='dark'] .resultsSection,
+[data-theme='dark'] .referenceSection {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .modeBtn,
+[data-theme='dark'] .precisionBtn {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .input {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .exampleBtn {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .resultCard {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .fullBinarySection {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .fullBinaryValue {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .stepsToggle {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .stepsContent {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .referenceTable tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .activeRow {
+  background: rgba(46, 134, 171, 0.25) !important;
+}
+
+[data-theme='dark'] .infoCard {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .infoCard code {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .resultsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    padding: var(--spacing-xl) var(--spacing-md);
+    margin-top: 70px;
+  }
+
+  .heroIcon {
+    font-size: 2.5rem;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .configRow {
+    flex-direction: column;
+  }
+
+  .modeSelector,
+  .precisionSelector {
+    flex-direction: column;
+  }
+
+  .bitsRow {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .bitGroup {
+    flex: 1 !important;
+  }
+
+  .resultsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .examples {
+    justify-content: center;
+  }
+}

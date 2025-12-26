@@ -1,6 +1,6 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 203 aplicaciones organizadas por 12 Suites Temáticas + 7 Momentos
+ * Total: 204 aplicaciones organizadas por 12 Suites Temáticas + 7 Momentos
  * Actualizado: 2025-12-26
  *
  * CONVENCIÓN DE NOMBRES:
@@ -361,13 +361,14 @@ export const applicationsDatabase: Application[] = [
   { name: "Vitaminas y Minerales", suites: ["salud", "cultura"], contexts: ["casa", "estudio"], icon: "🥗", description: "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso", url: "/vitaminas-minerales/", keywords: ["vitaminas", "minerales", "nutrientes", "b12", "vitamina d", "hierro", "calcio", "magnesio", "zinc", "nutricion", "deficiencia", "suplementos"] },
 
   // ============================================
-  // 13. Informática y Programación (5)
+  // 13. Informática y Programación (6)
   // ============================================
   { name: "Visualizador de Algoritmos", suites: ["diseno", "estudiantes"], contexts: ["estudio"], icon: "📊", description: "Visualiza paso a paso cómo funcionan los algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort con animaciones interactivas", url: "/visualizador-algoritmos/", keywords: ["algoritmos", "ordenacion", "bubble sort", "quick sort", "merge sort", "estructuras datos", "informatica", "programacion", "universidad"] },
   { name: "Playground SQL", suites: ["diseno", "estudiantes"], contexts: ["estudio", "trabajo"], icon: "🗃️", description: "Editor SQL interactivo en el navegador. Practica con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada", url: "/playground-sql/", keywords: ["sql", "base de datos", "select", "join", "group by", "sqlite", "consultas", "aprender sql", "ejercicios sql", "programacion", "universidad"] },
   { name: "Simulador de Puertas Lógicas", suites: ["diseno", "estudiantes"], contexts: ["estudio"], icon: "🔌", description: "Simula puertas lógicas (AND, OR, NOT, NAND, NOR, XOR, XNOR), genera tablas de verdad, prueba circuitos digitales y evalúa expresiones booleanas", url: "/simulador-puertas-logicas/", keywords: ["puertas logicas", "AND", "OR", "NOT", "NAND", "XOR", "tabla de verdad", "circuitos digitales", "electronica digital", "algebra booleana", "half adder", "full adder", "universidad"] },
   { name: "Calculadora de Subredes IP", suites: ["tecnicas", "estudiantes"], contexts: ["estudio", "trabajo"], icon: "🌐", description: "Calcula subredes IP: máscara de red, CIDR, broadcast, rango de hosts, IPs disponibles. Herramienta educativa para networking con explicaciones paso a paso", url: "/calculadora-subredes/", keywords: ["subred", "ip", "cidr", "mascara de red", "broadcast", "gateway", "hosts", "ipv4", "networking", "redes", "informatica", "universidad"] },
   { name: "Visualizador de Estructuras de Datos", suites: ["estudiantes", "diseno"], contexts: ["estudio"], icon: "📦", description: "Visualiza arrays, pilas (stacks), colas (queues), listas enlazadas y árboles BST con animaciones interactivas. Operaciones paso a paso para entender cada estructura", url: "/visualizador-estructuras-datos/", keywords: ["estructuras de datos", "array", "pila", "stack", "cola", "queue", "lista enlazada", "arbol binario", "BST", "push", "pop", "enqueue", "dequeue", "programacion", "algoritmos", "universidad"] },
+  { name: "Conversor IEEE 754", suites: ["estudiantes", "tecnicas"], contexts: ["estudio"], icon: "🔢", description: "Convierte decimales a formato IEEE 754 (punto flotante) y viceversa. Visualiza signo, exponente y mantisa. Precisión simple (32 bits) y doble (64 bits)", url: "/conversor-ieee754/", keywords: ["IEEE 754", "punto flotante", "float", "double", "binario", "exponente", "mantisa", "32 bits", "64 bits", "arquitectura computadores", "representacion numerica", "universidad"] },
 
   // ============================================
   // 14. Biomedicina y Ciencias de la Salud (2)

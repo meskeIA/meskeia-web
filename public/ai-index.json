@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 206,
+  "total_tools": 207,
   "updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -308,7 +308,8 @@
         { "name": "Glosario de Programación", "slug": "glosario-programacion", "url": "https://meskeia.com/glosario-programacion/", "description": "Diccionario de términos de desarrollo web con más de 100 conceptos: API, componente, hook, props, state. Filtro A-Z, búsqueda y categorías" },
         { "name": "Calculadora de Sistemas Numéricos", "slug": "calculadora-sistemas-numericos", "url": "https://meskeia.com/calculadora-sistemas-numericos/", "description": "Convierte entre binario, octal, decimal y hexadecimal con explicación paso a paso. Incluye operaciones bit a bit: AND, OR, XOR, NOT, shifts" },
         { "name": "Calculadora de Subredes IP", "slug": "calculadora-subredes", "url": "https://meskeia.com/calculadora-subredes/", "description": "Calcula subredes IP: máscara de red, CIDR, broadcast, rango de hosts. Incluye tabla de máscaras comunes y explicaciones de networking" },
-        { "name": "Visualizador de Estructuras de Datos", "slug": "visualizador-estructuras-datos", "url": "https://meskeia.com/visualizador-estructuras-datos/", "description": "Visualiza arrays, pilas, colas, listas enlazadas y árboles BST con animaciones interactivas. Operaciones paso a paso para entender cada estructura" }
+        { "name": "Visualizador de Estructuras de Datos", "slug": "visualizador-estructuras-datos", "url": "https://meskeia.com/visualizador-estructuras-datos/", "description": "Visualiza arrays, pilas, colas, listas enlazadas y árboles BST con animaciones interactivas. Operaciones paso a paso para entender cada estructura" },
+        { "name": "Conversor IEEE 754", "slug": "conversor-ieee754", "url": "https://meskeia.com/conversor-ieee754/", "description": "Convierte números decimales a formato IEEE 754 (punto flotante) en precisión simple (32 bits) y doble (64 bits). Visualiza signo, exponente y mantisa" }
       ]
     },
     {

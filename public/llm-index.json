@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 229+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 230+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 229,
+  "total_tools": 230,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -63,7 +63,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 46
+      "tool_count": 47
     },
     {
       "id": "salud",
@@ -98,7 +98,7 @@
       "name": "Herramientas Técnicas",
       "icon": "🔧",
       "description": "Herramientas especializadas y técnicas",
-      "tool_count": 26
+      "tool_count": 27
     }
   ],
   "moments": [
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 77
+      "tool_count": 78
     },
     {
       "id": "casa",
@@ -5607,6 +5607,34 @@
         "universidad"
       ],
       "icon": "📦"
+    },
+    {
+      "slug": "conversor-ieee754",
+      "name": "Conversor IEEE 754",
+      "url": "https://meskeia.com/conversor-ieee754/",
+      "description": "Convierte decimales a formato IEEE 754 (punto flotante) y viceversa. Visualiza signo, exponente y mantisa. Precisión simple (32 bits) y doble (64 bits)",
+      "suites": [
+        "estudiantes",
+        "tecnicas"
+      ],
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "IEEE 754",
+        "punto flotante",
+        "float",
+        "double",
+        "binario",
+        "exponente",
+        "mantisa",
+        "32 bits",
+        "64 bits",
+        "arquitectura computadores",
+        "representacion numerica",
+        "universidad"
+      ],
+      "icon": "🔢"
     },
     {
       "slug": "simulador-genetica-mendeliana",
