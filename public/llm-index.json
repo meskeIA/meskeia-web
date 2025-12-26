@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 231+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 232+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 231,
+  "total_tools": 232,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -21,7 +21,7 @@
       "name": "Fiscal y Herencias",
       "icon": "🏛️",
       "description": "Impuestos, herencias, donaciones y trámites fiscales",
-      "tool_count": 21
+      "tool_count": 22
     },
     {
       "id": "inmobiliaria",
@@ -42,7 +42,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 25
+      "tool_count": 26
     },
     {
       "id": "marketing",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 96
+      "tool_count": 97
     },
     {
       "id": "estudio",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 50
+      "tool_count": 51
     },
     {
       "id": "creando",
@@ -3061,6 +3061,32 @@
         "glosario legal"
       ],
       "icon": "📜"
+    },
+    {
+      "slug": "calculadora-sueldo-neto",
+      "name": "Calculadora Sueldo Neto",
+      "url": "https://meskeia.com/calculadora-sueldo-neto/",
+      "description": "Calcula tu sueldo neto a partir del bruto o viceversa. Incluye IRPF, Seguridad Social y deducciones actualizadas para España 2025",
+      "suites": [
+        "fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "sueldo neto",
+        "sueldo bruto",
+        "nomina",
+        "irpf",
+        "seguridad social",
+        "retenciones",
+        "salario",
+        "cotizaciones",
+        "pagas"
+      ],
+      "icon": "💶"
     },
     {
       "slug": "test-velocidad-escritura",

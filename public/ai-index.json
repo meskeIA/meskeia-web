@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 208,
+  "total_tools": 209,
   "updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -174,7 +174,8 @@
         { "name": "Calculadora de Herencias", "slug": "calculadora-herencias", "url": "https://meskeia.com/calculadora-herencias/", "description": "Reparto de herencia según derecho civil español: 8 regímenes forales (Código Civil, Cataluña, Aragón, Galicia, País Vasco, Navarra, Baleares)" },
         { "name": "Calculadora Plusvalías IRPF", "slug": "calculadora-plusvalias-irpf", "url": "https://meskeia.com/calculadora-plusvalias-irpf/", "description": "IRPF de plusvalías: acciones, fondos, cripto" },
         { "name": "Guía Tramitación Herencias", "slug": "guia-tramitacion-herencias", "url": "https://meskeia.com/guia-tramitacion-herencias/", "description": "Guía paso a paso: checklist documentos, orden gestiones, plazos y costes notaría/registro" },
-        { "name": "Herencias Paso a Paso", "slug": "herencias-paso-a-paso", "url": "https://meskeia.com/herencias-paso-a-paso/", "description": "Curso práctico de 9 capítulos para gestionar una herencia en España: primeros pasos, herederos, impuestos y trámites finales. Incluye glosario legal" }
+        { "name": "Herencias Paso a Paso", "slug": "herencias-paso-a-paso", "url": "https://meskeia.com/herencias-paso-a-paso/", "description": "Curso práctico de 9 capítulos para gestionar una herencia en España: primeros pasos, herederos, impuestos y trámites finales. Incluye glosario legal" },
+        { "name": "Calculadora Sueldo Neto", "slug": "calculadora-sueldo-neto", "url": "https://meskeia.com/calculadora-sueldo-neto/", "description": "Calcula tu sueldo neto a partir del bruto o viceversa. IRPF y Seguridad Social actualizados 2025" }
       ]
     },
     {

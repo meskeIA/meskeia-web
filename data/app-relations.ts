@@ -423,6 +423,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-herencias': herenciasApps.filter(a => a.url !== '/calculadora-herencias/'),
   'simulador-irpf': fiscalApps.filter(a => a.url !== '/simulador-irpf/'),
   'calculadora-plusvalias-irpf': fiscalApps.filter(a => a.url !== '/calculadora-plusvalias-irpf/'),
+  'calculadora-sueldo-neto': [
+    { url: '/simulador-irpf/', icon: '📋', name: 'Simulador IRPF', description: 'Calcula tu declaración' },
+    { url: '/calculadora-cuota-autonomo/', icon: '💼', name: 'Cuota Autónomo', description: 'Tramos cotización 2025' },
+    { url: '/simulador-gastos-deducibles/', icon: '✅', name: 'Gastos Deducibles', description: 'Para autónomos' },
+    { url: '/calculadora-tarifa-freelance/', icon: '💰', name: 'Tarifa Freelance', description: 'Calcula tu hora' },
+  ],
 
   // FINANZAS - INVERSIÓN
   'interes-compuesto': finanzasInversionApps.filter(a => a.url !== '/interes-compuesto/'),

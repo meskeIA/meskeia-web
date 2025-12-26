@@ -46,6 +46,7 @@ export const implementedAppsUrls = [
   "/simulador-autonomo-vs-sl/",        // Comparativa fiscal autónomo vs SL
   "/calculadora-cuota-autonomo/",      // Cuota autónomo por tramos 2025
   "/asistente-constitucion-asociacion/", // Constituir asociación sin ánimo de lucro
+  "/calculadora-sueldo-neto/",          // Sueldo bruto a neto y viceversa
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",
