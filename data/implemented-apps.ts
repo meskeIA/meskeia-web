@@ -259,10 +259,11 @@ export const implementedAppsUrls = [
   "/instrumentos-musicales/",       // Guía de 45 instrumentos: cuerda, viento, percusión, teclado
   "/vitaminas-minerales/",          // Guía de 30 nutrientes: vitaminas y minerales esenciales
 
-  // Informática y Programación (3 implementadas)
+  // Informática y Programación (4 implementadas)
   "/visualizador-algoritmos/",      // Visualiza algoritmos de ordenación paso a paso
   "/playground-sql/",               // Editor SQL interactivo con ejercicios
   "/simulador-puertas-logicas/",    // Puertas lógicas, tablas de verdad, circuitos digitales
+  "/glosario-programacion/",        // Diccionario términos programación: 100+ conceptos A-Z
 
   // Biomedicina y Ciencias de la Salud (2 implementadas)
   "/simulador-genetica/",           // Simulador de genética mendeliana con Punnett

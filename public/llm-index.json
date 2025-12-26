@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 225+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 226+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 225,
+  "total_tools": 226,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -63,7 +63,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 42
+      "tool_count": 43
     },
     {
       "id": "salud",
@@ -84,7 +84,7 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 38
+      "tool_count": 39
     },
     {
       "id": "productividad",
@@ -98,7 +98,7 @@
       "name": "Herramientas Técnicas",
       "icon": "🔧",
       "description": "Herramientas especializadas y técnicas",
-      "tool_count": 23
+      "tool_count": 24
     }
   ],
   "moments": [
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 93
+      "tool_count": 94
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 73
+      "tool_count": 74
     },
     {
       "id": "casa",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 51
+      "tool_count": 52
     },
     {
       "id": "relax",
@@ -2392,6 +2392,32 @@
         "quimica"
       ],
       "icon": "🧪"
+    },
+    {
+      "slug": "glosario-programacion",
+      "name": "Glosario de Programación",
+      "url": "https://meskeia.com/glosario-programacion/",
+      "description": "Diccionario de términos de desarrollo web con más de 100 conceptos: API, componente, hook, props, state y más. Filtro A-Z y búsqueda",
+      "suites": [
+        "estudiantes",
+        "tecnicas",
+        "cultura"
+      ],
+      "contexts": [
+        "estudio",
+        "trabajo",
+        "creando"
+      ],
+      "keywords": [
+        "glosario programacion",
+        "diccionario desarrollo",
+        "terminos javascript",
+        "vocabulario react",
+        "typescript",
+        "definiciones codigo",
+        "aprender programar"
+      ],
+      "icon": "📖"
     },
     {
       "slug": "calculadora-electricidad",

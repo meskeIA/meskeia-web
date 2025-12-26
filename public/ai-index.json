@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 202,
+  "total_tools": 203,
   "updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -304,7 +304,8 @@
       "tools": [
         { "name": "Visualizador de Algoritmos", "slug": "visualizador-algoritmos", "url": "https://meskeia.com/visualizador-algoritmos/", "description": "Visualiza paso a paso algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort" },
         { "name": "Playground SQL", "slug": "playground-sql", "url": "https://meskeia.com/playground-sql/", "description": "Editor SQL interactivo en el navegador. Practica con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada" },
-        { "name": "Simulador de Puertas Lógicas", "slug": "simulador-puertas-logicas", "url": "https://meskeia.com/simulador-puertas-logicas/", "description": "Simula puertas lógicas (AND, OR, NOT, NAND, XOR), genera tablas de verdad, prueba circuitos digitales y evalúa expresiones booleanas" }
+        { "name": "Simulador de Puertas Lógicas", "slug": "simulador-puertas-logicas", "url": "https://meskeia.com/simulador-puertas-logicas/", "description": "Simula puertas lógicas (AND, OR, NOT, NAND, XOR), genera tablas de verdad, prueba circuitos digitales y evalúa expresiones booleanas" },
+        { "name": "Glosario de Programación", "slug": "glosario-programacion", "url": "https://meskeia.com/glosario-programacion/", "description": "Diccionario de términos de desarrollo web con más de 100 conceptos: API, componente, hook, props, state. Filtro A-Z, búsqueda y categorías" }
       ]
     },
     {
