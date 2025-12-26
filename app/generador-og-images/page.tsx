@@ -57,6 +57,12 @@ interface OGDesign {
     size: number;
     visible: boolean;
   };
+  logo: {
+    imageUrl: string;
+    size: number;
+    position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
+    visible: boolean;
+  };
 }
 
 // Gradientes predefinidos
@@ -97,6 +103,7 @@ const TEMPLATES: { type: TemplateType; name: string; icon: string; design: OGDes
       branding: { text: '', fontSize: 24, color: '#FFFFFF', position: 'bottom-right', visible: false },
       badge: { text: '', bgColor: '#FF6B6B', textColor: '#FFFFFF', visible: false },
       icon: { emoji: '', size: 80, visible: false },
+      logo: { imageUrl: '', size: 100, position: 'bottom-right', visible: false },
     },
   },
   {
@@ -110,6 +117,7 @@ const TEMPLATES: { type: TemplateType; name: string; icon: string; design: OGDes
       branding: { text: 'miblog.com', fontSize: 24, color: '#FFFFFF', position: 'bottom-left', visible: true },
       badge: { text: 'NUEVO', bgColor: '#FF6B6B', textColor: '#FFFFFF', visible: true },
       icon: { emoji: '📰', size: 60, visible: true },
+      logo: { imageUrl: '', size: 80, position: 'top-left', visible: false },
     },
   },
   {
@@ -123,6 +131,7 @@ const TEMPLATES: { type: TemplateType; name: string; icon: string; design: OGDes
       branding: { text: 'miempresa.com', fontSize: 26, color: '#FFFFFF', position: 'bottom-right', visible: true },
       badge: { text: '-20%', bgColor: '#FFD200', textColor: '#1A1A1A', visible: true },
       icon: { emoji: '🚀', size: 70, visible: true },
+      logo: { imageUrl: '', size: 80, position: 'bottom-right', visible: false },
     },
   },
   {
@@ -136,6 +145,7 @@ const TEMPLATES: { type: TemplateType; name: string; icon: string; design: OGDes
       branding: { text: 'Inscríbete ahora', fontSize: 28, color: '#FFD200', position: 'bottom-center', visible: true },
       badge: { text: 'GRATIS', bgColor: '#10B981', textColor: '#FFFFFF', visible: true },
       icon: { emoji: '🎤', size: 70, visible: true },
+      logo: { imageUrl: '', size: 80, position: 'top-left', visible: false },
     },
   },
   {
@@ -149,6 +159,7 @@ const TEMPLATES: { type: TemplateType; name: string; icon: string; design: OGDes
       branding: { text: 'Más info →', fontSize: 26, color: '#FFFFFF', position: 'bottom-right', visible: true },
       badge: { text: '🔥 HOT', bgColor: '#1A1A1A', textColor: '#FFFFFF', visible: true },
       icon: { emoji: '📢', size: 80, visible: true },
+      logo: { imageUrl: '', size: 80, position: 'bottom-right', visible: false },
     },
   },
   {
@@ -162,6 +173,7 @@ const TEMPLATES: { type: TemplateType; name: string; icon: string; design: OGDes
       branding: { text: '@tuusuario', fontSize: 24, color: '#808080', position: 'bottom-right', visible: true },
       badge: { text: '', bgColor: '#FF6B6B', textColor: '#FFFFFF', visible: false },
       icon: { emoji: '💡', size: 50, visible: true },
+      logo: { imageUrl: '', size: 60, position: 'bottom-right', visible: false },
     },
   },
   {
@@ -175,6 +187,7 @@ const TEMPLATES: { type: TemplateType; name: string; icon: string; design: OGDes
       branding: { text: 'tutoriales.com', fontSize: 24, color: '#FFFFFF', position: 'bottom-left', visible: true },
       badge: { text: 'GUÍA', bgColor: '#10B981', textColor: '#FFFFFF', visible: true },
       icon: { emoji: '📖', size: 60, visible: true },
+      logo: { imageUrl: '', size: 80, position: 'top-left', visible: false },
     },
   },
   {
@@ -188,6 +201,7 @@ const TEMPLATES: { type: TemplateType; name: string; icon: string; design: OGDes
       branding: { text: 'Nombre del Podcast', fontSize: 26, color: '#FFFFFF', position: 'bottom-center', visible: true },
       badge: { text: 'EP. 42', bgColor: '#1A1A1A', textColor: '#FFFFFF', visible: true },
       icon: { emoji: '🎙️', size: 70, visible: true },
+      logo: { imageUrl: '', size: 80, position: 'top-left', visible: false },
     },
   },
 ];
@@ -198,12 +212,14 @@ const POPULAR_EMOJIS = ['🚀', '💡', '📢', '🔥', '⭐', '💰', '📝', '
 export default function GeneradorOGImagesPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Estado del diseño
   const [design, setDesign] = useState<OGDesign>(TEMPLATES[0].design);
-  const [activeTab, setActiveTab] = useState<'templates' | 'background' | 'title' | 'subtitle' | 'branding' | 'badge' | 'icon'>('templates');
+  const [activeTab, setActiveTab] = useState<'templates' | 'background' | 'title' | 'subtitle' | 'branding' | 'badge' | 'icon' | 'logo'>('templates');
   const [scale, setScale] = useState(1);
   const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
+  const [logoImage, setLogoImage] = useState<HTMLImageElement | null>(null);
 
   // Calcular escala para preview responsivo
   useEffect(() => {
@@ -227,6 +243,18 @@ export default function GeneradorOGImagesPage() {
       setBgImage(null);
     }
   }, [design.background.imageUrl, design.background.type]);
+
+  // Cargar imagen de logo cuando cambia
+  useEffect(() => {
+    if (design.logo.visible && design.logo.imageUrl) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => setLogoImage(img);
+      img.src = design.logo.imageUrl;
+    } else {
+      setLogoImage(null);
+    }
+  }, [design.logo.imageUrl, design.logo.visible]);
 
   // Dibujar canvas
   const drawCanvas = useCallback((ctx: CanvasRenderingContext2D, forExport = false) => {
@@ -384,7 +412,54 @@ export default function GeneradorOGImagesPage() {
       ctx.fillText(design.branding.text, brandingX, brandingY);
       ctx.restore();
     }
-  }, [design, bgImage]);
+
+    // Dibujar logo
+    if (design.logo.visible && logoImage) {
+      ctx.save();
+
+      // Calcular tamaño manteniendo proporción
+      const logoRatio = logoImage.width / logoImage.height;
+      let logoWidth = design.logo.size;
+      let logoHeight = design.logo.size / logoRatio;
+
+      // Si es más alto que ancho, ajustar
+      if (logoHeight > design.logo.size) {
+        logoHeight = design.logo.size;
+        logoWidth = design.logo.size * logoRatio;
+      }
+
+      // Calcular posición
+      const margin = 40;
+      let logoX: number;
+      let logoY: number;
+
+      switch (design.logo.position) {
+        case 'top-left':
+          logoX = margin;
+          logoY = margin;
+          break;
+        case 'top-right':
+          logoX = width - logoWidth - margin;
+          logoY = margin;
+          break;
+        case 'bottom-left':
+          logoX = margin;
+          logoY = height - logoHeight - margin;
+          break;
+        case 'bottom-right':
+          logoX = width - logoWidth - margin;
+          logoY = height - logoHeight - margin;
+          break;
+        case 'center':
+          logoX = (width - logoWidth) / 2;
+          logoY = (height - logoHeight) / 2;
+          break;
+      }
+
+      ctx.drawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+      ctx.restore();
+    }
+  }, [design, bgImage, logoImage]);
 
   // Función para dividir texto en líneas
   const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
@@ -493,6 +568,31 @@ export default function GeneradorOGImagesPage() {
     setDesign(prev => ({ ...prev, icon: { ...prev.icon, ...updates } }));
   };
 
+  const updateLogo = (updates: Partial<OGDesign['logo']>) => {
+    setDesign(prev => ({ ...prev, logo: { ...prev.logo, ...updates } }));
+  };
+
+  // Cargar imagen de logo
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      updateLogo({
+        imageUrl: event.target?.result as string,
+        visible: true,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Eliminar logo
+  const removeLogo = () => {
+    updateLogo({ imageUrl: '', visible: false });
+    setLogoImage(null);
+  };
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -517,6 +617,7 @@ export default function GeneradorOGImagesPage() {
               { id: 'branding', label: '🏷️ Marca' },
               { id: 'badge', label: '🏅 Badge' },
               { id: 'icon', label: '😀 Icono' },
+              { id: 'logo', label: '🖼️ Logo' },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -957,6 +1058,102 @@ export default function GeneradorOGImagesPage() {
                         className={styles.rangeInput}
                       />
                     </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Logo */}
+            {activeTab === 'logo' && (
+              <div className={styles.controlGroup}>
+                <p className={styles.logoDescription}>
+                  Sube tu logo o imagen de marca para añadirla a la imagen OG.
+                </p>
+
+                {!design.logo.imageUrl ? (
+                  <>
+                    <button
+                      className={styles.uploadBtn}
+                      onClick={() => logoInputRef.current?.click()}
+                    >
+                      🖼️ Subir logo
+                    </button>
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      style={{ display: 'none' }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.logoPreview}>
+                      <img src={design.logo.imageUrl} alt="Logo preview" />
+                      <button
+                        className={styles.removeLogoBtn}
+                        onClick={removeLogo}
+                        title="Eliminar logo"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <div className={styles.inputRow}>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={design.logo.visible}
+                          onChange={e => updateLogo({ visible: e.target.checked })}
+                        />
+                        Mostrar logo
+                      </label>
+                    </div>
+
+                    {design.logo.visible && (
+                      <>
+                        <div className={styles.inputRow}>
+                          <label>Tamaño: {design.logo.size}px</label>
+                          <input
+                            type="range"
+                            min="40"
+                            max="200"
+                            value={design.logo.size}
+                            onChange={e => updateLogo({ size: parseInt(e.target.value) })}
+                            className={styles.rangeInput}
+                          />
+                        </div>
+
+                        <div className={styles.inputRow}>
+                          <label>Posición:</label>
+                          <select
+                            value={design.logo.position}
+                            onChange={e => updateLogo({ position: e.target.value as typeof design.logo.position })}
+                            className={styles.select}
+                          >
+                            <option value="top-left">Arriba izquierda</option>
+                            <option value="top-right">Arriba derecha</option>
+                            <option value="bottom-left">Abajo izquierda</option>
+                            <option value="bottom-right">Abajo derecha</option>
+                            <option value="center">Centro</option>
+                          </select>
+                        </div>
+
+                        <button
+                          className={styles.changeLogoBtn}
+                          onClick={() => logoInputRef.current?.click()}
+                        >
+                          📷 Cambiar logo
+                        </button>
+                        <input
+                          ref={logoInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoUpload}
+                          style={{ display: 'none' }}
+                        />
+                      </>
+                    )}
                   </>
                 )}
               </div>
