@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 228+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 229+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 228,
+  "total_tools": 229,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -56,14 +56,14 @@
       "name": "Diseño y Desarrollo",
       "icon": "🎨",
       "description": "Herramientas para diseñadores y desarrolladores",
-      "tool_count": 25
+      "tool_count": 26
     },
     {
       "id": "estudiantes",
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 45
+      "tool_count": 46
     },
     {
       "id": "salud",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 76
+      "tool_count": 77
     },
     {
       "id": "casa",
@@ -5575,6 +5575,38 @@
         "universidad"
       ],
       "icon": "🌐"
+    },
+    {
+      "slug": "visualizador-estructuras-datos",
+      "name": "Visualizador de Estructuras de Datos",
+      "url": "https://meskeia.com/visualizador-estructuras-datos/",
+      "description": "Visualiza arrays, pilas (stacks), colas (queues), listas enlazadas y árboles BST con animaciones interactivas. Operaciones paso a paso para entender cada estructura",
+      "suites": [
+        "estudiantes",
+        "diseno"
+      ],
+      "contexts": [
+        "estudio"
+      ],
+      "keywords": [
+        "estructuras de datos",
+        "array",
+        "pila",
+        "stack",
+        "cola",
+        "queue",
+        "lista enlazada",
+        "arbol binario",
+        "BST",
+        "push",
+        "pop",
+        "enqueue",
+        "dequeue",
+        "programacion",
+        "algoritmos",
+        "universidad"
+      ],
+      "icon": "📦"
     },
     {
       "slug": "simulador-genetica-mendeliana",
