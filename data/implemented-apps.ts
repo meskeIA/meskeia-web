@@ -141,7 +141,7 @@ export const implementedAppsUrls = [
   "/generador-hashes/",         // MD5, SHA-256, SHA-512
   "/codificador-base64/",       // Base64, URL encode, Hexadecimal
 
-  // Juegos y Entretenimiento (14 implementadas)
+  // Juegos y Entretenimiento (15 implementadas)
   "/test-velocidad-escritura/",
   "/juego-piedra-papel-tijera/",
   "/juego-tres-en-raya/",
@@ -157,6 +157,7 @@ export const implementedAppsUrls = [
   "/ruleta-aleatoria/",         // Ruleta personalizable para sorteos
   "/generador-loteria/",        // Números para Primitiva, Euromillones, Bonoloto
   "/cara-o-cruz/",              // Lanza moneda con animación y estadísticas
+  "/tirador-dados/",            // Dados virtuales para rol y juegos de mesa
 
   // Salud y Bienestar (15 implementadas)
   "/calculadora-imc/",

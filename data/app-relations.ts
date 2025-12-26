@@ -303,6 +303,7 @@ const juegosCasualApps: RelatedApp[] = [
   { url: '/ruleta-aleatoria/', icon: '🎰', name: 'Ruleta', description: 'Sorteos' },
   { url: '/generador-loteria/', icon: '🎱', name: 'Lotería', description: 'Números aleatorios' },
   { url: '/cara-o-cruz/', icon: '🪙', name: 'Cara o Cruz', description: 'Lanza la moneda' },
+  { url: '/tirador-dados/', icon: '🎲', name: 'Tirador de Dados', description: 'Dados para rol y mesa' },
 ];
 
 // ==========================================
@@ -595,6 +596,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'ruleta-aleatoria': juegosCasualApps.filter(a => a.url !== '/ruleta-aleatoria/'),
   'generador-loteria': juegosCasualApps.filter(a => a.url !== '/generador-loteria/'),
   'cara-o-cruz': juegosCasualApps.filter(a => a.url !== '/cara-o-cruz/'),
+  'tirador-dados': juegosCasualApps.filter(a => a.url !== '/tirador-dados/'),
   'test-velocidad-escritura': [...productividadApps.slice(0, 2), ...juegosPuzzleApps.slice(0, 2)],
 
   // HERRAMIENTAS WEB
