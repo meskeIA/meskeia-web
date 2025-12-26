@@ -1,7 +1,7 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 200 aplicaciones organizadas por 12 Suites Temáticas + 7 Momentos
- * Actualizado: 2025-12-21
+ * Total: 201 aplicaciones organizadas por 12 Suites Temáticas + 7 Momentos
+ * Actualizado: 2025-12-26
  *
  * CONVENCIÓN DE NOMBRES:
  * - calculadora-: Apps que calculan/resuelven
@@ -237,7 +237,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Herencias Paso a Paso", suites: ["fiscal"], contexts: ["estudio", "dinero"], icon: "📜", description: "Curso práctico de 9 capítulos para gestionar una herencia en España: desde los primeros pasos hasta la escritura final. Incluye glosario legal y enlaces a calculadoras de impuestos", url: "/herencias-paso-a-paso/", keywords: ["herencia", "curso", "sucesion", "testamento", "herederos", "impuesto sucesiones", "plusvalia", "notario", "registro", "aceptar herencia", "renunciar herencia", "glosario legal"] },
 
   // ============================================
-  // 8. Juegos y Entretenimiento (12)
+  // 8. Juegos y Entretenimiento (13)
   // ============================================
   { name: "Test de Velocidad de Escritura", suites: ["juegos", "productividad"], contexts: ["relax", "trabajo", "estudio"], icon: "⌨️", description: "Mide tu velocidad de escritura en palabras por minuto (PPM) y mejora tu mecanografía con textos en español", url: "/test-velocidad-escritura/", keywords: ["mecanografia", "velocidad", "escritura", "ppm", "palabras por minuto", "typing test", "teclado"] },
   { name: "Radio meskeIA", suites: ["juegos"], contexts: ["relax", "casa", "trabajo"], icon: "📻", description: "Escucha miles de emisoras de radio de todo el mundo en vivo", url: "/radio-meskeia/", keywords: ["radio", "musica", "emisoras", "streaming", "noticias", "podcasts", "online"] },
@@ -254,6 +254,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Ruleta Aleatoria", suites: ["juegos"], contexts: ["relax", "trabajo", "curiosidad"], icon: "🎡", description: "Ruleta personalizable para sorteos, decisiones y selección al azar. Añade opciones, gira y elige ganador", url: "/ruleta-aleatoria/", keywords: ["ruleta", "sorteo", "aleatorio", "wheel of names", "decision", "elegir", "azar", "girar"] },
   { name: "Generador de Lotería", suites: ["juegos"], contexts: ["relax", "curiosidad"], icon: "🎲", description: "Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo y Lototurf. Combinaciones al azar y favoritos", url: "/generador-loteria/", keywords: ["loteria", "primitiva", "euromillones", "bonoloto", "numeros", "sorteo", "gordo", "suerte", "combinacion"] },
   { name: "Cara o Cruz", suites: ["juegos"], contexts: ["relax", "curiosidad"], icon: "🪙", description: "Lanza una moneda virtual con animación realista. Incluye historial de lanzamientos, estadísticas de probabilidad y visualización de la ley de grandes números", url: "/cara-o-cruz/", keywords: ["cara", "cruz", "moneda", "coin flip", "aleatorio", "probabilidad", "decision", "lanzar"] },
+  { name: "Tirador de Dados", suites: ["juegos"], contexts: ["relax"], icon: "🎲", description: "Lanza dados virtuales D4, D6, D8, D10, D12, D20 y D100 para D&D, Pathfinder y juegos de mesa. Historial, modificadores y suma automática", url: "/tirador-dados/", keywords: ["dados", "dice roller", "d20", "d6", "dungeons dragons", "pathfinder", "rol", "juegos mesa", "tirada"] },
 
   // ============================================
   // 9. Matemáticas y Estadística (13)

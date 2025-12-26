@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 224+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 225+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 224,
+  "total_tools": 225,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -77,7 +77,7 @@
       "name": "Juegos y Ocio",
       "icon": "🎲",
       "description": "Diversión y entretenimiento",
-      "tool_count": 17
+      "tool_count": 18
     },
     {
       "id": "cultura",
@@ -142,7 +142,7 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 18
+      "tool_count": 19
     },
     {
       "id": "curiosidad",
@@ -3338,6 +3338,30 @@
         "lanzar"
       ],
       "icon": "🪙"
+    },
+    {
+      "slug": "tirador-dados",
+      "name": "Tirador de Dados",
+      "url": "https://meskeia.com/tirador-dados/",
+      "description": "Lanza dados virtuales D4, D6, D8, D10, D12, D20 y D100 para D&D, Pathfinder y juegos de mesa. Historial, modificadores y suma automática",
+      "suites": [
+        "juegos"
+      ],
+      "contexts": [
+        "relax"
+      ],
+      "keywords": [
+        "dados",
+        "dice roller",
+        "d20",
+        "d6",
+        "dungeons dragons",
+        "pathfinder",
+        "rol",
+        "juegos mesa",
+        "tirada"
+      ],
+      "icon": "🎲"
     },
     {
       "slug": "calculadora-probabilidad",
