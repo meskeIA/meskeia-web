@@ -524,6 +524,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'generador-tipografias': disenoExtraApps.filter(a => a.url !== '/generador-tipografias/'),
   'calculadora-aspectos': [...disenoExtraApps.filter(a => a.url !== '/calculadora-aspectos/').slice(0, 2), ...imagenesApps.slice(0, 2)],
   'creador-thumbnails': [...imagenesApps.slice(0, 2), ...disenoColoresApps.slice(0, 2)],
+  'generador-og-images': [
+    { url: '/creador-thumbnails/', icon: '🎬', name: 'Creador Thumbnails', description: 'Miniaturas para YouTube' },
+    { url: '/generador-schema-markup/', icon: '🏷️', name: 'Schema Markup', description: 'Datos estructurados SEO' },
+    { url: '/analizador-titulos-seo/', icon: '🎯', name: 'Analizador Títulos', description: 'Optimiza títulos SEO' },
+    { url: '/generador-meta-descripciones/', icon: '📝', name: 'Meta Descripciones', description: 'Para Google' },
+  ],
 
   // FREELANCE Y NEGOCIOS
   'calculadora-tarifa-freelance': freelanceApps.filter(a => a.url !== '/calculadora-tarifa-freelance/'),

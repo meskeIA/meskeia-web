@@ -198,6 +198,7 @@ export const implementedAppsUrls = [
   "/creador-paletas/",
   "/generador-tipografias/",
   "/creador-thumbnails/",           // Creador de thumbnails para YouTube
+  "/generador-og-images/",          // Imágenes OG para redes sociales 1200x630
 
   // Emprendimiento y Negocios (8 implementadas)
   "/calculadora-tarifa-freelance/",

@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 200,
+  "total_tools": 201,
   "updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -77,7 +77,8 @@
         { "name": "Generador de Enlaces UTM", "slug": "generador-utm", "url": "https://meskeia.com/generador-utm/", "description": "Genera enlaces UTM para Google Analytics" },
         { "name": "Creador de Thumbnails YouTube", "slug": "creador-thumbnails", "url": "https://meskeia.com/creador-thumbnails/", "description": "Diseña miniaturas profesionales para YouTube con texto, imágenes, formas y exportación PNG 1280x720" },
         { "name": "Editor EXIF", "slug": "editor-exif", "url": "https://meskeia.com/editor-exif/", "description": "Visualiza y elimina metadatos EXIF de tus fotos: GPS, cámara, fecha, dispositivo. Protege tu privacidad" },
-        { "name": "Generador de Avatares", "slug": "generador-avatares", "url": "https://meskeia.com/generador-avatares/", "description": "Genera avatares únicos desde tu nombre. 8 estilos, descarga PNG, 100% privado" }
+        { "name": "Generador de Avatares", "slug": "generador-avatares", "url": "https://meskeia.com/generador-avatares/", "description": "Genera avatares únicos desde tu nombre. 8 estilos, descarga PNG, 100% privado" },
+        { "name": "Generador Imágenes OG", "slug": "generador-og-images", "url": "https://meskeia.com/generador-og-images/", "description": "Crea imágenes Open Graph profesionales 1200x630 para Facebook, Twitter, LinkedIn y WhatsApp. Plantillas, editor visual y exportación PNG" }
       ]
     },
     {

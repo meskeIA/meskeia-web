@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 223+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 224+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 223,
+  "total_tools": 224,
   "last_updated": "2025-12-26",
   "features": {
     "all_free": true,
@@ -49,14 +49,14 @@
       "name": "Marketing y Contenido",
       "icon": "📢",
       "description": "SEO, redes sociales y creación de contenido",
-      "tool_count": 24
+      "tool_count": 25
     },
     {
       "id": "diseno",
       "name": "Diseño y Desarrollo",
       "icon": "🎨",
       "description": "Herramientas para diseñadores y desarrolladores",
-      "tool_count": 24
+      "tool_count": 25
     },
     {
       "id": "estudiantes",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 92
+      "tool_count": 93
     },
     {
       "id": "estudio",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 50
+      "tool_count": 51
     },
     {
       "id": "relax",
@@ -872,6 +872,33 @@
         "videos"
       ],
       "icon": "🎬"
+    },
+    {
+      "slug": "generador-og-images",
+      "name": "Generador Imágenes OG",
+      "url": "https://meskeia.com/generador-og-images/",
+      "description": "Crea imágenes Open Graph profesionales para Facebook, Twitter, LinkedIn y WhatsApp. Plantillas, editor visual, 1200x630 px",
+      "suites": [
+        "marketing",
+        "diseno"
+      ],
+      "contexts": [
+        "creando",
+        "trabajo"
+      ],
+      "keywords": [
+        "og image",
+        "open graph",
+        "meta tags",
+        "facebook",
+        "twitter",
+        "linkedin",
+        "whatsapp",
+        "preview",
+        "social media",
+        "redes sociales"
+      ],
+      "icon": "🖼️"
     },
     {
       "slug": "validador-json",
