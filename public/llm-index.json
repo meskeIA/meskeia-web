@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 232+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 233+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 232,
-  "last_updated": "2025-12-26",
+  "total_tools": 233,
+  "last_updated": "2025-12-27",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -28,14 +28,14 @@
       "name": "Inmobiliaria y Hogar",
       "icon": "🏘️",
       "description": "Hipotecas, alquiler y gestión del hogar",
-      "tool_count": 19
+      "tool_count": 20
     },
     {
       "id": "finanzas",
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 23
+      "tool_count": 24
     },
     {
       "id": "freelance",
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 59
+      "tool_count": 60
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 51
+      "tool_count": 52
     },
     {
       "id": "creando",
@@ -3087,6 +3087,33 @@
         "pagas"
       ],
       "icon": "💶"
+    },
+    {
+      "slug": "calculadora-coste-vivienda",
+      "name": "Calculadora Coste Vivienda",
+      "url": "https://meskeia.com/calculadora-coste-vivienda/",
+      "description": "Calcula el coste real mensual de mantener una vivienda: hipoteca, IBI, comunidad, seguros, suministros y mantenimiento. Ideal para segundas residencias y viviendas heredadas",
+      "suites": [
+        "inmobiliaria",
+        "finanzas"
+      ],
+      "contexts": [
+        "casa",
+        "dinero"
+      ],
+      "keywords": [
+        "coste vivienda",
+        "gastos vivienda",
+        "mantenimiento casa",
+        "IBI",
+        "comunidad propietarios",
+        "seguro hogar",
+        "segunda residencia",
+        "vivienda vacaciones",
+        "gastos fijos",
+        "coste inmueble"
+      ],
+      "icon": "🏠"
     },
     {
       "slug": "test-velocidad-escritura",

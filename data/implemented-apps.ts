@@ -47,6 +47,7 @@ export const implementedAppsUrls = [
   "/calculadora-cuota-autonomo/",      // Cuota autónomo por tramos 2025
   "/asistente-constitucion-asociacion/", // Constituir asociación sin ánimo de lucro
   "/calculadora-sueldo-neto/",          // Sueldo bruto a neto y viceversa
+  "/calculadora-coste-vivienda/",       // Coste real mensual de mantener vivienda
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",

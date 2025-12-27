@@ -443,6 +443,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-prestamos': finanzasHipotecaApps.filter(a => a.url !== '/simulador-prestamos/'),
   'calculadora-alquiler-vs-compra': finanzasHipotecaApps.filter(a => a.url !== '/calculadora-alquiler-vs-compra/'),
   'simulador-compraventa-inmueble': finanzasHipotecaApps.filter(a => a.url !== '/simulador-compraventa-inmueble/'),
+  'calculadora-coste-vivienda': [
+    { url: '/simulador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/calculadora-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Compara opciones' },
+    { url: '/simulador-compraventa-inmueble/', icon: '🏠', name: 'Compraventa Inmueble', description: 'Gastos e impuestos' },
+    { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Coste de electrodomésticos' },
+  ],
 
   // FINANZAS - PERSONALES
   'control-gastos': finanzasPersonalesApps.filter(a => a.url !== '/control-gastos/'),
