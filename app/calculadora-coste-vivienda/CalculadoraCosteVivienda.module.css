@@ -76,45 +76,46 @@
   margin-bottom: var(--spacing-md);
 }
 
-/* Tipo de vivienda */
-.tipoGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-sm);
+/* Botones */
+.buttonGroup {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
 }
 
-.tipoBtn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-md);
-  border: 2px solid var(--border);
+.btnPrimary {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
   border-radius: var(--radius);
-  background: var(--bg-card);
+  background: var(--primary);
+  color: white;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.tipoBtn:hover {
-  border-color: var(--primary);
-  background: var(--hover);
+.btnPrimary:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
 }
 
-.tipoBtn.active {
-  border-color: var(--primary);
-  background: rgba(46, 134, 171, 0.1);
-}
-
-.tipoIcon {
-  font-size: 1.5rem;
-}
-
-.tipoLabel {
-  font-size: 0.85rem;
+.btnSecondary {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1rem;
   font-weight: 500;
-  color: var(--text-primary);
-  text-align: center;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btnSecondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 /* Form */
@@ -125,32 +126,6 @@
   margin-bottom: var(--spacing-md);
 }
 
-.formRowWithBtn {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--spacing-md);
-  align-items: flex-end;
-  margin-bottom: var(--spacing-md);
-}
-
-.btnEstimar {
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: 0.9rem;
-  font-weight: 500;
-  border: 2px solid var(--primary);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--primary);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  height: fit-content;
-}
-
-.btnEstimar:hover {
-  background: var(--primary);
-  color: white;
-}
 
 /* Results Panel */
 .resultsPanel {
@@ -240,12 +215,8 @@
   background: #f59e0b;
 }
 
-.barraSegmento.mantenimiento {
-  background: #10b981;
-}
-
 .barraSegmento.otros {
-  background: #8b5cf6;
+  background: #10b981;
 }
 
 .leyenda {
@@ -278,12 +249,8 @@
   background: #f59e0b;
 }
 
-.leyendaColor.mantenimiento {
-  background: #10b981;
-}
-
 .leyendaColor.otros {
-  background: #8b5cf6;
+  background: #10b981;
 }
 
 /* Secciones de desglose */
@@ -327,49 +294,6 @@
 .desgloseRow span:last-child {
   font-weight: 500;
   color: var(--text-primary);
-}
-
-/* Análisis */
-.analisis {
-  background: var(--bg-card);
-  border-radius: var(--radius-large);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
-}
-
-.analisisTitle {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-lg);
-}
-
-.analisisCard {
-  background: var(--bg-primary);
-  border-radius: var(--radius);
-  padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
-  border-left: 4px solid var(--primary);
-}
-
-.analisisCard:last-child {
-  margin-bottom: 0;
-}
-
-.analisisCard p {
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: var(--spacing-sm);
-}
-
-.analisisCard p:last-child {
-  margin-bottom: 0;
-}
-
-.analisisHint {
-  font-size: 0.9rem;
-  font-style: italic;
 }
 
 /* Disclaimer */
@@ -516,10 +440,6 @@
   background: rgba(46, 134, 171, 0.15);
 }
 
-[data-theme='dark'] .tipoBtn.active {
-  background: rgba(46, 134, 171, 0.2);
-}
-
 /* Responsive */
 @media (max-width: 1200px) {
   .mainContent {
@@ -545,13 +465,12 @@
     font-size: 1rem;
   }
 
-  .formRow,
-  .formRowWithBtn {
+  .formRow {
     grid-template-columns: 1fr;
   }
 
-  .tipoGrid {
-    grid-template-columns: 1fr;
+  .buttonGroup {
+    flex-direction: column;
   }
 
   .resultsGrid {
