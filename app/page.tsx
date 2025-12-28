@@ -53,6 +53,15 @@ const guidesData = [
     toolsCount: 5,
     available: true,
   },
+  {
+    id: 'herencias',
+    name: 'Guía Tramitación Herencias',
+    icon: '📋',
+    description: 'Checklist interactivo de documentos y pasos para gestionar una herencia',
+    url: '/guia-tramitacion-herencias/',
+    toolsCount: 2,
+    available: true,
+  },
 ];
 
 function HomeContent() {
