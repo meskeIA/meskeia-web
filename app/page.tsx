@@ -42,7 +42,7 @@ const guidesData = [
     description: 'Facturación, impuestos y gestión para trabajadores independientes',
     url: '/guia/freelance/',
     toolsCount: 6,
-    available: false,
+    available: true,
   },
   {
     id: 'invertir',
