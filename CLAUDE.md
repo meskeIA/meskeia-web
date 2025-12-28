@@ -61,6 +61,92 @@ Clasificación **NO excluyente**: una app puede aplicar a múltiples momentos.
 
 ---
 
+## Sección Guías
+
+Las Guías son **landing pages** que agrupan herramientas para un **proceso de decisión a corto-medio plazo** con implicaciones económicas/legales en España.
+
+### Características de una Guía
+
+- **Decisión concreta**: El usuario debe elegir entre alternativas (ej: ¿compro o alquilo?)
+- **Journey claro**: Proceso con inicio y fin definidos
+- **5-7 herramientas**: Apps meskeIA existentes que cubren el proceso
+- **Audiencia amplia**: No nichos técnicos específicos
+
+### Guías implementadas (5)
+
+| Guía | URL | Herramientas | Descripción |
+|------|-----|--------------|-------------|
+| Emprender | `/guia/emprendedor/` | 7 | Formas jurídicas, costes, fiscalidad |
+| Comprar Casa | `/guia/comprar-casa/` | 5 | Hipoteca, gastos, alquiler vs compra |
+| Freelance | `/guia/freelance/` | 6 | Cuotas, IRPF, IVA, tarifas, facturas |
+| Invertir | `/guia/invertir/` | 5 | Perfil inversor, interés compuesto, cartera |
+| Herencias | `/guia-tramitacion-herencias/` | 2 | Checklist interactivo (formato diferente) |
+
+### Estructura de carpetas para Guías
+
+```
+app/guia/
+├── emprendedor/
+│   ├── metadata.ts
+│   ├── page.tsx
+│   └── GuiaEmprendedor.module.css
+├── comprar-casa/
+│   ├── metadata.ts
+│   ├── page.tsx
+│   └── GuiaComprarCasa.module.css
+├── freelance/
+│   ├── metadata.ts
+│   ├── page.tsx
+│   └── GuiaFreelance.module.css
+└── invertir/
+    ├── metadata.ts
+    ├── page.tsx
+    └── GuiaInvertir.module.css
+```
+
+**Nota**: La Guía de Herencias usa la ruta `/guia-tramitacion-herencias/` (app existente con formato interactivo diferente).
+
+### Estructura estándar de una Guía (page.tsx)
+
+Cada guía incluye:
+1. **Hero Section**: Título, subtítulo, stats (herramientas, pasos, gratuito)
+2. **Journey Steps**: 4 pasos del proceso con tips
+3. **Caso de Estudio**: Ejemplo real con nombre, situación y conclusión
+4. **Tools Grid**: Cards con enlaces a las herramientas
+5. **FAQ Section**: 5 preguntas frecuentes colapsables
+6. **Disclaimer**: Aviso legal (solo en guías financieras)
+7. **CTA Section**: Llamada a la acción principal
+8. **Cross-linking**: Enlaces a otras guías relacionadas
+9. **RelatedApps + Footer**
+
+### Configuración en app/page.tsx
+
+Las guías se definen en el array `guidesData`:
+
+```typescript
+const guidesData = [
+  {
+    id: 'nombre-guia',
+    name: 'Nombre Visible',
+    icon: '🎯',
+    description: 'Descripción breve',
+    url: '/guia/nombre-guia/',
+    toolsCount: 5,
+    available: true,  // false = muestra "Próximamente"
+  },
+];
+```
+
+### Cuándo NO crear una Guía
+
+- Contenido educativo sin decisión (usar Cursos)
+- Audiencia muy técnica/nicho
+- Sin herramientas meskeIA asociadas
+- Proceso a muy largo plazo (ej: jubilación)
+- Temas legalmente sensibles sin datos objetivos
+
+---
+
 ## Reglas OBLIGATORIAS al crear nuevas apps
 
 ### 1. Cada app DEBE tener al menos una Suite
@@ -166,6 +252,7 @@ Plugins disponibles para mejorar el flujo de desarrollo:
 
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
+| 1.3.0 | 2025-12-28 | Añadida sección Guías (5 guías implementadas) |
 | 1.2.0 | 2025-12-24 | Añadidos plugins de Claude Code y documentación de testing |
 | 1.1.0 | 2025-12-21 | Añadida arquitectura Suites + Momentos |
 | 1.0.0 | 2025-12-19 | Versión inicial |
