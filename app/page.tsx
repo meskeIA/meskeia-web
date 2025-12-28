@@ -32,8 +32,8 @@ const guidesData = [
     icon: '🏠',
     description: 'Desde buscar hipoteca hasta calcular todos los gastos de compra',
     url: '/guia/comprar-casa/',
-    toolsCount: 8,
-    available: false,
+    toolsCount: 5,
+    available: true,
   },
   {
     id: 'freelance',
