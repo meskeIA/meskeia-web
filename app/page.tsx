@@ -51,7 +51,7 @@ const guidesData = [
     description: 'Primeros pasos en inversión: ahorro, fondos y planificación',
     url: '/guia/invertir/',
     toolsCount: 5,
-    available: false,
+    available: true,
   },
 ];
 
