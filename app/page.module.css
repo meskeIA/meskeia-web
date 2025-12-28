@@ -798,6 +798,109 @@
   padding-left: var(--spacing-sm);
 }
 
+/* ===== GUÍAS ===== */
+.viewDescription {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+  max-width: 700px;
+}
+
+.guidesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.guideCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.guideCard:hover:not(.guideCardDisabled) {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.guideCardDisabled {
+  opacity: 0.7;
+}
+
+.guideCardLink {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  text-decoration: none;
+  color: inherit;
+}
+
+.guideCardContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+}
+
+.guideIcon {
+  font-size: 3rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.guideInfo {
+  flex: 1;
+}
+
+.guideTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.guideDescription {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-sm);
+}
+
+.guideCount {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  background: var(--focus);
+  border-radius: 12px;
+}
+
+.guideBadge {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  background: var(--hover);
+  border-radius: 12px;
+}
+
+.guideArrow {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.guideCardLink:hover .guideArrow {
+  transform: translateX(4px);
+  color: var(--primary);
+}
+
 /* ===== RESPONSIVE VISTAS ===== */
 @media (max-width: 768px) {
   .searchSection {
@@ -824,5 +927,26 @@
 
   .appsList {
     grid-template-columns: 1fr;
+  }
+
+  .guidesGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .guideCardLink,
+  .guideCardContent {
+    padding: var(--spacing-lg);
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .guideIcon {
+    font-size: 2.5rem;
+  }
+
+  .guideArrow {
+    display: none;
   }
 }

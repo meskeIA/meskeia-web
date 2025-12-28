@@ -13,7 +13,47 @@ import { addRecentApp } from '@/lib/recentApps';
 import styles from './page.module.css';
 
 // Tipos de vista para el área principal
-type MainView = 'home' | 'momentos' | 'suites' | 'porquemeskeia' | 'faq';
+type MainView = 'home' | 'momentos' | 'suites' | 'guias' | 'porquemeskeia' | 'faq';
+
+// Datos de las guías disponibles
+const guidesData = [
+  {
+    id: 'emprendedor',
+    name: 'Guía para Emprender',
+    icon: '🚀',
+    description: 'Todo lo que necesitas calcular antes de montar tu negocio en España',
+    url: '/guia/emprendedor/',
+    toolsCount: 7,
+    available: true,
+  },
+  {
+    id: 'comprar-casa',
+    name: 'Guía para Comprar Casa',
+    icon: '🏠',
+    description: 'Desde buscar hipoteca hasta calcular todos los gastos de compra',
+    url: '/guia/comprar-casa/',
+    toolsCount: 8,
+    available: false,
+  },
+  {
+    id: 'freelance',
+    name: 'Guía Freelance',
+    icon: '💼',
+    description: 'Facturación, impuestos y gestión para trabajadores independientes',
+    url: '/guia/freelance/',
+    toolsCount: 6,
+    available: false,
+  },
+  {
+    id: 'invertir',
+    name: 'Guía para Invertir',
+    icon: '📈',
+    description: 'Primeros pasos en inversión: ahorro, fondos y planificación',
+    url: '/guia/invertir/',
+    toolsCount: 5,
+    available: false,
+  },
+];
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -206,6 +246,45 @@ function HomeContent() {
                   </div>
                 );
               })}
+            </div>
+          </section>
+        );
+
+      case 'guias':
+        return (
+          <section className={styles.viewSection}>
+            <div className={styles.viewHeader}>
+              <button onClick={goHome} className={styles.backButton}>← Volver</button>
+              <h2 className={styles.viewTitle}>📚 Guías Prácticas</h2>
+            </div>
+            <p className={styles.viewDescription}>
+              Guías paso a paso que conectan las herramientas que necesitas para resolver situaciones concretas.
+            </p>
+            <div className={styles.guidesGrid}>
+              {guidesData.map((guide) => (
+                <div key={guide.id} className={`${styles.guideCard} ${!guide.available ? styles.guideCardDisabled : ''}`}>
+                  {guide.available ? (
+                    <a href={guide.url} className={styles.guideCardLink}>
+                      <div className={styles.guideIcon}>{guide.icon}</div>
+                      <div className={styles.guideInfo}>
+                        <h3 className={styles.guideTitle}>{guide.name}</h3>
+                        <p className={styles.guideDescription}>{guide.description}</p>
+                        <span className={styles.guideCount}>{guide.toolsCount} herramientas</span>
+                      </div>
+                      <span className={styles.guideArrow}>→</span>
+                    </a>
+                  ) : (
+                    <div className={styles.guideCardContent}>
+                      <div className={styles.guideIcon}>{guide.icon}</div>
+                      <div className={styles.guideInfo}>
+                        <h3 className={styles.guideTitle}>{guide.name}</h3>
+                        <p className={styles.guideDescription}>{guide.description}</p>
+                        <span className={styles.guideBadge}>Próximamente</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </section>
         );

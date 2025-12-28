@@ -11,7 +11,7 @@ import { applicationsDatabase, type Application } from '@/data/applications';
 import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 
 // Tipo para las vistas principales
-type MainView = 'home' | 'momentos' | 'suites' | 'porquemeskeia' | 'faq';
+type MainView = 'home' | 'momentos' | 'suites' | 'guias' | 'porquemeskeia' | 'faq';
 
 // Obtener app por URL
 function getAppByUrl(url: string): Application | undefined {
@@ -226,6 +226,20 @@ export default function SidebarMobile({ onViewChange, currentView = 'home' }: Si
             >
               <span className={styles.navButtonIcon}>📦</span>
               <span className={styles.navButtonText}>Suites</span>
+            </button>
+          </div>
+
+          <div className={styles.divider} />
+
+          {/* Guías - Vista con todas las guías disponibles */}
+          <div className={styles.navButtons}>
+            <button
+              type="button"
+              className={`${styles.navButton} ${currentView === 'guias' ? styles.navButtonActive : ''}`}
+              onClick={() => handleViewChange('guias')}
+            >
+              <span className={styles.navButtonIcon}>📚</span>
+              <span className={styles.navButtonText}>Guías</span>
             </button>
           </div>
 
