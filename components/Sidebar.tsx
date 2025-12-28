@@ -213,6 +213,19 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
 
         <div className={styles.divider} />
 
+        {/* Guías - Landing pages con journey */}
+        <div className={styles.navButtons}>
+          <Link
+            href="/guia/emprendedor/"
+            className={`${styles.navButton} ${pathname?.startsWith("/guia/") ? styles.navButtonActive : ""}`}
+          >
+            <span className={styles.navButtonIcon}>📚</span>
+            <span className={styles.navButtonText}>Guías</span>
+          </Link>
+        </div>
+
+        <div className={styles.divider} />
+
         {/* Links informativos */}
         <div className={styles.infoLinks}>
           <button
