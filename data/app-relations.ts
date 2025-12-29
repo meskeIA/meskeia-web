@@ -468,15 +468,27 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'calculadora-seguro-vida': [
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
-    { url: '/simulador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas según tu perfil' },
+    { url: '/calculadora-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
     { url: '/calculadora-jubilacion/', icon: '👴', name: 'Calculadora Jubilación', description: 'Planifica tu retiro' },
-    { url: '/calculadora-fondo-emergencia/', icon: '🛡️', name: 'Fondo Emergencia', description: 'Tu colchón de seguridad' },
   ],
   'comparador-tipos-seguros': [
     { url: '/calculadora-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro necesitas' },
+    { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas según tu perfil' },
+    { url: '/calculadora-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
     { url: '/simulador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
-    { url: '/calculadora-alquiler-vs-compra/', icon: '🏡', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
-    { url: '/calculadora-jubilacion/', icon: '👴', name: 'Calculadora Jubilación', description: 'Planifica tu retiro' },
+  ],
+  'checklist-coberturas-seguros': [
+    { url: '/calculadora-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro de vida necesitas' },
+    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
+    { url: '/calculadora-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
+    { url: '/simulador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+  ],
+  'calculadora-infraseguro': [
+    { url: '/calculadora-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro de vida necesitas' },
+    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
+    { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas según tu perfil' },
+    { url: '/calculadora-alquiler-vs-compra/', icon: '🏡', name: 'Alquiler vs Compra', description: 'Análisis financiero vivienda' },
   ],
 
   // SALUD

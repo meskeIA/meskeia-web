@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 235+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 237+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 235,
+  "total_tools": 237,
   "last_updated": "2025-12-29",
   "features": {
     "all_free": true,
@@ -28,14 +28,14 @@
       "name": "Inmobiliaria y Hogar",
       "icon": "🏘️",
       "description": "Hipotecas, alquiler y gestión del hogar",
-      "tool_count": 20
+      "tool_count": 21
     },
     {
       "id": "finanzas",
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 26
+      "tool_count": 28
     },
     {
       "id": "freelance",
@@ -84,7 +84,7 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 40
+      "tool_count": 41
     },
     {
       "id": "productividad",
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 61
+      "tool_count": 63
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 54
+      "tool_count": 56
     },
     {
       "id": "creando",
@@ -2349,6 +2349,53 @@
         "terceros"
       ],
       "icon": "📊"
+    },
+    {
+      "slug": "checklist-coberturas-seguros",
+      "name": "Checklist Coberturas de Seguros",
+      "url": "https://meskeia.com/checklist-coberturas-seguros/",
+      "description": "Descubre qué seguros necesitas según tu perfil: autónomo, familia, jubilado, propietario. Coberturas obligatorias vs recomendables",
+      "suites": [
+        "finanzas",
+        "cultura"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "checklist seguros",
+        "coberturas seguros",
+        "seguros obligatorios",
+        "seguros familia",
+        "seguros autonomo",
+        "que seguros contratar"
+      ],
+      "icon": "✅"
+    },
+    {
+      "slug": "calculadora-infraseguro",
+      "name": "Calculadora de Infraseguro",
+      "url": "https://meskeia.com/calculadora-infraseguro/",
+      "description": "Calcula cuánto cobrarías en caso de siniestro si tienes infraseguro. Regla proporcional según Ley de Contrato de Seguro",
+      "suites": [
+        "finanzas",
+        "inmobiliaria"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "infraseguro",
+        "regla proporcional",
+        "seguro hogar",
+        "indemnizacion",
+        "capital asegurado",
+        "valor real",
+        "siniestro"
+      ],
+      "icon": "⚖️"
     },
     {
       "slug": "calculadora-movimiento",

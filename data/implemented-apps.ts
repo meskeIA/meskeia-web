@@ -50,6 +50,8 @@ export const implementedAppsUrls = [
   "/calculadora-coste-vivienda/",       // Coste real mensual de mantener vivienda
   "/calculadora-seguro-vida/",          // Necesidades de seguro de vida para proteger a la familia
   "/comparador-tipos-seguros/",         // Guía educativa: tipos de seguros vida, auto, hogar, salud
+  "/checklist-coberturas-seguros/",     // Qué seguros necesitas según tu perfil
+  "/calculadora-infraseguro/",          // Regla proporcional: cuánto cobras si tienes infraseguro
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",

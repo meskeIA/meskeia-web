@@ -1,0 +1,476 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.95;
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Selector de Perfil */
+.perfilSelector {
+  margin-bottom: var(--spacing-xl);
+}
+
+.selectorTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md);
+  text-align: center;
+}
+
+.perfilGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.perfilBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.perfilBtn:hover {
+  border-color: var(--primary);
+  background: var(--focus);
+}
+
+.perfilBtnActive {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+}
+
+.perfilIcon {
+  font-size: 1.8rem;
+}
+
+.perfilNombre {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Info del perfil */
+.perfilInfo {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-xl);
+}
+
+.perfilHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.perfilIconLarge {
+  font-size: 3rem;
+}
+
+.perfilTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.perfilDesc {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.progresoBox {
+  min-width: 200px;
+}
+
+.progresoLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.progresoBar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+/* Checklist */
+.checklistContainer {
+  margin-bottom: var(--spacing-xl);
+}
+
+.categoriaSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.categoriaTitulo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md);
+}
+
+.categoriaIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.coberturasList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.coberturaCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  transition: all 0.2s ease;
+}
+
+.coberturaCard:hover {
+  border-color: var(--primary);
+}
+
+.coberturaCardSeleccionada {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05) 0%, rgba(72, 169, 166, 0.05) 100%);
+  border-color: var(--primary);
+}
+
+.coberturaHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xs);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.checkbox {
+  display: none;
+}
+
+.checkboxCustom {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: white;
+  background: var(--bg-card);
+  transition: all 0.2s ease;
+}
+
+.checkbox:checked + .checkboxCustom {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.coberturaNombre {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.coberturaRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.coberturaBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+}
+
+.expandBtn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.expandBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.coberturaDesc {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+  padding-left: 34px;
+}
+
+.coberturaPorQue {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-md);
+  padding-left: 34px;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.coberturaPorQue strong {
+  color: var(--primary);
+}
+
+/* Leyenda */
+.leyenda {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.leyenda h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md);
+}
+
+.leyendaGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+.leyendaItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.leyendaBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  text-align: center;
+}
+
+.leyendaDesc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Disclaimer */
+.disclaimer {
+  background: #e0f2fe;
+  border: 2px solid #0ea5e9;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.disclaimer h3 {
+  color: #0369a1;
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1.1rem;
+}
+
+.disclaimer p {
+  color: #0369a1;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .disclaimer {
+  background: rgba(14, 165, 233, 0.15);
+  border-color: rgba(14, 165, 233, 0.5);
+}
+
+[data-theme='dark'] .disclaimer h3,
+[data-theme='dark'] .disclaimer p {
+  color: #7dd3fc;
+}
+
+[data-theme='dark'] .perfilBtnActive {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .coberturaCardSeleccionada {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .coberturaPorQue {
+  background: var(--bg-card);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .perfilGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .perfilInfo {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .perfilHeader {
+    flex-direction: column;
+  }
+
+  .progresoBox {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .leyendaGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    padding: var(--spacing-xl) var(--spacing-lg);
+    margin-top: 70px;
+  }
+
+  .heroIcon {
+    font-size: 3rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .perfilGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .perfilBtn {
+    padding: var(--spacing-sm);
+  }
+
+  .perfilIcon {
+    font-size: 1.5rem;
+  }
+
+  .coberturaHeader {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .coberturaRight {
+    width: 100%;
+    justify-content: space-between;
+    padding-left: 34px;
+  }
+
+  .coberturaDesc {
+    padding-left: 0;
+    margin-top: var(--spacing-sm);
+  }
+
+  .coberturaPorQue {
+    padding-left: var(--spacing-md);
+  }
+
+  .leyendaGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
