@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 237+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 238+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 237,
+  "total_tools": 238,
   "last_updated": "2025-12-29",
   "features": {
     "all_free": true,
@@ -35,7 +35,7 @@
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 28
+      "tool_count": 29
     },
     {
       "id": "freelance",
@@ -84,7 +84,7 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 41
+      "tool_count": 42
     },
     {
       "id": "productividad",
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 63
+      "tool_count": 64
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 56
+      "tool_count": 57
     },
     {
       "id": "creando",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 34
+      "tool_count": 35
     }
   ],
   "tools": [
@@ -2396,6 +2396,32 @@
         "siniestro"
       ],
       "icon": "⚖️"
+    },
+    {
+      "slug": "guia-reclamar-seguro-coche",
+      "name": "Guía Reclamar Seguro Coche",
+      "url": "https://meskeia.com/guia-reclamar-seguro-coche/",
+      "description": "Guía completa para decidir cuándo reclamar al seguro del coche: siniestros menores, asistencia, atropello de animales, rotura de lunas y más",
+      "suites": [
+        "finanzas",
+        "cultura"
+      ],
+      "contexts": [
+        "dinero",
+        "casa",
+        "curiosidad"
+      ],
+      "keywords": [
+        "reclamar seguro coche",
+        "siniestro menor",
+        "asistencia carretera",
+        "kilometro cero",
+        "atropello animal",
+        "rotura luna",
+        "bonus malus",
+        "seguro auto"
+      ],
+      "icon": "🚗"
     },
     {
       "slug": "calculadora-movimiento",

@@ -52,6 +52,7 @@ export const implementedAppsUrls = [
   "/comparador-tipos-seguros/",         // Guía educativa: tipos de seguros vida, auto, hogar, salud
   "/checklist-coberturas-seguros/",     // Qué seguros necesitas según tu perfil
   "/calculadora-infraseguro/",          // Regla proporcional: cuánto cobras si tienes infraseguro
+  "/guia-reclamar-seguro-coche/",       // Guía: cuándo reclamar al seguro del coche
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",
