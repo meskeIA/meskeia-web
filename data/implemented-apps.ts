@@ -48,6 +48,7 @@ export const implementedAppsUrls = [
   "/asistente-constitucion-asociacion/", // Constituir asociación sin ánimo de lucro
   "/calculadora-sueldo-neto/",          // Sueldo bruto a neto y viceversa
   "/calculadora-coste-vivienda/",       // Coste real mensual de mantener vivienda
+  "/calculadora-seguro-vida/",          // Necesidades de seguro de vida para proteger a la familia
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",

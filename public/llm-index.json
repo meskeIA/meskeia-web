@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 233+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 234+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 233,
+  "total_tools": 234,
   "last_updated": "2025-12-29",
   "features": {
     "all_free": true,
@@ -35,7 +35,7 @@
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 24
+      "tool_count": 25
     },
     {
       "id": "freelance",
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 60
+      "tool_count": 61
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 52
+      "tool_count": 53
     },
     {
       "id": "creando",
@@ -2300,6 +2300,30 @@
         "TAE coche"
       ],
       "icon": "🚗"
+    },
+    {
+      "slug": "calculadora-seguro-vida",
+      "name": "Calculadora Seguro de Vida",
+      "url": "https://meskeia.com/calculadora-seguro-vida/",
+      "description": "Calcula cuánto seguro de vida necesitas para proteger a tu familia según tus ingresos, deudas, hipoteca y situación familiar",
+      "suites": [
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "seguro vida",
+        "proteccion familiar",
+        "capital asegurado",
+        "hipoteca",
+        "hijos",
+        "fallecimiento",
+        "cobertura",
+        "prima seguro"
+      ],
+      "icon": "🛡️"
     },
     {
       "slug": "calculadora-movimiento",

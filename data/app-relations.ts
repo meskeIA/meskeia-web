@@ -466,6 +466,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-gastos-deducibles/', icon: '✅', name: 'Gastos Deducibles', description: 'Para autónomos y empresas' },
     { url: '/calculadora-tir-van/', icon: '📉', name: 'TIR y VAN', description: 'Análisis de inversiones' },
   ],
+  'calculadora-seguro-vida': [
+    { url: '/simulador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/calculadora-jubilacion/', icon: '👴', name: 'Calculadora Jubilación', description: 'Planifica tu retiro' },
+    { url: '/calculadora-fondo-emergencia/', icon: '🛡️', name: 'Fondo Emergencia', description: 'Tu colchón de seguridad' },
+    { url: '/interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Crecimiento de inversiones' },
+  ],
 
   // SALUD
   'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/'),
