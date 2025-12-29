@@ -6,6 +6,60 @@ import { MeskeiaLogo, Footer } from '@/components';
 
 type SectorType = 'gestorias' | 'autonomos' | 'inmobiliarias' | 'educacion';
 
+// Datos de las Guías disponibles para badges
+const GUIAS_DATA = [
+  {
+    id: 'comprar-casa',
+    name: 'Guía Comprar Casa',
+    icon: '🏠',
+    url: '/guia/comprar-casa/',
+    badgeUrl: '/badge-guia-comprar-casa.svg',
+    tools: 5,
+    sector: 'Inmobiliarias',
+    description: 'Hipoteca, gastos, comparativa alquiler vs compra'
+  },
+  {
+    id: 'emprendedor',
+    name: 'Guía Emprendedor',
+    icon: '🚀',
+    url: '/guia/emprendedor/',
+    badgeUrl: '/badge-guia-emprendedor.svg',
+    tools: 7,
+    sector: 'Incubadoras, Cámaras de Comercio',
+    description: 'Formas jurídicas, costes, fiscalidad inicial'
+  },
+  {
+    id: 'freelance',
+    name: 'Guía Freelance',
+    icon: '💼',
+    url: '/guia/freelance/',
+    badgeUrl: '/badge-guia-freelance.svg',
+    tools: 6,
+    sector: 'Asociaciones de Autónomos',
+    description: 'Cuotas, IRPF, IVA, tarifas, facturas'
+  },
+  {
+    id: 'invertir',
+    name: 'Guía para Invertir',
+    icon: '📈',
+    url: '/guia/invertir/',
+    badgeUrl: '/badge-guia-invertir.svg',
+    tools: 5,
+    sector: 'Banca, Asesores financieros',
+    description: 'Perfil inversor, interés compuesto, cartera'
+  },
+  {
+    id: 'herencias',
+    name: 'Guía Herencias',
+    icon: '📜',
+    url: '/guia-tramitacion-herencias/',
+    badgeUrl: '/badge-guia-herencias.svg',
+    tools: 2,
+    sector: 'Gestorías, Notarías',
+    description: 'Checklist paso a paso, plazos, documentos'
+  },
+];
+
 interface ToolLink {
   name: string;
   url: string;
@@ -83,8 +137,22 @@ const SECTOR_DATA: Record<SectorType, {
 export default function PartnersPage() {
   const [selectedSector, setSelectedSector] = useState<SectorType>('gestorias');
   const [copied, setCopied] = useState(false);
+  const [copiedBadge, setCopiedBadge] = useState<string | null>(null);
 
   const currentSector = SECTOR_DATA[selectedSector];
+
+  const generateBadgeHTML = (guia: typeof GUIAS_DATA[0]) => {
+    return `<!-- Badge meskeIA: ${guia.name} -->
+<a href="https://meskeia.com${guia.url}" target="_blank" rel="noopener" title="${guia.name} - meskeIA">
+  <img src="https://meskeia.com${guia.badgeUrl}" alt="${guia.name}" width="220" height="60" style="border-radius: 8px;">
+</a>`;
+  };
+
+  const copyBadgeToClipboard = (guia: typeof GUIAS_DATA[0]) => {
+    navigator.clipboard.writeText(generateBadgeHTML(guia));
+    setCopiedBadge(guia.id);
+    setTimeout(() => setCopiedBadge(null), 2000);
+  };
 
   const generateHTML = () => {
     const tools = currentSector.tools;
@@ -151,9 +219,52 @@ ${tools.map(tool => `    <a href="https://meskeia.com${tool.url}" target="_blank
         </div>
       </section>
 
-      {/* Selector de sector */}
+      {/* Opción 1: Badges con Guías */}
+      <section className={styles.guidesSection}>
+        <h2 className={styles.sectionTitle}>📘 Opción 1: Badge con Guía</h2>
+        <p className={styles.sectionSubtitle}>
+          Un badge compacto que enlaza a una guía completa. Ideal para sidebars, footers o artículos.
+        </p>
+        <div className={styles.guidesGrid}>
+          {GUIAS_DATA.map((guia) => (
+            <div key={guia.id} className={styles.guideCard}>
+              <div className={styles.guideHeader}>
+                <span className={styles.guideIcon}>{guia.icon}</span>
+                <div>
+                  <h3 className={styles.guideName}>{guia.name}</h3>
+                  <p className={styles.guideSector}>{guia.sector}</p>
+                </div>
+              </div>
+              <p className={styles.guideDescription}>{guia.description}</p>
+              <div className={styles.guideTools}>{guia.tools} herramientas incluidas</div>
+              <div className={styles.guideBadgePreview}>
+                <a href={`https://meskeia.com${guia.url}`} target="_blank" rel="noopener noreferrer">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={guia.badgeUrl}
+                    alt={guia.name}
+                    className={styles.badgeImage}
+                  />
+                </a>
+              </div>
+              <button
+                onClick={() => copyBadgeToClipboard(guia)}
+                className={styles.copyBadgeButton}
+              >
+                {copiedBadge === guia.id ? '✓ Copiado' : '📋 Copiar código'}
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Opción 2: Bloque completo - Selector de sector */}
       <section className={styles.selectorSection}>
-        <h2 className={styles.sectionTitle}>Elige tu sector</h2>
+        <h2 className={styles.sectionTitle}>📦 Opción 2: Bloque completo</h2>
+        <p className={styles.sectionSubtitle}>
+          Un widget con múltiples herramientas. Ideal para secciones destacadas o páginas de recursos.
+        </p>
+        <h3 className={styles.selectorLabel}>Elige tu sector:</h3>
         <div className={styles.sectorButtons}>
           {(Object.keys(SECTOR_DATA) as SectorType[]).map((sector) => (
             <button

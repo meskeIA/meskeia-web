@@ -130,9 +130,135 @@
   line-height: 1.5;
 }
 
-/* Sector Selector */
+/* Section Subtitle */
+.sectionSubtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: -0.5rem 0 var(--spacing-xl);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Guides Section (Opción 1: Badges) */
+.guidesSection {
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+}
+
+.guidesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.guideCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  transition: all 0.3s ease;
+}
+
+.guideCard:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.guideHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.guideIcon {
+  font-size: 2rem;
+}
+
+.guideName {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.guideSector {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.guideDescription {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-sm);
+  line-height: 1.5;
+}
+
+.guideTools {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 500;
+  margin-bottom: var(--spacing-md);
+}
+
+.guideBadgePreview {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.badgeImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.badgeImage:hover {
+  transform: scale(1.02);
+}
+
+.copyBadgeButton {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.copyBadgeButton:hover {
+  background: #256a8a;
+}
+
+/* Sector Selector (Opción 2: Bloque completo) */
 .selectorSection {
   margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+}
+
+.selectorLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
 }
 
 .sectorButtons {
@@ -454,6 +580,10 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .guidesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .previewContainer {
     grid-template-columns: 1fr;
   }
@@ -480,7 +610,8 @@
   .benefitsGrid,
   .sectorButtons,
   .toolsGrid,
-  .stepsGrid {
+  .stepsGrid,
+  .guidesGrid {
     grid-template-columns: 1fr;
   }
 
@@ -494,5 +625,10 @@
 
   .codeBox {
     font-size: 0.65rem;
+  }
+
+  .guidesSection,
+  .selectorSection {
+    padding: var(--spacing-md);
   }
 }
