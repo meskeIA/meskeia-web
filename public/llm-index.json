@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 234+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 235+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 234,
+  "total_tools": 235,
   "last_updated": "2025-12-29",
   "features": {
     "all_free": true,
@@ -35,7 +35,7 @@
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 25
+      "tool_count": 26
     },
     {
       "id": "freelance",
@@ -84,7 +84,7 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 39
+      "tool_count": 40
     },
     {
       "id": "productividad",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 53
+      "tool_count": 54
     },
     {
       "id": "creando",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 33
+      "tool_count": 34
     }
   ],
   "tools": [
@@ -2324,6 +2324,31 @@
         "prima seguro"
       ],
       "icon": "🛡️"
+    },
+    {
+      "slug": "comparador-tipos-seguros",
+      "name": "Comparador Tipos de Seguros",
+      "url": "https://meskeia.com/comparador-tipos-seguros/",
+      "description": "Guía educativa para comparar tipos de seguros en España: vida, auto, hogar y salud. Coberturas, ventajas y recomendaciones",
+      "suites": [
+        "finanzas",
+        "cultura"
+      ],
+      "contexts": [
+        "dinero",
+        "curiosidad"
+      ],
+      "keywords": [
+        "tipos seguros",
+        "comparador seguros",
+        "seguro vida",
+        "seguro coche",
+        "seguro hogar",
+        "seguro salud",
+        "todo riesgo",
+        "terceros"
+      ],
+      "icon": "📊"
     },
     {
       "slug": "calculadora-movimiento",

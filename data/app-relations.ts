@@ -467,10 +467,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-tir-van/', icon: '📉', name: 'TIR y VAN', description: 'Análisis de inversiones' },
   ],
   'calculadora-seguro-vida': [
+    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
     { url: '/simulador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
     { url: '/calculadora-jubilacion/', icon: '👴', name: 'Calculadora Jubilación', description: 'Planifica tu retiro' },
     { url: '/calculadora-fondo-emergencia/', icon: '🛡️', name: 'Fondo Emergencia', description: 'Tu colchón de seguridad' },
-    { url: '/interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Crecimiento de inversiones' },
+  ],
+  'comparador-tipos-seguros': [
+    { url: '/calculadora-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro necesitas' },
+    { url: '/simulador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/calculadora-alquiler-vs-compra/', icon: '🏡', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
+    { url: '/calculadora-jubilacion/', icon: '👴', name: 'Calculadora Jubilación', description: 'Planifica tu retiro' },
   ],
 
   // SALUD

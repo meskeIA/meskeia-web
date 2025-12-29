@@ -49,6 +49,7 @@ export const implementedAppsUrls = [
   "/calculadora-sueldo-neto/",          // Sueldo bruto a neto y viceversa
   "/calculadora-coste-vivienda/",       // Coste real mensual de mantener vivienda
   "/calculadora-seguro-vida/",          // Necesidades de seguro de vida para proteger a la familia
+  "/comparador-tipos-seguros/",         // Guía educativa: tipos de seguros vida, auto, hogar, salud
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",
