@@ -10,7 +10,7 @@
  * - Solo /mantenimiento es accesible
  */
 
-export const MAINTENANCE_MODE = false;
+export const MAINTENANCE_MODE = true;
 
 // Rutas que NO se redirigen (siempre accesibles)
 export const MAINTENANCE_EXCLUDED_PATHS = [
