@@ -8,7 +8,7 @@ export default function MantenimientoPage() {
         {/* Logo meskeIA */}
         <div className={styles.logoContainer}>
           <Image
-            src="/logo-meskeia.png"
+            src="/logo-meskeIA.png"
             alt="meskeIA"
             width={200}
             height={60}
