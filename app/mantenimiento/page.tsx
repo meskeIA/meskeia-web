@@ -1,22 +1,9 @@
-import Image from 'next/image';
 import styles from './Mantenimiento.module.css';
 
 export default function MantenimientoPage() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        {/* Logo meskeIA */}
-        <div className={styles.logoContainer}>
-          <Image
-            src="/logo-meskeIA.png"
-            alt="meskeIA"
-            width={200}
-            height={60}
-            className={styles.logo}
-            priority
-          />
-        </div>
-
         {/* Icono de mantenimiento */}
         <div className={styles.iconContainer}>
           <span className={styles.icon}>🔧</span>
