@@ -496,6 +496,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas según tu perfil' },
     { url: '/calculadora-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
   ],
+  'asistente-reclamaciones': [
+    { url: '/guia-reclamar-seguro-coche/', icon: '🚗', name: 'Reclamar Seguro Coche', description: 'Cuándo reclamar al seguro del coche' },
+    { url: '/guia-tramitacion-herencias/', icon: '📋', name: 'Tramitación Herencias', description: 'Pasos para tramitar una herencia' },
+    { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas' },
+    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Tipos de Seguros', description: 'Guía de seguros en España' },
+  ],
 
   // SALUD
   'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/'),

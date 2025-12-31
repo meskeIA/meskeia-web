@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 238+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 239+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 238,
-  "last_updated": "2025-12-30",
+  "total_tools": 239,
+  "last_updated": "2025-12-31",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -84,14 +84,14 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 42
+      "tool_count": 43
     },
     {
       "id": "productividad",
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 36
+      "tool_count": 37
     },
     {
       "id": "tecnicas",
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 64
+      "tool_count": 65
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 57
+      "tool_count": 58
     },
     {
       "id": "creando",
@@ -2422,6 +2422,31 @@
         "seguro auto"
       ],
       "icon": "🚗"
+    },
+    {
+      "slug": "asistente-reclamaciones",
+      "name": "Asistente de Reclamaciones al Consumidor",
+      "url": "https://meskeia.com/asistente-reclamaciones/",
+      "description": "Guía interactiva para reclamar tus derechos como consumidor en España. Árbol de decisión, plazos legales, organismos y modelos de carta",
+      "suites": [
+        "cultura",
+        "productividad"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "reclamaciones consumidor",
+        "derechos consumidor",
+        "omic",
+        "hoja reclamaciones",
+        "garantia",
+        "devolucion",
+        "desistimiento",
+        "arbitraje consumo"
+      ],
+      "icon": "⚖️"
     },
     {
       "slug": "calculadora-movimiento",

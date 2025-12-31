@@ -53,6 +53,7 @@ export const implementedAppsUrls = [
   "/checklist-coberturas-seguros/",     // Qué seguros necesitas según tu perfil
   "/calculadora-infraseguro/",          // Regla proporcional: cuánto cobras si tienes infraseguro
   "/guia-reclamar-seguro-coche/",       // Guía: cuándo reclamar al seguro del coche
+  "/asistente-reclamaciones/",          // Asistente reclamaciones consumidor: derechos, plazos, OMIC
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",
