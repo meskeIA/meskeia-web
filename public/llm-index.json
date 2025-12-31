@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 239+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 240+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 239,
+  "total_tools": 240,
   "last_updated": "2025-12-31",
   "features": {
     "all_free": true,
@@ -84,14 +84,14 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 43
+      "tool_count": 44
     },
     {
       "id": "productividad",
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 37
+      "tool_count": 38
     },
     {
       "id": "tecnicas",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 97
+      "tool_count": 98
     },
     {
       "id": "estudio",
@@ -128,7 +128,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 58
+      "tool_count": 59
     },
     {
       "id": "creando",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 35
+      "tool_count": 36
     }
   ],
   "tools": [
@@ -2447,6 +2447,33 @@
         "arbitraje consumo"
       ],
       "icon": "⚖️"
+    },
+    {
+      "slug": "plazos-legales",
+      "name": "Plazos Legales España",
+      "url": "https://meskeia.com/plazos-legales/",
+      "description": "Consulta plazos de prescripción y caducidad: garantías, deudas, despidos, multas, herencias, reclamaciones y más. Con referencias legales",
+      "suites": [
+        "cultura",
+        "productividad"
+      ],
+      "contexts": [
+        "dinero",
+        "trabajo",
+        "curiosidad"
+      ],
+      "keywords": [
+        "plazos legales",
+        "prescripcion",
+        "caducidad",
+        "garantia",
+        "deudas",
+        "despido",
+        "multas",
+        "herencia",
+        "reclamacion"
+      ],
+      "icon": "⏱️"
     },
     {
       "slug": "calculadora-movimiento",

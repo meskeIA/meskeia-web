@@ -497,10 +497,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
   ],
   'asistente-reclamaciones': [
+    { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Plazos de prescripción y caducidad' },
     { url: '/guia-reclamar-seguro-coche/', icon: '🚗', name: 'Reclamar Seguro Coche', description: 'Cuándo reclamar al seguro del coche' },
     { url: '/guia-tramitacion-herencias/', icon: '📋', name: 'Tramitación Herencias', description: 'Pasos para tramitar una herencia' },
     { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas' },
-    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Tipos de Seguros', description: 'Guía de seguros en España' },
+  ],
+  'plazos-legales': [
+    { url: '/asistente-reclamaciones/', icon: '📝', name: 'Asistente Reclamaciones', description: 'Guía para reclamar tus derechos' },
+    { url: '/guia-tramitacion-herencias/', icon: '📋', name: 'Tramitación Herencias', description: 'Pasos para tramitar una herencia' },
+    { url: '/calculadora-irpf/', icon: '📊', name: 'Calculadora IRPF', description: 'Calcula tu declaración de la renta' },
+    { url: '/calculadora-finiquito/', icon: '💼', name: 'Calculadora Finiquito', description: 'Calcula tu finiquito laboral' },
   ],
 
   // SALUD

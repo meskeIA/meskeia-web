@@ -54,6 +54,7 @@ export const implementedAppsUrls = [
   "/calculadora-infraseguro/",          // Regla proporcional: cuánto cobras si tienes infraseguro
   "/guia-reclamar-seguro-coche/",       // Guía: cuándo reclamar al seguro del coche
   "/asistente-reclamaciones/",          // Asistente reclamaciones consumidor: derechos, plazos, OMIC
+  "/plazos-legales/",                   // Plazos prescripción y caducidad: garantías, deudas, despidos, multas
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",
