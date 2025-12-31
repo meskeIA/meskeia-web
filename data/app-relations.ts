@@ -505,8 +505,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'plazos-legales': [
     { url: '/asistente-reclamaciones/', icon: '📝', name: 'Asistente Reclamaciones', description: 'Guía para reclamar tus derechos' },
     { url: '/guia-tramitacion-herencias/', icon: '📋', name: 'Tramitación Herencias', description: 'Pasos para tramitar una herencia' },
-    { url: '/calculadora-irpf/', icon: '📊', name: 'Calculadora IRPF', description: 'Calcula tu declaración de la renta' },
-    { url: '/calculadora-finiquito/', icon: '💼', name: 'Calculadora Finiquito', description: 'Calcula tu finiquito laboral' },
+    { url: '/calculadora-cuota-autonomo/', icon: '💼', name: 'Cuota Autónomo', description: 'Calcula tu cuota de autónomo' },
+    { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Calcula IVA incluido o sin IVA' },
   ],
 
   // SALUD
