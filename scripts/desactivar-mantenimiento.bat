@@ -11,10 +11,10 @@ cd /d "c:\Users\jaceb\meskeia-web"
 
 echo [1/4] Desactivando modo mantenimiento...
 
-powershell -Command "(Get-Content 'maintenance.config.ts') -replace 'MAINTENANCE_MODE = true', 'MAINTENANCE_MODE = false' | Set-Content 'maintenance.config.ts'"
+powershell -Command "(Get-Content 'maintenance.config.ts') -replace 'FILE_MAINTENANCE_MODE = true', 'FILE_MAINTENANCE_MODE = false' | Set-Content 'maintenance.config.ts'"
 
 echo [2/4] Verificando cambio...
-findstr /C:"MAINTENANCE_MODE = false" maintenance.config.ts >nul
+findstr /C:"FILE_MAINTENANCE_MODE = false" maintenance.config.ts >nul
 if %errorlevel% neq 0 (
     echo.
     echo ERROR: No se pudo desactivar el modo mantenimiento
