@@ -15,7 +15,7 @@
  */
 
 // Valor base del archivo (controlado por scripts activar/desactivar)
-const FILE_MAINTENANCE_MODE = true;
+const FILE_MAINTENANCE_MODE = false;
 
 // Override local: si existe NEXT_PUBLIC_MAINTENANCE_OVERRIDE, usar ese valor
 // En producción (Vercel) esta variable no existe, así que usa FILE_MAINTENANCE_MODE
