@@ -69,7 +69,52 @@ Genera archivos HTML estáticos en `out/`
 
 ---
 
-**Última actualización**: 22 de noviembre de 2025
-**Estado**: Infraestructura 100% + 2 apps migradas con éxito
+## 🔧 Modo Mantenimiento con Acceso Privado
+
+El sitio puede estar en modo mantenimiento pero permitir acceso solo al administrador mediante un sistema de token/cookie.
+
+### Cómo funciona
+
+1. **Usuarios normales**: Ven página de "Sitio en mantenimiento" (HTTP 503)
+2. **Administrador**: Accede con token secreto, obtiene cookie de 1 año
+
+### Acceder durante mantenimiento
+
+```
+https://meskeia.com?access=TU_TOKEN_SECRETO
+```
+
+Esto:
+- Valida el token
+- Guarda cookie `meskeia_access` (1 año)
+- Redirige a la home sin el token en la URL
+- Las siguientes visitas funcionan normal (la cookie ya está)
+
+### Configuración requerida
+
+**Variable de entorno** (en `.env.local` y Vercel Dashboard):
+```
+MAINTENANCE_ACCESS_TOKEN=tu-token-secreto-aqui
+```
+
+### Desactivar modo mantenimiento
+
+Para volver a web pública:
+1. Eliminar archivo `middleware.ts`
+2. Commit y push a GitHub
+3. Vercel despliega automáticamente
+
+### Archivos relacionados
+
+| Archivo | Descripción |
+|---------|-------------|
+| `middleware.ts` | Lógica de acceso restringido |
+| `maintenance.config.ts` | Config anterior (deprecated) |
+| `scripts/maintenance-*.ps1` | Scripts PowerShell (modo anterior) |
+
+---
+
+**Última actualización**: 21 de enero de 2026
+**Estado**: Infraestructura 100% + Modo mantenimiento con acceso privado
 **Velocidad**: 3x más rápido en segunda app gracias a componentes reutilizables
 **Servidor**: http://localhost:3000 (activo)
