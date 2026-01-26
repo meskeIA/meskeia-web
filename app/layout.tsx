@@ -6,6 +6,7 @@ import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import DynamicThemeColor from '@/components/DynamicThemeColor';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import RecentAppTracker from '@/components/RecentAppTracker';
+import TransparencyBanner from '@/components/TransparencyBanner';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -78,6 +79,7 @@ export default function RootLayout({
             <ServiceWorkerRegister />
             <RecentAppTracker />
             {children}
+            <TransparencyBanner />
           </ErrorBoundary>
         </ThemeProvider>
       </body>

@@ -20,3 +20,6 @@ export type { RelatedApp } from './RelatedApps';
 export { default as Sidebar } from './Sidebar';
 export { default as SidebarMobile } from './SidebarMobile';
 export { default as DailyApps } from './DailyApps';
+
+// Banner de transparencia (localStorage)
+export { default as TransparencyBanner } from './TransparencyBanner';
