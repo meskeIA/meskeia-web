@@ -8,17 +8,8 @@
  */
 
 export const implementedAppsUrls = [
-  // Finanzas y Fiscalidad (19 implementadas)
+  // Finanzas (apps universales, sin normativa española)
   "/calculadora-inflacion/",
-  "/calculadora-donaciones-cataluna/",
-  "/calculadora-donaciones-nacional/",
-  "/calculadora-sucesiones-cataluna/",
-  "/calculadora-sucesiones-nacional/",
-  "/calculadora-herencias/",
-  "/simulador-irpf/",
-  "/calculadora-plusvalias-irpf/",   // Plusvalías capital mobiliario (acciones, fondos, cripto)
-  "/guia-tramitacion-herencias/",    // Guía paso a paso para tramitar herencias
-  "/herencias-paso-a-paso/",         // Curso Herencias Paso a Paso (9 capítulos)
   "/calculadora-tir-van/",
   "/control-gastos/",
   "/interes-compuesto/",
@@ -35,26 +26,16 @@ export const implementedAppsUrls = [
   "/calculadora-regla-50-30-20/",     // Distribución presupuesto 50/30/20
   "/calculadora-fire/",               // Independencia financiera, retiro anticipado
   "/calculadora-alquiler-vs-compra/", // Análisis alquiler vs compra vivienda
-  "/simulador-compraventa-inmueble/", // Gastos compraventa: ITP, notaría, registro, plusvalía
   "/calculadora-coste-plazos/",       // Coste real financiación a plazos, TAE oculta
   "/calculadora-deuda/",              // Método bola de nieve vs avalancha
   "/comparador-vehiculos/",           // Comparador: contado vs financiación vs renting vs leasing
-  "/asistente-constitucion-sociedad/", // Guía SL, SLU, SA con checklist y costes
-  "/asistente-alta-autonomo/",         // Guía alta autónomo: checklist, cuota, tarifa plana
-  "/calendario-fiscal-emprendedor/",   // Calendario fiscal: fechas, modelos, estimador
-  "/comparador-formas-juridicas/",     // Comparador: autónomo, SL, cooperativa, asociación, CB
-  "/simulador-autonomo-vs-sl/",        // Comparativa fiscal autónomo vs SL
-  "/calculadora-cuota-autonomo/",      // Cuota autónomo por tramos 2025
-  "/asistente-constitucion-asociacion/", // Constituir asociación sin ánimo de lucro
-  "/calculadora-sueldo-neto/",          // Sueldo bruto a neto y viceversa
-  "/calculadora-coste-vivienda/",       // Coste real mensual de mantener vivienda
+  "/calculadora-coste-vivienda/",     // Coste real mensual de mantener vivienda
   "/calculadora-seguro-vida/",          // Necesidades de seguro de vida para proteger a la familia
   "/comparador-tipos-seguros/",         // Guía educativa: tipos de seguros vida, auto, hogar, salud
   "/checklist-coberturas-seguros/",     // Qué seguros necesitas según tu perfil
   "/calculadora-infraseguro/",          // Regla proporcional: cuánto cobras si tienes infraseguro
   "/guia-reclamar-seguro-coche/",       // Guía: cuándo reclamar al seguro del coche
   "/asistente-reclamaciones/",          // Asistente reclamaciones consumidor: derechos, plazos, OMIC
-  "/plazos-legales/",                   // Plazos prescripción y caducidad: garantías, deudas, despidos, multas
 
   // Calculadoras y Utilidades (14 implementadas)
   "/calculadora-propinas/",
@@ -210,9 +191,8 @@ export const implementedAppsUrls = [
   "/creador-thumbnails/",           // Creador de thumbnails para YouTube
   "/generador-og-images/",          // Imágenes OG para redes sociales 1200x630
 
-  // Emprendimiento y Negocios (8 implementadas)
+  // Emprendimiento y Negocios (7 implementadas) - Apps España-específicas movidas
   "/calculadora-tarifa-freelance/",
-  "/simulador-gastos-deducibles/",
   "/calculadora-break-even/",
   "/calculadora-roi-marketing/",
   "/planificador-cashflow/",

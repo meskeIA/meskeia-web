@@ -18,12 +18,12 @@ const tools = [
     step: 1,
   },
   {
-    id: 'simulador-compraventa',
-    name: 'Gastos de Compraventa',
+    id: 'coste-vivienda-gastos',
+    name: 'Gastos de Compra',
     icon: '📋',
-    url: '/simulador-compraventa-inmueble/',
+    url: '/calculadora-coste-vivienda/',
     question: '¿Cuánto me costará la compra además del precio?',
-    description: 'ITP o IVA, notaría, registro, gestoría, plusvalía... Todos los gastos que debes prever.',
+    description: 'Calcula todos los gastos asociados a la compra de tu vivienda.',
     step: 2,
   },
   {
@@ -270,11 +270,18 @@ export default function GuiaComprarCasaPage() {
           Otras guías que te pueden interesar
         </h2>
         <div className={styles.otherGuidesGrid}>
-          <Link href="/guia/emprendedor/" className={styles.otherGuideCard}>
-            <span className={styles.otherGuideIcon}>🚀</span>
+          <Link href="/guia/freelance/" className={styles.otherGuideCard}>
+            <span className={styles.otherGuideIcon}>💼</span>
             <div>
-              <h3 className={styles.otherGuideTitle}>Guía para Emprender</h3>
-              <p className={styles.otherGuideDescription}>Si vas a montar tu negocio</p>
+              <h3 className={styles.otherGuideTitle}>Guía Freelance</h3>
+              <p className={styles.otherGuideDescription}>Si trabajas por tu cuenta</p>
+            </div>
+          </Link>
+          <Link href="/guia/invertir/" className={styles.otherGuideCard}>
+            <span className={styles.otherGuideIcon}>📈</span>
+            <div>
+              <h3 className={styles.otherGuideTitle}>Guía para Invertir</h3>
+              <p className={styles.otherGuideDescription}>Ahorra para el futuro</p>
             </div>
           </Link>
         </div>

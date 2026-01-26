@@ -72,24 +72,18 @@ Las Guías son **landing pages** que agrupan herramientas para un **proceso de d
 - **5-7 herramientas**: Apps meskeIA existentes que cubren el proceso
 - **Audiencia amplia**: No nichos técnicos específicos
 
-### Guías implementadas (5)
+### Guías implementadas (3)
 
 | Guía | URL | Herramientas | Descripción |
 |------|-----|--------------|-------------|
-| Emprender | `/guia/emprendedor/` | 7 | Formas jurídicas, costes, fiscalidad |
 | Comprar Casa | `/guia/comprar-casa/` | 5 | Hipoteca, gastos, alquiler vs compra |
-| Freelance | `/guia/freelance/` | 6 | Cuotas, IRPF, IVA, tarifas, facturas |
-| Invertir | `/guia/invertir/` | 5 | Perfil inversor, interés compuesto, cartera |
-| Herencias | `/guia-tramitacion-herencias/` | 2 | Checklist interactivo (formato diferente) |
+| Freelance | `/guia/freelance/` | 3 | Tarifas, facturas, IVA |
+| Invertir | `/guia/invertir/` | 4 | Perfil inversor, interés compuesto, cartera |
 
 ### Estructura de carpetas para Guías
 
 ```
 app/guia/
-├── emprendedor/
-│   ├── metadata.ts
-│   ├── page.tsx
-│   └── GuiaEmprendedor.module.css
 ├── comprar-casa/
 │   ├── metadata.ts
 │   ├── page.tsx
@@ -103,8 +97,6 @@ app/guia/
     ├── page.tsx
     └── GuiaInvertir.module.css
 ```
-
-**Nota**: La Guía de Herencias usa la ruta `/guia-tramitacion-herencias/` (app existente con formato interactivo diferente).
 
 ### Estructura estándar de una Guía (page.tsx)
 

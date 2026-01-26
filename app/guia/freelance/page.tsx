@@ -9,31 +9,13 @@ import { getRelatedApps } from '@/data/app-relations';
 // Herramientas disponibles para freelances
 const tools = [
   {
-    id: 'cuota-autonomo',
-    name: 'Calculadora Cuota Autónomo',
-    icon: '💶',
-    url: '/calculadora-cuota-autonomo/',
-    question: '¿Cuánto pagaré de cuota a la Seguridad Social?',
-    description: 'Sistema de tramos 2025. Calcula tu cuota según ingresos reales y aprovecha la tarifa plana si eres nuevo.',
-    step: 1,
-  },
-  {
-    id: 'simulador-irpf',
-    name: 'Simulador IRPF',
-    icon: '📊',
-    url: '/simulador-irpf/',
-    question: '¿Cuánto pagaré de IRPF este año?',
-    description: 'Simula tu declaración de la renta. Deducciones, tipos marginales y resultado estimado.',
-    step: 2,
-  },
-  {
     id: 'calculadora-iva',
     name: 'Calculadora IVA',
     icon: '🧾',
     url: '/calculadora-iva/',
     question: '¿Cuánto IVA debo cobrar y declarar?',
     description: 'Calcula IVA al 21%, 10% o 4%. Separa base imponible de impuesto para tus facturas.',
-    step: 3,
+    step: 1,
   },
   {
     id: 'tarifa-freelance',
@@ -42,7 +24,7 @@ const tools = [
     url: '/calculadora-tarifa-freelance/',
     question: '¿Cuánto debería cobrar por hora/proyecto?',
     description: 'Calcula tu tarifa considerando gastos, impuestos, vacaciones y horas reales de trabajo.',
-    step: 4,
+    step: 2,
   },
   {
     id: 'generador-facturas',
@@ -51,16 +33,7 @@ const tools = [
     url: '/generador-facturas/',
     question: '¿Cómo hago una factura correcta?',
     description: 'Genera facturas profesionales con IVA e IRPF. Descarga en PDF listas para enviar.',
-    step: 5,
-  },
-  {
-    id: 'autonomo-vs-sl',
-    name: 'Autónomo vs SL',
-    icon: '⚖️',
-    url: '/simulador-autonomo-vs-sl/',
-    question: '¿Me conviene más ser autónomo o montar una SL?',
-    description: 'Comparativa fiscal completa. Descubre a partir de qué ingresos compensa constituir sociedad.',
-    step: 6,
+    step: 3,
   },
 ];
 
@@ -264,11 +237,11 @@ export default function GuiaFreelancePage() {
       <section className={styles.ctaSection}>
         <h2 className={styles.ctaTitle}>¿Listo para dar el salto?</h2>
         <p className={styles.ctaText}>
-          Empieza calculando cuánto pagarás de cuota de autónomo.
-          Es el primer coste fijo que debes conocer.
+          Empieza calculando cuánto cobrar por tus servicios.
+          Es la base para que tu negocio sea rentable.
         </p>
-        <Link href="/calculadora-cuota-autonomo/" className={styles.ctaButton}>
-          Calcular mi cuota de autónomo
+        <Link href="/calculadora-tarifa-freelance/" className={styles.ctaButton}>
+          Calcular mi tarifa freelance
         </Link>
       </section>
 
@@ -279,11 +252,11 @@ export default function GuiaFreelancePage() {
           Otras guías que te pueden interesar
         </h2>
         <div className={styles.otherGuidesGrid}>
-          <Link href="/guia/emprendedor/" className={styles.otherGuideCard}>
-            <span className={styles.otherGuideIcon}>🚀</span>
+          <Link href="/guia/invertir/" className={styles.otherGuideCard}>
+            <span className={styles.otherGuideIcon}>📈</span>
             <div>
-              <h3 className={styles.otherGuideTitle}>Guía para Emprender</h3>
-              <p className={styles.otherGuideDescription}>Si quieres montar un negocio</p>
+              <h3 className={styles.otherGuideTitle}>Guía para Invertir</h3>
+              <p className={styles.otherGuideDescription}>Haz crecer tus ahorros</p>
             </div>
           </Link>
           <Link href="/guia/comprar-casa/" className={styles.otherGuideCard}>

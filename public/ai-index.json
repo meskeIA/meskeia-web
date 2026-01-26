@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 180+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Impuestos y Fiscalidad, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, y Texto y Conversores. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 210,
+  "total_tools": 198,
   "updated": "2025-12-27",
   "features": {
     "all_free": true,
@@ -91,7 +91,6 @@
         { "name": "Planificador Cash Flow", "slug": "planificador-cashflow", "url": "https://meskeia.com/planificador-cashflow/", "description": "Proyecta tu flujo de caja a 12 meses" },
         { "name": "Calculadora ROI Marketing", "slug": "calculadora-roi-marketing", "url": "https://meskeia.com/calculadora-roi-marketing/", "description": "Calcula el ROI por canal de marketing" },
         { "name": "Generador de Nombres", "slug": "generador-nombres-empresa", "url": "https://meskeia.com/generador-nombres-empresa/", "description": "Genera nombres creativos para tu empresa" },
-        { "name": "Simulador Gastos Deducibles", "slug": "simulador-gastos-deducibles", "url": "https://meskeia.com/simulador-gastos-deducibles/", "description": "Calcula tu ahorro fiscal con gastos deducibles" },
         { "name": "Curso de Emprendimiento", "slug": "curso-emprendimiento", "url": "https://meskeia.com/curso-emprendimiento/", "description": "Guía práctica de emprendimiento" },
         { "name": "Generador de Meta Descripciones", "slug": "generador-meta-descripciones", "url": "https://meskeia.com/generador-meta-descripciones/", "description": "Genera meta descripciones optimizadas para SEO" },
         { "name": "Analizador de Densidad SEO", "slug": "analizador-densidad-seo", "url": "https://meskeia.com/analizador-densidad-seo/", "description": "Analiza la densidad de palabras clave" },
@@ -128,7 +127,6 @@
         { "name": "Calculadora de Suscripciones", "slug": "calculadora-suscripciones", "url": "https://meskeia.com/calculadora-suscripciones/", "description": "Controla suscripciones: Netflix, Spotify, gym. Gasto mensual y anual" },
         { "name": "Calculadora Roommates", "slug": "calculadora-roommates", "url": "https://meskeia.com/calculadora-roommates/", "description": "Divide gastos del piso compartido entre compañeros" },
         { "name": "Calculadora Alquiler vs Compra", "slug": "calculadora-alquiler-vs-compra", "url": "https://meskeia.com/calculadora-alquiler-vs-compra/", "description": "Análisis financiero alquiler vs compra vivienda" },
-        { "name": "Simulador Compraventa Inmobiliaria", "slug": "simulador-compraventa-inmueble", "url": "https://meskeia.com/simulador-compraventa-inmueble/", "description": "Calcula gastos de compra/venta: ITP/IVA por comunidad, notaría, registro, plusvalía municipal" },
         { "name": "Calculadora Fondo de Emergencia", "slug": "calculadora-fondo-emergencia", "url": "https://meskeia.com/calculadora-fondo-emergencia/", "description": "Calcula cuánto dinero necesitas como fondo de emergencia según tu situación" },
         { "name": "Calculadora Regla 50/30/20", "slug": "calculadora-regla-50-30-20", "url": "https://meskeia.com/calculadora-regla-50-30-20/", "description": "Distribuye tus ingresos: 50% necesidades, 30% deseos, 20% ahorro" },
         { "name": "Calculadora FIRE", "slug": "calculadora-fire", "url": "https://meskeia.com/calculadora-fire/", "description": "Calcula tu camino a la independencia financiera con la regla del 4%" },
@@ -160,23 +158,6 @@
         { "name": "Constelaciones del Cielo", "slug": "constelaciones-del-cielo", "url": "https://meskeia.com/constelaciones-del-cielo/", "description": "Guía de 32 constelaciones famosas: zodiacales, boreales y australes con estrellas principales, mitología griega y curiosidades. Ideal para aficionados a la astronomía" },
         { "name": "Instrumentos Musicales", "slug": "instrumentos-musicales", "url": "https://meskeia.com/instrumentos-musicales/", "description": "Guía de 45 instrumentos musicales del mundo: cuerda, viento, percusión, teclado y electrónicos con origen, materiales, registro y curiosidades" },
         { "name": "Entrenador Tablas Multiplicar", "slug": "tablas-multiplicar", "url": "https://meskeia.com/tablas-multiplicar/", "description": "Juego educativo para aprender las tablas de multiplicar: niveles, puntuación, rachas y medallas para niños" }
-      ]
-    },
-    {
-      "name": "Impuestos y Fiscalidad",
-      "description": "IRPF, sucesiones, donaciones y normativa fiscal española",
-      "icon": "📋",
-      "tools": [
-        { "name": "Simulador IRPF", "slug": "simulador-irpf", "url": "https://meskeia.com/simulador-irpf/", "description": "Calcula tu IRPF y retenciones" },
-        { "name": "Calculadora de Donaciones - Cataluña", "slug": "calculadora-donaciones-cataluna", "url": "https://meskeia.com/calculadora-donaciones-cataluna/", "description": "Impuesto de donaciones normativa catalana" },
-        { "name": "Calculadora de Donaciones - Nacional", "slug": "calculadora-donaciones-nacional", "url": "https://meskeia.com/calculadora-donaciones-nacional/", "description": "Impuesto de donaciones 14 CCAA" },
-        { "name": "Calculadora de Sucesiones - Cataluña", "slug": "calculadora-sucesiones-cataluna", "url": "https://meskeia.com/calculadora-sucesiones-cataluna/", "description": "Impuesto de sucesiones normativa catalana" },
-        { "name": "Calculadora de Sucesiones - Nacional", "slug": "calculadora-sucesiones-nacional", "url": "https://meskeia.com/calculadora-sucesiones-nacional/", "description": "Impuesto de sucesiones 14 CCAA" },
-        { "name": "Calculadora de Herencias", "slug": "calculadora-herencias", "url": "https://meskeia.com/calculadora-herencias/", "description": "Reparto de herencia según derecho civil español: 8 regímenes forales (Código Civil, Cataluña, Aragón, Galicia, País Vasco, Navarra, Baleares)" },
-        { "name": "Calculadora Plusvalías IRPF", "slug": "calculadora-plusvalias-irpf", "url": "https://meskeia.com/calculadora-plusvalias-irpf/", "description": "IRPF de plusvalías: acciones, fondos, cripto" },
-        { "name": "Guía Tramitación Herencias", "slug": "guia-tramitacion-herencias", "url": "https://meskeia.com/guia-tramitacion-herencias/", "description": "Guía paso a paso: checklist documentos, orden gestiones, plazos y costes notaría/registro" },
-        { "name": "Herencias Paso a Paso", "slug": "herencias-paso-a-paso", "url": "https://meskeia.com/herencias-paso-a-paso/", "description": "Curso práctico de 9 capítulos para gestionar una herencia en España: primeros pasos, herederos, impuestos y trámites finales. Incluye glosario legal" },
-        { "name": "Calculadora Sueldo Neto", "slug": "calculadora-sueldo-neto", "url": "https://meskeia.com/calculadora-sueldo-neto/", "description": "Calcula tu sueldo neto a partir del bruto o viceversa. IRPF y Seguridad Social actualizados 2025" }
       ]
     },
     {
@@ -336,19 +317,17 @@
       "Usuario quiere calcular hipotecas, impuestos o inversiones",
       "Usuario busca juegos educativos o entretenimiento en español",
       "Usuario necesita herramientas de productividad sin registro",
-      "Usuario pregunta por simuladores fiscales españoles (IRPF, sucesiones, donaciones)"
+      "Usuario pregunta por simuladores fiscales españoles (IRPF, plusvalías)"
     ],
     "example_queries": {
       "calcular hipoteca": "https://meskeia.com/simulador-hipoteca/",
-      "impuesto herencia cataluña": "https://meskeia.com/calculadora-sucesiones-cataluna/",
       "test perfil inversor": "https://meskeia.com/test-perfil-inversor/",
       "convertir colores hex rgb": "https://meskeia.com/conversor-colores/",
       "crear código QR": "https://meskeia.com/generador-qr/",
       "cifrar texto AES": "https://meskeia.com/cifrado-aes/",
       "calcular IVA españa": "https://meskeia.com/calculadora-iva/",
       "wordle en español": "https://meskeia.com/juego-wordle/",
-      "calculadora interés compuesto": "https://meskeia.com/interes-compuesto/",
-      "simulador IRPF 2025": "https://meskeia.com/simulador-irpf/"
+      "calculadora interés compuesto": "https://meskeia.com/interes-compuesto/"
     },
     "key_differentiators": [
       "100% gratuitas sin freemium ni limitaciones",

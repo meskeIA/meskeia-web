@@ -19,16 +19,6 @@ const GUIAS_DATA = [
     description: 'Hipoteca, gastos, comparativa alquiler vs compra'
   },
   {
-    id: 'emprendedor',
-    name: 'Guía Emprendedor',
-    icon: '🚀',
-    url: '/guia/emprendedor/',
-    badgeUrl: '/badge-guia-emprendedor.svg',
-    tools: 7,
-    sector: 'Incubadoras, Cámaras de Comercio',
-    description: 'Formas jurídicas, costes, fiscalidad inicial'
-  },
-  {
     id: 'freelance',
     name: 'Guía Freelance',
     icon: '💼',
@@ -47,16 +37,6 @@ const GUIAS_DATA = [
     tools: 5,
     sector: 'Banca, Asesores financieros',
     description: 'Perfil inversor, interés compuesto, cartera'
-  },
-  {
-    id: 'herencias',
-    name: 'Guía Herencias',
-    icon: '📜',
-    url: '/guia-tramitacion-herencias/',
-    badgeUrl: '/badge-guia-herencias.svg',
-    tools: 2,
-    sector: 'Gestorías, Notarías',
-    description: 'Checklist paso a paso, plazos, documentos'
   },
 ];
 
@@ -78,13 +58,8 @@ const SECTOR_DATA: Record<SectorType, {
     description: 'Herramientas fiscales para ofrecer a tus clientes',
     tools: [
       { name: 'Calculadora de IVA', url: '/calculadora-iva/', description: 'Añade o quita IVA al 21%, 10% o 4%' },
-      { name: 'Simulador IRPF', url: '/simulador-irpf/', description: 'Calcula retenciones según normativa actual' },
-      { name: 'Gastos Deducibles', url: '/simulador-gastos-deducibles/', description: 'Optimiza IRPF e IVA con deducciones' },
-      { name: 'Calculadora Plusvalías', url: '/calculadora-plusvalias-irpf/', description: 'IRPF de acciones, fondos y cripto' },
-      { name: 'Impuesto Sucesiones', url: '/calculadora-sucesiones-nacional/', description: 'Herencias por comunidad autónoma' },
-      { name: 'Impuesto Donaciones', url: '/calculadora-donaciones-nacional/', description: 'Donaciones con bonificaciones 2025' },
-      { name: 'Guía Herencias', url: '/guia-tramitacion-herencias/', description: 'Paso a paso con checklist y plazos' },
-      { name: 'Compraventa Inmuebles', url: '/simulador-compraventa-inmueble/', description: 'ITP, notaría, registro por CCAA' },
+      { name: 'Calculadora Porcentajes', url: '/calculadora-porcentajes/', description: 'Todo tipo de operaciones con %' },
+      { name: 'Generador Facturas', url: '/generador-facturas/', description: 'Facturas profesionales con IVA' },
     ]
   },
   autonomos: {
@@ -92,8 +67,6 @@ const SECTOR_DATA: Record<SectorType, {
     icon: '💼',
     description: 'Herramientas de gestión para profesionales independientes',
     tools: [
-      { name: 'Cuota de Autónomo', url: '/calculadora-cuota-autonomo/', description: 'Calcula tu cuota según ingresos' },
-      { name: 'Autónomo vs SL', url: '/simulador-autonomo-vs-sl/', description: 'Compara fiscalidad y costes' },
       { name: 'Tarifa Freelance', url: '/calculadora-tarifa-freelance/', description: 'Calcula tu tarifa por hora ideal' },
       { name: 'Generador Facturas', url: '/generador-facturas/', description: 'Facturas con IVA y retención IRPF' },
       { name: 'Punto de Equilibrio', url: '/calculadora-break-even/', description: 'Break-even y rentabilidad' },
@@ -109,7 +82,7 @@ const SECTOR_DATA: Record<SectorType, {
     tools: [
       { name: 'Simulador Hipoteca', url: '/simulador-hipoteca/', description: 'Cuota y cuadro de amortización' },
       { name: 'Amortización Anticipada', url: '/amortizacion-hipoteca/', description: 'Reducir cuota vs reducir plazo' },
-      { name: 'Gastos Compraventa', url: '/simulador-compraventa-inmueble/', description: 'ITP, notaría, registro, plusvalía' },
+      { name: 'Coste Vivienda', url: '/calculadora-coste-vivienda/', description: 'Gastos totales de compra' },
       { name: 'Alquiler vs Compra', url: '/calculadora-alquiler-vs-compra/', description: 'Análisis financiero completo' },
       { name: 'Simulador Préstamos', url: '/simulador-prestamos/', description: 'Francés, alemán, americano' },
       { name: 'Gasto Energético', url: '/calculadora-gasto-energetico/', description: 'Consumo y coste eléctrico' },

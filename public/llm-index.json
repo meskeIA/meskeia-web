@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 240+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 220+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 240,
-  "last_updated": "2025-12-31",
+  "total_tools": 220,
+  "last_updated": "2026-01-26",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -21,14 +21,14 @@
       "name": "Fiscal y Herencias",
       "icon": "🏛️",
       "description": "Impuestos, herencias, donaciones y trámites fiscales",
-      "tool_count": 22
+      "tool_count": 3
     },
     {
       "id": "inmobiliaria",
       "name": "Inmobiliaria y Hogar",
       "icon": "🏘️",
       "description": "Hipotecas, alquiler y gestión del hogar",
-      "tool_count": 21
+      "tool_count": 20
     },
     {
       "id": "finanzas",
@@ -42,7 +42,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 26
+      "tool_count": 17
     },
     {
       "id": "marketing",
@@ -84,14 +84,14 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 44
+      "tool_count": 43
     },
     {
       "id": "productividad",
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 38
+      "tool_count": 37
     },
     {
       "id": "tecnicas",
@@ -107,28 +107,28 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 98
+      "tool_count": 87
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 79
+      "tool_count": 78
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 65
+      "tool_count": 64
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 59
+      "tool_count": 39
     },
     {
       "id": "creando",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 36
+      "tool_count": 35
     }
   ],
   "tools": [
@@ -1262,29 +1262,6 @@
       "icon": "💼"
     },
     {
-      "slug": "simulador-gastos-deducibles",
-      "name": "Simulador Gastos Deducibles",
-      "url": "https://meskeia.com/simulador-gastos-deducibles/",
-      "description": "Calcula tu ahorro fiscal con gastos deducibles. Descubre qué gastos puedes deducir (100%, 50%, 30%) y optimiza tu declaración de IRPF e IVA",
-      "suites": [
-        "fiscal",
-        "freelance"
-      ],
-      "contexts": [
-        "trabajo",
-        "dinero"
-      ],
-      "keywords": [
-        "gastos deducibles",
-        "autonomo",
-        "irpf",
-        "iva",
-        "hacienda",
-        "deduccion"
-      ],
-      "icon": "💼"
-    },
-    {
       "slug": "curso-emprendimiento",
       "name": "Curso de Emprendimiento",
       "url": "https://meskeia.com/curso-emprendimiento/",
@@ -1512,212 +1489,6 @@
         "pequeña empresa"
       ],
       "icon": "🧾"
-    },
-    {
-      "slug": "asistente-constitucion-sociedad",
-      "name": "Asistente de Constitución de Sociedad",
-      "url": "https://meskeia.com/asistente-constitucion-sociedad/",
-      "description": "Guía paso a paso para constituir SL, SLU o SA en España. Checklist interactivo, formulario de datos, calculadora de costes y documentos necesarios",
-      "suites": [
-        "fiscal",
-        "freelance"
-      ],
-      "contexts": [
-        "trabajo",
-        "dinero"
-      ],
-      "keywords": [
-        "constituir sociedad",
-        "crear empresa",
-        "sociedad limitada",
-        "sl",
-        "slu",
-        "sociedad anonima",
-        "sa",
-        "registro mercantil",
-        "notario",
-        "escritura",
-        "capital social",
-        "estatutos",
-        "cif",
-        "emprendedor"
-      ],
-      "icon": "🏢"
-    },
-    {
-      "slug": "asistente-alta-autonomo",
-      "name": "Asistente Alta Autónomo",
-      "url": "https://meskeia.com/asistente-alta-autonomo/",
-      "description": "Guía completa para darte de alta como autónomo en España. Checklist con todos los trámites, calculadora de cuota y tarifa plana, comparativa autónomo vs SL",
-      "suites": [
-        "fiscal",
-        "freelance"
-      ],
-      "contexts": [
-        "trabajo",
-        "dinero"
-      ],
-      "keywords": [
-        "alta autonomo",
-        "autonomo",
-        "freelance",
-        "reta",
-        "tarifa plana",
-        "modelo 036",
-        "modelo 037",
-        "cuota autonomo",
-        "iae",
-        "epigrafe",
-        "hacienda",
-        "seguridad social",
-        "emprender"
-      ],
-      "icon": "💼"
-    },
-    {
-      "slug": "calendario-fiscal-emprendedor",
-      "name": "Calendario Fiscal del Emprendedor",
-      "url": "https://meskeia.com/calendario-fiscal-emprendedor/",
-      "description": "Calendario fiscal 2025 para autónomos y sociedades. Fechas límite de declaraciones, modelos tributarios (303, 130, 111, 200), recordatorios y estimador de pagos",
-      "suites": [
-        "fiscal",
-        "freelance"
-      ],
-      "contexts": [
-        "trabajo",
-        "dinero"
-      ],
-      "keywords": [
-        "calendario fiscal",
-        "fechas declaraciones",
-        "modelo 303",
-        "modelo 130",
-        "modelo 111",
-        "modelo 200",
-        "iva trimestral",
-        "irpf",
-        "impuesto sociedades",
-        "autonomo",
-        "pyme",
-        "obligaciones fiscales",
-        "hacienda",
-        "aeat",
-        "plazos tributarios"
-      ],
-      "icon": "📅"
-    },
-    {
-      "slug": "comparador-formas-juridicas",
-      "name": "Comparador de Formas Jurídicas",
-      "url": "https://meskeia.com/comparador-formas-juridicas/",
-      "description": "Compara autónomo, SL, SLU, cooperativa, asociación y comunidad de bienes. Tabla comparativa, test de recomendación y ficha detallada de cada forma jurídica",
-      "suites": [
-        "fiscal",
-        "freelance"
-      ],
-      "contexts": [
-        "trabajo",
-        "dinero"
-      ],
-      "keywords": [
-        "formas juridicas",
-        "autonomo vs sl",
-        "comparador empresas",
-        "sociedad limitada",
-        "cooperativa",
-        "asociacion",
-        "comunidad de bienes",
-        "emprender",
-        "constituir empresa",
-        "responsabilidad limitada",
-        "capital social",
-        "fiscalidad autonomo",
-        "irpf",
-        "impuesto sociedades"
-      ],
-      "icon": "⚖️"
-    },
-    {
-      "slug": "simulador-autonomo-vs-sl",
-      "name": "Simulador Autónomo vs SL",
-      "url": "https://meskeia.com/simulador-autonomo-vs-sl/",
-      "description": "Compara fiscalmente ser autónomo o crear una SL según tu facturación y gastos. Calcula IRPF vs Impuesto de Sociedades, cuotas RETA y descubre qué opción te conviene más",
-      "suites": [
-        "fiscal",
-        "freelance"
-      ],
-      "contexts": [
-        "trabajo",
-        "dinero"
-      ],
-      "keywords": [
-        "autonomo vs sl",
-        "comparativa fiscal",
-        "irpf vs impuesto sociedades",
-        "elegir forma juridica",
-        "simulador fiscal",
-        "tributacion autonomo",
-        "tributacion sl",
-        "reta",
-        "cuota autonomo",
-        "impuesto sociedades",
-        "emprender"
-      ],
-      "icon": "📊"
-    },
-    {
-      "slug": "calculadora-cuota-autonomo",
-      "name": "Calculadora Cuota de Autónomo",
-      "url": "https://meskeia.com/calculadora-cuota-autonomo/",
-      "description": "Calcula tu cuota de autónomo según tus ingresos reales. Sistema de cotización por tramos 2025, tarifa plana, bonificaciones y simulador de pagos mensuales",
-      "suites": [
-        "fiscal",
-        "freelance"
-      ],
-      "contexts": [
-        "trabajo",
-        "dinero"
-      ],
-      "keywords": [
-        "cuota autonomo",
-        "calculadora reta",
-        "cotizacion autonomos",
-        "tarifa plana",
-        "cuota seguridad social",
-        "autonomo ingresos reales",
-        "tramos cotizacion",
-        "base cotizacion",
-        "cuota minima autonomo"
-      ],
-      "icon": "💼"
-    },
-    {
-      "slug": "asistente-constitucion-asociacion",
-      "name": "Asistente Constitución de Asociación",
-      "url": "https://meskeia.com/asistente-constitucion-asociacion/",
-      "description": "Guía paso a paso para constituir una asociación sin ánimo de lucro en España. Genera Acta Fundacional, Estatutos y documentos para el Registro de Asociaciones. Ley 49/2002",
-      "suites": [
-        "fiscal",
-        "freelance"
-      ],
-      "contexts": [
-        "trabajo",
-        "dinero"
-      ],
-      "keywords": [
-        "constituir asociacion",
-        "asociacion sin animo lucro",
-        "acta fundacional",
-        "estatutos asociacion",
-        "registro asociaciones",
-        "ley 49/2002",
-        "ong",
-        "fundadores",
-        "junta directiva",
-        "asl",
-        "entidad no lucrativa"
-      ],
-      "icon": "🤝"
     },
     {
       "slug": "calculadora-presupuestos",
@@ -2021,33 +1792,6 @@
         "reducir plazo",
         "ahorro intereses",
         "cancelacion parcial"
-      ],
-      "icon": "🏠"
-    },
-    {
-      "slug": "simulador-compraventa-inmueble",
-      "name": "Simulador de Compraventa Inmobiliaria",
-      "url": "https://meskeia.com/simulador-compraventa-inmueble/",
-      "description": "Calcula todos los gastos de compra y venta de vivienda: ITP/IVA por comunidad, notaría, registro, plusvalía municipal. Comprador y vendedor",
-      "suites": [
-        "inmobiliaria",
-        "fiscal"
-      ],
-      "contexts": [
-        "dinero",
-        "casa"
-      ],
-      "keywords": [
-        "compraventa",
-        "vivienda",
-        "itp",
-        "iva",
-        "notario",
-        "registro",
-        "plusvalia",
-        "gastos compra piso",
-        "segunda mano",
-        "impuestos inmuebles"
       ],
       "icon": "🏠"
     },
@@ -2447,33 +2191,6 @@
         "arbitraje consumo"
       ],
       "icon": "⚖️"
-    },
-    {
-      "slug": "plazos-legales",
-      "name": "Plazos Legales España",
-      "url": "https://meskeia.com/plazos-legales/",
-      "description": "Consulta plazos de prescripción y caducidad: garantías, deudas, despidos, multas, herencias, reclamaciones y más. Con referencias legales",
-      "suites": [
-        "cultura",
-        "productividad"
-      ],
-      "contexts": [
-        "dinero",
-        "trabajo",
-        "curiosidad"
-      ],
-      "keywords": [
-        "plazos legales",
-        "prescripcion",
-        "caducidad",
-        "garantia",
-        "deudas",
-        "despido",
-        "multas",
-        "herencia",
-        "reclamacion"
-      ],
-      "icon": "⏱️"
     },
     {
       "slug": "calculadora-movimiento",
@@ -3016,251 +2733,6 @@
         "adopcion"
       ],
       "icon": "🐾"
-    },
-    {
-      "slug": "simulador-irpf",
-      "name": "Simulador IRPF",
-      "url": "https://meskeia.com/simulador-irpf/",
-      "description": "Calcula tu IRPF y retenciones según la normativa fiscal española actual",
-      "suites": [
-        "fiscal"
-      ],
-      "contexts": [
-        "dinero",
-        "trabajo"
-      ],
-      "keywords": [
-        "impuestos",
-        "renta",
-        "hacienda",
-        "declaracion",
-        "retenciones",
-        "fiscal"
-      ],
-      "icon": "💰"
-    },
-    {
-      "slug": "calculadora-donaciones-cataluna",
-      "name": "Calculadora de Donaciones - Cataluña",
-      "url": "https://meskeia.com/calculadora-donaciones-cataluna/",
-      "description": "Calcula el impuesto de donaciones según la normativa catalana con tarifa reducida, primera vivienda y bonificaciones",
-      "suites": [
-        "fiscal"
-      ],
-      "contexts": [
-        "dinero"
-      ],
-      "keywords": [
-        "donacion",
-        "impuesto",
-        "cataluna",
-        "catalunya",
-        "herencia",
-        "fiscal",
-        "tarifa reducida"
-      ],
-      "icon": "💰"
-    },
-    {
-      "slug": "calculadora-donaciones-nacional",
-      "name": "Calculadora de Donaciones - Nacional",
-      "url": "https://meskeia.com/calculadora-donaciones-nacional/",
-      "description": "Calcula el impuesto de donaciones para 14 comunidades autónomas con bonificaciones actualizadas 2025",
-      "suites": [
-        "fiscal"
-      ],
-      "contexts": [
-        "dinero"
-      ],
-      "keywords": [
-        "donacion",
-        "impuesto",
-        "comunidad autonoma",
-        "regimen comun",
-        "nacional",
-        "fiscal",
-        "madrid",
-        "andalucia"
-      ],
-      "icon": "💰"
-    },
-    {
-      "slug": "calculadora-sucesiones-cataluna",
-      "name": "Calculadora de Sucesiones - Cataluña",
-      "url": "https://meskeia.com/calculadora-sucesiones-cataluna/",
-      "description": "Calcula el impuesto de sucesiones (herencias) con normativa catalana: bonificación cónyuge 99%, vivienda habitual 95%",
-      "suites": [
-        "fiscal"
-      ],
-      "contexts": [
-        "dinero"
-      ],
-      "keywords": [
-        "herencia",
-        "testamento",
-        "sucesion",
-        "impuesto",
-        "cataluna",
-        "catalunya",
-        "fiscal"
-      ],
-      "icon": "💰"
-    },
-    {
-      "slug": "calculadora-sucesiones-nacional",
-      "name": "Calculadora de Sucesiones - Nacional",
-      "url": "https://meskeia.com/calculadora-sucesiones-nacional/",
-      "description": "Calcula el impuesto de sucesiones para 14 CCAA: bonificaciones desde 99% (Madrid) hasta 0% (Asturias)",
-      "suites": [
-        "fiscal"
-      ],
-      "contexts": [
-        "dinero"
-      ],
-      "keywords": [
-        "herencia",
-        "testamento",
-        "sucesion",
-        "impuesto",
-        "regimen comun",
-        "nacional",
-        "fiscal",
-        "bonificaciones"
-      ],
-      "icon": "💰"
-    },
-    {
-      "slug": "calculadora-herencias",
-      "name": "Calculadora de Herencias",
-      "url": "https://meskeia.com/calculadora-herencias/",
-      "description": "Calcula el reparto de herencia según derecho civil español. Incluye 8 regímenes: Código Civil, Cataluña, Aragón, Galicia, País Vasco, Navarra y Baleares",
-      "suites": [
-        "fiscal"
-      ],
-      "contexts": [
-        "dinero"
-      ],
-      "keywords": [
-        "herencia",
-        "reparto",
-        "legitima",
-        "derecho civil",
-        "foral",
-        "codigo civil",
-        "mejora",
-        "libre disposicion",
-        "usufructo",
-        "viudo",
-        "cataluna",
-        "aragon",
-        "navarra",
-        "pais vasco",
-        "galicia",
-        "baleares"
-      ],
-      "icon": "⚖️"
-    },
-    {
-      "slug": "calculadora-plusvalias-irpf",
-      "name": "Calculadora Plusvalías IRPF",
-      "url": "https://meskeia.com/calculadora-plusvalias-irpf/",
-      "description": "Calcula el IRPF de tus inversiones: plusvalías de acciones, fondos, criptomonedas, dividendos e intereses con tramos 2025",
-      "suites": [
-        "fiscal"
-      ],
-      "contexts": [
-        "dinero"
-      ],
-      "keywords": [
-        "plusvalias",
-        "irpf",
-        "capital mobiliario",
-        "dividendos",
-        "acciones",
-        "criptomonedas",
-        "fondos",
-        "tramos ahorro"
-      ],
-      "icon": "📊"
-    },
-    {
-      "slug": "guia-tramitacion-herencias",
-      "name": "Guía Tramitación Herencias",
-      "url": "https://meskeia.com/guia-tramitacion-herencias/",
-      "description": "Guía paso a paso para tramitar una herencia: checklist documentos, orden de gestiones, plazos críticos y costes orientativos de notaría y registro",
-      "suites": [
-        "fiscal"
-      ],
-      "contexts": [
-        "dinero"
-      ],
-      "keywords": [
-        "herencia",
-        "tramitar",
-        "testamento",
-        "notario",
-        "registro",
-        "sucesion",
-        "documentos",
-        "checklist",
-        "plazos",
-        "abintestato"
-      ],
-      "icon": "📋"
-    },
-    {
-      "slug": "herencias-paso-a-paso",
-      "name": "Herencias Paso a Paso",
-      "url": "https://meskeia.com/herencias-paso-a-paso/",
-      "description": "Curso práctico de 9 capítulos para gestionar una herencia en España: desde los primeros pasos hasta la escritura final. Incluye glosario legal y enlaces a calculadoras de impuestos",
-      "suites": [
-        "fiscal"
-      ],
-      "contexts": [
-        "estudio",
-        "dinero"
-      ],
-      "keywords": [
-        "herencia",
-        "curso",
-        "sucesion",
-        "testamento",
-        "herederos",
-        "impuesto sucesiones",
-        "plusvalia",
-        "notario",
-        "registro",
-        "aceptar herencia",
-        "renunciar herencia",
-        "glosario legal"
-      ],
-      "icon": "📜"
-    },
-    {
-      "slug": "calculadora-sueldo-neto",
-      "name": "Calculadora Sueldo Neto",
-      "url": "https://meskeia.com/calculadora-sueldo-neto/",
-      "description": "Calcula tu sueldo neto a partir del bruto o viceversa. Incluye IRPF, Seguridad Social y deducciones actualizadas para España 2025",
-      "suites": [
-        "fiscal",
-        "freelance"
-      ],
-      "contexts": [
-        "trabajo",
-        "dinero"
-      ],
-      "keywords": [
-        "sueldo neto",
-        "sueldo bruto",
-        "nomina",
-        "irpf",
-        "seguridad social",
-        "retenciones",
-        "salario",
-        "cotizaciones",
-        "pagas"
-      ],
-      "icon": "💶"
     },
     {
       "slug": "calculadora-coste-vivienda",

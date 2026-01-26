@@ -36,22 +36,9 @@ const estudiantesApps: RelatedApp[] = [
 ];
 
 // ==========================================
-// FAMILIA: HERENCIAS Y FISCAL
+// FAMILIA: HERENCIAS Y FISCAL - MOVIDAS A EX-MESKEIA
 // ==========================================
-const herenciasApps: RelatedApp[] = [
-  { url: '/calculadora-herencias/', icon: '⚖️', name: 'Calculadora Herencias', description: 'Reparto según derecho civil' },
-  { url: '/calculadora-sucesiones-cataluna/', icon: '🏛️', name: 'Sucesiones Cataluña', description: 'Impuesto de sucesiones' },
-  { url: '/calculadora-sucesiones-nacional/', icon: '🇪🇸', name: 'Sucesiones Nacional', description: 'Normativa estatal' },
-  { url: '/guia-tramitacion-herencias/', icon: '📋', name: 'Guía Herencias', description: 'Pasos a seguir' },
-  { url: '/herencias-paso-a-paso/', icon: '📚', name: 'Curso Herencias', description: '9 capítulos completos' },
-];
-
-const donacionesApps: RelatedApp[] = [
-  { url: '/calculadora-donaciones-cataluna/', icon: '🎁', name: 'Donaciones Cataluña', description: 'Impuesto donaciones' },
-  { url: '/calculadora-donaciones-nacional/', icon: '🇪🇸', name: 'Donaciones Nacional', description: 'Normativa estatal' },
-  { url: '/calculadora-sucesiones-cataluna/', icon: '🏛️', name: 'Sucesiones Cataluña', description: 'Herencias en Cataluña' },
-  { url: '/calculadora-sucesiones-nacional/', icon: '🇪🇸', name: 'Sucesiones Nacional', description: 'Herencias estatal' },
-];
+// herenciasApps y donacionesApps eliminadas
 
 // ==========================================
 // FAMILIA: FINANZAS PERSONALES
@@ -69,7 +56,6 @@ const finanzasHipotecaApps: RelatedApp[] = [
   { url: '/amortizacion-hipoteca/', icon: '💰', name: 'Amortización Anticipada', description: 'Reducir cuota vs plazo' },
   { url: '/simulador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas' },
   { url: '/calculadora-alquiler-vs-compra/', icon: '🔑', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
-  { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos Compraventa', description: 'ITP, notaría, plusvalía' },
 ];
 
 const finanzasPersonalesApps: RelatedApp[] = [
@@ -85,10 +71,7 @@ const finanzasPersonalesApps: RelatedApp[] = [
 ];
 
 const fiscalApps: RelatedApp[] = [
-  { url: '/simulador-irpf/', icon: '📋', name: 'Simulador IRPF', description: 'Calcula tu declaración' },
-  { url: '/calculadora-plusvalias-irpf/', icon: '📈', name: 'Plusvalías IRPF', description: 'Ganancias patrimoniales' },
   { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Añadir o quitar IVA' },
-  { url: '/simulador-gastos-deducibles/', icon: '✅', name: 'Gastos Deducibles', description: 'Para autónomos' },
 ];
 
 // ==========================================
@@ -209,19 +192,11 @@ const disenoExtraApps: RelatedApp[] = [
 // ==========================================
 const freelanceApps: RelatedApp[] = [
   { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu hora' },
-  { url: '/simulador-gastos-deducibles/', icon: '✅', name: 'Gastos Deducibles', description: 'Para autónomos' },
   { url: '/calculadora-presupuestos/', icon: '📋', name: 'Presupuestos', description: 'Propuestas a clientes' },
   { url: '/generador-facturas/', icon: '🧾', name: 'Generador Facturas', description: 'Facturas con IVA/IRPF' },
 ];
 
 const emprendimientoApps: RelatedApp[] = [
-  { url: '/asistente-constitucion-sociedad/', icon: '🏢', name: 'Constituir Sociedad', description: 'SL, SLU o SA paso a paso' },
-  { url: '/asistente-alta-autonomo/', icon: '💼', name: 'Alta Autónomo', description: 'Darse de alta paso a paso' },
-  { url: '/asistente-constitucion-asociacion/', icon: '🤝', name: 'Constituir Asociación', description: 'ASL sin ánimo de lucro' },
-  { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Fechas y modelos tributarios' },
-  { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Formas Jurídicas', description: 'Autónomo vs SL vs Cooperativa' },
-  { url: '/simulador-autonomo-vs-sl/', icon: '📊', name: 'Autónomo vs SL', description: 'Comparativa fiscal completa' },
-  { url: '/calculadora-cuota-autonomo/', icon: '💼', name: 'Cuota Autónomo', description: 'Tramos cotización 2025' },
   { url: '/generador-nombres-empresa/', icon: '✨', name: 'Nombres Empresa', description: 'Ideas de nombres' },
   { url: '/generador-facturas/', icon: '🧾', name: 'Generador Facturas', description: 'Facturas profesionales' },
   { url: '/calculadora-presupuestos/', icon: '📋', name: 'Presupuestos', description: 'Propuestas a clientes' },
@@ -413,23 +388,6 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'generador-horarios-estudio': estudiantesApps.filter(a => a.url !== '/generador-horarios-estudio/'),
   'temporizador-pomodoro': [...estudiantesApps.filter(a => a.url !== '/temporizador-pomodoro/').slice(0, 2), ...productividadApps.slice(0, 2)],
 
-  // HERENCIAS Y FISCAL
-  'calculadora-sucesiones-cataluna': herenciasApps.filter(a => a.url !== '/calculadora-sucesiones-cataluna/'),
-  'calculadora-sucesiones-nacional': herenciasApps.filter(a => a.url !== '/calculadora-sucesiones-nacional/'),
-  'calculadora-donaciones-cataluna': donacionesApps.filter(a => a.url !== '/calculadora-donaciones-cataluna/'),
-  'calculadora-donaciones-nacional': donacionesApps.filter(a => a.url !== '/calculadora-donaciones-nacional/'),
-  'guia-tramitacion-herencias': herenciasApps.filter(a => a.url !== '/guia-tramitacion-herencias/'),
-  'herencias-paso-a-paso': herenciasApps.filter(a => a.url !== '/herencias-paso-a-paso/'),
-  'calculadora-herencias': herenciasApps.filter(a => a.url !== '/calculadora-herencias/'),
-  'simulador-irpf': fiscalApps.filter(a => a.url !== '/simulador-irpf/'),
-  'calculadora-plusvalias-irpf': fiscalApps.filter(a => a.url !== '/calculadora-plusvalias-irpf/'),
-  'calculadora-sueldo-neto': [
-    { url: '/simulador-irpf/', icon: '📋', name: 'Simulador IRPF', description: 'Calcula tu declaración' },
-    { url: '/calculadora-cuota-autonomo/', icon: '💼', name: 'Cuota Autónomo', description: 'Tramos cotización 2025' },
-    { url: '/simulador-gastos-deducibles/', icon: '✅', name: 'Gastos Deducibles', description: 'Para autónomos' },
-    { url: '/calculadora-tarifa-freelance/', icon: '💰', name: 'Tarifa Freelance', description: 'Calcula tu hora' },
-  ],
-
   // FINANZAS - INVERSIÓN
   'interes-compuesto': finanzasInversionApps.filter(a => a.url !== '/interes-compuesto/'),
   'calculadora-inversiones': finanzasInversionApps.filter(a => a.url !== '/calculadora-inversiones/'),
@@ -442,11 +400,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'amortizacion-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/amortizacion-hipoteca/'),
   'simulador-prestamos': finanzasHipotecaApps.filter(a => a.url !== '/simulador-prestamos/'),
   'calculadora-alquiler-vs-compra': finanzasHipotecaApps.filter(a => a.url !== '/calculadora-alquiler-vs-compra/'),
-  'simulador-compraventa-inmueble': finanzasHipotecaApps.filter(a => a.url !== '/simulador-compraventa-inmueble/'),
   'calculadora-coste-vivienda': [
     { url: '/simulador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
     { url: '/calculadora-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Compara opciones' },
-    { url: '/simulador-compraventa-inmueble/', icon: '🏠', name: 'Compraventa Inmueble', description: 'Gastos e impuestos' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Coste de electrodomésticos' },
   ],
 
@@ -463,7 +419,6 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'comparador-vehiculos': [
     { url: '/simulador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas de amortización' },
     { url: '/calculadora-coste-plazos/', icon: '💳', name: 'Coste Real a Plazos', description: 'TAE e intereses ocultos' },
-    { url: '/simulador-gastos-deducibles/', icon: '✅', name: 'Gastos Deducibles', description: 'Para autónomos y empresas' },
     { url: '/calculadora-tir-van/', icon: '📉', name: 'TIR y VAN', description: 'Análisis de inversiones' },
   ],
   'calculadora-seguro-vida': [
@@ -497,18 +452,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
   ],
   'asistente-reclamaciones': [
-    { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Plazos de prescripción y caducidad' },
     { url: '/guia-reclamar-seguro-coche/', icon: '🚗', name: 'Reclamar Seguro Coche', description: 'Cuándo reclamar al seguro del coche' },
-    { url: '/guia-tramitacion-herencias/', icon: '📋', name: 'Tramitación Herencias', description: 'Pasos para tramitar una herencia' },
     { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas' },
   ],
-  'plazos-legales': [
-    { url: '/asistente-reclamaciones/', icon: '📝', name: 'Asistente Reclamaciones', description: 'Guía para reclamar tus derechos' },
-    { url: '/guia-tramitacion-herencias/', icon: '📋', name: 'Tramitación Herencias', description: 'Pasos para tramitar una herencia' },
-    { url: '/calculadora-cuota-autonomo/', icon: '💼', name: 'Cuota Autónomo', description: 'Calcula tu cuota de autónomo' },
-    { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Calcula IVA incluido o sin IVA' },
-  ],
-
   // SALUD
   'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/'),
   'calculadora-colesterol': saludApps.filter(a => a.url !== '/calculadora-colesterol/'),
@@ -594,16 +540,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // FREELANCE Y NEGOCIOS
   'calculadora-tarifa-freelance': freelanceApps.filter(a => a.url !== '/calculadora-tarifa-freelance/'),
-  'simulador-gastos-deducibles': freelanceApps.filter(a => a.url !== '/simulador-gastos-deducibles/'),
   'calculadora-presupuestos': freelanceApps.filter(a => a.url !== '/calculadora-presupuestos/'),
   'generador-facturas': freelanceApps.filter(a => a.url !== '/generador-facturas/'),
-  'asistente-constitucion-sociedad': emprendimientoApps.filter(a => a.url !== '/asistente-constitucion-sociedad/'),
-  'asistente-alta-autonomo': emprendimientoApps.filter(a => a.url !== '/asistente-alta-autonomo/'),
-  'asistente-constitucion-asociacion': emprendimientoApps.filter(a => a.url !== '/asistente-constitucion-asociacion/'),
-  'calendario-fiscal-emprendedor': emprendimientoApps.filter(a => a.url !== '/calendario-fiscal-emprendedor/'),
-  'comparador-formas-juridicas': emprendimientoApps.filter(a => a.url !== '/comparador-formas-juridicas/'),
-  'simulador-autonomo-vs-sl': emprendimientoApps.filter(a => a.url !== '/simulador-autonomo-vs-sl/'),
-  'calculadora-cuota-autonomo': emprendimientoApps.filter(a => a.url !== '/calculadora-cuota-autonomo/'),
   'calculadora-break-even': [...freelanceApps.filter(a => a.url !== '/calculadora-break-even/').slice(0, 2), ...negociosApps.slice(0, 2)],
   'calculadora-roi-marketing': negociosApps.filter(a => a.url !== '/calculadora-roi-marketing/'),
   'planificador-cashflow': [...negociosApps.filter(a => a.url !== '/planificador-cashflow/').slice(0, 2), ...freelanceApps.slice(0, 2)],
@@ -821,13 +759,7 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'creador-flashcards': { title: 'Más herramientas para estudiar', icon: '📚' },
     'generador-horarios-estudio': { title: 'Mejora tu rendimiento académico', icon: '📚' },
 
-    // Herencias
-    'calculadora-sucesiones-cataluna': { title: 'Herramientas para herencias', icon: '⚖️' },
-    'calculadora-sucesiones-nacional': { title: 'Herramientas para herencias', icon: '⚖️' },
-    'calculadora-donaciones-cataluna': { title: 'Herramientas fiscales', icon: '⚖️' },
-    'calculadora-donaciones-nacional': { title: 'Herramientas fiscales', icon: '⚖️' },
-    'guia-tramitacion-herencias': { title: 'Calculadoras de herencias', icon: '⚖️' },
-    'calculadora-herencias': { title: 'Herramientas para herencias', icon: '⚖️' },
+    // Herencias - Apps movidas a ex-meskeia
 
     // Finanzas
     'interes-compuesto': { title: 'Más herramientas de inversión', icon: '💰' },
@@ -860,12 +792,9 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'conversor-colores': { title: 'Herramientas de diseño', icon: '🎨' },
     'creador-paletas': { title: 'Diseña con colores', icon: '🎨' },
 
-    // Freelance y Emprendimiento
+    // Freelance
     'calculadora-tarifa-freelance': { title: 'Herramientas para autónomos', icon: '💼' },
     'generador-facturas': { title: 'Gestiona tu negocio', icon: '💼' },
-    'asistente-constitucion-sociedad': { title: 'Herramientas para emprendedores', icon: '🚀' },
-    'asistente-alta-autonomo': { title: 'Herramientas para emprendedores', icon: '💼' },
-    'calendario-fiscal-emprendedor': { title: 'Gestión fiscal', icon: '📅' },
 
     // Matemáticas
     'algebra-ecuaciones': { title: 'Más matemáticas', icon: '📐' },

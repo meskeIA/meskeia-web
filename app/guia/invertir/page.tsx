@@ -44,15 +44,6 @@ const tools = [
     description: 'Simulación Monte Carlo, ratio Sharpe y análisis de volatilidad para tu distribución de activos.',
     step: 4,
   },
-  {
-    id: 'plusvalias-irpf',
-    name: 'Calculadora Plusvalías',
-    icon: '🧾',
-    url: '/calculadora-plusvalias-irpf/',
-    question: '¿Cuánto pagaré de impuestos al vender?',
-    description: 'Calcula las plusvalías de acciones, fondos o cripto y cuánto retendrá Hacienda.',
-    step: 5,
-  },
 ];
 
 // Pasos del journey de inversión
