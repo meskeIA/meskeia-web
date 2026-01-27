@@ -5,7 +5,7 @@
   "language": "es",
   "country": "ES",
   "total_tools": 220,
-  "last_updated": "2026-01-26",
+  "last_updated": "2026-01-27",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -17,39 +17,11 @@
   },
   "suites": [
     {
-      "id": "fiscal",
-      "name": "Fiscal y Herencias",
-      "icon": "🏛️",
-      "description": "Impuestos, herencias, donaciones y trámites fiscales",
-      "tool_count": 3
-    },
-    {
-      "id": "inmobiliaria",
-      "name": "Inmobiliaria y Hogar",
-      "icon": "🏘️",
-      "description": "Hipotecas, alquiler y gestión del hogar",
-      "tool_count": 20
-    },
-    {
-      "id": "finanzas",
-      "name": "Finanzas e Inversión",
-      "icon": "📈",
-      "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 29
-    },
-    {
-      "id": "freelance",
-      "name": "Freelance y Autónomo",
-      "icon": "💼",
-      "description": "Herramientas para profesionales independientes",
-      "tool_count": 17
-    },
-    {
-      "id": "marketing",
-      "name": "Marketing y Contenido",
-      "icon": "📢",
-      "description": "SEO, redes sociales y creación de contenido",
-      "tool_count": 25
+      "id": "cultura",
+      "name": "Cultura General",
+      "icon": "📚",
+      "description": "Conocimiento, referencias y aprendizaje",
+      "tool_count": 43
     },
     {
       "id": "diseno",
@@ -66,11 +38,32 @@
       "tool_count": 48
     },
     {
-      "id": "salud",
-      "name": "Salud y Bienestar",
-      "icon": "🏥",
-      "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 24
+      "id": "finanzas",
+      "name": "Finanzas e Inversión",
+      "icon": "📈",
+      "description": "Ahorro, inversión y planificación financiera",
+      "tool_count": 29
+    },
+    {
+      "id": "freelance",
+      "name": "Freelance y Autónomo",
+      "icon": "💼",
+      "description": "Herramientas para profesionales independientes",
+      "tool_count": 17
+    },
+    {
+      "id": "tecnicas",
+      "name": "Herramientas Técnicas",
+      "icon": "🔧",
+      "description": "Herramientas especializadas y técnicas",
+      "tool_count": 28
+    },
+    {
+      "id": "inmobiliaria",
+      "name": "Inmobiliaria y Hogar",
+      "icon": "🏘️",
+      "description": "Hipotecas, alquiler y gestión del hogar",
+      "tool_count": 20
     },
     {
       "id": "juegos",
@@ -80,11 +73,11 @@
       "tool_count": 18
     },
     {
-      "id": "cultura",
-      "name": "Cultura General",
-      "icon": "📚",
-      "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 43
+      "id": "marketing",
+      "name": "Marketing y Contenido",
+      "icon": "📢",
+      "description": "SEO, redes sociales y creación de contenido",
+      "tool_count": 25
     },
     {
       "id": "productividad",
@@ -94,11 +87,11 @@
       "tool_count": 37
     },
     {
-      "id": "tecnicas",
-      "name": "Herramientas Técnicas",
-      "icon": "🔧",
-      "description": "Herramientas especializadas y técnicas",
-      "tool_count": 28
+      "id": "salud",
+      "name": "Salud y Bienestar",
+      "icon": "🏥",
+      "description": "Salud personal, nutrición y cuidado de mascotas",
+      "tool_count": 24
     }
   ],
   "moments": [
@@ -181,7 +174,6 @@
       "url": "https://meskeia.com/calculadora-iva/",
       "description": "Calcula el IVA español: añade o quita IVA al 21%, 10% o 4% con un clic",
       "suites": [
-        "fiscal",
         "freelance",
         "productividad"
       ],
@@ -195,8 +187,7 @@
         "base imponible",
         "21%",
         "10%",
-        "4%",
-        "fiscal"
+        "4%"
       ],
       "icon": "🧮"
     },
@@ -1471,7 +1462,6 @@
       "url": "https://meskeia.com/generador-facturas/",
       "description": "Crea facturas profesionales para autónomos. IVA automático, retención IRPF, múltiples líneas y exportación a PDF",
       "suites": [
-        "fiscal",
         "freelance"
       ],
       "contexts": [
@@ -1801,7 +1791,6 @@
       "url": "https://meskeia.com/calculadora-inflacion/",
       "description": "Calcula cómo la inflación afecta tu dinero. Poder adquisitivo histórico con datos del INE desde 1961",
       "suites": [
-        "fiscal",
         "finanzas"
       ],
       "contexts": [

@@ -94,7 +94,7 @@ export const applicationsDatabase: Application[] = [
   // 1. Calculadoras Prácticas (10)
   // ============================================
   { name: "Calculadora de Propinas", suites: ["finanzas", "productividad"], contexts: ["casa", "relax"], icon: "🧮", description: "Calcula propinas y divide la cuenta entre varias personas fácilmente", url: "/calculadora-propinas/", keywords: ["propina", "cuenta", "dividir", "restaurante", "porcentaje"] },
-  { name: "Calculadora de IVA", suites: ["fiscal", "freelance", "productividad"], contexts: ["dinero", "trabajo"], icon: "🧮", description: "Calcula el IVA español: añade o quita IVA al 21%, 10% o 4% con un clic", url: "/calculadora-iva/", keywords: ["iva", "impuesto", "base imponible", "21%", "10%", "4%", "fiscal"] },
+  { name: "Calculadora de IVA", suites: ["freelance", "productividad"], contexts: ["dinero", "trabajo"], icon: "🧮", description: "Calcula el IVA español: añade o quita IVA al 21%, 10% o 4% con un clic", url: "/calculadora-iva/", keywords: ["iva", "impuesto", "base imponible", "21%", "10%", "4%"] },
   { name: "Calculadora de Descuentos", suites: ["finanzas", "productividad"], contexts: ["casa", "dinero"], icon: "🏷️", description: "Calcula el precio final con descuento y cuánto ahorras. Soporta descuentos encadenados", url: "/calculadora-descuentos/", keywords: ["descuento", "rebaja", "oferta", "ahorro", "black friday", "rebajas"] },
   { name: "Calculadora de Porcentajes", suites: ["productividad", "estudiantes"], contexts: ["estudio", "trabajo", "casa"], icon: "🧮", description: "Calculadora de porcentajes completa: X% de cantidad, qué % es, aumentos, disminuciones y variaciones", url: "/calculadora-porcentajes/", keywords: ["porcentaje", "tanto por ciento", "aumento", "disminucion", "variacion"] },
   { name: "Calculadora Regla de Tres", suites: ["productividad", "estudiantes"], contexts: ["estudio", "casa"], icon: "🧮", description: "Calculadora completa de regla de tres simple y compuesta con ejemplos prácticos españoles", url: "/calculadora-regla-de-tres/", keywords: ["proporcion", "regla", "tres", "directa", "inversa", "matematicas"] },
@@ -161,7 +161,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora de Legibilidad", suites: ["marketing"], contexts: ["creando", "trabajo"], icon: "📖", description: "Calcula índices de legibilidad Flesch-Szigriszt, Fernández Huerta e INFLESZ. Optimiza textos para tu audiencia", url: "/calculadora-legibilidad/", keywords: ["legibilidad", "flesch", "readability", "inflesz", "fernandez huerta", "lectura", "comprension"] },
   { name: "Calculadora Tiempo de Lectura", suites: ["marketing"], contexts: ["creando"], icon: "⏱️", description: "Calcula el tiempo de lectura de tu contenido. Velocidad configurable, tiempo hablado y badge para tu artículo", url: "/calculadora-tiempo-lectura/", keywords: ["tiempo lectura", "reading time", "palabras por minuto", "ppm", "contenido", "articulo", "badge"] },
   { name: "Generador de Schema Markup", suites: ["marketing"], contexts: ["creando", "trabajo"], icon: "🏷️", description: "Genera código JSON-LD Schema.org para SEO. Artículos, productos, FAQ, negocios locales y recetas", url: "/generador-schema-markup/", keywords: ["schema", "json-ld", "structured data", "rich snippets", "seo tecnico", "schema.org", "markup"] },
-  { name: "Generador de Facturas", suites: ["fiscal", "freelance"], contexts: ["trabajo", "dinero"], icon: "🧾", description: "Crea facturas profesionales para autónomos. IVA automático, retención IRPF, múltiples líneas y exportación a PDF", url: "/generador-facturas/", keywords: ["factura", "autonomo", "facturar", "iva", "irpf", "pdf", "plantilla factura", "pequeña empresa"] },
+  { name: "Generador de Facturas", suites: ["freelance"], contexts: ["trabajo", "dinero"], icon: "🧾", description: "Crea facturas profesionales para autónomos. IVA automático, retención IRPF, múltiples líneas y exportación a PDF", url: "/generador-facturas/", keywords: ["factura", "autonomo", "facturar", "iva", "irpf", "pdf", "plantilla factura", "pequeña empresa"] },
   { name: "Calculadora de Presupuestos", suites: ["freelance"], contexts: ["trabajo", "dinero"], icon: "📋", description: "Crea presupuestos profesionales para clientes. Servicios, horas, materiales, descuentos. Exporta a PDF. Flujo completo: presupuesto → trabajo → factura", url: "/calculadora-presupuestos/", keywords: ["presupuesto", "freelance", "cotizacion", "propuesta", "cliente", "proyecto", "tarifa", "autonomo", "pdf"] },
   { name: "Generador de Carruseles", suites: ["marketing", "diseno"], contexts: ["creando", "trabajo"], icon: "📱", description: "Crea carruseles profesionales para Instagram y LinkedIn. Diseña slides, elige plantillas, personaliza colores y descarga como imágenes PNG", url: "/generador-carruseles/", keywords: ["carrusel", "instagram", "linkedin", "slides", "redes sociales", "marketing", "contenido", "png"] },
   { name: "Analizador GEO/AEO", suites: ["marketing"], contexts: ["creando", "trabajo"], icon: "🤖", description: "Analiza y optimiza tu contenido para ser citado por ChatGPT, Perplexity, Gemini y Google AI Overviews. Puntuación GEO con recomendaciones", url: "/analizador-geo/", keywords: ["geo", "aeo", "ia", "chatgpt", "perplexity", "gemini", "optimizacion", "citabilidad", "seo ia", "answer engine"] },
@@ -179,7 +179,7 @@ export const applicationsDatabase: Application[] = [
   { name: "Calculadora TIR-VAN", suites: ["finanzas", "freelance", "estudiantes"], contexts: ["dinero", "trabajo", "estudio"], icon: "💰", description: "Calcula TIR y VAN para análisis de inversiones y proyectos", url: "/calculadora-tir-van/", keywords: ["tir", "van", "inversion", "proyecto", "rentabilidad", "flujo caja"] },
   { name: "Simulador de Préstamos", suites: ["inmobiliaria", "finanzas"], contexts: ["dinero"], icon: "🏦", description: "Compara sistemas de amortización: francés, alemán y americano. Cuadro completo, TAE vs TIN y comisiones", url: "/simulador-prestamos/", keywords: ["prestamo", "amortizacion", "frances", "aleman", "americano", "cuota", "TAE", "TIN", "interes"] },
   { name: "Amortización Anticipada Hipoteca", suites: ["inmobiliaria", "finanzas"], contexts: ["dinero", "casa"], icon: "🏠", description: "Calcula el ahorro al amortizar tu hipoteca: reducir cuota vs reducir plazo. Comparativa y recomendación", url: "/amortizacion-hipoteca/", keywords: ["amortizacion anticipada", "hipoteca", "reducir cuota", "reducir plazo", "ahorro intereses", "cancelacion parcial"] },
-  { name: "Calculadora de Inflación", suites: ["fiscal", "finanzas"], contexts: ["dinero", "curiosidad"], icon: "📈", description: "Calcula cómo la inflación afecta tu dinero. Poder adquisitivo histórico con datos del INE desde 1961", url: "/calculadora-inflacion/", keywords: ["inflacion", "ipc", "poder adquisitivo", "ine", "precios", "coste vida", "devaluacion"] },
+  { name: "Calculadora de Inflación", suites: ["finanzas"], contexts: ["dinero", "curiosidad"], icon: "📈", description: "Calcula cómo la inflación afecta tu dinero. Poder adquisitivo histórico con datos del INE desde 1961", url: "/calculadora-inflacion/", keywords: ["inflacion", "ipc", "poder adquisitivo", "ine", "precios", "coste vida", "devaluacion"] },
   { name: "Curso Decisiones de Inversión", suites: ["finanzas", "cultura"], contexts: ["estudio", "dinero"], icon: "📚", description: "Aprende a tomar decisiones de inversión inteligentes con este curso interactivo", url: "/curso-decisiones-inversion/", keywords: ["curso", "inversion", "finanzas", "aprender", "bolsa"] },
   { name: "Calculadora de Suscripciones", suites: ["inmobiliaria", "finanzas"], contexts: ["dinero", "casa"], icon: "💳", description: "Controla tus suscripciones (Netflix, Spotify, gym...). Calcula gasto mensual y anual. Detecta gastos olvidados", url: "/calculadora-suscripciones/", keywords: ["suscripciones", "netflix", "spotify", "gastos recurrentes", "mensual", "anual", "control gastos"] },
   { name: "Calculadora Roommates", suites: ["inmobiliaria", "finanzas"], contexts: ["dinero", "casa"], icon: "🏠", description: "Divide los gastos del piso entre compañeros de forma justa. Calcula quién debe a quién automáticamente", url: "/calculadora-roommates/", keywords: ["roommates", "piso compartido", "dividir gastos", "compañeros", "deudas", "luz", "internet"] },
@@ -385,18 +385,17 @@ export const getAppsBySuite = (suiteId: SuiteType): Application[] => {
  */
 export const getSuiteCounts = (): Record<SuiteType, number> => {
   const counts: Record<SuiteType, number> = {
-    fiscal: 0,
-    inmobiliaria: 0,
-    finanzas: 0,
-    freelance: 0,
-    marketing: 0,
+    cultura: 0,
     diseno: 0,
     estudiantes: 0,
-    salud: 0,
-    juegos: 0,
-    cultura: 0,
-    productividad: 0,
+    finanzas: 0,
+    freelance: 0,
     tecnicas: 0,
+    inmobiliaria: 0,
+    juegos: 0,
+    marketing: 0,
+    productividad: 0,
+    salud: 0,
   };
 
   applicationsDatabase.forEach(app => {
