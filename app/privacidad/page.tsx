@@ -204,11 +204,6 @@ export default function PrivacidadPage() {
             <p><em>Responderemos en un plazo máximo de 30 días</em></p>
           </div>
 
-          <InfoBox type="warning" title="AUTORIDAD DE CONTROL" icon="⚖️">
-            <p>Si considera que el tratamiento de sus datos personales infringe el RGPD, tiene derecho a presentar una reclamación ante la <strong>Agencia Española de Protección de Datos (AEPD)</strong>:</p>
-            <p>🌐 <strong>www.aepd.es</strong> | 📧 <strong>consultas@aepd.es</strong></p>
-          </InfoBox>
-
           <InfoBox type="success" title="NUESTRO COMPROMISO" icon="🤝">
             <p><strong>meskeIA se compromete con la privacidad por diseño.</strong> Creemos que las herramientas útiles no requieren recopilar datos personales. Sus cálculos, sus contraseñas y su información sensible permanecen siempre bajo su control.</p>
           </InfoBox>
