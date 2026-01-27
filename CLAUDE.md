@@ -16,24 +16,24 @@
 
 meskeIA usa un sistema de clasificación bidimensional para organizar las apps:
 
-### Suites Temáticas (12) - "¿Qué problema resuelve?"
+### Suites Temáticas (11) - "¿Qué problema resuelve?"
 
 Clasificación **NO excluyente**: una app puede pertenecer a múltiples suites.
+Ordenadas alfabéticamente por nombre.
 
 | ID | Suite | Icono | Descripción |
 |----|-------|-------|-------------|
-| `fiscal` | Fiscal y Herencias | 🏛️ | Impuestos, herencias, donaciones |
-| `inmobiliaria` | Inmobiliaria y Hogar | 🏘️ | Hipotecas, alquiler, gestión hogar |
-| `finanzas` | Finanzas e Inversión | 📈 | Ahorro, inversión, planificación |
-| `freelance` | Freelance y Autónomo | 💼 | Herramientas para independientes |
-| `marketing` | Marketing y Contenido | 📢 | SEO, redes sociales, contenido |
+| `cultura` | Cultura General | 📚 | Conocimiento, referencias |
 | `diseno` | Diseño y Desarrollo | 🎨 | Herramientas para diseñadores/devs |
 | `estudiantes` | Estudiantes | 🧮 | Matemáticas, ciencias, estudio |
-| `salud` | Salud y Bienestar | 🏥 | Salud, nutrición, mascotas |
-| `juegos` | Juegos y Ocio | 🎲 | Diversión y entretenimiento |
-| `cultura` | Cultura General | 📚 | Conocimiento, referencias |
-| `productividad` | Productividad | ⚡ | Organización personal |
+| `finanzas` | Finanzas e Inversión | 📈 | Ahorro, inversión, planificación |
+| `freelance` | Freelance y Autónomo | 💼 | Herramientas para independientes |
 | `tecnicas` | Herramientas Técnicas | 🔧 | Herramientas especializadas |
+| `inmobiliaria` | Inmobiliaria y Hogar | 🏘️ | Hipotecas, alquiler, gestión hogar |
+| `juegos` | Juegos y Ocio | 🎲 | Diversión y entretenimiento |
+| `marketing` | Marketing y Contenido | 📢 | SEO, redes sociales, contenido |
+| `productividad` | Productividad | ⚡ | Organización personal |
+| `salud` | Salud y Bienestar | 🏥 | Salud, nutrición, mascotas |
 
 ### Momentos (7) - "¿Cuándo lo usas?"
 
@@ -53,7 +53,7 @@ Clasificación **NO excluyente**: una app puede aplicar a múltiples momentos.
 
 | Archivo | Descripción |
 |---------|-------------|
-| `data/suites.ts` | Definición de las 12 suites (id, name, icon, description) |
+| `data/suites.ts` | Definición de las 11 suites (id, name, icon, description) |
 | `data/applications.ts` | Base de datos de apps (re-exporta suites y moments) |
 | `data/implemented-apps.ts` | URLs de apps realmente implementadas |
 | `data/app-relations.ts` | Cross-linking entre apps |
