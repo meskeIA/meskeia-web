@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './PlanificadorEmbarazo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -708,18 +708,63 @@ export default function CalculadoraFechaPartoPage() {
         </div>
       )}
 
-      {/* DISCLAIMER - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Médico Importante</h3>
+      {/* Última Actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: "2026-02-02",
+            changes: [
+              "Añadido disclaimer obstétrico sobre seguimiento del embarazo",
+              "Reforzado aviso sobre control prenatal obligatorio",
+            ],
+          },
+          {
+            date: "2025-11-29",
+            changes: [
+              "Calculadora FPP con Regla de Naegele",
+              "Checklist por trimestres con tareas obstétricas y administrativas",
+              "Lista de compras del bebé por categorías",
+              "Calendario de vacunación infantil España 2024",
+            ],
+          },
+        ]}
+      />
+
+      {/* DISCLAIMER OBSTÉTRICO - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="medical"
+        severity="critical"
+        collapsible={false}
+        context="planificador-embarazo"
+      >
         <p>
-          Esta herramienta proporciona información <strong>orientativa y educativa</strong>.
-          La fecha probable de parto es solo una estimación; solo el 5% de los bebés nacen en su fecha calculada.
+          Esta herramienta proporciona <strong>información orientativa sobre embarazo y cuidados del recién nacido</strong>.
+          Es fundamental que entiendas las siguientes limitaciones:
         </p>
-        <p>
-          <strong>Esta herramienta NO sustituye el seguimiento médico profesional.</strong> Consulta siempre con
-          tu ginecólogo/a, matrona o pediatra para un control adecuado del embarazo y del bebé.
+
+        <ul className={styles.disclaimerList}>
+          <li><strong>La fecha probable de parto (FPP) es SOLO una estimación</strong>: Solo el 5% de bebés nacen exactamente en la FPP. El parto normal puede ocurrir entre las semanas 37-42. La FPP se ajusta con ecografía del primer trimestre</li>
+          <li><strong>NO sustituye las visitas prenatales</strong>: El embarazo requiere seguimiento médico profesional (ginecólogo/matrona) con ecografías, analíticas, detección de diabetes gestacional, control de tensión arterial y valoración del crecimiento fetal</li>
+          <li><strong>Cada embarazo es único</strong>: Los checklists son genéricos. Tu ginecólogo puede indicar pruebas adicionales según tu edad, historial médico, embarazos previos o factores de riesgo (hipertensión, diabetes, gemelaridad, etc.)</li>
+          <li><strong>Las listas de compras son orientativas</strong>: No todos los bebés necesitan lo mismo. Consulta con tu pediatra/matrona antes de comprar productos específicos (biberones, leche de fórmula, chupetes)</li>
+          <li><strong>El calendario de vacunas puede cambiar</strong>: Verifica el calendario actualizado de tu comunidad autónoma. Tu pediatra te indicará las vacunas obligatorias y recomendables</li>
+        </ul>
+
+        <p className={styles.highlight}>
+          <strong>⚕️ Esta herramienta NO diagnostica complicaciones del embarazo ni problemas del bebé.</strong>
+          El control prenatal es OBLIGATORIO para detectar a tiempo problemas como preeclampsia, diabetes gestacional,
+          restricción del crecimiento fetal o malformaciones. Acude a TODAS las citas programadas.
         </p>
-      </div>
+
+        <p className={styles.emergency}>
+          🚨 <strong>EMERGENCIAS OBSTÉTRICAS - Acude a urgencias inmediatamente si presentas:</strong><br/>
+          • Sangrado vaginal abundante • Pérdida de líquido amniótico • Dolor abdominal intenso<br/>
+          • Disminución o ausencia de movimientos fetales • Contracciones regulares antes de semana 37<br/>
+          • Dolor de cabeza severo con visión borrosa • Hinchazón súbita de cara/manos/pies
+        </p>
+      </DisclaimerCard>
 
       {/* Contenido Educativo Colapsable */}
       <EducationalSection

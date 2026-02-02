@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import styles from './CalculadoraIMC.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps, getRelatedAppsTitle } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -640,15 +640,57 @@ export default function CalculadoraIMCPage() {
         </div>
       )}
 
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
+      {/* Última Actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: "2026-02-02",
+            changes: [
+              "Añadido disclaimer médico profesional según normativa sanitaria",
+              "Incorporado aviso explícito sobre limitaciones del IMC",
+            ],
+          },
+          {
+            date: "2025-11-29",
+            changes: [
+              "Añadido modo comparador de perfiles con gráfico interactivo",
+              "Mejora visual de zonas de clasificación IMC en el gráfico",
+            ],
+          },
+        ]}
+      />
+
+      {/* Disclaimer Médico - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="medical"
+        severity="critical"
+        collapsible={false}
+        context="calculadora-imc"
+      >
         <p>
-          El IMC es un indicador general que no tiene en cuenta factores como la masa muscular,
-          la distribución de grasa corporal, la edad o el sexo. Los deportistas con alta masa
-          muscular pueden tener un IMC elevado sin tener sobrepeso real. Esta calculadora es
-          orientativa y <strong>no sustituye la valoración de un profesional de la salud</strong>.
+          El <strong>Índice de Masa Corporal (IMC) es un indicador orientativo</strong> que relaciona peso y altura.
+          Tiene limitaciones importantes que debes conocer:
         </p>
-      </div>
+
+        <ul className={styles.disclaimerList}>
+          <li><strong>NO distingue entre masa muscular y grasa</strong>: Deportistas con alta musculatura pueden clasificar como "sobrepeso" siendo saludables</li>
+          <li><strong>NO considera la distribución de grasa</strong>: La grasa abdominal (visceral) es más peligrosa que la subcutánea</li>
+          <li><strong>NO es aplicable a todos por igual</strong>: No válido para embarazadas, menores de 18 años, mayores de 65 años, ni personas con condiciones médicas específicas</li>
+          <li><strong>NO reemplaza evaluación médica</strong>: Tu médico debe considerar analíticas, tensión arterial, historial clínico y otros factores</li>
+        </ul>
+
+        <p className={styles.highlight}>
+          <strong>⚕️ Esta herramienta NO diagnostica ni trata enfermedades.</strong> Si tienes dudas sobre tu peso,
+          composición corporal o salud metabólica, consulta con un médico, endocrinólogo o nutricionista colegiado.
+        </p>
+
+        <p className={styles.emergency}>
+          🚨 <strong>Si presentas pérdida/ganancia de peso involuntaria, fatiga extrema o síntomas preocupantes,
+          acude a tu médico de inmediato.</strong>
+        </p>
+      </DisclaimerCard>
 
       <EducationalSection
         title="¿Quieres aprender más sobre el IMC?"

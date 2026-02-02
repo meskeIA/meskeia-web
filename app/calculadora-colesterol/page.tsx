@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './CalculadoraColesterol.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -335,20 +335,58 @@ export default function CalculadoraColesterolPage() {
         )}
       </div>
 
-      {/* Disclaimer - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Médico Importante</h3>
+      {/* Última Actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: "2026-02-02",
+            changes: [
+              "Añadido disclaimer médico profesional sobre interpretación de analíticas",
+              "Reforzado aviso sobre consulta médica obligatoria",
+            ],
+          },
+          {
+            date: "2025-11-29",
+            changes: [
+              "Implementada fórmula de Friedewald para cálculo automático de LDL",
+              "Añadidos ratios CT/HDL y LDL/HDL como indicadores de riesgo",
+            ],
+          },
+        ]}
+      />
+
+      {/* Disclaimer Médico - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="medical"
+        severity="critical"
+        collapsible={false}
+        context="calculadora-colesterol"
+      >
         <p>
-          Esta calculadora proporciona información <strong>orientativa y educativa</strong>.
-          Los resultados <strong>NO constituyen diagnóstico médico</strong> ni sustituyen
-          la consulta con un profesional de la salud.
+          Esta calculadora analiza valores de un <strong>análisis de sangre (analítica de lípidos)</strong>.
+          Es fundamental que entiendas las siguientes limitaciones:
         </p>
-        <p>
-          Los valores de referencia pueden variar según tu edad, sexo, historial médico
-          y otros factores de riesgo. <strong>Consulta siempre con tu médico</strong> para
-          interpretar tus análisis y recibir recomendaciones personalizadas.
+
+        <ul className={styles.disclaimerList}>
+          <li><strong>NO diagnostica enfermedades cardiovasculares</strong>: Los valores de colesterol son SOLO UNO de muchos factores de riesgo (hipertensión, diabetes, tabaquismo, historial familiar, edad, etc.)</li>
+          <li><strong>Los rangos de referencia varían según tu perfil</strong>: Una persona con diabetes, hipertensión o antecedentes de infarto necesita valores de LDL más bajos que una persona sana</li>
+          <li><strong>La fórmula de Friedewald tiene limitaciones</strong>: No es válida si los triglicéridos superan 400 mg/dL. Para triglicéridos muy altos, se necesita LDL directo</li>
+          <li><strong>Los resultados requieren contexto clínico</strong>: Tu médico debe valorar analíticas previas, síntomas, medicación actual y otros factores antes de tomar decisiones</li>
+        </ul>
+
+        <p className={styles.highlight}>
+          <strong>⚕️ Esta herramienta NO sustituye la interpretación médica de tus análisis.</strong>
+          Si tu analítica muestra valores alterados, consulta con tu médico de familia, cardiólogo o endocrinólogo.
+          Nunca inicies, cambies o suspendas medicación sin supervisión médica.
         </p>
-      </div>
+
+        <p className={styles.emergency}>
+          🚨 <strong>Si presentas dolor torácico, falta de aire, mareos intensos o síntomas de infarto,
+          llama al 112 inmediatamente.</strong> El colesterol alto no suele dar síntomas hasta que causa complicaciones graves.
+        </p>
+      </DisclaimerCard>
 
       {/* Contenido Educativo */}
       <EducationalSection

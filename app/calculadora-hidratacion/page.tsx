@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraHidratacion.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -285,15 +285,45 @@ export default function CalculadoraHidratacionPage() {
         </div>
       </div>
 
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
+      {/* Última Actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: "2026-02-02",
+            changes: [
+              "Añadido disclaimer médico sobre recomendaciones de hidratación",
+              "Reforzado aviso sobre personas con restricción de líquidos",
+            ],
+          },
+        ]}
+      />
+
+      {/* Disclaimer Médico */}
+      <DisclaimerCard
+        variant="medical"
+        severity="high"
+        collapsible={true}
+        context="calculadora-hidratacion"
+      >
         <p>
-          Estas recomendaciones son orientativas para adultos sanos. Las necesidades de hidratación
-          pueden variar según condiciones médicas, medicamentos, embarazo o lactancia. Consulta con
-          un profesional de la salud si tienes dudas sobre tu ingesta de líquidos. <strong>Personas
-          con problemas renales o cardíacos deben seguir indicaciones médicas específicas</strong>.
+          Estas recomendaciones son <strong>orientativas para adultos sanos</strong>. La hidratación adecuada
+          varía mucho según tu situación individual:
         </p>
-      </div>
+
+        <ul className={styles.disclaimerList}>
+          <li><strong>NO aplicable a personas con restricción de líquidos</strong>: Insuficiencia cardíaca, insuficiencia renal o cirrosis hepática pueden requerir LIMITAR la ingesta de agua. Sigue las indicaciones de tu nefrólogo/cardiólogo</li>
+          <li><strong>Embarazo y lactancia</strong>: Las necesidades de líquidos aumentan significativamente. Consulta con tu matrona o médico</li>
+          <li><strong>Medicamentos diuréticos</strong>: Si tomas diuréticos, tu médico debe indicarte la ingesta de líquidos apropiada</li>
+          <li><strong>Condiciones que alteran la sed</strong>: Diabetes insípida, diabetes mellitus no controlada o edad avanzada pueden afectar la sensación de sed</li>
+        </ul>
+
+        <p className={styles.highlight}>
+          <strong>⚕️ Si tienes enfermedad renal, cardíaca o hepática, NO uses esta calculadora.</strong>
+          Sigue estrictamente las indicaciones médicas sobre ingesta de líquidos. El exceso de agua puede ser peligroso en estas condiciones.
+        </p>
+      </DisclaimerCard>
 
       <EducationalSection
         title="¿Quieres aprender más sobre hidratación?"

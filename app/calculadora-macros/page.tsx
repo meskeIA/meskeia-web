@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 import styles from './CalculadoraMacros.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -419,16 +419,59 @@ export default function CalculadoraMacrosPage() {
         </div>
       </div>
 
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
+      {/* Última Actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: "2026-02-02",
+            changes: [
+              "Añadido disclaimer médico sobre planes nutricionales personalizados",
+              "Reforzado aviso sobre consulta con nutricionista colegiado",
+            ],
+          },
+          {
+            date: "2025-11-29",
+            changes: [
+              "Implementado cálculo basado en fórmula Mifflin-St Jeor (más precisa que Harris-Benedict)",
+              "Añadido gráfico de distribución de macronutrientes con Chart.js",
+            ],
+          },
+        ]}
+      />
+
+      {/* Disclaimer Médico - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="medical"
+        severity="critical"
+        collapsible={false}
+        context="calculadora-macros"
+      >
         <p>
-          Esta calculadora proporciona estimaciones basadas en fórmulas científicas estándar (Mifflin-St Jeor).
-          Los resultados son orientativos y pueden variar según tu metabolismo individual, nivel real de actividad,
-          composición corporal y otros factores. <strong>No sustituye el asesoramiento de un nutricionista
-          o dietista profesional</strong>. Consulta con un especialista antes de realizar cambios significativos
-          en tu alimentación.
+          Esta calculadora utiliza <strong>fórmulas generales (Mifflin-St Jeor + factores de actividad)</strong>
+          que NO tienen en cuenta tu situación individual. Limitaciones importantes:
         </p>
-      </div>
+
+        <ul className={styles.disclaimerList}>
+          <li><strong>NO reemplaza un plan nutricional personalizado</strong>: Un nutricionista colegiado debe evaluar tu composición corporal (bioimpedancia, pliegues cutáneos), analíticas, patologías previas y objetivos reales</li>
+          <li><strong>Los valores son estimaciones promedio</strong>: Tu metabolismo basal puede variar ±15% según genética, masa muscular, tiroides y otros factores hormonales</li>
+          <li><strong>No considera contraindicaciones médicas</strong>: Dietas altas en proteínas pueden ser peligrosas con enfermedad renal. Déficits calóricos extremos pueden causar trastornos hormonales</li>
+          <li><strong>El "objetivo" no es garantía de resultado</strong>: Perder/ganar peso depende de adherencia, calidad de alimentos, descanso, estrés y genética individual</li>
+        </ul>
+
+        <p className={styles.highlight}>
+          <strong>⚕️ Esta herramienta NO sustituye la valoración de un dietista-nutricionista colegiado.</strong>
+          Especialmente si tienes diabetes, enfermedad renal, trastornos alimentarios, embarazo o lactancia,
+          es OBLIGATORIO consultar con un profesional sanitario antes de modificar tu dieta.
+        </p>
+
+        <p className={styles.emergency}>
+          🚨 <strong>Si presentas pérdida de peso involuntaria, fatiga extrema, mareos frecuentes o amenorrea
+          (pérdida de menstruación), consulta con tu médico inmediatamente.</strong> Las dietas restrictivas
+          sin supervisión pueden causar deficiencias nutricionales graves.
+        </p>
+      </DisclaimerCard>
 
       <EducationalSection
         title="¿Quieres aprender más sobre macronutrientes?"

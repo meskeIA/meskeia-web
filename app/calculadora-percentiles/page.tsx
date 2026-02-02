@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraPercentiles.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Sexo = 'nino' | 'nina';
@@ -316,19 +316,59 @@ export default function CalculadoraPercentilesPage() {
         </p>
       </div>
 
-      {/* DISCLAIMER - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Médico Importante</h3>
+      {/* Última Actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: "2026-02-02",
+            changes: [
+              "Añadido disclaimer pediátrico sobre evaluación del crecimiento infantil",
+              "Reforzado aviso sobre consulta obligatoria con pediatra",
+            ],
+          },
+          {
+            date: "2025-11-29",
+            changes: [
+              "Implementadas tablas OMS para peso y talla (0-60 meses)",
+              "Añadida visualización gráfica de percentiles con colores por rango",
+            ],
+          },
+        ]}
+      />
+
+      {/* DISCLAIMER PEDIÁTRICO - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="medical"
+        severity="critical"
+        collapsible={false}
+        context="calculadora-percentiles"
+      >
         <p>
-          Esta calculadora utiliza tablas simplificadas basadas en los estándares de crecimiento de la OMS
-          y proporciona una <strong>estimación orientativa</strong>. Los resultados no son un diagnóstico médico.
+          Esta calculadora utiliza <strong>tablas simplificadas de la OMS</strong> para crecimiento infantil (0-5 años).
+          Es fundamental que entiendas las siguientes limitaciones:
         </p>
-        <p>
-          <strong>El crecimiento infantil debe ser evaluado por un profesional de la salud</strong> que considere
-          múltiples factores: genética, alimentación, desarrollo general, etc. Un solo valor fuera del rango
-          &quot;normal&quot; no indica necesariamente un problema. Consulta siempre con tu pediatra.
+
+        <ul className={styles.disclaimerList}>
+          <li><strong>UN SOLO VALOR NO INDICA NADA</strong>: El pediatra debe evaluar la CURVA DE CRECIMIENTO a lo largo del tiempo, no un punto aislado. Un bebé puede estar en P10 y estar perfectamente sano si crece de forma constante</li>
+          <li><strong>La genética familiar es clave</strong>: Hijos de padres bajos tenderán a percentiles bajos. Hijos de padres altos tenderán a percentiles altos. Esto es NORMAL</li>
+          <li><strong>No detecta todos los problemas de salud</strong>: Hay enfermedades que no afectan al peso/talla inicialmente (cardiopatías, problemas metabólicos, etc.). El pediatra debe hacer un examen clínico completo</li>
+          <li><strong>Percentiles extremos requieren valoración médica</strong>: Estar por debajo de P3 o por encima de P97 no es automáticamente malo, pero sí requiere seguimiento pediátrico estrecho</li>
+          <li><strong>Los bebés prematuros necesitan corrección de edad</strong>: Hasta los 2 años, se debe usar la edad corregida (restando semanas de prematuridad)</li>
+        </ul>
+
+        <p className={styles.highlight}>
+          <strong>⚕️ Esta herramienta NO sustituye las revisiones del niño sano con tu pediatra.</strong>
+          El crecimiento infantil se evalúa en conjunto con desarrollo psicomotor, alimentación, vacunas y exploración física.
+          Nunca tomes decisiones sobre la alimentación de tu bebé sin consultar con el pediatra.
         </p>
-      </div>
+
+        <p className={styles.emergency}>
+          🚨 <strong>Si tu bebé/niño presenta pérdida de peso, rechazo del alimento, vómitos persistentes,
+          diarrea grave o decaimiento importante, acude a urgencias pediátricas inmediatamente.</strong>
+        </p>
+      </DisclaimerCard>
 
       <RelatedApps apps={getRelatedApps('calculadora-percentiles')} />
 

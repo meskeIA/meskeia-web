@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCalorias.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -246,15 +246,53 @@ export default function CalculadoraCaloriasPage() {
         </div>
       </div>
 
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
+      {/* Última Actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: "2026-02-02",
+            changes: [
+              "Añadido disclaimer médico sobre estimaciones de gasto calórico",
+              "Reforzado aviso sobre consulta médica para programas de ejercicio",
+            ],
+          },
+          {
+            date: "2025-11-29",
+            changes: [
+              "Implementado cálculo basado en valores MET científicos",
+              "Añadidas 40+ actividades organizadas por categorías",
+            ],
+          },
+        ]}
+      />
+
+      {/* Disclaimer Médico */}
+      <DisclaimerCard
+        variant="medical"
+        severity="high"
+        collapsible={true}
+        context="calculadora-calorias-ejercicio"
+      >
         <p>
-          Los valores MET (Equivalente Metabólico de Tarea) son promedios científicos que pueden variar
-          según la intensidad real, condición física, edad y otros factores individuales. Esta calculadora
-          proporciona estimaciones orientativas y <strong>no sustituye el asesoramiento de un profesional
-          de la salud o entrenador personal</strong>.
+          Esta calculadora utiliza <strong>valores MET (Equivalente Metabólico de Tarea)</strong> que son promedios
+          científicos. Las estimaciones pueden variar significativamente según:
         </p>
-      </div>
+
+        <ul className={styles.disclaimerList}>
+          <li><strong>Intensidad real del ejercicio</strong>: La misma actividad puede tener gasto muy diferente según el esfuerzo (correr 8 km/h vs 12 km/h)</li>
+          <li><strong>Condición física individual</strong>: Una persona entrenada quema menos calorías haciendo la misma actividad que una persona sedentaria</li>
+          <li><strong>Composición corporal</strong>: La masa muscular aumenta el gasto calórico basal y durante el ejercicio</li>
+          <li><strong>Edad y metabolismo</strong>: El gasto energético disminuye con la edad y varía por factores hormonales</li>
+        </ul>
+
+        <p className={styles.highlight}>
+          <strong>⚕️ Antes de iniciar un programa de ejercicio intenso, consulta con tu médico</strong>,
+          especialmente si tienes más de 40 años, sobrepeso, hipertensión, diabetes o antecedentes cardíacos.
+          Un entrenador personal puede ayudarte a planificar rutinas seguras y efectivas.
+        </p>
+      </DisclaimerCard>
 
       <EducationalSection
         title="¿Quieres aprender más sobre calorías y ejercicio?"
