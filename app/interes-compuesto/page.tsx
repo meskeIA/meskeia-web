@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './InteresCompuesto.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -112,6 +112,48 @@ export default function InteresCompuestoPage() {
           Simula el crecimiento de tu inversión a largo plazo
         </p>
       </header>
+
+      {/* Disclaimer Legal */}
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        collapsible={true}
+        context="interes-compuesto"
+      >
+        <p>
+          Este simulador proporciona <strong>proyecciones educativas</strong> basadas en rentabilidades constantes.
+        </p>
+        <p>
+          <strong>⚠️ Factores NO considerados:</strong>
+        </p>
+        <ul>
+          <li><strong>Volatilidad:</strong> Los mercados fluctúan; las rentabilidades nunca son constantes</li>
+          <li><strong>Inflación:</strong> El poder adquisitivo de tu dinero disminuye con el tiempo</li>
+          <li><strong>Comisiones:</strong> Fondos de inversión, ETFs y gestoras cobran comisiones anuales (0,5%-2%)</li>
+          <li><strong>Fiscalidad:</strong> Las ganancias tributan en IRPF (19%-26% según tramo)</li>
+          <li><strong>Riesgo:</strong> Rentabilidades pasadas NO garantizan rentabilidades futuras</li>
+        </ul>
+        <p>
+          <strong>NO inviertas dinero que puedas necesitar a corto plazo.</strong> Consulta con un asesor
+          financiero profesional antes de tomar decisiones de inversión.
+        </p>
+      </DisclaimerCard>
+
+      {/* Última actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: '2026-02-02',
+            changes: [
+              'Añadidos disclaimers sobre riesgo e inversión',
+              'Mejorada visualización de evolución anual',
+              'Añadida frecuencia de capitalización configurable',
+            ],
+          },
+        ]}
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de Configuración */}

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './AmortizacionHipoteca.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -321,6 +321,46 @@ export default function AmortizacionHipotecaPage() {
           Calcula el ahorro al amortizar: simple, multi-escenarios o plan periódico
         </p>
       </header>
+
+      {/* Disclaimer Legal */}
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        collapsible={true}
+        context="amortizacion-hipoteca"
+      >
+        <p>
+          Este simulador calcula el <strong>ahorro teórico</strong> de amortizar anticipadamente.
+        </p>
+        <p className={styles.disclaimerHighlight}>
+          <strong>ANTES de amortizar, consulta con tu banco:</strong>
+        </p>
+        <ul>
+          <li><strong>Comisiones por amortización anticipada</strong> (hasta 0,25% en hipotecas variables, 0,15% en fijas según tiempo restante)</li>
+          <li><strong>Penalizaciones específicas</strong> según tu contrato de hipoteca</li>
+          <li><strong>Procedimiento y plazos</strong> para realizar la amortización</li>
+          <li><strong>Alternativas de inversión</strong> con tu asesor financiero (¿es mejor invertir ese dinero en otro sitio?)</li>
+        </ul>
+        <p>
+          <strong>La decisión de amortizar depende de tu situación financiera completa</strong> (fondo de emergencia, otras deudas, objetivos de inversión).
+        </p>
+      </DisclaimerCard>
+
+      {/* Última actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: '2026-02-02',
+            changes: [
+              'Añadidos disclaimers sobre comisiones bancarias',
+              'Añadido modo multi-escenarios para comparar diferentes importes',
+              'Añadido modo periódico para planificar amortizaciones anuales',
+            ],
+          },
+        ]}
+      />
 
       {/* Selector de modo */}
       <div className={styles.modoSelector}>

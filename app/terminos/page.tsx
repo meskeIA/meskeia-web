@@ -15,7 +15,7 @@ export default function TerminosPage() {
         <article className={styles.legalDocument}>
           <div className={styles.documentHeader}>
             <h1 className={styles.documentTitle}>Términos de Uso y Condiciones</h1>
-            <p className={styles.lastUpdated}>Última actualización: 20 de noviembre de 2025</p>
+            <p className={styles.lastUpdated}>Última actualización: 2 de febrero de 2026</p>
           </div>
 
           <InfoBox type="warning" title="IMPORTANTE - LEA ANTES DE USAR" icon="⚠️">
@@ -60,6 +60,56 @@ export default function TerminosPage() {
             </ul>
           </InfoBox>
 
+          <InfoBox type="warning" title="SECCIÓN ESPECIAL: CALCULADORAS FINANCIERAS E INMOBILIARIAS" icon="💰">
+            <h3>2.2 Naturaleza de las Herramientas Financieras e Inmobiliarias</h3>
+            <p><strong>Las calculadoras financieras e inmobiliarias de meskeIA (incluyendo simuladores de hipotecas, gastos de compraventa, comparativas alquiler vs compra, cálculo de capacidad de ahorro, entre otras) son ÚNICAMENTE herramientas educativas e informativas.</strong> NO constituyen asesoramiento financiero, fiscal, legal o inmobiliario profesional.</p>
+
+            <h4>Limitaciones Específicas de Herramientas Financieras:</h4>
+            <ul>
+              <li><strong>Solo estimaciones:</strong> Todos los cálculos proporcionan estimaciones aproximadas basadas en fórmulas estándar y datos introducidos por el usuario</li>
+              <li><strong>Variabilidad de condiciones:</strong> Los tipos de interés, comisiones bancarias, gastos notariales y requisitos legales varían significativamente según:
+                <ul>
+                  <li>La entidad financiera específica</li>
+                  <li>La comunidad autónoma (impuestos como ITP varían del 4% al 11%)</li>
+                  <li>Tu situación crediticia, laboral y financiera personal</li>
+                  <li>El momento en que realices la operación (tipos de interés cambiantes)</li>
+                  <li>Las características específicas de la vivienda o inversión</li>
+                </ul>
+              </li>
+              <li><strong>No vinculantes:</strong> Los resultados NO son ofertas vinculantes ni compromisos de ninguna entidad financiera</li>
+              <li><strong>Simplificaciones necesarias:</strong> Los modelos matemáticos pueden no incluir todos los costes asociados (seguros obligatorios, tasaciones, gestorías, IRPH, cláusulas específicas)</li>
+            </ul>
+
+            <h4>Limitaciones Específicas de Herramientas Inmobiliarias:</h4>
+            <ul>
+              <li><strong>Gastos territoriales variables:</strong> Los gastos de compraventa (notaría, registro, gestoría, impuestos) varían significativamente según la comunidad autónoma y el municipio</li>
+              <li><strong>Legislación cambiante:</strong> Las normativas sobre hipotecas, vivienda y fiscalidad inmobiliaria pueden cambiar (última reforma: Ley 5/2019 de contratos de crédito inmobiliario)</li>
+              <li><strong>Situaciones particulares:</strong> Viviendas protegidas, viviendas de segunda mano vs obra nueva, transmisiones con cargas, herencias, donaciones... tienen regímenes fiscales específicos no contemplados en calculadoras genéricas</li>
+              <li><strong>Factores personales:</strong> Tu capacidad de endeudamiento real depende de factores que solo un banco puede evaluar (historial crediticio, estabilidad laboral, otras deudas, avales disponibles)</li>
+            </ul>
+
+            <h4>Ejemplos de Factores NO Incluidos en Nuestras Calculadoras:</h4>
+            <ul>
+              <li>📋 <strong>Comisiones específicas:</strong> Comisión de apertura, estudio, subrogación, amortización anticipada (varían por banco)</li>
+              <li>🏦 <strong>Seguros obligatorios:</strong> Seguro de vida, seguro de hogar, seguros vinculados (cada banco exige diferentes coberturas)</li>
+              <li>📊 <strong>Tipos de interés futuros:</strong> Las hipotecas variables dependen del euríbor, que fluctúa mensualmente</li>
+              <li>⚖️ <strong>Tasación y gestoría:</strong> Costes variables según inmueble y profesional elegido</li>
+              <li>🏘️ <strong>Gastos de comunidad:</strong> Cuotas, derramas, IBI específico de la vivienda</li>
+              <li>🔧 <strong>Estado de la vivienda:</strong> Necesidad de reformas, antigüedad, eficiencia energética</li>
+            </ul>
+
+            <h4>IMPORTANTE - Decisiones de Compra de Vivienda:</h4>
+            <p><strong>La compra de una vivienda es probablemente la decisión financiera más importante de tu vida.</strong> Implica compromisos a largo plazo (20-30 años típicamente) y representa una parte significativa de tus ingresos futuros.</p>
+
+            <p><strong>ANTES de firmar cualquier compromiso de compra o solicitud de hipoteca, DEBES consultar con:</strong></p>
+            <ul>
+              <li>🏦 <strong>Asesor hipotecario profesional:</strong> Analiza tu capacidad de endeudamiento real y compara ofertas de múltiples bancos</li>
+              <li>⚖️ <strong>Abogado especializado en derecho inmobiliario:</strong> Revisa contratos, cláusulas, cargas del inmueble</li>
+              <li>📊 <strong>Asesor fiscal:</strong> Optimiza tu situación fiscal (deducción por vivienda habitual si aplica, IRPF, patrimonio)</li>
+              <li>🏗️ <strong>Arquitecto técnico (para vivienda de segunda mano):</strong> Evalúa el estado real del inmueble</li>
+            </ul>
+          </InfoBox>
+
           <h2>3. Descargo de Responsabilidad General</h2>
 
           <InfoBox type="warning" title="LIMITACIÓN TOTAL DE RESPONSABILIDAD" icon="🚨">
@@ -73,8 +123,21 @@ export default function TerminosPage() {
             </ul>
           </InfoBox>
 
-          <h3>3.1 Calculadoras Financieras</h3>
-          <p>Los resultados de las <strong>calculadoras de préstamos, hipotecas y financieras</strong> son aproximaciones para fines informativos únicamente. <strong>NO constituyen asesoramiento financiero profesional</strong>. Para decisiones financieras importantes, consulte siempre con un asesor financiero cualificado.</p>
+          <h3>3.1 Calculadoras Financieras e Inmobiliarias</h3>
+          <p>Los resultados de las <strong>calculadoras de préstamos, hipotecas, simuladores inmobiliarios y financieros</strong> son aproximaciones orientativas para fines educativos únicamente. <strong>NO constituyen asesoramiento financiero, fiscal, legal o inmobiliario profesional.</strong></p>
+
+          <p><strong>Responsabilidad del usuario en decisiones financieras importantes:</strong></p>
+          <ul>
+            <li>Para solicitar una hipoteca o préstamo, consulte con múltiples entidades financieras y compare ofertas reales</li>
+            <li>Para comprar o vender una vivienda, consulte con profesionales inmobiliarios, notarios y asesores fiscales</li>
+            <li>Verifique SIEMPRE los gastos específicos de su comunidad autónoma (ITP, AJD, plusvalía municipal)</li>
+            <li>Los tipos de interés y condiciones bancarias cambian constantemente; nuestras estimaciones pueden quedar obsoletas</li>
+            <li>Su capacidad de endeudamiento real debe ser evaluada por una entidad financiera que analice su historial crediticio completo</li>
+          </ul>
+
+          <InfoBox type="warning" title="ADVERTENCIA: DECISIONES DE ALTO IMPACTO FINANCIERO" icon="⚠️">
+            <p><strong>Una hipoteca mal calculada o una compra de vivienda sin análisis profesional puede comprometer tu estabilidad financiera durante décadas.</strong> Nuestras herramientas son el PRIMER PASO educativo, NO el último. La decisión final debe tomarse con asesoramiento profesional cualificado.</p>
+          </InfoBox>
 
           <h3>3.2 Herramientas Relacionadas con la Salud</h3>
 
@@ -148,6 +211,8 @@ export default function TerminosPage() {
             <li><strong>Asume el riesgo</strong> de decisiones basadas en los resultados obtenidos de nuestras herramientas</li>
             <li><strong>meskeIA no es responsable</strong> de pérdidas económicas, daños a la salud, consecuencias legales o cualquier otro perjuicio derivado del uso de estas aplicaciones</li>
             <li><strong>Entiende que los resultados son orientativos</strong> y pueden diferir de cálculos profesionales o certificados</li>
+            <li><strong>Específicamente para apps financieras/inmobiliarias:</strong> Consultará con entidades bancarias, asesores hipotecarios, notarios y asesores fiscales antes de firmar cualquier compromiso de compra, hipoteca o inversión significativa</li>
+            <li><strong>Específicamente para apps de salud:</strong> Consultará con su médico antes de tomar decisiones relacionadas con su salud, dieta o tratamiento</li>
           </ol>
 
           <h3>6.4 Recomendación de Uso</h3>

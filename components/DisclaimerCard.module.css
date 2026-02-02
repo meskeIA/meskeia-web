@@ -1,0 +1,352 @@
+/* DisclaimerCard.module.css */
+
+.disclaimerCard {
+  border-radius: var(--radius-large, 16px);
+  padding: var(--spacing-xl, 2rem);
+  margin-bottom: var(--spacing-xl, 2rem);
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+/* ========================================
+   VARIANTES POR TIPO
+   ======================================== */
+
+/* Financial (Amarillo/Naranja - Advertencia) */
+.variant-financial {
+  background: #fff8e1;
+  border-color: #ffc107;
+  color: #1a1a1a;
+}
+
+[data-theme='dark'] .variant-financial {
+  background: #3a2f00;
+  border-color: #ffb300;
+  color: #e5e5e5;
+}
+
+/* Medical (Azul claro - Información médica) */
+.variant-medical {
+  background: #e3f2fd;
+  border-color: #2196f3;
+  color: #1a1a1a;
+}
+
+[data-theme='dark'] .variant-medical {
+  background: #0d2644;
+  border-color: #42a5f5;
+  color: #e5e5e5;
+}
+
+/* General (Azul meskeIA - Info general) */
+.variant-general {
+  background: #e8f4f8;
+  border-color: var(--primary, #2e86ab);
+  color: #1a1a1a;
+}
+
+[data-theme='dark'] .variant-general {
+  background: #1a2832;
+  border-color: var(--accent, #7fb3d3);
+  color: #e5e5e5;
+}
+
+/* Educational (Verde suave - Educativo) */
+.variant-educational {
+  background: #e8f5e9;
+  border-color: #4caf50;
+  color: #1a1a1a;
+}
+
+[data-theme='dark'] .variant-educational {
+  background: #1b2e1b;
+  border-color: #66bb6a;
+  color: #e5e5e5;
+}
+
+/* ========================================
+   SEVERIDAD (Prominencia visual)
+   ======================================== */
+
+.severity-critical {
+  border-width: 3px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.severity-high {
+  border-width: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.severity-medium {
+  border-width: 2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.severity-low {
+  border-width: 1px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: var(--spacing-lg, 1.5rem);
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md, 1rem);
+}
+
+.disclaimerCard.collapsed .header {
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 0.5rem);
+}
+
+.icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.severity-critical .icon {
+  font-size: 2rem;
+}
+
+.severity-low .icon {
+  font-size: 1.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: inherit;
+}
+
+.severity-critical .title {
+  font-size: 1.5rem;
+}
+
+.severity-low .title {
+  font-size: 1.1rem;
+}
+
+/* ========================================
+   TOGGLE BUTTON (Collapsible)
+   ======================================== */
+
+.toggleButton {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: inherit;
+  cursor: pointer;
+  padding: var(--spacing-sm, 0.5rem);
+  border-radius: var(--radius, 12px);
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.toggleButton:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+}
+
+[data-theme='dark'] .toggleButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.toggleButton:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* ========================================
+   CONTENT
+   ======================================== */
+
+.content {
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content p {
+  margin: 0 0 var(--spacing-md, 1rem) 0;
+  line-height: 1.6;
+}
+
+.content p:last-child {
+  margin-bottom: 0;
+}
+
+/* ========================================
+   LISTAS
+   ======================================== */
+
+.list {
+  margin: var(--spacing-md, 1rem) 0;
+  padding-left: var(--spacing-lg, 1.5rem);
+  line-height: 1.7;
+}
+
+.list li {
+  margin-bottom: var(--spacing-sm, 0.5rem);
+}
+
+.list li:last-child {
+  margin-bottom: 0;
+}
+
+/* ========================================
+   TEXTOS ESPECIALES
+   ======================================== */
+
+.highlight {
+  font-weight: 600;
+  margin-top: var(--spacing-lg, 1.5rem);
+}
+
+.responsibility {
+  font-weight: 700;
+  margin-top: var(--spacing-lg, 1.5rem);
+  padding: var(--spacing-md, 1rem);
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius, 12px);
+}
+
+[data-theme='dark'] .responsibility {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.limitation {
+  font-size: 0.95rem;
+  font-style: italic;
+  margin-top: var(--spacing-md, 1rem);
+  opacity: 0.9;
+}
+
+.emergency {
+  font-weight: 700;
+  color: #d32f2f;
+  padding: var(--spacing-md, 1rem);
+  background: #ffebee;
+  border-radius: var(--radius, 12px);
+  margin-top: var(--spacing-lg, 1.5rem);
+}
+
+[data-theme='dark'] .emergency {
+  color: #ef5350;
+  background: #4a1a1a;
+}
+
+/* ========================================
+   ENLACE A TÉRMINOS
+   ======================================== */
+
+.termsLink {
+  margin-top: var(--spacing-lg, 1.5rem);
+  padding-top: var(--spacing-lg, 1.5rem);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 0.9rem;
+}
+
+[data-theme='dark'] .termsLink {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.termsLink a {
+  color: var(--primary, #2e86ab);
+  text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.termsLink a:hover {
+  color: var(--secondary, #48a9a6);
+}
+
+.termsLink a:focus-visible {
+  outline: 2px solid var(--primary, #2e86ab);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ========================================
+   ESTADO COLAPSADO
+   ======================================== */
+
+.disclaimerCard.collapsed {
+  padding: var(--spacing-lg, 1.5rem);
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.disclaimerCard.collapsed:hover {
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .disclaimerCard {
+    padding: var(--spacing-lg, 1.5rem);
+  }
+
+  .severity-critical {
+    border-width: 2px;
+  }
+
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .severity-critical .title {
+    font-size: 1.3rem;
+  }
+
+  .icon {
+    font-size: 1.5rem;
+  }
+
+  .severity-critical .icon {
+    font-size: 1.75rem;
+  }
+
+  .list {
+    padding-left: var(--spacing-md, 1rem);
+  }
+}
+
+/* ========================================
+   ANIMACIONES RESPETUOSAS
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .disclaimerCard,
+  .toggleButton,
+  .content {
+    animation: none !important;
+    transition: none !important;
+  }
+}

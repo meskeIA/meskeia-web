@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCosteVivienda.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -105,6 +105,40 @@ export default function CalculadoraCosteViviendaPage() {
           Introduce solo los gastos que tengas.
         </p>
       </header>
+
+      {/* Disclaimer Legal */}
+      <DisclaimerCard
+        variant="financial"
+        severity="medium"
+        collapsible={true}
+        context="coste-vivienda"
+      >
+        <p>
+          Esta calculadora proporciona <strong>estimaciones orientativas</strong> del coste mensual
+          de mantener una vivienda.
+        </p>
+        <ul>
+          <li>Los gastos varían significativamente según ubicación, tipo de vivienda y consumo personal</li>
+          <li>NO incluye gastos imprevistos (averías, derramas, reformas)</li>
+          <li>Úsala como guía para planificar tu presupuesto familiar</li>
+        </ul>
+      </DisclaimerCard>
+
+      {/* Última actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: '2026-02-02',
+            changes: [
+              'Añadidos disclaimers legales',
+              'Mejorada interfaz con NumberInput estándar',
+              'Añadido cálculo de coste por día',
+            ],
+          },
+        ]}
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

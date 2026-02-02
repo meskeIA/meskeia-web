@@ -16,6 +16,13 @@ export { default as TextToSpeech } from './TextToSpeech';
 export { default as RelatedApps } from './RelatedApps';
 export type { RelatedApp } from './RelatedApps';
 
+// Componente de disclaimer legal
+export { default as DisclaimerCard } from './DisclaimerCard';
+export type { DisclaimerVariant, DisclaimerSeverity } from './DisclaimerCard';
+
+// Componente de última actualización
+export { default as LastUpdated } from './LastUpdated';
+
 // Nuevos componentes de navegación
 export { default as Sidebar } from './Sidebar';
 export { default as SidebarMobile } from './SidebarMobile';

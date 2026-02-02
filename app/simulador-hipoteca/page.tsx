@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './SimuladorHipoteca.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -140,6 +140,56 @@ export default function SimuladorHipotecaPage() {
           Calcula tu cuota mensual y visualiza la amortización completa
         </p>
       </header>
+
+      {/* Disclaimer Legal */}
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        collapsible={true}
+        context="simulador-hipoteca"
+      >
+        <p>
+          <strong>Este simulador proporciona ESTIMACIONES educativas.</strong> Los resultados NO son
+          ofertas vinculantes de ninguna entidad bancaria.
+        </p>
+        <p className={styles.disclaimerHighlight}>
+          <strong>Factores NO incluidos en el cálculo:</strong>
+        </p>
+        <ul>
+          <li>Comisiones bancarias (apertura, estudio, etc.)</li>
+          <li>Seguros obligatorios (vida, hogar, protección de pagos)</li>
+          <li>Gastos de tasación y gestoría</li>
+          <li>Variaciones futuras del Euríbor (en hipotecas variables)</li>
+          <li>Tu situación crediticia específica</li>
+        </ul>
+        <p>
+          <strong>Consulta con varios bancos</strong> para obtener ofertas reales adaptadas a tu
+          situación personal antes de tomar una decisión de compra.
+        </p>
+      </DisclaimerCard>
+
+      {/* Última actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: '2026-02-02',
+            changes: [
+              'Añadidos disclaimers legales completos',
+              'Mejorada visualización de tabla de amortización',
+              'Actualizado cálculo de ratio de endeudamiento',
+            ],
+          },
+          {
+            date: '2025-12-15',
+            changes: [
+              'Añadida opción de tipo de interés variable (Euríbor + diferencial)',
+              'Mejorada visualización responsive en móviles',
+            ],
+          },
+        ]}
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de Configuración */}

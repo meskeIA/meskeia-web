@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './SimuladorPrestamos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
@@ -362,6 +362,48 @@ export default function SimuladorPrestamosPage() {
           Compara sistemas de amortización: Francés, Alemán y Americano
         </p>
       </header>
+
+      {/* Disclaimer Legal */}
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        collapsible={true}
+        context="simulador-prestamos"
+      >
+        <p>
+          Este simulador proporciona <strong>estimaciones educativas</strong> de préstamos personales.
+        </p>
+        <p>
+          <strong>⚠️ Factores NO incluidos:</strong>
+        </p>
+        <ul>
+          <li><strong>Comisiones bancarias:</strong> Apertura, estudio, gestión, amortización anticipada</li>
+          <li><strong>Seguros vinculados:</strong> Muchos préstamos requieren seguro de vida/paro</li>
+          <li><strong>Tu situación crediticia:</strong> Los bancos evalúan historial crediticio y solvencia</li>
+          <li><strong>Ofertas comerciales:</strong> Los tipos de interés reales varían según entidad y campaña</li>
+          <li><strong>TAE real:</strong> La TAE incluye todos los costes asociados (puede ser muy superior al TIN)</li>
+        </ul>
+        <p>
+          <strong>Compara ofertas de múltiples bancos</strong> antes de solicitar un préstamo. Lee siempre
+          la letra pequeña y el cuadro de información precontractual.
+        </p>
+      </DisclaimerCard>
+
+      {/* Última actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: '2026-02-02',
+            changes: [
+              'Añadidos disclaimers sobre comisiones y TAE',
+              'Añadido comparador de 3 préstamos',
+              'Mejorada visualización de sistemas de amortización',
+            ],
+          },
+        ]}
+      />
 
       {/* Selector de Modo */}
       <div className={styles.modoSelector}>

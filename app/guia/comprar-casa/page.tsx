@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaComprarCasa.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para compra de vivienda
@@ -149,6 +149,13 @@ export default function GuiaComprarCasaPage() {
           </div>
         </div>
       </header>
+
+      {/* Disclaimer Legal - CRÍTICO */}
+      <DisclaimerCard
+        variant="financial"
+        severity="critical"
+        context="mortgage-guide"
+      />
 
       {/* Journey Steps */}
       <section className={styles.journeySection}>

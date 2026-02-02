@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraAlquilerVsCompra.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -160,6 +160,47 @@ export default function CalculadoraAlquilerVsCompraPage() {
         <h1 className={styles.title}>🏠 Alquiler vs Compra</h1>
         <p className={styles.subtitle}>¿Qué me conviene más? Análisis financiero completo</p>
       </header>
+
+      {/* Disclaimer Legal */}
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        collapsible={true}
+        context="alquiler-vs-compra"
+      >
+        <p>
+          Este análisis proporciona <strong>comparación educativa</strong> basada en supuestos generales.
+        </p>
+        <p className={styles.disclaimerHighlight}>
+          <strong>Factores personales NO considerados:</strong>
+        </p>
+        <ul>
+          <li>Tu situación laboral futura (estabilidad, cambios de ciudad)</li>
+          <li>Planes personales (familia, estudios, etc.)</li>
+          <li>Riesgo financiero individual (fondo de emergencia, otras deudas)</li>
+          <li>Oportunidades de inversión específicas de tu perfil</li>
+        </ul>
+        <p>
+          <strong>La decisión de comprar vs alquilar no es solo financiera.</strong> Consulta con
+          asesores financieros que conozcan tu situación completa.
+        </p>
+      </DisclaimerCard>
+
+      {/* Última actualización */}
+      <LastUpdated
+        lastUpdate="2 de febrero de 2026"
+        showChangelog={true}
+        changelog={[
+          {
+            date: '2026-02-02',
+            changes: [
+              'Añadidos disclaimers sobre factores personales',
+              'Mejorada visualización de evolución patrimonial',
+              'Añadido cálculo de punto de equilibrio',
+            ],
+          },
+        ]}
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de datos vivienda */}
