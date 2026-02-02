@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraAlgebraAbstracta.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -610,6 +610,16 @@ export default function CalculadoraAlgebraAbstractaPage() {
           )}
         </div>
       </div>
+
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-algebra-abstracta">
+        <p>Esta calculadora es una <strong>herramienta educativa</strong> para explorar estructuras algebraicas (grupos, anillos, cuerpos):</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Verifica resultados en trabajos académicos</strong>: Especialmente en teoría de grupos, anillos modulares y álgebra abstracta</li>
+          <li><strong>Consulta con tu profesor</strong>: Para asegurarte de interpretar correctamente las propiedades algebraicas</li>
+        </ul>
+      </DisclaimerCard>
 
       <EducationalSection
         title="📚 ¿Quieres aprender más sobre Álgebra Abstracta?"

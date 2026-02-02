@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraEstadistica.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -340,6 +340,16 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
           )}
         </div>
       </div>
+
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-estadistica">
+        <p>Esta calculadora es una <strong>herramienta educativa</strong> para estadística descriptiva:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Verifica resultados en trabajos académicos</strong>: Especialmente en investigaciones o estudios que requieran precisión estadística</li>
+          <li><strong>Consulta con tu profesor o estadístico</strong>: Para análisis complejos o interpretación de resultados en contextos profesionales</li>
+        </ul>
+      </DisclaimerCard>
 
       <EducationalSection
         title="📚 ¿Quieres aprender más sobre Estadística Descriptiva?"

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstadisticaAvanzada.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import jStat from 'jstat';
@@ -1045,15 +1045,15 @@ export default function EstadisticaAvanzadaPage() {
         )}
       </main>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona resultados estadísticos con fines educativos y de referencia.
-          Para análisis profesionales o investigaciones académicas, se recomienda utilizar software
-          especializado (R, SPSS, Stata) y consultar con un estadístico profesional.
-        </p>
-      </div>
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="estadistica-avanzada">
+        <p>Esta calculadora es una <strong>herramienta educativa</strong> para estadística inferencial:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Para investigación académica o profesional</strong>: Utiliza software especializado (R, SPSS, Stata, Python) validado científicamente</li>
+          <li><strong>Consulta con un estadístico profesional</strong>: Para interpretación de resultados en contextos críticos de investigación</li>
+        </ul>
+      </DisclaimerCard>
 
       {/* Contenido educativo */}
       <EducationalSection

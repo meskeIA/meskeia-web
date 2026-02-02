@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './TeoriaColas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -588,6 +588,17 @@ RESULTADOS DE SIMULACIÓN
           </div>
         </div>
       )}
+
+      {/* Disclaimer */}
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-teoria-colas">
+        <p>Esta calculadora es una <strong>herramienta educativa</strong> para analizar sistemas de colas M/M/1:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Verifica resultados en análisis empresarial</strong>: Especialmente en diseño de servicios, optimización de recursos y simulación</li>
+          <li><strong>Consulta con un especialista</strong>: Para decisiones críticas sobre dimensionamiento de sistemas reales</li>
+        </ul>
+      </DisclaimerCard>
 
       {/* Contenido educativo colapsable */}
       <EducationalSection

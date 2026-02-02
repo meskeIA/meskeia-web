@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './InferenciaBayesiana.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -849,14 +849,15 @@ export default function InferenciaBayesianaPage() {
       </main>
 
       {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>Aviso Importante</h3>
-        <p>
-          Esta calculadora es una herramienta educativa para entender la inferencia bayesiana.
-          Para decisiones médicas, financieras o de investigación, consulta con profesionales
-          cualificados y utiliza software especializado.
-        </p>
-      </div>
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="inferencia-bayesiana">
+        <p>Esta calculadora es una <strong>herramienta educativa</strong> para comprender la inferencia bayesiana y el teorema de Bayes:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Verifica resultados en trabajos académicos</strong>: Especialmente en estadística, probabilidad y análisis de datos</li>
+          <li><strong>Consulta con un estadístico</strong>: Para decisiones médicas, financieras o de investigación crítica</li>
+        </ul>
+      </DisclaimerCard>
 
       {/* Educational content */}
       <EducationalSection

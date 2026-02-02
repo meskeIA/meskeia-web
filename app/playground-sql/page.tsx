@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './PlaygroundSQL.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { DATASETS, getDatasetById, EXERCISES, getExerciseById } from './components';
 import type { Dataset, QueryResult, Exercise, ExerciseProgress } from './components/types';
@@ -533,6 +533,17 @@ export default function PlaygroundSQLPage() {
           </div>
         </div>
       </div>
+
+      {/* Disclaimer */}
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="playground-sql">
+        <p>Este playground es una <strong>herramienta educativa</strong> para aprender SQL en el navegador:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Verifica sintaxis en proyectos reales</strong>: Los dialectos SQL varían (PostgreSQL, MySQL, SQL Server), consulta la documentación oficial</li>
+          <li><strong>No uses datos sensibles</strong>: Todo se ejecuta localmente en tu navegador, pero evita copiar datos confidenciales</li>
+        </ul>
+      </DisclaimerCard>
 
       {/* Sección educativa */}
       <EducationalSection

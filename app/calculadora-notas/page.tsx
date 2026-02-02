@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import styles from './CalculadoraNotas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -834,15 +834,15 @@ export default function CalculadoraNotasPage() {
         </div>
       )}
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona estimaciones orientativas basadas en los sistemas de evaluación
-          estándar. Los cálculos de EvAU pueden variar según la comunidad autónoma y el año académico.
-          Consulta siempre la normativa oficial de tu universidad o comunidad para información precisa.
-        </p>
-      </div>
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-notas">
+        <p>Esta calculadora es una <strong>herramienta educativa</strong> para apoyo académico:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Los cálculos de EvAU varían por comunidad autónoma</strong>: Cada región aplica ponderaciones y criterios específicos</li>
+          <li><strong>Verifica con tu centro educativo</strong>: Consulta la normativa oficial de tu universidad antes de tomar decisiones académicas importantes</li>
+        </ul>
+      </DisclaimerCard>
 
       {/* Contenido educativo */}
       <EducationalSection

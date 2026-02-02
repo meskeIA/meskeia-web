@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraProbabilidad.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -497,6 +497,16 @@ export default function CalculadoraProbabilidadPage() {
           )}
         </div>
       </div>
+
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-probabilidad">
+        <p>Esta calculadora es una <strong>herramienta educativa</strong> para comprender cálculos probabilísticos:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Verifica resultados en exámenes y trabajos</strong>: Especialmente en combinatoria, distribuciones y probabilidad condicional</li>
+          <li><strong>Consulta con tu profesor</strong>: Para asegurarte de aplicar correctamente las fórmulas en contextos específicos</li>
+        </ul>
+      </DisclaimerCard>
 
       <EducationalSection
         title="📚 ¿Quieres aprender más sobre Probabilidad?"
