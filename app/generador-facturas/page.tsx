@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorFacturas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, formatDate } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -554,12 +554,21 @@ export default function GeneradorFacturasPage() {
         <p className={styles.subtitle}>Crea facturas profesionales y expórtalas a PDF</p>
       </header>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <strong>⚠️ Aviso importante:</strong> Esta herramienta genera facturas para uso orientativo y personal.
-        A partir de 2026, los autónomos en España deberán usar software homologado con el sistema Verifactu.
-        Consulta con tu asesor fiscal para cumplir con la normativa vigente.
-      </div>
+      <DisclaimerCard
+        variant="legal"
+        severity="high"
+        context="generador-facturas"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <div className={styles.mainContent}>
         {/* Panel izquierdo: Formulario */}

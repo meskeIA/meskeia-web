@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './GuiaReclamarSeguroCoche.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de situaciones
@@ -435,16 +435,22 @@ export default function GuiaReclamarSeguroCochePage() {
         </div>
       </section>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso importante</h3>
-        <p>
-          Esta guía es meramente <strong>informativa y orientativa</strong>. Cada aseguradora tiene sus propias políticas,
-          coberturas y sistemas de penalización que pueden variar significativamente. Los consejos aquí proporcionados
-          NO sustituyen la consulta directa con tu compañía de seguros. <strong>Verifica siempre las condiciones
-          específicas de tu póliza</strong> antes de tomar cualquier decisión.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="legal"
+        severity="high"
+        context="guia-reclamar-seguro-coche"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Apps relacionadas */}
       <RelatedApps apps={getRelatedApps('guia-reclamar-seguro-coche')} />

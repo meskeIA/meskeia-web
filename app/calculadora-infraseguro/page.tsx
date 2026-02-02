@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraInfraseguro.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -212,16 +212,22 @@ export default function CalculadoraInfraseguroPage() {
         </div>
       </div>
 
-      {/* Disclaimer fuerte */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Legal Importante</h3>
-        <p>
-          Esta calculadora aplica la <strong>regla proporcional</strong> establecida en el <strong>artículo 30 de la Ley de Contrato de Seguro</strong>.
-          Sin embargo, cada póliza puede tener cláusulas específicas (franquicias, exclusiones, límites por concepto) que afecten a la indemnización final.
-          Los resultados son <strong>orientativos</strong> y no sustituyen la valoración de un perito o la interpretación de tu aseguradora.
-          Consulta siempre con tu compañía de seguros o un profesional antes de tomar decisiones.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="legal"
+        severity="high"
+        context="calculadora-infraseguro"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

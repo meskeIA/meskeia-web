@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorVehiculos.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -689,15 +689,21 @@ export default function ComparadorVehiculosPage() {
         </div>
       </div>
 
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona estimaciones orientativas basadas en los datos introducidos.
-          Los resultados no incluyen todos los posibles costes (neumáticos, averías, etc.) ni
-          consideran la inflación futura. El ahorro fiscal es aproximado y depende de tu situación
-          particular. <strong>Consulta con un asesor fiscal o financiero antes de tomar una decisión</strong>.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="comparador-vehiculos"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <EducationalSection
         title="¿Quieres entender mejor cada opción?"

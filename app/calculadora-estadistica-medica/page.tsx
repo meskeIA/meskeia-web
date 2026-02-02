@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraEstadisticaMedica.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -642,15 +642,17 @@ export default function CalculadoraEstadisticaMedicaPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora es una herramienta <strong>educativa</strong> para estudiantes de medicina,
-          enfermería y epidemiología. Los resultados NO deben usarse para tomar decisiones clínicas
-          reales. Consulta siempre con profesionales sanitarios cualificados.
-        </p>
-      </div>
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="medical" severity="high" collapsible={true} context="calculadora-estadistica-medica">
+        <p>Esta calculadora es <strong>exclusivamente educativa</strong> para estudiantes de ciencias de la salud. <strong>Limitaciones críticas:</strong></p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>NO usar para decisiones clínicas reales</strong>: Los cálculos requieren validación con datos clínicos completos y contexto del paciente</li>
+          <li><strong>Simplificaciones matemáticas</strong>: Los estudios epidemiológicos reales consideran variables confusoras, sesgos y intervalos de confianza complejos</li>
+          <li><strong>Interpretación requiere formación</strong>: Sensibilidad, especificidad, VPP y VPN dependen de la prevalencia de la enfermedad en la población estudiada</li>
+        </ul>
+        <p className={styles.highlight}><strong>⚕️ Solo para fines educativos y académicos.</strong> Las decisiones diagnósticas y terapéuticas deben tomarlas médicos con acceso a la historia clínica completa del paciente.</p>
+      </DisclaimerCard>
 
       {/* Contenido educativo */}
       <EducationalSection

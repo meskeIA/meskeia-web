@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoInversion.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, DisclaimerCard, LastUpdated } from '@/components';
 import { CHAPTERS, TOOLS, RESOURCES, useCourse } from './CourseContext';
 
 export default function CursoDecisionesInversionPage() {
@@ -63,16 +63,21 @@ export default function CursoDecisionesInversionPage() {
       </div>
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Legal Importante</h3>
-        <p>
-          Este curso tiene fines exclusivamente educativos e informativos. El contenido
-          NO constituye asesoramiento financiero, fiscal ni de inversión profesional.
-          Las decisiones de inversión conllevan riesgos, incluyendo la posible pérdida
-          del capital invertido. Antes de invertir, consulta con un asesor financiero
-          profesional autorizado. Los resultados pasados no garantizan rendimientos futuros.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="curso-decisiones-inversion"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Overview */}
       <section className={styles.overviewSection}>

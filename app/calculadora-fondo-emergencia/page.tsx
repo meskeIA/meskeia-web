@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './FondoEmergencia.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -253,14 +253,21 @@ export default function CalculadoraFondoEmergenciaPage() {
         </div>
       </div>
 
-      <div className={styles.disclaimer}>
-        <h3>Aviso importante</h3>
-        <p>
-          Esta calculadora proporciona estimaciones orientativas basadas en reglas generales de finanzas personales.
-          Los resultados NO constituyen asesoramiento financiero profesional. Tu situación personal puede requerir
-          un fondo mayor o menor según circunstancias específicas.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-fondo-emergencia"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <EducationalSection
         title="¿Quieres aprender más sobre el fondo de emergencia?"

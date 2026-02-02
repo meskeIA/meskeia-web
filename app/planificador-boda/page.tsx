@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './PlanificadorBoda.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -689,15 +689,22 @@ export default function PlanificadorBodaPage() {
         </button>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>💡 Información</h3>
-        <p>
-          Este planificador es una guía orientativa. Los porcentajes de presupuesto son aproximados
-          y pueden variar según la zona geográfica, tipo de celebración y preferencias personales.
-          Te recomendamos consultar con profesionales del sector para presupuestos detallados.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="default"
+        severity="low"
+        context="planificador-boda"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

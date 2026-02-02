@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraAlimentacionMascotas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -446,16 +446,22 @@ export default function CalculadoraAlimentacionMascotasPage() {
         </div>
       )}
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona estimaciones orientativas basadas en promedios.
-          Cada mascota es única y puede tener necesidades diferentes.
-          <strong> Consulta siempre con tu veterinario</strong> para determinar la alimentación
-          ideal para tu mascota, especialmente si tiene condiciones de salud específicas.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="health"
+        severity="medium"
+        context="calculadora-alimentacion-mascotas"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <RelatedApps
         apps={getRelatedApps('calculadora-alimentacion-mascotas')}

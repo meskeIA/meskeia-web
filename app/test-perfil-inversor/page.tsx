@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './TestPerfilInversor.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Definición de preguntas con puntuaciones
@@ -349,15 +349,12 @@ export default function TestPerfilInversorPage() {
           </button>
         </div>
 
-        <div className={styles.disclaimer}>
-          <h3>⚠️ Aviso Importante</h3>
-          <p>
-            Este test es orientativo y educativo. El resultado <strong>no constituye
-            asesoramiento financiero</strong>. Tu perfil real puede variar según
-            circunstancias personales no contempladas en este cuestionario. Antes de
-            invertir, consulta con un profesional autorizado.
-          </p>
-        </div>
+        <DisclaimerCard
+          variant="financial"
+          severity="high"
+          context="test-perfil-inversor"
+          collapsible={true}
+        />
 
         <EducationalSection
           title="¿Quieres aprender más sobre perfiles de inversor?"
@@ -670,16 +667,21 @@ export default function TestPerfilInversorPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Este resultado es orientativo y educativo. <strong>No constituye asesoramiento
-          financiero personalizado</strong>. Las rentabilidades pasadas no garantizan
-          resultados futuros. Antes de invertir, considera tu situación personal completa
-          y consulta con un profesional autorizado por la CNMV.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="test-perfil-inversor"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <Footer appName="test-perfil-inversor" />
     </div>

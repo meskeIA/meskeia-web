@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './SimuladorCartera.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import {
@@ -778,17 +778,21 @@ export default function SimuladorCarteraPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta simulación es <strong>educativa y orientativa</strong>. Los resultados se basan en
-          rentabilidades históricas típicas y <strong>no garantizan resultados futuros</strong>.
-          Las rentabilidades pasadas no predicen rentabilidades futuras. La simulación no considera
-          costes de transacción, impuestos, ni eventos extraordinarios del mercado. Consulta con
-          un asesor financiero antes de tomar decisiones de inversión.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="simulador-cartera-inversion"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

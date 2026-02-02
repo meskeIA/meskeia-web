@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraBreakEven.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -408,15 +408,21 @@ export default function CalculadoraBreakEvenPage() {
         )}
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona <strong>estimaciones simplificadas</strong> del punto de equilibrio.
-          En la realidad, los costos pueden variar, hay estacionalidad y otros factores.
-          Usa estos datos como guía, no como decisión final de negocio.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-break-even"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

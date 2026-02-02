@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './CalculadoraROIMarketing.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber, formatPercentage } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
@@ -654,15 +654,21 @@ export default function CalculadoraROIMarketingPage() {
         </section>
       )}
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona métricas simplificadas de ROI de marketing.
-          El rendimiento real puede variar según el modelo de atribución, ciclo de venta y otros factores.
-          <strong> Usa estas métricas como guía, no como única fuente de decisión.</strong>
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-roi-marketing"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

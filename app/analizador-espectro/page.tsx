@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AnalizadorEspectro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -533,15 +533,22 @@ export default function AnalizadorEspectroPage() {
         </div>
       </main>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Este analizador proporciona <strong>visualizaciones aproximadas</strong> con fines educativos y orientativos.
-          Los micrófonos de dispositivos de consumo tienen limitaciones de frecuencia y sensibilidad.
-          Para análisis profesional, utiliza equipos y software especializados.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        context="analizador-espectro"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

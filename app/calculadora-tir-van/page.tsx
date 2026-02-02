@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraTIRVAN.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps} from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -418,17 +418,21 @@ export default function CalculadoraTIRVANPage() {
         </div>
       </div>
 
-      {/* Disclaimer - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona una <strong>estimación orientativa</strong> para análisis de inversiones.
-          Los resultados dependen de la precisión de los flujos de caja estimados y no consideran
-          factores como inflación, riesgos específicos del proyecto o cambios en el mercado.
-          <strong> No constituye asesoramiento financiero profesional</strong>. Consulta con un
-          experto antes de tomar decisiones de inversión importantes.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-tir-van"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido Educativo */}
       <EducationalSection

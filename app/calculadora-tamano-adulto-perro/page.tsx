@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraTamanoAdultoPerro.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -352,15 +352,16 @@ export default function CalculadoraTamanoAdultoPerroPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona estimaciones basadas en curvas de crecimiento promedio.
-          El peso adulto real puede variar según la genética, alimentación, salud y otros factores.
-          <strong> En mestizos, la predicción es menos precisa</strong> ya que depende de las razas parentales.
-        </p>
-      </div>
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="calculadora-tamano-adulto-perro">
+        <p>Esta calculadora usa curvas de crecimiento promedio. <strong>Limitaciones:</strong></p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>En mestizos la predicción es menos precisa</strong>: Depende de las razas parentales y su proporción genética</li>
+          <li><strong>Factores individuales influyen</strong>: Alimentación, esterilización temprana, enfermedades y genética pueden alterar el crecimiento</li>
+        </ul>
+        <p className={styles.highlight}><strong>🐾 Solo orientativo. Consulta con tu veterinario sobre el desarrollo y peso ideal de tu cachorro.</strong></p>
+      </DisclaimerCard>
 
       <RelatedApps
         apps={getRelatedApps('calculadora-tamano-adulto-perro')}

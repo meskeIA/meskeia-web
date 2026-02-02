@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorLoteria.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type LotteryType = 'primitiva' | 'euromillones' | 'bonoloto' | 'gordo' | 'lototurf';
@@ -340,18 +340,22 @@ export default function GeneradorLoteriaPage() {
         )}
       </main>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso importante</h3>
-        <p>
-          Este generador produce números <strong>completamente aleatorios</strong>.
-          No existe ningún sistema ni algoritmo que pueda predecir los números ganadores de la lotería.
-          Juega con responsabilidad y solo dinero que puedas permitirte perder.
-        </p>
-        <p className={styles.disclaimerSmall}>
-          📞 Si tienes problemas con el juego: <strong>900 200 225</strong> (línea gratuita DGOJ)
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="default"
+        severity="medium"
+        context="generador-loteria"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Info adicional */}
       <div className={styles.infoSection}>

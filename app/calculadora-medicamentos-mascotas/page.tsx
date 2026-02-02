@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraMedicamentosMascotas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -488,16 +488,17 @@ export default function CalculadoraMedicamentosMascotasPage() {
         </div>
       )}
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta herramienta proporciona información orientativa general.
-          <strong> NO sustituye la consulta veterinaria.</strong> Cada mascota puede tener
-          necesidades específicas según su estado de salud, edad y estilo de vida.
-          Siempre consulta con un profesional antes de administrar cualquier medicamento.
-        </p>
-      </div>
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="calculadora-medicamentos-mascotas">
+        <p><strong>⚠️ NUNCA administres medicamentos sin consultar a tu veterinario:</strong></p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Dosis incorrectas pueden ser tóxicas</strong>: Especialmente en cachorros, gatos o mascotas con enfermedades renales/hepáticas</li>
+          <li><strong>Interacciones medicamentosas</strong>: Si tu mascota toma otros medicamentos, pueden haber incompatibilidades</li>
+          <li><strong>Resistencias a antiparasitarios</strong>: El uso inadecuado genera resistencias en pulgas/garrapatas</li>
+        </ul>
+        <p className={styles.highlight}><strong>🐾 Esta calculadora es orientativa. Tu veterinario debe prescribir tratamientos según el peso exacto, estado de salud y historial de tu mascota.</strong></p>
+      </DisclaimerCard>
 
       <RelatedApps
         apps={getRelatedApps('calculadora-medicamentos-mascotas')}

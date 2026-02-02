@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './Regla503020.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, parseSpanishNumber, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -280,14 +280,21 @@ export default function CalculadoraRegla503020Page() {
         </div>
       </div>
 
-      <div className={styles.disclaimer}>
-        <h3>Aviso importante</h3>
-        <p>
-          La regla 50/30/20 es una guía general de finanzas personales. Tu situación personal
-          puede requerir ajustes (ciudades caras pueden necesitar más del 50% en necesidades).
-          NO constituye asesoramiento financiero profesional.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-regla-50-30-20"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <EducationalSection
         title="¿Quieres aprender más sobre la regla 50/30/20?"

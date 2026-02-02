@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraTarifaFreelance.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -477,15 +477,21 @@ export default function CalculadoraTarifaFreelancePage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona <strong>estimaciones orientativas</strong> para ayudarte a fijar tu tarifa freelance.
-          Los cálculos fiscales son simplificados y pueden variar según tu situación personal, comunidad autónoma y régimen fiscal.
-          <strong> Consulta con un asesor fiscal profesional</strong> para obtener información precisa sobre tu caso particular.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="legal"
+        severity="high"
+        context="calculadora-tarifa-freelance"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

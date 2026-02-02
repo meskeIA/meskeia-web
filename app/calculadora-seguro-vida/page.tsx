@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraSeguroVida.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -333,16 +333,21 @@ export default function CalculadoraSeguroVidaPage() {
         </div>
       </div>
 
-      {/* Disclaimer - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora ofrece una <strong>estimación orientativa</strong> basada en métodos estándar del sector asegurador.
-          Los resultados <strong>no constituyen asesoramiento financiero ni recomendación de productos</strong>.
-          Las primas y coberturas reales dependen de múltiples factores (estado de salud, profesión, estilo de vida)
-          que solo una aseguradora puede evaluar. <strong>Consulta siempre con un profesional de seguros</strong> antes de contratar.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-seguro-vida"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo colapsable */}
       <EducationalSection

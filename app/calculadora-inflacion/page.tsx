@@ -5,7 +5,7 @@ import Chart from 'chart.js/auto';
 import styles from './CalculadoraInflacion.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -697,15 +697,21 @@ export default function CalculadoraInflacionPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Los datos del IPC provienen del Instituto Nacional de Estadística (INE).
-          Esta calculadora es orientativa y los resultados son aproximaciones basadas en el índice general.
-          La inflación puede variar según el tipo de bienes y servicios considerados.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-inflacion"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

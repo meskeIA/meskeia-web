@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraIva.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -171,6 +171,22 @@ export default function CalculadoraIvaPage() {
           </div>
         </div>
       </section>
+
+      <DisclaimerCard
+        variant="legal"
+        severity="critical"
+        context="calculadora-iva"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Añadido disclaimer fiscal con información de responsabilidad legal",
+          "Cumplimiento normativa: advertencia sobre consulta a asesor fiscal profesional",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <RelatedApps apps={getRelatedApps('calculadora-iva')} />
 

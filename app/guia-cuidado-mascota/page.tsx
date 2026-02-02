@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './GuiaCuidadoMascota.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { CourseProvider, useCourse, COURSE_MODULES } from './CourseContext';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -128,6 +128,17 @@ function GuideContent() {
           Empezar la Guía
         </Link>
       </section>
+
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="guia-cuidado-mascota">
+        <p>Esta guía proporciona <strong>información educativa general</strong> sobre cuidado de mascotas:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>No sustituye atención veterinaria</strong>: Consulta siempre con tu veterinario para diagnósticos, vacunas y tratamientos</li>
+          <li><strong>Cada mascota es única</strong>: Razas, edades y estados de salud requieren cuidados específicos</li>
+        </ul>
+        <p className={styles.highlight}><strong>🐾 Ante cualquier emergencia médica de tu mascota, acude inmediatamente a tu veterinario o clínica de urgencias.</strong></p>
+      </DisclaimerCard>
 
       <RelatedApps apps={getRelatedApps('guia-cuidado-mascota')} />
 

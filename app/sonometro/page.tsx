@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Sonometro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -338,15 +338,21 @@ export default function SonometroPage() {
       </main>
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Este sonómetro proporciona <strong>mediciones aproximadas</strong> con fines orientativos.
-          Los micrófonos de móviles y ordenadores no están calibrados profesionalmente.
-          Para mediciones oficiales (denuncias, certificaciones, etc.) utiliza un sonómetro homologado.
-          La precisión puede variar según el dispositivo y las condiciones de uso.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="technical"
+        severity="high"
+        context="sonometro"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

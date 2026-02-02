@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ComparadorTiposSeguros.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type SeguroCategoria = 'vida' | 'auto' | 'hogar' | 'salud';
@@ -321,15 +321,22 @@ export default function ComparadorTiposSegurosPage() {
         </div>
       </div>
 
-      {/* Disclaimer educativo (ligero) */}
-      <div className={styles.disclaimer}>
-        <h3>ℹ️ Información Educativa</h3>
-        <p>
-          Este comparador ofrece <strong>información general</strong> sobre tipos de seguros en España.
-          Las características, coberturas y precios pueden variar significativamente según la aseguradora.
-          Consulta con un profesional de seguros para elegir el producto adecuado a tu situación personal.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="educational"
+        severity="medium"
+        context="comparador-tipos-seguros"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Tabla comparativa rápida */}
       <div className={styles.tablaSection}>

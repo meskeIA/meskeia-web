@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraEdadMascotas.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -307,6 +307,17 @@ export default function CalculadoraEdadMascotasPage() {
           </div>
         </div>
       </div>
+
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="calculadora-edad-mascotas">
+        <p>Esta calculadora usa fórmulas científicas actualizadas, pero es <strong>solo orientativa</strong>:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>La edad biológica varía</strong>: Depende de raza, tamaño, alimentación, ejercicio y genética individual</li>
+          <li><strong>No reemplaza revisiones veterinarias</strong>: El envejecimiento de tu mascota debe evaluarlo un veterinario con exploración física</li>
+        </ul>
+        <p className={styles.highlight}><strong>🐾 Consulta con tu veterinario sobre cuidados específicos según la edad de tu mascota.</strong></p>
+      </DisclaimerCard>
 
       <RelatedApps
         apps={getRelatedApps('calculadora-edad-mascotas')}

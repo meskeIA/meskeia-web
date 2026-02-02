@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraSueno.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoCalculo = 'despertar' | 'dormir';
@@ -259,15 +259,17 @@ export default function CalculadoraSuenoPage() {
         </div>
       </div>
 
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona estimaciones basadas en ciclos de sueño promedio de 90 minutos.
-          La duración real puede variar según la persona, edad y otros factores. Si experimentas
-          problemas persistentes de sueño, <strong>consulta con un profesional de la salud</strong>.
-          Esta herramienta no sustituye el diagnóstico ni tratamiento médico.
-        </p>
-      </div>
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="medical" severity="high" collapsible={true} context="calculadora-sueno">
+        <p>Esta calculadora usa ciclos promedio de 90 minutos. <strong>Limitaciones importantes:</strong></p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Los ciclos varían individualmente</strong>: Pueden durar 80-110 minutos según edad, genética y estado de salud</li>
+          <li><strong>No detecta trastornos del sueño</strong>: Insomnio, apnea, síndrome piernas inquietas o narcolepsia requieren estudio médico</li>
+          <li><strong>Calidad vs cantidad</strong>: Dormir 8 horas con despertares frecuentes es peor que 6 horas continuas</li>
+        </ul>
+        <p className={styles.highlight}><strong>⚕️ Si tienes insomnio crónico, somnolencia diurna excesiva o ronquidos intensos, consulta con un médico especialista en sueño.</strong></p>
+      </DisclaimerCard>
 
       <EducationalSection
         title="¿Quieres aprender más sobre el sueño?"

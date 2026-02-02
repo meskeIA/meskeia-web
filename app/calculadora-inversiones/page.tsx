@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './CalculadoraInversiones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps} from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
@@ -688,17 +688,21 @@ export default function CalculadoraInversionesPage() {
       </div>
       )}
 
-      {/* Disclaimer - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona una <strong>distribución orientativa</strong> basada en perfiles
-          de riesgo estándar. Las rentabilidades pasadas no garantizan resultados futuros. La volatilidad
-          y las proyecciones son estimaciones y pueden variar significativamente.
-          <strong> No constituye asesoramiento financiero</strong>. Antes de invertir, consulta con un
-          profesional y evalúa tu situación personal, objetivos y tolerancia al riesgo.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-inversiones"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido Educativo */}
       <EducationalSection

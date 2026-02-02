@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './PlanificadorCashFlow.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -579,15 +579,21 @@ export default function PlanificadorCashFlowPage() {
         )}
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta herramienta proporciona <strong>proyecciones estimadas</strong> basadas en los datos introducidos.
-          El flujo de caja real puede variar por retrasos en cobros, pagos inesperados u otros factores.
-          <strong> Revisa y actualiza los datos regularmente</strong> para mantener la proyección actualizada.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="planificador-cashflow"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

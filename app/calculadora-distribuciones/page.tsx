@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraDistribuciones.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import jStat from 'jstat';
@@ -699,15 +699,22 @@ export default function CalculadoraDistribucionesPage() {
         )}
       </main>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona resultados para fines educativos y de referencia.
-          Para aplicaciones críticas (investigación, finanzas, ingeniería), verifique los
-          resultados con software especializado.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="educational"
+        severity="medium"
+        context="calculadora-distribuciones"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

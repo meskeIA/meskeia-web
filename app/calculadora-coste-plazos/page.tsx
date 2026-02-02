@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCostePlazos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -319,15 +319,21 @@ export default function CalculadoraCostePlazosPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona estimaciones orientativas. La TAE real puede variar según
-          las condiciones específicas del contrato de financiación. Revisa siempre el contrato
-          antes de firmar y compara varias opciones de financiación.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-coste-plazos"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Sección educativa */}
       <EducationalSection

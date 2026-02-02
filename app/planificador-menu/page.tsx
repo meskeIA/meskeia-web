@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './PlanificadorMenu.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type DayOfWeek = 'lunes' | 'martes' | 'miercoles' | 'jueves' | 'viernes' | 'sabado' | 'domingo';
@@ -345,15 +345,22 @@ export default function PlanificadorMenuPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>📋 Información</h3>
-        <p>
-          Este planificador ofrece sugerencias generales basadas en la dieta mediterránea.
-          Las opciones son orientativas y pueden adaptarse a tus preferencias y necesidades.
-          Para planes nutricionales específicos, consulta con un profesional de la nutrición.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="default"
+        severity="low"
+        context="planificador-menu"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <RelatedApps apps={getRelatedApps('planificador-menu')} />
       <Footer appName="planificador-menu" />

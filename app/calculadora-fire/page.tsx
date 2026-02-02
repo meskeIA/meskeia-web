@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './Fire.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -268,14 +268,21 @@ export default function CalculadoraFIREPage() {
         </div>
       </div>
 
-      <div className={styles.disclaimer}>
-        <h3>Aviso importante</h3>
-        <p>
-          Esta calculadora proporciona estimaciones basadas en la regla del 4% (Trinity Study) y rentabilidades históricas.
-          Los mercados son impredecibles y los resultados reales pueden variar significativamente.
-          NO constituye asesoramiento financiero profesional. Consulta con un asesor antes de tomar decisiones importantes.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-fire"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <EducationalSection
         title="¿Quieres aprender más sobre FIRE?"

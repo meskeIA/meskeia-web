@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './Luxometro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -493,16 +493,22 @@ export default function LuxometroPage() {
         </ul>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta herramienta proporciona mediciones aproximadas. Cuando se usa la cámara como sensor,
-          los valores son estimaciones basadas en la luminosidad de la imagen y pueden variar según
-          el dispositivo, la exposición automática de la cámara y las condiciones ambientales.
-          Para mediciones profesionales de iluminación, utiliza un luxómetro certificado.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        context="luxometro"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

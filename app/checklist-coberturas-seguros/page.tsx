@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ChecklistCoberturasSeguro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type PerfilType = 'joven-soltero' | 'pareja-sin-hijos' | 'familia-hijos' | 'autonomo' | 'jubilado' | 'propietario-alquila';
@@ -297,15 +297,22 @@ export default function ChecklistCoberturasSeguroPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>ℹ️ Información Orientativa</h3>
-        <p>
-          Este checklist ofrece <strong>recomendaciones generales</strong> basadas en perfiles típicos.
-          Cada persona tiene circunstancias únicas que pueden requerir coberturas adicionales o diferentes.
-          Consulta con un profesional de seguros para un análisis personalizado de tus necesidades.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="legal"
+        severity="medium"
+        context="checklist-coberturas-seguros"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <RelatedApps apps={getRelatedApps('checklist-coberturas-seguros')} />
       <Footer appName="checklist-coberturas-seguros" />

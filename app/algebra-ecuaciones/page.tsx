@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import styles from './AlgebraEcuaciones.module.css';
-import { Footer, MeskeiaLogo, EducationalSection, RelatedApps } from '@/components';
+import { Footer, MeskeiaLogo, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import * as Algebrite from 'algebrite';
@@ -589,16 +589,22 @@ export default function AlgebraEcuacionesPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona soluciones matemáticas exactas utilizando métodos algebraicos
-          estándar. Los resultados son educativos y deben verificarse en contextos académicos o
-          profesionales. Para ecuaciones más complejas o sistemas mayores, consulta con un
-          especialista en matemáticas.
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="educational"
+        severity="low"
+        context="algebra-ecuaciones"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       <EducationalSection
         title="¿Quieres aprender más sobre Ecuaciones Algebraicas?"

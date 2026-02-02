@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorNombresEmpresa.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Diccionarios por sector
@@ -335,15 +335,22 @@ export default function GeneradorNombresEmpresaPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Los nombres generados son <strong>sugerencias algorítmicas</strong>.
-          Antes de usar un nombre, verifica que no esté registrado como marca en la <strong>OEPM</strong> (Oficina Española de Patentes y Marcas)
-          y que el dominio esté disponible. <strong>meskeIA no garantiza la disponibilidad legal de los nombres.</strong>
-        </p>
-      </div>
+      {/* Disclaimer - SIEMPRE VISIBLE */}
+      <DisclaimerCard
+        variant="legal"
+        severity="high"
+        context="generador-nombres-empresa"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido educativo */}
       <EducationalSection

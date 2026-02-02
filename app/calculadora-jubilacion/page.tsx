@@ -5,7 +5,7 @@ import Chart from 'chart.js/auto';
 import styles from './CalculadoraJubilacion.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps} from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -834,17 +834,21 @@ export default function CalculadoraJubilacionPage() {
       </div>
       )}
 
-      {/* Disclaimer - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona una <strong>simulación teórica</strong> basada en una rentabilidad
-          constante. En la realidad, los mercados fluctúan y las rentabilidades pasadas no garantizan
-          resultados futuros. No tiene en cuenta inflación, impuestos ni comisiones de gestión.
-          <strong> No constituye asesoramiento financiero</strong>. Consulta con un profesional para
-          planificar tu jubilación de forma personalizada.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-jubilacion"
+        collapsible={true}
+      />
+
+      <LastUpdated
+        date="2026-02-02"
+        changelog={[
+          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
+          "Añadido componente LastUpdated con historial de cambios",
+          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
+        ]}
+      />
 
       {/* Contenido Educativo */}
       <EducationalSection
