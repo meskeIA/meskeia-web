@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './CursoNutrisalud.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, DisclaimerCard, LastUpdated, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import {
   MODULES,
   CHAPTERS,
@@ -156,19 +157,6 @@ function ConsentModal() {
   );
 }
 
-// Componente Disclaimer Médico permanente
-function MedicalDisclaimer() {
-  return (
-    <div className={styles.medicalDisclaimer}>
-      <span className={styles.disclaimerIcon}>ℹ️</span>
-      <p className={styles.disclaimerText}>
-        <strong>Recordatorio:</strong> Este curso es una herramienta educativa.
-        El contenido no sustituye el consejo médico profesional. Consulta siempre
-        con profesionales de la salud antes de realizar cambios en tu alimentación.
-      </p>
-    </div>
-  );
-}
 
 export default function CursoNutrisaludPage() {
   const { hasAcceptedConsent, getProgressPercentage, isChapterCompleted } = useCourse();
@@ -204,8 +192,15 @@ export default function CursoNutrisaludPage() {
         </p>
       </header>
 
-      {/* Disclaimer médico SIEMPRE VISIBLE */}
-      <MedicalDisclaimer />
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="medical" severity="low" collapsible={true} context="curso-nutrisalud">
+        <p>Este curso es una <strong>herramienta educativa</strong> basada en evidencia científica:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>No sustituye consejo médico profesional</strong>: El contenido es informativo, no prescriptivo</li>
+          <li><strong>Consulta con profesionales de la salud</strong>: Antes de realizar cambios significativos en tu alimentación o estilo de vida</li>
+        </ul>
+      </DisclaimerCard>
 
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
@@ -333,6 +328,8 @@ export default function CursoNutrisaludPage() {
               : 'Continuar aprendiendo'}
         </Link>
       </section>
+
+      <RelatedApps apps={getRelatedApps('curso-nutrisalud')} />
 
       <Footer appName="curso-nutrisalud" />
     </div>

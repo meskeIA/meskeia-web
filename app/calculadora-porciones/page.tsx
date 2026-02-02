@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraPorciones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface PortionMethod {
@@ -347,15 +347,15 @@ export default function CalculadoraPorcionesPage() {
         </div>
       </section>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>📋 Información</h3>
-        <p>
-          Este método de porciones es una guía visual general basada en recomendaciones nutricionales estándar.
-          Las necesidades individuales varían según edad, sexo, actividad física y objetivos personales.
-          Para un plan nutricional personalizado, consulta con un dietista-nutricionista.
-        </p>
-      </div>
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="medical" severity="low" collapsible={true} context="calculadora-porciones">
+        <p>Este método de porciones es una <strong>guía visual orientativa</strong> basada en recomendaciones nutricionales generales:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Las necesidades varían individualmente</strong>: Según edad, sexo, actividad física y objetivos personales</li>
+          <li><strong>Consulta con un dietista-nutricionista</strong>: Para un plan nutricional personalizado y adaptado a tu situación</li>
+        </ul>
+      </DisclaimerCard>
 
       <RelatedApps apps={getRelatedApps('calculadora-porciones')} />
 

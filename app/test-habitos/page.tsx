@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './TestHabitos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Question {
@@ -611,19 +611,18 @@ export default function TestHabitosPage() {
               🔄 Repetir Test
             </button>
           </div>
-
-          {/* Disclaimer */}
-          <div className={styles.disclaimer}>
-            <h3>📋 Información</h3>
-            <p>
-              Este test es una herramienta orientativa de autoevaluación. Los resultados
-              no constituyen un diagnóstico ni sustituyen el consejo de profesionales de
-              la salud. Para una evaluación completa de tu estado de salud, consulta con
-              tu médico.
-            </p>
-          </div>
         </div>
       )}
+
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="medical" severity="low" collapsible={true} context="test-habitos">
+        <p>Este test es una <strong>herramienta de autoevaluación orientativa</strong> sobre hábitos saludables:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>No constituye un diagnóstico médico</strong>: Los resultados son informativos, no diagnósticos</li>
+          <li><strong>Consulta con profesionales</strong>: Para una evaluación completa de tu estado de salud, acude a tu médico o nutricionista</li>
+        </ul>
+      </DisclaimerCard>
 
       <RelatedApps apps={getRelatedApps('test-habitos')} />
 

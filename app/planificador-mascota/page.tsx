@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './PlanificadorMascota.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -831,19 +831,15 @@ export default function PlanificadorMascotaPage() {
         </div>
       )}
 
-      {/* DISCLAIMER - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta herramienta proporciona información <strong>orientativa y educativa</strong> basada en
-          recomendaciones generales para el cuidado de mascotas en España.
-        </p>
-        <p>
-          <strong>No sustituye el consejo de un veterinario profesional.</strong> Cada animal es único
-          y puede tener necesidades específicas. Consulta siempre con tu veterinario para un plan de
-          cuidados personalizado.
-        </p>
-      </div>
+      <LastUpdated lastUpdate="2 de febrero de 2026" />
+
+      <DisclaimerCard variant="medical" severity="low" collapsible={true} context="planificador-mascota">
+        <p>Este planificador proporciona <strong>información orientativa</strong> basada en recomendaciones generales:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Cada mascota es única</strong>: El calendario puede variar según raza, edad y condiciones de salud</li>
+          <li><strong>Consulta con tu veterinario</strong>: Para un plan de cuidados personalizado y calendario de vacunación específico</li>
+        </ul>
+      </DisclaimerCard>
 
       {/* Contenido Educativo Colapsable */}
       <EducationalSection
