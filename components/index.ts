@@ -23,6 +23,9 @@ export type { DisclaimerVariant, DisclaimerSeverity } from './DisclaimerCard';
 // Componente de última actualización
 export { default as LastUpdated } from './LastUpdated';
 
+// Componente de aviso legal (términos, privacidad, fecha, copyright)
+export { default as LegalNotice } from './LegalNotice';
+
 // Nuevos componentes de navegación
 export { default as Sidebar } from './Sidebar';
 export { default as SidebarMobile } from './SidebarMobile';

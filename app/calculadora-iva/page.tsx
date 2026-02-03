@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraIva.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LastUpdated, LegalNotice } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -67,6 +67,8 @@ export default function CalculadoraIvaPage() {
           Calcula el IVA español al 21%, 10% o 4%. Añade o quita IVA al instante.
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>

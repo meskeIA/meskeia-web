@@ -1,0 +1,120 @@
+/**
+ * LegalNotice Component Styles
+ *
+ * Diseño compacto para enlaces legales + última actualización + copyright
+ * Responsive: 1 línea en PC, 2 líneas en móvil
+ */
+
+.legalNotice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  margin: var(--spacing-lg) 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .legalNotice {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+.icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.link:hover {
+  color: var(--secondary);
+  text-decoration: underline;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.separator {
+  color: var(--border);
+  user-select: none;
+}
+
+.lastUpdated {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.copyright {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+/* Responsive Text Variants */
+/* PC: Mostrar textos completos */
+.linkTextFull,
+.lastUpdatedFull,
+.copyrightFull {
+  display: inline;
+}
+
+.linkTextShort,
+.lastUpdatedShort,
+.copyrightShort {
+  display: none;
+}
+
+/* Móvil: Mostrar textos abreviados */
+@media (max-width: 768px) {
+  .legalNotice {
+    font-size: 0.8125rem;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .linkTextFull,
+  .lastUpdatedFull,
+  .copyrightFull {
+    display: none;
+  }
+
+  .linkTextShort,
+  .lastUpdatedShort,
+  .copyrightShort {
+    display: inline;
+  }
+
+  .lastUpdated,
+  .copyright {
+    font-size: 0.75rem;
+  }
+}
+
+/* Móvil muy pequeño (<400px): Forzar 2 líneas */
+@media (max-width: 400px) {
+  .legalNotice {
+    justify-content: flex-start;
+  }
+}

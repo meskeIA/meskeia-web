@@ -71,9 +71,6 @@ export default function Footer({ appName }: FooterProps) {
             🔗 Compártela
           </button>
         </div>
-        <div className={styles.copyright}>
-          © 2025 meskeIA
-        </div>
       </footer>
 
       {showMessage && (

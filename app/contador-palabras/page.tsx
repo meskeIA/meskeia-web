@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ContadorPalabras.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -180,6 +180,8 @@ export default function ContadorPalabrasPage() {
           Analiza tu texto: palabras, caracteres, tiempo de lectura y más
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}
