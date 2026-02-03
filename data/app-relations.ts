@@ -53,6 +53,7 @@ const finanzasInversionApps: RelatedApp[] = [
 
 const finanzasHipotecaApps: RelatedApp[] = [
   { url: '/simulador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+  { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
   { url: '/amortizacion-hipoteca/', icon: '💰', name: 'Amortización Anticipada', description: 'Reducir cuota vs plazo' },
   { url: '/simulador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas' },
   { url: '/calculadora-alquiler-vs-compra/', icon: '🔑', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
@@ -397,11 +398,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // FINANZAS - HIPOTECA / INMOBILIARIA
   'simulador-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/simulador-hipoteca/'),
+  'simulador-compraventa-inmueble': finanzasHipotecaApps.filter(a => a.url !== '/simulador-compraventa-inmueble/'),
   'amortizacion-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/amortizacion-hipoteca/'),
   'simulador-prestamos': finanzasHipotecaApps.filter(a => a.url !== '/simulador-prestamos/'),
   'calculadora-alquiler-vs-compra': finanzasHipotecaApps.filter(a => a.url !== '/calculadora-alquiler-vs-compra/'),
   'calculadora-coste-vivienda': [
     { url: '/simulador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
     { url: '/calculadora-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Compara opciones' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Coste de electrodomésticos' },
   ],

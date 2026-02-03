@@ -18,12 +18,12 @@ const tools = [
     step: 1,
   },
   {
-    id: 'coste-vivienda-gastos',
-    name: 'Gastos de Compra',
+    id: 'gastos-compraventa',
+    name: 'Gastos de Compraventa',
     icon: '📋',
-    url: '/calculadora-coste-vivienda/',
+    url: '/simulador-compraventa-inmueble/',
     question: '¿Cuánto me costará la compra además del precio?',
-    description: 'Calcula todos los gastos asociados a la compra de tu vivienda.',
+    description: 'Calcula ITP/IVA, notaría, registro y todos los gastos de compraventa en tu comunidad autónoma.',
     step: 2,
   },
   {
@@ -113,10 +113,10 @@ const caseStudy = {
   situation: 'Pareja de 32 años, ingresos netos conjuntos de 3.500€/mes, ahorrados 45.000€. Buscan piso de unos 200.000€ en Madrid.',
   steps: [
     { tool: 'Simulador de Hipoteca', result: 'Con 160.000€ de hipoteca a 25 años al 3%, cuota de 758€/mes (21% de ingresos). Viable.' },
-    { tool: 'Gastos de Compraventa', result: 'En Madrid, ITP 6% + gastos ≈ 18.000€. Total necesario: 40.000€ entrada + 18.000€ gastos = 58.000€.' },
+    { tool: 'Gastos de Compraventa', result: 'En Madrid, ITP 6% (12.000€) + notaría/registro/gestoría (≈ 2.500€) = 14.500€. Total necesario: 40.000€ entrada + 14.500€ gastos = 54.500€.' },
     { tool: 'Alquiler vs Compra', result: 'Pagando 1.100€ de alquiler actual, comprar sale mejor a partir del año 7. Planean quedarse 10+ años.' },
   ],
-  conclusion: 'Necesitan ahorrar 13.000€ más antes de poder comprar. Decisión: esperar 8-10 meses ahorrando 1.500€/mes.',
+  conclusion: 'Necesitan ahorrar 9.500€ más antes de poder comprar. Decisión: esperar 6-7 meses ahorrando 1.500€/mes.',
 };
 
 export default function GuiaComprarCasaPage() {

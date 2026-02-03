@@ -244,6 +244,7 @@ Plugins disponibles para mejorar el flujo de desarrollo:
 
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
+| 1.3.1 | 2026-02-03 | Sincronizado con CLAUDE.md global v2.12.0 (Sistema LegalNotice) |
 | 1.3.0 | 2025-12-28 | Añadida sección Guías (5 guías implementadas) |
 | 1.2.0 | 2025-12-24 | Añadidos plugins de Claude Code y documentación de testing |
 | 1.1.0 | 2025-12-21 | Añadida arquitectura Suites + Momentos |

@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 220+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 221+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 220,
+  "total_tools": 221,
   "last_updated": "2026-02-03",
   "features": {
     "all_free": true,
@@ -42,7 +42,7 @@
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 29
+      "tool_count": 30
     },
     {
       "id": "freelance",
@@ -63,7 +63,7 @@
       "name": "Inmobiliaria y Hogar",
       "icon": "🏘️",
       "description": "Hipotecas, alquiler y gestión del hogar",
-      "tool_count": 20
+      "tool_count": 21
     },
     {
       "id": "juegos",
@@ -114,14 +114,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 64
+      "tool_count": 65
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 39
+      "tool_count": 40
     },
     {
       "id": "creando",
@@ -1580,6 +1580,37 @@
         "euribor"
       ],
       "icon": "💰"
+    },
+    {
+      "slug": "simulador-compraventa-inmueble",
+      "name": "Simulador de Compraventa Inmobiliaria",
+      "url": "https://meskeia.com/simulador-compraventa-inmueble/",
+      "description": "Calcula todos los gastos de compra y venta de inmuebles en España: ITP/IVA por CCAA, notaría, registro, plusvalía municipal e IRPF del vendedor",
+      "suites": [
+        "inmobiliaria",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "compraventa",
+        "gastos",
+        "itp",
+        "iva",
+        "ajd",
+        "notaria",
+        "registro",
+        "plusvalia",
+        "irpf",
+        "comunidad autonoma",
+        "impuestos",
+        "vivienda",
+        "compra",
+        "venta"
+      ],
+      "icon": "📋"
     },
     {
       "slug": "calculadora-jubilacion",

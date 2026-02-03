@@ -14,6 +14,7 @@ export const implementedAppsUrls = [
   "/control-gastos/",
   "/interes-compuesto/",
   "/simulador-hipoteca/",
+  "/simulador-compraventa-inmueble/", // Gastos de compraventa: ITP/IVA, notaría, registro, plusvalía
   "/simulador-prestamos/",           // Compara sistemas francés, alemán, americano
   "/amortizacion-hipoteca/",         // Amortización anticipada: reducir cuota vs plazo
   "/calculadora-jubilacion/",
