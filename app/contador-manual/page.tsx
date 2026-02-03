@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './ContadorManual.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Contador {
@@ -152,6 +152,8 @@ export default function ContadorManualPage() {
           Tally counter digital - Cuenta cualquier cosa con un clic
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Configuración */}
       <div className={styles.config}>

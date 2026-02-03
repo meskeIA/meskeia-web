@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './CalculadoraProductividad.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -178,6 +178,8 @@ export default function CalculadoraProductividadPage() {
           descontando reuniones, gestión y tiempo no facturable.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Proyectos */}
       <div className={styles.projectsSection}>

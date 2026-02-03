@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraGastoEnergetico.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -256,6 +256,8 @@ export default function CalculadoraGastoEnergeticoPage() {
           Calcula el consumo eléctrico de tu hogar y descubre cuánto pagas en la factura de luz
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de configuración */}

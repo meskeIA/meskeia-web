@@ -1,5 +1,6 @@
 'use client';
 
+import { LegalNotice } from '@/components';
 import Link from 'next/link';
 import ChapterPage from '../ChapterPage';
 import styles from '../CursoEmprendimiento.module.css';

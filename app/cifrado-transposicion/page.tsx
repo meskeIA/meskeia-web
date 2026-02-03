@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CifradoTransposicion.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type MetodoType = 'columnas' | 'railfence' | 'escitala';
@@ -333,6 +333,8 @@ export default function CifradoTransposicionPage() {
           Reordena las letras de tu mensaje con métodos clásicos
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Selector de método */}

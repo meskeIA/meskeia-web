@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './PlanificadorMascota.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -413,6 +413,8 @@ export default function PlanificadorMascotaPage() {
           Organiza la llegada de tu cachorro o gatito: checklist, compras y vacunas
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Navegación de Tabs */}
       <div className={styles.tabs}>
@@ -831,7 +833,7 @@ export default function PlanificadorMascotaPage() {
         </div>
       )}
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      
 
       <DisclaimerCard variant="medical" severity="low" collapsible={true} context="planificador-mascota">
         <p>Este planificador proporciona <strong>información orientativa</strong> basada en recomendaciones generales:</p>

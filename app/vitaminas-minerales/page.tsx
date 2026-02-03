@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './VitaminasMinerales.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   NUTRIENTS,
@@ -73,6 +73,8 @@ export default function VitaminasMineralesPage() {
           dosis recomendada y síntomas de deficiencia
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Buscador y Filtros */}
       <div className={styles.searchSection}>

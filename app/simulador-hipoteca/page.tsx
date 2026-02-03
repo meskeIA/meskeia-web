@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './SimuladorHipoteca.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -141,6 +141,8 @@ export default function SimuladorHipotecaPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Disclaimer Legal */}
       <DisclaimerCard
         variant="financial"
@@ -169,27 +171,7 @@ export default function SimuladorHipotecaPage() {
       </DisclaimerCard>
 
       {/* Última actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: '2026-02-02',
-            changes: [
-              'Añadidos disclaimers legales completos',
-              'Mejorada visualización de tabla de amortización',
-              'Actualizado cálculo de ratio de endeudamiento',
-            ],
-          },
-          {
-            date: '2025-12-15',
-            changes: [
-              'Añadida opción de tipo de interés variable (Euríbor + diferencial)',
-              'Mejorada visualización responsive en móviles',
-            ],
-          },
-        ]}
-      />
+      
 
       <div className={styles.mainContent}>
         {/* Panel de Configuración */}

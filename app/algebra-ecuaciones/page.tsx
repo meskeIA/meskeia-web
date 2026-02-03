@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import styles from './AlgebraEcuaciones.module.css';
-import { Footer, MeskeiaLogo, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { Footer, MeskeiaLogo, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import * as Algebrite from 'algebrite';
@@ -316,6 +316,8 @@ export default function AlgebraEcuacionesPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Selector de tipo de ecuación */}
       <div className={styles.typeSelector}>
         <button
@@ -597,14 +599,6 @@ export default function AlgebraEcuacionesPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
 
       <EducationalSection
         title="¿Quieres aprender más sobre Ecuaciones Algebraicas?"

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency } from '@/lib/formatters';
 import { jsonLd } from './metadata';
@@ -82,6 +82,8 @@ export default function CalculadoraPropinas() {
 
       {/* Logo meskeIA */}
       <MeskeiaLogo />
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <main className={styles.container}>
         {/* Header */}
@@ -251,14 +253,7 @@ export default function CalculadoraPropinas() {
           collapsible={true}
         />
 
-        <LastUpdated
-          date="2026-02-02"
-          changelog={[
-            "Añadido disclaimer financiero con información de responsabilidad legal",
-            "Advertencia sobre variaciones culturales en propinas según el país",
-            "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-          ]}
-        />
+        
 
         {/* Contenido educativo colapsable */}
         <EducationalSection

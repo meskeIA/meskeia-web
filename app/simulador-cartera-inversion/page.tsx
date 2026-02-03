@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './SimuladorCartera.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import {
@@ -439,6 +439,8 @@ export default function SimuladorCarteraPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Banner si viene del test */}
       {perfilURL && PERFILES_PREDEFINIDOS[perfilURL] && (
         <div className={styles.perfilBanner}>
@@ -785,14 +787,7 @@ export default function SimuladorCarteraPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       {/* Contenido educativo */}
       <EducationalSection

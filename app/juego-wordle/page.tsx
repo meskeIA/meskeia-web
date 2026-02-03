@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoWordle.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Palabras de 5 letras en español (sin tildes para simplificar)
@@ -289,6 +289,8 @@ export default function JuegoWordlePage() {
           Adivina la palabra de 5 letras en 6 intentos
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Mensaje */}

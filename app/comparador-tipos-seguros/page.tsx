@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ComparadorTiposSeguros.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type SeguroCategoria = 'vida' | 'auto' | 'hogar' | 'salud';
@@ -227,6 +227,8 @@ export default function ComparadorTiposSegurosPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Selector de categoría */}
       <div className={styles.categorySelector}>
         {(Object.keys(segurosData) as SeguroCategoria[]).map((cat) => (
@@ -329,14 +331,7 @@ export default function ComparadorTiposSegurosPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       {/* Tabla comparativa rápida */}
       <div className={styles.tablaSection}>

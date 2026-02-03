@@ -36,7 +36,7 @@ export default function DisclaimerCard({
   severity = 'high',
   title,
   children,
-  showTermsLink = true,
+  showTermsLink = false,
   collapsible = false,
   context,
 }: DisclaimerCardProps) {

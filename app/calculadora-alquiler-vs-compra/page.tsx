@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraAlquilerVsCompra.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -161,6 +161,8 @@ export default function CalculadoraAlquilerVsCompraPage() {
         <p className={styles.subtitle}>¿Qué me conviene más? Análisis financiero completo</p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Disclaimer Legal */}
       <DisclaimerCard
         variant="financial"
@@ -186,21 +188,6 @@ export default function CalculadoraAlquilerVsCompraPage() {
         </p>
       </DisclaimerCard>
 
-      {/* Última actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: '2026-02-02',
-            changes: [
-              'Añadidos disclaimers sobre factores personales',
-              'Mejorada visualización de evolución patrimonial',
-              'Añadido cálculo de punto de equilibrio',
-            ],
-          },
-        ]}
-      />
 
       <div className={styles.mainContent}>
         {/* Panel de datos vivienda */}

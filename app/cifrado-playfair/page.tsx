@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CifradoPlayfair.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'cifrar' | 'descifrar';
@@ -150,6 +150,8 @@ export default function CifradoPlayfairPage() {
           Cifrado por pares de letras con matriz 5x5
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Configuración */}

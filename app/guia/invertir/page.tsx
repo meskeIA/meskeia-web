@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaInvertir.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para inversión
@@ -140,6 +140,8 @@ export default function GuiaInvertirPage() {
           </div>
         </div>
       </header>
+
+      <LegalNotice />
 
       {/* Journey Steps */}
       <section className={styles.journeySection}>

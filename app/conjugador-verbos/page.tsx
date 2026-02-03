@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './ConjugadorVerbos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   conjugarVerbo,
@@ -84,6 +84,8 @@ export default function ConjugadorVerbosPage() {
           y más de 60 verbos irregulares completamente conjugados.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Buscador */}
       <div className={styles.searchSection}>

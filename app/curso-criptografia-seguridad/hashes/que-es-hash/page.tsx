@@ -1,5 +1,6 @@
 'use client';
 
+import { LegalNotice } from '@/components';
 import ChapterPage from '../../ChapterPage';
 import styles from '../../CursoCriptografiaSeguridad.module.css';
 

@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './CreadorThumbnails.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Constantes del canvas
@@ -724,6 +724,8 @@ export default function CreadorThumbnailsPage() {
           Diseña miniaturas profesionales para tus videos. Añade texto, imágenes y formas.
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.editor}>
         {/* Panel izquierdo - Herramientas */}

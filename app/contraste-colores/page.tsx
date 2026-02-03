@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './ContrasteColores.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface ContrastResult {
@@ -123,6 +123,8 @@ export default function ContrasteColoresPage() {
           Verifica la accesibilidad según WCAG 2.1
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel izquierdo - Preview y Resultados */}

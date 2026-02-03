@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraTIRVAN.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -184,6 +184,8 @@ export default function CalculadoraTIRVANPage() {
           Evalúa la rentabilidad de tus proyectos de inversión
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         {/* Panel de Configuración */}
@@ -425,14 +427,7 @@ export default function CalculadoraTIRVANPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       {/* Contenido Educativo */}
       <EducationalSection

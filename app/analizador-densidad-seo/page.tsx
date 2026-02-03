@@ -5,7 +5,7 @@ import styles from './AnalizadorDensidadSeo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import EducationalSection from '@/components/EducationalSection';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -198,6 +198,8 @@ export default function AnalizadorDensidadSeoPage() {
           Analiza la frecuencia de palabras clave y optimiza tu contenido para SEO
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

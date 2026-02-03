@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraElectricidad.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps} from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber, parseSpanishNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -338,6 +338,8 @@ export default function CalculadoraElectricidadPage() {
           Ley de Ohm, Potencia, Divisores, Circuitos Mixtos, RC/RL y Consumo
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de configuración */}

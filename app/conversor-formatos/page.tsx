@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import styles from './ConversorFormatos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de formato soportados
@@ -434,6 +434,8 @@ export default function ConversorFormatosPage() {
           Convierte entre JSON, CSV, Excel, XML y YAML. 100% privado, todo en tu navegador.
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Zona de carga */}

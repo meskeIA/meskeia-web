@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoTeoriaPolitica.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 import {
   MODULES,
   CHAPTERS,
@@ -45,6 +45,8 @@ export default function CursoTeoriaPoliticaPage() {
           Ver introducción en video
         </a>
       </header>
+
+      <LegalNotice />
 
       {/* Stats Grid */}
       <div className={styles.statsGrid}>

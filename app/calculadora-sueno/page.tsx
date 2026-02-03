@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraSueno.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoCalculo = 'despertar' | 'dormir';
@@ -111,6 +111,8 @@ export default function CalculadoraSuenoPage() {
           Calcula la hora ideal para dormir o despertar respetando los ciclos de sueño de 90 minutos
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
@@ -259,7 +261,7 @@ export default function CalculadoraSuenoPage() {
         </div>
       </div>
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      
 
       <DisclaimerCard variant="medical" severity="high" collapsible={true} context="calculadora-sueno">
         <p>Esta calculadora usa ciclos promedio de 90 minutos. <strong>Limitaciones importantes:</strong></p>

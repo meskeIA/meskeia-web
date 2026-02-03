@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCosteVivienda.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -106,6 +106,8 @@ export default function CalculadoraCosteViviendaPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Disclaimer Legal */}
       <DisclaimerCard
         variant="financial"
@@ -125,20 +127,6 @@ export default function CalculadoraCosteViviendaPage() {
       </DisclaimerCard>
 
       {/* Última actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: '2026-02-02',
-            changes: [
-              'Añadidos disclaimers legales',
-              'Mejorada interfaz con NumberInput estándar',
-              'Añadido cálculo de coste por día',
-            ],
-          },
-        ]}
-      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

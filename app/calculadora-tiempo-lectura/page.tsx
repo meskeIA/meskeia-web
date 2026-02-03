@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './CalculadoraTiempoLectura.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps} from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -141,6 +141,8 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
           Estima cuánto tardarán tus lectores en consumir tu contenido
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

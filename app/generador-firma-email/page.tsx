@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorFirmaEmail.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Template = 'minimal' | 'corporate' | 'creative' | 'social';
@@ -191,6 +191,8 @@ export default function GeneradorFirmaEmailPage() {
           Crea firmas profesionales HTML para Gmail, Outlook y más
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainGrid}>
         <div className={styles.formSection}>

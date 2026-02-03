@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraMcdMcm.module.css';
-import { MeskeiaLogo, Footer, ResultCard, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -190,6 +190,8 @@ export default function CalculadoraMcdMcmPage() {
           Calcula el Máximo Común Divisor y Mínimo Común Múltiplo de hasta 5 números
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>

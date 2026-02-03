@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './GuiaCuidadoMascota.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { CourseProvider, useCourse, COURSE_MODULES } from './CourseContext';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -32,6 +32,8 @@ function GuideContent() {
           Ver introducción en video
         </a>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Stats */}
       <div className={styles.statsGrid}>
@@ -129,7 +131,7 @@ function GuideContent() {
         </Link>
       </section>
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      
 
       <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="guia-cuidado-mascota">
         <p>Esta guía proporciona <strong>información educativa general</strong> sobre cuidado de mascotas:</p>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './MatrizEisenhower.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -159,6 +159,8 @@ export default function MatrizEisenhowerPage() {
           Decide qué hacer, planificar, delegar o eliminar.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Input para nueva tarea */}
       <div className={styles.inputSection}>

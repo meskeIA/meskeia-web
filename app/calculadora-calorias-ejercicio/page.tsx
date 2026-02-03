@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCalorias.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -122,6 +122,8 @@ export default function CalculadoraCaloriasPage() {
           Calcula las calorías quemadas según tu actividad física usando valores MET científicos
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
@@ -246,27 +248,6 @@ export default function CalculadoraCaloriasPage() {
         </div>
       </div>
 
-      {/* Última Actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: "2026-02-02",
-            changes: [
-              "Añadido disclaimer médico sobre estimaciones de gasto calórico",
-              "Reforzado aviso sobre consulta médica para programas de ejercicio",
-            ],
-          },
-          {
-            date: "2025-11-29",
-            changes: [
-              "Implementado cálculo basado en valores MET científicos",
-              "Añadidas 40+ actividades organizadas por categorías",
-            ],
-          },
-        ]}
-      />
 
       {/* Disclaimer Médico */}
       <DisclaimerCard

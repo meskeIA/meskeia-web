@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './CalculadoraColesterol.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -206,6 +206,8 @@ export default function CalculadoraColesterolPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Formulario */}
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
@@ -335,27 +337,6 @@ export default function CalculadoraColesterolPage() {
         )}
       </div>
 
-      {/* Última Actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: "2026-02-02",
-            changes: [
-              "Añadido disclaimer médico profesional sobre interpretación de analíticas",
-              "Reforzado aviso sobre consulta médica obligatoria",
-            ],
-          },
-          {
-            date: "2025-11-29",
-            changes: [
-              "Implementada fórmula de Friedewald para cálculo automático de LDL",
-              "Añadidos ratios CT/HDL y LDL/HDL como indicadores de riesgo",
-            ],
-          },
-        ]}
-      />
 
       {/* Disclaimer Médico - SIEMPRE VISIBLE */}
       <DisclaimerCard

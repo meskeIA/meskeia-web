@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './RuletaAleatoria.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface WheelItem {
@@ -258,6 +258,8 @@ export default function RuletaAleatoriaPage() {
           Crea tu ruleta personalizada para sorteos, decisiones o simplemente divertirte. Sin registro, sin límites.
         </p>
       </header>
+
+      <LegalNotice />
 
       <main className={styles.mainContent}>
         <div className={styles.wheelSection}>

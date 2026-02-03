@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import styles from '../../CursoEmpresaFamiliar.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 
 interface GlossaryTerm {
   term: string;
@@ -100,6 +100,8 @@ export default function GlosarioPage() {
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
+
+      <LegalNotice />
 
       {/* Hero */}
       <header className={styles.chapterHero}>

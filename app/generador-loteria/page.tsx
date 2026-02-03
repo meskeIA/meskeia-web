@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorLoteria.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type LotteryType = 'primitiva' | 'euromillones' | 'bonoloto' | 'gordo' | 'lototurf';
@@ -182,6 +182,8 @@ export default function GeneradorLoteriaPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       <main className={styles.mainContent}>
         {/* Selector de lotería */}
         <div className={styles.lotterySelector}>
@@ -348,14 +350,7 @@ export default function GeneradorLoteriaPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       {/* Info adicional */}
       <div className={styles.infoSection}>

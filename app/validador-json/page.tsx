@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import styles from './ValidadorJSON.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type TabType = 'json' | 'xml';
@@ -198,6 +198,8 @@ export default function ValidadorJSONPage() {
         <h1 className={styles.title}>Validador JSON y XML</h1>
         <p className={styles.subtitle}>Valida, formatea y minifica código al instante</p>
       </header>
+
+      <LegalNotice />
 
       {/* Tabs */}
       <div className={styles.tabs}>

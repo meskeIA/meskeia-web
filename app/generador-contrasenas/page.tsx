@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import FixedHeader from '@/components/FixedHeader';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import ResultCard from '@/components/ResultCard';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { jsonLd } from './metadata';

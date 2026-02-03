@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './MiIp.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface IpInfo {
@@ -239,6 +239,8 @@ export default function MiIpPage() {
           Descubre tu dirección IP pública, ubicación aproximada y datos de tu conexión a internet
         </p>
       </header>
+
+      <LegalNotice />
 
       <main className={styles.mainContent}>
         {/* IP Principal */}

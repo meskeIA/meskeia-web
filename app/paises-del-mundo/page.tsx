@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import styles from './PaisesDelMundo.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   countries,
@@ -107,6 +107,8 @@ export default function PaisesDelMundoPage() {
           Explora los 195 países del mundo con sus capitales, banderas, monedas e información clave
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de búsqueda */}

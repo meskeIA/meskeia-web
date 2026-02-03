@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './TestPerfilInversor.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Definición de preguntas con puntuaciones
@@ -307,6 +307,8 @@ export default function TestPerfilInversorPage() {
           <h1 className={styles.title}>🎯 Test de Perfil Inversor</h1>
           <p className={styles.subtitle}>Descubre tu tolerancia al riesgo en 5 minutos</p>
         </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
         <div className={styles.startScreen}>
           <div className={styles.startIcon}>📊</div>
@@ -674,14 +676,7 @@ export default function TestPerfilInversorPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       <Footer appName="test-perfil-inversor" />
     </div>

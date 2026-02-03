@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorVehiculos.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -329,6 +329,8 @@ export default function ComparadorVehiculosPage() {
           Contado vs Financiación vs Renting vs Leasing: descubre cuál te conviene más
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         {/* Panel izquierdo: Datos */}
@@ -696,14 +698,7 @@ export default function ComparadorVehiculosPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       <EducationalSection
         title="¿Quieres entender mejor cada opción?"

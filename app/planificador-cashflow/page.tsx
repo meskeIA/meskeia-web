@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './PlanificadorCashFlow.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -207,6 +207,8 @@ export default function PlanificadorCashFlowPage() {
           Proyecta tu flujo de caja mes a mes. Identifica riesgos de liquidez y planifica tu tesorería.
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Resumen rápido */}
       <section className={styles.resumenRapido}>
@@ -586,14 +588,7 @@ export default function PlanificadorCashFlowPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       {/* Contenido educativo */}
       <EducationalSection

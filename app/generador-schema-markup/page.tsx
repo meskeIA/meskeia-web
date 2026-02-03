@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './GeneradorSchemaMarkup.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps} from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type SchemaType = 'article' | 'product' | 'faq' | 'localbusiness' | 'recipe';
@@ -268,6 +268,8 @@ export default function GeneradorSchemaMarkupPage() {
           Crea datos estructurados JSON-LD para mejorar tu SEO
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de configuración */}

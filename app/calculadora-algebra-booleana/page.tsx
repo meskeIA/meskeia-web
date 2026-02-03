@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import styles from './CalculadoraAlgebraBooleana.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type NumVariables = 2 | 3 | 4;
@@ -481,6 +481,8 @@ export default function CalculadoraAlgebraBooleanaPage() {
           Simplifica expresiones booleanas con mapas de Karnaugh
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Configuración */}
       <section className={styles.configSection}>

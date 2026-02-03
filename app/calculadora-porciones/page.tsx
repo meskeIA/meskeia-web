@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraPorciones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface PortionMethod {
@@ -188,6 +188,8 @@ export default function CalculadoraPorcionesPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Métodos de medición con la mano */}
       <section className={styles.methodsSection}>
         <h2 className={styles.sectionTitle}>🤚 Tu Mano como Herramienta de Medición</h2>
@@ -347,7 +349,7 @@ export default function CalculadoraPorcionesPage() {
         </div>
       </section>
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      
 
       <DisclaimerCard variant="medical" severity="low" collapsible={true} context="calculadora-porciones">
         <p>Este método de porciones es una <strong>guía visual orientativa</strong> basada en recomendaciones nutricionales generales:</p>

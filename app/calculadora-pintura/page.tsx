@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraPintura.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -105,6 +105,8 @@ export default function CalculadoraPinturaPage() {
           Calcula cuántos litros necesitas según superficie, capas y tipo de pared
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

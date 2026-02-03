@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ConversorUnidadesRF.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -490,6 +490,8 @@ export default function ConversorUnidadesRFPage() {
           Conversiones para radiofrecuencia: dBm↔Watts, VSWR, Return Loss, frecuencia↔longitud de onda
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de categorías */}

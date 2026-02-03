@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Metronomo.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tempos preestablecidos con nombres musicales
@@ -197,6 +197,8 @@ export default function MetronomoPage() {
           Ajusta el tempo, compás y usa tap tempo para detectar BPM.
         </p>
       </header>
+
+      <LegalNotice />
 
       <main className={styles.mainContent}>
         {/* Panel principal */}

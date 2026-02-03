@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoCriptografiaSeguridad.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 import { useCourse } from './CourseContext';
 
 // Iconos y colores por módulo
@@ -90,6 +90,8 @@ export default function CursoCriptografiaSeguridadPage() {
           Ver introducción en video
         </a>
       </header>
+
+      <LegalNotice />
 
       {/* Stats Grid */}
       <div className={styles.statsGrid}>

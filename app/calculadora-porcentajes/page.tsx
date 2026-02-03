@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraPorcentajes.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -155,6 +155,8 @@ export default function CalculadoraPorcentajesPage() {
           5 modos de cálculo para resolver cualquier problema con porcentajes
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.modeSelector}>
         {MODES.map((m) => (

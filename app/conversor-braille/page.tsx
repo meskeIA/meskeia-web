@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './ConversorBraille.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Alfabeto Braille español (Unicode)
@@ -223,6 +223,8 @@ export default function ConversorBraillePage() {
           Convierte texto a Braille español y viceversa con visualización interactiva
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         <div className={styles.modeSelector}>

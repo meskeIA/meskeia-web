@@ -1,3 +1,4 @@
+import { LegalNotice } from '@/components';
 import styles from './Mantenimiento.module.css';
 
 export default function MantenimientoPage() {

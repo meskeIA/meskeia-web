@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ConversorBinario.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'texto-binario' | 'binario-texto';
@@ -122,6 +122,8 @@ export default function ConversorBinarioPage() {
           Convierte texto a código binario (0 y 1) y viceversa
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         <div className={styles.modeSelector}>

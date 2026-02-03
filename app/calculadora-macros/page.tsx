@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 import styles from './CalculadoraMacros.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -180,6 +180,8 @@ export default function CalculadoraMacrosPage() {
           Calcula tus macronutrientes diarios según tu objetivo: volumen, definición o mantenimiento
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
@@ -420,26 +422,7 @@ export default function CalculadoraMacrosPage() {
       </div>
 
       {/* Última Actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: "2026-02-02",
-            changes: [
-              "Añadido disclaimer médico sobre planes nutricionales personalizados",
-              "Reforzado aviso sobre consulta con nutricionista colegiado",
-            ],
-          },
-          {
-            date: "2025-11-29",
-            changes: [
-              "Implementado cálculo basado en fórmula Mifflin-St Jeor (más precisa que Harris-Benedict)",
-              "Añadido gráfico de distribución de macronutrientes con Chart.js",
-            ],
-          },
-        ]}
-      />
+      
 
       {/* Disclaimer Médico - SIEMPRE VISIBLE */}
       <DisclaimerCard

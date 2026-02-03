@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraMatematica.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -229,6 +229,8 @@ export default function CalculadoraMatematicaPage() {
           Matrices, fracciones, potencias, raíces y logaritmos
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         <div className={styles.configPanel}>

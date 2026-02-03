@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './Regla503020.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatCurrency, parseSpanishNumber, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -119,6 +119,8 @@ export default function CalculadoraRegla503020Page() {
           Distribuye tus ingresos: 50% necesidades, 30% deseos, 20% ahorro
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
@@ -287,14 +289,7 @@ export default function CalculadoraRegla503020Page() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       <EducationalSection
         title="¿Quieres aprender más sobre la regla 50/30/20?"

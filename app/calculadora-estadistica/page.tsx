@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraEstadistica.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -118,6 +118,8 @@ export default function CalculadoraEstadisticaPage() {
           Análisis estadístico completo: media, mediana, moda, varianza, desviación y más
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
@@ -341,7 +343,6 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
         </div>
       </div>
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
 
       <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-estadistica">
         <p>Esta calculadora es una <strong>herramienta educativa</strong> para estadística descriptiva:</p>

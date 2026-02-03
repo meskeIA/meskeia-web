@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { jsonLd, faqSchema } from './metadata';
 import styles from './CalculadoraFechas.module.css';
@@ -277,6 +277,8 @@ export default function CalculadoraFechas() {
 
       {/* Logo meskeIA */}
       <MeskeiaLogo />
+
+      <LegalNotice />
 
       <main className={styles.container}>
         {/* Header */}

@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import styles from './ConversorMarkdown.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Ejemplos predefinidos
@@ -425,6 +425,8 @@ ${htmlOutput}
           Convierte Markdown a HTML limpio con vista previa en tiempo real
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Ejemplos rápidos */}
       <div className={styles.ejemplosBar}>

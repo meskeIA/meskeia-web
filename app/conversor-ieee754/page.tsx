@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ConversorIEEE754.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Precision = 'single' | 'double';
@@ -333,6 +333,8 @@ export default function ConversorIEEE754Page() {
           Convierte entre decimal y punto flotante. Visualiza signo, exponente y mantisa en binario.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Selector de modo y precisión */}
       <section className={styles.configSection}>

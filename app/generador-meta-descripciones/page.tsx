@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorMetaDescripciones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -143,6 +143,8 @@ export default function GeneradorMetaDescripcionesPage() {
           Crea meta descripciones optimizadas para SEO con vista previa de Google
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de edición */}

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './HuesosCuerpoHumano.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   BONES,
@@ -78,6 +78,8 @@ export default function HuesosCuerpoHumanoPage() {
           Explora los {totalHuesos} huesos del esqueleto humano adulto
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Buscador y filtros */}
       <div className={styles.filtersSection}>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './ListaCompras.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
@@ -256,6 +256,8 @@ export default function ListaComprasPage() {
           Organiza tu compra por categorías del supermercado
         </p>
       </header>
+
+      <LegalNotice />
 
       <main className={styles.mainContent}>
         {/* Panel superior: Nombre y progreso */}

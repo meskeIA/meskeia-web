@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './ContadorSilabas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Algoritmo de silabeo en español
@@ -154,6 +154,8 @@ export default function ContadorSilabasPage() {
           Separa y cuenta las sílabas de cualquier texto en español
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

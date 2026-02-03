@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './GeneradorActas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -301,6 +301,8 @@ export default function GeneradorActasPage() {
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
+
+      <LegalNotice />
 
       {/* Hero Section - Solo visible en pantalla */}
       <header className={`${styles.hero} ${styles.noPrint}`}>

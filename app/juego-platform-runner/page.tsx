@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoPlatformRunner.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -633,6 +633,8 @@ export default function JuegoPlatformRunnerPage() {
         <h1 className={styles.title}>🏃 PLATFORM RUNNER</h1>
         <p className={styles.subtitle}>Corre, salta y recolecta monedas</p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.gameLayout}>
         <div className={styles.gameColumn}>

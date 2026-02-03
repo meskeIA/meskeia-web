@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraTamanoAdultoPerro.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -164,6 +164,8 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           Calcula cuánto pesará tu cachorro cuando sea adulto
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
@@ -352,7 +354,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
         </div>
       </div>
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      
 
       <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="calculadora-tamano-adulto-perro">
         <p>Esta calculadora usa curvas de crecimiento promedio. <strong>Limitaciones:</strong></p>

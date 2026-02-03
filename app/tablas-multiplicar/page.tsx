@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './TablasMultiplicar.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Dificultad = 'facil' | 'medio' | 'dificil';
@@ -249,6 +249,8 @@ export default function TablasMultiplicarPage() {
           ¡Aprende las tablas de multiplicar jugando! Gana puntos, consigue rachas y colecciona medallas.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Menú principal */}
       {estado === 'menu' && (

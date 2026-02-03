@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraAlimentacionMascotas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -140,6 +140,8 @@ export default function CalculadoraAlimentacionMascotasPage() {
           Calcula la ración diaria ideal para tu perro o gato
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Tabs */}
       <div className={styles.tabs}>
@@ -454,14 +456,6 @@ export default function CalculadoraAlimentacionMascotasPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
 
       <RelatedApps
         apps={getRelatedApps('calculadora-alimentacion-mascotas')}

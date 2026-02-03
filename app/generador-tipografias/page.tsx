@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './GeneradorTipografias.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface FontInfo {
@@ -129,6 +129,8 @@ text-align: ${textAlign};`;
           Explora y compara fuentes de Google Fonts
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel izquierdo - Lista de fuentes */}

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './AnalizadorTitulosSeo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps} from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Palabras de poder que aumentan CTR
@@ -192,6 +192,8 @@ export default function AnalizadorTitulosSeoPage() {
           Optimiza tus title tags para mejorar el CTR en Google
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

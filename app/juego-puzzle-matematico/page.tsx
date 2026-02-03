@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './JuegoPuzzleMatematico.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Modo = 'suma' | 'resta' | 'multiplicacion' | 'division' | 'mixto';
@@ -270,6 +270,8 @@ export default function JuegoPuzzleMatematicoPage() {
         <h1 className={styles.title}>🧮 Puzzle Matemático</h1>
         <p className={styles.subtitle}>Resuelve operaciones contrarreloj</p>
       </header>
+
+      <LegalNotice />
 
       {/* Pantalla de inicio */}
       {pantalla === 'inicio' && (

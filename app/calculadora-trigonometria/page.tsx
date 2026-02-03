@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraTrigonometria.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -263,6 +263,8 @@ export default function CalculadoraTrigonometriaPage() {
           Funciones trigonométricas, resolución de triángulos, conversiones e identidades
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         <div className={styles.configPanel}>

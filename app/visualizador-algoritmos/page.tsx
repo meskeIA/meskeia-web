@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import styles from './VisualizadorAlgoritmos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   SortingCanvas,
@@ -92,6 +92,8 @@ export default function VisualizadorAlgoritmosPage() {
           Aprende cómo funcionan los algoritmos de ordenación paso a paso con visualizaciones interactivas
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Selector de Algoritmos */}
       <div className={styles.algorithmSelector}>

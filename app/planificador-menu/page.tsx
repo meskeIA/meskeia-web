@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './PlanificadorMenu.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type DayOfWeek = 'lunes' | 'martes' | 'miercoles' | 'jueves' | 'viernes' | 'sabado' | 'domingo';
@@ -192,6 +192,8 @@ export default function PlanificadorMenuPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Controles */}
       <div className={styles.controls}>
         <button onClick={generateRandomMenu} className={styles.btnPrimary}>
@@ -353,14 +355,7 @@ export default function PlanificadorMenuPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       <RelatedApps apps={getRelatedApps('planificador-menu')} />
       <Footer appName="planificador-menu" />

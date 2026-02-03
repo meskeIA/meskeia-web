@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoPensamientoSistemico.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 import { useCourse, COURSE_MODULES } from './CourseContext';
 
 const MODULE_ICONS: Record<string, string> = {
@@ -52,6 +52,8 @@ export default function CursoPensamientoSistemicoPage() {
           Ver introducción en video
         </a>
       </header>
+
+      <LegalNotice />
 
       {/* Stats Grid */}
       <div className={styles.statsGrid}>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './CalculadoraLegibilidad.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps} from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -192,6 +192,8 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
           Analiza la facilidad de lectura de tus textos en español
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

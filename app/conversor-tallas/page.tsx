@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ConversorTallas.module.css';
-import { Footer, ResultCard, MeskeiaLogo, EducationalSection, RelatedApps} from '@/components';
+import { Footer, ResultCard, MeskeiaLogo, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -384,6 +384,8 @@ export default function ConversorTallasPage() {
         <h1 className={styles.title}>Conversor de Tallas Internacional</h1>
         <p className={styles.subtitle}>Encuentra tu talla perfecta para compras online internacionales</p>
       </header>
+
+      <LegalNotice />
 
       {/* Tabs */}
       <div className={styles.tabs}>

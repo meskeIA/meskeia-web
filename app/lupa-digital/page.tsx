@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './LupaDigital.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type FiltroTipo = 'ninguno' | 'alto-contraste' | 'invertir' | 'escala-grises' | 'sepia';
@@ -141,6 +141,8 @@ export default function LupaDigitalPage() {
           Amplía texto y objetos con la cámara
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Visor de la lupa */}
       <div className={styles.lupaContainer}>

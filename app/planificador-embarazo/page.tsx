@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './PlanificadorEmbarazo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -393,6 +393,8 @@ export default function CalculadoraFechaPartoPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Navegación de Tabs */}
       <div className={styles.tabs}>
         <button
@@ -709,28 +711,7 @@ export default function CalculadoraFechaPartoPage() {
       )}
 
       {/* Última Actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: "2026-02-02",
-            changes: [
-              "Añadido disclaimer obstétrico sobre seguimiento del embarazo",
-              "Reforzado aviso sobre control prenatal obligatorio",
-            ],
-          },
-          {
-            date: "2025-11-29",
-            changes: [
-              "Calculadora FPP con Regla de Naegele",
-              "Checklist por trimestres con tareas obstétricas y administrativas",
-              "Lista de compras del bebé por categorías",
-              "Calendario de vacunación infantil España 2024",
-            ],
-          },
-        ]}
-      />
+      
 
       {/* DISCLAIMER OBSTÉTRICO - SIEMPRE VISIBLE */}
       <DisclaimerCard

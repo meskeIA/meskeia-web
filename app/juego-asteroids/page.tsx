@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoAsteroids.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -708,6 +708,8 @@ export default function JuegoAsteroidsPage() {
         <h1 className={styles.title}>🚀 ASTEROIDS</h1>
         <p className={styles.subtitle}>El clásico arcade de destrucción espacial</p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.gameLayout}>
         <div className={styles.gameColumn}>

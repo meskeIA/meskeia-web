@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AfinadorInstrumentos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Notas y frecuencias (A4 = 440Hz)
@@ -214,6 +214,8 @@ export default function AfinadorInstrumentosPage() {
           Afinador cromático con detección automática
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Panel principal */}
       <div className={styles.afinadorPanel}>

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './AmortizacionHipoteca.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -322,6 +322,8 @@ export default function AmortizacionHipotecaPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Disclaimer Legal */}
       <DisclaimerCard
         variant="financial"
@@ -347,20 +349,6 @@ export default function AmortizacionHipotecaPage() {
       </DisclaimerCard>
 
       {/* Última actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: '2026-02-02',
-            changes: [
-              'Añadidos disclaimers sobre comisiones bancarias',
-              'Añadido modo multi-escenarios para comparar diferentes importes',
-              'Añadido modo periódico para planificar amortizaciones anuales',
-            ],
-          },
-        ]}
-      />
 
       {/* Selector de modo */}
       <div className={styles.modoSelector}>

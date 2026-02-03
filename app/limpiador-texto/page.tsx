@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './LimpiadorTexto.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -162,6 +162,8 @@ export default function LimpiadorTextoPage() {
           Elimina espacios extra, líneas duplicadas, caracteres especiales y más
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de opciones */}

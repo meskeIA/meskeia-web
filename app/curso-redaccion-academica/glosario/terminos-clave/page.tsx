@@ -1,5 +1,6 @@
 'use client';
 
+import { LegalNotice } from '@/components';
 import { useState } from 'react';
 import ChapterPage from '../../ChapterPage';
 import styles from '../../CursoRedaccionAcademica.module.css';

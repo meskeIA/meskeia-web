@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './SimuladorPrestamos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
@@ -363,6 +363,8 @@ export default function SimuladorPrestamosPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Disclaimer Legal */}
       <DisclaimerCard
         variant="financial"
@@ -390,20 +392,7 @@ export default function SimuladorPrestamosPage() {
       </DisclaimerCard>
 
       {/* Última actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: '2026-02-02',
-            changes: [
-              'Añadidos disclaimers sobre comisiones y TAE',
-              'Añadido comparador de 3 préstamos',
-              'Mejorada visualización de sistemas de amortización',
-            ],
-          },
-        ]}
-      />
+      
 
       {/* Selector de Modo */}
       <div className={styles.modoSelector}>

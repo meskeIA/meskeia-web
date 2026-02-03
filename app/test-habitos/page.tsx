@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './TestHabitos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Question {
@@ -436,6 +436,8 @@ export default function TestHabitosPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Intro */}
       {currentStep === 'intro' && (
         <div className={styles.introSection}>
@@ -614,7 +616,7 @@ export default function TestHabitosPage() {
         </div>
       )}
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      
 
       <DisclaimerCard variant="medical" severity="low" collapsible={true} context="test-habitos">
         <p>Este test es una <strong>herramienta de autoevaluación orientativa</strong> sobre hábitos saludables:</p>

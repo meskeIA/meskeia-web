@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import styles from './SimuladorFisica.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 import { CaidaLibre, PenduloSimple, Proyectil, Ondas, Resorte } from './components';
@@ -104,6 +104,8 @@ export default function SimuladorFisicaPage() {
           Experimenta con física en tiempo real: caída libre, péndulos, proyectiles, ondas y resortes
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Selector de simuladores */}
       <div className={styles.simulatorSelector}>

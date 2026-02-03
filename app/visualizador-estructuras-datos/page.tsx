@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './VisualizadorEstructurasDatos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -516,6 +516,8 @@ export default function VisualizadorEstructurasDatosPage() {
           Explora arrays, pilas, colas, listas enlazadas y árboles binarios con animaciones interactivas
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Selector de estructura */}
       <section className={styles.selectorSection}>

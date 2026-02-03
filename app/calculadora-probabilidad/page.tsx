@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraProbabilidad.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -180,6 +180,8 @@ export default function CalculadoraProbabilidadPage() {
           Calcula probabilidades, combinaciones, permutaciones y distribuciones estadísticas
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         <div className={styles.configPanel}>
@@ -498,7 +500,7 @@ export default function CalculadoraProbabilidadPage() {
         </div>
       </div>
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      
 
       <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-probabilidad">
         <p>Esta calculadora es una <strong>herramienta educativa</strong> para comprender cálculos probabilísticos:</p>

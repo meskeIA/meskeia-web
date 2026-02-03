@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './AnalizadorGeo.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -424,6 +424,8 @@ export default function AnalizadorGeoPage() {
           Optimiza tu contenido para ser citado por ChatGPT, Perplexity, Gemini y Google AI Overviews
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Plataformas */}
       <div className={styles.platformsBar}>

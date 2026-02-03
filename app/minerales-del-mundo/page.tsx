@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './MineralesDelMundo.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   MINERALS,
@@ -62,6 +62,8 @@ export default function MineralesDelMundoPage() {
           Explora 50 minerales esenciales: composición, dureza, usos y curiosidades
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Buscador y filtros */}
       <div className={styles.filtersSection}>

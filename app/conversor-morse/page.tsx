@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import styles from './ConversorMorse.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Diccionario Morse internacional
@@ -159,6 +159,8 @@ export default function ConversorMorsePage() {
           Traduce texto a código Morse y viceversa con reproducción de sonido
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         <div className={styles.modeSelector}>

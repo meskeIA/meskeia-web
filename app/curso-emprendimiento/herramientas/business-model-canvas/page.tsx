@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './BusinessModelCanvas.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 
 interface CanvasData {
   partners: string;
@@ -135,6 +135,8 @@ export default function BusinessModelCanvasPage() {
           Diseña tu modelo de negocio de forma visual. Completa los 9 bloques para tener una visión completa de cómo funcionará tu empresa.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Barra de progreso y acciones */}
       <div className={styles.toolbar}>

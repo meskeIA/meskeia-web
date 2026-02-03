@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './PruebaMicrofono.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface MicrophoneInfo {
@@ -347,6 +347,8 @@ export default function PruebaMicrofonoPage() {
           Verifica tu micrófono antes de videollamadas. Visualiza niveles, graba y reproduce. Sin registro, 100% privado.
         </p>
       </header>
+
+      <LegalNotice />
 
       <main className={styles.mainContent}>
         {!isSupported ? (

@@ -5,7 +5,7 @@ import Chart from 'chart.js/auto';
 import styles from './CalculadoraInflacion.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -296,6 +296,8 @@ export default function CalculadoraInflacionPage() {
           Descubre cómo la inflación afecta tu dinero con datos históricos del INE
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Selector de modo */}
       <div className={styles.modoSelector}>
@@ -703,17 +705,7 @@ export default function CalculadoraInflacionPage() {
         context="calculadora-inflacion"
         collapsible={true}
       />
-
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
-
-      {/* Contenido educativo */}
+{/* Contenido educativo */}
       <EducationalSection
         title="📚 ¿Quieres entender mejor la inflación?"
         subtitle="Aprende cómo afecta a tu economía personal y estrategias para protegerte"

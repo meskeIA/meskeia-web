@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaFreelance.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para freelances
@@ -131,6 +131,8 @@ export default function GuiaFreelancePage() {
           </div>
         </div>
       </header>
+
+      <LegalNotice />
 
       {/* Journey Steps */}
       <section className={styles.journeySection}>

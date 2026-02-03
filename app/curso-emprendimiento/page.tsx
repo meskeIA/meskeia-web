@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoEmprendimiento.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 import { CHAPTERS, TOOLS, useCourse } from './CourseContext';
 
 export default function CursoEmprendimientoPage() {
@@ -32,6 +32,8 @@ export default function CursoEmprendimientoPage() {
           Ver introducción en video
         </a>
       </header>
+
+      <LegalNotice />
 
       {/* Stats */}
       <div className={styles.statsGrid}>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './CalculadoraSistemasNumericos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Base = 2 | 8 | 10 | 16;
@@ -243,6 +243,8 @@ export default function CalculadoraSistemasNumericosPage() {
           Convierte entre binario, octal, decimal y hexadecimal con explicación paso a paso
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de Conversión */}

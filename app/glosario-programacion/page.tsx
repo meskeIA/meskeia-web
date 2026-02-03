@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './GlosarioProgramacion.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   TERMINOS,
@@ -78,6 +78,8 @@ export default function GlosarioProgramacionPage() {
           Más de {TERMINOS.length} términos esenciales de desarrollo web explicados en español
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Buscador */}
       <div className={styles.searchSection}>

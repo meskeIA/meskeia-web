@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './GeneradorHorarios.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ============ TIPOS ============
@@ -448,6 +448,8 @@ export default function GeneradorHorariosPage() {
           Planifica tus sesiones de estudio y organiza tus trabajos y exámenes
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Alertas de entregas urgentes */}
       {alertasUrgentes > 0 && (

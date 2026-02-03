@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './InferenciaBayesiana.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -271,6 +271,8 @@ export default function InferenciaBayesianaPage() {
           Teorema de Bayes paso a paso - Actualiza creencias con evidencia
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Tabs */}
       <nav className={styles.tabNav}>
@@ -849,7 +851,7 @@ export default function InferenciaBayesianaPage() {
       </main>
 
       {/* Disclaimer */}
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      
 
       <DisclaimerCard variant="educational" severity="low" collapsible={true} context="inferencia-bayesiana">
         <p>Esta calculadora es una <strong>herramienta educativa</strong> para comprender la inferencia bayesiana y el teorema de Bayes:</p>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ConversorNumerosRomanos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -121,6 +121,8 @@ export default function ConversorNumerosRomanosPage() {
           Convierte entre números arábigos (1, 2, 3...) y romanos (I, II, III...)
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         <div className={styles.modeSelector}>

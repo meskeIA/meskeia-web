@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './SimuladorGenetica.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   useGeneticSimulation,
@@ -149,6 +149,8 @@ export default function SimuladorGeneticaPage() {
           Visualiza cruces genéticos, cuadros de Punnett y herencia paso a paso
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Selector de Organismo */}
       <div className={styles.organismSelector}>

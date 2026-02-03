@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './DashboardAnalytics.module.css';
-import { MeskeiaLogo } from '@/components';
+import { MeskeiaLogo, LegalNotice } from '@/components';
 
 // Importar Chart.js
 import {
@@ -430,6 +430,8 @@ export default function DashboardAnalyticsPage() {
     return (
       <div className={styles.container}>
         <MeskeiaLogo />
+
+      <LegalNotice />
         <div className={styles.loadingContainer}>
           <div className={styles.spinner}></div>
           <p>Cargando estadísticas...</p>

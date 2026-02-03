@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './PruebaCamara.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface CameraInfo {
@@ -214,6 +214,8 @@ export default function PruebaCamaraPage() {
           Verifica tu webcam antes de videollamadas. Toma fotos, ajusta configuración. Sin registro, 100% privado.
         </p>
       </header>
+
+      <LegalNotice />
 
       <main className={styles.mainContent}>
         {!isSupported ? (

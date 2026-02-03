@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './CalculadoraPresupuestos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, EducationalSection } from '@/components';
+import { RelatedApps, EducationalSection, LegalNotice } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -255,6 +255,8 @@ export default function CalculadoraPresupuestosPage() {
           Crea presupuestos profesionales para tus clientes. Servicios, horas, materiales y descuentos.
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de edición */}

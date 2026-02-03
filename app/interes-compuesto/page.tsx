@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './InteresCompuesto.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -113,6 +113,8 @@ export default function InteresCompuestoPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Disclaimer Legal */}
       <DisclaimerCard
         variant="financial"
@@ -140,20 +142,7 @@ export default function InteresCompuestoPage() {
       </DisclaimerCard>
 
       {/* Última actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: '2026-02-02',
-            changes: [
-              'Añadidos disclaimers sobre riesgo e inversión',
-              'Mejorada visualización de evolución anual',
-              'Añadida frecuencia de capitalización configurable',
-            ],
-          },
-        ]}
-      />
+      
 
       <div className={styles.mainContent}>
         {/* Panel de Configuración */}

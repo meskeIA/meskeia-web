@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorAnagramas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Diccionario español básico (palabras comunes de 2-8 letras)
@@ -126,6 +126,8 @@ export default function GeneradorAnagramasPage() {
           Encuentra todas las palabras que puedes formar con tus letras
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         <div className={styles.inputSection}>

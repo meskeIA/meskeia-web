@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './CifradoAES.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'cifrar' | 'descifrar';
@@ -209,6 +209,8 @@ export default function CifradoAESPage() {
           Cifrado simétrico moderno AES-256 - El estándar de seguridad mundial
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Selector de modo */}

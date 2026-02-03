@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import styles from './CalculadoraNotas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -333,6 +333,8 @@ export default function CalculadoraNotasPage() {
           Media ponderada, simulador EvAU y conversor de escalas de calificación
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Tabs */}
       <div className={styles.tabsContainer}>
@@ -834,7 +836,7 @@ export default function CalculadoraNotasPage() {
         </div>
       )}
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      
 
       <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-notas">
         <p>Esta calculadora es una <strong>herramienta educativa</strong> para apoyo académico:</p>

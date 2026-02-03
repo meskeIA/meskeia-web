@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './Notas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Categorías disponibles
@@ -200,6 +200,8 @@ export default function NotasPage() {
           Guarda tus ideas, apuntes y recordatorios organizados por categorías
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de crear/editar nota */}

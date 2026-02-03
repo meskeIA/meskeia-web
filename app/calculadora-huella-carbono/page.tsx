@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './CalculadoraHuellaCarbono.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -372,6 +372,8 @@ export default function CalculadoraHuellaCarbono() {
           Descubre cuánto CO₂ generas al año y cómo reducir tu impacto ambiental
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Navegación de secciones */}

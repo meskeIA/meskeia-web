@@ -5,7 +5,7 @@ import Chart from 'chart.js/auto';
 import styles from './CalculadoraJubilacion.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -316,6 +316,8 @@ export default function CalculadoraJubilacionPage() {
           Planifica tu retiro y calcula cuánto necesitas ahorrar
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Selector de Modo */}
       <div className={styles.modoSelector}>
@@ -841,14 +843,7 @@ export default function CalculadoraJubilacionPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       {/* Contenido Educativo */}
       <EducationalSection

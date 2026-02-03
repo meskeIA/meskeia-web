@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './InformacionTiempo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // API Key de OpenWeatherMap (límite gratuito: 1000 calls/día)
@@ -291,6 +291,8 @@ export default function InformacionTiempoPage() {
           Consulta el tiempo actual y pronóstico para cualquier ciudad
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Buscador */}

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraCombustible.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -103,6 +103,8 @@ export default function CalculadoraCombustiblePage() {
           Calcula el consumo de tu vehículo y el coste de tus viajes
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

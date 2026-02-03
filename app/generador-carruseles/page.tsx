@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import styles from './GeneradorCarruseles.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -270,6 +270,8 @@ export default function GeneradorCarruselesPage() {
           Crea slides profesionales para Instagram y LinkedIn
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel izquierdo: Editor */}

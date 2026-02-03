@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './AsistenteReclamaciones.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   PROBLEM_OPTIONS,
@@ -99,6 +99,8 @@ export default function AsistenteReclamacionesPage() {
           Te ayudamos a conocer tus derechos como consumidor y cómo reclamar
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Progress indicator */}
       <div className={styles.progress}>

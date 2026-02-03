@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Diapason.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface FrecuenciaPreset {
@@ -128,6 +128,8 @@ export default function DiapasonPage() {
           Tono de referencia para afinar instrumentos
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Diapasón principal */}
       <div className={styles.diapasonCard}>

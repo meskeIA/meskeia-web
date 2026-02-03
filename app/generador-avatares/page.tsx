@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorAvatares.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de estilos de avatar disponibles
@@ -561,6 +561,8 @@ export default function GeneradorAvataresPage() {
           Crea avatares únicos y personalizados a partir de tu nombre. Sin subir fotos, 100% privado.
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de configuración */}

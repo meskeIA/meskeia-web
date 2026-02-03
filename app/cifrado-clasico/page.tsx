@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CifradoClasico.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'cifrar' | 'descifrar';
@@ -135,6 +135,8 @@ export default function CifradoClasicoPage() {
           Métodos de encriptación históricos: César, ROT13 y Atbash
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Selector de método */}

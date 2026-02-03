@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoInversion.module.css';
-import { MeskeiaLogo, Footer, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, DisclaimerCard, LegalNotice } from '@/components';
 import { CHAPTERS, TOOLS, RESOURCES, useCourse } from './CourseContext';
 
 export default function CursoDecisionesInversionPage() {
@@ -38,6 +38,8 @@ export default function CursoDecisionesInversionPage() {
         </a>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Stats */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
@@ -70,14 +72,7 @@ export default function CursoDecisionesInversionPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       {/* Overview */}
       <section className={styles.overviewSection}>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCostePlazos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -118,6 +118,8 @@ export default function CalculadoraCostePlazosPage() {
           Descubre cuánto pagas realmente al financiar un producto. Calcula la TAE y los intereses ocultos.
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}
@@ -326,14 +328,6 @@ export default function CalculadoraCostePlazosPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
 
       {/* Sección educativa */}
       <EducationalSection

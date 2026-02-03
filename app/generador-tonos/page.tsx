@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorTonos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface FrecuenciaPreset {
@@ -184,6 +184,8 @@ export default function GeneradorTonosPage() {
           Frecuencias de audio de 20Hz a 20kHz
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Panel principal */}
       <div className={styles.mainPanel}>

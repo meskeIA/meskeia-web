@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ReglaDeTres.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -191,6 +191,8 @@ export default function CalculadoraReglaDeTresPage() {
           Resuelve proporciones con regla de tres simple (directa e inversa) y compuesta
         </p>
       </header>
+
+      <LegalNotice />
 
       <main className={styles.mainContent}>
         {/* Panel de configuración */}

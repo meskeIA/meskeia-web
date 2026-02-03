@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import styles from '../../CursoTeoriaPolitica.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 
 export default function DocumentoCompletoPage() {
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
+
+      <LegalNotice />
 
       {/* Hero */}
       <header className={styles.chapterHero}>

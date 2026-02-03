@@ -1,5 +1,6 @@
 'use client';
 
+import { LegalNotice } from '@/components';
 import Link from 'next/link';
 import styles from '../../GuiaCuidadoMascota.module.css';
 import ChapterPage from '../../ChapterPage';

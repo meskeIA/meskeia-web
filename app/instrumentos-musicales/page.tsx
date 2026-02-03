@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './InstrumentosMusicales.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   INSTRUMENTS,
@@ -53,6 +53,8 @@ export default function InstrumentosMusicalesPage() {
           teclado y electrónicos con su historia y curiosidades
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Buscador y Filtros */}
       <div className={styles.searchSection}>

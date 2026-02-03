@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import styles from './ConversorImagenes.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type OutputFormat = 'jpeg' | 'png' | 'webp';
@@ -178,6 +178,8 @@ export default function ConversorImagenesPage() {
         <h1 className={styles.title}>Conversor de Imágenes</h1>
         <p className={styles.subtitle}>Convierte, redimensiona y comprime imágenes</p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

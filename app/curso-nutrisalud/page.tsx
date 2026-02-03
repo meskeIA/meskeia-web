@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './CursoNutrisalud.module.css';
-import { MeskeiaLogo, Footer, DisclaimerCard, LastUpdated, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, DisclaimerCard, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   MODULES,
@@ -192,7 +192,9 @@ export default function CursoNutrisaludPage() {
         </p>
       </header>
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      <LegalNotice lastUpdated="2026-02-02" />
+
+      
 
       <DisclaimerCard variant="medical" severity="low" collapsible={true} context="curso-nutrisalud">
         <p>Este curso es una <strong>herramienta educativa</strong> basada en evidencia científica:</p>

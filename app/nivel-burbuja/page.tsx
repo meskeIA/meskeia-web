@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './NivelBurbuja.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -156,6 +156,8 @@ export default function NivelBurbujaPage() {
           Ideal para bricolaje, colgar cuadros o medir pendientes.
         </p>
       </header>
+
+      <LegalNotice />
 
       <main className={styles.mainContent}>
         {/* Panel principal del nivel */}

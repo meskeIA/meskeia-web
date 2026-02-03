@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './GuiaReclamarSeguroCoche.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de situaciones
@@ -253,6 +253,8 @@ export default function GuiaReclamarSeguroCochePage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Introducción */}
       <section className={styles.introSection}>
         <div className={styles.introCard}>
@@ -437,20 +439,13 @@ export default function GuiaReclamarSeguroCochePage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
-        variant="legal"
+        variant="financial"
         severity="high"
         context="guia-reclamar-seguro-coche"
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       {/* Apps relacionadas */}
       <RelatedApps apps={getRelatedApps('guia-reclamar-seguro-coche')} />

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraPercentiles.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Sexo = 'nino' | 'nina';
@@ -162,6 +162,8 @@ export default function CalculadoraPercentilesPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       <div className={styles.mainContent}>
         {/* Panel de entrada */}
         <div className={styles.inputPanel}>
@@ -317,26 +319,7 @@ export default function CalculadoraPercentilesPage() {
       </div>
 
       {/* Última Actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: "2026-02-02",
-            changes: [
-              "Añadido disclaimer pediátrico sobre evaluación del crecimiento infantil",
-              "Reforzado aviso sobre consulta obligatoria con pediatra",
-            ],
-          },
-          {
-            date: "2025-11-29",
-            changes: [
-              "Implementadas tablas OMS para peso y talla (0-60 meses)",
-              "Añadida visualización gráfica de percentiles con colores por rango",
-            ],
-          },
-        ]}
-      />
+      
 
       {/* DISCLAIMER PEDIÁTRICO - SIEMPRE VISIBLE */}
       <DisclaimerCard

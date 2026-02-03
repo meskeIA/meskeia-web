@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraRoommates.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -274,6 +274,8 @@ export default function CalculadoraRoommatesPage() {
         <h1 className={styles.title}>🏠 Calculadora Roommates</h1>
         <p className={styles.subtitle}>Divide los gastos del piso de forma justa</p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de compañeros */}

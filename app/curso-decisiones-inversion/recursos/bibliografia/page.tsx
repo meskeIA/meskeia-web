@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from '../../CursoInversion.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 
 interface Book {
   title: string;
@@ -123,6 +123,8 @@ export default function BibliografiaPage() {
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
+
+      <LegalNotice />
 
       <div className={styles.chapterContainer}>
         <header className={styles.chapterHero}>

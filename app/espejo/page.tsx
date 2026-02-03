@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './Espejo.module.css';
-import { MeskeiaLogo, Footer, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 export default function EspejoPage() {
@@ -89,6 +89,8 @@ export default function EspejoPage() {
           Tu espejo de bolsillo en el móvil
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Espejo */}
       <div

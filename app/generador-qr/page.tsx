@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import styles from './GeneradorQR.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -390,6 +390,8 @@ export default function GeneradorQRPage() {
           Crea códigos QR personalizados con logos, estilos únicos y múltiples formatos de exportación
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de configuración */}

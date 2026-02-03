@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import styles from './ElevatorPitch.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 
 interface PitchData {
   problema: string;
@@ -169,6 +169,8 @@ export default function ElevatorPitchPage() {
           Crea tu pitch perfecto en 30 segundos. Completa los campos y obtén tu presentación lista para impresionar.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Main Content */}
       <div className={styles.mainGrid}>

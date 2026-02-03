@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './GoldenHour.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Constantes astronómicas
@@ -456,6 +456,8 @@ export default function GoldenHourPage() {
           Calcula las horas de luz dorada y hora azul para fotografía. Planifica tus sesiones con la mejor luz natural.
         </p>
       </header>
+
+      <LegalNotice />
 
       <main className={styles.mainContent}>
         {/* Panel de ubicación */}

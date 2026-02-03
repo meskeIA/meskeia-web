@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './ConversorUnidades.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps} from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -294,6 +294,8 @@ export default function ConversorUnidadesPage() {
           13 categorías de conversión: longitud, masa, temperatura, presión, energía y más
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de categorías */}

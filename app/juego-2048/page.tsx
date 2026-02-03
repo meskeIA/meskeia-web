@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './Juego2048.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Tablero = number[][];
@@ -281,6 +281,8 @@ export default function Juego2048Page() {
           Desliza y combina números para llegar a 2048
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de puntuación */}

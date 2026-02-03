@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './PlanificadorTurnos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ============ TIPOS ============
@@ -442,6 +442,8 @@ export default function PlanificadorTurnosPage() {
           Organiza los horarios de trabajo de tu equipo de forma sencilla
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Tabs */}
       <div className={styles.tabs}>

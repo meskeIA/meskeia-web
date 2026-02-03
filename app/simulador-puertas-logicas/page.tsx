@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './SimuladorPuertasLogicas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
@@ -293,6 +293,8 @@ export default function SimuladorPuertasLogicasPage() {
           Tablas de verdad, circuitos digitales y expresiones booleanas
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Mode Selector */}
       <div className={styles.modeSelector}>

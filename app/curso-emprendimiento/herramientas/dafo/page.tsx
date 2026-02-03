@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './Dafo.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 
 interface DafoData {
   debilidades: string[];
@@ -191,6 +191,8 @@ export default function DafoPage() {
           Identifica tus Debilidades, Amenazas, Fortalezas y Oportunidades para tomar mejores decisiones estratégicas.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Toolbar */}
       <div className={styles.toolbar}>

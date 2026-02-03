@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import styles from '../../CursoNutrisalud.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 
 interface GlossaryTerm {
   term: string;
@@ -324,6 +324,8 @@ export default function GlosarioPage() {
           Términos clave del Curso de Nutrición ordenados alfabéticamente
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Navegación */}
       <nav className={styles.navigation}>

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraSubredes.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -180,6 +180,8 @@ export default function CalculadoraSubredesPage() {
           Calcula máscaras de red, rangos de hosts, broadcast y más. Ideal para estudiantes y administradores de redes.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Main Content */}
       <div className={styles.mainContent}>

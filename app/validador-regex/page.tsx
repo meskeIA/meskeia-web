@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import styles from './ValidadorRegex.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Match {
@@ -123,6 +123,8 @@ export default function ValidadorRegexPage() {
         <h1 className={styles.title}>Validador de Expresiones Regulares</h1>
         <p className={styles.subtitle}>Testa y valida regex con resaltado de coincidencias</p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

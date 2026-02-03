@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraDescuentos.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -74,6 +74,8 @@ export default function CalculadoraDescuentosPage() {
           Calcula el precio final con descuento y cuánto ahorras. Soporta descuentos encadenados.
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
@@ -180,14 +182,6 @@ export default function CalculadoraDescuentosPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Añadido disclaimer financiero con información de responsabilidad",
-          "Advertencia sobre verificación de precios originales en ofertas",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
 
       <section className={styles.tipsSection}>
         <h2>Consejos para aprovechar descuentos</h2>

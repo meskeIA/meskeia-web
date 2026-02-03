@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import styles from './GeneradorIconos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface GeneratedIcon {
@@ -332,6 +332,8 @@ export default function GeneradorIconosPage() {
           Genera todos los tamaños de iconos para tu PWA, favicon y aplicaciones móviles
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de subida */}

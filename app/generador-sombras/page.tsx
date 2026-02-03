@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorSombras.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ShadowType = 'box' | 'text';
@@ -198,6 +198,8 @@ export default function GeneradorSombrasPage() {
           Crea box-shadow y text-shadow con editor visual
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel izquierdo - Preview */}

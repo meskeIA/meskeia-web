@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraMedicamentosMascotas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -211,6 +211,8 @@ export default function CalculadoraMedicamentosMascotasPage() {
           Guía de antiparasitarios para perros y gatos
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Tabs */}
       <div className={styles.tabs}>
@@ -488,7 +490,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
         </div>
       )}
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
+      
 
       <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="calculadora-medicamentos-mascotas">
         <p><strong>⚠️ NUNCA administres medicamentos sin consultar a tu veterinario:</strong></p>

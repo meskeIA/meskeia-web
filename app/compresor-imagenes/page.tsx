@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import styles from './CompresorImagenes.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -424,6 +424,8 @@ export default function CompresorImagenesPage() {
           Comprime y redimensiona múltiples imágenes con vista previa y comparación
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Zona de carga */}

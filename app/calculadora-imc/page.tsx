@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import styles from './CalculadoraIMC.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps, getRelatedAppsTitle } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -304,6 +304,8 @@ export default function CalculadoraIMCPage() {
           Calcula tu Índice de Masa Corporal y conoce tu clasificación según la OMS
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Selector de modo */}
       <div className={styles.modoSelector}>
@@ -640,27 +642,6 @@ export default function CalculadoraIMCPage() {
         </div>
       )}
 
-      {/* Última Actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: "2026-02-02",
-            changes: [
-              "Añadido disclaimer médico profesional según normativa sanitaria",
-              "Incorporado aviso explícito sobre limitaciones del IMC",
-            ],
-          },
-          {
-            date: "2025-11-29",
-            changes: [
-              "Añadido modo comparador de perfiles con gráfico interactivo",
-              "Mejora visual de zonas de clasificación IMC en el gráfico",
-            ],
-          },
-        ]}
-      />
 
       {/* Disclaimer Médico - SIEMPRE VISIBLE */}
       <DisclaimerCard

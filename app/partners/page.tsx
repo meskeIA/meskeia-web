@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './Partners.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 
 type SectorType = 'gestorias' | 'autonomos' | 'inmobiliarias' | 'educacion';
 
@@ -164,6 +164,8 @@ ${tools.map(tool => `    <a href="https://meskeia.com${tool.url}" target="_blank
           Ofrece herramientas gratuitas a tus clientes. Integración en minutos.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Beneficios */}
       <section className={styles.benefitsSection}>

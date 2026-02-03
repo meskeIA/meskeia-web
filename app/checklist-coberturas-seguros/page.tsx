@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ChecklistCoberturasSeguro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type PerfilType = 'joven-soltero' | 'pareja-sin-hijos' | 'familia-hijos' | 'autonomo' | 'jubilado' | 'propietario-alquila';
@@ -161,6 +161,8 @@ export default function ChecklistCoberturasSeguroPage() {
         </p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       {/* Selector de perfil */}
       <div className={styles.perfilSelector}>
         <h2 className={styles.selectorTitle}>Selecciona tu perfil</h2>
@@ -299,20 +301,13 @@ export default function ChecklistCoberturasSeguroPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
-        variant="legal"
+        variant="financial"
         severity="medium"
         context="checklist-coberturas-seguros"
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       <RelatedApps apps={getRelatedApps('checklist-coberturas-seguros')} />
       <Footer appName="checklist-coberturas-seguros" />

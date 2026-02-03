@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoSudoku.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Dificultad = 'facil' | 'medio' | 'dificil';
@@ -371,6 +371,8 @@ export default function JuegoSudokuPage() {
         <h1 className={styles.title}>🔢 Sudoku</h1>
         <p className={styles.subtitle}>Completa la cuadrícula con números del 1 al 9</p>
       </header>
+
+      <LegalNotice />
 
       {/* Controles superiores */}
       <div className={styles.topControls}>

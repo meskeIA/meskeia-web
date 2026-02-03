@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GlosarioFisicaQuimica.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps} from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Categoria = 'fisica' | 'quimica' | 'todos';
@@ -132,6 +132,8 @@ export default function GlosarioFisicaQuimicaPage() {
           Más de {stats.total} términos y definiciones para estudiantes
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de filtros */}

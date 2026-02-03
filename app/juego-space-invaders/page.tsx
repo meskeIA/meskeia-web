@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoSpaceInvaders.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -545,6 +545,8 @@ export default function JuegoSpaceInvadersPage() {
         <h1 className={styles.title}>👾 SPACE INVADERS</h1>
         <p className={styles.subtitle}>Defiende la Tierra de la invasión alienígena</p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.gameLayout}>
         <div className={styles.gameColumn}>

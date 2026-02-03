@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './CalculadoraInversiones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
@@ -305,6 +305,8 @@ export default function CalculadoraInversionesPage() {
           Diseña tu cartera según tu perfil de riesgo
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Selector de Modo */}
       <div className={styles.modoSelector}>
@@ -695,14 +697,6 @@ export default function CalculadoraInversionesPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
 
       {/* Contenido Educativo */}
       <EducationalSection

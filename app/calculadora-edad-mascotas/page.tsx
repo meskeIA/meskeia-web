@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraEdadMascotas.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -99,6 +99,8 @@ export default function CalculadoraEdadMascotasPage() {
           Descubre la edad de tu perro o gato en años humanos
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}
@@ -308,7 +310,6 @@ export default function CalculadoraEdadMascotasPage() {
         </div>
       </div>
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
 
       <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="calculadora-edad-mascotas">
         <p>Esta calculadora usa fórmulas científicas actualizadas, pero es <strong>solo orientativa</strong>:</p>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './JuegoPiedraPapelTijera.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Opcion = 'piedra' | 'papel' | 'tijera';
@@ -147,6 +147,8 @@ export default function JuegoPiedraPapelTijeraPage() {
           El clásico juego contra la computadora
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de juego */}

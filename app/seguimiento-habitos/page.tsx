@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './SeguimientoHabitos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -442,6 +442,8 @@ export default function SeguimientoHabitosPage() {
         <h1 className={styles.title}>📊 Seguimiento de Hábitos</h1>
         <p className={styles.subtitle}>Construye rutinas saludables con visualización de rachas</p>
       </header>
+
+      <LegalNotice />
 
       {/* Navegación */}
       <div className={styles.navegacion}>

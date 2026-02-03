@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorTextos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -182,6 +182,8 @@ Nueva línea agregada
           Encuentra las diferencias entre dos textos (estilo Diff)
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Opciones */}
       <div className={styles.opcionesBar}>

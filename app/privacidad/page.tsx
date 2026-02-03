@@ -1,5 +1,6 @@
 'use client';
 
+import { LegalNotice } from '@/components';
 import { useState } from 'react';
 import Link from 'next/link';
 import FixedHeader from '@/components/FixedHeader';

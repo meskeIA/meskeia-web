@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from '../../CursoNegociacion.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 
 interface Exercise {
   id: string;
@@ -152,6 +152,8 @@ export default function EjerciciosPage() {
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
+
+      <LegalNotice />
 
       <header className={styles.chapterHero}>
         <span className={styles.chapterHeroIcon}>✏️</span>

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorFacturas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { formatCurrency, formatDate } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -554,21 +554,16 @@ export default function GeneradorFacturasPage() {
         <p className={styles.subtitle}>Crea facturas profesionales y expórtalas a PDF</p>
       </header>
 
+      <LegalNotice lastUpdated="2026-02-02" />
+
       <DisclaimerCard
-        variant="legal"
+        variant="financial"
         severity="high"
         context="generador-facturas"
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Migrado disclaimer antiguo a DisclaimerCard para consistencia visual",
-          "Añadido componente LastUpdated con historial de cambios",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       <div className={styles.mainContent}>
         {/* Panel izquierdo: Formulario */}

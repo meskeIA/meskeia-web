@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import styles from '../../CursoTeoriaPolitica.module.css';
-import { MeskeiaLogo, Footer } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
 
 // Definición del glosario
 const GLOSSARY_TERMS = [
@@ -262,6 +262,8 @@ export default function GlosarioPage() {
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
+
+      <LegalNotice />
 
       {/* Hero */}
       <header className={styles.chapterHero}>

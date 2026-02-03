@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './RadioMeskeia.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import Hls from 'hls.js';
 
@@ -424,6 +424,8 @@ export default function RadioMeskeiaPage() {
         <h1 className={styles.title}>📻 Radio meskeIA</h1>
         <p className={styles.subtitle}>Miles de emisoras en español de todo el mundo</p>
       </header>
+
+      <LegalNotice />
 
       {/* Reproductor actual */}
       <div className={styles.reproductorActual}>

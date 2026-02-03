@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './TestVelocidadEscritura.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -174,6 +174,8 @@ export default function TestVelocidadEscrituraPage() {
           Mide tu velocidad en palabras por minuto (PPM) y mejora tu mecanografía
         </p>
       </header>
+
+      <LegalNotice />
 
       {estado === 'idle' && (
         <div className={styles.setupPanel}>

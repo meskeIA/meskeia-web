@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './ControlGastos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -187,6 +187,8 @@ export default function ControlGastosPage() {
           Gestiona tu presupuesto mensual de forma sencilla
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Resumen */}
       <div className={styles.resumenGrid}>
@@ -394,14 +396,7 @@ export default function ControlGastosPage() {
         collapsible={true}
       />
 
-      <LastUpdated
-        date="2026-02-02"
-        changelog={[
-          "Añadido disclaimer financiero con información de responsabilidad legal",
-          "Advertencia sobre privacidad de datos: los datos se almacenan localmente en tu navegador",
-          "Mejorada accesibilidad con ARIA labels en componentes interactivos"
-        ]}
-      />
+      
 
       {/* Contenido Educativo */}
       <EducationalSection

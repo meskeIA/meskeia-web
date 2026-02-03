@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraEstadisticaMedica.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -230,6 +230,8 @@ export default function CalculadoraEstadisticaMedicaPage() {
           Sensibilidad, especificidad, valores predictivos, odds ratio, riesgo relativo y NNT
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       {/* Selector de modo */}
       <div className={styles.modeSelector}>
@@ -642,7 +644,6 @@ export default function CalculadoraEstadisticaMedicaPage() {
         </div>
       </div>
 
-      <LastUpdated lastUpdate="2 de febrero de 2026" />
 
       <DisclaimerCard variant="medical" severity="high" collapsible={true} context="calculadora-estadistica-medica">
         <p>Esta calculadora es <strong>exclusivamente educativa</strong> para estudiantes de ciencias de la salud. <strong>Limitaciones críticas:</strong></p>

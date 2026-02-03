@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './TablaPeriodica.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { elementos, elementosPorSimbolo, FAMILIAS, ESTADOS, Elemento } from './elementos-data';
 import { getRelatedApps } from '@/data/app-relations';
@@ -129,6 +129,8 @@ export default function TablaPerodicaPage() {
           Explora los 118 elementos químicos con información detallada y calculadora de masa molar
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Filtros */}
       <div className={styles.filtrosPanel}>

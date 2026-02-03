@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './CaraOCruz.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -128,6 +128,8 @@ export default function CaraOCruzPage() {
           Incluye historial y estadísticas para visualizar la ley de grandes números.
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Área principal */}
       <div className={styles.mainContent}>

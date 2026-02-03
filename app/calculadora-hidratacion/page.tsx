@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraHidratacion.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LastUpdated } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -142,6 +142,8 @@ export default function CalculadoraHidratacionPage() {
           Descubre cuánta agua necesitas beber al día para mantener una hidratación óptima
         </p>
       </header>
+
+      <LegalNotice lastUpdated="2026-02-02" />
 
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
@@ -285,20 +287,6 @@ export default function CalculadoraHidratacionPage() {
         </div>
       </div>
 
-      {/* Última Actualización */}
-      <LastUpdated
-        lastUpdate="2 de febrero de 2026"
-        showChangelog={true}
-        changelog={[
-          {
-            date: "2026-02-02",
-            changes: [
-              "Añadido disclaimer médico sobre recomendaciones de hidratación",
-              "Reforzado aviso sobre personas con restricción de líquidos",
-            ],
-          },
-        ]}
-      />
 
       {/* Disclaimer Médico */}
       <DisclaimerCard

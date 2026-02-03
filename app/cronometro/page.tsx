@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Cronometro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
@@ -197,6 +197,8 @@ export default function CronometroPage() {
           Mide el tiempo con precisión
         </p>
       </header>
+
+      <LegalNotice />
 
       {/* Tabs de modo */}
       <div className={styles.tabs}>

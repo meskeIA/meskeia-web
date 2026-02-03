@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorHashtags.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps } from '@/components';
+import { RelatedApps, LegalNotice } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -145,6 +145,8 @@ export default function GeneradorHashtagsPage() {
           Encuentra los mejores hashtags para Instagram, TikTok, Twitter y LinkedIn
         </p>
       </header>
+
+      <LegalNotice />
 
       <div className={styles.mainContent}>
         {/* Panel de selección */}
