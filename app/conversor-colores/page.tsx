@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import styles from './ConversorColores.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface ColorValues {
@@ -125,6 +125,10 @@ export default function ConvertidorColoresPage() {
   const [hexInput, setHexInput] = useState('#2E86AB');
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  // Estados para código HTML
+  const [htmlCode, setHtmlCode] = useState<string>('');
+  const [htmlExpanded, setHtmlExpanded] = useState(false);
+
   const updateFromHex = useCallback((hex: string) => {
     const rgb = hexToRgb(hex);
     if (rgb) {
@@ -180,6 +184,61 @@ export default function ConvertidorColoresPage() {
   const formatRgb = `rgb(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b})`;
   const formatHsl = `hsl(${color.hsl.h}, ${color.hsl.s}%, ${color.hsl.l}%)`;
   const formatCmyk = `cmyk(${color.cmyk.c}%, ${color.cmyk.m}%, ${color.cmyk.y}%, ${color.cmyk.k}%)`;
+
+  // Generar código HTML de implementación
+  const generarCodigoHTML = useCallback(() => {
+    let codigo = '<!-- Color generado con meskeIA -->\n\n';
+    codigo += '<!-- Paleta de color para blog de diseño -->\n';
+    codigo += '<div class="color-swatch">\n';
+    codigo += '  <div class="color-preview" style="background-color: ' + color.hex + ';"></div>\n';
+    codigo += '  <div class="color-info">\n';
+    codigo += '    <h4>' + getColorName(color.hex) + '</h4>\n';
+    codigo += '    <div class="color-values">\n';
+    codigo += '      <span><strong>HEX:</strong> ' + color.hex + '</span>\n';
+    codigo += '      <span><strong>RGB:</strong> ' + formatRgb + '</span>\n';
+    codigo += '      <span><strong>HSL:</strong> ' + formatHsl + '</span>\n';
+    codigo += '      <span><strong>CMYK:</strong> ' + formatCmyk + '</span>\n';
+    codigo += '    </div>\n';
+    codigo += '  </div>\n';
+    codigo += '</div>\n\n';
+    codigo += '<!-- CSS recomendado -->\n';
+    codigo += '<style>\n';
+    codigo += '  .color-swatch {\n';
+    codigo += '    display: flex;\n';
+    codigo += '    gap: 1rem;\n';
+    codigo += '    border: 1px solid #E5E5E5;\n';
+    codigo += '    border-radius: 8px;\n';
+    codigo += '    padding: 1rem;\n';
+    codigo += '    background: white;\n';
+    codigo += '  }\n';
+    codigo += '  .color-preview {\n';
+    codigo += '    width: 100px;\n';
+    codigo += '    height: 100px;\n';
+    codigo += '    border-radius: 8px;\n';
+    codigo += '    box-shadow: 0 2px 8px rgba(0,0,0,0.1);\n';
+    codigo += '  }\n';
+    codigo += '  .color-values {\n';
+    codigo += '    display: flex;\n';
+    codigo += '    flex-direction: column;\n';
+    codigo += '    gap: 0.25rem;\n';
+    codigo += '    font-size: 0.9rem;\n';
+    codigo += '  }\n';
+    codigo += '</style>';
+
+    setHtmlCode(codigo);
+  }, [color, formatRgb, formatHsl, formatCmyk]);
+
+  // Copiar código HTML al portapapeles
+  const copiarCodigoHTML = () => {
+    navigator.clipboard.writeText(htmlCode);
+    setCopiedField('html');
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  // Generar código HTML cuando cambia el color
+  useEffect(() => {
+    generarCodigoHTML();
+  }, [generarCodigoHTML]);
 
   return (
     <div className={styles.container}>
@@ -453,7 +512,39 @@ export default function ConvertidorColoresPage() {
         </div>
       </div>
 
-      {/* Información */}
+      {/* Código HTML de implementación - Colapsable */}
+      {htmlCode && (
+        <div className={styles.htmlSection}>
+          <div className={styles.htmlHeader}>
+            <div>
+              <h2>💻 Código de implementación</h2>
+              <p className={styles.htmlSubtitle}>
+                Exporta este color a tu blog de diseño, guía de estilo o documentación
+              </p>
+            </div>
+            <button
+              onClick={() => setHtmlExpanded(!htmlExpanded)}
+              className={styles.btnToggleCode}
+              aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
+            >
+              {htmlExpanded ? '▼ Ocultar código' : '▶ Ver código HTML'}
+            </button>
+          </div>
+
+          {htmlExpanded && (
+            <div className={styles.codeContainer}>
+              <pre className={styles.codeBlock}>
+                <code>{htmlCode}</code>
+              </pre>
+              <button onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
+                {copiedField === 'html' ? '✅ Copiado' : '📋 Copiar código'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Información Rápida */}
       <div className={styles.infoSection}>
         <h3>¿Cuándo usar cada formato?</h3>
         <div className={styles.infoGrid}>
@@ -479,6 +570,365 @@ export default function ConvertidorColoresPage() {
           </div>
         </div>
       </div>
+
+      {/* Contenido Educativo */}
+      <EducationalSection
+        title="📚 Guía completa sobre formatos de color"
+        subtitle="Aprende cuándo usar cada formato, diferencias técnicas, casos de uso y mejores prácticas"
+      >
+        <section className={styles.guideSection}>
+          {/* Tabla comparativa */}
+          <h2>⚖️ Comparativa de formatos: HEX vs RGB vs HSL vs CMYK</h2>
+          <p className={styles.introParagraph}>
+            Cada formato de color tiene sus ventajas y contextos ideales de uso.
+            Entender sus diferencias te ayudará a elegir el más apropiado para tu proyecto.
+          </p>
+
+          <div className={styles.comparativaTable}>
+            <div className={styles.comparativaRow}>
+              <div className={styles.comparativaAspecto}><strong>Aspecto</strong></div>
+              <div className={styles.comparativaFormato}><strong>🌐 HEX</strong></div>
+              <div className={styles.comparativaFormato}><strong>🖥️ RGB</strong></div>
+              <div className={styles.comparativaFormato}><strong>🎨 HSL</strong></div>
+              <div className={styles.comparativaFormato}><strong>🖨️ CMYK</strong></div>
+            </div>
+
+            <div className={styles.comparativaRow}>
+              <div className={styles.comparativaAspecto}>Uso principal</div>
+              <div className={styles.comparativaFormato}>Web (CSS/HTML)</div>
+              <div className={styles.comparativaFormato}>Pantallas digitales</div>
+              <div className={styles.comparativaFormato}>Diseño UI/UX</div>
+              <div className={styles.comparativaFormato}>Impresión</div>
+            </div>
+
+            <div className={styles.comparativaRow}>
+              <div className={styles.comparativaAspecto}>Facilidad de lectura</div>
+              <div className={styles.comparativaFormato}>⭐⭐ Media</div>
+              <div className={styles.comparativaFormato}>⭐⭐⭐ Alta</div>
+              <div className={styles.comparativaFormato}>⭐⭐⭐⭐ Muy alta</div>
+              <div className={styles.comparativaFormato}>⭐⭐ Media</div>
+            </div>
+
+            <div className={styles.comparativaRow}>
+              <div className={styles.comparativaAspecto}>Precisión técnica</div>
+              <div className={styles.comparativaFormato}>Alta (16.7M colores)</div>
+              <div className={styles.comparativaFormato}>Alta (16.7M colores)</div>
+              <div className={styles.comparativaFormato}>Alta (16.7M colores)</div>
+              <div className={styles.comparativaFormato}>Variable (impresora)</div>
+            </div>
+
+            <div className={styles.comparativaRow}>
+              <div className={styles.comparativaAspecto}>Manipulación</div>
+              <div className={styles.comparativaFormato}>Difícil (valores hex)</div>
+              <div className={styles.comparativaFormato}>Fácil (canales R,G,B)</div>
+              <div className={styles.comparativaFormato}>Muy fácil (tono/brillo)</div>
+              <div className={styles.comparativaFormato}>Media (4 canales)</div>
+            </div>
+
+            <div className={styles.comparativaRow}>
+              <div className={styles.comparativaAspecto}>Soporte navegadores</div>
+              <div className={styles.comparativaFormato}>✅ Universal</div>
+              <div className={styles.comparativaFormato}>✅ Universal</div>
+              <div className={styles.comparativaFormato}>✅ Universal (CSS3)</div>
+              <div className={styles.comparativaFormato}>❌ No nativo</div>
+            </div>
+
+            <div className={styles.comparativaRow}>
+              <div className={styles.comparativaAspecto}>Compatibilidad impresión</div>
+              <div className={styles.comparativaFormato}>⚠️ Conversión necesaria</div>
+              <div className={styles.comparativaFormato}>⚠️ Conversión necesaria</div>
+              <div className={styles.comparativaFormato}>⚠️ Conversión necesaria</div>
+              <div className={styles.comparativaFormato}>✅ Nativo</div>
+            </div>
+          </div>
+
+          <div className={styles.comparativaConsejo}>
+            <strong>💡 Recomendación meskeIA:</strong> Usa HEX o RGB para web, HSL para ajustes de diseño,
+            y CMYK solo si entregas archivos a imprenta profesional.
+          </div>
+
+          {/* Casos de uso prácticos */}
+          <h2>🎯 Casos de uso reales</h2>
+          <p className={styles.introParagraph}>
+            Ejemplos concretos de cuándo elegir cada formato según tu proyecto
+          </p>
+
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioIcon}>🌐</div>
+              <h3>Desarrollo web (CSS)</h3>
+              <div className={styles.escenarioContent}>
+                <p><strong>Formato recomendado:</strong> HEX o RGB</p>
+                <p className={styles.escenarioDetalle}>
+                  <strong>Por qué:</strong> HEX es más compacto (#2E86AB vs rgb(46,134,171)).
+                  RGB es mejor si necesitas manipular opacidad con rgba().
+                </p>
+                <code className={styles.escenarioCode}>
+                  background: #2E86AB;<br />
+                  color: rgb(46, 134, 171);<br />
+                  border: rgba(46, 134, 171, 0.5);
+                </code>
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioIcon}>🎨</div>
+              <h3>Diseño UI/UX (Figma, Sketch)</h3>
+              <div className={styles.escenarioContent}>
+                <p><strong>Formato recomendado:</strong> HSL</p>
+                <p className={styles.escenarioDetalle}>
+                  <strong>Por qué:</strong> Es intuitivo para crear variaciones de un color
+                  (más claro/oscuro, más saturado). Ideal para sistemas de diseño.
+                </p>
+                <code className={styles.escenarioCode}>
+                  Color base: hsl(198, 58%, 43%)<br />
+                  Hover: hsl(198, 58%, 35%) /* -8% brillo */<br />
+                  Disabled: hsl(198, 20%, 43%) /* -38% saturación */
+                </code>
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioIcon}>🖨️</div>
+              <h3>Material impreso (imprenta)</h3>
+              <div className={styles.escenarioContent}>
+                <p><strong>Formato recomendado:</strong> CMYK</p>
+                <p className={styles.escenarioDetalle}>
+                  <strong>Por qué:</strong> Las impresoras profesionales usan tintas CMYK.
+                  RGB/HEX pueden verse diferentes al imprimir.
+                </p>
+                <code className={styles.escenarioCode}>
+                  CMYK: C73 M22 Y0 K33<br />
+                  (Especificar en InDesign, Illustrator)<br />
+                  Validar con prueba de color física
+                </code>
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioIcon}>📱</div>
+              <h3>Apps móviles (iOS, Android)</h3>
+              <div className={styles.escenarioContent}>
+                <p><strong>Formato recomendado:</strong> HEX o RGB</p>
+                <p className={styles.escenarioDetalle}>
+                  <strong>Por qué:</strong> Ambos formatos son nativos.
+                  iOS usa UIColor(red, green, blue), Android usa #HEX.
+                </p>
+                <code className={styles.escenarioCode}>
+                  iOS: UIColor(red: 46/255, green: 134/255, blue: 171/255)<br />
+                  Android: #2E86AB<br />
+                  React Native: &#39;#2E86AB&#39; o &#39;rgb(46,134,171)&#39;
+                </code>
+              </div>
+            </div>
+          </div>
+
+          {/* Guía paso a paso */}
+          <h2>Cómo elegir el formato adecuado (paso a paso)</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h3>Identifica el contexto de uso</h3>
+                <p>
+                  <strong>Web/App:</strong> HEX, RGB o HSL<br />
+                  <strong>Impresión profesional:</strong> CMYK<br />
+                  <strong>Diseño/prototipado:</strong> HSL (más intuitivo)<br />
+                  <strong>Manipulación dinámica:</strong> RGB o HSL
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h3>Verifica compatibilidad técnica</h3>
+                <p>
+                  Si usas CSS moderno: HSL es más legible y fácil de ajustar.<br />
+                  Si necesitas opacidad: RGB + alpha → rgba(r, g, b, 0.5).<br />
+                  Si entregas a imprenta: Convierte a CMYK y valida con prueba física.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h3>Mantén consistencia en el proyecto</h3>
+                <p>
+                  Elige UN formato principal para tu sistema de diseño.<br />
+                  Documenta todos los colores en ese formato (ej: variables CSS con HSL).<br />
+                  Solo convierte cuando sea técnicamente necesario (ej: CMYK para impresión).
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h3>Prueba en el contexto real</h3>
+                <p>
+                  <strong>Web:</strong> Verifica en diferentes navegadores y dispositivos.<br />
+                  <strong>Impresión:</strong> Solicita prueba de color física antes de tirada masiva.<br />
+                  <strong>Apps:</strong> Prueba en dispositivos reales (colores varían según pantalla).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* FAQ */}
+          <h2>Preguntas frecuentes</h2>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Por qué mis colores se ven diferentes en pantalla y al imprimir?</h3>
+            <p>
+              Las pantallas usan <strong>RGB (luz)</strong>, mientras que las impresoras usan
+              <strong>CMYK (tinta)</strong>. Son modelos de color diferentes y no pueden reproducir
+              exactamente los mismos colores.
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Ejemplo práctico:</strong><br />
+              • Un azul brillante RGB (0, 100, 255) se verá más apagado en CMYK<br />
+              • Los colores neón/fluorescentes de RGB son imposibles de replicar en CMYK<br />
+              • CMYK tiene un "gamut" (rango de colores) menor que RGB
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Solución:</strong> Si diseñas para impresión, trabaja en CMYK desde el inicio
+              en Illustrator/InDesign. Siempre pide una prueba física de color antes de la tirada final.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Cuál es la diferencia práctica entre HEX y RGB?</h3>
+            <p>
+              Son el mismo modelo de color, solo varía la <strong>notación</strong>:
+            </p>
+            <p className={styles.faqExample}>
+              • <strong>HEX:</strong> #2E86AB (hexadecimal, compacto)<br />
+              • <strong>RGB:</strong> rgb(46, 134, 171) (decimal, más legible)<br />
+              • <strong>Equivalencia:</strong> 2E₁₆ = 46₁₀, 86₁₆ = 134₁₀, AB₁₆ = 171₁₀
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Cuándo usar cada uno:</strong><br />
+              • HEX: Código CSS limpio y compacto<br />
+              • RGB: Si necesitas manipular canales individuales o usar rgba() para transparencia
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Por qué HSL es mejor para diseñadores?</h3>
+            <p>
+              HSL representa el color de forma <strong>más intuitiva para humanos</strong>:
+            </p>
+            <p className={styles.faqExample}>
+              • <strong>H (Hue):</strong> Tono del color (0-360°) - Rojo=0°, Verde=120°, Azul=240°<br />
+              • <strong>S (Saturation):</strong> Intensidad (0-100%) - 0%=gris, 100%=color puro<br />
+              • <strong>L (Lightness):</strong> Brillo (0-100%) - 0%=negro, 50%=color, 100%=blanco
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Ejemplo práctico:</strong> Para crear un hover state más oscuro,
+              solo reduces L: hsl(198, 58%, 43%) → hsl(198, 58%, 35%). En HEX sería #2E86AB → #256A8A
+              (no tan obvio qué cambió).
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Puedo usar CMYK en CSS/HTML?</h3>
+            <p>
+              <strong>No directamente</strong>. Los navegadores solo entienden RGB, HEX y HSL nativamente.
+              CMYK requiere conversión.
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Si tienes un color CMYK que necesitas en web:</strong><br />
+              1. Usa este conversor para obtener el HEX/RGB equivalente<br />
+              2. Ten en cuenta que puede haber diferencias visuales (CMYK → RGB no es perfecto)<br />
+              3. Si es crítico, compara visualmente el resultado en pantalla
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Qué es el "espacio de color" y por qué importa?</h3>
+            <p>
+              Un espacio de color define el <strong>rango de colores posibles</strong>.
+              Los más comunes son:
+            </p>
+            <p className={styles.faqExample}>
+              • <strong>sRGB:</strong> Estándar web, menor rango de colores<br />
+              • <strong>Adobe RGB:</strong> Mayor rango, ideal para fotografía profesional<br />
+              • <strong>Display P3:</strong> Usado en pantallas Apple modernas, más colores que sRGB
+            </p>
+            <p className={styles.faqTip}>
+              ⚠️ <strong>Importante:</strong> Un mismo HEX puede verse diferente en diferentes
+              espacios de color. Para web, trabaja siempre en sRGB para consistencia.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Cómo garantizo accesibilidad en colores?</h3>
+            <p>
+              Verifica el <strong>contraste</strong> entre texto y fondo según WCAG:
+            </p>
+            <p className={styles.faqExample}>
+              • <strong>Nivel AA:</strong> Ratio mínimo 4.5:1 (texto normal), 3:1 (texto grande)<br />
+              • <strong>Nivel AAA:</strong> Ratio mínimo 7:1 (texto normal), 4.5:1 (texto grande)
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Herramientas recomendadas:</strong><br />
+              • WebAIM Contrast Checker (online)<br />
+              • Chrome DevTools (Lighthouse audit)<br />
+              • Figma plugins: Stark, Color Contrast Checker
+            </p>
+          </div>
+
+          {/* Mejores prácticas */}
+          <h2>Mejores prácticas para trabajar con colores</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Usa variables CSS</h4>
+              <p>Define colores en variables para cambiarlos fácilmente: --primary: #2E86AB;</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Documenta tu paleta</h4>
+              <p>Crea una guía de estilo con todos los colores y sus usos específicos (botones, fondos, textos).</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Valida el contraste</h4>
+              <p>Asegúrate de cumplir WCAG 2.1 AA (mínimo 4.5:1) para texto sobre fondo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Usa HSL para variaciones</h4>
+              <p>Es más fácil crear hovers, disabled states y escalas de color ajustando S y L.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Prueba en dispositivos reales</h4>
+              <p>Los colores varían según la pantalla. Verifica en móviles, tablets y monitores diferentes.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Mantén consistencia</h4>
+              <p>Elige UN formato principal para tu proyecto y úsalo en toda la documentación.</p>
+            </div>
+          </div>
+
+          {/* Warning box */}
+          <div className={styles.warningBox}>
+            <h3>⚠️ Errores comunes que debes evitar</h3>
+            <ul>
+              <li><strong>Usar colores RGB para impresión sin conversión:</strong> Se verán diferentes en papel.</li>
+              <li><strong>No verificar contraste de accesibilidad:</strong> Tu sitio será ilegible para algunos usuarios.</li>
+              <li><strong>Hardcodear colores en múltiples lugares:</strong> Usa variables CSS para facilitar cambios globales.</li>
+              <li><strong>Asumir que todos verán los mismos colores:</strong> Pantallas, calibración y daltonismo afectan la percepción.</li>
+              <li><strong>Copiar HEX con el # al CSS:</strong> Verifica que el # esté incluido (#2E86AB, no 2E86AB).</li>
+              <li><strong>Mezclar formatos sin motivo:</strong> Mantén consistencia (no uses HEX en unos sitios y HSL en otros sin razón).</li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('conversor-colores')} />
       <Footer appName="conversor-colores" />
