@@ -103,14 +103,12 @@ export default function GeneradorQRPage() {
   const [cargando, setCargando] = useState(false);
   const [tabActiva, setTabActiva] = useState<'contenido' | 'estilo' | 'logo'>('contenido');
   const [htmlCode, setHtmlCode] = useState<string>('');
+  const [htmlExpanded, setHtmlExpanded] = useState(false);
 
   // Referencias
   const qrRef = useRef<HTMLDivElement>(null);
   const qrCodeInstance = useRef<InstanceType<typeof import('qr-code-styling').default> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const phonePreviewRef = useRef<HTMLDivElement>(null);
-  const printPreviewRef = useRef<HTMLDivElement>(null);
-  const cardPreviewRef = useRef<HTMLDivElement>(null);
 
   // Generar el contenido del QR según el tipo
   const generarContenidoQR = useCallback((): string => {
@@ -422,41 +420,6 @@ export default function GeneradorQRPage() {
       }
     }
   }, [tieneContenido, generarQR]);
-
-  // Actualizar previews en contexto cuando el QR se genera
-  useEffect(() => {
-    if (!qrGenerado || !qrRef.current) return;
-
-    const canvas = qrRef.current.querySelector('canvas');
-    if (!canvas) return;
-
-    // Preview en móvil
-    if (phonePreviewRef.current) {
-      const clonePhone = canvas.cloneNode(true) as HTMLCanvasElement;
-      clonePhone.style.width = '120px';
-      clonePhone.style.height = '120px';
-      phonePreviewRef.current.innerHTML = '';
-      phonePreviewRef.current.appendChild(clonePhone);
-    }
-
-    // Preview impreso
-    if (printPreviewRef.current) {
-      const clonePrint = canvas.cloneNode(true) as HTMLCanvasElement;
-      clonePrint.style.width = '100px';
-      clonePrint.style.height = '100px';
-      printPreviewRef.current.innerHTML = '';
-      printPreviewRef.current.appendChild(clonePrint);
-    }
-
-    // Preview tarjeta de visita (solo para contactos)
-    if (tipoQR === 'contacto' && cardPreviewRef.current) {
-      const cloneCard = canvas.cloneNode(true) as HTMLCanvasElement;
-      cloneCard.style.width = '80px';
-      cloneCard.style.height = '80px';
-      cardPreviewRef.current.innerHTML = '';
-      cardPreviewRef.current.appendChild(cloneCard);
-    }
-  }, [qrGenerado, tipoQR]);
 
   // Tipos de QR disponibles
   const tiposQR = [
@@ -1050,97 +1013,35 @@ export default function GeneradorQRPage() {
         </div>
       </div>
 
-      {/* Código HTML de implementación */}
+      {/* Código HTML de implementación - Colapsable */}
       {qrGenerado && htmlCode && (
         <div className={styles.htmlSection}>
-          <h2>💻 Código de implementación</h2>
-          <p className={styles.htmlSubtitle}>
-            Copia este código HTML para usar tu QR en tu sitio web o aplicación
-          </p>
-          <div className={styles.codeContainer}>
-            <pre className={styles.codeBlock}>
-              <code>{htmlCode}</code>
-            </pre>
-            <button onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
-              {copiado ? '✅ Copiado' : '📋 Copiar código'}
+          <div className={styles.htmlHeader}>
+            <div>
+              <h2>💻 Código de implementación</h2>
+              <p className={styles.htmlSubtitle}>
+                Copia este código HTML para usar tu QR en tu sitio web o aplicación
+              </p>
+            </div>
+            <button
+              onClick={() => setHtmlExpanded(!htmlExpanded)}
+              className={styles.btnToggleCode}
+              aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
+            >
+              {htmlExpanded ? '▼ Ocultar código' : '▶ Ver código HTML'}
             </button>
           </div>
-        </div>
-      )}
 
-      {/* Preview en contexto */}
-      {qrGenerado && (
-        <div className={styles.contextPreviewSection}>
-          <h2>👀 Visualiza tu QR en contexto</h2>
-          <p className={styles.contextSubtitle}>
-            Así se verá tu código QR en diferentes situaciones reales
-          </p>
-
-          <div className={styles.contextGrid}>
-            {/* Preview en móvil */}
-            <div className={styles.contextCard}>
-              <h3>📱 En móvil</h3>
-              <div className={styles.phoneMockup}>
-                <div className={styles.phoneScreen}>
-                  <div className={styles.phoneQrArea}>
-                    <div className={styles.qrInPhone} ref={phonePreviewRef} />
-                    <p className={styles.phoneText}>
-                      {tipoQR === 'url' && 'Escanea para visitar'}
-                      {tipoQR === 'wifi' && 'Conéctate a WiFi'}
-                      {tipoQR === 'contacto' && 'Guardar contacto'}
-                      {tipoQR === 'email' && 'Enviar email'}
-                      {tipoQR === 'telefono' && 'Llamar ahora'}
-                      {tipoQR === 'texto' && 'Ver contenido'}
-                    </p>
-                  </div>
-                </div>
-              </div>
+          {htmlExpanded && (
+            <div className={styles.codeContainer}>
+              <pre className={styles.codeBlock}>
+                <code>{htmlCode}</code>
+              </pre>
+              <button onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
+                {copiado ? '✅ Copiado' : '📋 Copiar código'}
+              </button>
             </div>
-
-            {/* Preview impreso */}
-            <div className={styles.contextCard}>
-              <h3>🖨️ Impreso</h3>
-              <div className={styles.printMockup}>
-                <div className={styles.printedCard}>
-                  <div className={styles.qrInPrint} ref={printPreviewRef} />
-                  {tipoQR === 'wifi' && (
-                    <div className={styles.printInfo}>
-                      <strong>WiFi gratuito</strong>
-                      <span>Red: {configWifi.ssid}</span>
-                    </div>
-                  )}
-                  {tipoQR === 'contacto' && (
-                    <div className={styles.printInfo}>
-                      <strong>{configContacto.nombre}</strong>
-                      {configContacto.cargo && <span>{configContacto.cargo}</span>}
-                    </div>
-                  )}
-                  {tipoQR === 'url' && (
-                    <div className={styles.printInfo}>
-                      <strong>Visítanos online</strong>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Preview en tarjeta de visita */}
-            {tipoQR === 'contacto' && (
-              <div className={styles.contextCard}>
-                <h3>💳 Tarjeta de visita</h3>
-                <div className={styles.businessCard}>
-                  <div className={styles.cardLeft}>
-                    <h4>{configContacto.nombre}</h4>
-                    {configContacto.cargo && <p className={styles.cardCargo}>{configContacto.cargo}</p>}
-                    {configContacto.empresa && <p className={styles.cardEmpresa}>{configContacto.empresa}</p>}
-                    {configContacto.telefono && <p className={styles.cardContacto}>📞 {configContacto.telefono}</p>}
-                    {configContacto.email && <p className={styles.cardContacto}>📧 {configContacto.email}</p>}
-                  </div>
-                  <div className={styles.cardRight} ref={cardPreviewRef} />
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       )}
 

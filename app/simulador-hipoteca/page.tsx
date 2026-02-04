@@ -38,6 +38,7 @@ export default function SimuladorHipotecaPage() {
   // Estados para código HTML
   const [htmlCode, setHtmlCode] = useState<string>('');
   const [copiado, setCopiado] = useState(false);
+  const [htmlExpanded, setHtmlExpanded] = useState(false);
 
   // Calcular resultado
   const resultado = useMemo(() => {
@@ -506,119 +507,35 @@ export default function SimuladorHipotecaPage() {
         </div>
       </div>
 
-      {/* Código HTML de implementación */}
+      {/* Código HTML de implementación - Colapsable */}
       {resultado && htmlCode && (
         <div className={styles.htmlSection}>
-          <h2>💻 Código de implementación</h2>
-          <p className={styles.htmlSubtitle}>
-            Integra este widget en tu blog, inmobiliaria o sitio web de finanzas personales
-          </p>
-          <div className={styles.codeContainer}>
-            <pre className={styles.codeBlock}>
-              <code>{htmlCode}</code>
-            </pre>
-            <button onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
-              {copiado ? '✅ Copiado' : '📋 Copiar código'}
+          <div className={styles.htmlHeader}>
+            <div>
+              <h2>💻 Código de implementación</h2>
+              <p className={styles.htmlSubtitle}>
+                Integra este widget en tu blog, inmobiliaria o sitio web de finanzas personales
+              </p>
+            </div>
+            <button
+              onClick={() => setHtmlExpanded(!htmlExpanded)}
+              className={styles.btnToggleCode}
+              aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
+            >
+              {htmlExpanded ? '▼ Ocultar código' : '▶ Ver código HTML'}
             </button>
           </div>
-        </div>
-      )}
 
-      {/* Preview en contexto */}
-      {resultado && (
-        <div className={styles.contextPreviewSection}>
-          <h2>👀 Visualiza tu hipoteca en contexto</h2>
-          <p className={styles.contextSubtitle}>
-            Así verás tu simulación en diferentes situaciones reales
-          </p>
-
-          <div className={styles.contextGrid}>
-            {/* Preview en app bancaria (móvil) */}
-            <div className={styles.contextCard}>
-              <h3>📱 App bancaria</h3>
-              <div className={styles.phoneMockup}>
-                <div className={styles.phoneScreen}>
-                  <div className={styles.bankAppHeader}>
-                    <span className={styles.bankLogo}>🏦</span>
-                    <span className={styles.bankName}>Mi Banco</span>
-                  </div>
-                  <div className={styles.bankAppContent}>
-                    <div className={styles.bankLabel}>Tu cuota mensual</div>
-                    <div className={styles.bankCuota}>{formatCurrency(resultado.cuotaMensual)}</div>
-                    <div className={styles.bankDetalles}>
-                      <div className={styles.bankDetalle}>
-                        <span>Capital</span>
-                        <strong>{formatCurrency(resultado.capital)}</strong>
-                      </div>
-                      <div className={styles.bankDetalle}>
-                        <span>Plazo</span>
-                        <strong>{plazo} años</strong>
-                      </div>
-                      <div className={styles.bankDetalle}>
-                        <span>TIN</span>
-                        <strong>{formatNumber(resultado.tipoEfectivo, 2)}%</strong>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          {htmlExpanded && (
+            <div className={styles.codeContainer}>
+              <pre className={styles.codeBlock}>
+                <code>{htmlCode}</code>
+              </pre>
+              <button onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
+                {copiado ? '✅ Copiado' : '📋 Copiar código'}
+              </button>
             </div>
-
-            {/* Preview en folleto inmobiliario */}
-            <div className={styles.contextCard}>
-              <h3>🏘️ Folleto inmobiliario</h3>
-              <div className={styles.printMockup}>
-                <div className={styles.folletoCard}>
-                  <div className={styles.folletoHeader}>
-                    <div className={styles.folletoTitle}>Tu nueva casa</div>
-                    <div className={styles.folletoPrecio}>{formatCurrency(parseSpanishNumber(precioVivienda) || 0)}</div>
-                  </div>
-                  <div className={styles.folletoFinanciacion}>
-                    <div className={styles.folletoLabel}>Financiación disponible</div>
-                    <div className={styles.folletoCuota}>
-                      Desde <strong>{formatCurrency(resultado.cuotaMensual)}/mes</strong>
-                    </div>
-                    <div className={styles.folletoDetalles}>
-                      Entrada {formatCurrency(parseSpanishNumber(entrada) || 0)} · TIN {formatNumber(resultado.tipoEfectivo, 2)}% · {plazo} años
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Preview en dashboard web */}
-            <div className={styles.contextCard}>
-              <h3>💻 Dashboard web</h3>
-              <div className={styles.dashboardMockup}>
-                <div className={styles.dashboardPanel}>
-                  <div className={styles.dashboardHeader}>
-                    <span className={styles.dashboardIcon}>🏠</span>
-                    <span className={styles.dashboardTitle}>Seguimiento de Hipoteca</span>
-                  </div>
-                  <div className={styles.dashboardStats}>
-                    <div className={styles.dashboardStat}>
-                      <div className={styles.dashboardStatLabel}>Cuota mensual</div>
-                      <div className={styles.dashboardStatValor}>{formatCurrency(resultado.cuotaMensual)}</div>
-                    </div>
-                    <div className={styles.dashboardStat}>
-                      <div className={styles.dashboardStatLabel}>Pagado hasta hoy</div>
-                      <div className={styles.dashboardStatValor}>—</div>
-                    </div>
-                    <div className={styles.dashboardStat}>
-                      <div className={styles.dashboardStatLabel}>Pendiente</div>
-                      <div className={styles.dashboardStatValor}>{formatCurrency(resultado.capital)}</div>
-                    </div>
-                  </div>
-                  <div className={styles.dashboardProgress}>
-                    <div className={styles.dashboardProgressBar}>
-                      <div className={styles.dashboardProgressFill} style={{ width: '0%' }} />
-                    </div>
-                    <div className={styles.dashboardProgressLabel}>0% amortizado · {plazo} años restantes</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       )}
 

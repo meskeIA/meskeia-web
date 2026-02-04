@@ -761,7 +761,7 @@
 /* NUEVAS SECCIONES PROFESIONALES */
 /* ============================= */
 
-/* Sección de código HTML */
+/* Sección de código HTML - Colapsable */
 .htmlSection {
   background: var(--bg-card);
   border-radius: var(--radius-large);
@@ -769,6 +769,14 @@
   margin-bottom: var(--spacing-xl);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
+}
+
+.htmlHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
 .htmlSection h2 {
@@ -780,8 +788,32 @@
 
 .htmlSubtitle {
   color: var(--text-secondary);
-  margin-bottom: var(--spacing-lg);
+  margin: 0;
   font-size: 0.95rem;
+}
+
+.btnToggleCode {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btnToggleCode:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnToggleCode:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .codeContainer {
