@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import styles from './GeneradorIconos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface GeneratedIcon {
@@ -158,6 +158,7 @@ export default function GeneradorIconosPage() {
   const [generatedIcons, setGeneratedIcons] = useState<GeneratedIcon[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [manifestCode, setManifestCode] = useState<string>('');
+  const [htmlCode, setHtmlCode] = useState<string>('');
   const [icoUrl, setIcoUrl] = useState<string>('');
   const [icoSizeKB, setIcoSizeKB] = useState<string>('');
   const [canGenerateIco, setCanGenerateIco] = useState(false);
@@ -247,6 +248,7 @@ export default function GeneradorIconosPage() {
 
     setGeneratedIcons(icons);
     generateManifestCode(icons);
+    generateHtmlCode(icons);
 
     // Verificar si se puede generar ICO (al menos un tamaño ≤256px)
     const hasValidIcoSizes = icons.some(icon => icon.size <= 256 && icon.pngData);
@@ -277,6 +279,44 @@ export default function GeneradorIconosPage() {
 
     const code = JSON.stringify({ icons: iconsArray }, null, 2);
     setManifestCode(code);
+  };
+
+  const generateHtmlCode = (icons: GeneratedIcon[]) => {
+    const favicon16 = icons.find(i => i.size === 16);
+    const favicon32 = icons.find(i => i.size === 32);
+    const appleTouch180 = icons.find(i => i.size === 180);
+    const icon192 = icons.find(i => i.size === 192);
+    const icon512 = icons.find(i => i.size === 512);
+
+    let html = '<!-- Favicon para navegadores -->\n';
+
+    if (favicon16) {
+      html += `<link rel="icon" type="image/${outputFormat}" sizes="16x16" href="/icons/${favicon16.fileName}">\n`;
+    }
+    if (favicon32) {
+      html += `<link rel="icon" type="image/${outputFormat}" sizes="32x32" href="/icons/${favicon32.fileName}">\n`;
+    }
+
+    html += '\n<!-- Apple Touch Icon (iOS) -->\n';
+    if (appleTouch180) {
+      html += `<link rel="apple-touch-icon" href="/icons/${appleTouch180.fileName}">\n`;
+    }
+
+    html += '\n<!-- PWA Icons (Android/Chrome) -->\n';
+    if (icon192) {
+      html += `<link rel="icon" type="image/${outputFormat}" sizes="192x192" href="/icons/${icon192.fileName}">\n`;
+    }
+    if (icon512) {
+      html += `<link rel="icon" type="image/${outputFormat}" sizes="512x512" href="/icons/${icon512.fileName}">\n`;
+    }
+
+    html += '\n<!-- Manifest.json -->\n';
+    html += '<link rel="manifest" href="/manifest.json">\n';
+
+    html += '\n<!-- Theme Color (opcional, personaliza con tu color) -->\n';
+    html += '<meta name="theme-color" content="#2E86AB">';
+
+    setHtmlCode(html);
   };
 
   const downloadIcon = (icon: GeneratedIcon) => {
@@ -520,6 +560,44 @@ export default function GeneradorIconosPage() {
             </div>
           )}
 
+          {/* Preview en navbar simulada */}
+          {generatedIcons.find(i => i.size === 32) && (
+            <div className={styles.faviconPreviewSection}>
+              <h3>👀 Vista previa en navegador</h3>
+              <div className={styles.browserMockup}>
+                <div className={styles.browserHeader}>
+                  <div className={styles.browserButtons}>
+                    <span className={styles.browserBtn}></span>
+                    <span className={styles.browserBtn}></span>
+                    <span className={styles.browserBtn}></span>
+                  </div>
+                  <div className={styles.browserTab}>
+                    <img
+                      src={generatedIcons.find(i => i.size === 32)?.url}
+                      alt="Favicon"
+                      className={styles.faviconInTab}
+                    />
+                    <span>Mi Sitio Web</span>
+                  </div>
+                </div>
+                <div className={styles.browserContent}>
+                  <p className={styles.browserUrl}>🔒 https://misitio.com</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Código HTML */}
+          <div className={styles.manifestSection}>
+            <div className={styles.manifestHeader}>
+              <h3>🌐 Código HTML para tu &lt;head&gt;</h3>
+              <button onClick={() => navigator.clipboard.writeText(htmlCode)} className={styles.btnCopy}>
+                📋 Copiar
+              </button>
+            </div>
+            <pre className={styles.manifestCode}>{htmlCode}</pre>
+          </div>
+
           {/* Código manifest.json */}
           <div className={styles.manifestSection}>
             <div className={styles.manifestHeader}>
@@ -554,6 +632,221 @@ export default function GeneradorIconosPage() {
           </div>
         </div>
       </div>
+
+      {/* Tabla de compatibilidad */}
+      <div className={styles.compatibilitySection}>
+        <h3>🌍 Compatibilidad de navegadores y plataformas</h3>
+        <div className={styles.compatibilityTable}>
+          <div className={styles.compatRow}>
+            <div className={styles.compatPlatform}>
+              <span className={styles.compatIcon}>🌐</span>
+              <div>
+                <strong>Chrome / Edge / Firefox</strong>
+                <p>Favicon 16px, 32px, 48px</p>
+              </div>
+            </div>
+            <div className={styles.compatStatus}>✅ Totalmente compatible</div>
+          </div>
+          <div className={styles.compatRow}>
+            <div className={styles.compatPlatform}>
+              <span className={styles.compatIcon}>🍎</span>
+              <div>
+                <strong>Safari / iOS</strong>
+                <p>Apple Touch Icon 180px</p>
+              </div>
+            </div>
+            <div className={styles.compatStatus}>✅ Totalmente compatible</div>
+          </div>
+          <div className={styles.compatRow}>
+            <div className={styles.compatPlatform}>
+              <span className={styles.compatIcon}>🤖</span>
+              <div>
+                <strong>Android Chrome</strong>
+                <p>PWA Icons 192px, 512px</p>
+              </div>
+            </div>
+            <div className={styles.compatStatus}>✅ Totalmente compatible</div>
+          </div>
+          <div className={styles.compatRow}>
+            <div className={styles.compatPlatform}>
+              <span className={styles.compatIcon}>🪟</span>
+              <div>
+                <strong>Windows 10/11</strong>
+                <p>Tiles 70px, 150px, 310px</p>
+              </div>
+            </div>
+            <div className={styles.compatStatus}>✅ Totalmente compatible</div>
+          </div>
+        </div>
+        <p className={styles.compatNote}>
+          💡 <strong>Recomendación:</strong> Usa el preset "PWA Completo" para máxima compatibilidad en todas las plataformas.
+        </p>
+      </div>
+
+      {/* FAQ y guía */}
+      <EducationalSection
+        title="📚 ¿Tienes dudas sobre iconos PWA y favicons?"
+        subtitle="Respuestas a las preguntas más frecuentes y guía completa de implementación"
+        icon="📚"
+      >
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes</h2>
+
+          <div className={styles.faqItem}>
+            <h4>❓ ¿Qué tamaños son realmente obligatorios?</h4>
+            <p>
+              <strong>Mínimo indispensable:</strong> 16px, 32px (favicon navegador), 180px (Apple iOS), 192px y 512px (PWA Android).
+              Con estos 5 tamaños cubrirás el 90% de casos.
+            </p>
+            <p>
+              <strong>Recomendado completo:</strong> Usa el preset "PWA Completo" con 12 tamaños para cubrir todos los navegadores,
+              dispositivos y versiones antiguas.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4>❓ ¿Qué formato debo usar: PNG, WebP o JPEG?</h4>
+            <p>
+              <strong>PNG</strong> (recomendado): Soporta transparencia, calidad perfecta, compatible con todos los navegadores.
+              Es el estándar para iconos.
+            </p>
+            <p>
+              <strong>WebP</strong>: Archivos más pequeños (30-50% menos peso), pero no todos los navegadores antiguos lo soportan.
+              Úsalo solo si tu audiencia usa navegadores modernos.
+            </p>
+            <p>
+              <strong>JPEG</strong>: No soporta transparencia, evítalo para iconos (el fondo siempre será blanco o de color).
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4>❓ ¿Dónde subo los iconos en mi sitio web?</h4>
+            <p>
+              <strong>Opción 1 (raíz):</strong> Sube todos los iconos a la carpeta raíz de tu sitio (ejemplo: <code>https://misitio.com/icon-192x192.png</code>).
+              En el código HTML usa rutas absolutas: <code>/icon-192x192.png</code>
+            </p>
+            <p>
+              <strong>Opción 2 (carpeta /icons/):</strong> Crea una carpeta <code>/icons/</code> y sube todos los archivos ahí.
+              En el código HTML usa: <code>/icons/icon-192x192.png</code>
+            </p>
+            <p>
+              <strong>⚠️ Importante:</strong> El archivo <code>manifest.json</code> debe estar en la raíz (<code>/manifest.json</code>).
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4>❓ ¿Qué es el archivo favicon.ico y lo necesito?</h4>
+            <p>
+              El archivo <code>.ico</code> es un formato antiguo que soportan todos los navegadores (incluso Internet Explorer).
+              Contiene múltiples resoluciones (16px, 32px, 48px) en un solo archivo.
+            </p>
+            <p>
+              <strong>¿Lo necesitas?</strong> Ya no es obligatorio si usas PNG modernos con las etiquetas <code>&lt;link rel="icon"&gt;</code>,
+              pero es buena práctica incluirlo para compatibilidad con navegadores muy antiguos.
+            </p>
+            <p>
+              Simplemente descarga el <code>favicon.ico</code> generado y súbelo a la raíz de tu sitio.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4>❓ ¿Cómo pruebo que los iconos funcionan correctamente?</h4>
+            <p><strong>Método 1 - Navegador:</strong></p>
+            <ul>
+              <li>Abre tu sitio en Chrome/Firefox/Safari</li>
+              <li>Mira la pestaña del navegador → Debe aparecer tu favicon (16px o 32px)</li>
+              <li>Añade la página a marcadores → Verifica que aparece el icono</li>
+            </ul>
+            <p><strong>Método 2 - PWA en móvil:</strong></p>
+            <ul>
+              <li>Abre tu sitio en Chrome Android o Safari iOS</li>
+              <li>Menú → "Añadir a pantalla de inicio"</li>
+              <li>Verifica que el icono 192px (Android) o 180px (iOS) aparece correctamente</li>
+            </ul>
+            <p><strong>Método 3 - Herramienta online:</strong></p>
+            <ul>
+              <li>Usa <a href="https://realfavicongenerator.net/favicon_checker" target="_blank" rel="noopener">Favicon Checker</a></li>
+              <li>Introduce tu URL y verifica todos los iconos</li>
+            </ul>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4>❓ ¿Puedo usar un logo con texto o debe ser solo un icono?</h4>
+            <p>
+              <strong>Para tamaños pequeños (16-48px):</strong> Usa solo un icono/símbolo simple sin texto.
+              El texto es ilegible a esos tamaños y se verá borroso.
+            </p>
+            <p>
+              <strong>Para tamaños grandes (180-512px):</strong> Puedes usar logo con texto, ya que hay suficiente espacio.
+              Pero asegúrate de que el texto sea legible incluso a 180px.
+            </p>
+            <p>
+              <strong>Consejo:</strong> Si tu logo tiene texto, crea dos versiones: una solo con el símbolo (para tamaños pequeños)
+              y otra con logo completo (para tamaños grandes). Luego genera los iconos de cada versión por separado.
+            </p>
+          </div>
+
+          <h2>Guía de Implementación Paso a Paso</h2>
+
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Prepara tu imagen original</h4>
+                <p>Usa una imagen cuadrada (512×512px o superior) en formato PNG con fondo transparente. Si tu logo no es cuadrado, añade espacio transparente alrededor para hacerlo cuadrado.</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Genera los iconos</h4>
+                <p>Sube tu imagen, selecciona el preset "PWA Completo", elige formato PNG y haz clic en "Generar Iconos". Descarga todos los archivos (botón "Descargar Todos").</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Sube los archivos a tu servidor</h4>
+                <p>Crea una carpeta <code>/icons/</code> en la raíz de tu sitio web y sube todos los archivos .png generados. Sube también el <code>favicon.ico</code> a la raíz.</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Añade el código HTML</h4>
+                <p>Copia el código HTML generado y pégalo en el <code>&lt;head&gt;</code> de tu archivo HTML principal. Asegúrate de que las rutas coincidan con dónde subiste los archivos.</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Crea el manifest.json</h4>
+                <p>Crea un archivo <code>manifest.json</code> en la raíz de tu sitio, copia el código JSON generado y personaliza los campos <code>name</code>, <code>short_name</code>, <code>theme_color</code> con tu información.</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Prueba y verifica</h4>
+                <p>Abre tu sitio en diferentes navegadores, verifica el favicon, y prueba instalar como PWA en móvil. Limpia la caché del navegador si no ves cambios inmediatos.</p>
+              </div>
+            </div>
+          </div>
+
+          <h2>Recursos Adicionales</h2>
+          <div className={styles.resourcesList}>
+            <p>📖 <a href="https://web.dev/add-manifest/" target="_blank" rel="noopener">Web.dev - Guía completa de manifest.json</a></p>
+            <p>🔍 <a href="https://realfavicongenerator.net/favicon_checker" target="_blank" rel="noopener">Favicon Checker - Verifica tus iconos</a></p>
+            <p>🍎 <a href="https://developer.apple.com/design/human-interface-guidelines/app-icons" target="_blank" rel="noopener">Apple - Guía de iconos iOS</a></p>
+            <p>🤖 <a href="https://developer.chrome.com/docs/android/trusted-web-activity/integration-guide" target="_blank" rel="noopener">Google - PWA en Android</a></p>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-iconos')} />
 
