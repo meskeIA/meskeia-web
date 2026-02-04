@@ -35,6 +35,10 @@ export default function SimuladorHipotecaPage() {
   // Vista de tabla
   const [vistaTabla, setVistaTabla] = useState<VistaTabla>('anual');
 
+  // Estados para código HTML
+  const [htmlCode, setHtmlCode] = useState<string>('');
+  const [copiado, setCopiado] = useState(false);
+
   // Calcular resultado
   const resultado = useMemo(() => {
     const precio = parseSpanishNumber(precioVivienda) || 0;
@@ -129,6 +133,73 @@ export default function SimuladorHipotecaPage() {
   const tablaActual = vistaTabla === 'mensual'
     ? resultado?.tablaMensual || []
     : resultado?.tablaAnual || [];
+
+  // Generar código HTML de implementación
+  const generarCodigoHTML = () => {
+    if (!resultado) return;
+
+    let codigo = '<!-- Simulador de Hipoteca - generado con meskeIA -->\n\n';
+    codigo += '<!-- Widget básico para blogs/inmobiliarias -->\n';
+    codigo += '<div class="simulador-hipoteca-widget">\n';
+    codigo += '  <div class="widget-header">\n';
+    codigo += '    <h3>🏠 Tu hipoteca en un vistazo</h3>\n';
+    codigo += '  </div>\n';
+    codigo += '  <div class="widget-resultado">\n';
+    codigo += '    <div class="cuota-principal">\n';
+    codigo += `      <span class="label">Cuota mensual</span>\n`;
+    codigo += `      <span class="valor">${formatCurrency(resultado.cuotaMensual)}</span>\n`;
+    codigo += '    </div>\n';
+    codigo += '    <div class="detalles-grid">\n';
+    codigo += `      <div><strong>Capital:</strong> ${formatCurrency(resultado.capital)}</div>\n`;
+    codigo += `      <div><strong>Plazo:</strong> ${plazo} años</div>\n`;
+    codigo += `      <div><strong>Tipo:</strong> ${formatNumber(resultado.tipoEfectivo, 2)}% ${tipoInteres === 'fijo' ? 'fijo' : 'variable'}</div>\n`;
+    codigo += `      <div><strong>Total intereses:</strong> ${formatCurrency(resultado.totalIntereses)}</div>\n`;
+    codigo += '    </div>\n';
+    codigo += '    <a href="https://meskeia.com/simulador-hipoteca/" class="cta-simular">Simula tu hipoteca gratis</a>\n';
+    codigo += '  </div>\n';
+    codigo += '</div>\n\n';
+    codigo += '<!-- CSS recomendado (personaliza según tu diseño) -->\n';
+    codigo += '<style>\n';
+    codigo += '  .simulador-hipoteca-widget {\n';
+    codigo += '    border: 1px solid #E5E5E5;\n';
+    codigo += '    border-radius: 12px;\n';
+    codigo += '    padding: 1.5rem;\n';
+    codigo += '    background: #FFFFFF;\n';
+    codigo += '  }\n';
+    codigo += '  .cuota-principal .valor {\n';
+    codigo += '    font-size: 2rem;\n';
+    codigo += '    font-weight: bold;\n';
+    codigo += '    color: #2E86AB;\n';
+    codigo += '  }\n';
+    codigo += '  .cta-simular {\n';
+    codigo += '    display: inline-block;\n';
+    codigo += '    margin-top: 1rem;\n';
+    codigo += '    padding: 0.75rem 1.5rem;\n';
+    codigo += '    background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);\n';
+    codigo += '    color: white;\n';
+    codigo += '    text-decoration: none;\n';
+    codigo += '    border-radius: 8px;\n';
+    codigo += '  }\n';
+    codigo += '</style>';
+
+    setHtmlCode(codigo);
+  };
+
+  // Copiar código HTML al portapapeles
+  const copiarCodigoHTML = () => {
+    navigator.clipboard.writeText(htmlCode);
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
+  };
+
+  // Generar código HTML cuando hay resultado
+  useMemo(() => {
+    if (resultado) {
+      generarCodigoHTML();
+    } else {
+      setHtmlCode('');
+    }
+  }, [resultado]);
 
   return (
     <div className={styles.container}>
@@ -435,6 +506,273 @@ export default function SimuladorHipotecaPage() {
         </div>
       </div>
 
+      {/* Código HTML de implementación */}
+      {resultado && htmlCode && (
+        <div className={styles.htmlSection}>
+          <h2>💻 Código de implementación</h2>
+          <p className={styles.htmlSubtitle}>
+            Integra este widget en tu blog, inmobiliaria o sitio web de finanzas personales
+          </p>
+          <div className={styles.codeContainer}>
+            <pre className={styles.codeBlock}>
+              <code>{htmlCode}</code>
+            </pre>
+            <button onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
+              {copiado ? '✅ Copiado' : '📋 Copiar código'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Preview en contexto */}
+      {resultado && (
+        <div className={styles.contextPreviewSection}>
+          <h2>👀 Visualiza tu hipoteca en contexto</h2>
+          <p className={styles.contextSubtitle}>
+            Así verás tu simulación en diferentes situaciones reales
+          </p>
+
+          <div className={styles.contextGrid}>
+            {/* Preview en app bancaria (móvil) */}
+            <div className={styles.contextCard}>
+              <h3>📱 App bancaria</h3>
+              <div className={styles.phoneMockup}>
+                <div className={styles.phoneScreen}>
+                  <div className={styles.bankAppHeader}>
+                    <span className={styles.bankLogo}>🏦</span>
+                    <span className={styles.bankName}>Mi Banco</span>
+                  </div>
+                  <div className={styles.bankAppContent}>
+                    <div className={styles.bankLabel}>Tu cuota mensual</div>
+                    <div className={styles.bankCuota}>{formatCurrency(resultado.cuotaMensual)}</div>
+                    <div className={styles.bankDetalles}>
+                      <div className={styles.bankDetalle}>
+                        <span>Capital</span>
+                        <strong>{formatCurrency(resultado.capital)}</strong>
+                      </div>
+                      <div className={styles.bankDetalle}>
+                        <span>Plazo</span>
+                        <strong>{plazo} años</strong>
+                      </div>
+                      <div className={styles.bankDetalle}>
+                        <span>TIN</span>
+                        <strong>{formatNumber(resultado.tipoEfectivo, 2)}%</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview en folleto inmobiliario */}
+            <div className={styles.contextCard}>
+              <h3>🏘️ Folleto inmobiliario</h3>
+              <div className={styles.printMockup}>
+                <div className={styles.folletoCard}>
+                  <div className={styles.folletoHeader}>
+                    <div className={styles.folletoTitle}>Tu nueva casa</div>
+                    <div className={styles.folletoPrecio}>{formatCurrency(parseSpanishNumber(precioVivienda) || 0)}</div>
+                  </div>
+                  <div className={styles.folletoFinanciacion}>
+                    <div className={styles.folletoLabel}>Financiación disponible</div>
+                    <div className={styles.folletoCuota}>
+                      Desde <strong>{formatCurrency(resultado.cuotaMensual)}/mes</strong>
+                    </div>
+                    <div className={styles.folletoDetalles}>
+                      Entrada {formatCurrency(parseSpanishNumber(entrada) || 0)} · TIN {formatNumber(resultado.tipoEfectivo, 2)}% · {plazo} años
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview en dashboard web */}
+            <div className={styles.contextCard}>
+              <h3>💻 Dashboard web</h3>
+              <div className={styles.dashboardMockup}>
+                <div className={styles.dashboardPanel}>
+                  <div className={styles.dashboardHeader}>
+                    <span className={styles.dashboardIcon}>🏠</span>
+                    <span className={styles.dashboardTitle}>Seguimiento de Hipoteca</span>
+                  </div>
+                  <div className={styles.dashboardStats}>
+                    <div className={styles.dashboardStat}>
+                      <div className={styles.dashboardStatLabel}>Cuota mensual</div>
+                      <div className={styles.dashboardStatValor}>{formatCurrency(resultado.cuotaMensual)}</div>
+                    </div>
+                    <div className={styles.dashboardStat}>
+                      <div className={styles.dashboardStatLabel}>Pagado hasta hoy</div>
+                      <div className={styles.dashboardStatValor}>—</div>
+                    </div>
+                    <div className={styles.dashboardStat}>
+                      <div className={styles.dashboardStatLabel}>Pendiente</div>
+                      <div className={styles.dashboardStatValor}>{formatCurrency(resultado.capital)}</div>
+                    </div>
+                  </div>
+                  <div className={styles.dashboardProgress}>
+                    <div className={styles.dashboardProgressBar}>
+                      <div className={styles.dashboardProgressFill} style={{ width: '0%' }} />
+                    </div>
+                    <div className={styles.dashboardProgressLabel}>0% amortizado · {plazo} años restantes</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tabla comparativa Fija vs Variable */}
+      <div className={styles.comparativaSection}>
+        <h2>⚖️ Hipoteca Fija vs Variable: ¿Cuál te conviene?</h2>
+        <p className={styles.comparativaSubtitle}>
+          Entiende las diferencias clave para tomar la mejor decisión según tu perfil
+        </p>
+
+        <div className={styles.comparativaTable}>
+          <div className={styles.comparativaRow}>
+            <div className={styles.comparativaAspecto}>
+              <strong>Aspecto</strong>
+            </div>
+            <div className={styles.comparativaFija}>
+              <strong>🔒 Hipoteca Fija</strong>
+            </div>
+            <div className={styles.comparativaVariable}>
+              <strong>📊 Hipoteca Variable</strong>
+            </div>
+          </div>
+
+          <div className={styles.comparativaRow}>
+            <div className={styles.comparativaAspecto}>Cuota mensual</div>
+            <div className={styles.comparativaFija}>Siempre la misma</div>
+            <div className={styles.comparativaVariable}>Cambia según Euríbor</div>
+          </div>
+
+          <div className={styles.comparativaRow}>
+            <div className={styles.comparativaAspecto}>TIN inicial</div>
+            <div className={styles.comparativaFija}>Mayor (3-4%)</div>
+            <div className={styles.comparativaVariable}>Menor (Euríbor + 0.6-1.2%)</div>
+          </div>
+
+          <div className={styles.comparativaRow}>
+            <div className={styles.comparativaAspecto}>Riesgo</div>
+            <div className={styles.comparativaFija}>✅ Nulo (previsibilidad total)</div>
+            <div className={styles.comparativaVariable}>⚠️ Alto (si suben los tipos)</div>
+          </div>
+
+          <div className={styles.comparativaRow}>
+            <div className={styles.comparativaAspecto}>Ideal para...</div>
+            <div className={styles.comparativaFija}>
+              • Buscas estabilidad<br />
+              • Ingresos justos<br />
+              • Plazo largo (25-30 años)
+            </div>
+            <div className={styles.comparativaVariable}>
+              • Puedes asumir riesgo<br />
+              • Ingresos holgados<br />
+              • Plazo corto (10-15 años)
+            </div>
+          </div>
+
+          <div className={styles.comparativaRow}>
+            <div className={styles.comparativaAspecto}>Ahorro potencial</div>
+            <div className={styles.comparativaFija}>Menor (pagas "seguro")</div>
+            <div className={styles.comparativaVariable}>Mayor (si Euríbor baja o se mantiene)</div>
+          </div>
+        </div>
+
+        <div className={styles.comparativaConsejo}>
+          <strong>💡 Recomendación meskeIA:</strong> Si tu ratio de endeudamiento supera el 35%,
+          prioriza la hipoteca fija para evitar sorpresas. Si está por debajo del 25% y tienes
+          colchón de ahorro, la variable puede ahorrarte dinero.
+        </div>
+      </div>
+
+      {/* Escenarios típicos */}
+      <div className={styles.escenariosSection}>
+        <h2>🎯 Escenarios típicos de hipoteca</h2>
+        <p className={styles.escenariosSubtitle}>
+          Ejemplos reales para ayudarte a tomar decisiones informadas
+        </p>
+
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioIcon}>🏠</div>
+            <h3>Primera vivienda (joven)</h3>
+            <div className={styles.escenarioData}>
+              <div className={styles.escenarioDato}>
+                <span>Precio:</span> <strong>180.000 €</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Entrada:</span> <strong>36.000 € (20%)</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Plazo:</span> <strong>30 años</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>TIN:</span> <strong>3.5% fijo</strong>
+              </div>
+            </div>
+            <div className={styles.escenarioResultado}>
+              Cuota: <strong>~645 €/mes</strong>
+            </div>
+            <p className={styles.escenarioConsejo}>
+              Plazo largo para reducir cuota. Fijo para estabilidad con ingresos iniciales modestos.
+            </p>
+          </div>
+
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioIcon}>🏘️</div>
+            <h3>Segunda residencia (familiar)</h3>
+            <div className={styles.escenarioData}>
+              <div className={styles.escenarioDato}>
+                <span>Precio:</span> <strong>300.000 €</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Entrada:</span> <strong>90.000 € (30%)</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Plazo:</span> <strong>20 años</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>TIN:</span> <strong>Euríbor + 0.9%</strong>
+              </div>
+            </div>
+            <div className={styles.escenarioResultado}>
+              Cuota: <strong>~1.165 €/mes</strong>
+            </div>
+            <p className={styles.escenarioConsejo}>
+              Entrada mayor (más ahorro). Variable para aprovechar tipos bajos con colchón económico.
+            </p>
+          </div>
+
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioIcon}>🏢</div>
+            <h3>Inversión (alquiler)</h3>
+            <div className={styles.escenarioData}>
+              <div className={styles.escenarioDato}>
+                <span>Precio:</span> <strong>150.000 €</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Entrada:</span> <strong>45.000 € (30%)</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Plazo:</span> <strong>15 años</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>TIN:</span> <strong>Euríbor + 1.2%</strong>
+              </div>
+            </div>
+            <div className={styles.escenarioResultado}>
+              Cuota: <strong>~735 €/mes</strong>
+            </div>
+            <p className={styles.escenarioConsejo}>
+              Plazo corto para amortizar rápido. El alquiler debe cubrir la cuota + gastos (~900 €/mes).
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <div className={styles.disclaimer}>
         <h3>⚠️ Aviso Importante</h3>
@@ -449,8 +787,8 @@ export default function SimuladorHipotecaPage() {
 
       {/* Contenido Educativo */}
       <EducationalSection
-        title="📚 ¿Quieres entender mejor las hipotecas?"
-        subtitle="Aprende sobre tipos de interés, amortización y cómo elegir la mejor opción"
+        title="📚 Guía completa sobre hipotecas"
+        subtitle="Aprende sobre tipos de interés, amortización, negociación y preguntas frecuentes"
       >
         <section className={styles.guideSection}>
           <h2>Conceptos Clave de las Hipotecas</h2>
@@ -494,27 +832,264 @@ export default function SimuladorHipotecaPage() {
               </p>
             </div>
           </div>
-        </section>
 
-        <section className={styles.guideSection}>
-          <h2>Consejos para tu Hipoteca</h2>
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>💰 Ahorra para la Entrada</h4>
-              <p>
-                Los bancos financian como máximo el 80% del valor de tasación. Necesitarás
-                ahorrar al menos el 20% más un 10-12% adicional para gastos (impuestos, notaría,
-                registro, gestoría).
-              </p>
+          {/* Guía paso a paso */}
+          <h2>Cómo conseguir tu hipoteca (paso a paso)</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h3>Calcula tu capacidad de ahorro real</h3>
+                <p>
+                  Necesitas ahorrar <strong>al menos 30-32% del precio de la vivienda</strong>:
+                  20% de entrada + 10-12% de gastos (impuestos, notaría, registro, gestoría).
+                  Para una vivienda de 200.000 €, necesitas ~60.000 € ahorrados.
+                </p>
+              </div>
             </div>
-            <div className={styles.contentCard}>
-              <h4>🔍 Compara Ofertas</h4>
-              <p>
-                Solicita simulaciones en varios bancos. Negocia las condiciones, especialmente
-                los productos vinculados (seguros, domiciliación de nómina). Un pequeño diferencial
-                de 0.1% supone miles de euros a largo plazo.
-              </p>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h3>Determina tu presupuesto máximo</h3>
+                <p>
+                  Usa la regla del 30-35%: tu cuota mensual NO debe superar el 35% de tus ingresos netos.
+                  Si cobras 2.500 € netos, tu cuota máxima es ~875 €/mes. Esto te permite acceder a
+                  hipotecas de 150.000-180.000 € (dependiendo del plazo e interés).
+                </p>
+              </div>
             </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h3>Solicita ofertas en 3-5 bancos</h3>
+                <p>
+                  No te quedes con el primer banco. Pide simulaciones vinculantes en al menos 3 entidades.
+                  Lleva: DNI, últimas 3 nóminas, declaración de la renta, escrituras del piso (si ya tienes reserva).
+                  Compara TAE, no solo TIN.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h3>Negocia productos vinculados</h3>
+                <p>
+                  Los bancos ofrecen mejores tipos si contratas seguros, domicilias nómina o adquieres
+                  tarjetas. <strong>Calcula el coste real</strong>: un diferencial 0.2% más bajo puede
+                  compensar 30 €/mes de seguros. Negocia cada producto por separado.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h3>Revisa la oferta vinculante con un experto</h3>
+                <p>
+                  Antes de firmar, lleva la oferta a un abogado especializado en hipotecas o a un asesor
+                  financiero independiente. Verifica: comisiones de apertura, penalizaciones por amortización
+                  anticipada, cláusulas suelo, gastos de subrogación. Invertir 200-300 € aquí te ahorra miles.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h3>Firma en notaría y registra</h3>
+                <p>
+                  El día de la firma: lee TODO el contrato antes de firmar (lleva 1-2 horas). Pregunta cualquier
+                  duda al notario. Tras firmar, registra la hipoteca en el Registro de la Propiedad (lo hace
+                  la gestoría). Guarda TODOS los documentos originales en un lugar seguro.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* FAQ ampliado */}
+          <h2>Preguntas frecuentes</h2>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Qué es mejor: hipoteca fija o variable?</h3>
+            <p>
+              Depende de tu perfil de riesgo y situación financiera:
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Elige FIJA si:</strong><br />
+              • Tu ratio de endeudamiento es alto (más del 35%)<br />
+              • Tus ingresos son justos y no puedes asumir subidas de cuota<br />
+              • Buscas previsibilidad total durante 20-30 años<br />
+              • Los tipos están históricamente bajos (momento de "congelar" el precio)
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Elige VARIABLE si:</strong><br />
+              • Tu ratio de endeudamiento es bajo (menos del 25%)<br />
+              • Tienes colchón de ahorro para absorber subidas puntuales<br />
+              • El plazo es corto (10-15 años) y puedes amortizar anticipadamente<br />
+              • Esperas que el Euríbor se mantenga o baje en el medio plazo
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Cuánto necesito exactamente de entrada y gastos?</h3>
+            <p>
+              Para comprar una vivienda de <strong>200.000 €</strong>, necesitas ahorrar:
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Desglose completo:</strong><br />
+              • <strong>Entrada (20%):</strong> 40.000 € (el banco financia 160.000 €)<br />
+              • <strong>ITP/IVA:</strong> 12.000-20.000 € (6-10% según CCAA y si es nueva/usada)<br />
+              • <strong>Notaría + Registro:</strong> 1.500-2.000 €<br />
+              • <strong>Gestoría:</strong> 600-800 €<br />
+              • <strong>Tasación:</strong> 300-400 €<br />
+              • <strong>TOTAL NECESARIO:</strong> ~54.000-63.000 € (27-31% del precio)
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Consejo:</strong> Reserva 5.000-10.000 € adicionales como colchón para imprevistos
+              (muebles, pequeñas reformas, comunidad de propietarios del primer mes).
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Puedo cambiar mi hipoteca de banco (subrogación)?</h3>
+            <p>
+              Sí, es posible y GRATIS desde 2019 (Ley de Crédito Inmobiliario). El proceso:
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Pasos para subrogar:</strong><br />
+              1. Solicita ofertas vinculantes en otros bancos (mínimo 3)<br />
+              2. Informa a tu banco actual: tienen 15 días para mejorar condiciones<br />
+              3. Si no mejoran o no es suficiente, acepta la mejor oferta externa<br />
+              4. El nuevo banco paga al antiguo y tu hipoteca se "traslada"<br />
+              5. <strong>Gastos:</strong> Solo notaría (~500-800 €), el resto lo paga el banco
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Cuándo merece la pena:</strong> Si reduces el TIN más de 0.5% y te quedan
+              más de 10 años de hipoteca. Ahorro potencial: 10.000-30.000 € en total.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Qué pasa si suben los tipos de interés en una variable?</h3>
+            <p>
+              En hipotecas variables, tu cuota se revisa cada 6 o 12 meses según el Euríbor.
+              <strong>Ejemplo real:</strong>
+            </p>
+            <p className={styles.faqExample}>
+              • <strong>Situación inicial:</strong> Hipoteca de 150.000 € a 25 años, Euríbor 1% + diferencial 0.8% = 1.8% TIN<br />
+              • <strong>Cuota inicial:</strong> ~625 €/mes<br />
+              <br />
+              <strong>Escenario 1 - Euríbor sube a 3%:</strong><br />
+              • Nuevo TIN: 3.8% (3% + 0.8%)<br />
+              • Nueva cuota: ~800 €/mes (+175 €/mes = +28%)<br />
+              <br />
+              <strong>Escenario 2 - Euríbor baja a -0.5%:</strong><br />
+              • Nuevo TIN: 0.8% (-0.5% + 0.8%, con suelo en 0%)<br />
+              • Nueva cuota: ~540 €/mes (-85 €/mes = -14%)
+            </p>
+            <p className={styles.faqTip}>
+              ⚠️ <strong>Protección:</strong> Muchos bancos ofrecen "seguros de tipos" que limitan
+              las subidas (caps) a cambio de renunciar a bajadas (floors). Evalúa si te compensa.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Conviene hacer amortizaciones anticipadas?</h3>
+            <p>
+              Sí, <strong>especialmente en los primeros años</strong> de la hipoteca, cuando pagas más intereses.
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Ejemplo práctico:</strong><br />
+              Hipoteca de 160.000 € a 25 años al 3.5% TIN (cuota ~800 €/mes).<br />
+              <br />
+              <strong>Opción A - Amortizar 10.000 € en el año 5:</strong><br />
+              • Ahorras ~22.000 € en intereses totales<br />
+              • Reduces el plazo en 2 años (terminas en 23 años)<br />
+              <br />
+              <strong>Opción B - Amortizar 10.000 € en el año 15:</strong><br />
+              • Ahorras ~8.000 € en intereses totales<br />
+              • Reduces el plazo en 1 año (terminas en 24 años)
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Estrategia óptima:</strong> Si puedes, amortiza pequeñas cantidades (3.000-5.000 €)
+              cada 2-3 años en lugar de esperar a acumular mucho. Elige reducir PLAZO en lugar de cuota
+              para ahorrar más intereses.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Qué comisiones puedo negociar o evitar?</h3>
+            <p>
+              Hay comisiones obligatorias y otras negociables. Lista completa:
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Comisiones OBLIGATORIAS (no puedes evitarlas):</strong><br />
+              • Notaría: ~1.000-1.500 € (fijado por arancel)<br />
+              • Registro de la Propiedad: ~400-600 € (fijado por arancel)<br />
+              • Gestoría: ~600-800 € (libre, puedes elegir la tuya)<br />
+              • Tasación: ~300-400 € (obligatoria, elige la más barata)<br />
+              <br />
+              <strong>Comisiones NEGOCIABLES (intenta reducirlas):</strong><br />
+              • Comisión de apertura: 0-2% del capital (¡negocia que la eliminen!)<br />
+              • Comisión estudio: ~300-500 € (muchos bancos la quitan si domicilias nómina)<br />
+              • Seguros vinculados: Variable (compara con aseguradoras externas)
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Truco de negociación:</strong> Lleva ofertas de otros bancos. Si el Banco A
+              te cobra 1% de apertura (1.600 €) y el Banco B 0%, muéstraselo al A. Muchos aceptan
+              igualarlo para no perder el cliente.
+            </p>
+          </div>
+
+          {/* Mejores prácticas */}
+          <h2>Mejores prácticas para tu hipoteca</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Simula antes de buscar piso</h4>
+              <p>Calcula tu capacidad de compra ANTES de enamorarte de un piso. Evitarás decepciones y negociarás mejor sabiendo tu límite.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Compara TAE, no TIN</h4>
+              <p>La TAE incluye comisiones y seguros. Un TIN de 3% con TAE 3.8% puede ser peor que un TIN 3.2% con TAE 3.5%.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Negocia productos vinculados</h4>
+              <p>No aceptes todo el "pack". Calcula si los seguros obligatorios compensan el diferencial reducido. A veces es mejor pagar 0.2% más sin vinculaciones.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Lee cláusulas de penalización</h4>
+              <p>Verifica la comisión por amortización anticipada (máximo 0.15% en fijas, gratis en variables tras 5 años). Evita cláusulas suelo abusivas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Mantén un fondo de emergencia</h4>
+              <p>Tras pagar entrada y gastos, conserva 3-6 meses de gastos en ahorro líquido. Imprevistos (paro, reparaciones) no deben ponerte en riesgo de impago.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Revisa tu hipoteca cada 2 años</h4>
+              <p>Compara ofertas del mercado. Si encuentras mejores condiciones, negocia con tu banco o subroga. El ahorro acumulado puede superar los 20.000 €.</p>
+            </div>
+          </div>
+
+          {/* Advertencias */}
+          <div className={styles.warningBox}>
+            <h3>⚠️ Errores comunes que debes evitar</h3>
+            <ul>
+              <li><strong>Apurar toda tu capacidad de ahorro en la entrada:</strong> Necesitas colchón post-compra para imprevistos.</li>
+              <li><strong>No leer el contrato completo antes de firmar:</strong> Las cláusulas en letra pequeña pueden costarte miles de euros.</li>
+              <li><strong>Aceptar la primera oferta sin negociar:</strong> Los bancos SIEMPRE tienen margen de mejora. Pide reducción de diferencial.</li>
+              <li><strong>Ignorar gastos ocultos (seguros, productos vinculados):</strong> Suma TODO al calcular el coste real mensual.</li>
+              <li><strong>Elegir variable sin colchón financiero:</strong> Si tu ratio ya es del 35%, una subida del Euríbor puede ahogarte.</li>
+              <li><strong>No solicitar ofertas vinculantes:</strong> Las simulaciones orales no valen. Exige documento firmado con condiciones exactas.</li>
+            </ul>
           </div>
         </section>
       </EducationalSection>
