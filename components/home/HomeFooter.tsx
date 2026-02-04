@@ -9,7 +9,7 @@ export default function HomeFooter() {
       <div className={styles.container}>
         {/* Copyright y descripción */}
         <div className={styles.mainInfo}>
-          <p className={styles.copyright}>© 2025 meskeIA - Biblioteca de Aplicaciones Web Gratuitas</p>
+          <p className={styles.copyright}>© 2026 meskeIA - Biblioteca de Aplicaciones Web Gratuitas</p>
           <p className={styles.tagline}>Aplicaciones desarrolladas para simplificar tu día a día</p>
         </div>
 
