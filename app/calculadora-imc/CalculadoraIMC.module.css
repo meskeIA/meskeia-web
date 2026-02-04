@@ -951,3 +951,423 @@
     min-width: 500px;
   }
 }
+
+/* === NUEVAS SECCIONES PROFESIONALES === */
+
+/* Párrafo Introductorio */
+.introParagraph {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-lg);
+  text-align: left;
+}
+
+/* === INDICADOR VISUAL DE RANGOS IMC === */
+.rangoVisualContainer {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.rangoVisualBarra {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  margin-bottom: var(--spacing-md);
+}
+
+.segmentoBarra {
+  min-height: 80px;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.segmentoBarra:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.segmentoBarra[data-tipo="bajo"] {
+  background: linear-gradient(135deg, #3498db 0%, #5dade2 100%);
+  color: white;
+}
+
+.segmentoBarra[data-tipo="normal"] {
+  background: linear-gradient(135deg, #27ae60 0%, #52be80 100%);
+  color: white;
+}
+
+.segmentoBarra[data-tipo="sobrepeso"] {
+  background: linear-gradient(135deg, #f39c12 0%, #f5b041 100%);
+  color: white;
+}
+
+.segmentoBarra[data-tipo="obesidad1"] {
+  background: linear-gradient(135deg, #e67e22 0%, #eb984e 100%);
+  color: white;
+}
+
+.segmentoBarra[data-tipo="obesidad2"] {
+  background: linear-gradient(135deg, #e74c3c 0%, #ec7063 100%);
+  color: white;
+}
+
+.segmentoBarra[data-tipo="obesidad3"] {
+  background: linear-gradient(135deg, #c0392b 0%, #cd6155 100%);
+  color: white;
+}
+
+.segmentoLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.segmentoNombre {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* === TABLA WHO EXPANDIDA === */
+.tablaWHOExpandida {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.rangoRow {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  border: 2px solid;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.rangoRow:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateX(4px);
+}
+
+.rangoRow[data-tipo="bajo"] {
+  border-color: #3498db;
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(93, 173, 226, 0.05) 100%);
+}
+
+.rangoRow[data-tipo="normal"] {
+  border-color: #27ae60;
+  background: linear-gradient(135deg, rgba(39, 174, 96, 0.05) 0%, rgba(82, 190, 128, 0.05) 100%);
+}
+
+.rangoRow[data-tipo="sobrepeso"] {
+  border-color: #f39c12;
+  background: linear-gradient(135deg, rgba(243, 156, 18, 0.05) 0%, rgba(245, 176, 65, 0.05) 100%);
+}
+
+.rangoRow[data-tipo="obesidad1"] {
+  border-color: #e67e22;
+  background: linear-gradient(135deg, rgba(230, 126, 34, 0.05) 0%, rgba(235, 152, 78, 0.05) 100%);
+}
+
+.rangoRow[data-tipo="obesidad2"] {
+  border-color: #e74c3c;
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.05) 0%, rgba(236, 112, 99, 0.05) 100%);
+}
+
+.rangoRow[data-tipo="obesidad3"] {
+  border-color: #c0392b;
+  background: linear-gradient(135deg, rgba(192, 57, 43, 0.05) 0%, rgba(205, 97, 85, 0.05) 100%);
+}
+
+.rangoInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.rangoHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.rangoIcono {
+  font-size: 2rem;
+}
+
+.rangoHeader h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.rangoDetalle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.rangoDetalle p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.rangoDetalle strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* === GUÍA PASO A PASO === */
+.stepsGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.stepItem {
+  display: flex;
+  gap: var(--spacing-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.stepItem:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stepNumber {
+  min-width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.stepContent strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.stepContent a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.stepContent a:hover {
+  color: var(--secondary);
+  text-decoration: underline;
+}
+
+/* === CAJA DE ADVERTENCIAS === */
+.advertenciaBox {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+  border: 2px solid #ffc107;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.advertenciaBox h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-lg);
+  color: #f57c00;
+  text-align: center;
+}
+
+.advertenciaContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.advertenciaItem {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.advertenciaItem:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.advertenciaItem h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.advertenciaItem p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.advertenciaItem strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* FAQ con formato de listas */
+.faqItem ul {
+  margin: var(--spacing-sm) 0;
+  padding-left: var(--spacing-xl);
+}
+
+.faqItem ul li {
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.6;
+}
+
+/* === DARK MODE PARA NUEVAS SECCIONES === */
+[data-theme='dark'] .rangoVisualContainer {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .rangoRow[data-tipo="bajo"] {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(93, 173, 226, 0.1) 100%);
+}
+
+[data-theme='dark'] .rangoRow[data-tipo="normal"] {
+  background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(82, 190, 128, 0.1) 100%);
+}
+
+[data-theme='dark'] .rangoRow[data-tipo="sobrepeso"] {
+  background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, rgba(245, 176, 65, 0.1) 100%);
+}
+
+[data-theme='dark'] .rangoRow[data-tipo="obesidad1"] {
+  background: linear-gradient(135deg, rgba(230, 126, 34, 0.1) 0%, rgba(235, 152, 78, 0.1) 100%);
+}
+
+[data-theme='dark'] .rangoRow[data-tipo="obesidad2"] {
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(236, 112, 99, 0.1) 100%);
+}
+
+[data-theme='dark'] .rangoRow[data-tipo="obesidad3"] {
+  background: linear-gradient(135deg, rgba(192, 57, 43, 0.1) 0%, rgba(205, 97, 85, 0.1) 100%);
+}
+
+[data-theme='dark'] .stepItem {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .advertenciaBox {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 152, 0, 0.15) 100%);
+  border-color: rgba(255, 193, 7, 0.5);
+}
+
+[data-theme='dark'] .advertenciaBox h3 {
+  color: #ffc107;
+}
+
+[data-theme='dark'] .advertenciaItem {
+  background: var(--hover);
+  border-color: var(--border);
+}
+
+/* === RESPONSIVE NUEVAS SECCIONES === */
+@media (max-width: 1024px) {
+  .rangoVisualBarra {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .advertenciaContent {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .rangoVisualBarra {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stepItem {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .stepNumber {
+    min-width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .advertenciaContent {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .rangoVisualBarra {
+    grid-template-columns: 1fr;
+  }
+
+  .segmentoBarra {
+    min-height: 60px;
+  }
+
+  .segmentoLabel {
+    font-size: 0.75rem;
+  }
+
+  .segmentoNombre {
+    font-size: 0.7rem;
+  }
+}

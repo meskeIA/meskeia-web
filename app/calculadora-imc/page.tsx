@@ -674,85 +674,520 @@ export default function CalculadoraIMCPage() {
       </DisclaimerCard>
 
       <EducationalSection
-        title="¿Quieres aprender más sobre el IMC?"
-        subtitle="Descubre qué significa tu resultado, sus limitaciones y cómo mejorar tu salud"
+        title="📚 ¿Quieres aprender más sobre el IMC?"
+        subtitle="Descubre cómo interpretar tu resultado, estrategias para alcanzar un peso saludable y respuestas a las preguntas más frecuentes"
+        icon="📚"
       >
+        {/* Indicador Visual de Rangos IMC */}
         <section className={styles.guideSection}>
-          <h2>Conceptos Clave</h2>
+          <h2>📊 Escala Visual de Rangos IMC (OMS)</h2>
+          <p className={styles.introParagraph}>
+            Comprende dónde te sitúas en la clasificación internacional de índice de masa corporal:
+          </p>
+
+          <div className={styles.rangoVisualContainer}>
+            <div className={styles.rangoVisualBarra}>
+              {/* Segmentos de la barra */}
+              <div className={styles.segmentoBarra} data-tipo="bajo">
+                <span className={styles.segmentoLabel}>&lt;18.5</span>
+                <span className={styles.segmentoNombre}>Bajo peso</span>
+              </div>
+              <div className={styles.segmentoBarra} data-tipo="normal">
+                <span className={styles.segmentoLabel}>18.5-24.9</span>
+                <span className={styles.segmentoNombre}>Normal</span>
+              </div>
+              <div className={styles.segmentoBarra} data-tipo="sobrepeso">
+                <span className={styles.segmentoLabel}>25-29.9</span>
+                <span className={styles.segmentoNombre}>Sobrepeso</span>
+              </div>
+              <div className={styles.segmentoBarra} data-tipo="obesidad1">
+                <span className={styles.segmentoLabel}>30-34.9</span>
+                <span className={styles.segmentoNombre}>Obesidad I</span>
+              </div>
+              <div className={styles.segmentoBarra} data-tipo="obesidad2">
+                <span className={styles.segmentoLabel}>35-39.9</span>
+                <span className={styles.segmentoNombre}>Obesidad II</span>
+              </div>
+              <div className={styles.segmentoBarra} data-tipo="obesidad3">
+                <span className={styles.segmentoLabel}>≥40</span>
+                <span className={styles.segmentoNombre}>Obesidad III</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Tabla WHO Expandida */}
+        <section className={styles.guideSection}>
+          <h2>🏥 Clasificación Detallada OMS</h2>
+          <p className={styles.introParagraph}>
+            Tabla completa con contexto médico, riesgos asociados y recomendaciones por rango:
+          </p>
+
+          <div className={styles.tablaWHOExpandida}>
+            <div className={styles.rangoRow} data-tipo="bajo">
+              <div className={styles.rangoInfo}>
+                <div className={styles.rangoHeader}>
+                  <span className={styles.rangoIcono}>⚠️</span>
+                  <h4>Bajo Peso (IMC &lt; 18.5)</h4>
+                </div>
+                <div className={styles.rangoDetalle}>
+                  <p><strong>Contexto:</strong> Peso insuficiente para la altura. Puede indicar desnutrición, pérdida de masa muscular o condiciones médicas subyacentes.</p>
+                  <p><strong>Riesgos asociados:</strong> Debilidad del sistema inmune, osteoporosis, anemia, fatiga crónica, problemas de fertilidad.</p>
+                  <p><strong>Recomendación:</strong> Consulta con nutricionista para plan de aumento de peso saludable. Evalúa causas subyacentes con médico.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.rangoRow} data-tipo="normal">
+              <div className={styles.rangoInfo}>
+                <div className={styles.rangoHeader}>
+                  <span className={styles.rangoIcono}>✅</span>
+                  <h4>Peso Normal (IMC 18.5 - 24.9)</h4>
+                </div>
+                <div className={styles.rangoDetalle}>
+                  <p><strong>Contexto:</strong> Rango considerado saludable para la mayoría de adultos. Asociado con menor riesgo de enfermedades crónicas.</p>
+                  <p><strong>Beneficios:</strong> Menor riesgo cardiovascular, diabetes tipo 2, hipertensión. Mejor calidad de vida y movilidad.</p>
+                  <p><strong>Recomendación:</strong> Mantén estilo de vida activo, alimentación equilibrada y controles médicos regulares.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.rangoRow} data-tipo="sobrepeso">
+              <div className={styles.rangoInfo}>
+                <div className={styles.rangoHeader}>
+                  <span className={styles.rangoIcono}>⚡</span>
+                  <h4>Sobrepeso (IMC 25 - 29.9)</h4>
+                </div>
+                <div className={styles.rangoDetalle}>
+                  <p><strong>Contexto:</strong> Peso superior al recomendado. Incrementa riesgo de enfermedades crónicas moderadamente.</p>
+                  <p><strong>Riesgos asociados:</strong> Mayor probabilidad de hipertensión, colesterol elevado, prediabetes, apnea del sueño.</p>
+                  <p><strong>Recomendación:</strong> Reducción gradual de peso (5-10% inicial), actividad física regular, revisión de hábitos alimenticios.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.rangoRow} data-tipo="obesidad1">
+              <div className={styles.rangoInfo}>
+                <div className={styles.rangoHeader}>
+                  <span className={styles.rangoIcono}>🔶</span>
+                  <h4>Obesidad Grado I (IMC 30 - 34.9)</h4>
+                </div>
+                <div className={styles.rangoDetalle}>
+                  <p><strong>Contexto:</strong> Obesidad leve. Riesgo significativamente elevado de complicaciones metabólicas y cardiovasculares.</p>
+                  <p><strong>Riesgos asociados:</strong> Diabetes tipo 2, enfermedades cardíacas, artritis, problemas hepáticos (hígado graso).</p>
+                  <p><strong>Recomendación:</strong> Intervención médica/nutricional. Plan estructurado de pérdida de peso con seguimiento profesional.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.rangoRow} data-tipo="obesidad2">
+              <div className={styles.rangoInfo}>
+                <div className={styles.rangoHeader}>
+                  <span className={styles.rangoIcono}>🔴</span>
+                  <h4>Obesidad Grado II (IMC 35 - 39.9)</h4>
+                </div>
+                <div className={styles.rangoDetalle}>
+                  <p><strong>Contexto:</strong> Obesidad moderada a severa. Alto riesgo de enfermedades graves y reducción de esperanza de vida.</p>
+                  <p><strong>Riesgos asociados:</strong> Insuficiencia cardíaca, accidente cerebrovascular, cáncer (colon, mama), problemas respiratorios severos.</p>
+                  <p><strong>Recomendación:</strong> Tratamiento médico intensivo. Considerar intervenciones avanzadas (cirugía bariátrica) bajo supervisión.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.rangoRow} data-tipo="obesidad3">
+              <div className={styles.rangoInfo}>
+                <div className={styles.rangoHeader}>
+                  <span className={styles.rangoIcono}>🚨</span>
+                  <h4>Obesidad Grado III (IMC ≥ 40)</h4>
+                </div>
+                <div className={styles.rangoDetalle}>
+                  <p><strong>Contexto:</strong> Obesidad mórbida. Riesgo extremo de mortalidad prematura y complicaciones graves de salud.</p>
+                  <p><strong>Riesgos asociados:</strong> Alto riesgo de muerte súbita, insuficiencia multiorgánica, complicaciones quirúrgicas, discapacidad física.</p>
+                  <p><strong>Recomendación:</strong> Atención médica urgente y especializada. Programa integral multidisciplinar (endocrino, nutrición, psicología).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>🎯 Guía: Cómo Mejorar tu IMC de Forma Saludable</h2>
+          <p className={styles.introParagraph}>
+            6 pasos fundamentales para alcanzar y mantener un peso saludable sin sacrificar tu bienestar:
+          </p>
+
+          <div className={styles.stepsGuide}>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Establece Objetivos Realistas</h4>
+                <p>
+                  <strong>Meta inicial:</strong> Perder 5-10% de tu peso actual en 3-6 meses (ej: 5 kg si pesas 100 kg).
+                  Los cambios graduales son más sostenibles y seguros. Evita dietas extremas que prometen resultados rápidos.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Déficit Calórico Moderado</h4>
+                <p>
+                  <strong>Reducción recomendada:</strong> 300-500 calorías diarias por debajo de tu gasto.
+                  No bajes de 1.200 kcal/día (mujeres) o 1.500 kcal/día (hombres) sin supervisión médica.
+                  Usa nuestra <a href="/calculadora-calorias/" target="_blank">Calculadora de Calorías</a> para estimar tu gasto.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Alimentación Equilibrada</h4>
+                <p>
+                  <strong>Prioriza:</strong> Verduras (50% del plato), proteínas magras (25%), carbohidratos complejos (25%).
+                  Limita azúcares añadidos, ultraprocesados y grasas saturadas. Come cada 3-4 horas para mantener metabolismo activo.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Ejercicio Regular Combinado</h4>
+                <p>
+                  <strong>Cardio:</strong> 150 min/semana de actividad moderada (caminar rápido, bici, natación).
+                  <strong>Fuerza:</strong> 2-3 sesiones/semana de pesas o ejercicios corporales para preservar masa muscular.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Hábitos de Sueño y Estrés</h4>
+                <p>
+                  <strong>Duerme 7-9 horas:</strong> La privación de sueño aumenta hormonas del hambre (grelina).
+                  <strong>Maneja el estrés:</strong> El cortisol elevado favorece acumulación de grasa abdominal. Practica mindfulness o yoga.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Seguimiento y Ajustes</h4>
+                <p>
+                  <strong>Monitorea semanalmente:</strong> Peso, medidas corporales, cómo te sientes física y emocionalmente.
+                  Ajusta plan si no ves progreso en 3-4 semanas. Celebra pequeños logros para mantener motivación.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Grid de Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>💡 Mejores Prácticas para Gestión de Peso</h2>
+
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📊 ¿Qué es el IMC?</h4>
+              <h4>🥗 Nutrición Inteligente</h4>
               <p>
-                El Índice de Masa Corporal es una medida que relaciona el peso con la altura.
-                Fue desarrollado por Adolphe Quetelet en el siglo XIX y es utilizado por la OMS
-                como indicador de referencia para clasificar el peso corporal.
+                Cocina en casa para controlar ingredientes. Lee etiquetas nutricionales.
+                Usa plato pequeño (engaño visual). Mastica despacio (20-30 minutos por comida).
               </p>
             </div>
+
             <div className={styles.contentCard}>
-              <h4>⚖️ Limitaciones del IMC</h4>
+              <h4>💧 Hidratación Correcta</h4>
               <p>
-                El IMC no distingue entre masa muscular y grasa corporal. Un deportista con
-                mucha masa muscular puede tener un IMC alto sin tener exceso de grasa.
-                Tampoco considera la distribución de grasa (más peligrosa en el abdomen).
+                Bebe 2-3 litros de agua al día. Toma 1 vaso antes de cada comida (aumenta saciedad).
+                Evita bebidas azucaradas y alcohol (calorías vacías).
               </p>
             </div>
+
             <div className={styles.contentCard}>
-              <h4>📏 Alternativas al IMC</h4>
+              <h4>📝 Diario Alimenticio</h4>
               <p>
-                Otros indicadores complementarios: perímetro de cintura (riesgo cardiovascular),
-                índice cintura-cadera, porcentaje de grasa corporal (bioimpedancia o pliegues
-                cutáneos), y el índice de masa grasa.
+                Registra lo que comes con apps (MyFitnessPal, Yazio). Aumenta consciencia de patrones.
+                Identifica triggers emocionales de ingesta.
               </p>
             </div>
+
             <div className={styles.contentCard}>
-              <h4>🎯 IMC según edad</h4>
+              <h4>🚶 Actividad Diaria</h4>
               <p>
-                En niños y adolescentes se usan percentiles específicos por edad y sexo.
-                En adultos mayores (+65 años), un IMC ligeramente superior (25-27) puede
-                ser protector. Los rangos estándar aplican principalmente a adultos 18-65 años.
+                Acumula 10.000 pasos diarios. Usa escaleras en vez de ascensor.
+                Camina después de comidas (mejora digestión y glucemia).
+              </p>
+            </div>
+
+            <div className={styles.contentCard}>
+              <h4>👥 Apoyo Social</h4>
+              <p>
+                Comparte objetivos con familia/amigos. Únete a grupos de apoyo.
+                Considera ayuda profesional (nutricionista, psicólogo).
+              </p>
+            </div>
+
+            <div className={styles.contentCard}>
+              <h4>⏰ Constancia &gt; Perfección</h4>
+              <p>
+                Permite comidas "trampa" 1 vez/semana (20% flexibilidad). No te castigues por errores.
+                Enfócate en tendencia a largo plazo, no fluctuaciones diarias.
               </p>
             </div>
           </div>
         </section>
 
+        {/* Caja de Advertencias */}
         <section className={styles.guideSection}>
-          <h2>Preguntas Frecuentes</h2>
+          <div className={styles.advertenciaBox}>
+            <h3>⚠️ Limitaciones del IMC que Debes Conocer</h3>
+            <div className={styles.advertenciaContent}>
+              <div className={styles.advertenciaItem}>
+                <h4>🏋️ No Distingue Músculo vs Grasa</h4>
+                <p>
+                  Atletas y personas musculosas pueden tener IMC "alto" (25-30) siendo saludables.
+                  La masa muscular pesa más que la grasa pero es metabólicamente beneficiosa.
+                  <strong>Solución:</strong> Complementa con % grasa corporal (bioimpedancia, plicómetro).
+                </p>
+              </div>
+
+              <div className={styles.advertenciaItem}>
+                <h4>👴 Varía Según Edad</h4>
+                <p>
+                  En adultos mayores (+65 años), IMC ligeramente superior (25-27) puede ser protector
+                  contra pérdida de masa ósea y muscular (sarcopenia).
+                  <strong>Recomendación:</strong> Consulta rangos ajustados por edad con tu médico.
+                </p>
+              </div>
+
+              <div className={styles.advertenciaItem}>
+                <h4>🤰 Embarazo y Lactancia</h4>
+                <p>
+                  El IMC no es válido durante gestación ni primeros 6 meses postparto.
+                  Ganancia de peso en embarazo depende de IMC previo (7-18 kg según caso).
+                  <strong>Importante:</strong> Sigue indicaciones de tu obstetra/matrona.
+                </p>
+              </div>
+
+              <div className={styles.advertenciaItem}>
+                <h4>🧬 Diferencias Étnicas</h4>
+                <p>
+                  Poblaciones asiáticas tienen mayor riesgo metabólico con IMC más bajo (sobrepeso ≥23).
+                  Personas de origen africano pueden tener más masa muscular y ósea.
+                  <strong>Contexto:</strong> Los rangos OMS son orientativos, no absolutos.
+                </p>
+              </div>
+
+              <div className={styles.advertenciaItem}>
+                <h4>📏 No Mide Distribución de Grasa</h4>
+                <p>
+                  La grasa abdominal (visceral) es más peligrosa que la periférica (caderas/muslos).
+                  Personas con IMC "normal" pero cintura ancha pueden tener riesgo cardiovascular.
+                  <strong>Medida adicional:</strong> Perímetro de cintura (&lt;94 cm hombres, &lt;80 cm mujeres).
+                </p>
+              </div>
+
+              <div className={styles.advertenciaItem}>
+                <h4>🧒 Niños y Adolescentes</h4>
+                <p>
+                  En menores de 18 años se usan percentiles ajustados por edad y sexo, no valores absolutos.
+                  El crecimiento introduce variabilidad que el IMC adulto no contempla.
+                  <strong>Herramienta correcta:</strong> Tablas de crecimiento pediátricas (CDC, OMS).
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Expandido */}
+        <section className={styles.guideSection}>
+          <h2>❓ Preguntas Frecuentes (FAQ)</h2>
+
           <div className={styles.faqGrid}>
             <details className={styles.faqItem}>
-              <summary>¿Por qué mi IMC dice sobrepeso si estoy musculado?</summary>
+              <summary>¿Qué es el IMC y cómo se calcula?</summary>
               <p>
-                El IMC no diferencia entre masa muscular y grasa. El músculo pesa más que la
-                grasa por volumen, por lo que deportistas con mucha masa muscular pueden tener
-                un IMC elevado sin tener exceso de grasa corporal. En estos casos, es mejor
-                medir el porcentaje de grasa corporal.
+                El Índice de Masa Corporal (IMC) es una medida que relaciona tu peso con tu altura.
+                Se calcula dividiendo tu peso en kilogramos entre el cuadrado de tu altura en metros (kg/m²).
+              </p>
+              <p><strong>Ejemplo práctico:</strong></p>
+              <p>
+                Si pesas 70 kg y mides 1,75 m:<br/>
+                IMC = 70 / (1,75)² = 70 / 3,0625 = 22,86 → Peso Normal ✅
+              </p>
+              <p>
+                Si pesas 85 kg y mides 1,68 m:<br/>
+                IMC = 85 / (1,68)² = 85 / 2,8224 = 30,12 → Obesidad I 🔶
               </p>
             </details>
+
             <details className={styles.faqItem}>
-              <summary>¿Es el mismo IMC ideal para hombres y mujeres?</summary>
+              <summary>¿El IMC es la mejor medida de salud?</summary>
               <p>
-                Los rangos de la OMS son iguales para ambos sexos, pero fisiológicamente las
-                mujeres tienen mayor porcentaje de grasa corporal de forma natural. Algunos
-                expertos sugieren que mujeres pueden estar saludables con un IMC ligeramente
-                mayor, mientras que hombres con un IMC en el límite superior del rango normal
-                podrían tener exceso de grasa.
+                El IMC es una herramienta útil y fácil de calcular, pero tiene limitaciones importantes.
+                <strong>No distingue entre masa muscular y grasa corporal</strong>, por lo que puede ser engañoso
+                en atletas, personas mayores, embarazadas o con condiciones médicas específicas.
+              </p>
+              <p><strong>Ejemplo ilustrativo:</strong></p>
+              <p>
+                Un culturista de 90 kg y 1,80 m tendría IMC = 27,8 (Sobrepeso), pero su % de grasa
+                corporal podría ser solo 10% (excelente). Por el contrario, una persona sedentaria
+                con IMC 23 (Normal) podría tener 30% de grasa corporal (alto).
+              </p>
+              <p>
+                <strong>Para evaluación completa:</strong> Combina IMC con % grasa corporal, perímetro
+                de cintura, análisis de sangre (colesterol, glucosa) y consulta médica.
               </p>
             </details>
+
+            <details className={styles.faqItem}>
+              <summary>¿Qué rango de IMC se considera saludable?</summary>
+              <p>
+                Según la OMS, un IMC entre <strong>18,5 y 24,9</strong> se considera peso normal o saludable
+                para la mayoría de adultos de 18 a 65 años. Sin embargo, estos valores pueden variar:
+              </p>
+              <p><strong>Factores de ajuste:</strong></p>
+              <ul>
+                <li><strong>Edad:</strong> Adultos mayores (+65) pueden beneficiarse de IMC 25-27</li>
+                <li><strong>Etnia:</strong> Asiáticos tienen mayor riesgo con IMC ≥23</li>
+                <li><strong>Composición corporal:</strong> Deportistas con mucha masa muscular</li>
+                <li><strong>Historial familiar:</strong> Genética de obesidad o diabetes</li>
+              </ul>
+              <p>
+                <strong>Recomendación:</strong> Usa el rango OMS como guía inicial, pero considera
+                tu contexto individual con ayuda profesional.
+              </p>
+            </details>
+
             <details className={styles.faqItem}>
               <summary>¿Cómo puedo mejorar mi IMC de forma saludable?</summary>
               <p>
-                Para perder peso: déficit calórico moderado (300-500 kcal/día), aumentar
-                actividad física, priorizar proteínas y vegetales. Para ganar peso: superávit
-                calórico con alimentos nutritivos y ejercicio de fuerza. En ambos casos,
-                cambios graduales y sostenibles son más efectivos que dietas extremas.
+                Para mejorar tu IMC de forma saludable y sostenible, sigue estos principios clave:
+              </p>
+              <p><strong>Alimentación (70% del éxito):</strong></p>
+              <ul>
+                <li>Déficit calórico moderado (300-500 kcal/día por debajo de tu gasto)</li>
+                <li>Dieta rica en verduras, frutas, proteínas magras y granos integrales</li>
+                <li>Evita ultraprocesados, azúcares añadidos y bebidas calóricas</li>
+                <li>Come cada 3-4 horas en porciones controladas</li>
+              </ul>
+              <p><strong>Ejercicio (30% del éxito):</strong></p>
+              <ul>
+                <li>150 min/semana de cardio moderado (caminar, nadar, bici)</li>
+                <li>2-3 sesiones/semana de entrenamiento de fuerza (preserva músculo)</li>
+                <li>Mantén actividad diaria (10.000 pasos, escaleras, movimiento)</li>
+              </ul>
+              <p>
+                <strong>Hábitos de soporte:</strong> Duerme 7-9 horas, bebe 2-3L agua al día,
+                maneja estrés, registra progreso. Consulta siempre con profesionales (nutricionista, médico).
               </p>
             </details>
+
             <details className={styles.faqItem}>
-              <summary>¿Cada cuánto debo calcular mi IMC?</summary>
+              <summary>¿Cuánto tiempo tarda en cambiar mi IMC?</summary>
               <p>
-                Para seguimiento general, una vez al mes es suficiente. Si estás en un programa
-                de pérdida o ganancia de peso, puedes pesarte semanalmente (siempre a la misma
-                hora, idealmente por la mañana en ayunas). Evita pesarte diariamente, ya que las
-                fluctuaciones normales pueden ser desmotivantes.
+                El tiempo depende de tu objetivo y situación inicial. Como referencia:
+              </p>
+              <p><strong>Pérdida de peso saludable:</strong></p>
+              <ul>
+                <li><strong>Ritmo recomendado:</strong> 0,5 - 1 kg/semana (2-4 kg/mes)</li>
+                <li><strong>Cambio de 1 punto de IMC:</strong> ~2,5-3,5 kg (varía según altura)</li>
+                <li><strong>Ejemplo:</strong> Pasar de IMC 28 a 24 (4 puntos) puede llevar 3-6 meses</li>
+              </ul>
+              <p><strong>Aumento de peso saludable:</strong></p>
+              <ul>
+                <li><strong>Ritmo recomendado:</strong> 0,5 kg/semana (enfocado en músculo)</li>
+                <li><strong>Requiere:</strong> Superávit calórico +300-500 kcal + entrenamiento de fuerza</li>
+              </ul>
+              <p>
+                <strong>Importante:</strong> Los cambios rápidos (pérdida &gt;1 kg/semana) suelen incluir
+                pérdida de masa muscular y agua, no solo grasa. Sé paciente y prioriza salud sobre velocidad.
+              </p>
+            </details>
+
+            <details className={styles.faqItem}>
+              <summary>¿Qué hago si mi IMC indica obesidad?</summary>
+              <p>
+                Si tu IMC está en rango de obesidad (≥30), sigue estos pasos:
+              </p>
+              <p><strong>1. Evaluación médica completa:</strong></p>
+              <p>
+                Consulta con tu médico de cabecera para descartar condiciones subyacentes (hipotiroidismo,
+                síndrome de ovario poliquístico, medicamentos que causan ganancia de peso).
+                Solicita análisis de sangre: glucosa, colesterol, función hepática, tiroides.
+              </p>
+              <p><strong>2. Derivación a especialistas:</strong></p>
+              <ul>
+                <li><strong>Endocrino:</strong> Evalúa metabolismo y posibles tratamientos farmacológicos</li>
+                <li><strong>Nutricionista:</strong> Plan personalizado de alimentación</li>
+                <li><strong>Psicólogo:</strong> Aborda relación emocional con comida (ansiedad, compulsión)</li>
+              </ul>
+              <p><strong>3. Opciones de tratamiento:</strong></p>
+              <ul>
+                <li><strong>IMC 30-35:</strong> Cambios de estilo de vida supervisados</li>
+                <li><strong>IMC 35-40:</strong> Considerar medicación (orlistat, liraglutida)</li>
+                <li><strong>IMC ≥40 (o ≥35 con comorbilidades):</strong> Evaluar cirugía bariátrica</li>
+              </ul>
+              <p>
+                <strong>No estás solo:</strong> La obesidad es una enfermedad crónica multifactorial.
+                Buscar ayuda profesional no es señal de debilidad, es el primer paso hacia mejorar tu salud.
+              </p>
+            </details>
+
+            <details className={styles.faqItem}>
+              <summary>¿Debo usar IMC si hago mucho ejercicio?</summary>
+              <p>
+                Si entrenas regularmente con pesas o practicas deportes de alta intensidad,
+                el IMC puede no reflejar tu estado de salud real.
+              </p>
+              <p><strong>Por qué el IMC falla en atletas:</strong></p>
+              <p>
+                La masa muscular es más densa que la grasa (1,06 g/cm³ vs 0,9 g/cm³). Un atleta
+                con 12% de grasa corporal puede tener IMC 27 (Sobrepeso) siendo muy saludable.
+                El IMC clasificaría erróneamente a culturistas, crossfiters, rugbiers como "obesos".
+              </p>
+              <p><strong>Alternativas recomendadas:</strong></p>
+              <ul>
+                <li><strong>Porcentaje de grasa corporal:</strong> Bioimpedancia, DEXA, plicometría</li>
+                <li><strong>Perímetro de cintura:</strong> &lt;94 cm (hombres), &lt;80 cm (mujeres)</li>
+                <li><strong>Ratio cintura/altura:</strong> Debe ser &lt;0,5 (ej: 90 cm cintura / 180 cm altura = 0,5)</li>
+                <li><strong>Progreso visual:</strong> Fotos mensuales y cómo te queda la ropa</li>
+              </ul>
+              <p>
+                <strong>Conclusión:</strong> Si entrenas fuerza 3+ veces/semana, usa % grasa corporal
+                como métrica principal. El IMC puede servir como dato complementario, pero no definitivo.
+              </p>
+            </details>
+
+            <details className={styles.faqItem}>
+              <summary>¿Es seguro usar calculadoras de IMC online?</summary>
+              <p>
+                Sí, las calculadoras de IMC online como esta son <strong>seguras y confiables</strong>
+                para obtener una estimación rápida. Funcionan con la fórmula estándar de la OMS
+                que ha sido validada en millones de personas.
+              </p>
+              <p><strong>Ventajas:</strong></p>
+              <ul>
+                <li>Cálculo instantáneo y preciso basado en estándar internacional</li>
+                <li>No requiere datos personales (todo se procesa en tu navegador)</li>
+                <li>Acceso 24/7 sin coste ni cita médica</li>
+                <li>Incluye contexto educativo y recomendaciones generales</li>
+              </ul>
+              <p><strong>Limitaciones a considerar:</strong></p>
+              <ul>
+                <li>No sustituye evaluación médica personalizada</li>
+                <li>No detecta condiciones subyacentes (diabetes, hipertensión)</li>
+                <li>No ajusta por factores individuales (etnia, edad avanzada, embarazo)</li>
+              </ul>
+              <p>
+                <strong>Recomendación de uso:</strong> Utiliza esta calculadora como herramienta de
+                screening inicial. Si tu resultado indica bajo peso, sobrepeso u obesidad, o si tienes
+                dudas, consulta con un profesional sanitario para evaluación completa.
               </p>
             </details>
           </div>
