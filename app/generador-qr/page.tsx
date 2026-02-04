@@ -102,6 +102,7 @@ export default function GeneradorQRPage() {
   const [copiado, setCopiado] = useState(false);
   const [cargando, setCargando] = useState(false);
   const [tabActiva, setTabActiva] = useState<'contenido' | 'estilo' | 'logo'>('contenido');
+  const [htmlCode, setHtmlCode] = useState<string>('');
 
   // Referencias
   const qrRef = useRef<HTMLDivElement>(null);
@@ -332,13 +333,87 @@ export default function GeneradorQRPage() {
     }
   };
 
+  // Generar código HTML de implementación
+  const generarCodigoHTML = () => {
+    let codigo = '<!-- Código QR generado con meskeIA -->\n';
+
+    switch (tipoQR) {
+      case 'url':
+        codigo += '<!-- Añade este código donde quieras mostrar el QR -->\n';
+        codigo += '<div class="qr-container">\n';
+        codigo += '  <img src="/path/to/qr-code.png" alt="Escanea para visitar nuestro sitio" width="300" height="300" />\n';
+        codigo += '  <p>Escanea para visitar nuestro sitio</p>\n';
+        codigo += '</div>\n\n';
+        codigo += '<!-- También puedes añadir un enlace directo -->\n';
+        codigo += '<a href="' + urlInput + '" target="_blank">Visitar sitio web</a>';
+        break;
+      case 'wifi':
+        codigo += '<!-- Imprime este QR y colócalo cerca del router -->\n';
+        codigo += '<div class="qr-wifi">\n';
+        codigo += '  <h3>WiFi gratuito</h3>\n';
+        codigo += '  <img src="/path/to/qr-wifi.png" alt="Escanea para conectarte a WiFi" width="300" height="300" />\n';
+        codigo += '  <p>Escanea con tu cámara para conectarte automáticamente</p>\n';
+        codigo += '  <p class="red-info">Red: ' + configWifi.ssid + '</p>\n';
+        codigo += '</div>';
+        break;
+      case 'contacto':
+        codigo += '<!-- Tarjeta de visita digital -->\n';
+        codigo += '<div class="qr-vcard">\n';
+        codigo += '  <div class="info-contacto">\n';
+        codigo += '    <h3>' + configContacto.nombre + '</h3>\n';
+        if (configContacto.cargo) codigo += '    <p>' + configContacto.cargo + '</p>\n';
+        if (configContacto.empresa) codigo += '    <p>' + configContacto.empresa + '</p>\n';
+        codigo += '  </div>\n';
+        codigo += '  <img src="/path/to/qr-contacto.png" alt="Escanea para guardar contacto" width="200" height="200" />\n';
+        codigo += '  <p class="cta">Escanea para guardar mi contacto</p>\n';
+        codigo += '</div>';
+        break;
+      case 'email':
+        codigo += '<!-- Formulario de contacto rápido -->\n';
+        codigo += '<div class="qr-email">\n';
+        codigo += '  <h3>Contáctanos</h3>\n';
+        codigo += '  <img src="/path/to/qr-email.png" alt="Escanea para enviar email" width="250" height="250" />\n';
+        codigo += '  <p>Escanea para enviarnos un email directamente</p>\n';
+        codigo += '</div>';
+        break;
+      case 'telefono':
+        codigo += '<!-- Botón de llamada rápida -->\n';
+        codigo += '<div class="qr-telefono">\n';
+        codigo += '  <img src="/path/to/qr-telefono.png" alt="Escanea para llamar" width="200" height="200" />\n';
+        codigo += '  <p>Escanea para llamar</p>\n';
+        codigo += '  <a href="tel:' + telefonoInput + '" class="boton-llamar">O haz clic aquí</a>\n';
+        codigo += '</div>';
+        break;
+      case 'texto':
+        codigo += '<!-- QR con texto personalizado -->\n';
+        codigo += '<div class="qr-texto">\n';
+        codigo += '  <img src="/path/to/qr-texto.png" alt="Código QR" width="300" height="300" />\n';
+        codigo += '  <p>Escanea para ver el contenido</p>\n';
+        codigo += '</div>';
+        break;
+    }
+
+    setHtmlCode(codigo);
+  };
+
+  // Copiar código HTML al portapapeles
+  const copiarCodigoHTML = () => {
+    navigator.clipboard.writeText(htmlCode);
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
+  };
+
   // Regenerar QR automáticamente
   useEffect(() => {
     if (tieneContenido()) {
-      const timer = setTimeout(generarQR, 400);
+      const timer = setTimeout(() => {
+        generarQR();
+        generarCodigoHTML();
+      }, 400);
       return () => clearTimeout(timer);
     } else {
       setQrGenerado(false);
+      setHtmlCode('');
       if (qrRef.current) {
         qrRef.current.innerHTML = '';
       }
@@ -937,18 +1012,218 @@ export default function GeneradorQRPage() {
         </div>
       </div>
 
+      {/* Código HTML de implementación */}
+      {qrGenerado && htmlCode && (
+        <div className={styles.htmlSection}>
+          <h2>💻 Código de implementación</h2>
+          <p className={styles.htmlSubtitle}>
+            Copia este código HTML para usar tu QR en tu sitio web o aplicación
+          </p>
+          <div className={styles.codeContainer}>
+            <pre className={styles.codeBlock}>
+              <code>{htmlCode}</code>
+            </pre>
+            <button onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
+              {copiado ? '✅ Copiado' : '📋 Copiar código'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Preview en contexto */}
+      {qrGenerado && (
+        <div className={styles.contextPreviewSection}>
+          <h2>👀 Visualiza tu QR en contexto</h2>
+          <p className={styles.contextSubtitle}>
+            Así se verá tu código QR en diferentes situaciones reales
+          </p>
+
+          <div className={styles.contextGrid}>
+            {/* Preview en móvil */}
+            <div className={styles.contextCard}>
+              <h3>📱 En móvil</h3>
+              <div className={styles.phoneMockup}>
+                <div className={styles.phoneScreen}>
+                  <div className={styles.phoneQrArea}>
+                    <div className={styles.qrInPhone} ref={(el) => {
+                      if (el && qrRef.current) {
+                        const canvas = qrRef.current.querySelector('canvas');
+                        if (canvas) {
+                          const clone = canvas.cloneNode(true) as HTMLCanvasElement;
+                          clone.style.width = '120px';
+                          clone.style.height = '120px';
+                          el.innerHTML = '';
+                          el.appendChild(clone);
+                        }
+                      }
+                    }} />
+                    <p className={styles.phoneText}>
+                      {tipoQR === 'url' && 'Escanea para visitar'}
+                      {tipoQR === 'wifi' && 'Conéctate a WiFi'}
+                      {tipoQR === 'contacto' && 'Guardar contacto'}
+                      {tipoQR === 'email' && 'Enviar email'}
+                      {tipoQR === 'telefono' && 'Llamar ahora'}
+                      {tipoQR === 'texto' && 'Ver contenido'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview impreso */}
+            <div className={styles.contextCard}>
+              <h3>🖨️ Impreso</h3>
+              <div className={styles.printMockup}>
+                <div className={styles.printedCard}>
+                  <div className={styles.qrInPrint} ref={(el) => {
+                    if (el && qrRef.current) {
+                      const canvas = qrRef.current.querySelector('canvas');
+                      if (canvas) {
+                        const clone = canvas.cloneNode(true) as HTMLCanvasElement;
+                        clone.style.width = '100px';
+                        clone.style.height = '100px';
+                        el.innerHTML = '';
+                        el.appendChild(clone);
+                      }
+                    }
+                  }} />
+                  {tipoQR === 'wifi' && (
+                    <div className={styles.printInfo}>
+                      <strong>WiFi gratuito</strong>
+                      <span>Red: {configWifi.ssid}</span>
+                    </div>
+                  )}
+                  {tipoQR === 'contacto' && (
+                    <div className={styles.printInfo}>
+                      <strong>{configContacto.nombre}</strong>
+                      {configContacto.cargo && <span>{configContacto.cargo}</span>}
+                    </div>
+                  )}
+                  {tipoQR === 'url' && (
+                    <div className={styles.printInfo}>
+                      <strong>Visítanos online</strong>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Preview en tarjeta de visita */}
+            {tipoQR === 'contacto' && (
+              <div className={styles.contextCard}>
+                <h3>💳 Tarjeta de visita</h3>
+                <div className={styles.businessCard}>
+                  <div className={styles.cardLeft}>
+                    <h4>{configContacto.nombre}</h4>
+                    {configContacto.cargo && <p className={styles.cardCargo}>{configContacto.cargo}</p>}
+                    {configContacto.empresa && <p className={styles.cardEmpresa}>{configContacto.empresa}</p>}
+                    {configContacto.telefono && <p className={styles.cardContacto}>📞 {configContacto.telefono}</p>}
+                    {configContacto.email && <p className={styles.cardContacto}>📧 {configContacto.email}</p>}
+                  </div>
+                  <div className={styles.cardRight} ref={(el) => {
+                    if (el && qrRef.current) {
+                      const canvas = qrRef.current.querySelector('canvas');
+                      if (canvas) {
+                        const clone = canvas.cloneNode(true) as HTMLCanvasElement;
+                        clone.style.width = '80px';
+                        clone.style.height = '80px';
+                        el.innerHTML = '';
+                        el.appendChild(clone);
+                      }
+                    }
+                  }} />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Tabla de casos de uso */}
+      <div className={styles.useCasesSection}>
+        <h2>📋 Casos de uso y compatibilidad</h2>
+        <p className={styles.useCasesSubtitle}>
+          Descubre cómo aprovechar cada tipo de código QR
+        </p>
+
+        <div className={styles.useCasesTable}>
+          <div className={styles.useCaseRow}>
+            <div className={styles.useCaseIcon}>🔗</div>
+            <div className={styles.useCaseContent}>
+              <h3>QR para URLs</h3>
+              <p><strong>Ideal para:</strong> Landing pages, menús digitales, promociones, enlaces a redes sociales</p>
+              <p><strong>Compatibilidad:</strong> Todos los smartphones y aplicaciones de cámara nativas (iOS 11+, Android 8+)</p>
+              <p><strong>Consejo:</strong> Usa URLs cortas para QR más simples y legibles</p>
+            </div>
+          </div>
+
+          <div className={styles.useCaseRow}>
+            <div className={styles.useCaseIcon}>📶</div>
+            <div className={styles.useCaseContent}>
+              <h3>QR para WiFi</h3>
+              <p><strong>Ideal para:</strong> Cafeterías, hoteles, oficinas, eventos, espacios coworking</p>
+              <p><strong>Compatibilidad:</strong> iOS 11+, Android 10+ (cámara nativa), apps como WiFi QR Connect</p>
+              <p><strong>Consejo:</strong> Imprime en A4 y plastifica para mayor durabilidad</p>
+            </div>
+          </div>
+
+          <div className={styles.useCaseRow}>
+            <div className={styles.useCaseIcon}>👤</div>
+            <div className={styles.useCaseContent}>
+              <h3>QR para Contactos (vCard)</h3>
+              <p><strong>Ideal para:</strong> Tarjetas de visita, networking, ferias, presentaciones</p>
+              <p><strong>Compatibilidad:</strong> Todos los smartphones, se guarda automáticamente en la agenda</p>
+              <p><strong>Consejo:</strong> Incluye solo información relevante para mantener el QR simple</p>
+            </div>
+          </div>
+
+          <div className={styles.useCaseRow}>
+            <div className={styles.useCaseIcon}>📧</div>
+            <div className={styles.useCaseContent}>
+              <h3>QR para Email</h3>
+              <p><strong>Ideal para:</strong> Formularios de contacto, soporte técnico, feedback, eventos</p>
+              <p><strong>Compatibilidad:</strong> Todos los smartphones, abre la app de email del usuario</p>
+              <p><strong>Consejo:</strong> Prepara asunto y cuerpo para facilitar el envío al usuario</p>
+            </div>
+          </div>
+
+          <div className={styles.useCaseRow}>
+            <div className={styles.useCaseIcon}>📞</div>
+            <div className={styles.useCaseContent}>
+              <h3>QR para Teléfono</h3>
+              <p><strong>Ideal para:</strong> Atención al cliente, servicios urgentes, taxis, delivery</p>
+              <p><strong>Compatibilidad:</strong> Todos los smartphones, marca automáticamente el número</p>
+              <p><strong>Consejo:</strong> Incluye el prefijo internacional (+34) para llamadas globales</p>
+            </div>
+          </div>
+
+          <div className={styles.useCaseRow}>
+            <div className={styles.useCaseIcon}>📝</div>
+            <div className={styles.useCaseContent}>
+              <h3>QR para Texto</h3>
+              <p><strong>Ideal para:</strong> Códigos promocionales, instrucciones, mensajes secretos, juegos</p>
+              <p><strong>Compatibilidad:</strong> Todos los smartphones y lectores QR</p>
+              <p><strong>Consejo:</strong> Máximo 300 caracteres para QR de tamaño razonable</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Contenido educativo */}
       <EducationalSection
-        title="¿Cómo funcionan los códigos QR?"
-        subtitle="Aprende sobre tipos, usos y mejores prácticas"
+        title="📚 Guía completa de códigos QR"
+        subtitle="Aprende sobre tipos, mejores prácticas, implementación y preguntas frecuentes"
       >
         <section className={styles.guideSection}>
+          {/* Conceptos clave */}
+          <h2>Conceptos clave</h2>
           <div className={styles.conceptGrid}>
             <div className={styles.conceptCard}>
               <h4>🔗 QR para URLs</h4>
               <p>
                 Perfecto para compartir enlaces a sitios web, redes sociales,
-                landing pages o cualquier recurso online.
+                landing pages o cualquier recurso online. Los usuarios acceden
+                instantáneamente sin escribir URLs largas.
               </p>
             </div>
             <div className={styles.conceptCard}>
@@ -956,13 +1231,15 @@ export default function GeneradorQRPage() {
               <p>
                 Tus invitados pueden conectarse a tu red WiFi simplemente
                 escaneando el código, sin necesidad de escribir la contraseña.
+                Ideal para negocios, hoteles y espacios públicos.
               </p>
             </div>
             <div className={styles.conceptCard}>
               <h4>👤 QR para Contactos</h4>
               <p>
                 Crea tarjetas de visita digitales en formato vCard que se
-                guardan directamente en el teléfono del receptor.
+                guardan directamente en el teléfono del receptor. Incluye
+                nombre, teléfono, email, empresa y más.
               </p>
             </div>
             <div className={styles.conceptCard}>
@@ -970,28 +1247,239 @@ export default function GeneradorQRPage() {
               <p>
                 Los QR con logo y colores personalizados refuerzan tu marca
                 sin perder funcionalidad gracias a la corrección de errores.
+                Destaca con diseños únicos.
               </p>
             </div>
           </div>
 
-          <h3>Niveles de corrección de errores</h3>
+          {/* Niveles de corrección */}
+          <h2>Niveles de corrección de errores</h2>
+          <p className={styles.introParagraph}>
+            Los códigos QR incluyen redundancia para poder leerse incluso si están parcialmente dañados.
+            Mayor nivel = más resistencia pero QR más complejo.
+          </p>
           <div className={styles.tablaCorreccion}>
             <div className={styles.filaTabla}>
               <span className={styles.nivelBadge}>L (7%)</span>
-              <span>Menor redundancia. QR más pequeño pero sensible a daños.</span>
+              <span>Menor redundancia. QR más pequeño pero sensible a daños. Uso: URLs cortas en entornos limpios.</span>
             </div>
             <div className={styles.filaTabla}>
               <span className={styles.nivelBadge}>M (15%)</span>
-              <span>Balance entre tamaño y resistencia. Uso general.</span>
+              <span>Balance entre tamaño y resistencia. Uso general para la mayoría de casos.</span>
             </div>
             <div className={styles.filaTabla}>
               <span className={styles.nivelBadge}>Q (25%)</span>
-              <span>Buena resistencia. Recomendado para impresión.</span>
+              <span>Buena resistencia. Recomendado para impresión y uso en exteriores.</span>
             </div>
             <div className={styles.filaTabla}>
               <span className={styles.nivelBadge}>H (30%)</span>
-              <span>Máxima redundancia. Obligatorio si usas logo.</span>
+              <span>Máxima redundancia. Obligatorio si usas logo o en ambientes con desgaste.</span>
             </div>
+          </div>
+
+          {/* Guía paso a paso */}
+          <h2>Cómo crear e implementar tu código QR (paso a paso)</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h3>Selecciona el tipo de QR</h3>
+                <p>
+                  Elige entre URL, WiFi, Contacto, Email, Teléfono o Texto según tu objetivo.
+                  Para negocios, los más usados son URL (web) y WiFi (conectividad).
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h3>Introduce el contenido</h3>
+                <p>
+                  Completa los campos requeridos: URL completa (con https://), datos de red WiFi,
+                  información de contacto, etc. Verifica que todo esté correcto antes de continuar.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h3>Personaliza el diseño</h3>
+                <p>
+                  Accede a la pestaña &quot;Estilo&quot; y configura colores, forma de puntos y esquinas.
+                  Si tu marca tiene colores corporativos, úsalos aquí para reforzar identidad visual.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h3>Añade logo (opcional)</h3>
+                <p>
+                  En la pestaña &quot;Logo&quot;, sube tu logotipo (PNG con fondo transparente recomendado).
+                  Ajusta tamaño entre 20-40% y asegúrate de usar nivel de corrección &quot;Máximo&quot;.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h3>Descarga en el formato adecuado</h3>
+                <p>
+                  <strong>PNG/JPEG:</strong> Para impresión y uso en redes sociales.<br />
+                  <strong>SVG:</strong> Para escalado sin pérdida de calidad (diseño gráfico).<br />
+                  <strong>PDF:</strong> Para incluir en documentos o imprimir directamente.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h3>Implementa y prueba</h3>
+                <p>
+                  Usa el código HTML generado para tu sitio web, o imprime el QR en tamaño mínimo de 3x3cm.
+                  Prueba siempre el QR con varios dispositivos antes de la publicación final.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* FAQ ampliado */}
+          <h2>Preguntas frecuentes</h2>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Qué tamaño debe tener mi código QR para imprimirlo?</h3>
+            <p>
+              El tamaño mínimo recomendado es <strong>3x3 cm</strong> para garantizar legibilidad en smartphones.
+              Para distancias mayores, usa la regla: 1cm de QR por cada 10cm de distancia de escaneo.
+              Por ejemplo, si el QR estará a 2 metros, imprime al menos 20x20cm.
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Ejemplos prácticos:</strong><br />
+              • Tarjeta de visita: 2x2 cm (mínimo)<br />
+              • Folleto A4: 5x5 cm<br />
+              • Cartel A3: 10x10 cm<br />
+              • Valla publicitaria: 50x50 cm o más
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Los códigos QR personalizados (con logo) funcionan igual que los estándar?</h3>
+            <p>
+              Sí, siempre que uses el <strong>nivel de corrección &quot;Máximo&quot; (H - 30%)</strong>.
+              Este nivel permite que hasta el 30% del QR esté cubierto u dañado y siga siendo legible.
+              El logo debe ocupar entre 20-40% del área total para mantener funcionalidad.
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Consejo:</strong> Usa logos con fondo transparente (PNG) y formas simples.
+              Los logos muy detallados pueden dificultar el escaneo si son muy grandes.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Puedo editar el contenido de un QR después de imprimirlo?</h3>
+            <p>
+              No directamente. Los QR estáticos (como los de esta herramienta) codifican el contenido permanentemente.
+              <strong>Solución:</strong> Para QR que puedan cambiar, codifica una URL corta que redirija
+              al contenido real. Así puedes actualizar el destino sin cambiar el QR físico.
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Ejemplo:</strong> En lugar de codificar &quot;https://misitioweb.com/promo-navidad-2024&quot;,
+              usa &quot;https://misitioweb.com/p/1&quot; y actualiza el servidor para que /p/1 redirija
+              a la página actual que necesites.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Qué diferencia hay entre los formatos PNG, SVG y PDF?</h3>
+            <p>
+              <strong>PNG/JPEG:</strong> Imágenes de píxeles. Ideales para redes sociales, web y impresión en tamaños fijos.
+              Si amplías mucho, pueden pixelarse.<br />
+              <strong>SVG:</strong> Gráfico vectorial. Escalable sin pérdida de calidad. Perfecto para diseño gráfico
+              profesional, logos, carteles grandes.<br />
+              <strong>PDF:</strong> Documento imprimible. Incluye el QR centrado en A4. Ideal para enviar a imprenta
+              o compartir con terceros.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Los códigos QR para WiFi funcionan en todos los dispositivos?</h3>
+            <p>
+              La mayoría sí, pero depende del sistema operativo:<br />
+              <strong>iOS 11+:</strong> Soporta WiFi QR de forma nativa con la cámara.<br />
+              <strong>Android 10+:</strong> Funciona con cámara nativa en la mayoría de fabricantes.<br />
+              <strong>Android 9 o inferior:</strong> Puede requerir apps de terceros como &quot;WiFi QR Code Scanner&quot;.
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Recomendación:</strong> Incluye también las credenciales WiFi en texto pequeño
+              debajo del QR para usuarios con dispositivos antiguos.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Cuántos caracteres puedo incluir en un código QR de texto?</h3>
+            <p>
+              Técnicamente, hasta <strong>4.296 caracteres alfanuméricos</strong>, pero no es práctico.
+              A más contenido, el QR se vuelve más complejo y difícil de escanear.
+              <strong>Recomendación:</strong> Máximo 300 caracteres para mantener legibilidad.
+            </p>
+            <p className={styles.faqExample}>
+              <strong>Uso práctico:</strong><br />
+              • Códigos promocionales: 10-20 caracteres ✅<br />
+              • Instrucciones breves: 100-150 caracteres ✅<br />
+              • Texto largo / manual: Usa URL a documento completo ⚠️
+            </p>
+          </div>
+
+          {/* Mejores prácticas */}
+          <h2>Mejores prácticas y consejos profesionales</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Contraste alto</h4>
+              <p>Usa colores oscuros sobre fondo claro (o viceversa). El contraste mínimo debe ser 40:1 para garantizar legibilidad.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Margen blanco</h4>
+              <p>Deja al menos 4 módulos (cuadrados del QR) de margen blanco alrededor. Esto mejora el reconocimiento de la cámara.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Superficie plana</h4>
+              <p>Evita imprimir QR en superficies curvas o rugosas. Si es inevitable, aumenta el tamaño del QR al menos 30%.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Prueba antes</h4>
+              <p>Siempre prueba el QR con múltiples dispositivos (iOS, Android) y en diferentes condiciones de luz antes de producción masiva.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>CTA claro</h4>
+              <p>Incluye texto como &quot;Escanea para...&quot; junto al QR. Los usuarios necesitan saber qué esperar al escanear.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>URLs cortas</h4>
+              <p>Usa acortadores (bit.ly, QR.io) para URLs largas. Un QR simple es más rápido de escanear y funciona desde mayor distancia.</p>
+            </div>
+          </div>
+
+          {/* Advertencias */}
+          <div className={styles.warningBox}>
+            <h3>⚠️ Errores comunes que debes evitar</h3>
+            <ul>
+              <li><strong>QR demasiado pequeño:</strong> Mínimo 3x3cm. En carteles grandes, escala proporcionalmente.</li>
+              <li><strong>Colores de bajo contraste:</strong> Evita amarillo sobre blanco, gris claro sobre blanco, etc.</li>
+              <li><strong>URLs con HTTP en lugar de HTTPS:</strong> Los navegadores modernos advierten de seguridad.</li>
+              <li><strong>No probar antes de imprimir:</strong> Errores en el contenido pueden inutilizar miles de copias.</li>
+              <li><strong>Imprimir en superficies reflectantes:</strong> El brillo impide el escaneo. Usa acabados mates.</li>
+            </ul>
           </div>
         </section>
       </EducationalSection>
