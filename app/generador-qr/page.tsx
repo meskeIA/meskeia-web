@@ -108,6 +108,9 @@ export default function GeneradorQRPage() {
   const qrRef = useRef<HTMLDivElement>(null);
   const qrCodeInstance = useRef<InstanceType<typeof import('qr-code-styling').default> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const phonePreviewRef = useRef<HTMLDivElement>(null);
+  const printPreviewRef = useRef<HTMLDivElement>(null);
+  const cardPreviewRef = useRef<HTMLDivElement>(null);
 
   // Generar el contenido del QR según el tipo
   const generarContenidoQR = useCallback((): string => {
@@ -419,6 +422,41 @@ export default function GeneradorQRPage() {
       }
     }
   }, [tieneContenido, generarQR]);
+
+  // Actualizar previews en contexto cuando el QR se genera
+  useEffect(() => {
+    if (!qrGenerado || !qrRef.current) return;
+
+    const canvas = qrRef.current.querySelector('canvas');
+    if (!canvas) return;
+
+    // Preview en móvil
+    if (phonePreviewRef.current) {
+      const clonePhone = canvas.cloneNode(true) as HTMLCanvasElement;
+      clonePhone.style.width = '120px';
+      clonePhone.style.height = '120px';
+      phonePreviewRef.current.innerHTML = '';
+      phonePreviewRef.current.appendChild(clonePhone);
+    }
+
+    // Preview impreso
+    if (printPreviewRef.current) {
+      const clonePrint = canvas.cloneNode(true) as HTMLCanvasElement;
+      clonePrint.style.width = '100px';
+      clonePrint.style.height = '100px';
+      printPreviewRef.current.innerHTML = '';
+      printPreviewRef.current.appendChild(clonePrint);
+    }
+
+    // Preview tarjeta de visita (solo para contactos)
+    if (tipoQR === 'contacto' && cardPreviewRef.current) {
+      const cloneCard = canvas.cloneNode(true) as HTMLCanvasElement;
+      cloneCard.style.width = '80px';
+      cloneCard.style.height = '80px';
+      cardPreviewRef.current.innerHTML = '';
+      cardPreviewRef.current.appendChild(cloneCard);
+    }
+  }, [qrGenerado, tipoQR]);
 
   // Tipos de QR disponibles
   const tiposQR = [
@@ -1045,18 +1083,7 @@ export default function GeneradorQRPage() {
               <div className={styles.phoneMockup}>
                 <div className={styles.phoneScreen}>
                   <div className={styles.phoneQrArea}>
-                    <div className={styles.qrInPhone} ref={(el) => {
-                      if (el && qrRef.current) {
-                        const canvas = qrRef.current.querySelector('canvas');
-                        if (canvas) {
-                          const clone = canvas.cloneNode(true) as HTMLCanvasElement;
-                          clone.style.width = '120px';
-                          clone.style.height = '120px';
-                          el.innerHTML = '';
-                          el.appendChild(clone);
-                        }
-                      }
-                    }} />
+                    <div className={styles.qrInPhone} ref={phonePreviewRef} />
                     <p className={styles.phoneText}>
                       {tipoQR === 'url' && 'Escanea para visitar'}
                       {tipoQR === 'wifi' && 'Conéctate a WiFi'}
@@ -1075,18 +1102,7 @@ export default function GeneradorQRPage() {
               <h3>🖨️ Impreso</h3>
               <div className={styles.printMockup}>
                 <div className={styles.printedCard}>
-                  <div className={styles.qrInPrint} ref={(el) => {
-                    if (el && qrRef.current) {
-                      const canvas = qrRef.current.querySelector('canvas');
-                      if (canvas) {
-                        const clone = canvas.cloneNode(true) as HTMLCanvasElement;
-                        clone.style.width = '100px';
-                        clone.style.height = '100px';
-                        el.innerHTML = '';
-                        el.appendChild(clone);
-                      }
-                    }
-                  }} />
+                  <div className={styles.qrInPrint} ref={printPreviewRef} />
                   {tipoQR === 'wifi' && (
                     <div className={styles.printInfo}>
                       <strong>WiFi gratuito</strong>
@@ -1120,18 +1136,7 @@ export default function GeneradorQRPage() {
                     {configContacto.telefono && <p className={styles.cardContacto}>📞 {configContacto.telefono}</p>}
                     {configContacto.email && <p className={styles.cardContacto}>📧 {configContacto.email}</p>}
                   </div>
-                  <div className={styles.cardRight} ref={(el) => {
-                    if (el && qrRef.current) {
-                      const canvas = qrRef.current.querySelector('canvas');
-                      if (canvas) {
-                        const clone = canvas.cloneNode(true) as HTMLCanvasElement;
-                        clone.style.width = '80px';
-                        clone.style.height = '80px';
-                        el.innerHTML = '';
-                        el.appendChild(clone);
-                      }
-                    }
-                  }} />
+                  <div className={styles.cardRight} ref={cardPreviewRef} />
                 </div>
               </div>
             )}
