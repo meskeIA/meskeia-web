@@ -1050,51 +1050,11 @@ export default function CalculadoraJubilacionPage() {
             </div>
           </div>
         </section>
-      </EducationalSection>
 
-      {/* ==================== SECCIONES PROFESIONALES ==================== */}
+        {/* ==================== SECCIONES PROFESIONALES QUICK WINS v2.0 ==================== */}
+        {/* Las 6 secciones profesionales están DENTRO de EducationalSection (progressive disclosure) */}
 
-      {/* 1. HTML Code Exportable */}
-      {htmlCode && (
-        <section className={styles.htmlSection}>
-          <div className={styles.htmlHeader}>
-            <div>
-              <h2>📋 Exportar Proyección de Ahorro</h2>
-              <p className={styles.htmlSubtitle}>
-                Copia el código HTML para usar la proyección en tu web, blog o documento
-              </p>
-            </div>
-            <div className={styles.htmlActions}>
-              <button
-                onClick={() => setHtmlExpanded(!htmlExpanded)}
-                className={styles.btnToggleCode}
-                aria-label={htmlExpanded ? 'Ocultar código HTML' : 'Mostrar código HTML'}
-              >
-                {htmlExpanded ? '▲ Ocultar' : '▼ Mostrar'} código
-              </button>
-              {htmlExpanded && (
-                <button
-                  onClick={copiarCodigo}
-                  className={styles.btnCopyCode}
-                  aria-label="Copiar código HTML al portapapeles"
-                >
-                  📋 Copiar
-                </button>
-              )}
-            </div>
-          </div>
-
-          {htmlExpanded && (
-            <div className={styles.codeContainer}>
-              <pre className={styles.codeBlock}>
-                <code>{htmlCode}</code>
-              </pre>
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* 2. Tabla Comparativa de Escenarios */}
+        {/* 1. Tabla Comparativa de Escenarios */}
       <section className={styles.comparativaSection}>
         <h2>⚖️ Comparativa de Escenarios de Rentabilidad</h2>
         <p className={styles.sectionIntro}>
@@ -1174,7 +1134,7 @@ export default function CalculadoraJubilacionPage() {
         </div>
       </section>
 
-      {/* 3. Casos de Uso Reales */}
+      {/* 2. Casos de Uso Reales */}
       <section className={styles.casosSection}>
         <h2>💡 Casos de Uso: Situaciones Reales de Ahorro para Jubilación</h2>
         <p className={styles.sectionIntro}>
@@ -1254,7 +1214,7 @@ export default function CalculadoraJubilacionPage() {
         </div>
       </section>
 
-      {/* 4. FAQ */}
+      {/* 3. FAQ */}
       <section className={styles.faqSection}>
         <h2>❓ Preguntas Frecuentes sobre Ahorro para la Jubilación</h2>
 
@@ -1489,7 +1449,7 @@ export default function CalculadoraJubilacionPage() {
         </div>
       </section>
 
-      {/* 5. Guía Paso a Paso */}
+      {/* 4. Guía Paso a Paso */}
       <section className={styles.guiaSection}>
         <h2>🗺️ Guía Paso a Paso: Planificar tu Jubilación en España</h2>
         <p className={styles.sectionIntro}>
@@ -1621,7 +1581,7 @@ export default function CalculadoraJubilacionPage() {
         </div>
       </section>
 
-      {/* 6. Mejores Prácticas */}
+      {/* 5. Mejores Prácticas */}
       <section className={styles.tipsSection}>
         <h2>✨ Mejores Prácticas para Ahorrar para la Jubilación</h2>
         <p className={styles.sectionIntro}>
@@ -1709,7 +1669,7 @@ export default function CalculadoraJubilacionPage() {
         </div>
       </section>
 
-      {/* 7. Warning Box - Errores Comunes */}
+      {/* 6. Warning Box - Errores Comunes */}
       <section className={styles.warningSection}>
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
@@ -1859,8 +1819,49 @@ export default function CalculadoraJubilacionPage() {
           </div>
         </div>
       </section>
+      </EducationalSection>
 
-      {/* ==================== FIN SECCIONES PROFESIONALES ==================== */}
+      {/* ==================== FIN SECCIONES PROFESIONALES (DENTRO DE EDUCATIONAL SECTION) ==================== */}
+
+      {/* 1. HTML Code Exportable - FUERA por ser funcional */}
+      {htmlCode && (
+        <section className={styles.htmlSection}>
+          <div className={styles.htmlHeader}>
+            <div>
+              <h2>📋 Exportar Proyección de Ahorro</h2>
+              <p className={styles.htmlSubtitle}>
+                Copia el código HTML para usar la proyección en tu web, blog o documento
+              </p>
+            </div>
+            <div className={styles.htmlActions}>
+              <button
+                onClick={() => setHtmlExpanded(!htmlExpanded)}
+                className={styles.btnToggleCode}
+                aria-label={htmlExpanded ? 'Ocultar código HTML' : 'Mostrar código HTML'}
+              >
+                {htmlExpanded ? '▲ Ocultar' : '▼ Mostrar'} código
+              </button>
+              {htmlExpanded && (
+                <button
+                  onClick={copiarCodigo}
+                  className={styles.btnCopyCode}
+                  aria-label="Copiar código HTML al portapapeles"
+                >
+                  📋 Copiar
+                </button>
+              )}
+            </div>
+          </div>
+
+          {htmlExpanded && (
+            <div className={styles.codeContainer}>
+              <pre className={styles.codeBlock}>
+                <code>{htmlCode}</code>
+              </pre>
+            </div>
+          )}
+        </section>
+      )}
 
       <RelatedApps apps={getRelatedApps('calculadora-jubilacion')} />
 
