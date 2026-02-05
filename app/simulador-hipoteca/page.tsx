@@ -539,9 +539,14 @@ export default function SimuladorHipotecaPage() {
         </div>
       )}
 
-      {/* Tabla comparativa Fija vs Variable */}
-      <div className={styles.comparativaSection}>
-        <h2>⚖️ Hipoteca Fija vs Variable: ¿Cuál te conviene?</h2>
+      {/* Contenido Educativo */}
+      <EducationalSection
+        title="📚 Guía completa sobre hipotecas"
+        subtitle="Aprende sobre tipos de interés, amortización, negociación y preguntas frecuentes"
+      >
+        {/* Tabla comparativa Fija vs Variable */}
+        <div className={styles.comparativaSection}>
+          <h2>⚖️ Hipoteca Fija vs Variable: ¿Cuál te conviene?</h2>
         <p className={styles.comparativaSubtitle}>
           Entiende las diferencias clave para tomar la mejor decisión según tu perfil
         </p>
@@ -598,15 +603,15 @@ export default function SimuladorHipotecaPage() {
           </div>
         </div>
 
-        <div className={styles.comparativaConsejo}>
-          <strong>💡 Recomendación meskeIA:</strong> Si tu ratio de endeudamiento supera el 35%,
-          prioriza la hipoteca fija para evitar sorpresas. Si está por debajo del 25% y tienes
-          colchón de ahorro, la variable puede ahorrarte dinero.
+          <div className={styles.comparativaConsejo}>
+            <strong>💡 Recomendación meskeIA:</strong> Si tu ratio de endeudamiento supera el 35%,
+            prioriza la hipoteca fija para evitar sorpresas. Si está por debajo del 25% y tienes
+            colchón de ahorro, la variable puede ahorrarte dinero.
+          </div>
         </div>
-      </div>
 
-      {/* Escenarios típicos */}
-      <div className={styles.escenariosSection}>
+        {/* Escenarios típicos */}
+        <div className={styles.escenariosSection}>
         <h2>🎯 Escenarios típicos de hipoteca</h2>
         <p className={styles.escenariosSubtitle}>
           Ejemplos reales para ayudarte a tomar decisiones informadas
@@ -688,25 +693,8 @@ export default function SimuladorHipotecaPage() {
             </p>
           </div>
         </div>
-      </div>
+        </div>
 
-      {/* Disclaimer - SIEMPRE VISIBLE */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Este simulador proporciona una <strong>estimación orientativa</strong>. La cuota real
-          puede variar según las condiciones específicas de cada entidad bancaria, gastos asociados
-          (notaría, registro, tasación, impuestos) y otros factores. En hipotecas variables,
-          el Euríbor fluctúa y la cuota puede cambiar. <strong>No constituye una oferta vinculante</strong>.
-          Consulta con tu banco para obtener una simulación oficial.
-        </p>
-      </div>
-
-      {/* Contenido Educativo */}
-      <EducationalSection
-        title="📚 Guía completa sobre hipotecas"
-        subtitle="Aprende sobre tipos de interés, amortización, negociación y preguntas frecuentes"
-      >
         <section className={styles.guideSection}>
           <h2>Conceptos Clave de las Hipotecas</h2>
           <p className={styles.introParagraph}>
