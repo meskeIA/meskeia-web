@@ -821,8 +821,15 @@ export default function CalculadoraTarifaFreelancePage() {
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Debo cobrar lo mismo a todos los clientes?</h3>
               <p className={styles.faqAnswer}>
-                No necesariamente. Puedes ajustar tu tarifa según: (1) <strong>Volumen</strong> - clientes recurrentes pueden tener descuento del 10-15% por estabilidad, (2) <strong>Urgencia</strong> - proyectos urgentes (entrega &lt;48h) pueden llevar recargo del 50-100%, (3) <strong>Complejidad</strong> - proyectos nuevos/complejos pueden justificar tarifas más altas, (4) <strong>Tipo de cliente</strong> - startups vs corporaciones tienen presupuestos diferentes.
-                <br /><br />
+                No necesariamente. Puedes ajustar tu tarifa según:
+              </p>
+              <ul className={styles.faqList}>
+                <li><strong>Volumen:</strong> Clientes recurrentes pueden tener descuento del 10-15% por estabilidad</li>
+                <li><strong>Urgencia:</strong> Proyectos urgentes (entrega &lt;48h) pueden llevar recargo del 50-100%</li>
+                <li><strong>Complejidad:</strong> Proyectos nuevos/complejos pueden justificar tarifas más altas</li>
+                <li><strong>Tipo de cliente:</strong> Startups vs corporaciones tienen presupuestos diferentes</li>
+              </ul>
+              <p className={styles.faqAnswer}>
                 <strong>Regla de oro:</strong> Nunca bajes de tu tarifa base calculada (la que cubre costes + objetivo). Los descuentos deben venir de reducir tu margen, no de trabajar por debajo de coste.
               </p>
             </div>
@@ -830,8 +837,16 @@ export default function CalculadoraTarifaFreelancePage() {
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Cómo subo mi tarifa sin perder clientes?</h3>
               <p className={styles.faqAnswer}>
-                Estrategia gradual: (1) <strong>Clientes nuevos primero</strong> - aplica la nueva tarifa solo a proyectos futuros, (2) <strong>Aviso con 3 meses</strong> - informa a clientes actuales que subirás tarifas, (3) <strong>Justifica el valor</strong> - explica qué ha mejorado (experiencia, eficiencia, resultados probados), (4) <strong>Incrementos moderados</strong> - sube 10-20% cada 12-18 meses, no 50% de golpe, (5) <strong>Ofrece alternativa</strong> - "retainer anual con tarifa actual bloqueada".
-                <br /><br />
+                Estrategia gradual:
+              </p>
+              <ul className={styles.faqList}>
+                <li><strong>Clientes nuevos primero:</strong> Aplica la nueva tarifa solo a proyectos futuros</li>
+                <li><strong>Aviso con 3 meses:</strong> Informa a clientes actuales que subirás tarifas</li>
+                <li><strong>Justifica el valor:</strong> Explica qué ha mejorado (experiencia, eficiencia, resultados probados)</li>
+                <li><strong>Incrementos moderados:</strong> Sube 10-20% cada 12-18 meses, no 50% de golpe</li>
+                <li><strong>Ofrece alternativa:</strong> "Retainer anual con tarifa actual bloqueada"</li>
+              </ul>
+              <p className={styles.faqAnswer}>
                 <strong>Realidad:</strong> Perderás 1 de cada 5 clientes al subir tarifas. Si no pierdes ninguno, es que no has subido lo suficiente. Los buenos clientes entienden que tu experiencia vale más con el tiempo.
               </p>
             </div>
@@ -839,8 +854,15 @@ export default function CalculadoraTarifaFreelancePage() {
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Qué hago si un cliente dice "es muy caro"?</h3>
               <p className={styles.faqAnswer}>
-                Respuestas estratégicas: (1) <strong>Reformula en valor</strong> - "No es 5.000 €, es automatizar un proceso que te ahorra 2 horas diarias (40h/mes × 25 €/h = 1.000 €/mes de ahorro)", (2) <strong>Desglosa el precio</strong> - "Solo 166 €/día durante 30 días" suena menos que "5.000 € totales", (3) <strong>Ofrece opciones</strong> - "Versión completa 5.000 € o MVP básico 2.500 €", (4) <strong>Pregunta su presupuesto</strong> - "¿Qué tenías en mente?" (puede ser más alto de lo que imaginas).
-                <br /><br />
+                Respuestas estratégicas:
+              </p>
+              <ul className={styles.faqList}>
+                <li><strong>Reformula en valor:</strong> "No es 5.000 €, es automatizar un proceso que te ahorra 2 horas diarias (40h/mes × 25 €/h = 1.000 €/mes de ahorro)"</li>
+                <li><strong>Desglosa el precio:</strong> "Solo 166 €/día durante 30 días" suena menos que "5.000 € totales"</li>
+                <li><strong>Ofrece opciones:</strong> "Versión completa 5.000 € o MVP básico 2.500 €"</li>
+                <li><strong>Pregunta su presupuesto:</strong> "¿Qué tenías en mente?" (puede ser más alto de lo que imaginas)</li>
+              </ul>
+              <p className={styles.faqAnswer}>
                 <strong>Nunca hacer:</strong> No justifiques tu tarifa bajándola ("bueno, puedo hacerlo por..."). Si no pueden pagarte, no son tu cliente ideal. Mejor invertir ese tiempo en buscar clientes que valoren tu trabajo.
               </p>
             </div>
@@ -848,8 +870,27 @@ export default function CalculadoraTarifaFreelancePage() {
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Es mejor cobrar por hora o por proyecto?</h3>
               <p className={styles.faqAnswer}>
-                Depende de tu experiencia y tipo de trabajo: <strong>Cobra por hora si:</strong> (1) Eres junior y aún estimas mal, (2) El alcance es indefinido o cambiante, (3) Haces mantenimiento/soporte continuo, (4) Trabajas con metodologías ágiles flexibles. <strong>Cobra por proyecto si:</strong> (1) Tienes experiencia estimando, (2) El alcance está perfectamente definido, (3) Quieres recompensar tu eficiencia, (4) El cliente valora precio fijo.
-                <br /><br />
+                Depende de tu experiencia y tipo de trabajo:
+              </p>
+              <p className={styles.faqAnswer}>
+                <strong>Cobra por hora si:</strong>
+              </p>
+              <ul className={styles.faqList}>
+                <li>Eres junior y aún estimas mal</li>
+                <li>El alcance es indefinido o cambiante</li>
+                <li>Haces mantenimiento/soporte continuo</li>
+                <li>Trabajas con metodologías ágiles flexibles</li>
+              </ul>
+              <p className={styles.faqAnswer}>
+                <strong>Cobra por proyecto si:</strong>
+              </p>
+              <ul className={styles.faqList}>
+                <li>Tienes experiencia estimando</li>
+                <li>El alcance está perfectamente definido</li>
+                <li>Quieres recompensar tu eficiencia</li>
+                <li>El cliente valora precio fijo</li>
+              </ul>
+              <p className={styles.faqAnswer}>
                 <strong>Tip profesional:</strong> Calcula el proyecto en horas internamente, pero preséntalo como precio fijo. Ejemplo: "Diseño logo completo: 1.500 €" (tú sabes que son 20-25h × 60 €/h). Si terminas en 15h, ganas más por hora. Si tardas 30h, aprendes a estimar mejor la próxima vez.
               </p>
             </div>
@@ -857,8 +898,16 @@ export default function CalculadoraTarifaFreelancePage() {
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Debo incluir el IVA en mi tarifa?</h3>
               <p className={styles.faqAnswer}>
-                Depende de tu cliente: <strong>Siempre presenta dos cifras:</strong> "Mi tarifa es 60 €/h (sin IVA) o 72,60 €/h (IVA incluido)". <strong>Clientes B2B (empresas):</strong> El IVA es neutro para ellos (lo deducen), así que puedes hablar de tarifas sin IVA. <strong>Clientes B2C (particulares):</strong> El IVA es coste real, mejor presentar precio con IVA incluido para evitar sorpresas.
-                <br /><br />
+                Depende de tu cliente:
+              </p>
+              <p className={styles.faqAnswer}>
+                <strong>Siempre presenta dos cifras:</strong> "Mi tarifa es 60 €/h (sin IVA) o 72,60 €/h (IVA incluido)".
+              </p>
+              <ul className={styles.faqList}>
+                <li><strong>Clientes B2B (empresas):</strong> El IVA es neutro para ellos (lo deducen), así que puedes hablar de tarifas sin IVA</li>
+                <li><strong>Clientes B2C (particulares):</strong> El IVA es coste real, mejor presentar precio con IVA incluido para evitar sorpresas</li>
+              </ul>
+              <p className={styles.faqAnswer}>
                 <strong>Recuerda:</strong> El IVA NO es tu ingreso. Lo cobras del cliente y lo pagas trimestral/mensualmente a Hacienda. Tu tarifa real (lo que te llevas) es la cifra sin IVA menos los impuestos (IRPF).
               </p>
             </div>
@@ -866,17 +915,42 @@ export default function CalculadoraTarifaFreelancePage() {
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Cuánto debo cobrar si estoy empezando?</h3>
               <p className={styles.faqAnswer}>
-                Estrategia por etapas: <strong>Fase 1 (0-6 meses):</strong> Cobra el 50-70% de la tarifa de mercado. Prioriza portfolio y testimonios sobre ingresos máximos. <strong>Fase 2 (6-18 meses):</strong> Sube a 70-90% de mercado a medida que acumulas casos de éxito. <strong>Fase 3 (18+ meses):</strong> Cobra tarifa de mercado completa o más si te especializas.
-                <br /><br />
-                <strong>Error común:</strong> Trabajar gratis "por exposición". Cobrar poco es válido, trabajar gratis devalúa tu profesión. Mínimo: cubre tus costes reales (cuota autónomos + gastos directos). Si un cliente no puede pagar eso, ofrécele un descuento pequeño, no gratuidad.
+                Estrategia por etapas:
+              </p>
+              <ul className={styles.faqList}>
+                <li><strong>Fase 1 (0-6 meses):</strong> Cobra el 50-70% de la tarifa de mercado. Prioriza portfolio y testimonios sobre ingresos máximos</li>
+                <li><strong>Fase 2 (6-18 meses):</strong> Sube a 70-90% de mercado a medida que acumulas casos de éxito</li>
+                <li><strong>Fase 3 (18+ meses):</strong> Cobra tarifa de mercado completa o más si te especializas</li>
+              </ul>
+              <p className={styles.faqAnswer}>
+                <strong>Error común:</strong> Trabajar gratis "por exposición". Cobrar poco es válido, trabajar gratis devalúa tu profesión.
+              </p>
+              <p className={styles.faqAnswer}>
+                <strong>Mínimo:</strong> Cubre tus costes reales (cuota autónomos + gastos directos). Si un cliente no puede pagar eso, ofrécele un descuento pequeño, no gratuidad.
               </p>
             </div>
 
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Cómo gestiono los cambios de alcance (scope creep)?</h3>
               <p className={styles.faqAnswer}>
-                Prevención y reacción: <strong>Prevención:</strong> (1) Define alcance por escrito antes de empezar (documento firmado), (2) Especifica qué NO incluye el proyecto, (3) Establece sistema de "cambios requieren presupuesto adicional", (4) Usa herramientas de gestión de proyectos con tareas cerradas. <strong>Cuando ocurre:</strong> (1) Identifica el cambio: "Esto no estaba en el alcance original", (2) Valora impacto: "+8 horas de trabajo adicional", (3) Presenta opciones: "Puedo añadirlo por 480 € extra o lo dejamos para Fase 2", (4) Documenta aceptación del cliente por escrito.
-                <br /><br />
+                <strong>Prevención:</strong>
+              </p>
+              <ul className={styles.faqList}>
+                <li>Define alcance por escrito antes de empezar (documento firmado)</li>
+                <li>Especifica qué NO incluye el proyecto</li>
+                <li>Establece sistema de "cambios requieren presupuesto adicional"</li>
+                <li>Usa herramientas de gestión de proyectos con tareas cerradas</li>
+              </ul>
+              <p className={styles.faqAnswer}>
+                <strong>Cuando ocurre:</strong>
+              </p>
+              <ul className={styles.faqList}>
+                <li><strong>Identifica el cambio:</strong> "Esto no estaba en el alcance original"</li>
+                <li><strong>Valora impacto:</strong> "+8 horas de trabajo adicional"</li>
+                <li><strong>Presenta opciones:</strong> "Puedo añadirlo por 480 € extra o lo dejamos para Fase 2"</li>
+                <li><strong>Documenta aceptación del cliente por escrito</strong></li>
+              </ul>
+              <p className={styles.faqAnswer}>
                 <strong>Filosofía:</strong> Los clientes respetan más a freelancers que protegen su tiempo. Si aceptas todo cambio gratis, te verán como alguien que no valora su trabajo. La firmeza profesional genera respeto y mejores relaciones a largo plazo.
               </p>
             </div>
@@ -884,9 +958,25 @@ export default function CalculadoraTarifaFreelancePage() {
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Es normal cobrar anticipo o señal?</h3>
               <p className={styles.faqAnswer}>
-                Sí, es estándar profesional. Estructuras comunes: <strong>Proyectos pequeños (&lt;2.000 €):</strong> 50% al inicio, 50% a la entrega. <strong>Proyectos medianos (2.000-10.000 €):</strong> 30% al inicio, 40% a mitad de proyecto, 30% a la entrega. <strong>Proyectos grandes (&gt;10.000 €):</strong> 20% al inicio, hitos mensuales del 20-30%, 20% final. <strong>Retainers mensuales:</strong> 100% al inicio de cada mes (como Netflix).
-                <br /><br />
-                <strong>Por qué es importante:</strong> (1) Filtra clientes no serios (si no pueden pagar 30% inicial, no podrán pagar el 100% final), (2) Cubre tus gastos iniciales (software, herramientas), (3) Te protege si el cliente desaparece a mitad de proyecto, (4) Es práctica estándar en industrias creativas. <strong>Nunca:</strong> Empieces un proyecto sin anticipo, especialmente con clientes nuevos.
+                Sí, es estándar profesional. Estructuras comunes:
+              </p>
+              <ul className={styles.faqList}>
+                <li><strong>Proyectos pequeños (&lt;2.000 €):</strong> 50% al inicio, 50% a la entrega</li>
+                <li><strong>Proyectos medianos (2.000-10.000 €):</strong> 30% al inicio, 40% a mitad de proyecto, 30% a la entrega</li>
+                <li><strong>Proyectos grandes (&gt;10.000 €):</strong> 20% al inicio, hitos mensuales del 20-30%, 20% final</li>
+                <li><strong>Retainers mensuales:</strong> 100% al inicio de cada mes (como Netflix)</li>
+              </ul>
+              <p className={styles.faqAnswer}>
+                <strong>Por qué es importante:</strong>
+              </p>
+              <ul className={styles.faqList}>
+                <li>Filtra clientes no serios (si no pueden pagar 30% inicial, no podrán pagar el 100% final)</li>
+                <li>Cubre tus gastos iniciales (software, herramientas)</li>
+                <li>Te protege si el cliente desaparece a mitad de proyecto</li>
+                <li>Es práctica estándar en industrias creativas</li>
+              </ul>
+              <p className={styles.faqAnswer}>
+                <strong>Nunca:</strong> Empieces un proyecto sin anticipo, especialmente con clientes nuevos.
               </p>
             </div>
           </div>
