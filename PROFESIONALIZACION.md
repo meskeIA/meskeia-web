@@ -600,7 +600,7 @@ FASE 4: VERIFICACIÓN
 - **Excepción**: HTML exportable queda FUERA (funcional vs educativo)
 - **Beneficio**: Reduce scroll inicial en móvil (mejora UX significativa)
 - **Filosofía**: Progressive disclosure - usuario decide si profundizar
-- **Apps implementadas (9)**:
+- **Apps implementadas (10)**:
   1. Conversor de Unidades (app/conversor-unidades/) - Piloto
   2. Simulador de Préstamos (app/simulador-prestamos/) - 7 secciones profesionales
   3. Calculadora Jubilación (app/calculadora-jubilacion/) - 6 secciones profesionales
@@ -610,6 +610,7 @@ FASE 4: VERIFICACIÓN
   7. Generador QR (app/generador-qr/) - Casos de Uso (6 tipos QR), Conceptos Clave, Warning Box, HTML Code
   8. Simulador Cartera Inversión (app/simulador-cartera-inversion/) - 7 secciones profesionales (Tabla Comparativa perfiles, Casos de Uso 4 inversores, FAQ 8 preguntas, Guía 7 pasos, Tips 6 prácticas, Warning 8 errores)
   9. Calculadora Tarifa Freelance (app/calculadora-tarifa-freelance/) - 7 secciones profesionales (Tabla Comparativa 5 modelos, Casos de Uso 4 freelancers, FAQ 8 preguntas negociación, Guía 7 pasos cálculo, Tips 6 prácticas, Warning 8 errores)
+  10. Tabla Periódica Interactiva (app/tabla-periodica/) - 6 secciones profesionales enfocadas en estudiantes (Tabla Comparativa Metales/No Metales/Metaloides, Casos de Uso 4 perfiles, FAQ 8 preguntas estudio, Guía 7 pasos estequiometría, Tips 6 prácticas, Warning 8 errores)
 - Plantilla CSS: Sin cambios (misma de v1.0)
 - Tiempo promedio: 60 minutos (sin cambios)
 
@@ -647,7 +648,7 @@ Si quieres profesionalizar más apps:
 
 ---
 
-**Última actualización**: 2026-02-05 (Sesión migración masiva v2.0)
+**Última actualización**: 2026-02-05 (Sesión migración masiva v2.0 + Tabla Periódica)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
 **Versión**: 2.0
-**Apps implementadas**: 13 (3 v1.0 FULL, 2 v1.0 cleanup, 9 v2.0 migradas)
+**Apps implementadas**: 14 (3 v1.0 FULL, 2 v1.0 cleanup, 10 v2.0 migradas)
