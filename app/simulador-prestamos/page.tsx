@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import styles from './SimuladorPrestamos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
@@ -1026,7 +1026,13 @@ export default function SimuladorPrestamosPage() {
         </section>
       )}
 
-      {/* 2. Tabla Comparativa de Sistemas */}
+      {/* Contenido educativo colapsable - Patrón Profesional v2.0 */}
+      <EducationalSection
+        title="📚 ¿Quieres entender préstamos personales en profundidad?"
+        subtitle="Aprende a elegir el mejor sistema, comparar ofertas, evitar errores comunes y gestionar tu préstamo de forma inteligente"
+        icon="📚"
+      >
+        {/* 2. Tabla Comparativa de Sistemas */}
       <section className={styles.comparativaSection}>
         <h2>⚖️ Comparativa de Sistemas de Amortización</h2>
         <p className={styles.sectionIntro}>
@@ -1756,15 +1762,7 @@ export default function SimuladorPrestamosPage() {
           </div>
         </div>
       </section>
-
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Este simulador proporciona cálculos orientativos con fines educativos.
-          Los resultados pueden variar respecto a las condiciones reales ofrecidas por entidades financieras.
-          Consulta siempre con un profesional antes de contratar cualquier producto financiero.
-        </p>
-      </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('simulador-prestamos')} />
 

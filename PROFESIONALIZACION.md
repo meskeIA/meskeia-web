@@ -593,6 +593,18 @@ FASE 4: VERIFICACIÓN
 - 5 apps implementadas (3 FULL, 2 cleanup)
 - Plantilla CSS completa (~250 líneas)
 - Tiempo promedio: 60 minutos
+- **Limitación**: Scroll muy largo en móvil
+
+**v2.0** (2026-02-05) - ⭐ PATRÓN MEJORADO:
+- **Cambio clave**: Secciones profesionales DENTRO de `<EducationalSection>`
+- **Excepción**: HTML exportable queda FUERA (funcional vs educativo)
+- **Beneficio**: Reduce scroll inicial en móvil (mejora UX significativa)
+- **Filosofía**: Progressive disclosure - usuario decide si profundizar
+- **Apps implementadas (2)**:
+  1. Conversor de Unidades (app/conversor-unidades/) - Piloto
+  2. Simulador de Préstamos (app/simulador-prestamos/) - 7 secciones profesionales
+- Plantilla CSS: Sin cambios (misma de v1.0)
+- Tiempo promedio: 60 minutos (sin cambios)
 
 **Futuras mejoras**:
 - Componentes React reutilizables para FAQ/Steps/Cards
@@ -628,7 +640,7 @@ Si quieres profesionalizar más apps:
 
 ---
 
-**Última actualización**: 2026-02-04
+**Última actualización**: 2026-02-05
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
-**Versión**: 1.0
-**Apps implementadas**: 5 (3 FULL, 2 cleanup)
+**Versión**: 2.0
+**Apps implementadas**: 6 (3 v1.0 FULL, 2 v1.0 cleanup, 2 v2.0)
