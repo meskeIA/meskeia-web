@@ -1045,9 +1045,14 @@ export default function GeneradorQRPage() {
         </div>
       )}
 
-      {/* Tabla de casos de uso */}
-      <div className={styles.useCasesSection}>
-        <h2>📋 Casos de uso y compatibilidad</h2>
+      {/* Contenido educativo */}
+      <EducationalSection
+        title="📚 Guía completa de códigos QR"
+        subtitle="Aprende sobre tipos, mejores prácticas, implementación y preguntas frecuentes"
+      >
+        {/* Tabla de casos de uso */}
+        <div className={styles.useCasesSection}>
+          <h2>📋 Casos de uso y compatibilidad</h2>
         <p className={styles.useCasesSubtitle}>
           Descubre cómo aprovechar cada tipo de código QR
         </p>
@@ -1113,13 +1118,8 @@ export default function GeneradorQRPage() {
             </div>
           </div>
         </div>
-      </div>
+        </div>
 
-      {/* Contenido educativo */}
-      <EducationalSection
-        title="📚 Guía completa de códigos QR"
-        subtitle="Aprende sobre tipos, mejores prácticas, implementación y preguntas frecuentes"
-      >
         <section className={styles.guideSection}>
           {/* Conceptos clave */}
           <h2>Conceptos clave</h2>
