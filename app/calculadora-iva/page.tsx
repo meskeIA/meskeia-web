@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import styles from './CalculadoraIVA.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -279,46 +279,52 @@ export default function CalculadoraIvaPage() {
         </section>
       )}
 
-      {/* ========== SECCIÓN 2: TABLA COMPARATIVA ========== */}
-      <section className={styles.comparativaSection}>
-        <h2>📊 Comparativa de tipos de IVA en España</h2>
-        <p className={styles.comparativaSubtitle}>
-          Descubre qué tipo de IVA aplica a cada producto o servicio según la normativa española
-        </p>
+      {/* ========== CONTENIDO EDUCATIVO COLAPSABLE (v2.0) ========== */}
+      <EducationalSection
+        title="📚 ¿Quieres dominar el IVA en España?"
+        subtitle="Descubre tipos de IVA, casos de uso, declaraciones, mejores prácticas y errores comunes a evitar"
+        icon="📚"
+      >
+        {/* ========== SECCIÓN 2: TABLA COMPARATIVA ========== */}
+        <section className={styles.comparativaSection}>
+          <h2>📊 Comparativa de tipos de IVA en España</h2>
+          <p className={styles.comparativaSubtitle}>
+            Descubre qué tipo de IVA aplica a cada producto o servicio según la normativa española
+          </p>
 
-        <div className={styles.tableWrapper}>
-          <table className={styles.comparativaTable}>
-            <thead>
-              <tr>
-                <th>Tipo de IVA</th>
-                <th>Porcentaje</th>
-                <th>Ejemplos de productos/servicios</th>
-                <th>Cuándo aplicarlo</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>General</strong></td>
-                <td><strong>21%</strong></td>
-                <td>Electrónica, ropa, muebles, combustible, automóviles, servicios profesionales, reformas</td>
-                <td>Por defecto, si no aplica tipo reducido o superreducido</td>
-              </tr>
-              <tr>
-                <td><strong>Reducido</strong></td>
-                <td><strong>10%</strong></td>
-                <td>Alimentación general, transporte de viajeros, hostelería, espectáculos culturales, vivienda nueva</td>
-                <td>Bienes de primera necesidad no básicos y servicios esenciales</td>
-              </tr>
-              <tr>
-                <td><strong>Superreducido</strong></td>
-                <td><strong>4%</strong></td>
-                <td>Pan, leche, huevos, frutas, verduras, cereales, quesos, libros, periódicos, medicamentos, prótesis</td>
-                <td>Productos básicos de alimentación, cultura y salud</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo de IVA</th>
+                  <th>Porcentaje</th>
+                  <th>Ejemplos de productos/servicios</th>
+                  <th>Cuándo aplicarlo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>General</strong></td>
+                  <td><strong>21%</strong></td>
+                  <td>Electrónica, ropa, muebles, combustible, automóviles, servicios profesionales, reformas</td>
+                  <td>Por defecto, si no aplica tipo reducido o superreducido</td>
+                </tr>
+                <tr>
+                  <td><strong>Reducido</strong></td>
+                  <td><strong>10%</strong></td>
+                  <td>Alimentación general, transporte de viajeros, hostelería, espectáculos culturales, vivienda nueva</td>
+                  <td>Bienes de primera necesidad no básicos y servicios esenciales</td>
+                </tr>
+                <tr>
+                  <td><strong>Superreducido</strong></td>
+                  <td><strong>4%</strong></td>
+                  <td>Pan, leche, huevos, frutas, verduras, cereales, quesos, libros, periódicos, medicamentos, prótesis</td>
+                  <td>Productos básicos de alimentación, cultura y salud</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
       {/* ========== SECCIÓN 3: CASOS DE USO ========== */}
       <section className={styles.escenariosSection}>
@@ -677,6 +683,7 @@ export default function CalculadoraIvaPage() {
           </li>
         </ul>
       </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-iva')} />
 
