@@ -541,6 +541,546 @@ export default function CalculadoraTarifaFreelancePage() {
             <li><strong>Días sin facturar:</strong> Vacaciones, enfermedad, festivos, tiempo entre proyectos</li>
           </ul>
         </section>
+
+        {/* ========== SECCIÓN 1: TABLA COMPARATIVA ========== */}
+        <section className={styles.comparativaSection}>
+          <h2>📊 Comparativa de Modelos de Facturación Freelance</h2>
+          <p className={styles.comparativaSubtitle}>
+            Descubre las ventajas e inconvenientes de cada modelo de tarifa para elegir el que mejor se adapte a tu servicio
+          </p>
+
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Modelo</th>
+                  <th>Ventajas</th>
+                  <th>Inconvenientes</th>
+                  <th>Cuándo usarlo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Por Hora</strong></td>
+                  <td>
+                    • Fácil de calcular<br />
+                    • Flexible para cambios<br />
+                    • Control total del tiempo<br />
+                    • Ideal para sprints cortos
+                  </td>
+                  <td>
+                    • Penaliza la eficiencia<br />
+                    • Conflictos por horas extras<br />
+                    • Cliente vigila cada minuto<br />
+                    • Ingresos limitados por tiempo
+                  </td>
+                  <td>
+                    Proyectos con alcance indefinido, mantenimiento continuo, soporte técnico, consultoría puntual
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Por Día (Day Rate)</strong></td>
+                  <td>
+                    • Previsibilidad para ambas partes<br />
+                    • Simplifica facturación<br />
+                    • Minimiza conflicto por horas<br />
+                    • Standard en sectores creativos
+                  </td>
+                  <td>
+                    • Dificulta trabajos parciales<br />
+                    • Rigidez en jornadas<br />
+                    • Puede ser caro para proyectos cortos<br />
+                    • Cliente espera disponibilidad total
+                  </td>
+                  <td>
+                    Proyectos de varios días consecutivos, workshops, producción audiovisual, eventos presenciales
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Por Proyecto (Precio Fijo)</strong></td>
+                  <td>
+                    • Cliente conoce coste total<br />
+                    • Recompensa la eficiencia<br />
+                    • Menos microgestión<br />
+                    • Mayor margen si optimizas
+                  </td>
+                  <td>
+                    • Riesgo de subestimar scope<br />
+                    • Cambios generan conflictos<br />
+                    • Necesitas experiencia previa<br />
+                    • Difícil cotizar sin conocer bien
+                  </td>
+                  <td>
+                    Proyectos con alcance definido, diseño de marca, desarrollo web específico, redacción de contenidos
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Retainer Mensual</strong></td>
+                  <td>
+                    • Ingresos recurrentes estables<br />
+                    • Relación cliente a largo plazo<br />
+                    • Menos tiempo en comercial<br />
+                    • Previsibilidad de caja
+                  </td>
+                  <td>
+                    • Límites de horas confusos<br />
+                    • Cliente espera disponibilidad 24/7<br />
+                    • Difícil gestionar múltiples retainers<br />
+                    • Puede convertirse en "empleado barato"
+                  </td>
+                  <td>
+                    Community management, soporte técnico continuo, servicios de consultoría, gestión de campañas
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Por Valor (Value-Based)</strong></td>
+                  <td>
+                    • Ingresos desacoplados de tiempo<br />
+                    • Recompensa experiencia/resultados<br />
+                    • Alineado con impacto para cliente<br />
+                    • Mayor margen potencial
+                  </td>
+                  <td>
+                    • Difícil cuantificar el valor<br />
+                    • Requiere credibilidad alta<br />
+                    • Negociaciones complejas<br />
+                    • Cliente puede no entenderlo
+                  </td>
+                  <td>
+                    Estrategia de marketing con ROI claro, optimización de conversión, procesos que ahorran costes significativos
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ========== SECCIÓN 2: CASOS DE USO ========== */}
+        <section className={styles.casosSection}>
+          <h2>💼 Casos de Uso: Freelancers Reales</h2>
+          <p className={styles.casosSubtitle}>
+            Ejemplos prácticos de cómo diferentes perfiles calculan sus tarifas según su situación personal
+          </p>
+
+          <div className={styles.casosGrid}>
+            {/* Caso 1 */}
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>👨‍💻</span>
+                <h3>Alberto - Desarrollador Junior</h3>
+              </div>
+              <div className={styles.casoBody}>
+                <p className={styles.casoSituacion}>
+                  <strong>Situación:</strong> 2 años de experiencia, viviendo con padres, sin cargas familiares. Quiere independizarse.
+                </p>
+                <div className={styles.casoData}>
+                  <div className={styles.casoDataRow}>
+                    <span>Ingreso neto objetivo:</span>
+                    <span><strong>1.500 €/mes</strong></span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>Gastos mensuales:</span>
+                    <span><strong>455 €</strong> (cuota + software + móvil)</span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>Ocupación facturable:</span>
+                    <span><strong>60%</strong> (aprende mientras trabaja)</span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>IRPF:</span>
+                    <span><strong>7%</strong> (nuevos autónomos 2 años)</span>
+                  </div>
+                </div>
+                <div className={styles.casoResultado}>
+                  <strong>Tarifa recomendada:</strong> 35-40 €/h | 280-320 €/día
+                </div>
+                <p className={styles.casoConclusion}>
+                  Alberto cobra por debajo del mercado para ganar experiencia y crear portfolio, pero cubre sus costes reales y puede ahorrar moderadamente.
+                </p>
+              </div>
+            </div>
+
+            {/* Caso 2 */}
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>👩‍🎨</span>
+                <h3>María - Diseñadora Senior</h3>
+              </div>
+              <div className={styles.casoBody}>
+                <p className={styles.casoSituacion}>
+                  <strong>Situación:</strong> 8 años experiencia, vive en alquiler compartido, tiene hija de 5 años. Portfolio consolidado.
+                </p>
+                <div className={styles.casoData}>
+                  <div className={styles.casoDataRow}>
+                    <span>Ingreso neto objetivo:</span>
+                    <span><strong>2.500 €/mes</strong></span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>Gastos mensuales:</span>
+                    <span><strong>680 €</strong> (cuota + software Adobe + gestoría + seguros)</span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>Ocupación facturable:</span>
+                    <span><strong>75%</strong> (eficiente, clientes recurrentes)</span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>IRPF:</span>
+                    <span><strong>15%</strong> (reducido)</span>
+                  </div>
+                </div>
+                <div className={styles.casoResultado}>
+                  <strong>Tarifa recomendada:</strong> 55-65 €/h | 440-520 €/día
+                </div>
+                <p className={styles.casoConclusion}>
+                  María cobra tarifas medias-altas justificadas por su experiencia. Combina proyectos fijos (branding) con retainers mensuales (2-3 clientes).
+                </p>
+              </div>
+            </div>
+
+            {/* Caso 3 */}
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>🧑‍💼</span>
+                <h3>Javier - Consultor Estratégico</h3>
+              </div>
+              <div className={styles.casoBody}>
+                <p className={styles.casoSituacion}>
+                  <strong>Situación:</strong> 15 años experiencia corporativa, especializado en transformación digital. Hipoteca y 2 hijos.
+                </p>
+                <div className={styles.casoData}>
+                  <div className={styles.casoDataRow}>
+                    <span>Ingreso neto objetivo:</span>
+                    <span><strong>4.000 €/mes</strong></span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>Gastos mensuales:</span>
+                    <span><strong>950 €</strong> (cuota máxima + oficina + gestoría + seguros + formación)</span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>Ocupación facturable:</span>
+                    <span><strong>65%</strong> (mucha preparación + comercial)</span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>IRPF:</span>
+                    <span><strong>21%</strong> (general)</span>
+                  </div>
+                </div>
+                <div className={styles.casoResultado}>
+                  <strong>Tarifa recomendada:</strong> 95-120 €/h | 800-1.000 €/día
+                </div>
+                <p className={styles.casoConclusion}>
+                  Javier cobra por valor (no por hora). Proyectos típicos: 15.000-30.000 € por diagnóstico estratégico de 4-6 semanas. Su red de contactos le garantiza flujo constante.
+                </p>
+              </div>
+            </div>
+
+            {/* Caso 4 */}
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>📝</span>
+                <h3>Laura - Redactora Freelance</h3>
+              </div>
+              <div className={styles.casoBody}>
+                <p className={styles.casoSituacion}>
+                  <strong>Situación:</strong> 5 años experiencia, vive en zona rural (bajo coste vida), trabajo 100% remoto. Sin cargas.
+                </p>
+                <div className={styles.casoData}>
+                  <div className={styles.casoDataRow}>
+                    <span>Ingreso neto objetivo:</span>
+                    <span><strong>1.800 €/mes</strong></span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>Gastos mensuales:</span>
+                    <span><strong>420 €</strong> (cuota + internet + Grammarly + gestoría)</span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>Ocupación facturable:</span>
+                    <span><strong>80%</strong> (muy eficiente, templates propios)</span>
+                  </div>
+                  <div className={styles.casoDataRow}>
+                    <span>IRPF:</span>
+                    <span><strong>15%</strong> (reducido)</span>
+                  </div>
+                </div>
+                <div className={styles.casoResultado}>
+                  <strong>Tarifa recomendada:</strong> 40-50 €/h | Por palabra: 0,10-0,15 € | Artículo 1.000 palabras: 100-150 €
+                </div>
+                <p className={styles.casoConclusion}>
+                  Laura combina retainers (blogs mensuales 500 €) con proyectos puntuales. Su baja ocupación por gastos + vida rural le permite tarifas competitivas sin sacrificar calidad de vida.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ========== SECCIÓN 3: FAQ AMPLIADO ========== */}
+        <section className={styles.faqSection}>
+          <h2>❓ Preguntas Frecuentes sobre Tarifas Freelance</h2>
+
+          <div className={styles.faqGrid}>
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Debo cobrar lo mismo a todos los clientes?</h3>
+              <p className={styles.faqAnswer}>
+                No necesariamente. Puedes ajustar tu tarifa según: (1) <strong>Volumen</strong> - clientes recurrentes pueden tener descuento del 10-15% por estabilidad, (2) <strong>Urgencia</strong> - proyectos urgentes (entrega &lt;48h) pueden llevar recargo del 50-100%, (3) <strong>Complejidad</strong> - proyectos nuevos/complejos pueden justificar tarifas más altas, (4) <strong>Tipo de cliente</strong> - startups vs corporaciones tienen presupuestos diferentes.
+                <br /><br />
+                <strong>Regla de oro:</strong> Nunca bajes de tu tarifa base calculada (la que cubre costes + objetivo). Los descuentos deben venir de reducir tu margen, no de trabajar por debajo de coste.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Cómo subo mi tarifa sin perder clientes?</h3>
+              <p className={styles.faqAnswer}>
+                Estrategia gradual: (1) <strong>Clientes nuevos primero</strong> - aplica la nueva tarifa solo a proyectos futuros, (2) <strong>Aviso con 3 meses</strong> - informa a clientes actuales que subirás tarifas, (3) <strong>Justifica el valor</strong> - explica qué ha mejorado (experiencia, eficiencia, resultados probados), (4) <strong>Incrementos moderados</strong> - sube 10-20% cada 12-18 meses, no 50% de golpe, (5) <strong>Ofrece alternativa</strong> - "retainer anual con tarifa actual bloqueada".
+                <br /><br />
+                <strong>Realidad:</strong> Perderás 1 de cada 5 clientes al subir tarifas. Si no pierdes ninguno, es que no has subido lo suficiente. Los buenos clientes entienden que tu experiencia vale más con el tiempo.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Qué hago si un cliente dice "es muy caro"?</h3>
+              <p className={styles.faqAnswer}>
+                Respuestas estratégicas: (1) <strong>Reformula en valor</strong> - "No es 5.000 €, es automatizar un proceso que te ahorra 2 horas diarias (40h/mes × 25 €/h = 1.000 €/mes de ahorro)", (2) <strong>Desglosa el precio</strong> - "Solo 166 €/día durante 30 días" suena menos que "5.000 € totales", (3) <strong>Ofrece opciones</strong> - "Versión completa 5.000 € o MVP básico 2.500 €", (4) <strong>Pregunta su presupuesto</strong> - "¿Qué tenías en mente?" (puede ser más alto de lo que imaginas).
+                <br /><br />
+                <strong>Nunca hacer:</strong> No justifiques tu tarifa bajándola ("bueno, puedo hacerlo por..."). Si no pueden pagarte, no son tu cliente ideal. Mejor invertir ese tiempo en buscar clientes que valoren tu trabajo.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Es mejor cobrar por hora o por proyecto?</h3>
+              <p className={styles.faqAnswer}>
+                Depende de tu experiencia y tipo de trabajo: <strong>Cobra por hora si:</strong> (1) Eres junior y aún estimas mal, (2) El alcance es indefinido o cambiante, (3) Haces mantenimiento/soporte continuo, (4) Trabajas con metodologías ágiles flexibles. <strong>Cobra por proyecto si:</strong> (1) Tienes experiencia estimando, (2) El alcance está perfectamente definido, (3) Quieres recompensar tu eficiencia, (4) El cliente valora precio fijo.
+                <br /><br />
+                <strong>Tip profesional:</strong> Calcula el proyecto en horas internamente, pero preséntalo como precio fijo. Ejemplo: "Diseño logo completo: 1.500 €" (tú sabes que son 20-25h × 60 €/h). Si terminas en 15h, ganas más por hora. Si tardas 30h, aprendes a estimar mejor la próxima vez.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Debo incluir el IVA en mi tarifa?</h3>
+              <p className={styles.faqAnswer}>
+                Depende de tu cliente: <strong>Siempre presenta dos cifras:</strong> "Mi tarifa es 60 €/h (sin IVA) o 72,60 €/h (IVA incluido)". <strong>Clientes B2B (empresas):</strong> El IVA es neutro para ellos (lo deducen), así que puedes hablar de tarifas sin IVA. <strong>Clientes B2C (particulares):</strong> El IVA es coste real, mejor presentar precio con IVA incluido para evitar sorpresas.
+                <br /><br />
+                <strong>Recuerda:</strong> El IVA NO es tu ingreso. Lo cobras del cliente y lo pagas trimestral/mensualmente a Hacienda. Tu tarifa real (lo que te llevas) es la cifra sin IVA menos los impuestos (IRPF).
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Cuánto debo cobrar si estoy empezando?</h3>
+              <p className={styles.faqAnswer}>
+                Estrategia por etapas: <strong>Fase 1 (0-6 meses):</strong> Cobra el 50-70% de la tarifa de mercado. Prioriza portfolio y testimonios sobre ingresos máximos. <strong>Fase 2 (6-18 meses):</strong> Sube a 70-90% de mercado a medida que acumulas casos de éxito. <strong>Fase 3 (18+ meses):</strong> Cobra tarifa de mercado completa o más si te especializas.
+                <br /><br />
+                <strong>Error común:</strong> Trabajar gratis "por exposición". Cobrar poco es válido, trabajar gratis devalúa tu profesión. Mínimo: cubre tus costes reales (cuota autónomos + gastos directos). Si un cliente no puede pagar eso, ofrécele un descuento pequeño, no gratuidad.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Cómo gestiono los cambios de alcance (scope creep)?</h3>
+              <p className={styles.faqAnswer}>
+                Prevención y reacción: <strong>Prevención:</strong> (1) Define alcance por escrito antes de empezar (documento firmado), (2) Especifica qué NO incluye el proyecto, (3) Establece sistema de "cambios requieren presupuesto adicional", (4) Usa herramientas de gestión de proyectos con tareas cerradas. <strong>Cuando ocurre:</strong> (1) Identifica el cambio: "Esto no estaba en el alcance original", (2) Valora impacto: "+8 horas de trabajo adicional", (3) Presenta opciones: "Puedo añadirlo por 480 € extra o lo dejamos para Fase 2", (4) Documenta aceptación del cliente por escrito.
+                <br /><br />
+                <strong>Filosofía:</strong> Los clientes respetan más a freelancers que protegen su tiempo. Si aceptas todo cambio gratis, te verán como alguien que no valora su trabajo. La firmeza profesional genera respeto y mejores relaciones a largo plazo.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Es normal cobrar anticipo o señal?</h3>
+              <p className={styles.faqAnswer}>
+                Sí, es estándar profesional. Estructuras comunes: <strong>Proyectos pequeños (&lt;2.000 €):</strong> 50% al inicio, 50% a la entrega. <strong>Proyectos medianos (2.000-10.000 €):</strong> 30% al inicio, 40% a mitad de proyecto, 30% a la entrega. <strong>Proyectos grandes (&gt;10.000 €):</strong> 20% al inicio, hitos mensuales del 20-30%, 20% final. <strong>Retainers mensuales:</strong> 100% al inicio de cada mes (como Netflix).
+                <br /><br />
+                <strong>Por qué es importante:</strong> (1) Filtra clientes no serios (si no pueden pagar 30% inicial, no podrán pagar el 100% final), (2) Cubre tus gastos iniciales (software, herramientas), (3) Te protege si el cliente desaparece a mitad de proyecto, (4) Es práctica estándar en industrias creativas. <strong>Nunca:</strong> Empieces un proyecto sin anticipo, especialmente con clientes nuevos.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ========== SECCIÓN 4: GUÍA PASO A PASO ========== */}
+        <section className={styles.guiaSection}>
+          <h2>📋 Guía Paso a Paso: Cómo Fijar Tu Tarifa Freelance</h2>
+          <p className={styles.guiaSubtitle}>
+            Sigue estos 7 pasos para calcular una tarifa justa que cubra tus necesidades y refleje tu valor real
+          </p>
+
+          <div className={styles.stepsContainer}>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h3>Define tu Ingreso Neto Objetivo</h3>
+                <p>
+                  Calcula cuánto dinero necesitas <strong>llevarte a casa cada mes</strong> después de pagar impuestos y gastos profesionales. Considera: alquiler, comida, transporte, ahorros, ocio y fondo de emergencia. No confundas "ingreso bruto" (lo que facturas) con "ingreso neto" (lo que realmente te queda).
+                </p>
+                <p className={styles.stepExample}>
+                  <strong>Ejemplo:</strong> Si necesitas 2.000 €/mes para vivir cómodamente y ahorrar 300 €, tu objetivo neto es 2.300 €/mes (27.600 €/año).
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h3>Lista Todos tus Gastos Profesionales</h3>
+                <p>
+                  Identifica <strong>todos los costes</strong> de operar como autónomo, incluso los pequeños que suelen olvidarse. Divide en fijos (cuota, alquiler oficina, seguros) y variables (formación, material, marketing). Muchos freelancers olvidan amortización de equipo (ordenador cada 3-4 años = 800€/4 años = 16,67€/mes).
+                </p>
+                <p className={styles.stepExample}>
+                  <strong>Ejemplo:</strong> Cuota autónomos 300€ + Internet 40€ + Software 50€ + Gestoría 60€ + Seguros 25€ + Formación 30€ + Marketing 50€ = <strong>555 €/mes</strong>.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h3>Calcula tus Días Facturables Reales</h3>
+                <p>
+                  NO puedes facturar 365 días al año. Resta: 104 fines de semana + 22 días vacaciones + 14 festivos + 5 días enfermedad = <strong>220 días laborables/año</strong>. Ahora aplica tu tasa de ocupación facturable (70% es realista): 220 × 0,70 = <strong>154 días facturables/año</strong> (12,8 días/mes).
+                </p>
+                <p className={styles.stepExample}>
+                  <strong>Ejemplo:</strong> Si trabajas 8h/día, tienes 154 días × 8h = 1.232 horas facturables/año (103 h/mes). El resto lo dedicas a admin, comercial, formación, descansos.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h3>Calcula tu Base Imponible Necesaria</h3>
+                <p>
+                  Suma tu ingreso neto objetivo + gastos profesionales. Luego divide entre (1 - tipo IRPF) para obtener el bruto necesario antes de impuestos. Este es el dinero que debes facturar mensualmente ANTES de que te retengan el IRPF.
+                </p>
+                <p className={styles.stepExample}>
+                  <strong>Ejemplo:</strong> (2.300€ objetivo + 555€ gastos) / (1 - 0,21) = 2.855€ / 0,79 = <strong>3.614 €/mes</strong> necesarios antes de IRPF.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h3>Añade Margen de Beneficio/Seguridad</h3>
+                <p>
+                  Incrementa entre 10-20% para cubrir imprevistos: clientes que pagan tarde, meses con menos trabajo, inversiones necesarias (nuevo ordenador, formación cara), reserva para autónomos en vacaciones. Este margen NO es lujo, es gestión de riesgo empresarial.
+                </p>
+                <p className={styles.stepExample}>
+                  <strong>Ejemplo:</strong> 3.614 € × 1,15 (margen 15%) = <strong>4.156 €/mes</strong> que debes facturar para estar seguro.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h3>Calcula tu Tarifa por Hora/Día</h3>
+                <p>
+                  Divide tu facturación mensual necesaria entre tus horas/días facturables. Esto te da tu <strong>tarifa base sin IVA</strong>. Si trabajas en sectores B2B, presenta siempre la tarifa sin IVA (el IVA se suma después). Si trabajas con particulares (B2C), presenta con IVA incluido.
+                </p>
+                <p className={styles.stepExample}>
+                  <strong>Ejemplo:</strong> 4.156 €/mes ÷ 103 h/mes = <strong>40,35 €/h</strong> (sin IVA) o <strong>48,82 €/h</strong> (con IVA 21%). Por día (8h): 323 €/día o 391 €/día con IVA.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h3>Valida con Mercado y Ajusta</h3>
+                <p>
+                  Investiga qué cobran otros freelancers de tu sector y experiencia (plataformas: Malt, Workana, LinkedIn). Si tu tarifa calculada está muy por debajo del mercado, puedes subirla (aprovecha demanda). Si está muy por encima, analiza: ¿puedes reducir gastos? ¿mejorar ocupación? Nunca bajes de tu coste real.
+                </p>
+                <p className={styles.stepExample}>
+                  <strong>Ejemplo:</strong> Si calculas 40€/h pero el mercado paga 60€/h a tu perfil, cobra 60€/h. Si calculas 80€/h pero el mercado paga 50€/h, revisa gastos/ocupación, pero no bajes de 40€/h si ese es tu coste real. Busca nichos mejor pagados.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ========== SECCIÓN 5: MEJORES PRÁCTICAS ========== */}
+        <section className={styles.tipsSection}>
+          <h2>💡 Mejores Prácticas para Fijar y Defender tu Tarifa</h2>
+
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>📊</div>
+              <h3>Revisa tu tarifa cada 6-12 meses</h3>
+              <p>
+                Tu coste de vida aumenta (inflación), tu experiencia mejora, tus gastos cambian. Recalcula tu tarifa mínimo 2 veces al año. Un error común: mantener la misma tarifa durante 3-4 años porque "funciona". En ese tiempo, la inflación ha reducido tu poder adquisitivo un 10-15%.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>🎯</div>
+              <h3>Especialízate para cobrar más</h3>
+              <p>
+                Un generalista cobra 40-50€/h. Un especialista en React Native para fintech cobra 80-120€/h haciendo lo mismo. La especialización te permite: (1) Competir menos por precio, (2) Resolver problemas más rápido (más valor por hora), (3) Atraer clientes dispuestos a pagar más. Define tu nicho en 12-18 meses.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>📝</div>
+              <h3>Documenta TODO por escrito</h3>
+              <p>
+                Antes de empezar cualquier proyecto: (1) Presupuesto firmado con alcance detallado, (2) Condiciones de pago (anticipo, hitos, plazos), (3) Política de cambios ("modificaciones fuera de alcance se facturan aparte"), (4) Plazos de entrega y revisiones incluidas. Esto previene el 90% de conflictos futuros.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>💰</div>
+              <h3>Ofrece paquetes en lugar de solo tarifas horarias</h3>
+              <p>
+                En vez de "60€/h", ofrece: "Pack Básico 1.500€ (logo + tarjetas), Pack Pro 3.000€ (logo + branding completo + web landing), Pack Premium 6.000€ (todo lo anterior + estrategia de marca)". Los clientes prefieren precios cerrados y tú vendes más valor que horas. El Pack Pro tiene mejor margen aunque incluya más trabajo.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>🚫</div>
+              <h3>Di NO a proyectos por debajo de tu mínimo</h3>
+              <p>
+                Cada proyecto mal pagado te quita tiempo para buscar clientes buenos. Si aceptas un proyecto a 20€/h cuando tu mínimo es 40€/h, estás perdiendo 20€/h + el coste de oportunidad de no estar disponible para proyectos buenos. Mejor respuesta: "Mi tarifa actual es 40€/h, pero si tu presupuesto es inferior, puedo recomendarte a [compañero junior]".
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>🔄</div>
+              <h3>Automatiza y sistematiza para mejorar margen</h3>
+              <p>
+                Cada hora que ahorras mejora tu tarifa efectiva. Crea: (1) Templates de propuestas/contratos (ahorra 2h por proyecto), (2) Flujos de trabajo documentados (rediseño web en 5 pasos repetibles), (3) Snippets de código reutilizables, (4) Procesos de onboarding de clientes. Si un proyecto que antes tomaba 20h ahora toma 15h, tu tarifa efectiva sube 33% (de 60€/h a 80€/h).
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ========== SECCIÓN 6: WARNING BOX ========== */}
+        <div className={styles.warningBox}>
+          <h2>⚠️ Errores Costosos al Fijar Tarifas (Evítalos)</h2>
+          <p className={styles.warningIntro}>
+            Estos errores han costado miles de euros a freelancers experimentados. Aprende de sus fallos:
+          </p>
+          <ul className={styles.warningList}>
+            <li>
+              <strong>Calcular tarifa basándote solo en lo que ganan empleados de tu sector</strong>: Un empleado con sueldo de 30.000€/año no equivale a un freelance cobrando 30.000€/año. El empleado tiene: pagas extras (14 pagas), vacaciones pagadas, Seguridad Social pagada por empresa (30% adicional), estabilidad, equipo proporcionado. Como freelance necesitas facturar 45.000-50.000€/año para igualar ese sueldo.
+            </li>
+            <li>
+              <strong>Olvidar incluir tu propio seguro de salud privado</strong>: La Seguridad Social de autónomos cubre lo básico, pero muchos freelancers necesitan seguro privado (150-300€/mes) para: atención rápida, especialistas sin listas de espera, baja dental. Esto suma 1.800-3.600€/año que debes incluir en gastos.
+            </li>
+            <li>
+              <strong>Cobrar igual a tu competencia sin conocer sus costes</strong>: Tu competidor que cobra 50€/h puede: (1) Vivir con padres (sin alquiler), (2) Tener pareja con ingresos estables, (3) Estar sobreocupado al 90% (tú al 60%), (4) Aceptar márgenes peligrosamente bajos. No copies precios sin conocer contexto. Calcula TU tarifa según TUS necesidades.
+            </li>
+            <li>
+              <strong>Aceptar proyectos "de exposición" sin pago adecuado</strong>: "No puedo pagarte pero tendrás mucha visibilidad". La exposición NO paga facturas. Estadística real: menos del 5% de proyectos "por exposición" generan clientes pagos después. Si quieres portfolio, haz proyectos personales de calidad (tienes control 100%) o cobra mínimo el 50% de tu tarifa normal.
+            </li>
+            <li>
+              <strong>No ajustar tarifa por inflación anual</strong>: Con inflación del 5%/año, mantener la misma tarifa durante 3 años equivale a perder 15% de poder adquisitivo. Si cobrabas 50€/h en 2021 y sigues cobrando lo mismo en 2024, realmente estás cobrando el equivalente a 42,50€/h en poder de compra. Sube tarifas 3-5%/año como mínimo para compensar inflación.
+            </li>
+            <li>
+              <strong>No considerar tiempo de comercial y administración</strong>: Si asumes ocupación facturable del 100%, tu tarifa será insuficiente. Realísticamente: 20% del tiempo se va en buscar clientes, 10% en administración (facturas, impuestos, correos), 5% en formación. Una ocupación del 65-75% es lo normal para freelances sostenibles. Si calculas con 100%, trabajarás gratis el 25-35% del tiempo.
+            </li>
+            <li>
+              <strong>Bajar precio para "cerrar el trato" con cliente indeciso</strong>: Cuando bajas precio por presión, comunicas: "mi precio inicial estaba inflado" o "no confío en mi valor". El cliente lo recuerda y pedirá descuentos siempre. Mejor respuesta: "Entiendo que es tu presupuesto. Puedo reducir el alcance [eliminar X funcionalidad] para ajustarnos a 3.000€ en lugar de 4.000€". Reduces trabajo, no tarifa.
+            </li>
+            <li>
+              <strong>No separar dinero para impuestos trimestrales</strong>: Muchos nuevos autónomos gastan todo lo facturado y luego no tienen para pagar IRPF trimestral (modelo 130) o IVA trimestral (modelo 303). Regla simple: cada vez que cobres una factura, AUTOMÁTICAMENTE transfiere el 25-30% a cuenta de ahorro "impuestos". Nunca toques ese dinero salvo para pagar Hacienda. Evitarás sustos en julio, octubre, enero y abril.
+            </li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-tarifa-freelance')} />
