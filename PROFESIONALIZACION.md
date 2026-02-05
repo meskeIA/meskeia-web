@@ -600,10 +600,14 @@ FASE 4: VERIFICACIÓN
 - **Excepción**: HTML exportable queda FUERA (funcional vs educativo)
 - **Beneficio**: Reduce scroll inicial en móvil (mejora UX significativa)
 - **Filosofía**: Progressive disclosure - usuario decide si profundizar
-- **Apps implementadas (3)**:
+- **Apps implementadas (7)**:
   1. Conversor de Unidades (app/conversor-unidades/) - Piloto
   2. Simulador de Préstamos (app/simulador-prestamos/) - 7 secciones profesionales
-  3. Calculadora Jubilación (app/calculadora-jubilacion/) - 6 secciones profesionales (Comparativa, Casos, FAQ, Guía, Tips, Warning)
+  3. Calculadora Jubilación (app/calculadora-jubilacion/) - 6 secciones profesionales
+  4. Conversor de Colores (app/conversor-colores/) - 7 secciones profesionales (Tabla Comparativa HEX/RGB/HSL/CMYK, Casos de Uso, FAQ, Guía, Tips, Warning, HTML Code)
+  5. Calculadora IVA (app/calculadora-iva/) - 7 secciones profesionales (Tabla Comparativa tipos IVA, Casos de Uso freelance/e-commerce, FAQ fiscal, Guía declaración, Tips, Warning, HTML Code)
+  6. Simulador Hipoteca (app/simulador-hipoteca/) - 7 secciones profesionales (Tabla Comparativa Fija vs Variable, Escenarios, Conceptos, Guía, FAQ, Tips, Warning, HTML Code)
+  7. Generador QR (app/generador-qr/) - Casos de Uso (6 tipos QR), Conceptos Clave, Warning Box, HTML Code
 - Plantilla CSS: Sin cambios (misma de v1.0)
 - Tiempo promedio: 60 minutos (sin cambios)
 
@@ -627,11 +631,11 @@ FASE 4: VERIFICACIÓN
 Si quieres profesionalizar más apps:
 
 **Candidatos prioritarios** (máximo impacto):
-1. Calculadora IVA (fiscal, exportable)
-2. Generador Facturas (exportable, legal)
-3. Simulador Hipoteca (financiero, escenarios)
-4. Calculadora Tarifa Freelance (fiscal, profesional)
-5. Generador QR (exportable, múltiples formatos)
+1. Generador Facturas (exportable, legal)
+2. Calculadora Tarifa Freelance (fiscal, profesional)
+3. Generador Meta Descripciones (ya tiene v1.0, migrar a v2.0)
+4. Calculadora Seguro Vida (financiero, decisión importante)
+5. Simulador Cartera Inversión (financiero, múltiples escenarios)
 
 **Criterio de priorización**:
 - Alto tráfico de usuarios
@@ -641,7 +645,7 @@ Si quieres profesionalizar más apps:
 
 ---
 
-**Última actualización**: 2026-02-05
+**Última actualización**: 2026-02-05 (Sesión migración masiva v2.0)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
 **Versión**: 2.0
-**Apps implementadas**: 7 (3 v1.0 FULL, 2 v1.0 cleanup, 3 v2.0)
+**Apps implementadas**: 11 (3 v1.0 FULL, 2 v1.0 cleanup, 7 v2.0 migradas)
