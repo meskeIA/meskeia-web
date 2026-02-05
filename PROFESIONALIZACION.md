@@ -600,7 +600,7 @@ FASE 4: VERIFICACIÓN
 - **Excepción**: HTML exportable queda FUERA (funcional vs educativo)
 - **Beneficio**: Reduce scroll inicial en móvil (mejora UX significativa)
 - **Filosofía**: Progressive disclosure - usuario decide si profundizar
-- **Apps implementadas (7)**:
+- **Apps implementadas (8)**:
   1. Conversor de Unidades (app/conversor-unidades/) - Piloto
   2. Simulador de Préstamos (app/simulador-prestamos/) - 7 secciones profesionales
   3. Calculadora Jubilación (app/calculadora-jubilacion/) - 6 secciones profesionales
@@ -608,6 +608,7 @@ FASE 4: VERIFICACIÓN
   5. Calculadora IVA (app/calculadora-iva/) - 7 secciones profesionales (Tabla Comparativa tipos IVA, Casos de Uso freelance/e-commerce, FAQ fiscal, Guía declaración, Tips, Warning, HTML Code)
   6. Simulador Hipoteca (app/simulador-hipoteca/) - 7 secciones profesionales (Tabla Comparativa Fija vs Variable, Escenarios, Conceptos, Guía, FAQ, Tips, Warning, HTML Code)
   7. Generador QR (app/generador-qr/) - Casos de Uso (6 tipos QR), Conceptos Clave, Warning Box, HTML Code
+  8. Simulador Cartera Inversión (app/simulador-cartera-inversion/) - 7 secciones profesionales (Tabla Comparativa perfiles, Casos de Uso 4 inversores, FAQ 8 preguntas, Guía 7 pasos, Tips 6 prácticas, Warning 8 errores)
 - Plantilla CSS: Sin cambios (misma de v1.0)
 - Tiempo promedio: 60 minutos (sin cambios)
 
@@ -648,4 +649,4 @@ Si quieres profesionalizar más apps:
 **Última actualización**: 2026-02-05 (Sesión migración masiva v2.0)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
 **Versión**: 2.0
-**Apps implementadas**: 11 (3 v1.0 FULL, 2 v1.0 cleanup, 7 v2.0 migradas)
+**Apps implementadas**: 12 (3 v1.0 FULL, 2 v1.0 cleanup, 8 v2.0 migradas)
