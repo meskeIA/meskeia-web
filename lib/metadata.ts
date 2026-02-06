@@ -218,6 +218,52 @@ export function generateLegalMetadata(
   });
 }
 
+/**
+ * Genera JSON-LD de tipo SoftwareApplication para una app meskeIA.
+ * Uso en page.tsx:
+ *
+ * ```tsx
+ * import { generateAppJsonLd } from '@/lib/metadata';
+ *
+ * const jsonLd = generateAppJsonLd({
+ *   name: 'Calculadora de Interés Compuesto',
+ *   description: 'Simula el crecimiento de tu inversión...',
+ *   url: '/interes-compuesto/',
+ *   category: 'FinanceApplication',
+ * });
+ *
+ * // En el JSX, antes del contenido:
+ * <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
+ * ```
+ */
+export function generateAppJsonLd(options: {
+  name: string;
+  description: string;
+  url: string;
+  category?: string;
+}): string {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: options.name,
+    description: options.description,
+    url: `${siteConfig.url}${options.url}`,
+    applicationCategory: options.category || 'UtilitiesApplication',
+    operatingSystem: 'Web',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'EUR',
+    },
+    inLanguage: 'es',
+    author: {
+      '@type': 'Organization',
+      name: 'meskeIA',
+      url: siteConfig.url,
+    },
+  });
+}
+
 // Metadata para página de aplicaciones
 export function generateToolsMetadata(): Metadata {
   const title = 'Catálogo Completo de Aplicaciones';
