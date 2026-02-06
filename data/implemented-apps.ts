@@ -4,7 +4,7 @@
  * IMPORTANTE: Esta lista debe coincidir con las carpetas en app/
  * Solo añadir URLs cuando la app esté realmente creada
  *
- * Actualizado: 2025-12-07
+ * Actualizado: 2026-02-06
  */
 
 export const implementedAppsUrls = [
@@ -158,7 +158,6 @@ export const implementedAppsUrls = [
   "/calculadora-hidratacion/",
   "/calculadora-sueno/",
   "/seguimiento-habitos/",
-  "/curso-nutrisalud/",
   "/planificador-menu/",
   "/calculadora-porciones/",
   "/test-habitos/",
