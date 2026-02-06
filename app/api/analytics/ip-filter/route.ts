@@ -2,26 +2,47 @@
  * API Route: /api/analytics/ip-filter
  * Gestiona la IP excluida para desarrollo (meskeIA Analytics v3.0)
  *
- * GET: Obtiene la IP actual y la IP excluida guardada
- * POST: Guarda la IP actual como IP excluida
+ * GET: Obtiene la IP actual (anonimizada) y la IP excluida guardada
+ * POST: Guarda la IP actual (anonimizada) como IP excluida
+ *
+ * RGPD: Solo trabaja con IPs anonimizadas (último octeto truncado)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
 import { getCorsHeaders } from '@/lib/cors';
 
-// Obtener IP del request
+/**
+ * Anonimiza una dirección IP truncando el último octeto (IPv4)
+ * o los últimos 80 bits (IPv6).
+ */
+function anonymizeIP(ip: string): string {
+  if (ip.includes('.') && !ip.includes(':')) {
+    const parts = ip.split('.');
+    if (parts.length === 4) {
+      parts[3] = '0';
+      return parts.join('.');
+    }
+  }
+  if (ip.includes(':')) {
+    const parts = ip.split(':');
+    if (parts.length >= 4) {
+      return parts.slice(0, 3).join(':') + '::';
+    }
+  }
+  return 'anonymous';
+}
+
+// Obtener IP anonimizada del request
 function getClientIP(request: NextRequest): string {
-  // Vercel pone la IP real en x-forwarded-for
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
-    return forwarded.split(',')[0].trim();
+    return anonymizeIP(forwarded.split(',')[0].trim());
   }
 
-  // Fallback a x-real-ip
   const realIP = request.headers.get('x-real-ip');
   if (realIP) {
-    return realIP;
+    return anonymizeIP(realIP);
   }
 
   return 'unknown';

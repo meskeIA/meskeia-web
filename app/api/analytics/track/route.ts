@@ -3,6 +3,9 @@
  * Endpoint: POST /api/analytics/track
  *
  * Reemplaza: api/v1/guardar-uso.php
+ *
+ * RGPD: No almacena IP completa ni datos identificables.
+ * Geolocalización (solo país) vía headers de Vercel, sin servicios externos.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -11,6 +14,30 @@ import { getCorsHeaders } from '@/lib/cors';
 
 // Configuración para edge runtime (más rápido en Vercel)
 export const runtime = 'edge';
+
+/**
+ * Anonimiza una dirección IP truncando el último octeto (IPv4)
+ * o los últimos 80 bits (IPv6).
+ * Ejemplo: 83.45.123.67 → 83.45.123.0
+ */
+function anonymizeIP(ip: string): string {
+  // IPv4: reemplazar último octeto por 0
+  if (ip.includes('.') && !ip.includes(':')) {
+    const parts = ip.split('.');
+    if (parts.length === 4) {
+      parts[3] = '0';
+      return parts.join('.');
+    }
+  }
+  // IPv6: truncar últimos 5 grupos (80 bits)
+  if (ip.includes(':')) {
+    const parts = ip.split(':');
+    if (parts.length >= 4) {
+      return parts.slice(0, 3).join(':') + '::';
+    }
+  }
+  return 'anonymous';
+}
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders('POST, OPTIONS') });
@@ -51,33 +78,21 @@ export async function POST(request: NextRequest) {
     const modo = datos.modo || 'web';
     const sesion_id = datos.sesion_id || null;
 
-    // Obtener IP del cliente (Vercel proporciona esto en headers)
-    const ip_address =
+    // RGPD: Anonimizar IP (truncar último octeto)
+    const rawIP =
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       request.headers.get('x-real-ip') ||
       null;
+    const ip_address = rawIP ? anonymizeIP(rawIP) : null;
 
-    // Geolocalización (intentar obtener país/ciudad)
-    let pais: string | null = null;
-    let ciudad: string | null = null;
+    // RGPD: Geolocalización solo país, vía headers de Vercel (sin servicios externos)
+    // Vercel proporciona estos headers automáticamente en Edge Runtime
+    const pais = request.headers.get('x-vercel-ip-country-name') ||
+                 request.headers.get('x-vercel-ip-country') ||
+                 null;
 
-    if (ip_address && ip_address !== '127.0.0.1' && ip_address !== '::1') {
-      try {
-        const geoResponse = await fetch(
-          `http://ip-api.com/json/${ip_address}?fields=status,country,city`,
-          { signal: AbortSignal.timeout(2000) }
-        );
-        if (geoResponse.ok) {
-          const geoData = await geoResponse.json();
-          if (geoData.status === 'success') {
-            pais = geoData.country || null;
-            ciudad = geoData.city || null;
-          }
-        }
-      } catch {
-        // Geolocalización falla silenciosamente
-      }
-    }
+    // RGPD: No almacenar ciudad (dato demasiado específico)
+    const ciudad: string | null = null;
 
     // Datos adicionales como JSON
     const datos_adicionales = datos.datos_adicionales
