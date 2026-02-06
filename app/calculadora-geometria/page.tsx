@@ -551,41 +551,530 @@ export default function CalculadoraGeometriaPage() {
         title="📚 ¿Quieres aprender más sobre Geometría?"
         subtitle="Descubre fórmulas, propiedades y aplicaciones de las figuras geométricas"
       >
+        {/* SECCIÓN 1: Tabla Comparativa 2D vs 3D */}
         <section className={styles.guideSection}>
-          <h2>Geometría: Fundamentos y Aplicaciones</h2>
+          <h2>📊 Figuras 2D vs 3D: Comparación Completa</h2>
           <p className={styles.introParagraph}>
-            La geometría estudia las propiedades y medidas de las figuras en el plano (2D)
-            y en el espacio (3D). Es fundamental en arquitectura, ingeniería, diseño y ciencias.
+            Comprende las diferencias fundamentales entre figuras planas (2D) y sólidos (3D),
+            sus propiedades, fórmulas clave y aplicaciones prácticas en matemáticas y ciencias.
+          </p>
+
+          <div className={styles.comparisonTable}>
+            <div className={styles.tableRow}>
+              <div className={styles.tableHeader}>Característica</div>
+              <div className={styles.tableHeader}>Figuras 2D</div>
+              <div className={styles.tableHeader}>Sólidos 3D</div>
+            </div>
+
+            <div className={styles.tableRow}>
+              <div className={styles.tableCell}><strong>Dimensiones</strong></div>
+              <div className={styles.tableCell}>Longitud y anchura (plano)</div>
+              <div className={styles.tableCell}>Longitud, anchura y altura (espacio)</div>
+            </div>
+
+            <div className={styles.tableRow}>
+              <div className={styles.tableCell}><strong>Medidas Principales</strong></div>
+              <div className={styles.tableCell}>Área (u²) y Perímetro (u)</div>
+              <div className={styles.tableCell}>Volumen (u³) y Superficie (u²)</div>
+            </div>
+
+            <div className={styles.tableRow}>
+              <div className={styles.tableCell}><strong>Ejemplos Básicos</strong></div>
+              <div className={styles.tableCell}>Cuadrado, círculo, triángulo</div>
+              <div className={styles.tableCell}>Cubo, esfera, pirámide</div>
+            </div>
+
+            <div className={styles.tableRow}>
+              <div className={styles.tableCell}><strong>Fórmula de Área</strong></div>
+              <div className={styles.tableCell}>
+                <ul className={styles.faqList}>
+                  <li>Cuadrado: A = l²</li>
+                  <li>Rectángulo: A = b × h</li>
+                  <li>Triángulo: A = (b × h)/2</li>
+                  <li>Círculo: A = πr²</li>
+                </ul>
+              </div>
+              <div className={styles.tableCell}>No aplica (usan volumen)</div>
+            </div>
+
+            <div className={styles.tableRow}>
+              <div className={styles.tableCell}><strong>Fórmula de Volumen</strong></div>
+              <div className={styles.tableCell}>No aplica (son planas)</div>
+              <div className={styles.tableCell}>
+                <ul className={styles.faqList}>
+                  <li>Cubo: V = l³</li>
+                  <li>Cilindro: V = πr²h</li>
+                  <li>Esfera: V = (4/3)πr³</li>
+                  <li>Cono: V = (1/3)πr²h</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className={styles.tableRow}>
+              <div className={styles.tableCell}><strong>Aplicaciones en Estudios</strong></div>
+              <div className={styles.tableCell}>
+                Geometría plana, dibujo técnico, mapas, planos arquitectónicos
+              </div>
+              <div className={styles.tableCell}>
+                Física (volúmenes, densidad), química (moléculas), arquitectura 3D
+              </div>
+            </div>
+
+            <div className={styles.tableRow}>
+              <div className={styles.tableCell}><strong>Nivel Académico</strong></div>
+              <div className={styles.tableCell}>ESO (1º-2º), Bachillerato</div>
+              <div className={styles.tableCell}>ESO (3º-4º), Bachillerato, Universidad</div>
+            </div>
+
+            <div className={styles.tableRow}>
+              <div className={styles.tableCell}><strong>Relación con π</strong></div>
+              <div className={styles.tableCell}>Círculo y figuras circulares</div>
+              <div className={styles.tableCell}>Cilindro, esfera, cono</div>
+            </div>
+
+            <div className={styles.tableRow}>
+              <div className={styles.tableCell}><strong>Complejidad de Cálculo</strong></div>
+              <div className={styles.tableCell}>Baja-Media (1-2 fórmulas)</div>
+              <div className={styles.tableCell}>Media-Alta (múltiples superficies)</div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 2: Casos de Uso (Estudiantes) */}
+        <section className={styles.guideSection}>
+          <h2>👥 ¿Quién Usa Esta Calculadora?</h2>
+          <p className={styles.introParagraph}>
+            Casos reales de estudiantes de diferentes niveles académicos que utilizan la calculadora
+            de geometría para resolver problemas, verificar resultados y comprender conceptos.
           </p>
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>Figuras Planas (2D)</h4>
+              <h4>📐 Marta - Estudiante de Arquitectura</h4>
               <p>
-                Tienen dos dimensiones: longitud y anchura. Se miden por área (superficie)
-                y perímetro (contorno). Ejemplos: triángulos, círculos, polígonos.
+                <strong>Situación:</strong> Diseño de proyecto de vivienda unifamiliar.
+              </p>
+              <p>
+                <strong>Uso:</strong> Calcula áreas de habitaciones (rectángulos), superficies de columnas
+                cilíndricas, y volúmenes de escaleras (prismas rectangulares) para entregar planos técnicos.
+              </p>
+              <p>
+                <strong>Beneficio:</strong> Verifica cálculos rápidamente antes de presentar el proyecto final.
+                "Me ahorra tiempo y me da confianza en los números que incluyo en los planos."
               </p>
             </div>
+
             <div className={styles.contentCard}>
-              <h4>Sólidos (3D)</h4>
+              <h4>🔬 David - Ingeniería Industrial (Universidad)</h4>
               <p>
-                Tienen tres dimensiones: longitud, anchura y altura. Se miden por volumen
-                (espacio ocupado) y superficie (área total). Ejemplos: esferas, cilindros.
+                <strong>Situación:</strong> Ejercicios de resistencia de materiales y cálculo de volúmenes.
+              </p>
+              <p>
+                <strong>Uso:</strong> Calcula volúmenes de piezas mecánicas (cilindros, conos, esferas) para
+                determinar masas con densidad conocida. También superficies para problemas de fluidos.
+              </p>
+              <p>
+                <strong>Beneficio:</strong> "Perfecto para validar resultados de ejercicios antes de entregarlos.
+                Las 4 decimales me dan precisión suficiente para ingeniería."
               </p>
             </div>
+
             <div className={styles.contentCard}>
-              <h4>Polígonos Regulares</h4>
+              <h4>📚 Laura - ESO 3º (Matemáticas)</h4>
               <p>
-                Todos sus lados y ángulos son iguales. El apotema es la distancia del centro
-                al punto medio de un lado. Área = (Perímetro × Apotema) / 2.
+                <strong>Situación:</strong> Deberes de geometría sobre áreas y perímetros.
+              </p>
+              <p>
+                <strong>Uso:</strong> Resuelve problemas de triángulos, cuadrados y círculos para practicar.
+                Comprueba si sus cálculos manuales coinciden con la calculadora.
+              </p>
+              <p>
+                <strong>Beneficio:</strong> "Me ayuda a entender dónde me equivoco. Si mi resultado no coincide,
+                reviso la fórmula y aprendo del error."
               </p>
             </div>
+
             <div className={styles.contentCard}>
-              <h4>El Número π</h4>
+              <h4>👨‍🏫 Profesor Andrés - Bachillerato (Matemáticas)</h4>
               <p>
-                π ≈ 3,14159... Es la relación entre la circunferencia y el diámetro de cualquier
-                círculo. Fundamental en todos los cálculos con círculos y esferas.
+                <strong>Situación:</strong> Creación de exámenes y ejercicios de geometría.
               </p>
+              <p>
+                <strong>Uso:</strong> Genera problemas con resultados conocidos (polígonos regulares, sólidos
+                complejos) para diseñar pruebas equilibradas. También valida ejercicios propuestos por alumnos.
+              </p>
+              <p>
+                <strong>Beneficio:</strong> "Herramienta perfecta para preparar material didáctico. Me aseguro
+                de que los ejercicios tengan soluciones coherentes."
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 3: FAQ Ampliado */}
+        <section className={styles.guideSection}>
+          <h2>❓ Preguntas Frecuentes de Estudiantes</h2>
+
+          <div className={styles.faqItem}>
+            <h4 className={styles.faqQuestion}>¿Cómo memorizo todas estas fórmulas para el examen?</h4>
+            <p className={styles.faqAnswer}>
+              <strong>Estrategia efectiva:</strong> En lugar de memorizar por repetición, entiende la lógica:
+            </p>
+            <ul className={styles.faqList}>
+              <li><strong>2D (áreas):</strong> Siempre multiplicas dos longitudes → resultado en u²</li>
+              <li><strong>3D (volúmenes):</strong> Multiplicas tres longitudes (o área × altura) → resultado en u³</li>
+              <li><strong>Círculos/esferas:</strong> Siempre aparece π. Radio al cuadrado (área) o al cubo (volumen)</li>
+              <li><strong>Truco visual:</strong> Dibuja la figura, marca las medidas, y deduce qué se multiplica</li>
+              <li><strong>Flashcards:</strong> Crea tarjetas con la figura en un lado y la fórmula en el otro</li>
+            </ul>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4 className={styles.faqQuestion}>¿Cuándo uso π = 3,14 y cuándo dejo π sin aproximar?</h4>
+            <p className={styles.faqAnswer}>
+              Depende del contexto del ejercicio:
+            </p>
+            <ul className={styles.faqList}>
+              <li><strong>Resultados exactos:</strong> Deja π en la fórmula (ej: A = 25π cm²). Más preciso para Bachillerato</li>
+              <li><strong>Resultados decimales:</strong> Usa π ≈ 3,1416 cuando te pidan número con decimales</li>
+              <li><strong>Esta calculadora:</strong> Usa el valor completo de π (Math.PI en JavaScript) con 4 decimales de precisión</li>
+              <li><strong>Regla general:</strong> Si el problema dice "calcula el valor numérico", aproxima π. Si dice "expresa el resultado", deja π</li>
+            </ul>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4 className={styles.faqQuestion}>¿Cuál es la diferencia entre área y perímetro?</h4>
+            <p className={styles.faqAnswer}>
+              Confusión muy común en ESO. Piensa en ejemplos físicos:
+            </p>
+            <ul className={styles.faqList}>
+              <li><strong>Perímetro (u):</strong> La longitud del CONTORNO. Como una valla alrededor de un jardín. Se mide en metros lineales</li>
+              <li><strong>Área (u²):</strong> La superficie INTERIOR. Como el césped que cubre el jardín. Se mide en metros cuadrados</li>
+              <li><strong>Ejemplo cuadrado de 5m:</strong> Perímetro = 20m (4 lados × 5m). Área = 25m² (5m × 5m)</li>
+              <li><strong>Truco nemotécnico:</strong> PerÍmetro → PerÍferia (borde). Área → SuperficieA (interior)</li>
+            </ul>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4 className={styles.faqQuestion}>¿Cómo sé si un problema es de 2D o 3D?</h4>
+            <p className={styles.faqAnswer}>
+              Lee el enunciado buscando estas pistas:
+            </p>
+            <ul className={styles.faqList}>
+              <li><strong>Palabras clave 2D:</strong> "superficie del terreno", "plano", "dibujo", "área de la hoja", "perímetro del marco"</li>
+              <li><strong>Palabras clave 3D:</strong> "volumen", "capacidad", "espacio que ocupa", "cantidad de agua", "masa del objeto"</li>
+              <li><strong>Datos del problema:</strong> Si te dan 2 medidas (base y altura) → 2D. Si te dan 3 medidas → probablemente 3D</li>
+              <li><strong>Resultado esperado:</strong> Si piden m² → 2D (área). Si piden m³ → 3D (volumen)</li>
+            </ul>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4 className={styles.faqQuestion}>¿Qué es el apotema y cuándo se usa?</h4>
+            <p className={styles.faqAnswer}>
+              El apotema es específico de polígonos regulares (pentágono, hexágono):
+            </p>
+            <ul className={styles.faqList}>
+              <li><strong>Definición:</strong> Distancia del centro del polígono al punto medio de un lado</li>
+              <li><strong>Uso:</strong> Fórmula del área = (Perímetro × Apotema) / 2</li>
+              <li><strong>Diferencia con radio:</strong> El radio va del centro a un VÉRTICE. El apotema va del centro al LADO</li>
+              <li><strong>Dato del problema:</strong> Si no te dan el apotema, a veces puedes calcularlo con trigonometría (Bachillerato)</li>
+              <li><strong>Esta calculadora:</strong> Calcula el apotema automáticamente para pentágono y hexágono regulares</li>
+            </ul>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4 className={styles.faqQuestion}>¿Volumen y superficie total son lo mismo?</h4>
+            <p className={styles.faqAnswer}>
+              NO. Son conceptos diferentes en figuras 3D:
+            </p>
+            <ul className={styles.faqList}>
+              <li><strong>Volumen (u³):</strong> Espacio que ocupa el sólido POR DENTRO. Como la cantidad de agua que cabe en una botella</li>
+              <li><strong>Superficie Total (u²):</strong> Área de TODAS las caras EXTERNAS. Como el papel necesario para envolver una caja</li>
+              <li><strong>Ejemplo cubo de 2m:</strong> Volumen = 8m³ (2×2×2). Superficie = 24m² (6 caras × 4m² cada una)</li>
+              <li><strong>Aplicaciones:</strong> Volumen → capacidad, masa, densidad. Superficie → pintura, materiales de construcción</li>
+            </ul>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4 className={styles.faqQuestion}>¿Cómo convierto entre unidades (cm, m, km)?</h4>
+            <p className={styles.faqAnswer}>
+              Conversión de unidades en geometría tiene TRAMPAS:
+            </p>
+            <ul className={styles.faqList}>
+              <li><strong>Longitudes (u):</strong> 1 m = 100 cm. Multiplicas/divides por 10, 100, 1000...</li>
+              <li><strong>Áreas (u²):</strong> 1 m² = 10.000 cm² (100×100). El factor se ELEVA AL CUADRADO</li>
+              <li><strong>Volúmenes (u³):</strong> 1 m³ = 1.000.000 cm³ (100×100×100). El factor se ELEVA AL CUBO</li>
+              <li><strong>Regla de oro:</strong> Convierte PRIMERO todas las medidas a la misma unidad ANTES de calcular</li>
+              <li><strong>Ejemplo error común:</strong> Base en metros, altura en cm → resultado INCORRECTO. Convierte todo a metros primero</li>
+            </ul>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h4 className={styles.faqQuestion}>¿Esta calculadora sirve para preparar la EVAU/Selectividad?</h4>
+            <p className={styles.faqAnswer}>
+              Sí, pero con matices:
+            </p>
+            <ul className={styles.faqList}>
+              <li><strong>Para practicar:</strong> Perfecto. Resuelves ejercicios y verificas resultados al instante</li>
+              <li><strong>Para entender:</strong> Te muestra las fórmulas aplicadas en cada caso. Compara con tu procedimiento manual</li>
+              <li><strong>Limitación EVAU:</strong> En el examen debes JUSTIFICAR el procedimiento. No basta el resultado numérico</li>
+              <li><strong>Estrategia recomendada:</strong> Resuelve el problema a mano, luego verifica aquí. Si no coincide, revisa tu proceso</li>
+              <li><strong>Ventaja Bachillerato:</strong> 4 decimales de precisión son suficientes para problemas de geometría analítica</li>
+            </ul>
+          </div>
+        </section>
+
+        {/* SECCIÓN 4: Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>🎯 Guía Paso a Paso: Resolver Problemas de Geometría</h2>
+          <p className={styles.introParagraph}>
+            Metodología sistemática para abordar cualquier problema de geometría sin perderte.
+            Especialmente útil en exámenes bajo presión.
+          </p>
+
+          <div className={styles.stepByStep}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Lee el Enunciado Completo</h4>
+                <p>
+                  No empieces a calcular de inmediato. Lee TODO el problema para entender:
+                  ¿Qué figura es? ¿Qué te dan? ¿Qué te piden? ¿Es 2D o 3D?
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Dibuja la Figura</h4>
+                <p>
+                  Representa la figura aunque el problema no incluya dibujo. Marca con claridad
+                  las medidas conocidas (datos) y la incógnita que buscas. Usa colores si ayuda.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Identifica la Fórmula Correcta</h4>
+                <p>
+                  Según la figura y lo que pidan (área, volumen, perímetro), escribe la fórmula.
+                  Si no la recuerdas exactamente, usa lógica: áreas multiplican 2 longitudes,
+                  volúmenes multiplican 3 longitudes (o área × altura).
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Convierte Unidades (Si Es Necesario)</h4>
+                <p>
+                  ANTES de sustituir en la fórmula, asegúrate de que todas las medidas estén en la
+                  MISMA unidad. Si hay cm y m mezclados, convierte todo a metros (o a la unidad del resultado).
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Sustituye Valores y Calcula</h4>
+                <p>
+                  Reemplaza los datos en la fórmula. Haz las operaciones paso a paso (no todo de golpe).
+                  Si usas calculadora, anota los resultados intermedios por si necesitas revisar.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Verifica la Coherencia del Resultado</h4>
+                <p>
+                  ¿Tiene sentido? Un área de 1.000.000 m² para un cuadrado de 5m es IMPOSIBLE (debería ser 25 m²).
+                  Si el resultado parece raro, revisa: ¿olvidaste elevar al cuadrado? ¿usaste la fórmula correcta?
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Comprueba con la Calculadora (Opcional)</h4>
+                <p>
+                  Si tienes tiempo, valida tu resultado aquí. Introduce las medidas y compara.
+                  Si no coincide, repasa tu procedimiento manual punto por punto.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 5: Tips de Estudio */}
+        <section className={styles.guideSection}>
+          <h2>💡 Tips de Estudio para Dominar Geometría</h2>
+
+          <div className={styles.contentGrid}>
+            <div className={styles.contentCard}>
+              <h4>📌 1. Crea tu Formulario Visual</h4>
+              <p>
+                Dibuja en una hoja TODAS las figuras (2D y 3D) con sus fórmulas al lado.
+                Usa colores: azul para 2D, rojo para 3D. Pon ejemplos numéricos debajo de cada fórmula.
+                Repásalo 10 minutos antes del examen.
+              </p>
+            </div>
+
+            <div className={styles.contentCard}>
+              <h4>🔄 2. Practica con Figuras Compuestas</h4>
+              <p>
+                Los problemas reales combinan figuras (ej: área de una casa = rectángulo + triángulo).
+                Descompón figuras complejas en formas básicas, calcula cada una, y SUMA/RESTA áreas.
+                Practica al menos 5 ejercicios de este tipo antes del examen.
+              </p>
+            </div>
+
+            <div className={styles.contentCard}>
+              <h4>📐 3. Aprende Patrones, No Solo Fórmulas</h4>
+              <p>
+                <strong>Patrón círculos:</strong> Área = πr², Perímetro = 2πr (siempre el doble del radio).
+                <strong>Patrón prismas:</strong> Volumen = Área_base × altura (funciona para cilindro, prisma rectangular, etc.).
+                Identifica patrones comunes y memorizarás menos.
+              </p>
+            </div>
+
+            <div className={styles.contentCard}>
+              <h4>🎮 4. Usa Problemas de la Vida Real</h4>
+              <p>
+                Calcula el área de tu habitación (rectángulo), el volumen de una lata de refresco (cilindro),
+                o el perímetro de una cancha de fútbol. Medir cosas reales hace la geometría más memorable
+                que ejercicios abstractos del libro.
+              </p>
+            </div>
+
+            <div className={styles.contentCard}>
+              <h4>⏱️ 5. Cronometra tus Ejercicios</h4>
+              <p>
+                En exámenes, el tiempo es limitado. Practica resolver 5 problemas tipo en 30 minutos.
+                Identifica qué tipo de ejercicio te lleva más tiempo (ej: polígonos irregulares) y practica
+                ESE tipo extra hasta que seas más rápido.
+              </p>
+            </div>
+
+            <div className={styles.contentCard}>
+              <h4>🤝 6. Explica las Fórmulas a Alguien</h4>
+              <p>
+                La mejor forma de confirmar que entiendes es ENSEÑAR. Explica a un compañero por qué
+                el área del círculo es πr² (relación entre radio y circunferencia). Si puedes explicarlo
+                con tus palabras, lo dominas. Si no puedes, necesitas repasar el concepto.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 6: Warning Box - Errores Comunes */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <h3>⚠️ Errores Comunes que Debes Evitar</h3>
+            <p className={styles.warningIntro}>
+              Estos son los fallos más frecuentes que cometen estudiantes en exámenes de geometría.
+              Revisar esta lista antes de entregar puede salvarte puntos valiosos.
+            </p>
+
+            <div className={styles.contentGrid}>
+              <div className={styles.warningCard}>
+                <h4>❌ Confundir Perímetro con Área</h4>
+                <p>
+                  <strong>Error típico:</strong> Usar la fórmula del área cuando piden perímetro (o viceversa).
+                </p>
+                <p>
+                  <strong>Cómo evitarlo:</strong> Lee QUÉ piden. Perímetro → suma de lados (u). Área → superficie interior (u²).
+                  Las UNIDADES te dan la pista: si piden m², es área; si piden m, es perímetro.
+                </p>
+              </div>
+
+              <div className={styles.warningCard}>
+                <h4>❌ Olvidar Elevar al Cuadrado/Cubo</h4>
+                <p>
+                  <strong>Error típico:</strong> Área del cuadrado = 4 × l (incorrecto). Lo correcto es l².
+                  Volumen del cubo = 3 × l (incorrecto). Lo correcto es l³.
+                </p>
+                <p>
+                  <strong>Cómo evitarlo:</strong> Si la fórmula tiene exponente, NO LO OMITAS. Escribe siempre
+                  l², r³, etc. Anota en tu formulario los exponentes en GRANDE.
+                </p>
+              </div>
+
+              <div className={styles.warningCard}>
+                <h4>❌ Mezclar Unidades sin Convertir</h4>
+                <p>
+                  <strong>Error típico:</strong> Base = 2 m, altura = 50 cm → Área = 2 × 50 = 100 (INCORRECTO).
+                </p>
+                <p>
+                  <strong>Cómo evitarlo:</strong> Convierte TODO a la misma unidad ANTES de calcular.
+                  50 cm = 0,5 m → Área = 2 × 0,5 = 1 m². Escribe la conversión explícitamente en el examen.
+                </p>
+              </div>
+
+              <div className={styles.warningCard}>
+                <h4>❌ Usar π = 3 (Aproximación Demasiado Burda)</h4>
+                <p>
+                  <strong>Error típico:</strong> Calcular π como 3 da resultados imprecisos que pueden ser marcados como incorrectos.
+                </p>
+                <p>
+                  <strong>Cómo evitarlo:</strong> Usa π ≈ 3,14 (mínimo) o mejor π ≈ 3,1416. Si tu calculadora
+                  tiene botón π, úsalo. Si dejas π simbólico (ej: 25π cm²), aún mejor en Bachillerato.
+                </p>
+              </div>
+
+              <div className={styles.warningCard}>
+                <h4>❌ Confundir Radio con Diámetro</h4>
+                <p>
+                  <strong>Error típico:</strong> El problema dice "círculo de 10 cm de diámetro" y usas r = 10 (INCORRECTO).
+                  El radio es la MITAD del diámetro.
+                </p>
+                <p>
+                  <strong>Cómo evitarlo:</strong> Subraya en el enunciado si hablan de radio o diámetro.
+                  Anota: d = 10 → r = 5 ANTES de sustituir en la fórmula. Este error es MUY común.
+                </p>
+              </div>
+
+              <div className={styles.warningCard}>
+                <h4>❌ No Leer Bien el Enunciado</h4>
+                <p>
+                  <strong>Error típico:</strong> El problema pide "superficie a pintar" (solo paredes, sin techo/suelo)
+                  y calculas superficie TOTAL del cubo.
+                </p>
+                <p>
+                  <strong>Cómo evitarlo:</strong> Lee DOS veces el enunciado. Si dice "superficie lateral",
+                  NO incluyas las bases. Si dice "volumen de agua", puede que el recipiente no esté lleno al 100%.
+                </p>
+              </div>
+
+              <div className={styles.warningCard}>
+                <h4>❌ Aplicar Fórmula Incorrecta por Prisa</h4>
+                <p>
+                  <strong>Error típico:</strong> Calcular el área de un triángulo con b × h (sin dividir entre 2).
+                  O volumen de cono como πr²h (sin el 1/3).
+                </p>
+                <p>
+                  <strong>Cómo evitarlo:</strong> Escribe la fórmula COMPLETA antes de sustituir valores.
+                  No calcules de memoria en tu cabeza. Si hay fracciones (1/2, 1/3, 4/3), escríbelas explícitamente.
+                </p>
+              </div>
+
+              <div className={styles.warningCard}>
+                <h4>❌ Redondear Demasiado Pronto</h4>
+                <p>
+                  <strong>Error típico:</strong> Calcular √2 = 1,4 y usar ese valor en pasos siguientes (pierde precisión).
+                </p>
+                <p>
+                  <strong>Cómo evitarlo:</strong> Usa TODOS los decimales que te de la calculadora en pasos intermedios.
+                  Redondea SOLO en el resultado final (ej: 4 decimales). O deja raíces sin aproximar hasta el final.
+                </p>
+              </div>
             </div>
           </div>
         </section>
