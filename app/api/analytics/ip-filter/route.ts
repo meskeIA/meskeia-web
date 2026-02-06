@@ -8,13 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
-
-// Headers CORS
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
+import { getCorsHeaders } from '@/lib/cors';
 
 // Obtener IP del request
 function getClientIP(request: NextRequest): string {
@@ -65,14 +59,14 @@ export async function GET(request: NextRequest) {
         ip_excluida: ipExcluida,
         activo: filtroActivo,
       },
-    }, { headers: corsHeaders });
+    }, { headers: getCorsHeaders('GET, POST, OPTIONS', request.headers.get('origin')) });
 
   } catch (error) {
     console.error('Error al obtener configuración IP:', error);
     return NextResponse.json({
       status: 'error',
       message: 'Error al obtener configuración',
-    }, { status: 500, headers: corsHeaders });
+    }, { status: 500, headers: getCorsHeaders('GET, POST, OPTIONS', request.headers.get('origin')) });
   }
 }
 
@@ -117,18 +111,18 @@ export async function POST(request: NextRequest) {
         activo: filtroActivo,
       },
       message: `IP ${ipActual} guardada correctamente`,
-    }, { headers: corsHeaders });
+    }, { headers: getCorsHeaders('GET, POST, OPTIONS', request.headers.get('origin')) });
 
   } catch (error) {
     console.error('Error al guardar IP:', error);
     return NextResponse.json({
       status: 'error',
       message: 'Error al guardar IP',
-    }, { status: 500, headers: corsHeaders });
+    }, { status: 500, headers: getCorsHeaders('GET, POST, OPTIONS', request.headers.get('origin')) });
   }
 }
 
 // OPTIONS: CORS preflight
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 200, headers: corsHeaders });
+  return new NextResponse(null, { status: 200, headers: getCorsHeaders('GET, POST, OPTIONS') });
 }

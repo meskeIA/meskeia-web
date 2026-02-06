@@ -12,19 +12,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getCorsHeaders } from '@/lib/cors';
 
 // Configuración para edge runtime
 export const runtime = 'edge';
 
-// Headers CORS
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
-
-export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
+export async function OPTIONS(request: NextRequest) {
+  return NextResponse.json({}, { headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) });
 }
 
 // Longitudes de IBAN por país (ISO 13616)
@@ -478,6 +472,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { iban } = body;
+    const origin = request.headers.get('origin');
 
     if (!iban || typeof iban !== 'string') {
       return NextResponse.json(
@@ -485,7 +480,7 @@ export async function POST(request: NextRequest) {
           status: 'error',
           mensaje: 'Se requiere el campo "iban" como string.',
         },
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers: getCorsHeaders('POST, OPTIONS', origin) }
       );
     }
 
@@ -497,7 +492,7 @@ export async function POST(request: NextRequest) {
         ...resultado,
         iban_original: iban,
       },
-      { headers: corsHeaders }
+      { headers: getCorsHeaders('POST, OPTIONS', origin) }
     );
   } catch (error) {
     console.error('Error en /api/validaciones/iban:', error);
@@ -506,7 +501,7 @@ export async function POST(request: NextRequest) {
         status: 'error',
         mensaje: error instanceof Error ? error.message : 'Error desconocido',
       },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: getCorsHeaders('POST, OPTIONS', origin) }
     );
   }
 }

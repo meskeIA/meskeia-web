@@ -7,19 +7,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient } from '@/lib/turso';
+import { getCorsHeaders } from '@/lib/cors';
 
 // Configuración para edge runtime
 export const runtime = 'edge';
 
-// Permitir CORS
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
-
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
+  return NextResponse.json({}, { headers: getCorsHeaders('POST, OPTIONS') });
 }
 
 export async function POST(request: NextRequest) {
@@ -33,7 +27,7 @@ export async function POST(request: NextRequest) {
           status: 'error',
           message: 'Campos "aplicacion" y "duracion_segundos" son obligatorios',
         },
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
       );
     }
 
@@ -71,7 +65,7 @@ export async function POST(request: NextRequest) {
           duracion_segundos: datos.duracion_segundos,
         },
       },
-      { status: 200, headers: corsHeaders }
+      { status: 200, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
     );
   } catch (error) {
     console.error('Error en /api/analytics/duration:', error);
@@ -80,7 +74,7 @@ export async function POST(request: NextRequest) {
         status: 'error',
         message: error instanceof Error ? error.message : 'Error desconocido',
       },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
     );
   }
 }

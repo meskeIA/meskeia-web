@@ -13,19 +13,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient, initializeDatabase, formatearDuracion } from '@/lib/turso';
+import { getCorsHeaders } from '@/lib/cors';
 
 // Configuración para edge runtime
 export const runtime = 'edge';
 
-// Permitir CORS
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
-
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
+  return NextResponse.json({}, { headers: getCorsHeaders('GET, OPTIONS') });
 }
 
 export async function GET(request: NextRequest) {
@@ -335,7 +329,7 @@ export async function GET(request: NextRequest) {
         ranking_aplicaciones: rankingAplicaciones,
         data: registros,
       },
-      { headers: corsHeaders }
+      { headers: getCorsHeaders('GET, OPTIONS', request.headers.get('origin')) }
     );
   } catch (error) {
     console.error('Error en /api/analytics/stats:', error);
@@ -344,7 +338,7 @@ export async function GET(request: NextRequest) {
         status: 'error',
         message: error instanceof Error ? error.message : 'Error desconocido',
       },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: getCorsHeaders('GET, OPTIONS', request.headers.get('origin')) }
     );
   }
 }
