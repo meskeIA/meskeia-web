@@ -600,7 +600,7 @@ FASE 4: VERIFICACIÓN
 - **Excepción**: HTML exportable queda FUERA (funcional vs educativo)
 - **Beneficio**: Reduce scroll inicial en móvil (mejora UX significativa)
 - **Filosofía**: Progressive disclosure - usuario decide si profundizar
-- **Apps implementadas (10)**:
+- **Apps implementadas (11)**:
   1. Conversor de Unidades (app/conversor-unidades/) - Piloto
   2. Simulador de Préstamos (app/simulador-prestamos/) - 7 secciones profesionales
   3. Calculadora Jubilación (app/calculadora-jubilacion/) - 6 secciones profesionales
@@ -611,6 +611,7 @@ FASE 4: VERIFICACIÓN
   8. Simulador Cartera Inversión (app/simulador-cartera-inversion/) - 7 secciones profesionales (Tabla Comparativa perfiles, Casos de Uso 4 inversores, FAQ 8 preguntas, Guía 7 pasos, Tips 6 prácticas, Warning 8 errores)
   9. Calculadora Tarifa Freelance (app/calculadora-tarifa-freelance/) - 7 secciones profesionales (Tabla Comparativa 5 modelos, Casos de Uso 4 freelancers, FAQ 8 preguntas negociación, Guía 7 pasos cálculo, Tips 6 prácticas, Warning 8 errores)
   10. Tabla Periódica Interactiva (app/tabla-periodica/) - 6 secciones profesionales enfocadas en estudiantes (Tabla Comparativa Metales/No Metales/Metaloides, Casos de Uso 4 perfiles, FAQ 8 preguntas estudio, Guía 7 pasos estequiometría, Tips 6 prácticas, Warning 8 errores)
+  11. Calculadora de Geometría (app/calculadora-geometria/) - 6 secciones profesionales enfocadas en estudiantes (Tabla Comparativa 2D vs 3D 10 filas, Casos de Uso 4 perfiles academia/universidad, FAQ 8 preguntas comunes, Guía 7 pasos resolver problemas, Tips 6 consejos estudio, Warning 8 errores comunes)
 - Plantilla CSS: Sin cambios (misma de v1.0)
 - Tiempo promedio: 60 minutos (sin cambios)
 
@@ -648,7 +649,7 @@ Si quieres profesionalizar más apps:
 
 ---
 
-**Última actualización**: 2026-02-05 (Sesión migración masiva v2.0 + Tabla Periódica)
+**Última actualización**: 2026-02-06 (Sesión migración masiva v2.0 + Tabla Periódica + Calculadora Geometría)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
 **Versión**: 2.0
-**Apps implementadas**: 14 (3 v1.0 FULL, 2 v1.0 cleanup, 10 v2.0 migradas)
+**Apps implementadas**: 15 (3 v1.0 FULL, 2 v1.0 cleanup, 11 v2.0 migradas)
