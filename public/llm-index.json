@@ -5052,32 +5052,6 @@
       "icon": "✖️"
     },
     {
-      "slug": "minerales-mundo",
-      "name": "Minerales del Mundo",
-      "url": "https://meskeia.com/minerales-mundo/",
-      "description": "Guía de 50 minerales esenciales con composición química, dureza Mohs, sistema cristalino, usos y curiosidades",
-      "suites": [
-        "cultura"
-      ],
-      "contexts": [
-        "estudio",
-        "curiosidad"
-      ],
-      "keywords": [
-        "minerales",
-        "geologia",
-        "mineralogia",
-        "cristales",
-        "mohs",
-        "cuarzo",
-        "diamante",
-        "pirita",
-        "silicatos",
-        "oxidos"
-      ],
-      "icon": "💎"
-    },
-    {
       "slug": "huesos-cuerpo-humano",
       "name": "Huesos del Cuerpo Humano",
       "url": "https://meskeia.com/huesos-cuerpo-humano/",
