@@ -36,7 +36,7 @@ export default function ResultCard({
   return (
     <div className={cardClass}>
       <div className={styles.header}>
-        {icon && <span className={styles.icon}>{icon}</span>}
+        {icon && <span className={styles.icon} aria-hidden="true">{icon}</span>}
         <h3 className={styles.title}>{title}</h3>
       </div>
 

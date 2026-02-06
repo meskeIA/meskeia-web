@@ -66,8 +66,9 @@
   transform: translateY(0);
 }
 
-.toggleButton:focus {
-  outline: none;
+.toggleButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
   box-shadow: 0 0 0 3px var(--focus, rgba(46, 134, 171, 0.1));
 }
 

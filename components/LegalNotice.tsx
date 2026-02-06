@@ -72,8 +72,8 @@ export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
       <span className={styles.separator}>|</span>
 
       <span className={styles.copyright}>
-        <span className={styles.copyrightFull}>© 2026 meskeIA</span>
-        <span className={styles.copyrightShort}>© 2026</span>
+        <span className={styles.copyrightFull}>© {new Date().getFullYear()} meskeIA</span>
+        <span className={styles.copyrightShort}>© {new Date().getFullYear()}</span>
       </span>
     </div>
   );

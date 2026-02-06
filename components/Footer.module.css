@@ -50,6 +50,11 @@
   opacity: 0.7;
 }
 
+.shareButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .copyright {
   color: #666;
   font-size: 0.85rem;
@@ -80,6 +85,29 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Dark Mode Support */
+[data-theme='dark'] .footer {
+  background: rgba(42, 42, 42, 0.95);
+  border-color: rgba(46, 134, 171, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .shareText {
+  color: var(--primary);
+}
+
+[data-theme='dark'] .shareButton {
+  color: var(--primary);
+}
+
+[data-theme='dark'] .copyright {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .toast {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 768px) {

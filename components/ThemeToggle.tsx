@@ -26,6 +26,7 @@ export default function ThemeToggle() {
       className={styles.themeToggle}
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+      aria-pressed={theme === 'dark' ? 'true' : 'false'}
       title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
     >
       <span className={styles.icon}>

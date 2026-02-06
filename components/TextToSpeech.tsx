@@ -117,14 +117,8 @@ export default function TextToSpeech({
 
       const content = contentRef.current?.textContent || '';
 
-      // DEBUG: Mostrar información en móviles (TEMPORAL - quitar después)
-      const debugInfo = `Chars: ${content.length}, Voces: ${voicesRef.current.length}`;
-      console.log('TTS Debug:', debugInfo);
-      // alert(debugInfo); // Descomentar para debug en móvil
-
       // Si no hay contenido, probar con texto de prueba
       if (!content.trim()) {
-        console.warn('TTS: No hay contenido en contentRef');
         // Intentar con texto de prueba para verificar que TTS funciona
         const testUtterance = new SpeechSynthesisUtterance('Prueba de audio');
         testUtterance.lang = lang;
@@ -157,14 +151,11 @@ export default function TextToSpeech({
       }
 
       utterance.onstart = () => {
-        // Confirmar que la lectura ha comenzado
-        console.log('TTS: Lectura iniciada');
         setIsReading(true);
         setIsPaused(false);
       };
 
       utterance.onend = () => {
-        console.log('TTS: Lectura finalizada');
         setIsReading(false);
         setIsPaused(false);
       };
@@ -175,7 +166,6 @@ export default function TextToSpeech({
           return;
         }
         console.error('TTS Error:', event.error);
-        // alert('Error TTS: ' + event.error); // Descomentar para debug
         setIsReading(false);
         setIsPaused(false);
       };
