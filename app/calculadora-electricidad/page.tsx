@@ -895,25 +895,25 @@ export default function CalculadoraElectricidadPage() {
                   <div className={styles.resultadoDestacado}>
                     <span className={styles.resultadoLabel}>Voltaje de Salida (Vout)</span>
                     <span className={styles.resultadoValor}>
-                      {formatNumber(resultadoDivisor.voltajeSalida, 4)} V
+                      {formatNumber(resultadoDivisor.voltajeSalida ?? 0, 4)} V
                     </span>
                   </div>
                   <div className={styles.divisorGrid}>
                     <div className={styles.divisorCard}>
                       <span className={styles.divisorLabel}>Ratio (R2/(R1+R2))</span>
-                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.ratio, 4)}</span>
+                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.ratio ?? 0, 4)}</span>
                     </div>
                     <div className={styles.divisorCard}>
                       <span className={styles.divisorLabel}>Corriente</span>
-                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.corriente * 1000, 4)} mA</span>
+                      <span className={styles.divisorValor}>{formatNumber((resultadoDivisor.corriente ?? 0) * 1000, 4)} mA</span>
                     </div>
                     <div className={styles.divisorCard}>
                       <span className={styles.divisorLabel}>Potencia R1</span>
-                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.potenciaR1 * 1000, 2)} mW</span>
+                      <span className={styles.divisorValor}>{formatNumber((resultadoDivisor.potenciaR1 ?? 0) * 1000, 2)} mW</span>
                     </div>
                     <div className={styles.divisorCard}>
                       <span className={styles.divisorLabel}>Potencia R2</span>
-                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.potenciaR2 * 1000, 2)} mW</span>
+                      <span className={styles.divisorValor}>{formatNumber((resultadoDivisor.potenciaR2 ?? 0) * 1000, 2)} mW</span>
                     </div>
                   </div>
                   <div className={styles.formulaBox}>
@@ -926,19 +926,19 @@ export default function CalculadoraElectricidadPage() {
                   <div className={styles.divisorGrid}>
                     <div className={styles.divisorCardDestacado}>
                       <span className={styles.divisorLabel}>Corriente por R1</span>
-                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.corrienteR1, 4)} mA</span>
+                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.corrienteR1 ?? 0, 4)} mA</span>
                     </div>
                     <div className={styles.divisorCardDestacado}>
                       <span className={styles.divisorLabel}>Corriente por R2</span>
-                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.corrienteR2, 4)} mA</span>
+                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.corrienteR2 ?? 0, 4)} mA</span>
                     </div>
                     <div className={styles.divisorCard}>
                       <span className={styles.divisorLabel}>Voltaje común</span>
-                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.voltaje, 4)} V</span>
+                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.voltaje ?? 0, 4)} V</span>
                     </div>
                     <div className={styles.divisorCard}>
                       <span className={styles.divisorLabel}>Req paralelo</span>
-                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.resistenciaEquivalente, 2)} Ω</span>
+                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.resistenciaEquivalente ?? 0, 2)} Ω</span>
                     </div>
                   </div>
                   <div className={styles.formulaBox}>

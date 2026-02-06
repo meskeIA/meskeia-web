@@ -4,7 +4,7 @@ import { useState, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
 import styles from './DisclaimerCard.module.css';
 
-export type DisclaimerVariant = 'financial' | 'general' | 'medical' | 'educational';
+export type DisclaimerVariant = 'financial' | 'general' | 'medical' | 'educational' | 'technical';
 export type DisclaimerSeverity = 'critical' | 'high' | 'medium' | 'low';
 
 interface DisclaimerCardProps {
@@ -22,6 +22,7 @@ const DEFAULT_TITLES: Record<DisclaimerVariant, string> = {
   medical: 'Aviso Médico Importante',
   general: 'Información Importante',
   educational: 'Aviso Educativo',
+  technical: 'Información Técnica Importante',
 };
 
 const DEFAULT_ICONS: Record<DisclaimerVariant, string> = {
@@ -29,6 +30,7 @@ const DEFAULT_ICONS: Record<DisclaimerVariant, string> = {
   medical: '⚕️',
   general: 'ℹ️',
   educational: '📚',
+  technical: '🔧',
 };
 
 export default function DisclaimerCard({

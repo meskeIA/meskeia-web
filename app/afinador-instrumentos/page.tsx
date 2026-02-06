@@ -135,7 +135,7 @@ export default function AfinadorInstrumentosPage() {
   const detectarPitch = useCallback(() => {
     if (!analyserRef.current || !bufferRef.current) return;
 
-    analyserRef.current.getFloatTimeDomainData(bufferRef.current);
+    analyserRef.current.getFloatTimeDomainData(bufferRef.current as Float32Array<ArrayBuffer>);
     const frecuencia = autoCorrelate(bufferRef.current, audioContextRef.current!.sampleRate);
 
     if (frecuencia > 0 && frecuencia < 2000) {

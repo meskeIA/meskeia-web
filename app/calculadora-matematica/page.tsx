@@ -433,7 +433,7 @@ export default function CalculadoraMatematicaPage() {
                   <div className={styles.matrizResultado}>
                     <h3>{resultados.descripcion}</h3>
                     <div className={styles.matrizGrid}>
-                      {resultados.resultado.map((v: number, i: number) => (
+                      {Array.isArray(resultados.resultado) && resultados.resultado.map((v: number, i: number) => (
                         <span key={i} className={styles.matrizCellRes}>
                           {formatNumber(v, 4)}
                         </span>
@@ -442,13 +442,13 @@ export default function CalculadoraMatematicaPage() {
                   </div>
                   <ResultCard
                     title="det(A)"
-                    value={formatNumber(resultados.detA, 4)}
+                    value={formatNumber(resultados.detA ?? 0, 4)}
                     variant="info"
                     icon="📐"
                   />
                   <ResultCard
                     title="det(B)"
-                    value={formatNumber(resultados.detB, 4)}
+                    value={formatNumber(resultados.detB ?? 0, 4)}
                     variant="default"
                     icon="📐"
                   />
@@ -459,13 +459,13 @@ export default function CalculadoraMatematicaPage() {
                 <>
                   <ResultCard
                     title="det(A)"
-                    value={formatNumber(resultados.detA, 4)}
+                    value={formatNumber(resultados.detA ?? 0, 4)}
                     variant="highlight"
                     icon="📐"
                   />
                   <ResultCard
                     title="det(B)"
-                    value={formatNumber(resultados.detB, 4)}
+                    value={formatNumber(resultados.detB ?? 0, 4)}
                     variant="info"
                     icon="📐"
                   />
@@ -484,7 +484,7 @@ export default function CalculadoraMatematicaPage() {
                   </div>
                   <ResultCard
                     title="Decimal"
-                    value={formatNumber(resultados.decimal, 6)}
+                    value={formatNumber(resultados.decimal ?? 0, 6)}
                     variant="highlight"
                     icon="🔢"
                   />
@@ -502,14 +502,14 @@ export default function CalculadoraMatematicaPage() {
               {resultados.tipo === 'potencia' && (
                 <>
                   <ResultCard
-                    title={`${resultados.base}^${resultados.exponente}`}
-                    value={formatNumber(resultados.resultado, 10)}
+                    title={`${resultados.base ?? 0}^${resultados.exponente ?? 0}`}
+                    value={formatNumber(Number(resultados.resultado ?? 0), 10)}
                     variant="highlight"
                     icon="²"
                   />
                   <ResultCard
-                    title={`${resultados.base}^${-resultados.exponente}`}
-                    value={formatNumber(resultados.inversa, 10)}
+                    title={`${resultados.base ?? 0}^${-(resultados.exponente ?? 0)}`}
+                    value={formatNumber(resultados.inversa ?? 0, 10)}
                     variant="info"
                     icon="⁻¹"
                     description="Inverso"
@@ -526,20 +526,20 @@ export default function CalculadoraMatematicaPage() {
               {resultados.tipo === 'raiz' && (
                 <>
                   <ResultCard
-                    title={`ⁿ√${resultados.radicando} (n=${resultados.indice})`}
-                    value={formatNumber(resultados.resultado, 10)}
+                    title={`ⁿ√${resultados.radicando ?? 0} (n=${resultados.indice ?? 0})`}
+                    value={formatNumber(Number(resultados.resultado ?? 0), 10)}
                     variant="highlight"
                     icon="√"
                   />
                   <ResultCard
                     title="Resultado²"
-                    value={formatNumber(resultados.cuadrado, 6)}
+                    value={formatNumber(resultados.cuadrado ?? 0, 6)}
                     variant="info"
                     icon="²"
                   />
                   <ResultCard
                     title="Resultado³"
-                    value={formatNumber(resultados.cubo, 6)}
+                    value={formatNumber(resultados.cubo ?? 0, 6)}
                     variant="default"
                     icon="³"
                   />
@@ -555,26 +555,26 @@ export default function CalculadoraMatematicaPage() {
               {resultados.tipo === 'logaritmo' && (
                 <>
                   <ResultCard
-                    title={`log${resultados.base === 10 ? '' : '₍' + resultados.base + '₎'}(${resultados.numero})`}
-                    value={formatNumber(resultados.resultado, 10)}
+                    title={`log${(resultados.base ?? 0) === 10 ? '' : '₍' + (resultados.base ?? 0) + '₎'}(${resultados.numero ?? 0})`}
+                    value={formatNumber(Number(resultados.resultado ?? 0), 10)}
                     variant="highlight"
                     icon="log"
                   />
                   <ResultCard
                     title="ln (logaritmo natural)"
-                    value={formatNumber(resultados.logNatural, 10)}
+                    value={formatNumber(resultados.logNatural ?? 0, 10)}
                     variant="info"
                     icon="e"
                   />
                   <ResultCard
                     title="log₁₀ (logaritmo común)"
-                    value={formatNumber(resultados.log10, 10)}
+                    value={formatNumber(resultados.log10 ?? 0, 10)}
                     variant="default"
                     icon="10"
                   />
                   <ResultCard
                     title="log₂ (logaritmo binario)"
-                    value={formatNumber(resultados.log2, 10)}
+                    value={formatNumber(resultados.log2 ?? 0, 10)}
                     variant="default"
                     icon="2"
                   />

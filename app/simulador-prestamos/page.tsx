@@ -430,7 +430,7 @@ export default function SimuladorPrestamosPage() {
           },
           tooltip: {
             callbacks: {
-              label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
+              label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y ?? 0)}`,
             },
           },
         },
@@ -935,13 +935,13 @@ export default function SimuladorPrestamosPage() {
                     <tr>
                       <td>Cuota inicial</td>
                       {datosComparador.resultados.filter(r => r.valido).map((r, idx) => (
-                        <td key={idx}>{formatCurrency(r.cuotaInicial)}</td>
+                        <td key={idx}>{formatCurrency(r.cuotaInicial ?? 0)}</td>
                       ))}
                     </tr>
                     <tr>
                       <td>Cuota final</td>
                       {datosComparador.resultados.filter(r => r.valido).map((r, idx) => (
-                        <td key={idx}>{formatCurrency(r.cuotaFinal)}</td>
+                        <td key={idx}>{formatCurrency(r.cuotaFinal ?? 0)}</td>
                       ))}
                     </tr>
                     <tr>

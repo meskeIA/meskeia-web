@@ -396,22 +396,22 @@ export default function CalculadoraCalculoPage() {
               {resultados.tipo === 'derivada' && (
                 <>
                   <ResultCard
-                    title={`f(${formatNumber(resultados.punto, 2)})`}
-                    value={formatNumber(resultados.valorFuncion, 6)}
+                    title={`f(${formatNumber(resultados.punto ?? 0, 2)})`}
+                    value={formatNumber(resultados.valorFuncion ?? 0, 6)}
                     variant="default"
                     icon="f"
                     description="Valor de la función"
                   />
                   <ResultCard
-                    title={`f'(${formatNumber(resultados.punto, 2)})`}
-                    value={formatNumber(resultados.primeraDerivada, 6)}
+                    title={`f'(${formatNumber(resultados.punto ?? 0, 2)})`}
+                    value={formatNumber(resultados.primeraDerivada ?? 0, 6)}
                     variant="highlight"
                     icon="f'"
                     description="Primera derivada"
                   />
                   <ResultCard
-                    title={`f''(${formatNumber(resultados.punto, 2)})`}
-                    value={formatNumber(resultados.segundaDerivada, 6)}
+                    title={`f''(${formatNumber(resultados.punto ?? 0, 2)})`}
+                    value={formatNumber(resultados.segundaDerivada ?? 0, 6)}
                     variant="info"
                     icon="f''"
                     description="Segunda derivada"
@@ -435,20 +435,20 @@ export default function CalculadoraCalculoPage() {
                 <>
                   <ResultCard
                     title={`∫f(x)dx ${resultados.intervalo}`}
-                    value={formatNumber(resultados.resultado, 6)}
+                    value={formatNumber(resultados.resultado ?? 0, 6)}
                     variant="highlight"
                     icon="∫"
                     description="Integral definida"
                   />
                   <ResultCard
                     title="f(a)"
-                    value={formatNumber(resultados.valorEnA, 6)}
+                    value={formatNumber(resultados.valorEnA ?? 0, 6)}
                     variant="default"
                     icon="a"
                   />
                   <ResultCard
                     title="f(b)"
-                    value={formatNumber(resultados.valorEnB, 6)}
+                    value={formatNumber(resultados.valorEnB ?? 0, 6)}
                     variant="default"
                     icon="b"
                   />
@@ -465,26 +465,26 @@ export default function CalculadoraCalculoPage() {
               {resultados.tipo === 'limite' && (
                 <>
                   <ResultCard
-                    title={`lim x→${formatNumber(resultados.punto, 2)}`}
-                    value={resultados.existe ? formatNumber(resultados.limite!, 6) : 'No existe'}
-                    variant={resultados.existe ? 'highlight' : 'warning'}
+                    title={`lim x→${formatNumber(resultados.punto ?? 0, 2)}`}
+                    value={(resultados as any).existe ? formatNumber((resultados as any).limite ?? 0, 6) : 'No existe'}
+                    variant={(resultados as any).existe ? 'highlight' : 'warning'}
                     icon="lim"
                   />
                   <ResultCard
                     title="Límite por izquierda"
-                    value={formatNumber(resultados.izquierda, 6)}
+                    value={formatNumber((resultados as any).izquierda ?? 0, 6)}
                     variant="default"
                     icon="←"
                   />
                   <ResultCard
                     title="Límite por derecha"
-                    value={formatNumber(resultados.derecha, 6)}
+                    value={formatNumber((resultados as any).derecha ?? 0, 6)}
                     variant="default"
                     icon="→"
                   />
                   <ResultCard
-                    title={`f(${formatNumber(resultados.punto, 2)})`}
-                    value={isNaN(resultados.valorEnPunto) ? 'Indefinido' : formatNumber(resultados.valorEnPunto, 6)}
+                    title={`f(${formatNumber(resultados.punto ?? 0, 2)})`}
+                    value={isNaN((resultados as any).valorEnPunto) ? 'Indefinido' : formatNumber((resultados as any).valorEnPunto ?? 0, 6)}
                     variant="info"
                     icon="f"
                     description="Valor en el punto"
@@ -496,14 +496,14 @@ export default function CalculadoraCalculoPage() {
                 <>
                   <ResultCard
                     title={`S${numTerminos}`}
-                    value={formatNumber(resultados.suma, 6)}
+                    value={formatNumber(resultados.suma ?? 0, 6)}
                     variant="highlight"
                     icon="Σ"
                     description={`Suma de ${numTerminos} términos`}
                   />
                   <ResultCard
                     title="Último término"
-                    value={formatNumber(resultados.ultimoTermino, 6)}
+                    value={formatNumber(resultados.ultimoTermino ?? 0, 6)}
                     variant="info"
                     icon={`a${numTerminos}`}
                   />
@@ -511,7 +511,7 @@ export default function CalculadoraCalculoPage() {
                     <>
                       <ResultCard
                         title="Suma infinita (S∞)"
-                        value={resultados.sumaInfinita !== null ? formatNumber(resultados.sumaInfinita, 6) : 'Diverge'}
+                        value={resultados.sumaInfinita !== null ? formatNumber(resultados.sumaInfinita ?? 0, 6) : 'Diverge'}
                         variant={resultados.converge ? 'success' : 'warning'}
                         icon="∞"
                         description={resultados.converge ? '|r| < 1' : '|r| ≥ 1'}
@@ -521,7 +521,7 @@ export default function CalculadoraCalculoPage() {
                   <div className={styles.terminosBox}>
                     <h4>Primeros términos</h4>
                     <p className={styles.terminos}>
-                      {resultados.terminos.map((t: number, i: number) => formatNumber(t, 2)).join(', ')}
+                      {(resultados.terminos ?? []).map((t: number, i: number) => formatNumber(t, 2)).join(', ')}
                       {parseInt(numTerminos) > 10 ? '...' : ''}
                     </p>
                     <p className={styles.formulaSmall}>{resultados.formula}</p>

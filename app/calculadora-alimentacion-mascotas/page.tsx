@@ -450,7 +450,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
-        variant="health"
+        variant="medical"
         severity="medium"
         context="calculadora-alimentacion-mascotas"
         collapsible={true}

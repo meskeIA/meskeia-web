@@ -231,7 +231,7 @@ export default function GeneradorQRPage() {
       }
 
       // Crear nueva instancia
-      qrCodeInstance.current = new QRCodeStyling(options);
+      qrCodeInstance.current = new QRCodeStyling(options as never);
       qrCodeInstance.current.append(qrRef.current);
 
       setQrGenerado(true);

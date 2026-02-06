@@ -194,7 +194,7 @@ export default function CalculadoraPresupuestosPage() {
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
       };
 
-      html2pdf().set(opt).from(previewRef.current).save();
+      html2pdf().set(opt as any).from(previewRef.current).save();
     } catch (error) {
       console.error('Error al generar PDF:', error);
       alert('Error al generar el PDF. Por favor, intenta de nuevo.');

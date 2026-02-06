@@ -433,14 +433,14 @@ export default function CalculadoraGeometriaPage() {
                   <>
                     <ResultCard
                       title="Área"
-                      value={formatNumber(resultados.area, 4)}
+                      value={formatNumber(resultados.area ?? 0, 4)}
                       unit="u²"
                       variant="highlight"
                       icon="📐"
                     />
                     <ResultCard
                       title="Perímetro"
-                      value={formatNumber(resultados.perimetro, 4)}
+                      value={formatNumber(resultados.perimetro ?? 0, 4)}
                       unit="u"
                       variant="info"
                       icon="📏"
@@ -486,14 +486,14 @@ export default function CalculadoraGeometriaPage() {
                   <>
                     <ResultCard
                       title="Volumen"
-                      value={formatNumber(resultados.volumen, 4)}
+                      value={formatNumber(resultados.volumen ?? 0, 4)}
                       unit="u³"
                       variant="highlight"
                       icon="📦"
                     />
                     <ResultCard
                       title="Superficie Total"
-                      value={formatNumber(resultados.superficieTotal, 4)}
+                      value={formatNumber(resultados.superficieTotal ?? 0, 4)}
                       unit="u²"
                       variant="info"
                       icon="🔲"

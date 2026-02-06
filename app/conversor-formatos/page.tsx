@@ -95,7 +95,7 @@ export default function ConversorFormatosPage() {
         header: true,
         delimiter,
         skipEmptyLines: true,
-        complete: (results) => {
+        complete: (results: { data: Record<string, unknown>[] }) => {
           resolve(results.data as Record<string, unknown>[]);
         },
         error: (err: Error) => {

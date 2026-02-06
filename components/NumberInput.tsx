@@ -23,6 +23,7 @@ interface NumberInputProps {
   className?: string;
   helperText?: string;
   error?: string;
+  suffix?: string;
 }
 
 export default function NumberInput({
@@ -38,6 +39,7 @@ export default function NumberInput({
   className = '',
   helperText,
   error,
+  suffix,
 }: NumberInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;

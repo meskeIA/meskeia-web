@@ -67,7 +67,7 @@ const productosSugeridos: Record<string, string> = {
   'pescado congelado': 'congelados', 'patatas congeladas': 'congelados',
   // Bebidas
   'agua': 'bebidas', 'zumo': 'bebidas', 'refrescos': 'bebidas', 'cerveza': 'bebidas',
-  'vino': 'bebidas', 'leche': 'bebidas',
+  'vino': 'bebidas',
   // Limpieza
   'detergente': 'limpieza', 'suavizante': 'limpieza', 'lejía': 'limpieza', 'lavavajillas': 'limpieza',
   'papel higiénico': 'limpieza', 'servilletas': 'limpieza', 'bolsas basura': 'limpieza',

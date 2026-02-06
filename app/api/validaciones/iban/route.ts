@@ -208,7 +208,6 @@ const BANCOS_ESPANOLES: Record<string, string> = {
   '0162': 'Crédit Lyonnais',
   '0167': 'Banco Mediolanum',
   '0169': 'Banco de la Nación Argentina',
-  '0182': 'BBVA',
   '0186': 'Banco de Finanzas e Inversiones (Fibanc)',
   '0188': 'Banco Alcalá',
   '0198': 'Banco Cooperativo Español',

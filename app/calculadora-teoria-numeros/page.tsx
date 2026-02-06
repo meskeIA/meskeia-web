@@ -496,7 +496,7 @@ export default function CalculadoraTeoriaNumerosPage() {
                   )}
                   <ResultCard
                     title="Siguiente primo"
-                    value={resultados.siguientePrimo.toString()}
+                    value={(resultados.siguientePrimo ?? 0).toString()}
                     variant="default"
                     icon="→"
                   />
@@ -507,7 +507,7 @@ export default function CalculadoraTeoriaNumerosPage() {
                 <>
                   <ResultCard
                     title="Primos encontrados"
-                    value={resultados.cantidad.toString()}
+                    value={(resultados.cantidad ?? 0).toString()}
                     variant="highlight"
                     icon="🔢"
                     description={`Entre ${resultados.inicio} y ${resultados.fin}`}
@@ -515,8 +515,8 @@ export default function CalculadoraTeoriaNumerosPage() {
                   <div className={styles.primosLista}>
                     <h4>Lista de primos</h4>
                     <p className={styles.primos}>
-                      {resultados.primos.slice(0, 100).join(', ')}
-                      {resultados.primos.length > 100 ? '...' : ''}
+                      {(resultados.primos ?? []).slice(0, 100).join(', ')}
+                      {(resultados.primos ?? []).length > 100 ? '...' : ''}
                     </p>
                   </div>
                 </>
@@ -530,13 +530,13 @@ export default function CalculadoraTeoriaNumerosPage() {
                   </div>
                   <ResultCard
                     title="Número de divisores"
-                    value={resultados.numDivisores.toString()}
+                    value={(resultados.numDivisores ?? 0).toString()}
                     variant="info"
                     icon="÷"
                   />
                   <ResultCard
                     title="Suma de divisores"
-                    value={formatNumber(resultados.sumaDivisores, 0)}
+                    value={formatNumber(resultados.sumaDivisores ?? 0, 0)}
                     variant="default"
                     icon="Σ"
                   />
@@ -553,14 +553,14 @@ export default function CalculadoraTeoriaNumerosPage() {
                 <>
                   <ResultCard
                     title="MCD"
-                    value={formatNumber(resultados.mcd, 0)}
+                    value={formatNumber(resultados.mcd ?? 0, 0)}
                     variant="highlight"
                     icon="÷"
                     description="Máximo Común Divisor"
                   />
                   <ResultCard
                     title="MCM"
-                    value={formatNumber(resultados.mcm, 0)}
+                    value={formatNumber(resultados.mcm ?? 0, 0)}
                     variant="highlight"
                     icon="×"
                     description="Mínimo Común Múltiplo"
@@ -588,19 +588,19 @@ export default function CalculadoraTeoriaNumerosPage() {
                 <>
                   <ResultCard
                     title="Cantidad de divisores"
-                    value={resultados.cantidad.toString()}
+                    value={(resultados.cantidad ?? 0).toString()}
                     variant="highlight"
                     icon="📊"
                   />
                   <ResultCard
                     title="Suma de divisores"
-                    value={formatNumber(resultados.suma, 0)}
+                    value={formatNumber(resultados.suma ?? 0, 0)}
                     variant="info"
                     icon="Σ"
                   />
                   <ResultCard
                     title="Clasificación"
-                    value={resultados.clasificacion}
+                    value={resultados.clasificacion ?? ''}
                     variant={resultados.clasificacion === 'Perfecto' ? 'success' : 'default'}
                     icon={resultados.clasificacion === 'Perfecto' ? '⭐' : resultados.clasificacion === 'Abundante' ? '📈' : '📉'}
                     description={`σ(n)-n ${resultados.clasificacion === 'Perfecto' ? '=' : resultados.clasificacion === 'Abundante' ? '>' : '<'} n`}
@@ -608,11 +608,11 @@ export default function CalculadoraTeoriaNumerosPage() {
                   <div className={styles.divisoresLista}>
                     <h4>Divisores de {resultados.numero}</h4>
                     <p className={styles.divisores}>
-                      {resultados.divisores.join(', ')}
+                      {(resultados.divisores ?? []).join(', ')}
                     </p>
                     <h4>Pares complementarios</h4>
                     <p className={styles.pares}>
-                      {resultados.pares.map(([a, b]) => `(${a}×${b})`).join(' ')}
+                      {(resultados.pares ?? []).map(([a, b]) => `(${a}×${b})`).join(' ')}
                     </p>
                   </div>
                 </>
@@ -622,14 +622,14 @@ export default function CalculadoraTeoriaNumerosPage() {
                 <>
                   <ResultCard
                     title={`${resultados.base} mod ${resultados.modulo}`}
-                    value={resultados.residuo.toString()}
+                    value={(resultados.residuo ?? 0).toString()}
                     variant="highlight"
                     icon="mod"
                   />
                   {resultados.potenciaMod !== null && (
                     <ResultCard
                       title={`${resultados.base}^${resultados.exponente} mod ${resultados.modulo}`}
-                      value={resultados.potenciaMod.toString()}
+                      value={(resultados.potenciaMod ?? 0).toString()}
                       variant="highlight"
                       icon="^"
                       description="Exponenciación modular"
@@ -637,7 +637,7 @@ export default function CalculadoraTeoriaNumerosPage() {
                   )}
                   <ResultCard
                     title={`φ(${resultados.modulo})`}
-                    value={resultados.phi.toString()}
+                    value={(resultados.phi ?? 0).toString()}
                     variant="info"
                     icon="φ"
                     description="Función de Euler"

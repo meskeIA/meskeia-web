@@ -708,13 +708,13 @@ export default function CalculadoraHuellaCarbono() {
               <div className={styles.chartCard}>
                 <h3>Desglose por categoría</h3>
                 <div className={styles.chartWrapper}>
-                  {chartData && <Doughnut data={chartData} options={chartOptions} />}
+                  {chartData && <Doughnut data={chartData} options={chartOptions as never} />}
                 </div>
               </div>
               <div className={styles.chartCard}>
                 <h3>Comparativa</h3>
                 <div className={styles.chartWrapperBar}>
-                  <Bar data={barData} options={barOptions} />
+                  <Bar data={barData} options={barOptions as never} />
                 </div>
               </div>
             </div>

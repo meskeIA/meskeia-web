@@ -408,7 +408,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
                   />
                   <ResultCard
                     title="φ(n)"
-                    value={resultados.ordenGrupoMultiplicativo.toString()}
+                    value={(resultados.ordenGrupoMultiplicativo ?? 0).toString()}
                     variant="info"
                     icon="φ"
                     description="Función de Euler"
@@ -423,21 +423,21 @@ export default function CalculadoraAlgebraAbstractaPage() {
                   <div className={styles.listaElementos}>
                     <h4>Unidades (invertibles)</h4>
                     <p className={styles.elementos}>
-                      {resultados.unidades.join(', ')}
+                      {(resultados.unidades ?? []).join(', ')}
                     </p>
                   </div>
 
                   <div className={styles.listaElementos}>
                     <h4>Generadores de (Zn, +)</h4>
                     <p className={styles.elementos}>
-                      {resultados.generadoresAditivos.join(', ') || 'Ninguno'}
+                      {(resultados.generadoresAditivos ?? []).join(', ') || 'Ninguno'}
                     </p>
                   </div>
 
                   <div className={styles.listaElementos}>
                     <h4>Generadores de (Zn*, ×)</h4>
                     <p className={styles.elementos}>
-                      {resultados.generadoresMultiplicativos.join(', ') || 'Ninguno'}
+                      {(resultados.generadoresMultiplicativos ?? []).join(', ') || 'Ninguno'}
                     </p>
                   </div>
                 </div>
@@ -447,25 +447,25 @@ export default function CalculadoraAlgebraAbstractaPage() {
                 <div className={styles.resultsGrid}>
                   <ResultCard
                     title={`[${resultados.elemento}] en Z${resultados.modulo}`}
-                    value={resultados.elemento.toString()}
+                    value={(resultados.elemento ?? 0).toString()}
                     variant="highlight"
                     icon="a"
                   />
                   <ResultCard
                     title="Inverso aditivo (-a)"
-                    value={resultados.inversoAditivo.toString()}
+                    value={(resultados.inversoAditivo ?? 0).toString()}
                     variant="info"
                     icon="-"
                   />
                   <ResultCard
                     title="Inverso multiplicativo (a⁻¹)"
-                    value={resultados.inversoMultiplicativo !== null ? resultados.inversoMultiplicativo.toString() : 'No existe'}
+                    value={resultados.inversoMultiplicativo != null ? resultados.inversoMultiplicativo.toString() : 'No existe'}
                     variant={resultados.inversoMultiplicativo !== null ? 'success' : 'warning'}
                     icon="⁻¹"
                   />
                   <ResultCard
                     title={`Orden (${operacion === '+' ? 'aditivo' : 'multiplicativo'})`}
-                    value={resultados.orden > 0 ? resultados.orden.toString() : 'N/A'}
+                    value={(resultados.orden ?? 0) > 0 ? (resultados.orden ?? 0).toString() : 'N/A'}
                     variant="default"
                     icon="ord"
                   />
@@ -478,7 +478,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
                   {resultados.resultado !== null && (
                     <ResultCard
                       title={`a ${operacion} b`}
-                      value={resultados.resultado.toString()}
+                      value={(resultados.resultado ?? 0).toString()}
                       variant="highlight"
                       icon="="
                     />
@@ -487,7 +487,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
                   <div className={styles.listaElementos}>
                     <h4>Potencias de {resultados.elemento}</h4>
                     <p className={styles.elementos}>
-                      {resultados.potencias.map((p, i) => `${resultados.elemento}^${i}=${p}`).join(', ')}
+                      {(resultados.potencias ?? []).map((p, i) => `${resultados.elemento ?? 0}^${i}=${p}`).join(', ')}
                     </p>
                   </div>
                 </div>
@@ -508,7 +508,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {resultados.tablaSuma.map((fila, i) => (
+                          {(resultados.tablaSuma ?? []).map((fila, i) => (
                             <tr key={i}>
                               <th>{i}</th>
                               {fila.map((val, j) => (
@@ -534,7 +534,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {resultados.tablaMult.map((fila, i) => (
+                          {(resultados.tablaMult ?? []).map((fila, i) => (
                             <tr key={i}>
                               <th>{i}</th>
                               {fila.map((val, j) => (
@@ -568,7 +568,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
                   />
                   <ResultCard
                     title="Característica"
-                    value={resultados.caracteristica.toString()}
+                    value={(resultados.caracteristica ?? 0).toString()}
                     variant="info"
                     icon="char"
                   />
@@ -582,28 +582,28 @@ export default function CalculadoraAlgebraAbstractaPage() {
                   <div className={styles.listaElementos}>
                     <h4>Unidades (Z{resultados.modulo}*)</h4>
                     <p className={styles.elementos}>
-                      {resultados.unidades.join(', ')}
+                      {(resultados.unidades ?? []).join(', ')}
                     </p>
                   </div>
 
                   <div className={styles.listaElementos}>
                     <h4>Divisores de cero</h4>
                     <p className={styles.elementos}>
-                      {resultados.divisoresCero.length > 0 ? resultados.divisoresCero.sort((a, b) => a - b).join(', ') : 'Ninguno'}
+                      {(resultados.divisoresCero?.length ?? 0) > 0 ? (resultados.divisoresCero ?? []).sort((a, b) => a - b).join(', ') : 'Ninguno'}
                     </p>
                   </div>
 
                   <div className={styles.listaElementos}>
                     <h4>Elementos idempotentes (a² = a)</h4>
                     <p className={styles.elementos}>
-                      {resultados.idempotentes.join(', ')}
+                      {(resultados.idempotentes ?? []).join(', ')}
                     </p>
                   </div>
 
                   <div className={styles.listaElementos}>
                     <h4>Elementos nilpotentes</h4>
                     <p className={styles.elementos}>
-                      {resultados.nilpotentes.length > 0 ? resultados.nilpotentes.join(', ') : 'Ninguno (excepto 0)'}
+                      {(resultados.nilpotentes?.length ?? 0) > 0 ? (resultados.nilpotentes ?? []).join(', ') : 'Ninguno (excepto 0)'}
                     </p>
                   </div>
                 </div>

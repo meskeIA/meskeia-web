@@ -41,12 +41,12 @@ export default function CifradoAESPage() {
     return crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
-        salt: salt,
+        salt: salt as BufferSource,
         iterations: 100000,
         hash: 'SHA-256'
-      },
+      } as Pbkdf2Params,
       keyMaterial,
-      { name: algoritmo, length: 256 },
+      { name: algoritmo, length: 256 } as AesKeyGenParams,
       false,
       ['encrypt', 'decrypt']
     );

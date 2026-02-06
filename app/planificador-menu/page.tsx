@@ -349,7 +349,7 @@ export default function PlanificadorMenuPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
-        variant="default"
+        variant="general"
         severity="low"
         context="planificador-menu"
         collapsible={true}

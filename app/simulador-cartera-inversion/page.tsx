@@ -645,7 +645,7 @@ export default function SimuladorCarteraPage() {
                     <Line
                       ref={chartRef}
                       data={chartData}
-                      options={chartOptions}
+                      options={chartOptions as never}
                     />
                   )}
                 </div>

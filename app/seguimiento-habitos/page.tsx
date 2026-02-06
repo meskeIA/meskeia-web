@@ -360,7 +360,7 @@ export default function SeguimientoHabitosPage() {
     let diaSemanaInicio = primerDia.getDay() - 1;
     if (diaSemanaInicio === -1) diaSemanaInicio = 6;
 
-    const dias: JSX.Element[] = [];
+    const dias: React.ReactElement[] = [];
 
     // Días del mes anterior
     const ultimoDiaMesAnterior = new Date(mesActual.getFullYear(), mesActual.getMonth(), 0);

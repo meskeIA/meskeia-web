@@ -356,10 +356,10 @@ export default function EstadisticaAvanzadaPage() {
     const sorted = [...data].sort((a, b) => a - b);
 
     // Asimetría (Skewness)
-    const skewness = jStat.skewness(data);
+    const skewness = (jStat as Record<string, (d: number[]) => number>).skewness(data);
 
     // Curtosis
-    const kurtosis = jStat.kurtosis(data);
+    const kurtosis = (jStat as Record<string, (d: number[]) => number>).kurtosis(data);
 
     // Test de Jarque-Bera (aproximación para normalidad)
     const jb = (n / 6) * (Math.pow(skewness, 2) + Math.pow(kurtosis - 3, 2) / 4);
@@ -567,11 +567,11 @@ export default function EstadisticaAvanzadaPage() {
                     <>
                       <div className={styles.resultCard}>
                         <span className={styles.resultLabel}>Media Grupo 1</span>
-                        <span className={styles.resultValue}>{formatNumber(ttestResults.mean1, 4)}</span>
+                        <span className={styles.resultValue}>{formatNumber((ttestResults as unknown as Record<string, number>).mean1 ?? 0, 4)}</span>
                       </div>
                       <div className={styles.resultCard}>
                         <span className={styles.resultLabel}>Media Grupo 2</span>
-                        <span className={styles.resultValue}>{formatNumber(ttestResults.mean2, 4)}</span>
+                        <span className={styles.resultValue}>{formatNumber((ttestResults as unknown as Record<string, number>).mean2 ?? 0, 4)}</span>
                       </div>
                     </>
                   )}

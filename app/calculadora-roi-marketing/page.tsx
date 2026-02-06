@@ -459,14 +459,14 @@ export default function CalculadoraROIMarketingPage() {
 
               <div className={styles.canalInputs}>
                 <NumberInput
-                  value={canal.inversion}
+                  value={String(canal.inversion)}
                   onChange={(v) => actualizarCanal(canal.id, 'inversion', v)}
                   label="Inversión"
                   placeholder="0"
                   suffix="€"
                 />
                 <NumberInput
-                  value={canal.clientes}
+                  value={String(canal.clientes)}
                   onChange={(v) => actualizarCanal(canal.id, 'clientes', v)}
                   label="Clientes"
                   placeholder="0"

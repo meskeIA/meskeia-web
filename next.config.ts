@@ -35,12 +35,10 @@ const nextConfig: NextConfig = {
   },
 
   // ============================================================================
-  // TYPESCRIPT - Validación parcial
+  // TYPESCRIPT - Validación estricta activada (0 errores desde 2026-02-06)
   // ============================================================================
-  // IMPORTANTE: Las apps nuevas NO tienen errores TypeScript
-  // Errores existentes SOLO en guías auto-generadas (atributos HTML legacy)
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 
   // ============================================================================

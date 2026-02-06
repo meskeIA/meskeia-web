@@ -227,7 +227,7 @@ export default function CalculadoraInflacionPage() {
               title: (items) => `Año ${items[0].parsed.x}`,
               label: (context) => {
                 const valor = context.parsed.y;
-                return `${context.dataset.label}: ${formatNumber(valor, 2)} (base 100)`;
+                return `${context.dataset.label}: ${formatNumber(valor ?? 0, 2)} (base 100)`;
               },
             },
           },

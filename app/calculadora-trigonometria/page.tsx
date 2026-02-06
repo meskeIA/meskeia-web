@@ -410,37 +410,37 @@ export default function CalculadoraTrigonometriaPage() {
                 <>
                   <ResultCard
                     title="sin(θ)"
-                    value={formatNumber(resultados.seno, 8)}
+                    value={formatNumber(resultados.seno ?? 0, 8)}
                     variant="highlight"
                     icon="sin"
                   />
                   <ResultCard
                     title="cos(θ)"
-                    value={formatNumber(resultados.coseno, 8)}
+                    value={formatNumber(resultados.coseno ?? 0, 8)}
                     variant="highlight"
                     icon="cos"
                   />
                   <ResultCard
                     title="tan(θ)"
-                    value={resultados.tangente !== null ? formatNumber(resultados.tangente, 8) : '∞'}
+                    value={resultados.tangente !== null ? formatNumber(resultados.tangente ?? 0, 8) : '∞'}
                     variant="highlight"
                     icon="tan"
                   />
                   <ResultCard
                     title="csc(θ)"
-                    value={resultados.cosecante !== null ? formatNumber(resultados.cosecante, 8) : '∞'}
+                    value={resultados.cosecante !== null ? formatNumber(resultados.cosecante ?? 0, 8) : '∞'}
                     variant="info"
                     icon="csc"
                   />
                   <ResultCard
                     title="sec(θ)"
-                    value={resultados.secante !== null ? formatNumber(resultados.secante, 8) : '∞'}
+                    value={resultados.secante !== null ? formatNumber(resultados.secante ?? 0, 8) : '∞'}
                     variant="info"
                     icon="sec"
                   />
                   <ResultCard
                     title="cot(θ)"
-                    value={resultados.cotangente !== null ? formatNumber(resultados.cotangente, 8) : '∞'}
+                    value={resultados.cotangente !== null ? formatNumber(resultados.cotangente ?? 0, 8) : '∞'}
                     variant="info"
                     icon="cot"
                   />
@@ -452,7 +452,7 @@ export default function CalculadoraTrigonometriaPage() {
                   />
                   <ResultCard
                     title="En radianes"
-                    value={formatNumber(resultados.anguloRad, 6)}
+                    value={formatNumber(resultados.anguloRad ?? 0, 6)}
                     variant="default"
                     icon="rad"
                   />
@@ -463,46 +463,46 @@ export default function CalculadoraTrigonometriaPage() {
                 <>
                   <ResultCard
                     title="Cateto a"
-                    value={formatNumber(resultados.catetoA, 4)}
+                    value={formatNumber(resultados.catetoA ?? 0, 4)}
                     variant="default"
                     icon="a"
                   />
                   <ResultCard
                     title="Cateto b"
-                    value={formatNumber(resultados.catetoB, 4)}
+                    value={formatNumber(resultados.catetoB ?? 0, 4)}
                     variant="default"
                     icon="b"
                   />
                   <ResultCard
                     title="Hipotenusa c"
-                    value={formatNumber(resultados.hipotenusa, 4)}
+                    value={formatNumber(resultados.hipotenusa ?? 0, 4)}
                     variant="highlight"
                     icon="c"
                   />
                   <ResultCard
                     title="Ángulo A"
-                    value={formatNumber(resultados.anguloA, 4)}
+                    value={formatNumber(resultados.anguloA ?? 0, 4)}
                     unit="°"
                     variant="info"
                     icon="α"
                   />
                   <ResultCard
                     title="Ángulo B"
-                    value={formatNumber(resultados.anguloB, 4)}
+                    value={formatNumber(resultados.anguloB ?? 0, 4)}
                     unit="°"
                     variant="info"
                     icon="β"
                   />
                   <ResultCard
                     title="Área"
-                    value={formatNumber(resultados.area, 4)}
+                    value={formatNumber(resultados.area ?? 0, 4)}
                     unit="u²"
                     variant="default"
                     icon="📐"
                   />
                   <ResultCard
                     title="Perímetro"
-                    value={formatNumber(resultados.perimetro, 4)}
+                    value={formatNumber(resultados.perimetro ?? 0, 4)}
                     unit="u"
                     variant="default"
                     icon="📏"
@@ -514,27 +514,27 @@ export default function CalculadoraTrigonometriaPage() {
                 <>
                   <ResultCard
                     title="Grados"
-                    value={formatNumber(resultados.grados, 6)}
+                    value={formatNumber(resultados.grados ?? 0, 6)}
                     unit="°"
                     variant="highlight"
                     icon="°"
                   />
                   <ResultCard
                     title="Radianes"
-                    value={formatNumber(resultados.radianes, 6)}
+                    value={formatNumber(resultados.radianes ?? 0, 6)}
                     variant="highlight"
                     icon="rad"
                   />
                   <ResultCard
                     title="Gradianes"
-                    value={formatNumber(resultados.gradianes, 6)}
+                    value={formatNumber(resultados.gradianes ?? 0, 6)}
                     unit="gon"
                     variant="info"
                     icon="gon"
                   />
                   <ResultCard
                     title="Fracción de π"
-                    value={resultados.fraccionPi}
+                    value={resultados.fraccionPi ?? ''}
                     variant="info"
                     icon="π"
                   />
@@ -545,34 +545,34 @@ export default function CalculadoraTrigonometriaPage() {
                 <>
                   <ResultCard
                     title="sin²θ + cos²θ"
-                    value={formatNumber(resultados.sin2cos2, 8)}
+                    value={formatNumber(resultados.sin2cos2 ?? 0, 8)}
                     variant="success"
                     icon="="
                     description="Siempre = 1"
                   />
                   <ResultCard
                     title="sin(2θ)"
-                    value={formatNumber(resultados.sin2a, 8)}
+                    value={formatNumber(resultados.sin2a ?? 0, 8)}
                     variant="highlight"
                     icon="2θ"
                     description="= 2·sin(θ)·cos(θ)"
                   />
                   <ResultCard
                     title="cos(2θ)"
-                    value={formatNumber(resultados.cos2a, 8)}
+                    value={formatNumber(resultados.cos2a ?? 0, 8)}
                     variant="highlight"
                     icon="2θ"
                     description="= cos²θ - sin²θ"
                   />
                   <ResultCard
                     title="sin(θ/2)"
-                    value={formatNumber(resultados.sinMitad, 8)}
+                    value={formatNumber(resultados.sinMitad ?? 0, 8)}
                     variant="info"
                     icon="θ/2"
                   />
                   <ResultCard
                     title="cos(θ/2)"
-                    value={formatNumber(resultados.cosMitad, 8)}
+                    value={formatNumber(resultados.cosMitad ?? 0, 8)}
                     variant="info"
                     icon="θ/2"
                   />

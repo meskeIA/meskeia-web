@@ -317,26 +317,26 @@ export default function CalculadoraProbabilidadPage() {
                 <>
                   <ResultCard
                     title="Probabilidad"
-                    value={formatNumber(resultados.probabilidad, 6)}
+                    value={formatNumber(resultados.probabilidad ?? 0, 6)}
                     variant="highlight"
                     icon="🎯"
                   />
                   <ResultCard
                     title="Porcentaje"
-                    value={formatNumber(resultados.porcentaje, 2)}
+                    value={formatNumber(resultados.porcentaje ?? 0, 2)}
                     unit="%"
                     variant="info"
                     icon="📊"
                   />
                   <ResultCard
                     title="Odds (a favor)"
-                    value={resultados.odds}
+                    value={resultados.odds ?? ''}
                     variant="default"
                     icon="⚖️"
                   />
                   <ResultCard
                     title="Complemento P(no ocurra)"
-                    value={formatNumber(resultados.complemento, 6)}
+                    value={formatNumber(resultados.complemento ?? 0, 6)}
                     variant="default"
                     icon="🔄"
                   />
@@ -347,27 +347,27 @@ export default function CalculadoraProbabilidadPage() {
                 <>
                   <ResultCard
                     title="Combinaciones C(n,r)"
-                    value={formatNumber(resultados.combinaciones, 0)}
+                    value={formatNumber(resultados.combinaciones ?? 0, 0)}
                     variant="highlight"
                     icon="🔢"
                     description="Sin importar el orden"
                   />
                   <ResultCard
                     title="Permutaciones P(n,r)"
-                    value={formatNumber(resultados.permutaciones, 0)}
+                    value={formatNumber(resultados.permutaciones ?? 0, 0)}
                     variant="info"
                     icon="🔄"
                     description="Importa el orden"
                   />
                   <ResultCard
                     title="n!"
-                    value={formatNumber(resultados.factorialN, 0)}
+                    value={formatNumber(resultados.factorialN ?? 0, 0)}
                     variant="default"
                     icon="❗"
                   />
                   <ResultCard
                     title="r!"
-                    value={formatNumber(resultados.factorialR, 0)}
+                    value={formatNumber(resultados.factorialR ?? 0, 0)}
                     variant="default"
                     icon="❗"
                   />
@@ -378,21 +378,21 @@ export default function CalculadoraProbabilidadPage() {
                 <>
                   <ResultCard
                     title="Permutaciones P(n,r)"
-                    value={formatNumber(resultados.permutaciones, 0)}
+                    value={formatNumber(resultados.permutaciones ?? 0, 0)}
                     variant="highlight"
                     icon="🔄"
                     description="Sin repetición"
                   />
                   <ResultCard
                     title="Permutaciones con repetición"
-                    value={formatNumber(resultados.permutacionesConRepeticion, 0)}
+                    value={formatNumber(resultados.permutacionesConRepeticion ?? 0, 0)}
                     variant="info"
                     icon="🔁"
                     description="n^r"
                   />
                   <ResultCard
                     title="n!"
-                    value={formatNumber(resultados.factorialN, 0)}
+                    value={formatNumber(resultados.factorialN ?? 0, 0)}
                     variant="default"
                     icon="❗"
                   />
@@ -403,28 +403,28 @@ export default function CalculadoraProbabilidadPage() {
                 <>
                   <ResultCard
                     title="P(X = k) exacta"
-                    value={formatNumber(resultados.probabilidadExacta, 6)}
+                    value={formatNumber(resultados.probabilidadExacta ?? 0, 6)}
                     variant="highlight"
                     icon="🎯"
-                    description={`${formatNumber(resultados.probabilidadExacta * 100, 2)}%`}
+                    description={`${formatNumber((resultados.probabilidadExacta ?? 0) * 100, 2)}%`}
                   />
                   <ResultCard
                     title="P(X ≤ k) acumulada"
-                    value={formatNumber(resultados.probabilidadAcumulada, 6)}
+                    value={formatNumber(resultados.probabilidadAcumulada ?? 0, 6)}
                     variant="info"
                     icon="📈"
-                    description={`${formatNumber(resultados.probabilidadAcumulada * 100, 2)}%`}
+                    description={`${formatNumber((resultados.probabilidadAcumulada ?? 0) * 100, 2)}%`}
                   />
                   <ResultCard
                     title="Media (μ)"
-                    value={formatNumber(resultados.media, 2)}
+                    value={formatNumber(resultados.media ?? 0, 2)}
                     variant="default"
                     icon="📊"
                     description="Valor esperado"
                   />
                   <ResultCard
                     title="Desviación estándar (σ)"
-                    value={formatNumber(resultados.desviacion, 4)}
+                    value={formatNumber(resultados.desviacion ?? 0, 4)}
                     variant="default"
                     icon="📉"
                   />
@@ -435,21 +435,21 @@ export default function CalculadoraProbabilidadPage() {
                 <>
                   <ResultCard
                     title="P(A|B)"
-                    value={formatNumber(resultados.pADadoB, 6)}
+                    value={formatNumber(resultados.pADadoB ?? 0, 6)}
                     variant="highlight"
                     icon="🔗"
                     description="Probabilidad de A dado B"
                   />
                   <ResultCard
                     title="P(B|A)"
-                    value={formatNumber(resultados.pBDadoA, 6)}
+                    value={formatNumber(resultados.pBDadoA ?? 0, 6)}
                     variant="info"
                     icon="🔗"
                     description="Probabilidad de B dado A"
                   />
                   <ResultCard
                     title="P(A ∪ B)"
-                    value={formatNumber(resultados.pAoB, 6)}
+                    value={formatNumber(resultados.pAoB ?? 0, 6)}
                     variant="default"
                     icon="⚡"
                     description="Probabilidad de A o B"
@@ -469,7 +469,7 @@ export default function CalculadoraProbabilidadPage() {
             <div className={styles.formulaBox}>
               <h3>Fórmula aplicada</h3>
               <p className={styles.formula}>
-                P(E) = Casos favorables / Casos posibles = {favorables} / {posibles} = {formatNumber(resultados.probabilidad, 6)}
+                P(E) = Casos favorables / Casos posibles = {favorables} / {posibles} = {formatNumber(resultados.probabilidad ?? 0, 6)}
               </p>
             </div>
           )}

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 /**
@@ -15,7 +15,7 @@ const APPS = [
   {
     name: 'Calculadora de Propinas',
     url: '/calculadora-propinas',
-    interactions: async (page) => {
+    interactions: async (page: Page) => {
       // Probar interacción básica
       await page.fill('input[type="number"]#monto', '50');
       await page.click('button:has-text("15%")');
@@ -25,7 +25,7 @@ const APPS = [
   {
     name: 'Generador de Contraseñas',
     url: '/generador-contrasenas',
-    interactions: async (page) => {
+    interactions: async (page: Page) => {
       // Probar generación básica
       await page.click('button:has-text("Generar")');
     }
@@ -33,7 +33,7 @@ const APPS = [
   {
     name: 'Calculadora de Porcentajes',
     url: '/calculadora-porcentajes',
-    interactions: async (page) => {
+    interactions: async (page: Page) => {
       // Probar tab básico
       await page.waitForSelector('[role="tablist"]', { timeout: 5000 }).catch(() => {
         console.log('No tabs found, skipping tab interaction');
@@ -212,7 +212,7 @@ APPS.forEach(({ name, url, interactions }) => {
         await interactions(page);
         console.log('✅ Interacción básica completada con éxito');
       } catch (error) {
-        console.log(`❌ Error en interacción: ${error.message}`);
+        console.log(`❌ Error en interacción: ${(error as Error).message}`);
         throw error;
       }
 
