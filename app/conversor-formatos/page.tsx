@@ -676,89 +676,579 @@ export default function ConversorFormatosPage() {
         </div>
       </div>
 
-      {/* Contenido educativo */}
+      {/* Contenido educativo profesional */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre formatos de datos?"
-        subtitle="Descubre cuándo usar cada formato y cómo estructurar tus datos"
+        title="📚 ¿Quieres dominar la conversión de formatos de datos?"
+        subtitle="Descubre cuándo usar cada formato, casos de uso reales y mejores prácticas profesionales"
+        icon="📚"
       >
+        {/* Introducción */}
         <section className={styles.guideSection}>
-          <h2>Guía de formatos de datos</h2>
+          <h2>¿Por qué convertir entre formatos de datos?</h2>
           <p className={styles.introParagraph}>
-            Cada formato tiene sus ventajas. Elegir el correcto puede ahorrarte horas de trabajo
-            y evitar problemas de compatibilidad.
+            En el mundo profesional, los datos viajan entre sistemas, equipos y herramientas. Un mismo
+            dataset puede originarse en Excel (marketing), procesarse en Python (data science), enviarse
+            via API REST (JSON) y finalmente consumirse en Tableau (CSV). Dominar la conversión de formatos
+            elimina cuellos de botella, reduce errores manuales y hace tu workflow más eficiente.
           </p>
+        </section>
 
-          <div className={styles.formatGuide}>
-            <div className={styles.formatCard}>
-              <h4>📋 JSON (JavaScript Object Notation)</h4>
-              <p><strong>Mejor para:</strong> APIs, configuraciones, datos anidados</p>
-              <p><strong>Ventajas:</strong> Soporta estructuras complejas, muy usado en desarrollo web</p>
-              <p><strong>Limitaciones:</strong> No ideal para hojas de cálculo</p>
+        {/* Tabla Comparativa de 6 Formatos */}
+        <section className={styles.comparativaSection}>
+          <h2>Tabla Comparativa: Los 6 Formatos Esenciales</h2>
+          <p className={styles.comparativaSubtitle}>
+            ¿Cuál usar en cada contexto? Compara ventajas y limitaciones técnicas.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>JSON</th>
+                  <th>CSV</th>
+                  <th>Excel</th>
+                  <th>XML</th>
+                  <th>YAML</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Legibilidad humana</strong></td>
+                  <td>Alta (sintaxis limpia)</td>
+                  <td>Alta (simple)</td>
+                  <td>Media (requiere software)</td>
+                  <td>Baja (verbose)</td>
+                  <td>Muy alta (indentación)</td>
+                </tr>
+                <tr>
+                  <td><strong>Uso principal</strong></td>
+                  <td>APIs REST, configs web</td>
+                  <td>Excel, análisis, bases datos</td>
+                  <td>Informes, presentaciones</td>
+                  <td>SOAP, sistemas legacy</td>
+                  <td>DevOps (Docker, K8s, CI/CD)</td>
+                </tr>
+                <tr>
+                  <td><strong>Datos anidados</strong></td>
+                  <td>✅ Nativo</td>
+                  <td>❌ Se aplanan</td>
+                  <td>⚠️ Limitado (múltiples hojas)</td>
+                  <td>✅ Nativo</td>
+                  <td>✅ Nativo</td>
+                </tr>
+                <tr>
+                  <td><strong>Tamaño archivo</strong></td>
+                  <td>Compacto (~100 KB)</td>
+                  <td>Muy compacto (~50 KB)</td>
+                  <td>Pesado (~200 KB+)</td>
+                  <td>Pesado (~150 KB)</td>
+                  <td>Compacto (~80 KB)</td>
+                </tr>
+                <tr>
+                  <td><strong>Compatibilidad</strong></td>
+                  <td>Universal (web, móvil, APIs)</td>
+                  <td>Universal (Excel, Sheets, BD)</td>
+                  <td>Excel, LibreOffice, Google Sheets</td>
+                  <td>Sistemas enterprise, SOAP</td>
+                  <td>DevOps, programación</td>
+                </tr>
+                <tr>
+                  <td><strong>Validación</strong></td>
+                  <td>JSON Schema</td>
+                  <td>❌ Sin estándar</td>
+                  <td>Validación de celdas</td>
+                  <td>XSD, DTD</td>
+                  <td>❌ Sin estándar oficial</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de Uso Reales */}
+        <section className={styles.escenariosSection}>
+          <h2>Casos de Uso Profesionales</h2>
+          <p className={styles.escenariosSubtitle}>
+            Escenarios reales donde convertir formatos resuelve problemas críticos
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📊</span>
+                <h3>JSON → CSV: Análisis en Excel/Google Sheets</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Escenario:</strong></p>
+                <code>Tu API devuelve JSON con ventas mensuales. Marketing necesita visualizarlo en Excel.</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>Por qué funciona:</strong> CSV es el formato universal para hojas de cálculo.
+                Excel/Sheets importan CSV sin configuración. Los stakeholders no técnicos pueden analizar
+                datos con tablas dinámicas, gráficos y fórmulas. <strong>Tip:</strong> Si tu JSON tiene
+                objetos anidados, aplánalo primero o perderás datos.
+              </p>
             </div>
 
-            <div className={styles.formatCard}>
-              <h4>📊 CSV (Comma-Separated Values)</h4>
-              <p><strong>Mejor para:</strong> Hojas de cálculo, importar a Excel/Sheets, datos tabulares</p>
-              <p><strong>Ventajas:</strong> Universal, muy ligero, fácil de editar</p>
-              <p><strong>Limitaciones:</strong> Solo datos planos (no anidados)</p>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔌</span>
+                <h3>CSV → JSON: Alimentar APIs y Apps Web</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Escenario:</strong></p>
+                <code>Tienes un CSV con productos. Necesitas exponerlos via API REST para tu e-commerce.</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>Por qué funciona:</strong> JSON es el estándar de facto para APIs modernas (REST, GraphQL).
+                Frontend frameworks (React, Vue) parsean JSON nativamente. Convertir CSV → JSON permite
+                automatizar la carga de datos a tu API. <strong>Cuidado:</strong> Valida tipos de datos
+                (números, fechas) tras conversión - CSV guarda todo como texto.
+              </p>
             </div>
 
-            <div className={styles.formatCard}>
-              <h4>📗 Excel (.xlsx)</h4>
-              <p><strong>Mejor para:</strong> Informes, compartir con usuarios no técnicos</p>
-              <p><strong>Ventajas:</strong> Formatos, fórmulas, múltiples hojas</p>
-              <p><strong>Limitaciones:</strong> Archivos más pesados, requiere software</p>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>⚙️</span>
+                <h3>Excel → JSON: Procesamiento Automatizado</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Escenario:</strong></p>
+                <code>Recibes Excel con inventario semanal. Necesitas procesarlo con Python/Node.js.</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>Por qué funciona:</strong> Lenguajes de programación (Python, JavaScript) trabajan
+                mejor con JSON que con Excel binario. Convertir Excel → JSON permite scripts automatizados
+                sin dependencias de librerías pesadas (openpyxl, pandas). <strong>Limitación:</strong>
+                Se pierden fórmulas, formatos y gráficos - solo se extraen valores.
+              </p>
             </div>
 
-            <div className={styles.formatCard}>
-              <h4>📄 XML (eXtensible Markup Language)</h4>
-              <p><strong>Mejor para:</strong> Configuraciones, intercambio entre sistemas legacy</p>
-              <p><strong>Ventajas:</strong> Muy estructurado, validación con esquemas</p>
-              <p><strong>Limitaciones:</strong> Verbose, más pesado que JSON</p>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🐳</span>
+                <h3>JSON → YAML: Configs DevOps (Docker, K8s)</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Escenario:</strong></p>
+                <code>Generas configuraciones en JSON. Tu equipo usa Docker Compose (requiere YAML).</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>Por qué funciona:</strong> YAML es el formato estándar para DevOps (Docker Compose,
+                Kubernetes, GitHub Actions, Ansible). Es más legible que JSON para configs grandes porque
+                evita llaves y comas. <strong>Ventaja extra:</strong> YAML soporta comentarios - documenta
+                tus configs inline sin romper la sintaxis.
+              </p>
             </div>
 
-            <div className={styles.formatCard}>
-              <h4>⚙️ YAML (YAML Ain&apos;t Markup Language)</h4>
-              <p><strong>Mejor para:</strong> Configuraciones (Docker, Kubernetes, CI/CD)</p>
-              <p><strong>Ventajas:</strong> Muy legible, soporta comentarios</p>
-              <p><strong>Limitaciones:</strong> Sensible a indentación</p>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📈</span>
+                <h3>CSV → Excel: Informes con Formato Profesional</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Escenario:</strong></p>
+                <code>Exportas datos crudos a CSV. Necesitas entregarlos con formato a dirección.</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>Por qué funciona:</strong> Excel permite aplicar formatos (colores, bordes, negritas),
+                fórmulas automáticas (SUM, AVERAGE) y gráficos. Un informe CSV raw es difícil de leer;
+                en Excel puedes resaltar KPIs, añadir totales y crear dashboards. <strong>Workflow:</strong>
+                Convierte CSV → Excel, aplica formato manualmente, guarda como template para futuros informes.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔄</span>
+                <h3>XML → JSON: Modernizar APIs Legacy</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Escenario:</strong></p>
+                <code>Tu backend legacy devuelve SOAP/XML. Tu frontend React necesita JSON.</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>Por qué funciona:</strong> XML (SOAP) se usa en sistemas antiguos (bancos, gobierno,
+                SAP). Convertir XML → JSON en un middleware permite que frontends modernos consuman datos
+                sin reescribir todo el backend. <strong>Arquitectura:</strong> API Gateway convierte
+                XML legacy → JSON → Frontend. Migración gradual sin downtime.
+              </p>
             </div>
           </div>
         </section>
 
-        <section className={styles.guideSection}>
-          <h2>Preguntas frecuentes</h2>
+        {/* FAQ Ampliado */}
+        <section className={styles.faqSection}>
+          <h2>Preguntas Frecuentes</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>¿Mis datos son seguros?</h4>
+              <h4>❓ ¿Se pierden datos al convertir entre formatos?</h4>
               <p>
-                Sí, 100%. Todo el procesamiento ocurre en tu navegador usando JavaScript.
-                Tus archivos nunca se envían a ningún servidor.
+                Depende de la conversión. <strong>Conversiones sin pérdida:</strong> JSON ↔ XML ↔ YAML
+                (todos soportan estructuras anidadas). <strong>Conversiones con pérdida potencial:</strong>
+                Cualquier formato → CSV (se aplanan objetos anidados), Excel → JSON (se pierden fórmulas,
+                formatos, gráficos - solo valores).
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Regla práctica:</strong> Si tu formato destino es menos expresivo que el origen,
+                habrá pérdida. CSV es el menos expresivo (solo tablas planas). JSON/XML/YAML preservan
+                estructuras complejas. Siempre guarda backup del archivo original antes de convertir.
               </p>
             </div>
+
             <div className={styles.faqItem}>
-              <h4>¿Hay límite de tamaño?</h4>
+              <h4>❓ ¿Qué pasa con los datos anidados al convertir a CSV?</h4>
               <p>
-                No hay límite fijo, pero archivos muy grandes (más de 50 MB) pueden
-                ralentizar tu navegador. Para archivos enormes, considera herramientas de línea de comandos.
+                CSV NO soporta anidación. Los objetos anidados se <strong>aplanan</strong> o <strong>serializan
+                como strings</strong>. Ejemplo: un JSON con <code>{`{usuario: {nombre: "Ana", edad: 30}}`}</code>
+                puede aplanarse a columnas <code>usuario_nombre</code>, <code>usuario_edad</code> o convertirse
+                a string <code>{`{nombre:Ana,edad:30}`}</code>.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Solución:</strong> Esta herramienta aplana automáticamente al convertir a CSV.
+                Si necesitas preservar estructura anidada, usa JSON, XML o YAML. Para análisis en Excel
+                de datos complejos, considera aplanar manualmente en JSON primero para controlar cómo se
+                estructuran las columnas.
               </p>
             </div>
+
             <div className={styles.faqItem}>
-              <h4>¿Puedo convertir JSON a Google Sheets?</h4>
+              <h4>❓ ¿Puedo convertir archivos Excel con fórmulas?</h4>
               <p>
-                Sí. Convierte tu JSON a CSV, descarga el archivo, y en Google Sheets
-                usa Archivo → Importar para cargarlo directamente.
+                Sí, pero <strong>solo se convierten los valores calculados</strong>, NO las fórmulas.
+                Si tu Excel tiene <code>=SUMA(A1:A10)</code>, el resultado (ej: 150) se convierte, pero
+                la fórmula se pierde. Esto aplica a todos los formatos destino (JSON, CSV, XML, YAML).
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Workaround:</strong> Si necesitas las fórmulas, NO uses conversión automatizada.
+                Para datos calculados (subtotales, KPIs), esto es exactamente lo que quieres - los valores
+                finales. Para preservar lógica de cálculo, documenta fórmulas en otra hoja/archivo.
               </p>
             </div>
+
             <div className={styles.faqItem}>
-              <h4>¿Qué pasa con datos anidados?</h4>
+              <h4>❓ ¿Cómo manejar caracteres especiales (ñ, á, €) correctamente?</h4>
               <p>
-                Los datos anidados (objetos dentro de objetos) se aplanan al convertir a CSV.
-                Para preservar la estructura, usa JSON, XML o YAML.
+                Usa <strong>UTF-8 encoding</strong> siempre. Problema común: abrir CSV en Excel con
+                caracteres raros (�, Ã±). Causa: Excel asume Latin-1 (ISO-8859-1) por defecto en Windows.
+                Esta herramienta genera UTF-8 correctamente, pero Excel puede malinterpretarlo.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Solución Excel:</strong> No abrir CSV con doble clic. Ir a Datos → Desde texto/CSV
+                → Seleccionar archivo → Elegir encoding UTF-8 → Cargar. Alternativa: Guarda directamente
+                como Excel (.xlsx) desde esta herramienta - el encoding se preserva automáticamente.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Hay límite de tamaño en las conversiones?</h4>
+              <p>
+                No hay límite fijo impuesto por la herramienta. El límite es tu navegador (RAM disponible).
+                <strong>Archivos típicos:</strong> Hasta 50 MB funcionan bien (~500k filas CSV). <strong>Archivos
+                grandes:</strong> 50-200 MB pueden ralentizarse. <strong>Archivos enormes:</strong> Más de 200 MB
+                pueden causar out of memory.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Para archivos gigantes:</strong> Usa herramientas de línea de comandos (Python
+                pandas, <code>jq</code> para JSON, <code>csvkit</code> para CSV). También considera si
+                realmente necesitas procesar TODO el archivo - puedes dividirlo en chunks más pequeños
+                o filtrar datos innecesarios antes de convertir.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Mis datos son 100% privados? ¿Se envían a un servidor?</h4>
+              <p>
+                <strong>100% privado, garantizado.</strong> Todo el procesamiento ocurre en tu navegador
+                usando JavaScript (librerías: PapaParse para CSV, SheetJS para Excel, js-yaml para YAML).
+                Tus archivos NUNCA salen de tu dispositivo. No tenemos servidor backend que procese datos -
+                es técnicamente imposible que veamos tu información.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Ventaja adicional:</strong> Funciona offline después de cargar la página (service
+                workers). Puedes procesar datos confidenciales (nóminas, contratos, datos médicos) sin
+                preocuparte por seguridad. Para paranoia máxima: desconecta WiFi y verifica que sigue
+                funcionando.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Puedo automatizar conversiones en mi flujo de trabajo?</h4>
+              <p>
+                Esta herramienta es manual (UI web). Para automatización, necesitas scripts. <strong>Opciones
+                profesionales:</strong> (1) Python con pandas: <code>df.to_csv()</code>, <code>df.to_json()</code>,
+                (2) Node.js con PapaParse/SheetJS, (3) Bash con <code>jq</code> (JSON) y <code>csvkit</code> (CSV).
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Cuando automatizar:</strong> Si conviertes el mismo tipo de archivo más de 5 veces
+                al mes, escribe un script. Ejemplo: cron job que convierte Excel semanal → JSON → API.
+                Para conversiones one-off o poco frecuentes, esta herramienta web es más rápida que escribir
+                código.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué formato debo elegir para mi proyecto?</h4>
+              <p>
+                <strong>Depende de tu audiencia y caso de uso:</strong> Usa <strong>JSON</strong> para APIs
+                y desarrollo web. Usa <strong>CSV</strong> para análisis en Excel/Sheets y bases de datos.
+                Usa <strong>Excel</strong> para informes a stakeholders no técnicos. Usa <strong>XML</strong>
+                solo si integras con sistemas legacy (SOAP) o necesitas validación estricta. Usa <strong>YAML</strong>
+                para configuraciones DevOps.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Regla de oro:</strong> Elige el formato que tu audiencia/sistema CONSUME, no el
+                que tú prefieres. Si entregas a marketing: Excel. Si alimentas una API: JSON. Si despliegas
+                en Kubernetes: YAML. Si importas a base de datos: CSV. El formato es un medio, no un fin.
               </p>
             </div>
           </div>
         </section>
+
+        {/* Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Guía Paso a Paso: Conversión Profesional</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Carga tu archivo (drag & drop o clic)</h4>
+                <p>
+                  Arrastra tu archivo JSON, CSV, Excel, XML o YAML a la zona de carga, o haz clic para
+                  seleccionar. <strong>Formatos aceptados:</strong> .json, .csv, .tsv, .xlsx, .xls, .xml,
+                  .yaml, .yml. <strong>No necesitas preparar el archivo</strong> - la herramienta detecta
+                  formato automáticamente por la extensión.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Verifica la vista previa de datos</h4>
+                <p>
+                  Tras cargar, aparece una tabla con las primeras 5 filas y hasta 8 columnas. <strong>Revisa
+                  que los datos se parsearon correctamente:</strong> Nombres de columnas, tipos de valores,
+                  estructura general. Si ves errores o datos raros, tu archivo original puede tener problemas
+                  de encoding o formato - corrígelo antes de convertir.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Selecciona el formato de destino</h4>
+                <p>
+                  Haz clic en uno de los 6 formatos disponibles (JSON, CSV, TSV, Excel, XML, YAML). El formato
+                  origen aparece deshabilitado (no puedes convertir JSON → JSON). <strong>La herramienta
+                  auto-selecciona un destino inteligente</strong> (ej: JSON → CSV) pero puedes cambiarlo.
+                  Considera tu caso de uso (ver tabla comparativa arriba).
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Configura opciones avanzadas (opcional)</h4>
+                <p>
+                  Según el formato destino, aparecen opciones configurables: <strong>CSV/TSV:</strong>
+                  Incluir encabezados, entrecomillar valores. <strong>JSON:</strong> Indentación (compacto,
+                  2 espacios, 4 espacios). <strong>XML:</strong> Nombre del elemento raíz. <strong>Default
+                  settings son óptimas</strong> para el 90% de casos - solo ajusta si tienes requisitos específicos.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Ejecuta la conversión</h4>
+                <p>
+                  Haz clic en el botón grande <strong>&quot;Convertir a [Formato]&quot;</strong>. El proceso es
+                  instantáneo para archivos típicos (menos de 10 MB). <strong>Si hay error</strong>, verás
+                  mensaje específico - problema común: datos corruptos o encoding incorrecto. Para archivos
+                  grandes (más de 50 MB) puede tardar 5-10 segundos.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Descarga o copia el resultado</h4>
+                <p>
+                  Tras conversión exitosa, aparecen dos botones: <strong>Copiar</strong> (portapapeles,
+                  solo formatos texto) y <strong>Descargar</strong> (archivo con nombre auto-generado
+                  <code>original_converted.ext</code>). Para Excel (.xlsx), solo descarga está disponible
+                  (es binario). <strong>Verifica el archivo descargado</strong> antes de usarlo en producción.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Integra en tu flujo de trabajo</h4>
+                <p>
+                  <strong>Workflow recomendado para conversiones recurrentes:</strong> (1) Convierte un
+                  archivo de ejemplo para validar formato, (2) Documenta pasos y opciones usadas, (3) Si
+                  se repite más de 5 veces/mes, automatiza con script (Python/Node.js), (4) Para conversiones
+                  one-off, usa esta herramienta directamente. <strong>Guarda templates</strong> de archivos
+                  destino exitosos para referencia futura.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mejores Prácticas */}
+        <section className={styles.tipsSection}>
+          <h2>Mejores Prácticas Profesionales</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Valida datos ANTES de convertir</h4>
+              <p>
+                Usa herramientas como Validador JSON (meskeIA) o linters para verificar que tu archivo
+                origen es sintácticamente correcto. Un JSON inválido produce CSV corrupto.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Backup obligatorio antes de conversiones masivas</h4>
+              <p>
+                Siempre guarda una copia del archivo original antes de convertir. Las conversiones
+                con pérdida (Excel → CSV) son irreversibles sin el backup.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Usa UTF-8 para internacionalización</h4>
+              <p>
+                Siempre trabaja en UTF-8 encoding. Evita problemas con caracteres especiales (ñ, á, €).
+                Esta herramienta genera UTF-8 por defecto - verifica que tu software destino lo respeta.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Elige formato según audiencia, no preferencia</h4>
+              <p>
+                Stakeholders no técnicos: Excel. Desarrolladores: JSON. Data analysts: CSV. DevOps: YAML.
+                El formato es para quien LO CONSUME, no para ti.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Automatiza conversiones recurrentes con scripts</h4>
+              <p>
+                Si conviertes el mismo archivo más de 5 veces/mes, escribe un script (Python pandas, Node.js).
+                Ahorra tiempo y reduce errores manuales. Esta herramienta es para one-off.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Mantén formatos fuente editables</h4>
+              <p>
+                Nunca edites archivos convertidos como fuente de verdad. Edita en el formato original
+                (ej: Excel) y reconvierte. Evita pérdida de datos y confusión de versiones.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Errores Comunes que Rompen Conversiones</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li>
+              <strong>❌ Perder datos anidados al convertir a CSV:</strong> CSV es plano (2D). Convertir
+              JSON/XML con objetos anidados a CSV aplana estructura - puedes perder jerarquía. Ejemplo:
+              <code>{`{usuario: {nombre: "Ana"}}`}</code> se convierte a <code>usuario_nombre: Ana</code>.
+              <br/>
+              <strong>Solución:</strong> Si necesitas preservar anidación, usa JSON, XML o YAML. Para CSV,
+              aplana manualmente en origen antes de convertir para controlar cómo se estructuran columnas.
+            </li>
+
+            <li>
+              <strong>❌ Encoding incorrecto causa mojibake (caracteres raros):</strong> Abrir CSV UTF-8
+              en Excel con doble clic asume Latin-1 → <code>España</code> se ve como <code>EspaÃ±a</code>.
+              Problema común en Windows.
+              <br/>
+              <strong>Solución:</strong> En Excel, usa Datos → Desde texto/CSV → Seleccionar UTF-8 manualmente.
+              O convierte a .xlsx directamente (el encoding binario se preserva). NUNCA guardes CSV en Excel
+              sin verificar encoding - puede romper datos.
+            </li>
+
+            <li>
+              <strong>❌ Formato de fechas inconsistente entre sistemas:</strong> Excel interpreta
+              <code>01/02/2023</code> como 1 Feb (UK) o 2 Ene (US) según locale. JSON no tiene tipo fecha
+              nativo - se usa string ISO <code>2023-02-01T00:00:00Z</code>.
+              <br/>
+              <strong>Solución:</strong> Siempre usa formato ISO 8601 (<code>YYYY-MM-DD</code>) en CSV/JSON.
+              En Excel, formatea celdas como texto para evitar conversiones automáticas. Documenta formato
+              de fecha en README si compartes archivos.
+            </li>
+
+            <li>
+              <strong>❌ Comas dentro de valores CSV sin entrecomillar:</strong> Si tu CSV tiene valores
+              como <code>Madrid, España</code> sin comillas, el parser interpreta como dos columnas separadas.
+              Rompe la estructura.
+              <br/>
+              <strong>Solución:</strong> Esta herramienta entrecomilla automáticamente valores con comas,
+              saltos de línea o comillas (configurable). Si parseas CSV manualmente, activa opción
+              <code>quotes: true</code>. Para datos con comas frecuentes, considera TSV (tab-separated).
+            </li>
+
+            <li>
+              <strong>❌ Caracteres especiales XML sin escapar:</strong> XML requiere escapar <code>&lt;</code>
+              <code>&gt;</code> <code>&amp;</code> <code>&quot;</code> <code>&apos;</code>. Si tu JSON tiene
+              <code>{`{msg: "5 < 10"}`}</code> y conviertes a XML sin escapar, el parser falla.
+              <br/>
+              <strong>Solución:</strong> Esta herramienta escapa automáticamente. Si generas XML manualmente,
+              usa funciones escape de tu lenguaje o librerías (xml2js, lxml). NUNCA concatenes strings
+              para formar XML - siempre usa builders.
+            </li>
+
+            <li>
+              <strong>❌ Fórmulas Excel se convierten a valores estáticos:</strong> Si tu Excel tiene
+              <code>=SUMA(A1:A10)</code> con resultado 150, al convertir a JSON/CSV solo obtienes <code>150</code>.
+              La fórmula se pierde PERMANENTEMENTE.
+              <br/>
+              <strong>Solución:</strong> Si necesitas preservar fórmulas, NO conviertas - trabaja en Excel
+              nativo. Para datos calculados (totales, KPIs), esto es exactamente lo esperado. Documenta
+              fórmulas críticas en otra hoja antes de convertir.
+            </li>
+
+            <li>
+              <strong>❌ Headers duplicados en CSV causan sobrescritura:</strong> Si tu CSV tiene dos
+              columnas llamadas <code>nombre</code>, el parser JSON solo guarda la última. Pierdes datos
+              silenciosamente.
+              <br/>
+              <strong>Solución:</strong> Renombra columnas duplicadas en origen antes de convertir (ej:
+              <code>nombre_1</code>, <code>nombre_2</code>). O verifica que tu herramienta auto-renombra
+              duplicados. Esta herramienta preserva todas las columnas pero puede haber conflictos.
+            </li>
+
+            <li>
+              <strong>❌ XML sin declaración UTF-8 rompe caracteres especiales:</strong> Si omites
+              <code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</code> y tienes ñ, á, €,
+              parsers antiguos asumen ASCII → text corruption.
+              <br/>
+              <strong>Solución:</strong> Esta herramienta añade la declaración automáticamente. Si generas
+              XML manualmente, SIEMPRE incluye encoding UTF-8 en primera línea. Es obligatorio para
+              compatibilidad internacional y previene bugs difíciles de rastrear.
+            </li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('conversor-formatos')} />

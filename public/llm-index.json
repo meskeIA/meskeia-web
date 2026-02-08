@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 221+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 220+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 221,
-  "last_updated": "2026-02-06",
+  "total_tools": 220,
+  "last_updated": "2026-02-08",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -21,7 +21,7 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 43
+      "tool_count": 42
     },
     {
       "id": "diseno",
@@ -107,7 +107,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 78
+      "tool_count": 77
     },
     {
       "id": "casa",
@@ -142,7 +142,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 35
+      "tool_count": 34
     }
   ],
   "tools": [

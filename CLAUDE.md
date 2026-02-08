@@ -188,9 +188,47 @@ Una app puede resolver múltiples problemas:
 
 ---
 
+## Seguridad y Calidad del Código
+
+### TypeScript Estricto (desde 2026-02-06)
+
+- **`ignoreBuildErrors: false`** en `next.config.ts` - El build falla si hay errores TS
+- **0 errores TypeScript** verificados en todo el proyecto (220+ apps)
+- Archivos de tipos custom: `types/algebrite.d.ts`, `types/jstat.d.ts`, `types/sql-js.d.ts`, `lib/schema-dts.d.ts`
+
+### Cabeceras de Seguridad HTTP (desde 2026-02-06)
+
+Configuradas en **dos capas** (`next.config.ts` headers() + `vercel.json`):
+
+| Cabecera | Valor | Protección |
+|----------|-------|------------|
+| `X-Frame-Options` | `DENY` | Anti-clickjacking |
+| `X-Content-Type-Options` | `nosniff` | Anti-MIME sniffing |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Control de referrer |
+| `X-XSS-Protection` | `1; mode=block` | XSS (legacy) |
+| `Permissions-Policy` | camera, geolocation, payment... bloqueados | APIs innecesarias |
+| `Content-Security-Policy-Report-Only` | CSP completo | CSP sin bloqueo (monitor) |
+
+**PENDIENTE**: CSP en modo report-only. Tras verificar que no hay violaciones en consola (`[Report Only]`), cambiar a `Content-Security-Policy` (enforcement) en `next.config.ts` y `vercel.json`.
+
+### CORS en API Routes (desde 2026-02-06)
+
+Todas las API routes en `app/api/` tienen CORS restringido a `meskeia.com` (no `*`).
+
+### RGPD Analytics (desde 2026-02-06)
+
+- Analytics anonimizados (sin datos personales identificables)
+- JSON-LD schema en metadata.ts de apps profesionalizadas
+
+---
+
 ## Componentes disponibles
 
 Ver `components/README.md` para documentación completa.
+
+**Actualizaciones recientes (2026-02-06):**
+- `DisclaimerCard` - Nueva variante `'technical'` disponible
+- `NumberInput` - Nueva prop opcional `suffix?: string`
 
 ---
 
@@ -244,6 +282,7 @@ Plugins disponibles para mejorar el flujo de desarrollo:
 
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
+| 1.4.0 | 2026-02-06 | Auditoría de seguridad: TS estricto, security headers, CORS, RGPD, SEO JSON-LD |
 | 1.3.1 | 2026-02-03 | Sincronizado con CLAUDE.md global v2.12.0 (Sistema LegalNotice) |
 | 1.3.0 | 2025-12-28 | Añadida sección Guías (5 guías implementadas) |
 | 1.2.0 | 2025-12-24 | Añadidos plugins de Claude Code y documentación de testing |
