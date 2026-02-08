@@ -79,6 +79,7 @@ export const implementedAppsUrls = [
   "/planificador-turnos/",
   "/notas/",
   "/generador-contrasenas/",
+  "/generador-gitignore/",        // Plantillas .gitignore para Node, Python, Java, React+
   "/lista-tareas/",
   "/cronometro/",
   "/temporizador-pomodoro/",       // Técnica Pomodoro con estadísticas

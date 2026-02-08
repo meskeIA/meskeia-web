@@ -631,6 +631,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'generador-qr': codigosApps.filter(a => a.url !== '/generador-qr/'),
   'generador-codigos-barras': codigosApps.filter(a => a.url !== '/generador-codigos-barras/'),
   'generador-contrasenas': [...criptografiaModernaApps.filter(a => a.url !== '/generador-contrasenas/').slice(0, 2), ...codigosApps.slice(0, 2)],
+  'generador-gitignore': webDevApps,
   'generador-firma-email': codigosApps.filter(a => a.url !== '/generador-firma-email/'),
 
   // HOGAR Y COCINA

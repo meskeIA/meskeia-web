@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 220+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 221+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 220,
+  "total_tools": 221,
   "last_updated": "2026-02-08",
   "features": {
     "all_free": true,
@@ -28,7 +28,7 @@
       "name": "Diseño y Desarrollo",
       "icon": "🎨",
       "description": "Herramientas para diseñadores y desarrolladores",
-      "tool_count": 26
+      "tool_count": 27
     },
     {
       "id": "estudiantes",
@@ -56,7 +56,7 @@
       "name": "Herramientas Técnicas",
       "icon": "🔧",
       "description": "Herramientas especializadas y técnicas",
-      "tool_count": 28
+      "tool_count": 29
     },
     {
       "id": "inmobiliaria",
@@ -100,7 +100,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 87
+      "tool_count": 88
     },
     {
       "id": "estudio",
@@ -128,7 +128,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 52
+      "tool_count": 53
     },
     {
       "id": "relax",
@@ -3610,6 +3610,36 @@
         "segura"
       ],
       "icon": "🔐"
+    },
+    {
+      "slug": "generador-gitignore",
+      "name": "Generador de .gitignore",
+      "url": "https://meskeia.com/generador-gitignore/",
+      "description": "Genera archivos .gitignore profesionales combinando plantillas para Node.js, Python, Java, React y más de 10 tecnologías. Compatible con todos los IDEs y sistemas operativos",
+      "suites": [
+        "tecnicas",
+        "diseno"
+      ],
+      "contexts": [
+        "trabajo",
+        "creando"
+      ],
+      "keywords": [
+        "gitignore",
+        "git",
+        "github",
+        "plantillas git",
+        "node gitignore",
+        "python gitignore",
+        "java gitignore",
+        "react gitignore",
+        "control de versiones",
+        "desarrollo web",
+        "vscode",
+        "jetbrains",
+        "github template"
+      ],
+      "icon": "📝"
     },
     {
       "slug": "generador-qr",
