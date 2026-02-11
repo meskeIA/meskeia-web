@@ -7,6 +7,7 @@ import DynamicThemeColor from '@/components/DynamicThemeColor';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import RecentAppTracker from '@/components/RecentAppTracker';
 import TransparencyBanner from '@/components/TransparencyBanner';
+import { Providers } from './providers';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -100,21 +101,23 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ThemeProvider
-          attribute="data-theme"
-          defaultTheme="light"
-          enableSystem={false}
-          storageKey="meskeia-theme"
-          disableTransitionOnChange={false}
-        >
-          <ErrorBoundary>
-            <DynamicThemeColor />
-            <ServiceWorkerRegister />
-            <RecentAppTracker />
-            {children}
-            <TransparencyBanner />
-          </ErrorBoundary>
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider
+            attribute="data-theme"
+            defaultTheme="light"
+            enableSystem={false}
+            storageKey="meskeia-theme"
+            disableTransitionOnChange={false}
+          >
+            <ErrorBoundary>
+              <DynamicThemeColor />
+              <ServiceWorkerRegister />
+              <RecentAppTracker />
+              {children}
+              <TransparencyBanner />
+            </ErrorBoundary>
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

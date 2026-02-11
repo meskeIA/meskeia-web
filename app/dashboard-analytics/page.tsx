@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './DashboardAnalytics.module.css';
 import { MeskeiaLogo, LegalNotice } from '@/components';
+import { trpc } from '@/lib/trpc';
 
 // Importar Chart.js
 import {
@@ -100,6 +101,7 @@ interface EstadisticasData {
     navegador: string | null;
     sistema_operativo: string | null;
     resolucion: string | null;
+    datos_adicionales?: any;
   }>;
 }
 
@@ -110,111 +112,67 @@ interface IPConfig {
 }
 
 export default function DashboardAnalyticsPage() {
-  const [datos, setDatos] = useState<EstadisticasData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [ultimaActualizacion, setUltimaActualizacion] = useState<string>('');
   const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros'>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
-
-  // Estado para filtro de IP
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
-  const [ipConfig, setIPConfig] = useState<IPConfig | null>(null);
-  const [actualizandoIP, setActualizandoIP] = useState(false);
 
-  // Ref para evitar múltiples cargas iniciales
+  // Ref para control de inicialización
   const iniciado = useRef(false);
-  const filtroIPRef = useRef(filtroIPActivo);
 
-  // Mantener ref sincronizada
-  useEffect(() => {
-    filtroIPRef.current = filtroIPActivo;
-  }, [filtroIPActivo]);
+  // tRPC: Obtener estadísticas (con refetch manual)
+  const statsQuery = trpc.analytics.getStats.useQuery(
+    { limite: 500, excluir_mi_ip: filtroIPActivo },
+    { enabled: true } // Siempre habilitado
+  );
 
-  // Función para cargar datos (usa ref para evitar dependencias)
-  const cargarDatos = useCallback(async (excluirIP?: boolean) => {
-    setLoading(true);
-    setError(null);
+  // tRPC: Obtener configuración de IP
+  const ipConfigQuery = trpc.analytics.getIPConfig.useQuery(
+    { ip_actual: typeof window !== 'undefined' ? window.location.hostname : 'unknown' },
+    { enabled: typeof window !== 'undefined' }
+  );
 
-    const usarFiltro = excluirIP !== undefined ? excluirIP : filtroIPRef.current;
+  // tRPC: Mutation para actualizar IP
+  const updateIPMutation = trpc.analytics.updateIPFilter.useMutation({
+    onSuccess: (data) => {
+      alert(`✅ IP guardada: ${data.data.ip_excluida}\n\nTus pruebas ya no se registrarán.`);
+      // Refetch stats con el nuevo filtro
+      statsQuery.refetch();
+    },
+    onError: () => {
+      alert('❌ Error al guardar IP');
+    },
+  });
 
-    try {
-      const url = `/api/analytics/stats?limite=500${usarFiltro ? '&excluir_mi_ip=true' : ''}`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
+  // Variables derivadas de los queries
+  const datos = statsQuery.data || null;
+  const loading = statsQuery.isLoading || statsQuery.isFetching;
+  const error = statsQuery.error?.message || null;
+  const ipConfig = ipConfigQuery.data?.data || null;
+  const actualizandoIP = updateIPMutation.isPending;
 
-      const data = await response.json();
-
-      if (data.status === 'error') {
-        throw new Error(data.message);
-      }
-
-      setDatos(data);
-      setUltimaActualizacion(
-        new Date().toLocaleTimeString('es-ES', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        })
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Cargar configuración de IP
-  const cargarConfigIP = useCallback(async () => {
-    try {
-      const response = await fetch('/api/analytics/ip-filter');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status === 'success') {
-          setIPConfig(data.data);
-          // Solo actualizar si es diferente para evitar renders
-          if (data.data.activo !== filtroIPRef.current) {
-            setFiltroIPActivo(data.data.activo);
-          }
-        }
-      }
-    } catch (err) {
-      console.error('Error al cargar config IP:', err);
-    }
-  }, []);
+  // Última actualización
+  const ultimaActualizacion = statsQuery.dataUpdatedAt
+    ? new Date(statsQuery.dataUpdatedAt).toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })
+    : '';
 
   // Guardar IP actual como excluida
-  const guardarMiIP = async () => {
-    setActualizandoIP(true);
-    try {
-      const response = await fetch('/api/analytics/ip-filter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ activo: filtroIPActivo }),
-      });
-      const data = await response.json();
-      if (data.status === 'success') {
-        setIPConfig((prev) => prev ? { ...prev, ip_excluida: data.data.ip_excluida } : null);
-        alert(`✅ IP guardada: ${data.data.ip_excluida}\n\nTus pruebas ya no se registrarán.`);
-        // Recargar datos con el nuevo filtro
-        cargarDatos(filtroIPActivo);
-      }
-    } catch {
-      alert('❌ Error al guardar IP');
-    } finally {
-      setActualizandoIP(false);
-    }
+  const guardarMiIP = () => {
+    updateIPMutation.mutate({
+      ip_actual: typeof window !== 'undefined' ? window.location.hostname : 'unknown',
+      activo: filtroIPActivo,
+    });
   };
 
   // Toggle filtro IP
   const toggleFiltroIP = () => {
     const nuevoEstado = !filtroIPActivo;
     setFiltroIPActivo(nuevoEstado);
-    // Guardar preferencia y recargar
     localStorage.setItem('filtroMiIPActivo', nuevoEstado.toString());
-    cargarDatos(nuevoEstado);
+    // El query se refetcheará automáticamente cuando cambien los inputs
   };
 
   // Efecto de inicialización (solo una vez)
@@ -225,15 +183,9 @@ export default function DashboardAnalyticsPage() {
     // Cargar preferencia de localStorage
     const prefLocal = localStorage.getItem('filtroMiIPActivo');
     if (prefLocal !== null) {
-      const prefValue = prefLocal === 'true';
-      setFiltroIPActivo(prefValue);
-      filtroIPRef.current = prefValue;
+      setFiltroIPActivo(prefLocal === 'true');
     }
-
-    // Cargar config IP y datos
-    cargarConfigIP();
-    cargarDatos();
-  }, [cargarConfigIP, cargarDatos]);
+  }, []);
 
   // Función helper para parsear timestamp español (DD/MM/YYYY, HH:MM:SS)
   const parsearTimestamp = (timestamp: string): Date | null => {
@@ -284,7 +236,7 @@ export default function DashboardAnalyticsPage() {
 
     const usosPorDia: { [key: string]: number } = {};
 
-    datos.data.forEach((registro) => {
+    datos.data.forEach((registro: any) => {
       const fechaObj = parsearTimestamp(registro.timestamp || '');
       if (!fechaObj) return;
 
@@ -326,7 +278,7 @@ export default function DashboardAnalyticsPage() {
     if (!datos?.data) return null;
 
     const navegadores: { [key: string]: number } = {};
-    datos.data.forEach((registro) => {
+    datos.data.forEach((registro: any) => {
       const nav = extraerNavegador(registro.navegador);
       navegadores[nav] = (navegadores[nav] || 0) + 1;
     });
@@ -351,7 +303,7 @@ export default function DashboardAnalyticsPage() {
     if (!datos?.data) return null;
 
     const sistemas: { [key: string]: number } = {};
-    datos.data.forEach((registro) => {
+    datos.data.forEach((registro: any) => {
       const so = extraerSO(registro.sistema_operativo);
       sistemas[so] = (sistemas[so] || 0) + 1;
     });
@@ -376,7 +328,7 @@ export default function DashboardAnalyticsPage() {
     if (!datos?.data) return null;
 
     const resoluciones: { [key: string]: number } = {};
-    datos.data.forEach((registro) => {
+    datos.data.forEach((registro: any) => {
       if (registro.resolucion) {
         resoluciones[registro.resolucion] = (resoluciones[registro.resolucion] || 0) + 1;
       }
@@ -448,7 +400,7 @@ export default function DashboardAnalyticsPage() {
           <span className={styles.errorIcon}>❌</span>
           <h2>Error al cargar datos</h2>
           <p>{error}</p>
-          <button onClick={() => cargarDatos()} className={styles.btnPrimary}>
+          <button onClick={() => statsQuery.refetch()} className={styles.btnPrimary}>
             Reintentar
           </button>
         </div>
@@ -476,7 +428,7 @@ export default function DashboardAnalyticsPage() {
 
         <div className={styles.headerControls}>
           <button
-            onClick={() => cargarDatos()}
+            onClick={() => statsQuery.refetch()}
             className={styles.btnRefresh}
             disabled={loading}
           >
@@ -750,8 +702,8 @@ export default function DashboardAnalyticsPage() {
             <section className={styles.section}>
               <h2>🌍 Top Países</h2>
               <div className={styles.geoList}>
-                {datos.estadisticas.geografia.paises.slice(0, 5).map((pais, idx) => (
-                  <div key={pais.pais} className={styles.geoItem}>
+                {datos.estadisticas.geografia.paises.slice(0, 5).map((pais: any, idx) => (
+                  <div key={String(pais.pais)} className={styles.geoItem}>
                     <span className={styles.geoRank}>#{idx + 1}</span>
                     <span className={styles.geoName}>{pais.pais}</span>
                     <span className={styles.geoCount}>{formatearNumero(Number(pais.total))}</span>
@@ -886,8 +838,8 @@ export default function DashboardAnalyticsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {datos.ranking_aplicaciones.map((app, idx) => (
-                    <tr key={app.aplicacion}>
+                  {datos.ranking_aplicaciones.map((app: any, idx) => (
+                    <tr key={String(app.aplicacion)}>
                       <td>{idx + 1}</td>
                       <td>
                         <strong>{app.aplicacion}</strong>
@@ -923,8 +875,8 @@ export default function DashboardAnalyticsPage() {
                 className={styles.selectApp}
               >
                 <option value="">-- Todas las aplicaciones --</option>
-                {datos.ranking_aplicaciones.map((app) => (
-                  <option key={app.aplicacion} value={app.aplicacion}>
+                {datos.ranking_aplicaciones.map((app: any) => (
+                  <option key={String(app.aplicacion)} value={String(app.aplicacion)}>
                     {app.aplicacion} ({app.total_usos} usos)
                   </option>
                 ))}
@@ -935,9 +887,9 @@ export default function DashboardAnalyticsPage() {
             {appSeleccionada ? (
               <>
                 {(() => {
-                  const appData = datos.ranking_aplicaciones.find(a => a.aplicacion === appSeleccionada);
-                  const registrosApp = datos.data.filter(r => r.aplicacion === appSeleccionada);
-                  const registrosHoy = registrosApp.filter(r => {
+                  const appData = datos.ranking_aplicaciones.find((a: any) => a.aplicacion === appSeleccionada);
+                  const registrosApp = datos.data.filter((r: any) => r.aplicacion === appSeleccionada);
+                  const registrosHoy = registrosApp.filter((r: any) => {
                     const partes = r.timestamp.split(' ');
                     if (partes.length !== 2) return false;
                     const [fecha] = partes;
@@ -949,8 +901,8 @@ export default function DashboardAnalyticsPage() {
                   });
 
                   const dispositivosApp = {
-                    movil: registrosApp.filter(r => r.tipo_dispositivo === 'movil').length,
-                    escritorio: registrosApp.filter(r => r.tipo_dispositivo === 'escritorio').length,
+                    movil: registrosApp.filter((r: any) => r.tipo_dispositivo === 'movil').length,
+                    escritorio: registrosApp.filter((r: any) => r.tipo_dispositivo === 'escritorio').length,
                   };
 
                   return (
@@ -980,7 +932,7 @@ export default function DashboardAnalyticsPage() {
                         <div className={styles.statCard}>
                           <div className={styles.statIcon}>📅</div>
                           <div className={styles.statContent}>
-                            <h3>{appData?.ultimo_uso?.split(' ')[0] || '-'}</h3>
+                            <h3>{appData?.ultimo_uso ? String(appData.ultimo_uso).split(' ')[0] : '-'}</h3>
                             <p>Último Uso</p>
                           </div>
                         </div>
@@ -1027,7 +979,7 @@ export default function DashboardAnalyticsPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {registrosApp.slice(0, 20).map((registro) => (
+                            {registrosApp.slice(0, 20).map((registro: any) => (
                               <tr key={registro.id}>
                                 <td>{registro.id}</td>
                                 <td>{registro.timestamp}</td>
@@ -1076,7 +1028,7 @@ export default function DashboardAnalyticsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {datos.data.slice(0, 100).map((registro) => (
+                  {datos.data.slice(0, 100).map((registro: any) => (
                     <tr key={registro.id}>
                       <td>{registro.id}</td>
                       <td>

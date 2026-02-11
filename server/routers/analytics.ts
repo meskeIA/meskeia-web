@@ -1,0 +1,421 @@
+/**
+ * Router de Analytics para tRPC
+ * Migra la lógica de /api/analytics/* a procedures type-safe
+ */
+
+import { z } from 'zod';
+import { router, publicProcedure } from '../trpc';
+import { getTursoClient, initializeDatabase, formatearDuracion } from '@/lib/turso';
+
+/**
+ * Helper: Anonimizar IP (RGPD compliance)
+ */
+function anonymizeIP(ip: string): string {
+  if (ip.includes('.') && !ip.includes(':')) {
+    const parts = ip.split('.');
+    if (parts.length === 4) {
+      parts[3] = '0';
+      return parts.join('.');
+    }
+  }
+  if (ip.includes(':')) {
+    const parts = ip.split(':');
+    if (parts.length >= 4) {
+      return parts.slice(0, 3).join(':') + '::';
+    }
+  }
+  return 'anonymous';
+}
+
+/**
+ * Helper: Obtener IP del request (para ip-filter)
+ * Nota: En tRPC no tenemos acceso directo a headers, se debe pasar desde el handler
+ */
+
+export const analyticsRouter = router({
+  /**
+   * Procedure: getStats
+   * Obtiene estadísticas de uso con filtros opcionales
+   * Reemplaza: GET /api/analytics/stats
+   */
+  getStats: publicProcedure
+    .input(
+      z.object({
+        aplicacion: z.string().optional(),
+        desde: z.string().optional(),
+        hasta: z.string().optional(),
+        limite: z.number().int().positive().default(100),
+        excluir_mi_ip: z.boolean().default(false),
+      })
+    )
+    .query(async ({ input }) => {
+      await initializeDatabase();
+      const client = getTursoClient();
+
+      const { aplicacion, desde, hasta, limite, excluir_mi_ip } = input;
+
+      // Obtener IP excluida si el filtro está activo
+      let ipExcluida = '';
+      if (excluir_mi_ip) {
+        try {
+          const configResult = await client.execute({
+            sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+            args: [],
+          });
+          if (configResult.rows.length > 0) {
+            ipExcluida = String(configResult.rows[0].valor);
+          }
+        } catch {
+          // Ignorar error si la tabla no existe aún
+        }
+      }
+
+      // Construir query con filtros
+      let sql = 'SELECT * FROM uso_aplicaciones WHERE 1=1';
+      const args: (string | number)[] = [];
+
+      if (aplicacion) {
+        sql += ' AND aplicacion = ?';
+        args.push(aplicacion);
+      }
+      if (desde) {
+        sql += ' AND timestamp >= ?';
+        args.push(desde);
+      }
+      if (hasta) {
+        sql += ' AND timestamp <= ?';
+        args.push(hasta);
+      }
+      if (ipExcluida) {
+        sql += ' AND (ip_address IS NULL OR ip_address != ?)';
+        args.push(ipExcluida);
+      }
+
+      sql += ' ORDER BY id DESC LIMIT ?';
+      args.push(limite);
+
+      const registrosResult = await client.execute({ sql, args });
+      const registros = registrosResult.rows.map((row) => ({
+        ...row,
+        datos_adicionales: row.datos_adicionales
+          ? JSON.parse(row.datos_adicionales as string)
+          : null,
+      }));
+
+      // Estadísticas agregadas
+      let sqlStats = `
+        SELECT
+          COUNT(*) as total_usos,
+          COUNT(DISTINCT aplicacion) as total_aplicaciones,
+          MIN(timestamp) as primer_uso,
+          MAX(timestamp) as ultimo_uso,
+          AVG(CASE WHEN duracion_segundos IS NOT NULL THEN duracion_segundos END) as duracion_promedio,
+          SUM(CASE WHEN tipo_dispositivo = 'movil' THEN 1 ELSE 0 END) as total_movil,
+          SUM(CASE WHEN tipo_dispositivo = 'escritorio' THEN 1 ELSE 0 END) as total_escritorio,
+          SUM(CASE WHEN es_recurrente = 1 THEN 1 ELSE 0 END) as total_recurrentes,
+          SUM(CASE WHEN es_recurrente = 0 THEN 1 ELSE 0 END) as total_nuevos
+        FROM uso_aplicaciones WHERE 1=1
+      `;
+      const statsArgs: string[] = [];
+
+      if (aplicacion) {
+        sqlStats += ' AND aplicacion = ?';
+        statsArgs.push(aplicacion);
+      }
+      if (desde) {
+        sqlStats += ' AND timestamp >= ?';
+        statsArgs.push(desde);
+      }
+      if (hasta) {
+        sqlStats += ' AND timestamp <= ?';
+        statsArgs.push(hasta);
+      }
+      if (ipExcluida) {
+        sqlStats += ' AND (ip_address IS NULL OR ip_address != ?)';
+        statsArgs.push(ipExcluida);
+      }
+
+      const statsResult = await client.execute({ sql: sqlStats, args: statsArgs });
+      const stats = statsResult.rows[0];
+
+      const total = Number(stats.total_usos) || 0;
+      const totalMovil = Number(stats.total_movil) || 0;
+      const totalEscritorio = Number(stats.total_escritorio) || 0;
+      const totalRecurrentes = Number(stats.total_recurrentes) || 0;
+      const totalNuevos = Number(stats.total_nuevos) || 0;
+      const duracionPromedio = Number(stats.duracion_promedio) || 0;
+
+      const porcentajeMovil = total > 0 ? Math.round((totalMovil / total) * 1000) / 10 : 0;
+      const porcentajeEscritorio = total > 0 ? Math.round((totalEscritorio / total) * 1000) / 10 : 0;
+      const porcentajeRecurrentes = total > 0 ? Math.round((totalRecurrentes / total) * 1000) / 10 : 0;
+
+      // Ranking de aplicaciones (con filtro de IP si está activo)
+      let rankingSql = `
+        SELECT
+          aplicacion,
+          COUNT(*) as total_usos,
+          MAX(timestamp) as ultimo_uso,
+          AVG(CASE WHEN duracion_segundos IS NOT NULL THEN duracion_segundos END) as duracion_promedio_segundos
+        FROM uso_aplicaciones
+        WHERE 1=1
+      `;
+      const rankingArgs: string[] = [];
+      if (ipExcluida) {
+        rankingSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+        rankingArgs.push(ipExcluida);
+      }
+      rankingSql += ' GROUP BY aplicacion ORDER BY total_usos DESC';
+
+      const rankingResult = await client.execute({ sql: rankingSql, args: rankingArgs });
+
+      const rankingAplicaciones = rankingResult.rows.map((app) => {
+        const usos = Number(app.total_usos);
+        let estado = '⚠️ Muy bajo';
+        if (usos >= 50) estado = '✅ Activa';
+        else if (usos >= 10) estado = '⚠️ Bajo uso';
+
+        return {
+          aplicacion: app.aplicacion,
+          total_usos: usos,
+          ultimo_uso: app.ultimo_uso,
+          duracion_promedio_segundos: Number(app.duracion_promedio_segundos) || 0,
+          duracion_promedio_formato: formatearDuracion(
+            Math.round(Number(app.duracion_promedio_segundos) || 0)
+          ),
+          estado,
+        };
+      });
+
+      // Estadísticas geográficas (con filtro de IP si está activo)
+      let paisesSql = `
+        SELECT pais, COUNT(*) as total
+        FROM uso_aplicaciones
+        WHERE pais IS NOT NULL AND pais != ''
+      `;
+      const paisesArgs: string[] = [];
+      if (ipExcluida) {
+        paisesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+        paisesArgs.push(ipExcluida);
+      }
+      paisesSql += ' GROUP BY pais ORDER BY total DESC LIMIT 10';
+      const paisesResult = await client.execute({ sql: paisesSql, args: paisesArgs });
+
+      let ciudadesSql = `
+        SELECT ciudad, COUNT(*) as total
+        FROM uso_aplicaciones
+        WHERE ciudad IS NOT NULL AND ciudad != ''
+      `;
+      const ciudadesArgs: string[] = [];
+      if (ipExcluida) {
+        ciudadesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+        ciudadesArgs.push(ipExcluida);
+      }
+      ciudadesSql += ' GROUP BY ciudad ORDER BY total DESC LIMIT 10';
+      const ciudadesResult = await client.execute({ sql: ciudadesSql, args: ciudadesArgs });
+
+      // Comparativa temporal
+      const formatoEspanol = (fecha: Date): string => {
+        const dia = String(fecha.getDate()).padStart(2, '0');
+        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+        const anio = fecha.getFullYear();
+        return `${dia}/${mes}/${anio}`;
+      };
+
+      const ahora = new Date();
+      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+      const hace7Dias = new Date(hoy); hace7Dias.setDate(hoy.getDate() - 7);
+      const hace14Dias = new Date(hoy); hace14Dias.setDate(hoy.getDate() - 14);
+      const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+      const inicioMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+      const finMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+
+      const contarEnRango = async (fechaInicio: Date, fechaFin: Date): Promise<number> => {
+        let sqlCount = `
+          SELECT COUNT(*) as total
+          FROM uso_aplicaciones
+          WHERE substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) >= ?
+            AND substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) <= ?
+        `;
+        const argsCount: string[] = [
+          `${fechaInicio.getFullYear()}${String(fechaInicio.getMonth() + 1).padStart(2, '0')}${String(fechaInicio.getDate()).padStart(2, '0')}`,
+          `${fechaFin.getFullYear()}${String(fechaFin.getMonth() + 1).padStart(2, '0')}${String(fechaFin.getDate()).padStart(2, '0')}`,
+        ];
+
+        if (ipExcluida) {
+          sqlCount += ' AND (ip_address IS NULL OR ip_address != ?)';
+          argsCount.push(ipExcluida);
+        }
+
+        const result = await client.execute({ sql: sqlCount, args: argsCount });
+        return Number(result.rows[0]?.total) || 0;
+      };
+
+      const usosHoy = await contarEnRango(hoy, hoy);
+      const usosAyer = await contarEnRango(ayer, ayer);
+      const usosUltimos7Dias = await contarEnRango(hace7Dias, hoy);
+      const usosSemanaAnterior = await contarEnRango(hace14Dias, hace7Dias);
+      const usosMesActual = await contarEnRango(inicioMesActual, hoy);
+      const usosMesAnterior = await contarEnRango(inicioMesAnterior, finMesAnterior);
+
+      const calcularVariacion = (actual: number, anterior: number) => {
+        if (anterior === 0) {
+          return { porcentaje: actual > 0 ? 100 : 0, tendencia: actual > 0 ? ('up' as const) : ('neutral' as const) };
+        }
+        const porcentaje = Math.round(((actual - anterior) / anterior) * 100);
+        const tendencia = porcentaje > 0 ? ('up' as const) : porcentaje < 0 ? ('down' as const) : ('neutral' as const);
+        return { porcentaje: Math.abs(porcentaje), tendencia };
+      };
+
+      const anteayer = new Date(hoy); anteayer.setDate(hoy.getDate() - 2);
+      const usosAnteayer = await contarEnRango(anteayer, anteayer);
+
+      const comparativa = {
+        hoy: {
+          usos: usosHoy,
+          comparacion: calcularVariacion(usosHoy, usosAyer),
+          etiqueta: 'vs ayer',
+        },
+        ayer: {
+          usos: usosAyer,
+          comparacion: calcularVariacion(usosAyer, usosAnteayer),
+          etiqueta: 'vs anteayer',
+          fecha: formatoEspanol(ayer),
+        },
+        semana: {
+          usos: usosUltimos7Dias,
+          comparacion: calcularVariacion(usosUltimos7Dias, usosSemanaAnterior),
+          etiqueta: 'vs semana anterior',
+        },
+        mes: {
+          usos: usosMesActual,
+          comparacion: calcularVariacion(usosMesActual, usosMesAnterior),
+          etiqueta: 'vs mes anterior',
+        },
+        detalles: {
+          ayer: usosAyer,
+          anteayer: usosAnteayer,
+          semanaAnterior: usosSemanaAnterior,
+          mesAnterior: usosMesAnterior,
+        },
+      };
+
+      return {
+        status: 'success',
+        version: 'v3.2-trpc',
+        filtros: {
+          aplicacion,
+          desde,
+          hasta,
+          limite,
+          excluir_mi_ip,
+          ip_excluida: ipExcluida || null,
+        },
+        estadisticas: {
+          total_usos: total,
+          total_aplicaciones: Number(stats.total_aplicaciones) || 0,
+          primer_uso: stats.primer_uso,
+          ultimo_uso: stats.ultimo_uso,
+          duracion_promedio_segundos: Math.round(duracionPromedio * 10) / 10,
+          duracion_promedio_formato: formatearDuracion(Math.round(duracionPromedio)),
+          dispositivos: {
+            movil: { total: totalMovil, porcentaje: porcentajeMovil },
+            escritorio: { total: totalEscritorio, porcentaje: porcentajeEscritorio },
+          },
+          usuarios: {
+            nuevos: { total: totalNuevos, porcentaje: Math.round((100 - porcentajeRecurrentes) * 10) / 10 },
+            recurrentes: { total: totalRecurrentes, porcentaje: porcentajeRecurrentes },
+          },
+          geografia: {
+            paises: paisesResult.rows,
+            ciudades: ciudadesResult.rows,
+          },
+        },
+        comparativa,
+        registros_mostrados: registros.length,
+        ranking_aplicaciones: rankingAplicaciones,
+        data: registros,
+      };
+    }),
+
+  /**
+   * Procedure: getIPConfig
+   * Obtiene configuración de IP excluida
+   * Reemplaza: GET /api/analytics/ip-filter
+   */
+  getIPConfig: publicProcedure
+    .input(z.object({ ip_actual: z.string() }))
+    .query(async ({ input }) => {
+      await initializeDatabase();
+      const client = getTursoClient();
+
+      const ipActual = anonymizeIP(input.ip_actual);
+
+      // Buscar IP excluida en la tabla de configuración
+      const result = await client.execute({
+        sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+        args: [],
+      });
+
+      const ipExcluida = result.rows.length > 0 ? String(result.rows[0].valor) : '';
+
+      // Obtener estado del filtro
+      const estadoResult = await client.execute({
+        sql: `SELECT valor FROM analytics_config WHERE clave = 'filtro_ip_activo'`,
+        args: [],
+      });
+
+      const filtroActivo = estadoResult.rows.length > 0 ? estadoResult.rows[0].valor === 'true' : true;
+
+      return {
+        status: 'success',
+        data: {
+          ip_actual: ipActual,
+          ip_excluida: ipExcluida,
+          activo: filtroActivo,
+        },
+      };
+    }),
+
+  /**
+   * Procedure: updateIPFilter
+   * Guarda la IP actual como excluida
+   * Reemplaza: POST /api/analytics/ip-filter
+   */
+  updateIPFilter: publicProcedure
+    .input(
+      z.object({
+        ip_actual: z.string(),
+        activo: z.boolean().default(true),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await initializeDatabase();
+      const client = getTursoClient();
+
+      const ipActual = anonymizeIP(input.ip_actual);
+
+      // Guardar o actualizar IP excluida
+      await client.execute({
+        sql: `INSERT OR REPLACE INTO analytics_config (clave, valor, actualizado)
+              VALUES ('ip_excluida', ?, datetime('now'))`,
+        args: [ipActual],
+      });
+
+      // Guardar estado del filtro
+      await client.execute({
+        sql: `INSERT OR REPLACE INTO analytics_config (clave, valor, actualizado)
+              VALUES ('filtro_ip_activo', ?, datetime('now'))`,
+        args: [input.activo ? 'true' : 'false'],
+      });
+
+      return {
+        status: 'success',
+        data: {
+          ip_excluida: ipActual,
+          activo: input.activo,
+        },
+        message: `IP ${ipActual} guardada correctamente`,
+      };
+    }),
+});

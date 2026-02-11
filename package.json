@@ -16,6 +16,11 @@
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",
+    "@tanstack/react-query": "^5.90.21",
+    "@trpc/client": "^11.10.0",
+    "@trpc/next": "^11.10.0",
+    "@trpc/react-query": "^11.10.0",
+    "@trpc/server": "^11.10.0",
     "algebrite": "^1.4.0",
     "chart.js": "^4.5.1",
     "flag-icons": "^7.5.0",
@@ -36,7 +41,8 @@
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.4",
     "sql.js": "^1.13.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
