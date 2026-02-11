@@ -222,6 +222,271 @@ Todas las API routes en `app/api/` tienen CORS restringido a `meskeia.com` (no `
 
 ---
 
+## Stack Tecnológico: tRPC + React Query (desde 2026-02-11)
+
+### Arquitectura Híbrida
+
+meskeIA usa una **estrategia híbrida** para APIs:
+
+| Enfoque | Cuándo usar | Estado |
+|---------|-------------|--------|
+| **tRPC + React Query** | Nuevas apps que necesiten APIs | ✅ Recomendado |
+| **API Routes (legacy)** | Apps existentes (220+) | ✅ Mantenido |
+
+**Principio**: No migrar código legacy que funciona. Usar tRPC solo para nuevas apps.
+
+---
+
+### ¿Cuándo usar tRPC?
+
+#### ✅ Usar tRPC cuando:
+- Creas una **nueva app** que necesita consumir datos del servidor
+- La app necesita **múltiples queries** con estado complejo
+- Quieres **type-safety end-to-end** (servidor → cliente)
+- La app tiene **formularios con validación** Zod
+- Necesitas **cache automático** y revalidación (React Query)
+
+#### ❌ NO usar tRPC cuando:
+- La app **NO consume APIs** (solo frontend)
+- Es un **simple POST fire-and-forget** sin respuesta (ej: analytics tracking)
+- Estás **modificando una app existente** que ya usa API Routes (mantener consistencia)
+- La app es **crítica** y afecta a 220+ apps (ej: AnalyticsTracker)
+
+---
+
+### Estructura de Archivos tRPC
+
+```
+meskeia-web/
+├── server/
+│   ├── trpc.ts                    # Configuración base tRPC
+│   └── routers/
+│       ├── _app.ts                # Router principal (combina todos)
+│       ├── analytics.ts           # Router de analytics (ejemplo)
+│       └── validaciones.ts        # Router de validaciones (futuro)
+├── lib/
+│   └── trpc.ts                    # Cliente tRPC para React
+├── app/
+│   ├── providers.tsx              # Wrapper React Query + tRPC
+│   ├── layout.tsx                 # Incluye <Providers>
+│   └── api/trpc/[trpc]/
+│       └── route.ts               # Handler Next.js para tRPC
+└── app/[tu-app]/
+    └── page.tsx                   # Consume hooks tRPC
+```
+
+---
+
+### Template: Nueva App con tRPC
+
+#### 1. Crear Router (server/routers/ejemplo.ts)
+
+```typescript
+import { z } from 'zod';
+import { router, publicProcedure } from '../trpc';
+
+export const ejemploRouter = router({
+  // Query (GET): Obtener datos
+  getDatos: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        limite: z.number().int().positive().default(10),
+      })
+    )
+    .query(async ({ input }) => {
+      const { id, limite } = input;
+
+      // Tu lógica aquí (fetch DB, API externa, etc.)
+      const datos = await obtenerDatos(id, limite);
+
+      return {
+        status: 'success',
+        data: datos,
+      };
+    }),
+
+  // Mutation (POST): Crear/actualizar datos
+  crearDato: publicProcedure
+    .input(
+      z.object({
+        nombre: z.string().min(1),
+        valor: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { nombre, valor } = input;
+
+      // Tu lógica aquí
+      const resultado = await crearEnDB(nombre, valor);
+
+      return {
+        status: 'success',
+        data: resultado,
+      };
+    }),
+});
+```
+
+#### 2. Registrar Router (server/routers/_app.ts)
+
+```typescript
+import { router } from '../trpc';
+import { analyticsRouter } from './analytics';
+import { ejemploRouter } from './ejemplo';  // ← Añadir import
+
+export const appRouter = router({
+  analytics: analyticsRouter,
+  ejemplo: ejemploRouter,  // ← Registrar aquí
+});
+
+export type AppRouter = typeof appRouter;
+```
+
+#### 3. Consumir en React (app/mi-app/page.tsx)
+
+```typescript
+'use client';
+
+import { trpc } from '@/lib/trpc';
+import { useState } from 'react';
+
+export default function MiAppPage() {
+  const [id, setId] = useState('123');
+
+  // Query: Se ejecuta automáticamente, con cache
+  const { data, isLoading, error } = trpc.ejemplo.getDatos.useQuery({
+    id,
+    limite: 20,
+  });
+
+  // Mutation: Se ejecuta manualmente
+  const createMutation = trpc.ejemplo.crearDato.useMutation({
+    onSuccess: () => {
+      console.log('Creado con éxito');
+    },
+  });
+
+  const handleCreate = () => {
+    createMutation.mutate({
+      nombre: 'Test',
+      valor: 42,
+    });
+  };
+
+  if (isLoading) return <div>Cargando...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <div>
+      <h1>Mis Datos</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+      <button onClick={handleCreate}>Crear Nuevo</button>
+    </div>
+  );
+}
+```
+
+---
+
+### Ventajas de tRPC
+
+1. **Type-Safety End-to-End**
+   - Los tipos se infieren automáticamente desde el servidor
+   - Autocompletado completo en el cliente
+   - Errores de tipo en tiempo de desarrollo
+
+2. **Menos Código Boilerplate**
+   ```typescript
+   // ❌ Antes (API Routes + fetch)
+   const [data, setData] = useState(null);
+   const [loading, setLoading] = useState(false);
+   const [error, setError] = useState(null);
+
+   useEffect(() => {
+     setLoading(true);
+     fetch('/api/datos')
+       .then(res => res.json())
+       .then(setData)
+       .catch(setError)
+       .finally(() => setLoading(false));
+   }, []);
+
+   // ✅ Ahora (tRPC)
+   const { data, isLoading, error } = trpc.datos.get.useQuery();
+   ```
+
+3. **Cache Automático**
+   - React Query gestiona el cache (staleTime: 60s por defecto)
+   - Revalidación automática cuando la ventana vuelve a tener foco
+   - Invalidación manual con `utils.invalidate()`
+
+4. **Validación con Zod**
+   - Inputs validados automáticamente antes de llegar al servidor
+   - Mensajes de error tipados y descriptivos
+
+5. **Batching Automático**
+   - Múltiples queries en paralelo se combinan en 1 request HTTP
+   - Reduce latencia y mejora performance
+
+---
+
+### Decisiones Arquitectónicas
+
+#### Por qué tRPC para nuevas apps
+
+1. **Developer Experience**: Type-safety completo reduce bugs
+2. **Performance**: Cache + batching automático
+3. **Mantenibilidad**: Cambios en el servidor se reflejan automáticamente en cliente
+4. **Validación**: Zod en ambos lados (cliente + servidor)
+5. **Ecosistema**: React Query es estándar de la industria
+
+#### Por qué mantener API Routes legacy
+
+1. **Estabilidad**: 220+ apps funcionando correctamente
+2. **Bajo riesgo**: No arriesgarse a romper código estable
+3. **Pragmatismo**: "Si no está roto, no lo arregles"
+4. **Compatibilidad**: Futuras apps pueden seguir usando API Routes si lo necesitan
+5. **Coste/Beneficio**: Migrar 220+ apps requeriría semanas sin beneficio real
+
+#### Estrategia a largo plazo
+
+- **Corto plazo** (3-6 meses):
+  - Nuevas apps con APIs → tRPC
+  - Apps existentes → Mantener API Routes
+  - No forzar migraciones
+
+- **Medio plazo** (6-12 meses):
+  - Si una app legacy necesita refactorización mayor → Considerar migrar a tRPC
+  - Mantener ambos enfoques coexistiendo
+
+- **Largo plazo** (12+ meses):
+  - Evaluar si vale la pena migrar apps legacy más usadas
+  - Decisión basada en métricas (uso, mantenimiento, bugs)
+
+---
+
+### Ejemplo Real: dashboard-analytics
+
+El dashboard-analytics fue migrado a tRPC como **prueba de concepto**:
+
+**Archivos modificados:**
+- `server/routers/analytics.ts` - 3 procedures (getStats, getIPConfig, updateIPFilter)
+- `app/dashboard-analytics/page.tsx` - Usa hooks tRPC en lugar de fetch()
+
+**Resultado:**
+- ✅ Build sin errores (434 páginas)
+- ✅ Funcionando en producción (https://meskeia.com/dashboard-analytics)
+- ✅ Type-safety completo
+- ✅ Cache automático con React Query
+
+**Lecciones aprendidas:**
+- Turso result types requieren casts `any` temporales
+- React Query reduce código en ~40%
+- tRPC batching combina queries automáticamente
+
+---
+
 ## Componentes disponibles
 
 Ver `components/README.md` para documentación completa.
@@ -282,6 +547,7 @@ Plugins disponibles para mejorar el flujo de desarrollo:
 
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
+| 1.5.0 | 2026-02-11 | Stack tRPC: Nueva sección completa con arquitectura híbrida, templates, decisiones arquitectónicas |
 | 1.4.0 | 2026-02-06 | Auditoría de seguridad: TS estricto, security headers, CORS, RGPD, SEO JSON-LD |
 | 1.3.1 | 2026-02-03 | Sincronizado con CLAUDE.md global v2.12.0 (Sistema LegalNotice) |
 | 1.3.0 | 2025-12-28 | Añadida sección Guías (5 guías implementadas) |
