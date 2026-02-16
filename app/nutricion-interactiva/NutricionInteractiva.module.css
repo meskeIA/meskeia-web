@@ -1,0 +1,638 @@
+/* ============================================================================
+   NUTRICIÓN INTERACTIVA - ESTILOS PRINCIPALES
+   ============================================================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --focus: rgba(46, 134, 171, 0.1);
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #333333;
+  --focus: rgba(46, 134, 171, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.loading {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   HERO SECTION
+   ============================================================================ */
+
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-2xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.95;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ============================================================================
+   TABS (PESTAÑAS DE NAVEGACIÓN)
+   ============================================================================ */
+
+.tabs {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 2px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  bottom: -2px;
+}
+
+.tab:hover {
+  color: var(--primary);
+  background: var(--hover);
+}
+
+.tabActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   MAIN CONTENT
+   ============================================================================ */
+
+.mainContent {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-2xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  min-height: 500px;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+/* ============================================================================
+   BÚSQUEDA POR ÓRGANO
+   ============================================================================ */
+
+.organoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.organoCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.organoCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.organoCardActive {
+  border-color: var(--primary);
+  background: var(--focus);
+}
+
+.organoEmoji {
+  font-size: 2.5rem;
+}
+
+.organoNombre {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* ============================================================================
+   RESULTADOS DE BÚSQUEDA
+   ============================================================================ */
+
+.resultados {
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-xl);
+  border-top: 2px solid var(--border);
+}
+
+.resultadoTitle {
+  font-size: 1.8rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.alimentosLista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.listaTitle {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.listaTitleWarning {
+  color: #ff9800;
+}
+
+.alimentoItem {
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+}
+
+.alimentoItem:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateX(4px);
+}
+
+.alimentoWarning {
+  border-left-color: #ff9800;
+  background: rgba(255, 152, 0, 0.05);
+}
+
+.alimentoHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.alimentoEmoji {
+  font-size: 1.5rem;
+}
+
+.alimentoDescripcion {
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-sm);
+}
+
+.condicion {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-bottom: var(--spacing-sm);
+}
+
+.fuente {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.nivel {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.nivelalto {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+[data-theme='dark'] .nivelalto {
+  background: rgba(46, 125, 50, 0.2);
+  color: #81c784;
+}
+
+.nivelmedio {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+[data-theme='dark'] .nivelmedio {
+  background: rgba(230, 81, 0, 0.2);
+  color: #ffb74d;
+}
+
+.nivelbajo {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
+[data-theme='dark'] .nivelbajo {
+  background: rgba(106, 27, 154, 0.2);
+  color: #ba68c8;
+}
+
+.noResultados {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: var(--spacing-xl);
+}
+
+/* ============================================================================
+   BÚSQUEDA POR ALIMENTO
+   ============================================================================ */
+
+.buscador {
+  position: relative;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.input {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 1.1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.sugerencias {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: var(--spacing-xs);
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+}
+
+.sugerenciaItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.sugerenciaItem:hover {
+  background: var(--hover);
+}
+
+.sugerenciaItem:last-child {
+  border-bottom: none;
+}
+
+.sugerenciaEmoji {
+  font-size: 1.5rem;
+}
+
+/* ============================================================================
+   DETALLE DEL ALIMENTO
+   ============================================================================ */
+
+.detalleAlimento {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-2xl);
+  background: var(--bg-primary);
+}
+
+.detalleHeader {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-xl);
+  border-bottom: 2px solid var(--border);
+}
+
+.detalleEmoji {
+  font-size: 5rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.detalleTitle {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.detalleDescripcion {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.detalleSection {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.detalleSectionTitle {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--border);
+}
+
+.detalleSectionWarning {
+  color: #ff9800;
+}
+
+/* Órganos en detalle */
+.organosList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.organoDetalle {
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--primary);
+}
+
+.organoDetalleHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+/* Nutrientes en detalle */
+.nutrientesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.nutrienteItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.nutrienteEmoji {
+  font-size: 1.5rem;
+}
+
+.nutrienteInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+}
+
+.cantidad {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Sinergias */
+.sinergiasList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.sinergiaItem {
+  padding: var(--spacing-lg);
+  background: #e8f5e9;
+  border-left: 4px solid #4caf50;
+  border-radius: var(--radius);
+}
+
+[data-theme='dark'] .sinergiaItem {
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.sinergiaHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.1rem;
+}
+
+.sinergiaPlus {
+  color: #4caf50;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Antagonismos */
+.antagonismosList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.antagonismoItem {
+  padding: var(--spacing-lg);
+  background: #fff3e0;
+  border-left: 4px solid #ff9800;
+  border-radius: var(--radius);
+}
+
+[data-theme='dark'] .antagonismoItem {
+  background: rgba(255, 152, 0, 0.1);
+}
+
+.antagonismoHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.1rem;
+}
+
+.antagonismoX {
+  color: #ff9800;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+  .mainContent {
+    padding: var(--spacing-lg);
+  }
+
+  .organoGrid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+
+  .hero {
+    padding: var(--spacing-lg);
+    margin-top: 60px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .tabs {
+    flex-direction: column;
+  }
+
+  .tab {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .organoGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--spacing-sm);
+  }
+
+  .organoCard {
+    padding: var(--spacing-md);
+  }
+
+  .organoEmoji {
+    font-size: 2rem;
+  }
+
+  .organoNombre {
+    font-size: 0.8rem;
+  }
+
+  .detalleAlimento {
+    padding: var(--spacing-lg);
+  }
+
+  .detalleEmoji {
+    font-size: 3rem;
+  }
+
+  .nutrientesList {
+    grid-template-columns: 1fr;
+  }
+}
