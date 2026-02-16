@@ -15,7 +15,7 @@ import {
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
-export default function [NombreApp]Page() {
+export default function [NombreApp]Page(): JSX.Element {
   const [input, setInput] = useState('');
   const [resultado, setResultado] = useState('');
 
