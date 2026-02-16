@@ -168,6 +168,7 @@ export const implementedAppsUrls = [
   "/calculadora-medicamentos-mascotas/", // Medicamentos mascotas: antiparasitarios, frecuencia, síntomas
   "/calculadora-tamano-adulto-perro/",   // Predicción peso adulto cachorros
   "/calculadora-percentiles/",       // Percentiles peso/talla infantil OMS
+  "/nutricion-interactiva/",         // Alimentos por órgano, sinergias y antagonismos nutricionales
 
   // Herramientas Web y Tecnología (6 implementadas)
   "/validador-json/",
