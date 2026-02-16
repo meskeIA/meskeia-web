@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 223,
+  "total_tools": 222,
   "updated": "2026-02-16",
   "features": {
     "all_free": true,
@@ -245,7 +245,6 @@
         { "name": "Calculadora de Hidratación", "slug": "calculadora-hidratacion", "url": "https://meskeia.com/calculadora-hidratacion/", "description": "Cuánta agua necesitas diariamente" },
         { "name": "Calculadora de Sueño", "slug": "calculadora-sueno", "url": "https://meskeia.com/calculadora-sueno/", "description": "Ciclos de sueño ideales" },
         { "name": "Curso de Nutrición", "slug": "curso-nutrisalud", "url": "https://meskeia.com/curso-nutrisalud/", "description": "Curso de nutrición avanzado basado en ciencia" },
-        { "name": "Nutrición Interactiva", "slug": "nutricion-interactiva", "url": "https://meskeia.com/nutricion-interactiva/", "description": "Descubre qué alimentos benefician a cada órgano, sinergias nutricionales y combinaciones que inhiben la absorción" },
         { "name": "Seguimiento de Hábitos", "slug": "seguimiento-habitos", "url": "https://meskeia.com/seguimiento-habitos/", "description": "Rastrea hábitos con rachas" },
         { "name": "Planificador de Menú Semanal", "slug": "planificador-menu", "url": "https://meskeia.com/planificador-menu/", "description": "Planifica menú equilibrado" },
         { "name": "Calculadora de Porciones", "slug": "calculadora-porciones", "url": "https://meskeia.com/calculadora-porciones/", "description": "Mide porciones con tu mano" },

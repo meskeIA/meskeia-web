@@ -86,7 +86,6 @@ const saludApps: RelatedApp[] = [
   { url: '/calculadora-hidratacion/', icon: '💧', name: 'Hidratación', description: 'Agua recomendada' },
   { url: '/planificador-menu/', icon: '🍽️', name: 'Planificador Menú', description: 'Dieta mediterránea' },
   { url: '/vitaminas-minerales/', icon: '🥗', name: 'Vitaminas y Minerales', description: '30 nutrientes esenciales' },
-  { url: '/nutricion-interactiva/', icon: '🥗', name: 'Nutrición Interactiva', description: 'Alimentos y sinergias' },
 ];
 
 const saludHabitosApps: RelatedApp[] = [
@@ -468,7 +467,6 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'planificador-menu': [...saludApps.filter(a => a.url !== '/planificador-menu/').slice(0, 2), ...cocinaApps.slice(0, 2)],
   'calculadora-porciones': [...cocinaApps.filter(a => a.url !== '/calculadora-porciones/').slice(0, 2), ...saludApps.slice(0, 2)],
   'vitaminas-minerales': saludApps.filter(a => a.url !== '/vitaminas-minerales/'),
-  'nutricion-interactiva': saludApps.filter(a => a.url !== '/nutricion-interactiva/'),
   'seguimiento-habitos': saludHabitosApps.filter(a => a.url !== '/seguimiento-habitos/'),
   'test-habitos': saludHabitosApps.filter(a => a.url !== '/test-habitos/'),
   'calculadora-sueno': saludHabitosApps.filter(a => a.url !== '/calculadora-sueno/'),
@@ -775,7 +773,6 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     // Salud
     'calculadora-imc': { title: 'Cuida tu salud', icon: '❤️' },
     'calculadora-calorias-ejercicio': { title: 'Herramientas de salud', icon: '❤️' },
-    'nutricion-interactiva': { title: 'Optimiza tu nutrición', icon: '🥗' },
 
     // Mascotas
     'planificador-mascota': { title: 'Más herramientas para tu mascota', icon: '🐾' },
