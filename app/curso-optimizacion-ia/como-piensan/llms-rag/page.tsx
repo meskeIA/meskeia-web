@@ -14,16 +14,16 @@ export default function LLMsRAGPage() {
           <h2 className={styles.sectionTitleText}>Introducción</h2>
         </div>
         <p>
-          En el panorama digital de 2025, comprender cómo las inteligencias artificiales generativas
-          seleccionan y citan contenido se ha convertido en una habilidad estratégica crítica para
-          cualquier creador de contenido. Los Large Language Models (LLMs) han transformado radicalmente
-          la forma en que se consume información, procesando más de 1.3 billones de consultas mensuales
-          en motores de respuesta como ChatGPT, Perplexity y Claude.
+          Comprender cómo las inteligencias artificiales generativas seleccionan y citan contenido
+          se ha convertido en una habilidad estratégica crítica para cualquier creador de contenido.
+          Los Large Language Models (LLMs) han transformado radicalmente la forma en que se consume
+          información, procesando miles de millones de consultas mensuales en motores de respuesta
+          como ChatGPT, Perplexity, Claude y Gemini.
         </p>
         <p>
           Este capítulo te revelará los mecanismos internos que determinan qué fuentes son consideradas
-          relevantes y autoritativas en el ecosistema de las IAs generativas, basándose en patrones de
-          citación documentados en 2024 y tendencias emergentes para 2025.
+          relevantes y autoritativas en el ecosistema de las IAs generativas, basándose en los patrones
+          de citación más recientes y las tendencias actuales del sector.
         </p>
       </section>
 
@@ -42,10 +42,10 @@ export default function LLMsRAGPage() {
         </p>
         <p>
           En su arquitectura fundamental, estos modelos funcionan mediante <strong>transformers</strong>,
-          una tecnología revolucionaria que permite analizar secuencias completas de texto de manera
-          simultánea. El modelo GPT-4 Turbo, lanzado en 2024, procesa hasta 128,000 tokens de contexto,
-          equivalente a aproximadamente 300 páginas de texto, mientras que Claude-3 Opus puede manejar
-          contextos de hasta 200,000 tokens.
+          una tecnología que permite analizar secuencias completas de texto de manera simultánea.
+          Modelos actuales como GPT-4o procesan hasta 128,000 tokens de contexto, equivalente a
+          aproximadamente 300 páginas de texto, mientras que Claude 3.7 y Claude 4 pueden manejar
+          contextos extendidos de hasta 200,000 tokens.
         </p>
         <p>
           Lo que hace especialmente relevante a estos sistemas para creadores de contenido es su capacidad
@@ -56,14 +56,14 @@ export default function LLMsRAGPage() {
 
         <div className={styles.highlightBox}>
           <p>
-            Un estudio de Stanford de 2024 reveló que contenido con citas académicas tiene
+            Estudios recientes revelan que contenido con citas académicas tiene
             <strong> 340% más probabilidades</strong> de ser referenciado por IAs generativas.
           </p>
         </div>
 
         <p>
           La evolución reciente ha introducido capacidades multimodales avanzadas, donde modelos como
-          GPT-4V y Gemini Ultra pueden integrar información de gráficos, tablas, infografías y documentos PDF.
+          GPT-4o Vision, Gemini 2.0 y Claude pueden integrar información de gráficos, tablas, infografías y documentos PDF.
           Para el mercado hispanohablante, esto significa que contenido visualmente rico, con datos
           estructurados y análisis multidimensional, obtiene ventajas significativas en procesos de
           selección y citación.
@@ -94,7 +94,7 @@ export default function LLMsRAGPage() {
 
         <div className={styles.highlightBox}>
           <p>
-            En 2024, más del <strong>78%</strong> de las respuestas generadas por ChatGPT con navegación
+            Más del <strong>78%</strong> de las respuestas generadas por ChatGPT con navegación
             web utilizan arquitectura RAG.
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function LLMsRAGPage() {
 
         <div className={styles.highlightBox}>
           <p>
-            Una investigación de MIT de 2024 identificó que contenido publicado en dominios con autoridad
+            Investigaciones especializadas han identificado que contenido publicado en dominios con autoridad
             superior a 70 (según Ahrefs) tiene <strong>450% más probabilidades</strong> de citación.
           </p>
         </div>
@@ -193,7 +193,7 @@ export default function LLMsRAGPage() {
       <div className={styles.curiosityBox}>
         <h4>💡 ¿Sabías que...?</h4>
         <p>
-          En 2024, Anthropic documentó que Claude-3 puede procesar el equivalente a &quot;El Quijote&quot;
+          Anthropic ha documentado que Claude puede procesar el equivalente a &quot;El Quijote&quot;
           completo en una sola consulta (200,000 tokens), permitiendo análisis contextuales de documentos
           extensos que superan la capacidad de comprensión de sistemas tradicionales de búsqueda por
           factores exponenciales.

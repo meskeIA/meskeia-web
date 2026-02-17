@@ -14,10 +14,10 @@ export default function SeoAGeoPage() {
           <h2 className={styles.sectionTitleText}>Introducción</h2>
         </div>
         <p>
-          En 2025, el panorama digital ha experimentado una transformación radical: las inteligencias
+          El panorama digital ha experimentado una transformación radical en los últimos años: las inteligencias
           artificiales no solo responden búsquedas, sino que generan experiencias personalizadas de
           conocimiento en tiempo real. El SEO tradicional, basado en palabras clave y backlinks, ha
-          quedado obsoleto ante la emergencia del GEO/AEO, una disciplina revolucionaria que requiere
+          quedado obsoleto ante la emergencia del GEO/AEO, una disciplina que requiere
           comprender profundamente cómo las IAs procesan contextos, evalúan credibilidad y sintetizan información.
         </p>
         <p>
@@ -75,7 +75,7 @@ export default function SeoAGeoPage() {
         <p>
           Answer Engine Optimization (AEO) se centra específicamente en crear contenido que responda de
           manera directa, precisa y contextualmente relevante a las consultas conversacionales de los usuarios.
-          En 2025, las búsquedas por voz y conversacionales representan el 73% de las consultas digitales en
+          Las búsquedas por voz y conversacionales representan ya más del 50% de las consultas digitales en
           mercados hispanohablantes, especialmente en dispositivos móviles y asistentes virtuales.
         </p>
         <p>
@@ -160,7 +160,7 @@ export default function SeoAGeoPage() {
       <div className={styles.curiosityBox}>
         <h4>💡 ¿Sabías que...?</h4>
         <p>
-          Según estudios de 2024, el 67% de los contenidos digitales más citados por IAs incluyen datos
+          El 67% de los contenidos digitales más citados por IAs incluyen datos
           primarios y análisis regional específico, mientras que solo el 12% del contenido genérico logra
           ser referenciado consistentemente por sistemas generativos. En mercados hispanohablantes, la
           inclusión de contexto cultural local aumenta la probabilidad de citación en un <strong>340%</strong>.

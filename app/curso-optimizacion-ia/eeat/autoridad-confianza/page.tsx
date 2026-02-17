@@ -14,14 +14,14 @@ export default function AutoridadConfianzaPage() {
           <h2 className={styles.sectionTitleText}>Introducción</h2>
         </div>
         <p>
-          En el ecosistema digital de 2025, las Inteligencias Artificiales están redefiniendo cómo se
+          En el ecosistema digital actual, las Inteligencias Artificiales están redefiniendo cómo se
           consume y valora el contenido. El E-E-A-T ya no es solo un concepto de SEO tradicional, sino
           una carta de presentación crucial para ser reconocido por los motores de respuesta generativa.
         </p>
         <p>
           Los creadores de contenido que no comprendan esta nueva dinámica quedarán relegados en un mundo
           donde la IA selecciona y jerarquiza la información con criterios cada vez más sofisticados.
-          Según estudios de 2024, el 78% de las búsquedas son ahora procesadas por sistemas de IA que
+          El 78% de las búsquedas complejas son ahora procesadas por sistemas de IA que
           evalúan la credibilidad del contenido antes de mostrarlo a los usuarios.
         </p>
       </section>
@@ -33,12 +33,12 @@ export default function AutoridadConfianzaPage() {
           <h2 className={styles.sectionTitleText}>E-E-A-T: La Nueva Credencial Digital en la Era de las IAs</h2>
         </div>
         <p>
-          El E-E-A-T (Experiencia, Expertise, Autoridad y Confianza) se ha transformado radicalmente en 2024.
+          El E-E-A-T (Experiencia, Expertise, Autoridad y Confianza) se ha transformado radicalmente.
           Ya no basta con tener conocimientos teóricos; las Inteligencias Artificiales buscan contenido que
           demuestre una experiencia práctica, verificable y contextualizada.
         </p>
         <p>
-          Las IAs como Gemini, Claude y GPT-4 utilizan algoritmos de evaluación de credibilidad más complejos
+          Las IAs como Gemini, Claude y ChatGPT utilizan algoritmos de evaluación de credibilidad más complejos
           que Google. Estos sistemas analizan <strong>147 señales diferentes</strong>, incluyendo la coherencia
           temporal del contenido, la consistencia de la información across múltiples publicaciones, y la
           profundidad de los datos presentados.
@@ -93,7 +93,7 @@ export default function AutoridadConfianzaPage() {
           <h2 className={styles.sectionTitleText}>Expertise: Más Allá de los Títulos Académicos</h2>
         </div>
         <p>
-          En 2025, el concepto de expertise ha evolucionado significativamente hacia lo que los expertos
+          El concepto de expertise ha evolucionado significativamente hacia lo que los expertos
           llaman &quot;expertise dinámica&quot;. Ya no se trata únicamente de credenciales formales, sino de la
           capacidad de demostrar conocimiento aplicado, actualizado y verificable en tiempo real.
         </p>
@@ -141,7 +141,7 @@ export default function AutoridadConfianzaPage() {
           de credibilidad que las IAs pueden auditar de manera independiente.
         </p>
         <p>
-          En 2024, las IAs utilizan más de <strong>200 señales</strong> para evaluar autoridad, incluyendo
+          Las IAs actuales utilizan más de <strong>200 señales</strong> para evaluar autoridad, incluyendo
           la frecuencia con la que otros expertos referencian tu trabajo, la calidad de las preguntas que
           recibes de tu audiencia, el nivel de debate constructivo que generas, y tu capacidad para corregir
           información incorrecta en tu campo.
@@ -212,7 +212,7 @@ export default function AutoridadConfianzaPage() {
         </div>
         <ul>
           <li><strong>Perplexity.ai</strong> - Análisis de autoridad de contenido con verificación de fuentes en tiempo real</li>
-          <li><strong>Claude 3</strong> - Herramienta de evaluación de coherencia y expertise técnica</li>
+          <li><strong>Claude (claude.ai)</strong> - Herramienta de evaluación de coherencia y expertise técnica</li>
           <li><strong>Google Scholar AI</strong> - Sistema de verificación automática de citaciones</li>
           <li><strong>Semantic Scholar API</strong> - Análisis de impacto e influencia en comunidades académicas</li>
           <li><strong>Research Rabbit</strong> - Mapeo de redes de conocimiento y autoridad</li>
@@ -223,7 +223,7 @@ export default function AutoridadConfianzaPage() {
       <div className={styles.curiosityBox}>
         <h4>💡 ¿Sabías que...?</h4>
         <p>
-          En 2024, los sistemas de IA procesan más de 2.3 billones de piezas de contenido mensualmente
+          Los sistemas de IA procesan actualmente más de 2.3 billones de piezas de contenido mensualmente
           para evaluar E-E-A-T, y solo el <strong>12%</strong> del contenido evaluado alcanza los estándares
           mínimos para ser recomendado en respuestas generativas. Los creadores que dominan estos criterios
           ven un aumento promedio del <strong>340%</strong> en su visibilidad digital comparado con

@@ -14,7 +14,7 @@ export default function EstructuraSchemaPage() {
           <h2 className={styles.sectionTitleText}>Introducción</h2>
         </div>
         <p>
-          En el panorama digital de 2025, la optimización para motores generativos e inteligencia artificial
+          En el panorama digital actual, la optimización para motores generativos e inteligencia artificial
           (GEO/AEO) ha redefinido completamente las reglas del juego. Mientras que el SEO tradicional se
           enfocaba en posicionamiento en resultados de búsqueda, el GEO busca que las IAs como ChatGPT,
           Claude, Gemini y Copilot seleccionen, comprendan y recomienden nuestro contenido como fuente autorizada.
@@ -22,7 +22,7 @@ export default function EstructuraSchemaPage() {
 
         <div className={styles.highlightBox}>
           <p>
-            Los estudios de BrightEdge revelan que en 2024, el <strong>71%</strong> de las búsquedas generativas
+            Los estudios de BrightEdge revelan que el <strong>71%</strong> de las búsquedas generativas
             utilizan contenido estructurado semánticamente, mientras que el <strong>43%</strong> de las respuestas
             de IA provienen de sitios con Schema Markup implementado.
           </p>
@@ -66,7 +66,7 @@ export default function EstructuraSchemaPage() {
             <strong>Ejemplo de estructura óptima:</strong>
           </p>
           <ul>
-            <li>H1: &quot;Estrategias de Marketing Digital para Startups Fintech en Mercados Emergentes 2025&quot;</li>
+            <li>H1: &quot;Estrategias de Marketing Digital para Startups Fintech en Mercados Emergentes&quot;</li>
             <li>H2: &quot;Fundamentos de Marketing Fintech&quot; (con H3: Regulaciones por país, H3: Audiencia objetivo)</li>
             <li>H2: &quot;Canales de Adquisición&quot; (con H3: LinkedIn Ads B2B, H3: Content Marketing, H3: Influencer partnerships)</li>
             <li>H2: &quot;Métricas y Optimización&quot; (con tabla comparativa de herramientas y lista de KPIs)</li>
@@ -128,7 +128,7 @@ export default function EstructuraSchemaPage() {
             <strong>Implementación completa para un blog de software:</strong>
           </p>
           <ul>
-            <li>FAQ Schema con preguntas como &quot;¿Qué es DevOps en 2025?&quot;, &quot;¿Cómo implementar CI/CD con GitHub Actions?&quot;</li>
+            <li>FAQ Schema con preguntas como &quot;¿Cómo implementar DevOps efectivamente?&quot;, &quot;¿Cómo implementar CI/CD con GitHub Actions?&quot;</li>
             <li>HowTo Schema para tutorial &quot;Deploying a React App to AWS&quot;: step 1 &quot;Configurar AWS CLI&quot;, step 2 &quot;Crear bucket S3&quot;, etc.</li>
             <li>Article Schema con author entity conectando a LinkedIn, dateModified actualizado mensualmente</li>
           </ul>
@@ -183,7 +183,7 @@ export default function EstructuraSchemaPage() {
           <li><strong>Schema.org documentation</strong> - schema.org</li>
           <li><strong>Merkle Schema Markup Generator</strong> - technicalseo.com/tools/schema-markup-generator</li>
           <li><strong>Wikidata Entity Search</strong> - wikidata.org</li>
-          <li><strong>BrightEdge Generative AI Research 2024</strong></li>
+          <li><strong>BrightEdge Generative AI Research</strong> - brightedge.com</li>
           <li><strong>Google Search Central AI Guidelines</strong> - developers.google.com/search/docs</li>
         </ul>
       </section>
@@ -192,7 +192,7 @@ export default function EstructuraSchemaPage() {
       <div className={styles.curiosityBox}>
         <h4>💡 ¿Sabías que...?</h4>
         <p>
-          Un estudio de Conductor reveló que en 2024, el contenido con Schema Markup tiene
+          Estudios de Conductor revelan que el contenido con Schema Markup tiene
           <strong> 4x más probabilidades</strong> de aparecer en respuestas de ChatGPT y Claude.
           Además, sitios con entidades bien definidas experimentaron un aumento promedio del
           <strong> 156%</strong> en traffic referral de motores generativos comparado con sitios

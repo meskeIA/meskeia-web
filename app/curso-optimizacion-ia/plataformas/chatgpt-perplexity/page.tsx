@@ -14,24 +14,24 @@ export default function PlataformasIAPage() {
           <h2 className={styles.sectionTitleText}>Introducción</h2>
         </div>
         <p>
-          En 2024-2025, la optimización para motores generativos de inteligencia artificial (GEO/AEO)
-          representa una revolución silenciosa que está redefiniendo las reglas del contenido digital.
-          Mientras el SEO tradicional se enfocaba en posicionamiento, el GEO se centra en ser citado,
-          referenciado y presentado como fuente confiable por sistemas de IA generativa.
+          La optimización para motores generativos de inteligencia artificial (GEO/AEO) ha pasado de ser
+          una tendencia emergente a una necesidad estratégica. El ecosistema de plataformas IA ha madurado
+          y diversificado enormemente: ya no hablamos solo de ChatGPT o Gemini, sino de un panorama con
+          múltiples actores establecidos, cada uno con sus propios criterios de evaluación y citación.
         </p>
 
         <div className={styles.highlightBox}>
           <p>
             Las estadísticas son contundentes: más del <strong>40%</strong> de las consultas complejas
-            ya se realizan a través de interfaces conversacionales de IA, y para 2025 se proyecta que
-            este número supere el <strong>65%</strong>.
+            ya se realizan a través de interfaces conversacionales de IA, y esta tendencia sigue acelerándose
+            con la adopción masiva de herramientas como ChatGPT, Claude, Gemini, Grok y Perplexity.
           </p>
         </div>
 
         <p>
-          Para los creadores de contenido hispanohablantes, esto no es solo una oportunidad, sino una
-          necesidad estratégica urgente. Los sistemas de IA no solo buscan información; evalúan credibilidad,
-          analizan profundidad, verifican coherencia y priorizan fuentes que demuestren experiencia práctica.
+          Para los creadores de contenido hispanohablantes, dominar este ecosistema ya no es opcional.
+          Cada plataforma tiene lógicas de citación diferenciadas, y entenderlas es la clave para
+          maximizar la visibilidad de tu contenido en la era generativa.
         </p>
       </section>
 
@@ -39,12 +39,13 @@ export default function PlataformasIAPage() {
       <section className={styles.contentSection}>
         <div className={styles.sectionHeader}>
           <span className={styles.sectionIcon}>💬</span>
-          <h2 className={styles.sectionTitleText}>ChatGPT con Navegación: El Motor de IA Más Influyente</h2>
+          <h2 className={styles.sectionTitleText}>ChatGPT: El Estándar de Referencia Global</h2>
         </div>
         <p>
-          ChatGPT con capacidades de navegación web ha transformado radicalmente el ecosistema de búsqueda.
-          Con más de 100 millones de usuarios activos semanales en 2024, se ha convertido en el punto de
-          entrada principal para consultas complejas y especializadas.
+          ChatGPT se ha consolidado como la plataforma conversacional de mayor adopción global. Con más de
+          400 millones de usuarios activos semanales, ha evolucionado desde GPT-4 hasta GPT-4o y modelos
+          de razonamiento avanzado (o1, o3), integrando capacidades de búsqueda web, generación de imágenes
+          y análisis de documentos en una sola plataforma.
         </p>
         <p>
           El algoritmo de selección de fuentes de ChatGPT prioriza contenido que demuestre tres
@@ -64,7 +65,7 @@ export default function PlataformasIAPage() {
         <div className={styles.highlightBox}>
           <p>
             Los contenidos que combinan teoría con casos prácticos locales obtienen tasas de citación
-            <strong> 340% superiores</strong> según análisis de citaciones realizados en 2024.
+            <strong> 340% superiores</strong> según análisis de citaciones recientes.
           </p>
         </div>
 
@@ -82,12 +83,14 @@ export default function PlataformasIAPage() {
       <section className={styles.contentSection}>
         <div className={styles.sectionHeader}>
           <span className={styles.sectionIcon}>🔍</span>
-          <h2 className={styles.sectionTitleText}>Perplexity AI: El Buscador Conversacional de Nueva Generación</h2>
+          <h2 className={styles.sectionTitleText}>Perplexity AI: El Motor de Búsqueda Conversacional</h2>
         </div>
         <p>
-          Perplexity AI ha emergido como el competidor más sofisticado en el espacio de búsqueda conversacional,
-          procesando más de 500 millones de consultas mensuales a finales de 2024. Su enfoque híbrido combina
-          capacidades de IA generativa con verificación en tiempo real de fuentes.
+          Perplexity AI se ha establecido como el referente de búsqueda conversacional con citación de fuentes,
+          procesando más de 1.000 millones de consultas mensuales. Su modelo de negocio diferenciado —que
+          comparte ingresos con los editores de contenido citados— lo convierte en un canal especialmente
+          estratégico para creadores de contenido. Su enfoque híbrido combina IA generativa con verificación
+          en tiempo real de fuentes.
         </p>
         <p>
           Lo que distingue a Perplexity es su capacidad de <strong>contextualización cultural y geográfica</strong>.
@@ -122,46 +125,59 @@ export default function PlataformasIAPage() {
         </div>
       </section>
 
-      {/* Claude y Gemini */}
+      {/* Claude, Gemini y el ecosistema consolidado */}
       <section className={styles.contentSection}>
         <div className={styles.sectionHeader}>
           <span className={styles.sectionIcon}>🌐</span>
-          <h2 className={styles.sectionTitleText}>Claude AI y Gemini: Ecosistemas de IA Emergentes</h2>
+          <h2 className={styles.sectionTitleText}>Claude, Gemini, Grok y el Ecosistema Consolidado de IA</h2>
         </div>
         <p>
-          Claude AI de Anthropic y Gemini de Google representan la frontera emergente de sistemas de IA
-          conversacional, cada uno con criterios únicos de evaluación y citación.
+          El ecosistema de plataformas IA se ha diversificado radicalmente. Claude (Anthropic), Gemini (Google),
+          Grok (xAI/Elon Musk), Microsoft Copilot y DeepSeek han pasado de ser experimentos a convertirse en
+          plataformas consolidadas con cientos de millones de usuarios. Cada una tiene criterios de evaluación
+          diferenciados que el creador de contenido debe conocer.
         </p>
 
         <div className={styles.conceptGrid}>
           <div className={styles.conceptCard}>
             <span className={styles.conceptIcon}>🤖</span>
-            <h4>Claude AI</h4>
-            <p>Prioriza balance, consideración ética y múltiples perspectivas. Penaliza contenido unilateral.</p>
+            <h4>Claude (Anthropic)</h4>
+            <p>Prioriza balance, razonamiento ético y múltiples perspectivas. Los modelos Claude 3.5/4 son líderes en seguimiento de instrucciones y análisis de documentos.</p>
           </div>
           <div className={styles.conceptCard}>
             <span className={styles.conceptIcon}>✨</span>
-            <h4>Gemini</h4>
-            <p>Integrado con Knowledge Graph de Google. Valora contenido que enriquezca entidades conocidas.</p>
+            <h4>Gemini (Google)</h4>
+            <p>Integrado con Knowledge Graph y búsqueda de Google. Gemini 2.0/2.5 tienen acceso directo a información web actualizada y son la base de AI Overviews en Search.</p>
+          </div>
+          <div className={styles.conceptCard}>
+            <span className={styles.conceptIcon}>⚡</span>
+            <h4>Grok (xAI)</h4>
+            <p>Integrado en X (Twitter) con acceso a datos en tiempo real. Especialmente relevante para contenido de actualidad, tendencias y análisis de redes sociales.</p>
+          </div>
+          <div className={styles.conceptCard}>
+            <span className={styles.conceptIcon}>🔷</span>
+            <h4>Microsoft Copilot</h4>
+            <p>Basado en GPT-4o e integrado en el ecosistema Microsoft 365. Clave para contenido orientado a entornos empresariales y productividad profesional.</p>
           </div>
         </div>
 
         <p>
-          Para Claude, la estrategia más efectiva incluye reconocimiento explícito de limitaciones,
-          presentación de viewpoints alternativos, y consideraciones éticas cuando son relevantes.
-          Este sistema penaliza contenido que parezca unilateral o que haga afirmaciones absolutas sin matices.
+          <strong>DeepSeek</strong> irrumpió con fuerza en el mercado con modelos de alto rendimiento a
+          bajo coste, democratizando el acceso a capacidades IA avanzadas. Aunque originado en China,
+          su adopción global ha sido significativa, especialmente en entornos técnicos y de investigación.
         </p>
         <p>
-          Gemini privilegia contenido que enriquezca entidades conocidas, proporcione contexto actualizado,
-          y ofrezca perspectivas únicas sobre temas establecidos. Su algoritmo de citación favorece fuentes
-          que demuestren <strong>expertise temporal</strong>: contenido que muestre evolución de conocimiento
-          y actualizaciones regulares.
+          Para <strong>Claude</strong>, la estrategia más efectiva incluye reconocimiento explícito de
+          limitaciones, presentación de perspectivas alternativas, y consideraciones éticas cuando son
+          relevantes. Para <strong>Gemini</strong>, el contenido debe enriquecer entidades del Knowledge
+          Graph y demostrar actualización constante. Para <strong>Grok</strong>, la actualidad y la
+          conexión con conversaciones en redes sociales son factores diferenciales.
         </p>
 
         <div className={styles.exampleBox}>
           <p>
             <strong>Caso de éxito:</strong> MedTechES.com, especializado en tecnología médica para el mercado
-            español, logró citaciones consistentes en Claude y Gemini mediante su serie &quot;Telemedicina Post-Pandemia&quot;.
+            español, logró citaciones consistentes en Claude y Gemini mediante su serie &quot;Telemedicina en la Era IA&quot;.
             Cada artículo incluía: análisis de beneficios Y limitaciones, consideraciones de privacidad
             específicas bajo GDPR, impactos en diferentes demografías, y actualizaciones trimestrales
             con nuevos estudios clínicos.
@@ -174,12 +190,12 @@ export default function PlataformasIAPage() {
         <h4>💡 Ideas Clave</h4>
         <ul>
           <li>GEO/AEO requiere transición de &quot;posicionar para buscar&quot; a &quot;crear para citar&quot;</li>
-          <li>Los sistemas de IA priorizan autoridad temática demostrable sobre métricas tradicionales</li>
-          <li>Contenido contextualizado culturalmente supera traducciones genéricas en 340%</li>
-          <li>La transparencia metodológica y trazabilidad de fuentes son factores críticos</li>
-          <li>Cada plataforma de IA tiene algoritmos únicos de evaluación y citación</li>
+          <li>El ecosistema de IA ya no es solo ChatGPT: Claude, Gemini, Grok, Perplexity y Copilot son actores consolidados</li>
+          <li>Cada plataforma tiene criterios diferenciados: balance ético (Claude), actualidad (Grok), entidades (Gemini)</li>
+          <li>Contenido contextualizado culturalmente supera traducciones genéricas en más de un 300%</li>
+          <li>La transparencia metodológica y trazabilidad de fuentes son factores críticos en todos los sistemas</li>
+          <li>Perplexity comparte ingresos con editores citados: es especialmente estratégico para publishers</li>
           <li>La actualización sistemática de contenido es más valiosa que la creación masiva</li>
-          <li>E-E-A-T evolucionó: incluye &quot;Experiencia Comprobable&quot; y &quot;Transparencia Metodológica&quot;</li>
         </ul>
       </div>
 
@@ -214,13 +230,13 @@ export default function PlataformasIAPage() {
           <h2 className={styles.sectionTitleText}>Recursos Recomendados</h2>
         </div>
         <ul>
-          <li><strong>ChatGPT Plus con navegación</strong> - Acceso directo para testing de citabilidad</li>
-          <li><strong>Perplexity AI Pro</strong> - Análisis de competencia en citaciones</li>
-          <li><strong>Claude AI de Anthropic</strong> - Evaluación de balance y profundidad</li>
-          <li><strong>Google Gemini Advanced</strong> - Integración con Knowledge Graph</li>
+          <li><strong>ChatGPT (chatgpt.com)</strong> - Testing de citabilidad y búsqueda web integrada</li>
+          <li><strong>Perplexity AI Pro</strong> - Búsqueda con citación de fuentes, programa de revenue sharing</li>
+          <li><strong>Claude (claude.ai)</strong> - Evaluación de balance, profundidad y razonamiento</li>
+          <li><strong>Google Gemini Advanced</strong> - Integración con Knowledge Graph y AI Overviews</li>
+          <li><strong>Grok (x.ai)</strong> - Análisis de tendencias en tiempo real vía X/Twitter</li>
+          <li><strong>Microsoft Copilot</strong> - Testing para contenido orientado a entornos corporativos</li>
           <li><strong>Clearscope.io</strong> - Análisis de contenido optimizado para IA</li>
-          <li><strong>MarketMuse</strong> - Planificación de autoridad temática</li>
-          <li><strong>Alertas Google personalizadas</strong> - Monitoreo de citaciones</li>
           <li><strong>Semrush Topic Research</strong> - Identificación de gaps de contenido</li>
         </ul>
       </section>
@@ -229,11 +245,11 @@ export default function PlataformasIAPage() {
       <div className={styles.curiosityBox}>
         <h4>💡 ¿Sabías que...?</h4>
         <p>
-          En octubre de 2024, un estudio realizado por Stanford AI Lab reveló que el <strong>67%</strong>
+          Estudios del sector revelan que el <strong>67%</strong>
           del contenido citado por sistemas de IA generativa proviene de solo el <strong>12%</strong> de
-          sitios web activos, y que contenido en español representa menos del <strong>8%</strong> de las
-          citaciones globales, creando una oportunidad masiva para creadores hispanohablantes que implementen
-          estrategias GEO/AEO efectivas.
+          sitios web activos, y que el contenido en español representa menos del <strong>8%</strong> de las
+          citaciones globales. Con el ecosistema de plataformas IA expandiéndose (ChatGPT, Claude, Gemini,
+          Grok, Perplexity, Copilot), la oportunidad para creadores hispanohablantes no ha hecho más que crecer.
         </p>
       </div>
     </ChapterPage>

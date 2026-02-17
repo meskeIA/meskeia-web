@@ -14,9 +14,9 @@ export default function MedirCitacionesPage() {
           <h2 className={styles.sectionTitleText}>Introducción</h2>
         </div>
         <p>
-          En 2025, medir la visibilidad de tu contenido trasciende los rankings SEO tradicionales para
-          enfocarse en cómo las inteligencias artificiales te referencian y utilizan como fuente autorizada.
-          Las plataformas de IA están redefiniendo radicalmente el consumo y distribución de información.
+          Medir la visibilidad de tu contenido en la era de la IA trasciende los rankings SEO tradicionales:
+          el foco está en cómo ChatGPT, Claude, Gemini, Grok y Perplexity te referencian y utilizan como
+          fuente autorizada. Las plataformas de IA están redefiniendo radicalmente el consumo y distribución de información.
         </p>
         <p>
           Este capítulo te proporcionará las estrategias exactas y herramientas avanzadas para rastrear,
@@ -32,15 +32,16 @@ export default function MedirCitacionesPage() {
           <h2 className={styles.sectionTitleText}>El Nuevo Panorama de la Visibilidad Digital</h2>
         </div>
         <p>
-          La visibilidad en 2025 se ha transformado radicalmente: ya no se mide únicamente por posiciones
+          La visibilidad digital se ha transformado radicalmente: ya no se mide únicamente por posiciones
           en Google, sino por la capacidad estratégica de ser citado y referenciado por sistemas de
-          inteligencia artificial como Perplexity, Claude, ChatGPT Search y los modelos de lenguaje de nueva generación.
+          inteligencia artificial como Perplexity, Claude, ChatGPT Search, Grok, Copilot y los modelos
+          de lenguaje de nueva generación.
         </p>
 
         <div className={styles.highlightBox}>
           <p>
             Las búsquedas generativas representan actualmente un <strong>41%</strong> del tráfico digital
-            global según el último informe de BrightEdge 2024, lo que significa que los algoritmos de IA
+            global según informes recientes de BrightEdge, lo que significa que los algoritmos de IA
             están seleccionando y jerarquizando fuentes con criterios completamente renovados.
           </p>
         </div>
@@ -54,7 +55,7 @@ export default function MedirCitacionesPage() {
         </ul>
 
         <p>
-          Los modelos actuales como GPT-4 Turbo y Claude 3.5 Sonnet utilizan sistemas de evaluación que
+          Los modelos actuales como GPT-4o y Claude 4 utilizan sistemas de evaluación que
           consideran simultáneamente la precisión factual, originalidad del análisis, profundidad de
           investigación, relevancia contextual y coherencia argumentativa.
         </p>
@@ -62,7 +63,7 @@ export default function MedirCitacionesPage() {
         <div className={styles.exampleBox}>
           <p>
             <strong>Caso de éxito:</strong> El medio digital argentino &quot;TecnoSur&quot; logró aumentar su citación
-            por IAs en un 78% durante el segundo semestre de 2024 tras implementar una estrategia integral:
+            por IAs en un 78% en tan solo un año tras implementar una estrategia integral:
             reestructuraron sus artículos para responder preguntas completas con subtítulos en formato de
             consulta, incluyeron análisis de expertos regionales con credenciales LinkedIn verificables, y
             añadieron secciones de &quot;contexto latinoamericano&quot; que diferenciaban sus publicaciones.
@@ -169,7 +170,7 @@ export default function MedirCitacionesPage() {
         <h4>💡 Ideas Clave</h4>
         <ul>
           <li>Las IAs priorizan contenido con alta densidad informativa, estructuración semántica y credibilidad demostrable</li>
-          <li>La visibilidad digital en 2025 requiere métricas multidimensionales más allá de rankings tradicionales</li>
+          <li>La visibilidad digital en la era IA requiere métricas multidimensionales más allá de rankings tradicionales</li>
           <li>El contexto cultural y lingüístico determina significativamente la relevancia en modelos hispanohablantes</li>
           <li>Las herramientas especializadas detectan menciones indirectas y calculan índices de influencia generativa</li>
           <li>La medición efectiva requiere KPIs específicos como CQI, Semantic Authority Score y Context Preservation Rate</li>
@@ -221,7 +222,7 @@ export default function MedirCitacionesPage() {
       <div className={styles.curiosityBox}>
         <h4>💡 ¿Sabías que...?</h4>
         <p>
-          Según el último estudio de BrightEdge (diciembre 2024), el <strong>73%</strong> del contenido que
+          Según estudios recientes de BrightEdge, el <strong>73%</strong> del contenido que
           aparece consistentemente en respuestas generativas tiene una estructura de &quot;respuesta completa&quot;
           con promedio de 1,247 palabras, mientras que contenido fragmentado solo alcanza el <strong>12%</strong>
           de citación por IAs. Además, contenido que incluye al menos 3 fuentes verificables tiene
