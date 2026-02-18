@@ -4641,9 +4641,9 @@
       "icon": "💊"
     },
     {
-      "slug": "calculadora-tamano-cachorro",
+      "slug": "calculadora-tamano-adulto-perro",
       "name": "Calculadora Tamaño Adulto Cachorro",
-      "url": "https://meskeia.com/calculadora-tamano-cachorro/",
+      "url": "https://meskeia.com/calculadora-tamano-adulto-perro/",
       "description": "Predice el peso adulto de tu cachorro según su edad, peso actual y tamaño de raza. Curvas de crecimiento y tabla de razas de referencia",
       "suites": [
         "salud"
@@ -4663,9 +4663,9 @@
       "icon": "📏"
     },
     {
-      "slug": "calculadora-percentiles-infantiles",
+      "slug": "calculadora-percentiles",
       "name": "Calculadora Percentiles Infantiles",
-      "url": "https://meskeia.com/calculadora-percentiles-infantiles/",
+      "url": "https://meskeia.com/calculadora-percentiles/",
       "description": "Calcula el percentil de peso y talla de tu bebé o niño según las tablas de crecimiento de la OMS",
       "suites": [
         "salud"
@@ -4792,9 +4792,9 @@
       "icon": "📝"
     },
     {
-      "slug": "conversor-codigo-morse",
+      "slug": "conversor-morse",
       "name": "Conversor de Código Morse",
-      "url": "https://meskeia.com/conversor-codigo-morse/",
+      "url": "https://meskeia.com/conversor-morse/",
       "description": "Convierte texto a código Morse y viceversa con reproducción de audio. Alfabeto completo y señales internacionales",
       "suites": [
         "cultura"
@@ -5060,9 +5060,9 @@
       "icon": "📖"
     },
     {
-      "slug": "entrenador-tablas-multiplicar",
+      "slug": "tablas-multiplicar",
       "name": "Entrenador Tablas Multiplicar",
-      "url": "https://meskeia.com/entrenador-tablas-multiplicar/",
+      "url": "https://meskeia.com/tablas-multiplicar/",
       "description": "Aprende las tablas de multiplicar jugando. Juego educativo con niveles, puntuación, rachas y medallas para niños de primaria",
       "suites": [
         "estudiantes"
@@ -5108,9 +5108,9 @@
       "icon": "🦴"
     },
     {
-      "slug": "constelaciones-cielo",
+      "slug": "constelaciones-del-cielo",
       "name": "Constelaciones del Cielo",
-      "url": "https://meskeia.com/constelaciones-cielo/",
+      "url": "https://meskeia.com/constelaciones-del-cielo/",
       "description": "Guía de 32 constelaciones famosas: zodiacales, boreales y australes con estrellas principales, mitología griega y curiosidades",
       "suites": [
         "cultura"
@@ -5388,9 +5388,9 @@
       "icon": "🔢"
     },
     {
-      "slug": "simulador-genetica-mendeliana",
+      "slug": "simulador-genetica",
       "name": "Simulador de Genética Mendeliana",
-      "url": "https://meskeia.com/simulador-genetica-mendeliana/",
+      "url": "https://meskeia.com/simulador-genetica/",
       "description": "Simula cruces genéticos, cuadros de Punnett, herencia ligada al sexo, árboles genealógicos y simulación de poblaciones con estadísticas chi-cuadrado",
       "suites": [
         "estudiantes",
