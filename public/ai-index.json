@@ -248,7 +248,7 @@
         { "name": "Seguimiento de Hábitos", "slug": "seguimiento-habitos", "url": "https://meskeia.com/seguimiento-habitos/", "description": "Rastrea hábitos con rachas" },
         { "name": "Planificador de Menú Semanal", "slug": "planificador-menu", "url": "https://meskeia.com/planificador-menu/", "description": "Planifica menú equilibrado" },
         { "name": "Calculadora de Porciones", "slug": "calculadora-porciones", "url": "https://meskeia.com/calculadora-porciones/", "description": "Mide porciones con tu mano" },
-        { "name": "Test de Hábitos Saludables", "slug": "test-habitos", "url": "https://meskeia.com/test-habitos/", "description": "Evalúa tus hábitos de vida" },
+        { "name": "Test de Hábitos Saludables", "slug": "test-habitos-saludables", "url": "https://meskeia.com/test-habitos-saludables/", "description": "Evalúa tus hábitos de vida" },
         { "name": "Planificador Embarazo y Bebé", "slug": "planificador-embarazo", "url": "https://meskeia.com/planificador-embarazo/", "description": "Planificador completo: calculadora FPP, checklist por trimestre, lista compras bebé y vacunas España 2024" },
         { "name": "Planificador de Mascota", "slug": "planificador-mascota", "url": "https://meskeia.com/planificador-mascota/", "description": "Organiza la llegada de tu cachorro o gatito: perfil, checklist por etapas, lista de compras y vacunas para perros y gatos" },
         { "name": "Calculadora de Alimentación Mascotas", "slug": "calculadora-alimentacion-mascotas", "url": "https://meskeia.com/calculadora-alimentacion-mascotas/", "description": "Cantidad diaria de comida para perros y gatos, alimentos tóxicos y guía de transición de pienso" },

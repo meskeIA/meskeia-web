@@ -618,7 +618,7 @@ export default function TestHabitosPage() {
 
       
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} context="test-habitos">
+      <DisclaimerCard variant="medical" severity="low" collapsible={true} context="test-habitos-saludables">
         <p>Este test es una <strong>herramienta de autoevaluación orientativa</strong> sobre hábitos saludables:</p>
         <ul className={styles.disclaimerList}>
           <li><strong>No constituye un diagnóstico médico</strong>: Los resultados son informativos, no diagnósticos</li>
@@ -626,9 +626,9 @@ export default function TestHabitosPage() {
         </ul>
       </DisclaimerCard>
 
-      <RelatedApps apps={getRelatedApps('test-habitos')} />
+      <RelatedApps apps={getRelatedApps('test-habitos-saludables')} />
 
-      <Footer appName="test-habitos" />
+      <Footer appName="test-habitos-saludables" />
     </div>
   );
 }

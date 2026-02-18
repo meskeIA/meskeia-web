@@ -90,7 +90,7 @@ const saludApps: RelatedApp[] = [
 
 const saludHabitosApps: RelatedApp[] = [
   { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento Hábitos', description: 'Construye rutinas' },
-  { url: '/test-habitos/', icon: '📋', name: 'Test de Hábitos', description: 'Evalúa tus hábitos' },
+  { url: '/test-habitos-saludables/', icon: '📋', name: 'Test de Hábitos', description: 'Evalúa tus hábitos' },
   { url: '/calculadora-sueno/', icon: '😴', name: 'Calculadora Sueño', description: 'Ciclos de sueño' },
   { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Productividad' },
 ];
@@ -468,7 +468,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-porciones': [...cocinaApps.filter(a => a.url !== '/calculadora-porciones/').slice(0, 2), ...saludApps.slice(0, 2)],
   'vitaminas-minerales': saludApps.filter(a => a.url !== '/vitaminas-minerales/'),
   'seguimiento-habitos': saludHabitosApps.filter(a => a.url !== '/seguimiento-habitos/'),
-  'test-habitos': saludHabitosApps.filter(a => a.url !== '/test-habitos/'),
+  'test-habitos-saludables': saludHabitosApps.filter(a => a.url !== '/test-habitos-saludables/'),
   'calculadora-sueno': saludHabitosApps.filter(a => a.url !== '/calculadora-sueno/'),
 
   // MASCOTAS

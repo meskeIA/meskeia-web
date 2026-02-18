@@ -161,7 +161,7 @@ export const implementedAppsUrls = [
   "/seguimiento-habitos/",
   "/planificador-menu/",
   "/calculadora-porciones/",
-  "/test-habitos/",
+  "/test-habitos-saludables/",
   "/planificador-embarazo/",         // Planificador embarazo: FPP, checklist, compras, vacunas
   "/planificador-mascota/",          // Planificador mascota: cachorro/gatito, checklist, compras, vacunas
   "/calculadora-alimentacion-mascotas/", // Alimentación perros/gatos: raciones, tóxicos, transición pienso
