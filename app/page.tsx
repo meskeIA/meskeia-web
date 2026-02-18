@@ -44,6 +44,42 @@ const guidesData = [
     toolsCount: 5,
     available: true,
   },
+  {
+    id: 'ahorrar-dinero',
+    name: 'Guía para Ahorrar Dinero',
+    icon: '💰',
+    description: 'Control de gastos, fondo de emergencia y estrategias para eliminar deudas',
+    url: '/guia/ahorrar-dinero/',
+    toolsCount: 6,
+    available: true,
+  },
+  {
+    id: 'vivir-sano',
+    name: 'Guía para Vivir Más Sano',
+    icon: '🌿',
+    description: 'Nutrición, sueño, hidratación y hábitos saludables duraderos',
+    url: '/guia/vivir-sano/',
+    toolsCount: 7,
+    available: true,
+  },
+  {
+    id: 'comprar-coche',
+    name: 'Guía para Comprar un Coche',
+    icon: '🚗',
+    description: 'Compara contado, financiación y renting. Calcula el coste real de uso',
+    url: '/guia/comprar-coche/',
+    toolsCount: 4,
+    available: true,
+  },
+  {
+    id: 'montar-negocio',
+    name: 'Guía para Montar un Negocio',
+    icon: '🚀',
+    description: 'Valida tu idea, calcula el break-even y gestiona desde el primer día',
+    url: '/guia/montar-negocio/',
+    toolsCount: 7,
+    available: true,
+  },
 ];
 
 function HomeContent() {
