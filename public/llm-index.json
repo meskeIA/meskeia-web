@@ -5,7 +5,7 @@
   "language": "es",
   "country": "ES",
   "total_tools": 221,
-  "last_updated": "2026-02-16",
+  "last_updated": "2026-02-17",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -5010,9 +5010,9 @@
       "icon": "📝"
     },
     {
-      "slug": "paises-mundo",
+      "slug": "paises-del-mundo",
       "name": "Países del Mundo",
-      "url": "https://meskeia.com/paises-mundo/",
+      "url": "https://meskeia.com/paises-del-mundo/",
       "description": "Buscador de 195 países con capitales, banderas, monedas, idiomas, población y prefijos telefónicos",
       "suites": [
         "cultura"
