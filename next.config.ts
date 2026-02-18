@@ -77,6 +77,22 @@ const nextConfig: NextConfig = {
   },
 
   // ============================================================================
+  // REDIRECTS 301 - URLs antiguas renombradas (evita 404 en bookmarks y Google)
+  // ============================================================================
+  async redirects() {
+    return [
+      // Apps renombradas en febrero 2026
+      { source: '/test-habitos/', destination: '/test-habitos-saludables/', permanent: true },
+      { source: '/conversor-codigo-morse/', destination: '/conversor-morse/', permanent: true },
+      { source: '/calculadora-tamano-cachorro/', destination: '/calculadora-tamano-adulto-perro/', permanent: true },
+      { source: '/calculadora-percentiles-infantiles/', destination: '/calculadora-percentiles/', permanent: true },
+      { source: '/entrenador-tablas-multiplicar/', destination: '/tablas-multiplicar/', permanent: true },
+      { source: '/constelaciones-cielo/', destination: '/constelaciones-del-cielo/', permanent: true },
+      { source: '/simulador-genetica-mendeliana/', destination: '/simulador-genetica/', permanent: true },
+    ];
+  },
+
+  // ============================================================================
   // CABECERAS DE SEGURIDAD - Se aplican a todas las rutas
   // ============================================================================
   async headers() {
