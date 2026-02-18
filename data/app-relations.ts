@@ -737,6 +737,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/generador-qr/', icon: '📱', name: 'Generador QR', description: 'Crea códigos QR' },
     { url: '/generador-firma-email/', icon: '✉️', name: 'Firma Email', description: 'Firma profesional HTML' },
   ],
+
+  // GUÍAS
+  'guia-ahorrar-dinero': [
+    { url: '/control-gastos/', icon: '📊', name: 'Control de Gastos', description: 'Registra y categoriza tus gastos' },
+    { url: '/calculadora-regla-50-30-20/', icon: '🥧', name: 'Regla 50/30/20', description: 'Distribuye tu sueldo' },
+    { url: '/calculadora-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Tu colchón de seguridad' },
+    { url: '/calculadora-deuda/', icon: '🧨', name: 'Eliminar Deudas', description: 'Bola de nieve vs avalancha' },
+  ],
+  'guia-vivir-sano': [
+    { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora de IMC', description: 'Peso e índice de masa corporal' },
+    { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora de Macros', description: 'Proteínas, carbos y grasas' },
+    { url: '/calculadora-hidratacion/', icon: '💧', name: 'Hidratación Diaria', description: 'Cuánta agua necesitas' },
+    { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento de Hábitos', description: 'Crea hábitos duraderos' },
+  ],
+  'guia-comprar-coche': [
+    { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
+    { url: '/simulador-prestamos/', icon: '🏦', name: 'Simulador de Préstamos', description: 'Cuota y coste total' },
+    { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
+    { url: '/calculadora-seguro-vida/', icon: '🛡️', name: 'Seguro de Vida', description: 'Cobertura para tu préstamo' },
+  ],
+  'guia-montar-negocio': [
+    { url: '/calculadora-break-even/', icon: '⚖️', name: 'Break-Even', description: 'Punto de equilibrio del negocio' },
+    { url: '/planificador-cashflow/', icon: '💸', name: 'Planificador Cashflow', description: 'Flujo de caja mensual' },
+    { url: '/calculadora-tarifa-freelance/', icon: '💰', name: 'Tarifa Freelance', description: 'Cuánto cobrar por hora' },
+    { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
+  ],
 };
 
 /**

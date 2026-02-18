@@ -267,6 +267,15 @@ export const implementedAppsUrls = [
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
+
+  // Guías (7 implementadas)
+  "/guia/comprar-casa/",            // Guía para comprar vivienda en España
+  "/guia/freelance/",               // Guía para trabajar como freelance/autónomo
+  "/guia/invertir/",                // Guía para empezar a invertir
+  "/guia/ahorrar-dinero/",          // Guía para ahorrar dinero y salir de deudas
+  "/guia/vivir-sano/",              // Guía para vivir más sano: nutrición, sueño, hábitos
+  "/guia/comprar-coche/",           // Guía para comprar un coche en España
+  "/guia/montar-negocio/",          // Guía para montar un negocio o emprender
 ];
 
 /**

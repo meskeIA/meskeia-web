@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 220,
-  "updated": "2026-02-16",
+  "total_tools": 224,
+  "updated": "2026-02-18",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -105,7 +105,8 @@
         { "name": "Generador de Carruseles", "slug": "generador-carruseles", "url": "https://meskeia.com/generador-carruseles/", "description": "Crea carruseles para Instagram y LinkedIn, descarga como PNG" },
         { "name": "Analizador GEO/AEO", "slug": "analizador-geo", "url": "https://meskeia.com/analizador-geo/", "description": "Analiza y optimiza tu contenido para ser citado por ChatGPT, Perplexity y Gemini" },
         { "name": "Curso de Optimización para IAs (GEO/AEO)", "slug": "curso-optimizacion-ia", "url": "https://meskeia.com/curso-optimizacion-ia/", "description": "Aprende GEO/AEO: optimiza contenido para ChatGPT, Perplexity y Gemini. LLMs, RAG, E-E-A-T, Schema Markup" },
-        { "name": "Curso de Marketing Digital 2025", "slug": "curso-marketing-digital", "url": "https://meskeia.com/curso-marketing-digital/", "description": "Domina el marketing digital: branding, SEO, redes sociales, Meta Ads, Google Ads, automatización e IA. 30 capítulos prácticos" }
+        { "name": "Curso de Marketing Digital 2025", "slug": "curso-marketing-digital", "url": "https://meskeia.com/curso-marketing-digital/", "description": "Domina el marketing digital: branding, SEO, redes sociales, Meta Ads, Google Ads, automatización e IA. 30 capítulos prácticos" },
+        { "name": "Guía para Montar un Negocio", "slug": "guia/montar-negocio", "url": "https://meskeia.com/guia/montar-negocio/", "description": "Guía de emprendimiento: valida tu idea, calcula break-even, planifica cashflow y fija tu tarifa desde el primer día" }
       ]
     },
     {
@@ -131,7 +132,9 @@
         { "name": "Calculadora Regla 50/30/20", "slug": "calculadora-regla-50-30-20", "url": "https://meskeia.com/calculadora-regla-50-30-20/", "description": "Distribuye tus ingresos: 50% necesidades, 30% deseos, 20% ahorro" },
         { "name": "Calculadora FIRE", "slug": "calculadora-fire", "url": "https://meskeia.com/calculadora-fire/", "description": "Calcula tu camino a la independencia financiera con la regla del 4%" },
         { "name": "Comparador Compra Vehículos", "slug": "comparador-vehiculos", "url": "https://meskeia.com/comparador-vehiculos/", "description": "Compara las 4 formas de adquirir un coche: contado, financiación, renting y leasing. Calcula el coste total real de cada opción" },
-        { "name": "Calculadora Coste Vivienda", "slug": "calculadora-coste-vivienda", "url": "https://meskeia.com/calculadora-coste-vivienda/", "description": "Calcula el coste real mensual de mantener una vivienda: hipoteca, IBI, comunidad, seguros, suministros y mantenimiento" }
+        { "name": "Calculadora Coste Vivienda", "slug": "calculadora-coste-vivienda", "url": "https://meskeia.com/calculadora-coste-vivienda/", "description": "Calcula el coste real mensual de mantener una vivienda: hipoteca, IBI, comunidad, seguros, suministros y mantenimiento" },
+        { "name": "Guía para Ahorrar Dinero", "slug": "guia/ahorrar-dinero", "url": "https://meskeia.com/guia/ahorrar-dinero/", "description": "Guía completa: control de gastos, regla 50/30/20, fondo de emergencia y estrategias para eliminar deudas" },
+        { "name": "Guía para Comprar un Coche", "slug": "guia/comprar-coche", "url": "https://meskeia.com/guia/comprar-coche/", "description": "Guía de compra de vehículo: compara contado, financiación y renting. Calcula consumo y coste total real" }
       ]
     },
     {
@@ -255,7 +258,8 @@
         { "name": "Calculadora de Medicamentos Mascotas", "slug": "calculadora-medicamentos-mascotas", "url": "https://meskeia.com/calculadora-medicamentos-mascotas/", "description": "Dosis de antiparasitarios para perros y gatos según peso, frecuencia y síntomas" },
         { "name": "Calculadora Tamaño Adulto Cachorro", "slug": "calculadora-tamano-adulto-perro", "url": "https://meskeia.com/calculadora-tamano-adulto-perro/", "description": "Predice el peso adulto de tu cachorro según edad, peso actual y tamaño de raza" },
         { "name": "Calculadora Percentiles Infantiles", "slug": "calculadora-percentiles", "url": "https://meskeia.com/calculadora-percentiles/", "description": "Percentil de peso y talla según tablas OMS" },
-        { "name": "Vitaminas y Minerales", "slug": "vitaminas-minerales", "url": "https://meskeia.com/vitaminas-minerales/", "description": "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso" }
+        { "name": "Vitaminas y Minerales", "slug": "vitaminas-minerales", "url": "https://meskeia.com/vitaminas-minerales/", "description": "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso" },
+        { "name": "Guía para Vivir Más Sano", "slug": "guia/vivir-sano", "url": "https://meskeia.com/guia/vivir-sano/", "description": "Guía de salud integral: IMC, macros, calorías, hidratación, sueño y hábitos. Sin dietas milagro, con herramientas basadas en datos" }
       ]
     },
     {
