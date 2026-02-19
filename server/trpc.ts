@@ -6,8 +6,16 @@
 import { initTRPC } from '@trpc/server';
 import { ZodError } from 'zod';
 
-// Crear instancia de tRPC
-const t = initTRPC.create({
+/**
+ * Contexto de tRPC - incluye el request original para acceder a headers
+ * Necesario para leer la IP real del cliente (x-forwarded-for) en los procedures
+ */
+export interface TRPCContext {
+  req?: Request;
+}
+
+// Crear instancia de tRPC con contexto tipado
+const t = initTRPC.context<TRPCContext>().create({
   errorFormatter({ shape, error }) {
     return {
       ...shape,

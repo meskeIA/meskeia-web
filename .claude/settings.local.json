@@ -37,7 +37,11 @@
       "Grep",
       "WebFetch",
       "WebSearch",
-      "NotebookEdit"
+      "NotebookEdit",
+      "Bash(copy:*)",
+      "Bash(copy \"C:\\\\Users\\\\jaceb\\\\meskeia-web\\\\app\\\\guia\\\\ahorrar-dinero\\\\GuiaAhorrarDinero.module.css\" \"C:\\\\Users\\\\jaceb\\\\meskeia-web\\\\app\\\\guia\\\\comprar-coche\\\\GuiaComprarCoche.module.css\")",
+      "Bash(copy \"C:\\\\Users\\\\jaceb\\\\meskeia-web\\\\app\\\\guia\\\\ahorrar-dinero\\\\GuiaAhorrarDinero.module.css\" \"C:\\\\Users\\\\jaceb\\\\meskeia-web\\\\app\\\\guia\\\\montar-negocio\\\\GuiaMontarNegocio.module.css\")",
+      "Bash(powershell -Command:*)"
     ],
     "deny": [],
     "ask": []

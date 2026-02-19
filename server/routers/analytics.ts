@@ -28,9 +28,17 @@ function anonymizeIP(ip: string): string {
 }
 
 /**
- * Helper: Obtener IP del request (para ip-filter)
- * Nota: En tRPC no tenemos acceso directo a headers, se debe pasar desde el handler
+ * Helper: Obtener IP real del request desde headers
+ * Lee x-forwarded-for (Vercel/proxies) o x-real-ip, luego anonimiza
  */
+function getClientIPFromRequest(req: Request | undefined): string {
+  if (!req) return 'unknown';
+  const forwarded = req.headers.get('x-forwarded-for');
+  if (forwarded) return anonymizeIP(forwarded.split(',')[0].trim());
+  const realIP = req.headers.get('x-real-ip');
+  if (realIP) return anonymizeIP(realIP);
+  return 'unknown';
+}
 
 export const analyticsRouter = router({
   /**
@@ -345,11 +353,15 @@ export const analyticsRouter = router({
    */
   getIPConfig: publicProcedure
     .input(z.object({ ip_actual: z.string() }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       await initializeDatabase();
       const client = getTursoClient();
 
-      const ipActual = anonymizeIP(input.ip_actual);
+      // Leer IP real desde headers del request (x-forwarded-for vía Vercel)
+      // Fallback a input.ip_actual solo si no hay headers (no debería ocurrir en producción)
+      const ipActual = getClientIPFromRequest(ctx.req) !== 'unknown'
+        ? getClientIPFromRequest(ctx.req)
+        : anonymizeIP(input.ip_actual);
 
       // Buscar IP excluida en la tabla de configuración
       const result = await client.execute({
@@ -389,11 +401,15 @@ export const analyticsRouter = router({
         activo: z.boolean().default(true),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
       await initializeDatabase();
       const client = getTursoClient();
 
-      const ipActual = anonymizeIP(input.ip_actual);
+      // Leer IP real desde headers del request (x-forwarded-for vía Vercel)
+      // Fallback a input.ip_actual solo si no hay headers (no debería ocurrir en producción)
+      const ipActual = getClientIPFromRequest(ctx.req) !== 'unknown'
+        ? getClientIPFromRequest(ctx.req)
+        : anonymizeIP(input.ip_actual);
 
       // Guardar o actualizar IP excluida
       await client.execute({

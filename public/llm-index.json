@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 227+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 230+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 227,
+  "total_tools": 230,
   "last_updated": "2026-02-19",
   "features": {
     "all_free": true,
@@ -42,7 +42,7 @@
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 33
+      "tool_count": 34
     },
     {
       "id": "freelance",
@@ -63,7 +63,7 @@
       "name": "Inmobiliaria y Hogar",
       "icon": "🏘️",
       "description": "Hipotecas, alquiler y gestión del hogar",
-      "tool_count": 21
+      "tool_count": 23
     },
     {
       "id": "juegos",
@@ -91,7 +91,7 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 24
+      "tool_count": 25
     },
     {
       "id": "viajes",
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 69
+      "tool_count": 72
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 43
+      "tool_count": 45
     },
     {
       "id": "creando",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 37
+      "tool_count": 38
     }
   ],
   "tools": [
@@ -5614,6 +5614,83 @@
         "universidad"
       ],
       "icon": "🩺"
+    },
+    {
+      "slug": "calculadora-rentabilidad-alquiler",
+      "name": "Rentabilidad de Inversión en Alquiler",
+      "url": "https://meskeia.com/calculadora-rentabilidad-alquiler/",
+      "description": "Calcula la rentabilidad bruta y neta de comprar un piso para alquilar. ROI, cash flow mensual, payback y análisis completo de gastos: IBI, comunidad, seguro, reparaciones e hipoteca opcional",
+      "suites": [
+        "inmobiliaria",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "rentabilidad alquiler",
+        "roi inmobiliario",
+        "inversion inmobiliaria",
+        "comprar para alquilar",
+        "yield alquiler",
+        "cash flow alquiler",
+        "rentabilidad piso",
+        "inversion vivienda",
+        "roi vivienda",
+        "retorno inversion inmueble"
+      ],
+      "icon": "🏘️"
+    },
+    {
+      "slug": "seguimiento-ciclo-menstrual",
+      "name": "Seguimiento Ciclo Menstrual y Fertilidad",
+      "url": "https://meskeia.com/seguimiento-ciclo-menstrual/",
+      "description": "Calcula tu ventana fértil, predicción de ovulación y próximas fechas de menstruación. Privacidad total: cálculo 100% local en tu navegador, sin envío de datos",
+      "suites": [
+        "salud"
+      ],
+      "contexts": [
+        "casa",
+        "curiosidad"
+      ],
+      "keywords": [
+        "ciclo menstrual",
+        "ovulacion",
+        "fertilidad",
+        "ventana fertil",
+        "periodo",
+        "calculadora ovulacion",
+        "calendario menstrual",
+        "dias fertiles",
+        "prediccion periodo",
+        "seguimiento ciclo"
+      ],
+      "icon": "🌸"
+    },
+    {
+      "slug": "calculadora-gastos-comunidad",
+      "name": "Calculadora de Gastos de Comunidad",
+      "url": "https://meskeia.com/calculadora-gastos-comunidad/",
+      "description": "Calcula y reparte los gastos de la comunidad de propietarios: cuota mensual, derramas, reparto por coeficiente de participación o partes iguales. Gestiona el presupuesto de tu comunidad",
+      "suites": [
+        "inmobiliaria"
+      ],
+      "contexts": [
+        "casa",
+        "dinero"
+      ],
+      "keywords": [
+        "gastos comunidad",
+        "cuota comunidad",
+        "derrama comunidad",
+        "comunidad propietarios",
+        "reparto gastos",
+        "coeficiente participacion",
+        "presupuesto comunidad",
+        "vecinos gastos"
+      ],
+      "icon": "🏘️"
     }
   ],
   "llm_instructions": {

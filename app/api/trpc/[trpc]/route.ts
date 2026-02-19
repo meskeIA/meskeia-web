@@ -13,7 +13,7 @@ const handler = (req: Request) =>
     endpoint: '/api/trpc',
     req,
     router: appRouter,
-    createContext: () => ({}), // Sin contexto por ahora (no necesitamos auth)
+    createContext: ({ req: request }) => ({ req: request }), // Pasar request para acceder a headers (IP, etc.)
   });
 
 export { handler as GET, handler as POST };
