@@ -32,7 +32,7 @@ const guidesData = [
     icon: '💼',
     description: 'Facturación, impuestos y gestión para trabajadores independientes',
     url: '/guia/freelance/',
-    toolsCount: 6,
+    toolsCount: 7,
     available: true,
   },
   {

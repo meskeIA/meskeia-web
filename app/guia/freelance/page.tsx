@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaFreelance.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para freelances
@@ -34,6 +34,42 @@ const tools = [
     question: '¿Cómo hago una factura correcta?',
     description: 'Genera facturas profesionales con IVA e IRPF. Descarga en PDF listas para enviar.',
     step: 3,
+  },
+  {
+    id: 'calculadora-presupuestos',
+    name: 'Generador de Presupuestos',
+    icon: '📋',
+    url: '/calculadora-presupuestos/',
+    question: '¿Cómo presupuesto un proyecto de forma profesional?',
+    description: 'Crea presupuestos detallados para tus clientes. Incluye partidas, IVA, condiciones y descuentos.',
+    step: 4,
+  },
+  {
+    id: 'planificador-cashflow',
+    name: 'Planificador de Cashflow',
+    icon: '💸',
+    url: '/planificador-cashflow/',
+    question: '¿Tendré dinero en caja el próximo mes?',
+    description: 'Planifica cobros y pagos mes a mes. Detecta meses de baja facturación antes de que sean un problema.',
+    step: 5,
+  },
+  {
+    id: 'calculadora-break-even',
+    name: 'Calculadora Break-Even',
+    icon: '⚖️',
+    url: '/calculadora-break-even/',
+    question: '¿Cuántos proyectos necesito para no perder dinero?',
+    description: 'Calcula el mínimo de ingresos o proyectos para cubrir todos tus gastos fijos como freelance.',
+    step: 6,
+  },
+  {
+    id: 'calculadora-productividad',
+    name: 'Calculadora de Productividad',
+    icon: '⚡',
+    url: '/calculadora-productividad/',
+    question: '¿Cuántas horas reales puedo facturar al mes?',
+    description: 'Calcula tus horas facturables reales descontando reuniones, gestión, formación y vacaciones.',
+    step: 7,
   },
 ];
 
@@ -133,6 +169,12 @@ export default function GuiaFreelancePage() {
       </header>
 
       <LegalNotice />
+
+      {/* Disclaimer Legal */}
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+      />
 
       {/* Journey Steps */}
       <section className={styles.journeySection}>
@@ -254,6 +296,13 @@ export default function GuiaFreelancePage() {
           Otras guías que te pueden interesar
         </h2>
         <div className={styles.otherGuidesGrid}>
+          <Link href="/guia/montar-negocio/" className={styles.otherGuideCard}>
+            <span className={styles.otherGuideIcon}>🚀</span>
+            <div>
+              <h3 className={styles.otherGuideTitle}>Guía para Montar un Negocio</h3>
+              <p className={styles.otherGuideDescription}>Da el salto de freelance a empresa</p>
+            </div>
+          </Link>
           <Link href="/guia/invertir/" className={styles.otherGuideCard}>
             <span className={styles.otherGuideIcon}>📈</span>
             <div>
