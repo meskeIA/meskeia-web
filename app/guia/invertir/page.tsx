@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaInvertir.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para inversión
@@ -143,6 +143,12 @@ export default function GuiaInvertirPage() {
 
       <LegalNotice />
 
+      {/* Disclaimer Legal */}
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+      />
+
       {/* Journey Steps */}
       <section className={styles.journeySection}>
         <h2 className={styles.sectionTitle}>
@@ -241,18 +247,6 @@ export default function GuiaInvertirPage() {
               )}
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Disclaimer */}
-      <section className={styles.disclaimerSection}>
-        <div className={styles.disclaimer}>
-          <h3>⚠️ Aviso importante</h3>
-          <p>
-            Esta guía tiene fines educativos. Las rentabilidades pasadas no garantizan rentabilidades futuras.
-            Invertir conlleva riesgos, incluyendo la posible pérdida del capital invertido.
-            Antes de invertir, consulta con un asesor financiero profesional.
-          </p>
         </div>
       </section>
 
