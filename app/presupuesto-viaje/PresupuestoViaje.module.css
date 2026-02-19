@@ -1,0 +1,464 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: white;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.hero p {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Configuración del viaje */
+.configuracion {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-color, #e5e5e5);
+}
+
+[data-theme='dark'] .configuracion {
+  border-color: #3a3a3a;
+}
+
+.configuracion h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 1rem;
+}
+
+.filaConfiguracion {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.grupoCampo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.grupoCampo label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.inputTexto,
+.inputNumero,
+.inputSelect {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color, #e0e0e0);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.inputTexto:focus,
+.inputNumero:focus,
+.inputSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .inputTexto,
+[data-theme='dark'] .inputNumero,
+[data-theme='dark'] .inputSelect {
+  border-color: #3a3a3a;
+}
+
+/* Sección de categorías */
+.categorias {
+  margin-bottom: 1.5rem;
+}
+
+.categoriasHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.categoriasHeader h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.btnAniadirCategoria {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAniadirCategoria:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* Tarjeta de categoría */
+.tarjetaCategoria {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color, #e5e5e5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme='dark'] .tarjetaCategoria {
+  border-color: #3a3a3a;
+}
+
+.cabeceraTarjeta {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.iconoCategoria {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.nombreCategoria {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  padding: 0;
+}
+
+.nombreCategoria:focus {
+  outline: 2px solid var(--primary);
+  border-radius: 4px;
+}
+
+.btnEliminar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.btnEliminar:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.filasGastos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filaGasto {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.inputGastoDesc {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.inputGastoDesc:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .inputGastoDesc {
+  border-color: #3a3a3a;
+}
+
+.inputGastoImporte {
+  width: 110px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.inputGastoImporte:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .inputGastoImporte {
+  border-color: #3a3a3a;
+}
+
+.btnEliminarGasto {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btnEliminarGasto:hover {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+.btnAniadirGasto {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: 1px dashed var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAniadirGasto:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.subtotalCategoria {
+  margin-top: 0.8rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border-color, #e5e5e5);
+  display: flex;
+  justify-content: flex-end;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .subtotalCategoria {
+  border-color: #3a3a3a;
+}
+
+/* Panel de resultados */
+.panelResultados {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 2px solid var(--primary);
+}
+
+.panelResultados h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 1.2rem;
+}
+
+.totalGeneral {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.totalGeneralLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.totalGeneralValor {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* División por personas */
+.divisionPersonas {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.divisionPersonasLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.divisionPersonasValor {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Desglose por categorías */
+.desglose {
+  margin-top: 1rem;
+}
+
+.desgloseItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+  font-size: 0.9rem;
+}
+
+[data-theme='dark'] .desgloseItem {
+  border-color: #3a3a3a;
+}
+
+.desgloseItem:last-child {
+  border-bottom: none;
+}
+
+.desgloseNombre {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+}
+
+.desgloseImporte {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.desglosePorc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-left: 0.3rem;
+}
+
+/* Barra de progreso por categoría */
+.barraProgreso {
+  height: 4px;
+  background: var(--border-color, #e5e5e5);
+  border-radius: 2px;
+  margin-top: 0.2rem;
+  overflow: hidden;
+}
+
+.barraProgresoRelleno {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* Botón reset */
+.btnReset {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 2px solid var(--border-color, #e0e0e0);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 1.5rem;
+}
+
+.btnReset:hover {
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.moneda {
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin-left: 0.3rem;
+  opacity: 0.7;
+}
+
+.porDia {
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin-left: 0.8rem;
+  opacity: 0.7;
+}
+
+@media (max-width: 600px) {
+  .filaConfiguracion {
+    grid-template-columns: 1fr;
+  }
+
+  .totalGeneralValor {
+    font-size: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barraProgresoRelleno {
+    transition: none;
+  }
+}

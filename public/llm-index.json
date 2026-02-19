@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 223+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 226+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 223,
-  "last_updated": "2026-02-18",
+  "total_tools": 226,
+  "last_updated": "2026-02-19",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -42,7 +42,7 @@
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 30
+      "tool_count": 32
     },
     {
       "id": "freelance",
@@ -56,7 +56,7 @@
       "name": "Herramientas Técnicas",
       "icon": "🔧",
       "description": "Herramientas especializadas y técnicas",
-      "tool_count": 30
+      "tool_count": 31
     },
     {
       "id": "inmobiliaria",
@@ -92,6 +92,13 @@
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
       "tool_count": 24
+    },
+    {
+      "id": "viajes",
+      "name": "Viajes y Turismo",
+      "icon": "✈️",
+      "description": "Planifica viajes, divisas, enchufes y presupuestos de viaje",
+      "tool_count": 9
     }
   ],
   "moments": [
@@ -114,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 65
+      "tool_count": 68
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 40
+      "tool_count": 42
     },
     {
       "id": "creando",
@@ -142,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 35
+      "tool_count": 36
     }
   ],
   "tools": [
@@ -153,7 +160,8 @@
       "description": "Calcula propinas y divide la cuenta entre varias personas fácilmente",
       "suites": [
         "finanzas",
-        "productividad"
+        "productividad",
+        "viajes"
       ],
       "contexts": [
         "casa",
@@ -435,7 +443,8 @@
       "description": "Calcula el consumo de combustible de tu vehículo en L/100km y el coste de tus viajes",
       "suites": [
         "inmobiliaria",
-        "finanzas"
+        "finanzas",
+        "viajes"
       ],
       "contexts": [
         "casa",
@@ -3552,7 +3561,8 @@
       "description": "Convierte horarios entre 25+ ciudades del mundo con reloj mundial en tiempo real",
       "suites": [
         "freelance",
-        "productividad"
+        "productividad",
+        "viajes"
       ],
       "contexts": [
         "trabajo",
@@ -3815,7 +3825,8 @@
       "url": "https://meskeia.com/conversor-unidades/",
       "description": "Conversor científico avanzado: 13 categorías incluyendo química, presión, energía, fuerza y potencia",
       "suites": [
-        "productividad"
+        "productividad",
+        "viajes"
       ],
       "contexts": [
         "estudio",
@@ -3866,7 +3877,8 @@
       "url": "https://meskeia.com/lista-equipaje/",
       "description": "Genera una lista de equipaje personalizada según tipo de viaje, clima y duración. Checklist interactivo",
       "suites": [
-        "productividad"
+        "productividad",
+        "viajes"
       ],
       "contexts": [
         "casa",
@@ -3882,6 +3894,85 @@
         "empacar"
       ],
       "icon": "🧳"
+    },
+    {
+      "slug": "conversor-divisas",
+      "name": "Conversor de Divisas",
+      "url": "https://meskeia.com/conversor-divisas/",
+      "description": "Convierte entre más de 30 divisas con tipos de cambio actualizados diariamente. Orientativo, no apto para trading",
+      "suites": [
+        "viajes",
+        "finanzas"
+      ],
+      "contexts": [
+        "casa",
+        "dinero"
+      ],
+      "keywords": [
+        "divisas",
+        "cambio",
+        "moneda",
+        "euro",
+        "dolar",
+        "libra",
+        "yen",
+        "conversor",
+        "tipo de cambio",
+        "viaje",
+        "vacaciones"
+      ],
+      "icon": "💱"
+    },
+    {
+      "slug": "presupuesto-viaje",
+      "name": "Presupuesto de Viaje",
+      "url": "https://meskeia.com/presupuesto-viaje/",
+      "description": "Planifica el presupuesto de tu viaje por categorías y divide los gastos entre el grupo de viajeros",
+      "suites": [
+        "viajes",
+        "finanzas"
+      ],
+      "contexts": [
+        "casa",
+        "dinero"
+      ],
+      "keywords": [
+        "presupuesto viaje",
+        "gastos viaje",
+        "dividir gastos",
+        "viajeros",
+        "grupo",
+        "vacaciones",
+        "planificar viaje",
+        "coste viaje"
+      ],
+      "icon": "🗺️"
+    },
+    {
+      "slug": "enchufes-por-pais",
+      "name": "Enchufes por País",
+      "url": "https://meskeia.com/enchufes-por-pais/",
+      "description": "Consulta qué tipo de enchufe y adaptador necesitas para cada país. Voltaje, frecuencia y tipos A-M",
+      "suites": [
+        "viajes",
+        "tecnicas"
+      ],
+      "contexts": [
+        "casa",
+        "curiosidad"
+      ],
+      "keywords": [
+        "enchufe",
+        "adaptador",
+        "pais",
+        "voltaje",
+        "electricidad",
+        "viaje",
+        "tipo enchufe",
+        "corriente",
+        "electricidad pais"
+      ],
+      "icon": "🔌"
     },
     {
       "slug": "generador-actas",
@@ -5015,7 +5106,8 @@
       "url": "https://meskeia.com/paises-del-mundo/",
       "description": "Buscador de 195 países con capitales, banderas, monedas, idiomas, población y prefijos telefónicos",
       "suites": [
-        "cultura"
+        "cultura",
+        "viajes"
       ],
       "contexts": [
         "curiosidad",

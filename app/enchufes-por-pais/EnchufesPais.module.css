@@ -1,0 +1,239 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: white;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.hero p {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Buscador */
+.buscador {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.inputBusqueda {
+  width: 100%;
+  padding: 1rem 1.2rem 1rem 3rem;
+  border: 2px solid var(--border-color, #e0e0e0);
+  border-radius: 12px;
+  font-size: 1rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.inputBusqueda:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .inputBusqueda {
+  border-color: #3a3a3a;
+}
+
+.iconoBusqueda {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+/* Tarjeta del país */
+.tarjetaPais {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color, #e5e5e5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s;
+}
+
+[data-theme='dark'] .tarjetaPais {
+  border-color: #3a3a3a;
+}
+
+.tarjetaPais:hover {
+  border-color: var(--primary);
+}
+
+.cabeceraPais {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.bandera {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.infoPais {
+  flex: 1;
+}
+
+.nombrePais {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.continentePais {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Chips de tipos de enchufes */
+.tiposEnchufe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.chipTipo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.12) 0%, rgba(72, 169, 166, 0.12) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.3);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* Datos eléctricos */
+.datosElectricos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.dato {
+  text-align: center;
+  padding: 0.8rem 0.5rem;
+  background: var(--bg-primary);
+  border-radius: 10px;
+}
+
+.datoValor {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+}
+
+.datoLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Nota adaptador */
+.notaAdaptador {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 0.7rem 1rem;
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary);
+}
+
+/* Sin resultados */
+.sinResultados {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+/* Referencia de tipos */
+.referenciaTypes {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color, #e5e5e5);
+}
+
+[data-theme='dark'] .referenciaTypes {
+  border-color: #3a3a3a;
+}
+
+.referenciaTypes h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gridTipos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.7rem;
+}
+
+.itemTipo {
+  padding: 0.7rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.itemTipoLetra {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+/* Contador */
+.contador {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+  .datosElectricos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .gridTipos {
+    grid-template-columns: 1fr 1fr;
+  }
+}

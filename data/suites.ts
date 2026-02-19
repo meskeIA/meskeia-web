@@ -5,7 +5,7 @@
  * Una app puede pertenecer a múltiples suites (clasificación NO excluyente).
  * Ordenadas alfabéticamente por nombre.
  *
- * Actualizado: 2026-01-27
+ * Actualizado: 2026-02-19
  */
 
 // Tipos de suites disponibles (exportado como valor para compatibilidad con Turbopack)
@@ -21,6 +21,7 @@ export const SUITE_IDS = [
   'marketing',
   'productividad',
   'salud',
+  'viajes',
 ] as const;
 
 export type SuiteType = typeof SUITE_IDS[number];
@@ -92,6 +93,12 @@ export const suites = [
     name: 'Salud y Bienestar',
     icon: '🏥',
     description: 'Salud personal, nutrición y cuidado de mascotas'
+  },
+  {
+    id: 'viajes' as SuiteType,
+    name: 'Viajes y Turismo',
+    icon: '✈️',
+    description: 'Planifica viajes, divisas, enchufes y presupuestos de viaje'
   },
 ] as const;
 
