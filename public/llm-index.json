@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 226+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 227+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 226,
+  "total_tools": 227,
   "last_updated": "2026-02-19",
   "features": {
     "all_free": true,
@@ -42,7 +42,7 @@
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 32
+      "tool_count": 33
     },
     {
       "id": "freelance",
@@ -98,7 +98,7 @@
       "name": "Viajes y Turismo",
       "icon": "✈️",
       "description": "Planifica viajes, divisas, enchufes y presupuestos de viaje",
-      "tool_count": 9
+      "tool_count": 10
     }
   ],
   "moments": [
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 68
+      "tool_count": 69
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 42
+      "tool_count": 43
     },
     {
       "id": "creando",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 36
+      "tool_count": 37
     }
   ],
   "tools": [
@@ -3973,6 +3973,32 @@
         "electricidad pais"
       ],
       "icon": "🔌"
+    },
+    {
+      "slug": "comparador-coste-vida",
+      "name": "Comparador de Coste de Vida",
+      "url": "https://meskeia.com/comparador-coste-vida/",
+      "description": "Compara el coste de vida entre más de 55 ciudades del mundo: alquiler, comida, transporte e internet. Datos de referencia 2024-2025 (Numbeo)",
+      "suites": [
+        "viajes",
+        "finanzas"
+      ],
+      "contexts": [
+        "casa",
+        "dinero",
+        "curiosidad"
+      ],
+      "keywords": [
+        "coste de vida",
+        "comparar ciudades",
+        "vivir extranjero",
+        "alquiler ciudad",
+        "nomada digital",
+        "precio vida mundo",
+        "mudarse extranjero",
+        "expatriado"
+      ],
+      "icon": "🏙️"
     },
     {
       "slug": "generador-actas",
