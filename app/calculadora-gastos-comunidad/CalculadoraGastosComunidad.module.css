@@ -1,0 +1,469 @@
+/* Calculadora Gastos de Comunidad - meskeIA */
+
+.container {
+  max-width: 960px;
+  margin: 100px auto 40px;
+  padding: 0 20px;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 40px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 12px;
+}
+
+.heroSubtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ===== TABS DE MODO ===== */
+.modeTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.modeTab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary, #666);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.modeTab.active {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.25);
+}
+
+.modeTab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ===== SECCIÓN FORMULARIO ===== */
+.formSection {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 28px 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border, #e5e7eb);
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inputGroupFull {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.inputText {
+  padding: 10px 14px;
+  border: 2px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inputText:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.1);
+}
+
+.selectInput {
+  padding: 10px 14px;
+  border: 2px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  width: 100%;
+}
+
+.selectInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ===== TABLA VECINOS ===== */
+.vecinosTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
+.vecinosTable th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.vecinosTable th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.vecinosTable th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+.vecinosTable td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  color: var(--text-primary);
+}
+
+.vecinosTable tr:last-child td {
+  border-bottom: none;
+}
+
+.vecinosTable tr:nth-child(even) td {
+  background: var(--bg-primary, #fafafa);
+}
+
+.vecinoInput {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.vecinoInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.cuotaBadge {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.95rem;
+}
+
+/* ===== BOTÓN AÑADIR VECINO ===== */
+.btnAddVecino {
+  background: transparent;
+  border: 2px dashed var(--primary);
+  color: var(--primary);
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btnAddVecino:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.btnAddVecino:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnRemove {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.btnRemove:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ===== BOTÓN CALCULAR ===== */
+.btnWrapper {
+  text-align: center;
+  margin: 8px 0 32px;
+}
+
+.btnCalcular {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border: none;
+  padding: 14px 48px;
+  border-radius: 50px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnCalcular:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.35);
+}
+
+.btnCalcular:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* ===== RESULTADOS ===== */
+.resultsSection {
+  margin-bottom: 32px;
+}
+
+.resumenGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.resumenCard {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.resumenCard.highlight {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05) 0%, rgba(72, 169, 166, 0.08) 100%);
+}
+
+.resumenIcon {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.resumenLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted, #999);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
+}
+
+.resumenValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.resumenSub {
+  font-size: 0.78rem;
+  color: var(--text-muted, #999);
+  margin-top: 4px;
+}
+
+/* ===== TABLA RESULTADO ===== */
+.resultTable {
+  background: var(--bg-card);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e5e7eb);
+  margin-bottom: 24px;
+}
+
+.resultTableHeader {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 12px 20px;
+  background: var(--primary);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 700;
+  gap: 12px;
+}
+
+.resultTableRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  font-size: 0.9rem;
+  gap: 12px;
+  align-items: center;
+}
+
+.resultTableRow:last-child {
+  border-bottom: none;
+}
+
+.resultTableRow:nth-child(even) {
+  background: var(--bg-primary, #fafafa);
+}
+
+.resultTableRow.total {
+  background: rgba(46, 134, 171, 0.05);
+  border-top: 2px solid var(--primary);
+  font-weight: 700;
+}
+
+.colName {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.colValue {
+  color: var(--text-secondary, #666);
+  text-align: right;
+}
+
+.colCuota {
+  font-weight: 700;
+  color: var(--primary);
+  text-align: right;
+}
+
+/* ===== DARK MODE ===== */
+[data-theme='dark'] .formSection,
+[data-theme='dark'] .resumenCard,
+[data-theme='dark'] .resultTable,
+[data-theme='dark'] .modeTabs {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .resumenCard.highlight {
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .vecinosTable td {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .vecinosTable tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .resultTableRow {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .resultTableRow:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme='dark'] .resultTableRow.total {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .vecinoInput,
+[data-theme='dark'] .inputText,
+[data-theme='dark'] .selectInput {
+  border-color: #374151;
+  background: var(--bg-card);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .container {
+    margin: 70px auto 20px;
+    padding: 0 16px;
+  }
+
+  .heroTitle {
+    font-size: 1.6rem;
+  }
+
+  .formSection {
+    padding: 20px;
+  }
+
+  .inputGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resumenGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resultTableHeader,
+  .resultTableRow {
+    grid-template-columns: 1fr 1fr;
+    font-size: 0.8rem;
+  }
+
+  .resultTableHeader > *:nth-child(3),
+  .resultTableRow > *:nth-child(3) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(*), :global(*::before), :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -59,6 +59,27 @@ const finanzasHipotecaApps: RelatedApp[] = [
   { url: '/calculadora-alquiler-vs-compra/', icon: '🔑', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
 ];
 
+// ==========================================
+// FAMILIA: INVERSIÓN INMOBILIARIA
+// ==========================================
+const inversionInmobiliariaApps: RelatedApp[] = [
+  { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI, cash flow y payback' },
+  { url: '/calculadora-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
+  { url: '/simulador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+  { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
+  { url: '/calculadora-gastos-comunidad/', icon: '🏘️', name: 'Gastos de Comunidad', description: 'Reparto cuotas propietarios' },
+];
+
+// ==========================================
+// FAMILIA: SALUD FEMENINA
+// ==========================================
+const saludFemeninaApps: RelatedApp[] = [
+  { url: '/seguimiento-ciclo-menstrual/', icon: '🌸', name: 'Ciclo Menstrual', description: 'Ventana fértil y ovulación' },
+  { url: '/planificador-embarazo/', icon: '🤰', name: 'Planificador Embarazo', description: 'Semanas y checklist' },
+  { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice de masa corporal' },
+  { url: '/calculadora-percentiles/', icon: '📏', name: 'Percentiles Infantiles', description: 'Peso y talla OMS' },
+];
+
 const finanzasPersonalesApps: RelatedApp[] = [
   { url: '/control-gastos/', icon: '💳', name: 'Control de Gastos', description: 'Gestiona tu presupuesto' },
   { url: '/calculadora-suscripciones/', icon: '📱', name: 'Control Suscripciones', description: 'Gastos recurrentes' },
@@ -414,6 +435,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Coste de electrodomésticos' },
   ],
 
+  // INVERSIÓN INMOBILIARIA
+  'calculadora-rentabilidad-alquiler': inversionInmobiliariaApps.filter(a => a.url !== '/calculadora-rentabilidad-alquiler/'),
+  'calculadora-gastos-comunidad': [
+    { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI, cash flow y payback' },
+    { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
+    { url: '/calculadora-coste-vivienda/', icon: '🏠', name: 'Coste Real Vivienda', description: 'Gasto mensual total del hogar' },
+    { url: '/calculadora-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero completo' },
+  ],
+
   // FINANZAS - PERSONALES
   'control-gastos': finanzasPersonalesApps.filter(a => a.url !== '/control-gastos/'),
   'calculadora-suscripciones': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-suscripciones/'),
@@ -658,8 +688,11 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // FAMILIA
-  'planificador-embarazo': familiaApps.filter(a => a.url !== '/planificador-embarazo/'),
+  'planificador-embarazo': saludFemeninaApps.filter(a => a.url !== '/planificador-embarazo/'),
   'calculadora-percentiles': familiaApps.filter(a => a.url !== '/calculadora-percentiles/'),
+
+  // SALUD FEMENINA
+  'seguimiento-ciclo-menstrual': saludFemeninaApps.filter(a => a.url !== '/seguimiento-ciclo-menstrual/'),
   'calculadora-fechas': [...familiaApps.filter(a => a.url !== '/calculadora-fechas/'), ...productividadApps.slice(0, 2)],
 
   // FÍSICA Y QUÍMICA

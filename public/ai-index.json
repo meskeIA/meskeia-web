@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 224,
-  "updated": "2026-02-18",
+  "total_tools": 227,
+  "updated": "2026-02-19",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -134,7 +134,9 @@
         { "name": "Comparador Compra Vehículos", "slug": "comparador-vehiculos", "url": "https://meskeia.com/comparador-vehiculos/", "description": "Compara las 4 formas de adquirir un coche: contado, financiación, renting y leasing. Calcula el coste total real de cada opción" },
         { "name": "Calculadora Coste Vivienda", "slug": "calculadora-coste-vivienda", "url": "https://meskeia.com/calculadora-coste-vivienda/", "description": "Calcula el coste real mensual de mantener una vivienda: hipoteca, IBI, comunidad, seguros, suministros y mantenimiento" },
         { "name": "Guía para Ahorrar Dinero", "slug": "guia/ahorrar-dinero", "url": "https://meskeia.com/guia/ahorrar-dinero/", "description": "Guía completa: control de gastos, regla 50/30/20, fondo de emergencia y estrategias para eliminar deudas" },
-        { "name": "Guía para Comprar un Coche", "slug": "guia/comprar-coche", "url": "https://meskeia.com/guia/comprar-coche/", "description": "Guía de compra de vehículo: compara contado, financiación y renting. Calcula consumo y coste total real" }
+        { "name": "Guía para Comprar un Coche", "slug": "guia/comprar-coche", "url": "https://meskeia.com/guia/comprar-coche/", "description": "Guía de compra de vehículo: compara contado, financiación y renting. Calcula consumo y coste total real" },
+        { "name": "Calculadora Rentabilidad de Alquiler", "slug": "calculadora-rentabilidad-alquiler", "url": "https://meskeia.com/calculadora-rentabilidad-alquiler/", "description": "Calcula ROI bruto y neto de comprar para alquilar: cash flow mensual, payback, análisis de IBI, comunidad, seguro e hipoteca" },
+        { "name": "Calculadora Gastos de Comunidad", "slug": "calculadora-gastos-comunidad", "url": "https://meskeia.com/calculadora-gastos-comunidad/", "description": "Reparte los gastos de la comunidad de propietarios por partes iguales o según coeficiente de participación" }
       ]
     },
     {
@@ -259,7 +261,8 @@
         { "name": "Calculadora Tamaño Adulto Cachorro", "slug": "calculadora-tamano-adulto-perro", "url": "https://meskeia.com/calculadora-tamano-adulto-perro/", "description": "Predice el peso adulto de tu cachorro según edad, peso actual y tamaño de raza" },
         { "name": "Calculadora Percentiles Infantiles", "slug": "calculadora-percentiles", "url": "https://meskeia.com/calculadora-percentiles/", "description": "Percentil de peso y talla según tablas OMS" },
         { "name": "Vitaminas y Minerales", "slug": "vitaminas-minerales", "url": "https://meskeia.com/vitaminas-minerales/", "description": "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso" },
-        { "name": "Guía para Vivir Más Sano", "slug": "guia/vivir-sano", "url": "https://meskeia.com/guia/vivir-sano/", "description": "Guía de salud integral: IMC, macros, calorías, hidratación, sueño y hábitos. Sin dietas milagro, con herramientas basadas en datos" }
+        { "name": "Guía para Vivir Más Sano", "slug": "guia/vivir-sano", "url": "https://meskeia.com/guia/vivir-sano/", "description": "Guía de salud integral: IMC, macros, calorías, hidratación, sueño y hábitos. Sin dietas milagro, con herramientas basadas en datos" },
+        { "name": "Seguimiento Ciclo Menstrual y Fertilidad", "slug": "seguimiento-ciclo-menstrual", "url": "https://meskeia.com/seguimiento-ciclo-menstrual/", "description": "Calcula ventana fértil, ovulación y próximas fechas. Privacidad total: cálculo 100% local en tu navegador" }
       ]
     },
     {

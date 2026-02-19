@@ -280,6 +280,11 @@ export const implementedAppsUrls = [
   "/guia/vivir-sano/",              // Guía para vivir más sano: nutrición, sueño, hábitos
   "/guia/comprar-coche/",           // Guía para comprar un coche en España
   "/guia/montar-negocio/",          // Guía para montar un negocio o emprender
+
+  // Nuevas apps (2026-02-19)
+  "/calculadora-rentabilidad-alquiler/", // ROI inversión inmobiliaria: rentabilidad bruta/neta, cash flow, payback
+  "/seguimiento-ciclo-menstrual/",       // Ciclo menstrual: ventana fértil, ovulación, próximas fechas (cálculo local)
+  "/calculadora-gastos-comunidad/",      // Gastos comunidad propietarios: reparto igual o por coeficiente
 ];
 
 /**

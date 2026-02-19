@@ -1,0 +1,24 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Seguimiento Ciclo Menstrual y Fertilidad - Calculadora Ovulación | meskeIA',
+  description: 'Calcula tu ventana fértil, predicción de ovulación y próximas fechas de menstruación. Todo se calcula en tu navegador: ningún dato se envía a servidores.',
+  keywords: 'ciclo menstrual, ovulacion, fertilidad, ventana fertil, periodo, calculadora ovulacion, calendario menstrual, dias fertiles, prediccion periodo, seguimiento ciclo',
+  authors: [{ name: 'meskeIA' }],
+  creator: 'meskeIA',
+  publisher: 'meskeIA',
+  robots: 'index, follow',
+  openGraph: {
+    type: 'website',
+    title: 'Seguimiento Ciclo Menstrual y Fertilidad - meskeIA',
+    description: 'Predicción de ovulación, ventana fértil y próximas menstruaciones. Privacidad total: cálculo 100% local.',
+    url: 'https://meskeia.com/seguimiento-ciclo-menstrual/',
+    siteName: 'meskeIA',
+    locale: 'es_ES',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Calculadora Ciclo Menstrual y Ovulación - meskeIA',
+    description: 'Conoce tu ventana fértil y próximas fechas. Privacidad garantizada.',
+  },
+};

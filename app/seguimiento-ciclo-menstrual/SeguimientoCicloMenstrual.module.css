@@ -1,0 +1,386 @@
+/* Seguimiento Ciclo Menstrual - meskeIA */
+
+.container {
+  max-width: 900px;
+  margin: 100px auto 40px;
+  padding: 0 20px;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 40px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 12px;
+}
+
+.heroSubtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ===== AVISO DE PRIVACIDAD ===== */
+.privacyNotice {
+  background: linear-gradient(135deg, rgba(72, 169, 166, 0.08) 0%, rgba(46, 134, 171, 0.06) 100%);
+  border: 1px solid var(--secondary);
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666);
+}
+
+.privacyIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+/* ===== FORMULARIO ===== */
+.formSection {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 28px 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border, #e5e7eb);
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dateInput {
+  padding: 10px 14px;
+  border: 2px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+.dateInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.1);
+}
+
+.rangeContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rangeInput {
+  flex: 1;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.rangeValue {
+  min-width: 36px;
+  text-align: right;
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.rangeHint {
+  font-size: 0.75rem;
+  color: var(--text-muted, #999);
+  margin-top: 2px;
+}
+
+/* ===== BOTÓN ===== */
+.btnWrapper {
+  text-align: center;
+  margin: 8px 0 32px;
+}
+
+.btnCalcular {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border: none;
+  padding: 14px 48px;
+  border-radius: 50px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnCalcular:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.35);
+}
+
+.btnCalcular:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* ===== RESULTADOS ===== */
+.resultsSection {
+  margin-bottom: 32px;
+}
+
+.resultsTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* ===== CALENDARIO DE PRÓXIMOS CICLOS ===== */
+.ciclosCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px 28px;
+  border: 1px solid var(--border, #e5e7eb);
+  margin-bottom: 20px;
+}
+
+.ciclosTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 16px;
+}
+
+.cicloRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.cicloRow:last-child {
+  border-bottom: none;
+}
+
+.cicloNum {
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.cicloFechas {
+  font-size: 0.9rem;
+}
+
+.cicloFechaPeriodo {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cicloFechaOvulacion {
+  font-size: 0.8rem;
+  color: var(--text-muted, #999);
+  margin-top: 2px;
+}
+
+.cicloFertil {
+  font-size: 0.78rem;
+  background: rgba(72, 169, 166, 0.1);
+  border: 1px solid var(--secondary);
+  color: var(--secondary);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== FASE ACTUAL ===== */
+.faseActual {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px 28px;
+  border: 2px solid var(--primary);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.faseIcon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.faseInfo {
+  flex: 1;
+}
+
+.faseTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 4px;
+}
+
+.faseDes {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.faseDia {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.faseDiaLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted, #999);
+  text-align: center;
+  margin-top: -4px;
+}
+
+/* ===== LEYENDA FASES ===== */
+.leyenda {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.leyendaItem {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.leyendaIcon {
+  font-size: 1.5rem;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.leyendaNombre {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.leyendaDias {
+  font-size: 0.72rem;
+  color: var(--text-muted, #999);
+}
+
+/* ===== DARK MODE ===== */
+[data-theme='dark'] .formSection,
+[data-theme='dark'] .ciclosCard,
+[data-theme='dark'] .faseActual,
+[data-theme='dark'] .leyendaItem {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .faseActual {
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .cicloRow {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .dateInput {
+  border-color: #374151;
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .privacyNotice {
+  border-color: rgba(72, 169, 166, 0.3);
+  background: rgba(72, 169, 166, 0.05);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .container {
+    margin: 70px auto 20px;
+    padding: 0 16px;
+  }
+
+  .heroTitle {
+    font-size: 1.6rem;
+  }
+
+  .formSection {
+    padding: 20px;
+  }
+
+  .inputGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .leyenda {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .faseActual {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(*), :global(*::before), :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
