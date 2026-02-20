@@ -658,8 +658,9 @@ Si quieres profesionalizar más apps:
   18. Interés Compuesto (app/interes-compuesto/) - 6 secciones profesionales (Tabla Comparativa 5 instrumentos 6 criterios, Casos de Uso 4 perfiles vital, FAQ 8 preguntas TAE/inflación/DCA/comisiones, Guía 7 pasos empezar a invertir, Tips 6 hábitos, Warning 6 errores que destruyen el interés compuesto)
   19. Calculadora de Inversiones (app/calculadora-inversiones/) - 6 secciones profesionales con CSS prefijado 'edu' (Tabla Comparativa 5 tipos activos 6 criterios, Casos de Uso 4 perfiles capital, FAQ 8 preguntas Sharpe/rebalanceo/ETF vs fondo/REITs, Guía 7 pasos construir cartera, Tips 6 principios, Warning 6 errores diseño cartera)
   20. Calculadora ROI Marketing (app/calculadora-roi-marketing/) - 6 secciones profesionales con CSS prefijado 'edu' para evitar conflictos con tablaWrapper/tablaComparativa existentes (Tabla Comparativa 6 canales × 7 criterios ROI/ROAS/CPL/horizonte, Casos de Uso 4 perfiles ecommerce/SaaS B2B/local/infoproductos, FAQ 8 preguntas atribución/CAC/CLV/gestión, Guía 7 pasos optimizar mix, Tips 6 reglas marketing rentable, Warning 6 errores que destruyen ROI)
+  21. Calculadora Coste Vivienda (app/calculadora-coste-vivienda/) - 6 secciones profesionales + eliminado disclaimer duplicado (Tabla Comparativa 5 tipos vivienda × 7 criterios, Casos de Uso 4 perfiles joven/familia/segunda residencia/inversor, FAQ 8 preguntas adquisición/regla 30%/alquilar vs comprar/derramas, Guía 7 pasos auditar y reducir costes, Tips 6 hábitos propietario inteligente, Warning 6 errores que disparan el coste)
 
-**Última actualización**: 2026-02-20 (Sesión: calculadora-roi-marketing → 20 apps v2.0, 24 total)
+**Última actualización**: 2026-02-20 (Sesión: calculadora-roi-marketing + calculadora-coste-vivienda → 21 apps v2.0, 25 total)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
 **Versión**: 2.0
-**Apps implementadas**: 23 (3 v1.0 FULL, 2 v1.0 cleanup, 19 v2.0 migradas)
+**Apps implementadas**: 25 (3 v1.0 FULL, 2 v1.0 cleanup, 21 v2.0 migradas)
