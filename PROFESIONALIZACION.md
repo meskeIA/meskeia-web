@@ -649,7 +649,12 @@ Si quieres profesionalizar más apps:
 
 ---
 
-**Última actualización**: 2026-02-06 (Sesión migración masiva v2.0 + Tabla Periódica + Calculadora Geometría)
+  12. Huesos Cuerpo Humano (app/huesos-cuerpo-humano/) - 6 secciones profesionales (Tabla Comparativa Axial/Apendicular 7 criterios, Casos de Uso 4 perfiles, FAQ 8 preguntas anatomía/clínica, Guía 7 pasos estudio esqueleto, Tips 6 prácticas, Warning 6 errores de examen)
+  13. Instrumentos Musicales (app/instrumentos-musicales/) - 6 secciones profesionales (Tabla Comparativa 4 familias 7 criterios, Casos de Uso 4 perfiles, FAQ 8 preguntas organología, Guía 6 pasos reconocimiento auditivo, Tips 6 prácticas, Warning 6 errores conceptuales)
+  14. Glosario de Programación (app/glosario-programacion/) - 6 secciones profesionales (Tabla Comparativa 4 paradigmas, Casos de Uso 4 perfiles dev, FAQ 8 preguntas técnicas, Guía 6 pasos ruta junior, Tips 6 prácticas aprendizaje, Warning 6 errores conceptuales)
+  15. Creador de Paletas (app/creador-paletas/) - 6 secciones profesionales (Tabla Comparativa 6 armonías 5 criterios, Casos de Uso 4 perfiles diseño, FAQ 8 preguntas color/accesibilidad, Guía 6 pasos identidad visual, Tips 6 prácticas, Warning 6 errores de diseño)
+
+**Última actualización**: 2026-02-19 (Sesión profesionalización x4: huesos, instrumentos, glosario-prog, paletas)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
 **Versión**: 2.0
-**Apps implementadas**: 15 (3 v1.0 FULL, 2 v1.0 cleanup, 11 v2.0 migradas)
+**Apps implementadas**: 19 (3 v1.0 FULL, 2 v1.0 cleanup, 15 v2.0 migradas)
