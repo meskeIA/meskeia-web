@@ -266,13 +266,15 @@ export default function VisualizadorAlgoritmosPage() {
 
       {/* Sección Educativa */}
       <EducationalSection
-        title="¿Quieres aprender más sobre algoritmos de ordenación?"
-        subtitle="Descubre las diferencias entre algoritmos, cuándo usar cada uno y conceptos clave de complejidad computacional"
+        title="Aprende Algoritmos de Ordenación: Guía Completa con Ejemplos"
+        subtitle="Comprende las diferencias, cuándo usar cada algoritmo y cómo elegir el más adecuado para tu proyecto"
         icon="📚"
       >
         <div className={styles.educationalContent}>
+
+          {/* Tabla comparativa */}
           <section className={styles.guideSection}>
-            <h2>📊 Comparativa de Algoritmos</h2>
+            <h2>📊 Comparativa Completa de Algoritmos</h2>
             <table className={styles.comparisonTable}>
               <thead>
                 <tr>
@@ -282,6 +284,7 @@ export default function VisualizadorAlgoritmosPage() {
                   <th>Peor Caso</th>
                   <th>Espacio</th>
                   <th>Estable</th>
+                  <th>Ideal para</th>
                 </tr>
               </thead>
               <tbody>
@@ -292,6 +295,7 @@ export default function VisualizadorAlgoritmosPage() {
                   <td>O(n²)</td>
                   <td>O(1)</td>
                   <td>Sí</td>
+                  <td>Aprender, arrays muy pequeños</td>
                 </tr>
                 <tr>
                   <td><strong>Selection Sort</strong></td>
@@ -300,6 +304,7 @@ export default function VisualizadorAlgoritmosPage() {
                   <td>O(n²)</td>
                   <td>O(1)</td>
                   <td>No</td>
+                  <td>Minimizar escrituras en memoria</td>
                 </tr>
                 <tr>
                   <td><strong>Insertion Sort</strong></td>
@@ -308,6 +313,7 @@ export default function VisualizadorAlgoritmosPage() {
                   <td>O(n²)</td>
                   <td>O(1)</td>
                   <td>Sí</td>
+                  <td>Arrays casi ordenados, pequeños</td>
                 </tr>
                 <tr>
                   <td><strong>Quick Sort</strong></td>
@@ -316,6 +322,7 @@ export default function VisualizadorAlgoritmosPage() {
                   <td>O(n²)</td>
                   <td>O(log n)</td>
                   <td>No</td>
+                  <td>Uso general, datos aleatorios</td>
                 </tr>
                 <tr>
                   <td><strong>Merge Sort</strong></td>
@@ -324,87 +331,299 @@ export default function VisualizadorAlgoritmosPage() {
                   <td>O(n log n)</td>
                   <td>O(n)</td>
                   <td>Sí</td>
+                  <td>Ordenación garantizada, objetos</td>
                 </tr>
               </tbody>
             </table>
           </section>
 
+          {/* Casos de uso */}
           <section className={styles.guideSection}>
-            <h2>🎯 ¿Cuándo usar cada algoritmo?</h2>
-
-            <div className={styles.tipCard}>
-              <h4>🫧 Bubble Sort</h4>
-              <p>
-                Ideal para fines educativos y arrays muy pequeños. Su simplicidad lo hace perfecto
-                para entender los conceptos básicos de ordenación. No recomendado para producción.
-              </p>
-            </div>
-
-            <div className={styles.tipCard}>
-              <h4>👆 Selection Sort</h4>
-              <p>
-                Útil cuando el coste de escribir en memoria es alto, ya que minimiza el número
-                de intercambios (máximo n intercambios). Bueno para arrays pequeños.
-              </p>
-            </div>
-
-            <div className={styles.tipCard}>
-              <h4>📥 Insertion Sort</h4>
-              <p>
-                Excelente para arrays pequeños o casi ordenados. Muchas implementaciones de
-                Quick Sort lo usan para particiones pequeñas. Es estable y eficiente en memoria.
-              </p>
-            </div>
-
-            <div className={styles.tipCard}>
-              <h4>⚡ Quick Sort</h4>
-              <p>
-                El más usado en la práctica. Muy eficiente para la mayoría de casos.
-                Es el algoritmo por defecto en muchas librerías (como qsort en C).
-                Cuidado con arrays ya ordenados (peor caso O(n²)).
-              </p>
-            </div>
-
-            <div className={styles.tipCard}>
-              <h4>🔀 Merge Sort</h4>
-              <p>
-                Garantiza O(n log n) siempre. Ideal cuando necesitas estabilidad y rendimiento
-                predecible. Usado en Java para ordenar objetos. Requiere memoria adicional O(n).
-              </p>
+            <h2>👥 ¿Quién usa este visualizador?</h2>
+            <div className={styles.casosUsoGrid}>
+              <div className={styles.casoCard}>
+                <div className={styles.casoIcon}>🎓</div>
+                <div className={styles.casoTitle}>Estudiante de Informática</div>
+                <div className={styles.casoSubtitle}>1º y 2º de grado, FP DAM/DAW</div>
+                <div className={styles.casoDesc}>
+                  Visualiza cómo funciona cada algoritmo paso a paso para entender los conceptos
+                  de complejidad. Ideal para preparar exámenes de Algoritmos y Estructuras de Datos.
+                </div>
+              </div>
+              <div className={styles.casoCard}>
+                <div className={styles.casoIcon}>💼</div>
+                <div className={styles.casoTitle}>Dev Junior en Entrevistas</div>
+                <div className={styles.casoSubtitle}>Preparando entrevistas técnicas</div>
+                <div className={styles.casoDesc}>
+                  Repasa los algoritmos clásicos que preguntan en entrevistas de empresas tech.
+                  Comprende el trade-off entre Quick Sort y Merge Sort para explicarlo con fluidez.
+                </div>
+              </div>
+              <div className={styles.casoCard}>
+                <div className={styles.casoIcon}>🏫</div>
+                <div className={styles.casoTitle}>Profesor / Formador</div>
+                <div className={styles.casoSubtitle}>Docentes de programación</div>
+                <div className={styles.casoDesc}>
+                  Usa la visualización en clase para explicar de forma gráfica cómo se comportan
+                  los algoritmos. El modo paso a paso permite avanzar al ritmo de los alumnos.
+                </div>
+              </div>
+              <div className={styles.casoCard}>
+                <div className={styles.casoIcon}>🔍</div>
+                <div className={styles.casoTitle}>Curioso con Experiencia</div>
+                <div className={styles.casoSubtitle}>Devs con varios años de experiencia</div>
+                <div className={styles.casoDesc}>
+                  Refresca conceptos que quizás no usas en el día a día. Comprueba visualmente
+                  por qué Insertion Sort supera a Quick Sort en arrays muy pequeños o ya ordenados.
+                </div>
+              </div>
             </div>
           </section>
 
+          {/* FAQ */}
           <section className={styles.guideSection}>
-            <h2>📖 Conceptos Clave</h2>
+            <h2>❓ Preguntas Frecuentes sobre Algoritmos</h2>
+            <div className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Por qué Quick Sort es más rápido en la práctica si tiene peor caso O(n²)?</div>
+                <div className={styles.faqRespuesta}>
+                  La constante oculta en la notación Big O importa. Quick Sort tiene muy buen rendimiento
+                  de caché (accede a memoria secuencialmente) y el peor caso O(n²) es estadísticamente raro
+                  con datos aleatorios. Con pivote aleatorio, la probabilidad del peor caso es despreciable.
+                </div>
+              </div>
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Cuándo usar Merge Sort en lugar de Quick Sort?</div>
+                <div className={styles.faqRespuesta}>
+                  Usa Merge Sort cuando necesites rendimiento garantizado O(n log n) siempre (Quick Sort
+                  puede degradarse), cuando necesites estabilidad (mantener el orden de elementos iguales),
+                  o cuando ordenes listas enlazadas (Merge Sort no necesita acceso aleatorio).
+                </div>
+              </div>
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Qué significa exactamente que un algoritmo sea "estable"?</div>
+                <div className={styles.faqRespuesta}>
+                  Un algoritmo estable mantiene el orden relativo de los elementos con la misma clave.
+                  Ejemplo: si ordenas una lista de personas por apellido y dos personas tienen el mismo
+                  apellido, un algoritmo estable mantiene el orden original entre ellas. Bubble, Insertion
+                  y Merge Sort son estables; Selection y Quick Sort no lo son.
+                </div>
+              </div>
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Existen algoritmos más rápidos que O(n log n) para ordenar?</div>
+                <div className={styles.faqRespuesta}>
+                  Sí, pero solo cuando los datos tienen restricciones. Counting Sort, Radix Sort y Bucket Sort
+                  pueden lograr O(n) si los valores son enteros en un rango conocido. Para ordenación por
+                  comparación pura, O(n log n) es el límite teórico demostrado matemáticamente.
+                </div>
+              </div>
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Por qué se enseña Bubble Sort si es tan ineficiente?</div>
+                <div className={styles.faqRespuesta}>
+                  Bubble Sort es pedagogicamente valioso: su lógica es intuitiva, fácil de implementar
+                  y debuggear, y sirve para introducir conceptos como comparaciones, intercambios y
+                  complejidad. En producción nunca se usa directamente, pero entenderlo afianza las bases.
+                </div>
+              </div>
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Qué es un "pivote" en Quick Sort y por qué importa su elección?</div>
+                <div className={styles.faqRespuesta}>
+                  El pivote es el elemento sobre el que se divide el array en dos partes: menores y mayores.
+                  Una mala elección (siempre el mínimo o máximo) lleva al peor caso O(n²). La estrategia
+                  "mediana de tres" (primer, medio y último elemento) o pivote aleatorio evita este problema.
+                </div>
+              </div>
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Cuándo es mejor Insertion Sort que Quick Sort?</div>
+                <div className={styles.faqRespuesta}>
+                  Para arrays de menos de 10-20 elementos, Insertion Sort suele ganar por su constante
+                  pequeña y mejor comportamiento de caché. Además, si el array está casi ordenado (pocas
+                  inversiones), Insertion Sort es O(n) mientras Quick Sort sigue siendo O(n log n).
+                  Por eso muchos Quick Sort modernos cambian a Insertion Sort para subproblemas pequeños.
+                </div>
+              </div>
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Qué algoritmo usa JavaScript internamente en Array.sort()?</div>
+                <div className={styles.faqRespuesta}>
+                  Desde 2019 (V8 v7.0+), JavaScript usa Tim Sort, un híbrido de Merge Sort e Insertion Sort
+                  diseñado para datos reales. Es estable, con complejidad O(n log n) en el peor caso y
+                  O(n) cuando los datos ya están parcialmente ordenados (muy común en la práctica).
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Guía paso a paso */}
+          <section className={styles.guideSection}>
+            <h2>🗺️ Cómo elegir el algoritmo correcto: 6 pasos</h2>
+            <ol className={styles.pasosList}>
+              <li className={styles.paso}>
+                <span className={styles.pasoNum}>1</span>
+                <div className={styles.pasoContent}>
+                  <div className={styles.pasoTitle}>Evalúa el tamaño de los datos</div>
+                  <div className={styles.pasoDesc}>
+                    ¿Menos de 50 elementos? Considera Insertion Sort (constante pequeña, buen caché).
+                    ¿Cientos o miles? O(n log n) es obligatorio: Quick Sort o Merge Sort.
+                    ¿Millones? Considera algoritmos especializados (Radix Sort si son enteros).
+                  </div>
+                </div>
+              </li>
+              <li className={styles.paso}>
+                <span className={styles.pasoNum}>2</span>
+                <div className={styles.pasoContent}>
+                  <div className={styles.pasoTitle}>Analiza si los datos están parcialmente ordenados</div>
+                  <div className={styles.pasoDesc}>
+                    Si los datos llegan casi ordenados (ej: logs con timestamps), Insertion Sort es O(n).
+                    Si son completamente aleatorios, Quick Sort con pivote aleatorio es óptimo.
+                    Si son datos reales mixtos, Tim Sort (el de JavaScript) es la mejor opción general.
+                  </div>
+                </div>
+              </li>
+              <li className={styles.paso}>
+                <span className={styles.pasoNum}>3</span>
+                <div className={styles.pasoContent}>
+                  <div className={styles.pasoTitle}>Decide si necesitas estabilidad</div>
+                  <div className={styles.pasoDesc}>
+                    ¿Ordenas por múltiples criterios? (ej: primero por precio, luego por nombre).
+                    Si la ordenación secundaria ya está hecha y quieres preservarla, necesitas
+                    un algoritmo estable: Merge Sort, Insertion Sort o Tim Sort.
+                  </div>
+                </div>
+              </li>
+              <li className={styles.paso}>
+                <span className={styles.pasoNum}>4</span>
+                <div className={styles.pasoContent}>
+                  <div className={styles.pasoTitle}>Considera las restricciones de memoria</div>
+                  <div className={styles.pasoDesc}>
+                    Si la memoria es crítica (sistemas embebidos, arrays gigantes), usa algoritmos
+                    in-place: Quick Sort O(log n), Heap Sort O(1). Si tienes memoria disponible,
+                    Merge Sort O(n) extra te da estabilidad y rendimiento garantizado.
+                  </div>
+                </div>
+              </li>
+              <li className={styles.paso}>
+                <span className={styles.pasoNum}>5</span>
+                <div className={styles.pasoContent}>
+                  <div className={styles.pasoTitle}>Evalúa el peor caso aceptable</div>
+                  <div className={styles.pasoDesc}>
+                    En sistemas críticos (tiempo real, banca), el peor caso importa tanto como
+                    el promedio. Quick Sort puede degradarse a O(n²) en datos adversariales.
+                    Merge Sort garantiza O(n log n) siempre. Para uso general, Quick Sort aleatorio
+                    es seguro estadísticamente.
+                  </div>
+                </div>
+              </li>
+              <li className={styles.paso}>
+                <span className={styles.pasoNum}>6</span>
+                <div className={styles.pasoContent}>
+                  <div className={styles.pasoTitle}>Mide y decide con benchmarks reales</div>
+                  <div className={styles.pasoDesc}>
+                    La teoría guía, pero los datos reales deciden. Haz benchmarks con tu conjunto
+                    de datos específico. A veces una implementación bien optimizada de un algoritmo
+                    &ldquo;peor&rdquo; supera a una naïve de un algoritmo &ldquo;mejor&rdquo;.
+                    Usa herramientas como jsperf.com o console.time() en JavaScript.
+                  </div>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          {/* Tips y Errores */}
+          <section className={styles.guideSection}>
+            <h2>💡 Tips y Errores Frecuentes</h2>
+            <div className={styles.tipsErrorsSection}>
+              <div className={styles.tipsColumn}>
+                <div className={styles.tipsHeader}>✅ Tips de Experto</div>
+                <div className={styles.tipItem}>
+                  Para arrays pequeños (&lt;20 elementos), Insertion Sort gana por la constante pequeña
+                  y mejor localidad de caché, aunque su Big O sea peor.
+                </div>
+                <div className={styles.tipItem}>
+                  Quick Sort con pivote aleatorio convierte el peor caso O(n²) en un evento
+                  estadísticamente despreciable sin coste algorítmico.
+                </div>
+                <div className={styles.tipItem}>
+                  En JavaScript usa Array.sort() (Tim Sort) en lugar de reimplementar:
+                  está altamente optimizado y es estable desde ES2019.
+                </div>
+                <div className={styles.tipItem}>
+                  Selection Sort tiene una ventaja única: minimiza el número de escrituras
+                  en memoria (máximo n-1 intercambios). Útil en EEPROM con escrituras limitadas.
+                </div>
+                <div className={styles.tipItem}>
+                  Para ordenar listas enlazadas, Merge Sort es natural porque no necesita
+                  acceso aleatorio. Quick Sort en listas enlazadas es complicado.
+                </div>
+                <div className={styles.tipItem}>
+                  Si tus datos son enteros en rango acotado, Counting Sort o Radix Sort
+                  logran O(n), superando el límite teórico de comparación O(n log n).
+                </div>
+              </div>
+              <div className={styles.tipsColumn}>
+                <div className={styles.errorsHeader}>❌ Errores Frecuentes</div>
+                <div className={styles.errorItem}>
+                  Confundir complejidad media con peor caso. Quick Sort tiene O(n log n) promedio
+                  pero O(n²) peor caso, no al revés.
+                </div>
+                <div className={styles.errorItem}>
+                  Asumir que O(n log n) siempre es más rápido que O(n²). Para arrays pequeños,
+                  la constante oculta en Big O puede invertir el resultado real.
+                </div>
+                <div className={styles.errorItem}>
+                  Ignorar la estabilidad. Si ordenas registros multi-campo (nombre + apellido),
+                  un algoritmo inestable puede destruir la ordenación secundaria.
+                </div>
+                <div className={styles.errorItem}>
+                  Creer que Quick Sort es O(log n) en espacio porque es in-place.
+                  La pila de llamadas recursivas ocupa O(log n) en el caso medio y O(n) en el peor.
+                </div>
+                <div className={styles.errorItem}>
+                  Usar Bubble Sort en producción &ldquo;porque los arrays son pequeños&rdquo;.
+                  Insertion Sort es siempre mejor que Bubble Sort para arrays pequeños.
+                </div>
+                <div className={styles.errorItem}>
+                  Confundir número de comparaciones con número de intercambios.
+                  Selection Sort minimiza intercambios pero maximiza comparaciones.
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Conceptos clave (mantenido del original) */}
+          <section className={styles.guideSection}>
+            <h2>📖 Conceptos Clave de Complejidad</h2>
 
             <div className={styles.tipCard}>
-              <h4>¿Qué significa O(n²)?</h4>
+              <h4>¿Qué significa O(n²) en la práctica?</h4>
               <p>
                 La notación O grande describe cómo crece el tiempo de ejecución con el tamaño
                 de la entrada. O(n²) significa que si duplicas el tamaño del array, el tiempo
-                se cuadruplica. O(n log n) crece mucho más lento: un array de 1000 elementos
-                tarda ~10.000 operaciones en vez de ~1.000.000.
+                se cuadruplica. O(n log n) crece mucho más lento: un array de 1.000 elementos
+                tarda ~10.000 operaciones en vez de ~1.000.000 con O(n²).
               </p>
             </div>
 
             <div className={styles.tipCard}>
-              <h4>¿Qué es un algoritmo estable?</h4>
+              <h4>Algoritmos estables vs. inestables</h4>
               <p>
                 Un algoritmo estable mantiene el orden relativo de elementos con claves iguales.
                 Por ejemplo, si ordenas estudiantes por nota y dos tienen la misma nota,
-                un algoritmo estable los mantiene en el orden original.
+                un algoritmo estable los mantiene en el orden original. Estables: Bubble, Insertion,
+                Merge Sort. Inestables: Selection Sort, Quick Sort (implementación estándar).
               </p>
             </div>
 
             <div className={styles.tipCard}>
-              <h4>In-place vs. Extra memoria</h4>
+              <h4>In-place vs. memoria adicional</h4>
               <p>
-                Los algoritmos in-place (como Bubble, Selection, Insertion, Quick) ordenan
+                Los algoritmos in-place (Bubble, Selection, Insertion, Quick) ordenan
                 usando solo O(1) o O(log n) de memoria extra. Merge Sort necesita O(n) de
-                memoria adicional para el array temporal durante la fusión.
+                memoria adicional para el array temporal durante la fusión, lo que puede ser
+                un problema con arrays de cientos de millones de elementos.
               </p>
             </div>
           </section>
+
         </div>
       </EducationalSection>
 
