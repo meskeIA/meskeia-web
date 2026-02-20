@@ -657,8 +657,9 @@ Si quieres profesionalizar más apps:
   17. Test Perfil Inversor (app/test-perfil-inversor/) - 6 secciones profesionales (Tabla Comparativa 5 perfiles 6 criterios rentabilidad/volatilidad/horizonte, Casos de Uso 4 perfiles vital, FAQ 8 preguntas avanzadas, Guía 7 pasos determinar perfil real, Tips 6 reglas de oro, Warning 6 errores al elegir perfil)
   18. Interés Compuesto (app/interes-compuesto/) - 6 secciones profesionales (Tabla Comparativa 5 instrumentos 6 criterios, Casos de Uso 4 perfiles vital, FAQ 8 preguntas TAE/inflación/DCA/comisiones, Guía 7 pasos empezar a invertir, Tips 6 hábitos, Warning 6 errores que destruyen el interés compuesto)
   19. Calculadora de Inversiones (app/calculadora-inversiones/) - 6 secciones profesionales con CSS prefijado 'edu' (Tabla Comparativa 5 tipos activos 6 criterios, Casos de Uso 4 perfiles capital, FAQ 8 preguntas Sharpe/rebalanceo/ETF vs fondo/REITs, Guía 7 pasos construir cartera, Tips 6 principios, Warning 6 errores diseño cartera)
+  20. Calculadora ROI Marketing (app/calculadora-roi-marketing/) - 6 secciones profesionales con CSS prefijado 'edu' para evitar conflictos con tablaWrapper/tablaComparativa existentes (Tabla Comparativa 6 canales × 7 criterios ROI/ROAS/CPL/horizonte, Casos de Uso 4 perfiles ecommerce/SaaS B2B/local/infoproductos, FAQ 8 preguntas atribución/CAC/CLV/gestión, Guía 7 pasos optimizar mix, Tips 6 reglas marketing rentable, Warning 6 errores que destruyen ROI)
 
-**Última actualización**: 2026-02-20 (Sesión profesionalización x4: simulador-genetica, test-perfil-inversor, interes-compuesto, calculadora-inversiones)
+**Última actualización**: 2026-02-20 (Sesión: calculadora-roi-marketing → 20 apps v2.0, 24 total)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
 **Versión**: 2.0
 **Apps implementadas**: 23 (3 v1.0 FULL, 2 v1.0 cleanup, 19 v2.0 migradas)
