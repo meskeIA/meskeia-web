@@ -423,6 +423,387 @@
   line-height: 1.6;
 }
 
+/* ===== SECCIONES EDUCATIVAS PROFESIONALES ===== */
+
+/* Tabla Comparativa de Tipos de Vivienda */
+.eduComparativaSection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.eduComparativaSection h3 {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.eduComparativaSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduTablaWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-md);
+}
+
+.eduTablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.eduTablaComparativa th,
+.eduTablaComparativa td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.eduTablaComparativa thead th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.eduTablaComparativa tbody tr:nth-child(even) {
+  background: var(--hover);
+}
+
+.eduTablaComparativa tbody tr:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.eduTablaComparativa td {
+  color: var(--text-secondary);
+}
+
+.eduTablaComparativa td:first-child {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .eduTablaComparativa thead th {
+  background: #1a5c7a;
+}
+
+/* Casos de Uso / Escenarios */
+.eduEscenariosSection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.eduEscenariosSection h3 {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.eduEscenariosSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduEscenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.eduEscenarioCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.eduEscenarioCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.eduEscenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.eduEscenarioIcon {
+  font-size: 1.8rem;
+}
+
+.eduEscenarioHeader h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.eduEscenarioExample {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-sm);
+}
+
+.eduEscenarioTip {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 500;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(46, 134, 171, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid var(--primary);
+}
+
+/* FAQ Avanzado */
+.eduFaqSection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.eduFaqSection h3 {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.eduFaqSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduFaqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.eduFaqItem {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  border-left: 3px solid var(--secondary);
+}
+
+.eduFaqItem h4 {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.eduFaqItem p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Guía Paso a Paso */
+.eduStepSection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.eduStepSection h3 {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.eduStepSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduStepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.eduStepItem {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.eduStepNumber {
+  min-width: 36px;
+  height: 36px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.eduStepContent h4 {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.eduStepContent p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Tips / Mejores Prácticas */
+.eduTipsSection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.eduTipsSection h3 {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduTipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.eduTipCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.eduTipIcon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.eduTipCard h4 {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+
+.eduTipCard p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Warning Box */
+.eduWarningBox {
+  margin-top: var(--spacing-xl);
+  background: rgba(245, 158, 11, 0.08);
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .eduWarningBox {
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.eduWarningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.eduWarningIcon {
+  font-size: 1.5rem;
+}
+
+.eduWarningHeader h3 {
+  font-size: 1.1rem;
+  color: #92400E;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .eduWarningHeader h3 {
+  color: #FCD34D;
+}
+
+.eduWarningList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.eduWarningList li {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.eduWarningList li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.eduWarningList li strong {
+  color: var(--text-primary);
+}
+
+/* Responsive para secciones edu */
+@media (max-width: 900px) {
+  .eduEscenariosGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .eduTipsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .eduEscenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .eduTipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eduEscenarioCard {
+    transition: none;
+  }
+}
+
 /* Dark Mode */
 [data-theme='dark'] .disclaimer {
   background: rgba(255, 193, 7, 0.15);
