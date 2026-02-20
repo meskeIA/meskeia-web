@@ -439,6 +439,434 @@ export default function TestPerfilInversorPage() {
               </details>
             </div>
           </section>
+
+          {/* Tabla Comparativa de Perfiles */}
+          <section className={styles.comparativaSection}>
+            <h2>Comparativa de Perfiles de Inversor</h2>
+            <p className={styles.comparativaSubtitle}>
+              Compara los 5 perfiles en los criterios más relevantes para elegir la estrategia adecuada
+            </p>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Criterio</th>
+                    <th>🛡️ Conservador</th>
+                    <th>⚖️ Moderado</th>
+                    <th>📊 Equilibrado</th>
+                    <th>📈 Dinámico</th>
+                    <th>🚀 Agresivo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Rentabilidad esperada anual</strong></td>
+                    <td>2–4%</td>
+                    <td>4–6%</td>
+                    <td>6–8%</td>
+                    <td>8–10%</td>
+                    <td>10–12%+</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Volatilidad máxima</strong></td>
+                    <td>5–8%</td>
+                    <td>8–12%</td>
+                    <td>12–15%</td>
+                    <td>15–20%</td>
+                    <td>20–25%+</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Renta variable (%)</strong></td>
+                    <td>15%</td>
+                    <td>30%</td>
+                    <td>50%</td>
+                    <td>70%</td>
+                    <td>90%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Horizonte mínimo</strong></td>
+                    <td>1–3 años</td>
+                    <td>3–5 años</td>
+                    <td>5–10 años</td>
+                    <td>10–15 años</td>
+                    <td>+15 años</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Activos típicos</strong></td>
+                    <td>Depósitos, bonos corto</td>
+                    <td>Mixtos conservadores</td>
+                    <td>ETFs globales 60/40</td>
+                    <td>ETFs renta variable</td>
+                    <td>100% acciones globales</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Pérdida máxima soportable</strong></td>
+                    <td>–5%</td>
+                    <td>–10%</td>
+                    <td>–20%</td>
+                    <td>–30%</td>
+                    <td>–50%+</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* Casos de Uso Reales */}
+          <section className={styles.escenariosSection}>
+            <h2>Perfiles en la Vida Real</h2>
+            <p className={styles.escenariosSubtitle}>
+              Ejemplos concretos de qué perfil corresponde a cada situación vital
+            </p>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>👤</span>
+                  <h3>Joven de 25 años</h3>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <p>Situación:</p>
+                  <code>Primer empleo estable. Sin hijos. Puede ahorrar 200€/mes. No necesita el dinero hasta los 40+.</code>
+                </div>
+                <p className={styles.escenarioTip}>
+                  <strong>Perfil recomendado: Dinámico o Agresivo.</strong> El tiempo es su mayor aliado.
+                  Puede soportar mercados bajistas de 2–3 años. Un crash a los 30 no importa si invierte hasta los 60.
+                </p>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+                  <h3>Familia con hipoteca</h3>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <p>Situación:</p>
+                  <code>Pareja de 40 años, 2 hijos. Hipoteca de 1.000€/mes. Quieren complementar la jubilación.</code>
+                </div>
+                <p className={styles.escenarioTip}>
+                  <strong>Perfil recomendado: Moderado o Equilibrado.</strong> Tienen obligaciones financieras fijas.
+                  No pueden permitirse grandes caídas. Horizonte de 20–25 años permite algo de renta variable.
+                </p>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>👴</span>
+                  <h3>Pre-jubilado de 55 años</h3>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <p>Situación:</p>
+                  <code>10 años para jubilarse. 100.000€ ahorrados. Necesitará el dinero a partir de los 65.</code>
+                </div>
+                <p className={styles.escenarioTip}>
+                  <strong>Perfil recomendado: Conservador o Moderado.</strong> Un crash del 40% a los 60 años sería devastador.
+                  La preservación de capital es prioritaria. Solo pequeña exposición a renta variable.
+                </p>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>💼</span>
+                  <h3>Empresario con excedente</h3>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <p>Situación:</p>
+                  <code>45 años. Ingresos variables pero altos. 200.000€ para invertir. Ya tiene inmuebles y negocio.</code>
+                </div>
+                <p className={styles.escenarioTip}>
+                  <strong>Perfil recomendado: Equilibrado o Dinámico.</strong> Patrimonio diversificado reduce el riesgo global.
+                  Los 200.000€ son solo una parte. Puede asumir más riesgo en este capital específico.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ Avanzado */}
+          <section className={styles.faqSection}>
+            <h2>Preguntas Frecuentes Avanzadas</h2>
+            <div className={styles.faqList}>
+              <div className={styles.faqSectionItem}>
+                <h3>¿Qué diferencia hay entre el perfil moderado y el equilibrado?</h3>
+                <p>
+                  La diferencia principal está en el <strong>porcentaje de renta variable</strong>: el moderado tiene
+                  un 30% en bolsa frente al 50% del equilibrado. El moderado prefiere más bonos y estabilidad,
+                  mientras que el equilibrado acepta más volatilidad a cambio de mayor crecimiento potencial.
+                </p>
+                <p className={styles.faqTip}>
+                  💡 Si dudas entre ambos, elige el moderado. Es más fácil ser más agresivo en el futuro que
+                  recuperarse de una pérdida que no soportas emocionalmente.
+                </p>
+              </div>
+
+              <div className={styles.faqSectionItem}>
+                <h3>¿Puedo tener dos perfiles diferentes para distintos objetivos?</h3>
+                <p>
+                  Sí, y de hecho es lo más inteligente. Puedes ser <strong>conservador para tu fondo de emergencia</strong>
+                  (3–6 meses de gastos en cuenta remunerada) y <strong>dinámico para la jubilación</strong>
+                  (que queda a 30+ años). Cada objetivo tiene su propio horizonte temporal y tolerancia al riesgo.
+                </p>
+                <p className={styles.faqTip}>
+                  💡 Técnica &quot;bucket&quot;: Divide tu capital en cubos: corto plazo (conservador), medio plazo (equilibrado)
+                  y largo plazo (agresivo).
+                </p>
+              </div>
+
+              <div className={styles.faqSectionItem}>
+                <h3>¿Cómo afecta la inflación a mi elección de perfil?</h3>
+                <p>
+                  La inflación es el &quot;riesgo invisible&quot; que erosiona el poder adquisitivo del dinero parado.
+                  Con una inflación del 3%, un perfil <strong>demasiado conservador puede perder poder adquisitivo</strong>
+                  en términos reales aunque no pierda dinero nominalmente. Por eso, incluso los más conservadores
+                  deben buscar algo por encima de la inflación.
+                </p>
+              </div>
+
+              <div className={styles.faqSectionItem}>
+                <h3>¿Debería ser más agresivo por ser joven?</h3>
+                <p>
+                  El tiempo es la variable más importante. <strong>A los 25 años, un crash del 50% tiene 35 años
+                  para recuperarse</strong>; a los 60 años, puede ser catastrófico. Sin embargo, ser joven no es
+                  suficiente: también necesitas la estabilidad financiera para no vender en pánico durante caídas.
+                </p>
+                <p className={styles.faqTip}>
+                  💡 La regla de &quot;110 menos tu edad&quot; da el porcentaje máximo en renta variable. Con 30 años:
+                  un 70–80% en bolsa sería razonable para un horizonte largo.
+                </p>
+              </div>
+
+              <div className={styles.faqSectionItem}>
+                <h3>¿Qué pasa si el banco me asigna un perfil diferente?</h3>
+                <p>
+                  Los bancos hacen el test de MiFID II por obligación legal, pero a veces están sesgados hacia
+                  productos propios o hacia perfiles más conservadores para reducir reclamaciones.
+                  <strong>El perfil del banco es orientativo</strong>; el de este test busca darte una imagen más
+                  objetiva de tu situación real.
+                </p>
+              </div>
+
+              <div className={styles.faqSectionItem}>
+                <h3>¿Con qué frecuencia debo revisar mi perfil?</h3>
+                <p>
+                  Se recomienda revisar el perfil <strong>al menos una vez al año</strong> y siempre que ocurra
+                  un cambio vital significativo: nuevo trabajo, matrimonio, nacimiento de hijos, herencia,
+                  compra de vivienda o jubilación próxima. Los mercados también cambian tu exposición real:
+                  si la bolsa sube mucho, tu porcentaje en renta variable aumenta automáticamente.
+                </p>
+              </div>
+
+              <div className={styles.faqSectionItem}>
+                <h3>¿Existe un perfil &quot;perfecto&quot; para todos?</h3>
+                <p>
+                  No. El perfil óptimo es personal y depende de factores únicos: tu edad, ingresos, deudas,
+                  dependientes a cargo, experiencia inversora y, sobre todo, cómo reaccionas emocionalmente
+                  ante pérdidas. <strong>El mejor perfil es el que puedes mantener sin vender en pánico</strong>
+                  durante una crisis de mercado.
+                </p>
+                <p className={styles.faqTip}>
+                  💡 Warren Buffett: &quot;Nunca inviertas en algo que no puedas entender&quot;. Con tus inversiones:
+                  nunca asumas un riesgo que no puedas soportar emocionalmente.
+                </p>
+              </div>
+
+              <div className={styles.faqSectionItem}>
+                <h3>¿Qué es la aversión al riesgo conductual?</h3>
+                <p>
+                  Es la tendencia humana a sentir las pérdidas el doble de intensamente que las ganancias
+                  equivalentes (teoría de la perspectiva de Kahneman y Tversky). Esto lleva a <strong>vender en el peor
+                  momento</strong> (en crisis) y comprar tarde (en euforia). Conocer tu perfil te ayuda a
+                  tomar decisiones más racionales y menos emocionales.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Guía Paso a Paso */}
+          <section className={styles.stepGuideSection}>
+            <h2>Cómo Determinar tu Perfil Real en 7 Pasos</h2>
+            <div className={styles.stepGuide}>
+              <div className={styles.stepItem}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <h3>Calcula tu colchón de emergencia</h3>
+                  <p>
+                    Antes de invertir, asegúrate de tener <strong>3–6 meses de gastos fijos</strong> en una
+                    cuenta de fácil acceso. Este dinero nunca debe invertirse con riesgo. Sin colchón,
+                    cualquier imprevisto te forzará a vender inversiones en el peor momento.
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.stepItem}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <h3>Identifica para qué inviertes</h3>
+                  <p>
+                    Define un objetivo concreto: <strong>jubilación, comprar casa en 10 años, educación de hijos
+                    o independencia financiera</strong>. Cada objetivo tiene un horizonte temporal diferente,
+                    lo que determinará cuánto riesgo puedes asumir en esa parte de tu patrimonio.
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.stepItem}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <h3>Determina cuándo necesitarás el dinero</h3>
+                  <p>
+                    Regla general: si necesitas el dinero en <strong>menos de 3 años → conservador</strong>;
+                    en 3–7 años → moderado/equilibrado; en más de 10 años → dinámico/agresivo.
+                    El horizonte temporal es el factor más objetivo para definir tu perfil.
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.stepItem}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepContent}>
+                  <h3>Evalúa tu tolerancia emocional honestamente</h3>
+                  <p>
+                    Imagina que tu cartera de 10.000€ vale 6.000€ mañana. <strong>¿Vendes, mantienes o compras más?</strong>
+                    Tu respuesta honesta vale más que cualquier teoría financiera. Muchos inversores creen ser
+                    agresivos hasta que experimentan su primer mercado bajista real.
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.stepItem}>
+                <div className={styles.stepNumber}>5</div>
+                <div className={styles.stepContent}>
+                  <h3>Completa el test con sinceridad absoluta</h3>
+                  <p>
+                    Responde lo que <strong>harías de verdad</strong>, no lo que &quot;deberías&quot; hacer.
+                    El test mide tu situación real, no tu conocimiento financiero teórico. Engañarse a uno mismo
+                    conduce a tomar un perfil inadecuado y arrepentirse en la primera caída seria del mercado.
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.stepItem}>
+                <div className={styles.stepNumber}>6</div>
+                <div className={styles.stepContent}>
+                  <h3>Ajusta la distribución a tu situación concreta</h3>
+                  <p>
+                    El resultado del test es un <strong>punto de partida, no una sentencia</strong>.
+                    Si tienes deudas de alto interés, págalas primero. Si tienes múltiples fuentes de ingresos,
+                    puedes ser más agresivo. Si dependes de esta inversión para algo concreto, sé más conservador.
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.stepItem}>
+                <div className={styles.stepNumber}>7</div>
+                <div className={styles.stepContent}>
+                  <h3>Empieza con pequeñas aportaciones periódicas</h3>
+                  <p>
+                    El <strong>DCA (aportación periódica)</strong> te permite probar tu tolerancia real al riesgo
+                    con importes pequeños. Invierte 100€/mes durante 6 meses antes de poner grandes cantidades.
+                    Si duermes bien con pérdidas del 15%, puede que seas más agresivo de lo que creías.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Mejores Prácticas */}
+          <section className={styles.tipsSection}>
+            <h2>6 Reglas de Oro del Inversor Inteligente</h2>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🧘</span>
+                <h3>No cambies de perfil en crisis</h3>
+                <p>
+                  Vender en pánico durante una caída es el error más costoso. Tu perfil se elige en calma;
+                  mantenlo en tormenta.
+                </p>
+              </div>
+
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📅</span>
+                <h3>Revisa tu perfil cada año</h3>
+                <p>
+                  Tu situación cambia: ingresos, dependientes, horizonte temporal. Un perfil correcto hoy
+                  puede no serlo en 5 años.
+                </p>
+              </div>
+
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🏦</span>
+                <h3>Separa el fondo de emergencia</h3>
+                <p>
+                  El dinero de emergencias nunca debe invertirse. Tenerlo separado evita vender
+                  inversiones en el peor momento.
+                </p>
+              </div>
+
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🌍</span>
+                <h3>Diversifica globalmente</h3>
+                <p>
+                  No concentres en España ni en Europa. Un ETF global (MSCI World) te da exposición
+                  a más de 1.500 empresas de 23 países desarrollados.
+                </p>
+              </div>
+
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📚</span>
+                <h3>Entiende lo que tienes</h3>
+                <p>
+                  No inviertas en lo que no entiendes. Si no sabes qué hay dentro de tu fondo,
+                  investiga antes de poner dinero real.
+                </p>
+              </div>
+
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>⏳</span>
+                <h3>Invierte solo lo que no necesitas</h3>
+                <p>
+                  Solo invierte dinero que no vayas a necesitar en el horizonte definido.
+                  La necesidad urgente de liquidez provoca los peores errores inversores.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Errores Comunes */}
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Errores Comunes al Elegir tu Perfil Inversor</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Mentirse a uno mismo en el test:</strong> Responder lo que &quot;debería&quot; hacer en vez de
+                lo que harías de verdad lleva a un perfil inadecuado. Sé brutalmente honesto contigo mismo.
+              </li>
+              <li>
+                <strong>Cambiar a conservador en cada caída:</strong> El &quot;market timing&quot; (intentar predecir los
+                movimientos del mercado) destruye rentabilidad. Estadísticamente, los inversores que venden en
+                caídas y recompran tarde obtienen un 2–4% menos anual.
+              </li>
+              <li>
+                <strong>Invertir el fondo de emergencia:</strong> Mezclar el colchón de seguridad con inversiones
+                es el error más peligroso. Te obliga a vender cuando el mercado está bajo para cubrir imprevistos.
+              </li>
+              <li>
+                <strong>Elegir perfil agresivo por euforia del mercado:</strong> Muchos inversores se vuelven
+                &quot;agresivos&quot; cuando la bolsa lleva 3 años subiendo y se arrepienten en el siguiente crash.
+                El perfil debe reflejar tolerancia real al riesgo, no optimismo del momento.
+              </li>
+              <li>
+                <strong>Compararse con otros inversores:</strong> El vecino que ganó 30% con criptomonedas tiene
+                un horizonte, situación y tolerancia al riesgo distinta a la tuya. Tu perfil es personal e
+                intransferible.
+              </li>
+              <li>
+                <strong>No revisar el perfil tras cambios vitales:</strong> Casarse, tener hijos, cambiar de trabajo
+                o acercarse a la jubilación cambian tu perfil óptimo. Un perfil agresivo a los 30 puede ser
+                inadecuado a los 55.
+              </li>
+            </ul>
+          </div>
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('test-perfil-inversor')} />

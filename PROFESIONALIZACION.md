@@ -653,8 +653,10 @@ Si quieres profesionalizar más apps:
   13. Instrumentos Musicales (app/instrumentos-musicales/) - 6 secciones profesionales (Tabla Comparativa 4 familias 7 criterios, Casos de Uso 4 perfiles, FAQ 8 preguntas organología, Guía 6 pasos reconocimiento auditivo, Tips 6 prácticas, Warning 6 errores conceptuales)
   14. Glosario de Programación (app/glosario-programacion/) - 6 secciones profesionales (Tabla Comparativa 4 paradigmas, Casos de Uso 4 perfiles dev, FAQ 8 preguntas técnicas, Guía 6 pasos ruta junior, Tips 6 prácticas aprendizaje, Warning 6 errores conceptuales)
   15. Creador de Paletas (app/creador-paletas/) - 6 secciones profesionales (Tabla Comparativa 6 armonías 5 criterios, Casos de Uso 4 perfiles diseño, FAQ 8 preguntas color/accesibilidad, Guía 6 pasos identidad visual, Tips 6 prácticas, Warning 6 errores de diseño)
+  16. Simulador Genética (app/simulador-genetica/) - 6 secciones profesionales (Tabla Comparativa 4 tipos herencia 6 criterios, Casos de Uso 4 perfiles estudiante/criador/familiar, FAQ 8 preguntas genética, Guía 7 pasos resolver problema genético, Tips 6 prácticas estudio, Warning 6 errores conceptuales)
+  17. Test Perfil Inversor (app/test-perfil-inversor/) - 6 secciones profesionales (Tabla Comparativa 5 perfiles 6 criterios rentabilidad/volatilidad/horizonte, Casos de Uso 4 perfiles vital, FAQ 8 preguntas avanzadas, Guía 7 pasos determinar perfil real, Tips 6 reglas de oro, Warning 6 errores al elegir perfil)
 
-**Última actualización**: 2026-02-19 (Sesión profesionalización x4: huesos, instrumentos, glosario-prog, paletas)
+**Última actualización**: 2026-02-20 (Sesión profesionalización x2: simulador-genetica, test-perfil-inversor)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
 **Versión**: 2.0
-**Apps implementadas**: 19 (3 v1.0 FULL, 2 v1.0 cleanup, 15 v2.0 migradas)
+**Apps implementadas**: 21 (3 v1.0 FULL, 2 v1.0 cleanup, 17 v2.0 migradas)
