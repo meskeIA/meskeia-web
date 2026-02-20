@@ -812,6 +812,484 @@
   border-bottom-color: var(--primary);
 }
 
+/* Sección guía educativa base */
+.guideSection {
+  margin-bottom: 2rem;
+}
+
+.guideSection h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.guideSection h3 {
+  font-size: 1.05rem;
+  color: var(--primary);
+  margin: 1.25rem 0 0.5rem;
+}
+
+.guideSection p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.guideSection ul {
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* ========================================
+   PROFESIONALIZACIÓN - Tabla Comparativa
+   ======================================== */
+
+.comparativaSection {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+}
+
+.comparativaSection h2 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.comparativaSubtitle {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.comparativaTable th {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  border: none;
+}
+
+.comparativaTable td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+[data-theme='dark'] .comparativaTable {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   PROFESIONALIZACIÓN - Casos de Uso
+   ======================================== */
+
+.escenariosSection {
+  margin-bottom: 2rem;
+}
+
+.escenariosSection h2 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.escenariosSubtitle {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.escenarioCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.escenarioIcon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.escenarioHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.escenarioExample {
+  background: #f8f9fa;
+  border-left: 3px solid var(--primary);
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin: 1rem 0;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.escenarioExample p {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--primary);
+}
+
+.escenarioExample code {
+  display: block;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+}
+
+.escenarioTip {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.escenarioTip strong {
+  color: var(--primary);
+}
+
+/* ========================================
+   PROFESIONALIZACIÓN - FAQ Ampliado
+   ======================================== */
+
+.faqSection {
+  margin-bottom: 2rem;
+}
+
+.faqSection h2 {
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.faqItem:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.faqItem h4 {
+  margin: 0 0 0.75rem;
+  color: var(--primary);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.faqItem p {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.faqItem p:last-child {
+  margin-bottom: 0;
+}
+
+.faqTip {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(46, 134, 171, 0.1);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+/* ========================================
+   PROFESIONALIZACIÓN - Guía Paso a Paso
+   ======================================== */
+
+.stepGuideSection {
+  margin-bottom: 2rem;
+}
+
+.stepGuideSection h2 {
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.stepItem {
+  display: flex;
+  gap: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.25rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.stepItem:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.3);
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   PROFESIONALIZACIÓN - Mejores Prácticas
+   ======================================== */
+
+.tipsSection {
+  margin-bottom: 2rem;
+}
+
+.tipsSection h2 {
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.tipCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.tipIcon {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tipCard h4 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   PROFESIONALIZACIÓN - Warning Box
+   ======================================== */
+
+.warningBox {
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+  border: 2px solid #f59e0b;
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+[data-theme='dark'] .warningBox {
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.08));
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.warningIcon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.warningHeader h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningList li {
+  padding: 0.85rem 1rem;
+  background: var(--bg-card);
+  border-left: 4px solid #f59e0b;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   RESPONSIVE - Breakpoints profesionalización
+   ======================================== */
+
+@media (max-width: 900px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .comparativaTable {
+    font-size: 0.85rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .stepItem {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaSection {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .escenarioCard,
+  .faqItem,
+  .stepItem,
+  .tipCard {
+    transition: none;
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .title {
