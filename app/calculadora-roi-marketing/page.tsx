@@ -713,6 +713,299 @@ export default function CalculadoraROIMarketingPage() {
             <li><strong>LinkedIn Ads:</strong> ROI 50-200% (B2B, tickets altos)</li>
           </ul>
         </section>
+
+        {/* --- SECCIÓN 2: Tabla Comparativa de Canales --- */}
+        <section className={styles.eduComparativaSection}>
+          <h3>📊 Comparativa de Canales de Marketing</h3>
+          <p className={styles.eduComparativaSubtitle}>Benchmarks orientativos para España 2025. Los resultados reales dependen del sector, la creatividad y la optimización de cada cuenta.</p>
+          <div className={styles.eduTablaWrapper}>
+            <table className={styles.eduTablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Canal</th>
+                  <th>ROI Típico</th>
+                  <th>ROAS Mínimo</th>
+                  <th>CPL Medio</th>
+                  <th>Mejor Para</th>
+                  <th>Horizonte</th>
+                  <th>Dificultad</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🔍 Google Ads (Search)</td>
+                  <td>200–400%</td>
+                  <td>3–5x</td>
+                  <td>15–80 €</td>
+                  <td>Demanda activa</td>
+                  <td>Inmediato</td>
+                  <td>Media</td>
+                </tr>
+                <tr>
+                  <td>📱 Meta Ads (FB/IG)</td>
+                  <td>100–300%</td>
+                  <td>2–4x</td>
+                  <td>5–40 €</td>
+                  <td>Awareness + Remarketing</td>
+                  <td>1–3 meses</td>
+                  <td>Media-Alta</td>
+                </tr>
+                <tr>
+                  <td>📧 Email Marketing</td>
+                  <td>3.000–4.200%</td>
+                  <td>–</td>
+                  <td>1–5 €</td>
+                  <td>Retención y fidelización</td>
+                  <td>Inmediato</td>
+                  <td>Baja</td>
+                </tr>
+                <tr>
+                  <td>🌐 SEO Orgánico</td>
+                  <td>500–2.000%</td>
+                  <td>–</td>
+                  <td>Casi 0 €</td>
+                  <td>Tráfico sostenible</td>
+                  <td>6–12 meses</td>
+                  <td>Alta</td>
+                </tr>
+                <tr>
+                  <td>💼 LinkedIn Ads</td>
+                  <td>50–200%</td>
+                  <td>2–3x</td>
+                  <td>40–150 €</td>
+                  <td>B2B, decisores</td>
+                  <td>3–6 meses</td>
+                  <td>Alta</td>
+                </tr>
+                <tr>
+                  <td>🎵 TikTok Ads</td>
+                  <td>80–250%</td>
+                  <td>2–4x</td>
+                  <td>3–20 €</td>
+                  <td>Público joven, productos virales</td>
+                  <td>1–2 meses</td>
+                  <td>Media</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* --- SECCIÓN 3: Casos de Uso por Tipo de Negocio --- */}
+        <section className={styles.eduEscenariosSection}>
+          <h3>💼 Casos de Uso por Tipo de Negocio</h3>
+          <p className={styles.eduEscenariosSubtitle}>Estrategias reales adaptadas a diferentes modelos de negocio en el mercado español.</p>
+          <div className={styles.eduEscenariosGrid}>
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon}>🛒</span>
+                <h4>Ecommerce — Moda</h4>
+              </div>
+              <p className={styles.eduEscenarioExample}>
+                Inversión: 2.000 €/mes entre Google Shopping (50%), Meta Ads (30%) y Email (20%). CLV medio: 280 €. CAC objetivo máximo: 35 €. ROAS mínimo rentable: 3,5x.
+              </p>
+              <p className={styles.eduEscenarioTip}>💡 Email Marketing da el mayor ROI: cuida tu lista como un activo estratégico.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon}>💻</span>
+                <h4>SaaS B2B — Software</h4>
+              </div>
+              <p className={styles.eduEscenarioExample}>
+                Inversión: 5.000 €/mes en LinkedIn Ads (40%), Google Search (40%) y SEO/Contenidos (20%). CLV medio: 4.800 €/año. CAC objetivo: hasta 600 €. Ciclo de venta: 30–90 días.
+              </p>
+              <p className={styles.eduEscenarioTip}>💡 Ratio CLV/CAC de 8:1 justifica un CAC elevado. No optimices solo para CPL bajo.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon}>🏠</span>
+                <h4>Negocio Local — Clínica</h4>
+              </div>
+              <p className={styles.eduEscenarioExample}>
+                Inversión: 800 €/mes en Google Ads Local (60%) y Meta Local (40%). Ticket medio primera cita: 90 €. CLV recurrente: 1.200 €. CAC máximo permitido: 120 €.
+              </p>
+              <p className={styles.eduEscenarioTip}>💡 Usa extensiones de llamada y ubicación. El 70% de los clics locales son desde móvil.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon}>🎓</span>
+                <h4>Infoproductos — Cursos Online</h4>
+              </div>
+              <p className={styles.eduEscenarioExample}>
+                Inversión: 3.000 €/mes en Meta Ads (60%), Email a lista propia (20%) y YouTube orgánico (20%). Precio producto: 497 €. CAC objetivo: 80–120 €. ROI objetivo: 300–500%.
+              </p>
+              <p className={styles.eduEscenarioTip}>💡 El webinar como embudo convierte 3–5x más que la venta directa desde anuncio.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* --- SECCIÓN 4: FAQ Avanzado --- */}
+        <section className={styles.eduFaqSection}>
+          <h3>❓ Preguntas Frecuentes sobre ROI en Marketing</h3>
+          <p className={styles.eduFaqSubtitle}>Respuestas a las dudas más habituales al analizar la rentabilidad de tus campañas.</p>
+          <div className={styles.eduFaqList}>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cuál es el ROAS mínimo para que una campaña sea rentable?</h4>
+              <p>Depende de tu margen bruto. Si vendes con un margen del 30%, necesitas ROAS ≥ 3,33x para cubrir costes. Fórmula: ROAS mínimo = 1 / Margen bruto. Por debajo de ese umbral, cada venta genera pérdida.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cuándo debería pausar un canal con ROI negativo?</h4>
+              <p>Antes de pausar, analiza si el canal está en fase de aprendizaje (primeras 2–4 semanas), si el problema es creativo o de segmentación, y si tiene valor de marca no medido. Pausa si tras 60 días optimizando el ROI sigue negativo.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cómo afecta la atribución multicanal al ROI calculado?</h4>
+              <p>La atribución al último clic sobrevalora al canal que cierra la venta (normalmente Search) y subvalora al que genera conciencia (Display, Social). Usa modelos de atribución basados en datos o lineal en GA4 para una visión más justa.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Qué CAC es razonable para mi sector?</h4>
+              <p>La regla general es CAC ≤ 1/3 del CLV (ratio CLV/CAC ≥ 3:1). En ecommerce: 20–80 €. En SaaS B2B: 500–3.000 €. En seguros: 100–300 €. En inmobiliaria: 500–2.000 €. En servicios locales: 30–150 €.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cuál es la diferencia entre ROI y ROAS?</h4>
+              <p>ROI incluye todos los costes (producción, personal, herramientas, plataforma) y mide el beneficio real. ROAS solo divide ingresos entre gasto en plataforma publicitaria. Un ROAS de 5x puede tener ROI negativo si los costes operativos son altos.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cómo calcular el CLV si tengo clientes de larga duración?</h4>
+              <p>CLV = Ticket medio × Frecuencia anual × Años de retención media. Ejemplo: 80 € × 4 compras/año × 3 años = 960 €. Alternativa: CLV = Margen bruto anual por cliente / Tasa de churn anual.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Debo incluir el coste de la agencia en la inversión?</h4>
+              <p>Sí, siempre. Un ROI calculado sin incluir fees de agencia o coste de gestión interna está inflado artificialmente. El coste real incluye: inversión en plataforma + gestión + creatividades + herramientas de analítica.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cada cuánto revisar el ROI por canal?</h4>
+              <p>Micro-optimizaciones: diariamente o 3 veces/semana. Decisiones estratégicas (pausar/escalar): mensualmente, con al menos 30 días de datos y 100+ conversiones por canal para significancia estadística.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* --- SECCIÓN 5: Guía Paso a Paso --- */}
+        <section className={styles.eduStepSection}>
+          <h3>🗺️ Guía: Cómo Optimizar tu Mix de Marketing en 7 Pasos</h3>
+          <p className={styles.eduStepSubtitle}>Proceso sistemático para redistribuir presupuesto y maximizar el ROI global de todos tus canales.</p>
+          <div className={styles.eduStepGuide}>
+            <div className={styles.eduStepItem}>
+              <span className={styles.eduStepNumber}>1</span>
+              <div className={styles.eduStepContent}>
+                <h4>Audita tus canales actuales</h4>
+                <p>Introduce en la calculadora los datos reales de los últimos 90 días de cada canal. Usa datos completos: incluye gastos de gestión, herramientas y producción de creatividades.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <span className={styles.eduStepNumber}>2</span>
+              <div className={styles.eduStepContent}>
+                <h4>Calcula tu CLV real</h4>
+                <p>No uses el precio de primera compra. Analiza cuánto gasta un cliente durante 12–36 meses. Segmenta por canal de adquisición: los clientes de SEO suelen tener mayor LTV que los de Social Ads.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <span className={styles.eduStepNumber}>3</span>
+              <div className={styles.eduStepContent}>
+                <h4>Fija tu CAC máximo por canal</h4>
+                <p>Define el CAC máximo que puedes permitirte según el CLV esperado. Los canales con CLV alto (B2B, clientes recurrentes) admiten un CAC mayor que los transaccionales de ticket bajo.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <span className={styles.eduStepNumber}>4</span>
+              <div className={styles.eduStepContent}>
+                <h4>Identifica el canal con mejor ratio CLV/CAC</h4>
+                <p>Es tu candidato a escalar primero. Antes de escalar, verifica que el CAC no se dispara al aumentar presupuesto (efecto de saturación de audiencia).</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <span className={styles.eduStepNumber}>5</span>
+              <div className={styles.eduStepContent}>
+                <h4>Redistribuye presupuesto hacia los canales ganadores</h4>
+                <p>Reasigna entre un 20–40% del presupuesto de canales con ROI bajo hacia los de mayor ROI. Hazlo gradualmente: los algoritmos de las plataformas necesitan tiempo de reaprendizaje.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <span className={styles.eduStepNumber}>6</span>
+              <div className={styles.eduStepContent}>
+                <h4>Mantén siempre un canal de demanda orgánica</h4>
+                <p>SEO y Email Marketing son activos propios: no dependes de plataformas terceras ni de subidas de CPC. Destina al menos un 20% del presupuesto a canales propios.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <span className={styles.eduStepNumber}>7</span>
+              <div className={styles.eduStepContent}>
+                <h4>Revisa el mix mensualmente, no el canal individualmente</h4>
+                <p>El marketing multicanal tiene efectos sinérgicos: un lead de LinkedIn puede convertir después de un anuncio de remarketing de Meta. Evalúa el ROI global del mix, no solo canal a canal.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* --- SECCIÓN 6: Mejores Prácticas --- */}
+        <section className={styles.eduTipsSection}>
+          <h3>⚡ 6 Reglas del Marketing Rentable</h3>
+          <div className={styles.eduTipsGrid}>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>📏</span>
+              <h4>Mide conversiones, no clics</h4>
+              <p>El CTR alto con conversión baja es ruido. Configura Google Analytics 4 y los píxeles de conversión correctamente antes de lanzar cualquier campaña.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🎯</span>
+              <h4>Define el CAC máximo antes de gastar</h4>
+              <p>Sin un CAC máximo definido, optimizarás por volumen de clientes en lugar de por rentabilidad. Tu CAC máximo = CLV × Margen objetivo / Periodo de recuperación.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🔄</span>
+              <h4>El remarketing tiene el mejor ROI</h4>
+              <p>Las audiencias que ya conocen tu marca convierten 3–7x más que el tráfico frío. Destina al menos el 20% del presupuesto en Social y Display a remarketing.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>📧</span>
+              <h4>Email es el canal con mayor ROI</h4>
+              <p>Con ROI medio de 3.500–4.200%, el email supera a todos los canales de pago. Una lista de email de calidad es el mejor activo de marketing a largo plazo.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>⏳</span>
+              <h4>Respeta el periodo de aprendizaje</h4>
+              <p>Los algoritmos de Meta y Google necesitan 50–100 conversiones para optimizar bien. No realices cambios bruscos en los primeros 7–14 días de una campaña nueva.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🌱</span>
+              <h4>Diversifica sin dispersar</h4>
+              <p>2–3 canales bien trabajados dan mejores resultados que 8 canales mal optimizados. Domina un canal antes de añadir el siguiente. La dispersión destruye el ROI.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* --- SECCIÓN 7: Warning Box --- */}
+        <section className={styles.eduWarningBox}>
+          <div className={styles.eduWarningHeader}>
+            <span className={styles.eduWarningIcon}>⚠️</span>
+            <h3>Errores que Destruyen el ROI de tus Campañas</h3>
+          </div>
+          <ul className={styles.eduWarningList}>
+            <li>
+              <span>🔴</span>
+              <span><strong>Optimizar solo para el último clic.</strong> El canal que cierra la venta recibe todo el crédito, aunque el usuario te conoció por otro canal. Usa atribución basada en datos en GA4.</span>
+            </li>
+            <li>
+              <span>🔴</span>
+              <span><strong>Ignorar el coste total de gestión.</strong> Una agencia cobra 1.500 €/mes por gestionar 3.000 € en plataformas. Tu ROI real es sobre 4.500 €, no sobre 3.000 €. Incluye siempre todos los costes.</span>
+            </li>
+            <li>
+              <span>🔴</span>
+              <span><strong>Pausar campañas en el período de aprendizaje.</strong> Pausar o modificar campañas en las primeras 2 semanas reinicia el aprendizaje del algoritmo. Da tiempo antes de tomar decisiones.</span>
+            </li>
+            <li>
+              <span>🔴</span>
+              <span><strong>No segmentar por canal de adquisición en CRM.</strong> Sin saber qué canal genera clientes con mayor CLV, redistribuirás el presupuesto por volumen y no por rentabilidad real a largo plazo.</span>
+            </li>
+            <li>
+              <span>🔴</span>
+              <span><strong>Usar el presupuesto de marketing como colchón de emergencia.</strong> Cuando las ventas bajan, recortar marketing reduce las ventas aún más. El presupuesto debe ser fijo y planificado anualmente.</span>
+            </li>
+            <li>
+              <span>🔴</span>
+              <span><strong>Confundir ROAS con ROI.</strong> Un ROAS de 6x con costes de gestión y producción del 40% puede tener un ROI del 20%. Calcula siempre el ROI incluyendo todos los costes asociados.</span>
+            </li>
+          </ul>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-roi-marketing')} />
