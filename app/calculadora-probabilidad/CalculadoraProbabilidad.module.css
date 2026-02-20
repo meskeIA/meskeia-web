@@ -296,3 +296,276 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Sección educativa */
+.educationalContent {
+  margin-top: var(--spacing-xl);
+}
+
+/* Disclaimer List */
+.disclaimerList {
+  margin: var(--spacing-sm) 0 0 var(--spacing-md);
+  padding: 0;
+  list-style: disc;
+}
+
+.disclaimerList li {
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Tabla Comparativa */
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.875rem;
+}
+
+.tablaComparativa th,
+.tablaComparativa td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.tablaComparativa th {
+  background: var(--hover);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tablaComparativa td {
+  color: var(--text-secondary);
+}
+
+.tablaComparativa tr:hover td {
+  background: var(--hover);
+}
+
+/* Casos de Uso */
+.casosUsoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.casoCard {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--primary);
+  transition: box-shadow 0.2s ease;
+}
+
+.casoCard:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.casoIcon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.casoTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.casoSubtitle {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.casoDesc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.faqPregunta {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--hover);
+  border-bottom: 1px solid var(--border);
+}
+
+.faqRespuesta {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* Pasos (Guía) */
+.pasosList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.paso {
+  display: flex;
+  gap: var(--spacing-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  align-items: flex-start;
+}
+
+.pasoNum {
+  background: var(--primary);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.pasoContent {
+  flex: 1;
+}
+
+.pasoTitle {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.pasoDesc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Tips y Errores */
+.tipsErrorsSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+.tipsColumn {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.tipsHeader {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--success);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--success);
+}
+
+.errorsHeader {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--danger);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--danger);
+}
+
+.tipItem {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border);
+  padding-left: var(--spacing-md);
+  position: relative;
+}
+
+.tipItem::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--success);
+  font-weight: 700;
+}
+
+.tipItem:last-child {
+  border-bottom: none;
+}
+
+.errorItem {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border);
+  padding-left: var(--spacing-md);
+  position: relative;
+}
+
+.errorItem::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.errorItem:last-child {
+  border-bottom: none;
+}
+
+/* Responsive educativo */
+@media (max-width: 768px) {
+  .casosUsoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsErrorsSection {
+    grid-template-columns: 1fr;
+  }
+
+  .tablaComparativa {
+    font-size: 0.75rem;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .paso {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+}
