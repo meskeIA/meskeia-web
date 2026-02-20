@@ -767,6 +767,434 @@ export default function CalculadoraInversionesPage() {
             </div>
           </div>
         </section>
+
+        {/* Tabla Comparativa de Tipos de Activos */}
+        <section className={styles.eduComparativaSection}>
+          <h2>Comparativa de Tipos de Activos</h2>
+          <p className={styles.eduComparativaSubtitle}>
+            Características clave de cada clase de activo para diseñar una cartera equilibrada
+          </p>
+          <div className={styles.eduTableWrapper}>
+            <table className={styles.eduComparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>📈 Acciones RV</th>
+                  <th>📊 Bonos RF</th>
+                  <th>🏠 REITs</th>
+                  <th>🪙 Materias Primas</th>
+                  <th>💵 Liquidez</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Rentabilidad esperada</strong></td>
+                  <td>7–10%</td>
+                  <td>3–5%</td>
+                  <td>5–8%</td>
+                  <td>2–5%</td>
+                  <td>2–4%</td>
+                </tr>
+                <tr>
+                  <td><strong>Volatilidad anual</strong></td>
+                  <td>15–20%</td>
+                  <td>5–8%</td>
+                  <td>12–18%</td>
+                  <td>15–25%</td>
+                  <td>&lt;1%</td>
+                </tr>
+                <tr>
+                  <td><strong>Horizonte ideal</strong></td>
+                  <td>+10 años</td>
+                  <td>3–7 años</td>
+                  <td>+7 años</td>
+                  <td>Táctica</td>
+                  <td>1–3 años</td>
+                </tr>
+                <tr>
+                  <td><strong>Correlación con RV</strong></td>
+                  <td>Alta (+1)</td>
+                  <td>Baja/negativa</td>
+                  <td>Media (0,6)</td>
+                  <td>Baja (0,2)</td>
+                  <td>Ninguna</td>
+                </tr>
+                <tr>
+                  <td><strong>Liquidez inmediata</strong></td>
+                  <td>Alta (mercado)</td>
+                  <td>Media</td>
+                  <td>Alta (ETF)</td>
+                  <td>Alta (ETF)</td>
+                  <td>Inmediata</td>
+                </tr>
+                <tr>
+                  <td><strong>Uso en cartera</strong></td>
+                  <td>Motor de crecimiento</td>
+                  <td>Amortiguador</td>
+                  <td>Diversificación</td>
+                  <td>Cobertura inflación</td>
+                  <td>Fondo emergencia</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de Uso por Perfil de Inversor */}
+        <section className={styles.eduEscenariosSection}>
+          <h2>Carteras Reales por Perfil de Capital</h2>
+          <p className={styles.eduEscenariosSubtitle}>
+            Cómo distribuiría la calculadora distintos capitales según perfil y horizonte
+          </p>
+          <div className={styles.eduEscenariosGrid}>
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon}>🌱</span>
+                <h3>Primer inversor</h3>
+              </div>
+              <div className={styles.eduEscenarioExample}>
+                <p>Configuración:</p>
+                <code>Capital: 10.000€ · Perfil: Moderado · Horizonte: 10 años · Edad: 28</code>
+              </div>
+              <p className={styles.eduEscenarioTip}>
+                <strong>Distribución: 30% RV · 50% RF · 15% Liquidez · 5% Alt.</strong> Capital modesto
+                con horizonte medio. Priorizar fondos indexados de bajo coste. Meta: aprender
+                gestionando sin riesgo excesivo.
+              </p>
+            </div>
+
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon}>🎯</span>
+                <h3>Inversor intermedio</h3>
+              </div>
+              <div className={styles.eduEscenarioExample}>
+                <p>Configuración:</p>
+                <code>Capital: 50.000€ · Perfil: Equilibrado · Horizonte: 15 años · Edad: 38</code>
+              </div>
+              <p className={styles.eduEscenarioTip}>
+                <strong>Distribución: 50% RV · 35% RF · 10% Liquidez · 5% Alt.</strong> Cartera 60/40
+                clásica con mayor peso en renta variable. Ideal para objetivo de independencia financiera
+                o complementar jubilación.
+              </p>
+            </div>
+
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon}>🚀</span>
+                <h3>Inversor avanzado</h3>
+              </div>
+              <div className={styles.eduEscenarioExample}>
+                <p>Configuración:</p>
+                <code>Capital: 200.000€ · Perfil: Dinámico · Horizonte: 20 años · Edad: 42</code>
+              </div>
+              <p className={styles.eduEscenarioTip}>
+                <strong>Distribución: 70% RV · 20% RF · 5% Liquidez · 5% Alt.</strong> Capital elevado
+                permite mayor exposición a renta variable. Considera factor investing (small caps, value)
+                y mercados emergentes para potenciar rentabilidad.
+              </p>
+            </div>
+
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon}>🛡️</span>
+                <h3>Jubilado / Preservación</h3>
+              </div>
+              <div className={styles.eduEscenarioExample}>
+                <p>Configuración:</p>
+                <code>Capital: 300.000€ · Perfil: Conservador · Horizonte: 3 años · Edad: 65</code>
+              </div>
+              <p className={styles.eduEscenarioTip}>
+                <strong>Distribución: 15% RV · 60% RF · 20% Liquidez · 5% Alt.</strong> Objetivo:
+                preservar capital y generar rentas. La regla del 4% permite retirar 12.000€/año
+                manteniendo el patrimonio a largo plazo.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Avanzado */}
+        <section className={styles.eduFaqSection}>
+          <h2>Preguntas Frecuentes sobre Asignación de Activos</h2>
+          <div className={styles.eduFaqList}>
+            <div className={styles.eduFaqItem}>
+              <h3>¿Qué es el Ratio Sharpe y cómo interpreto el que muestra la calculadora?</h3>
+              <p>
+                El <strong>Ratio Sharpe mide la rentabilidad ajustada al riesgo</strong>: cuánta rentabilidad
+                extra obtienes por cada unidad de riesgo asumida. Un Sharpe &gt; 1 es bueno, &gt; 2 es excelente.
+                Si la calculadora muestra 0,8 para tu perfil equilibrado, significa que por cada 1% de volatilidad
+                extra, obtienes 0,8% de rentabilidad adicional sobre la tasa libre de riesgo.
+              </p>
+              <p className={styles.eduFaqTip}>
+                💡 El perfil equilibrado suele tener el mejor Ratio Sharpe de todos, no el agresivo.
+                Más rentabilidad bruta no significa mejor rentabilidad ajustada al riesgo.
+              </p>
+            </div>
+
+            <div className={styles.eduFaqItem}>
+              <h3>¿Cuándo y cómo debo rebalancear mi cartera?</h3>
+              <p>
+                Rebalancea cuando tu distribución real se desvíe <strong>más de un 5% del objetivo</strong>
+                (por ejemplo: objetivo 50% RV y tienes 57% tras un año alcista en bolsa).
+                Hazlo <strong>una vez al año</strong> o tras movimientos excepcionales del mercado.
+                La forma más eficiente: añade nuevas aportaciones al activo infraponderado antes de vender.
+              </p>
+            </div>
+
+            <div className={styles.eduFaqItem}>
+              <h3>¿Qué diferencia hay entre un ETF y un fondo indexado?</h3>
+              <p>
+                Ambos replican un índice de forma pasiva, pero los ETFs <strong>cotizan en bolsa</strong>
+                (puedes comprar/vender en cualquier momento de la sesión) mientras que los fondos indexados
+                solo se valoran una vez al día. Los ETFs suelen tener menor TER pero requieren bróker.
+                Los fondos indexados permiten traspasos sin tributación en España, ventaja fiscal exclusiva.
+              </p>
+            </div>
+
+            <div className={styles.eduFaqItem}>
+              <h3>¿Cuánto destruyen realmente las comisiones a largo plazo?</h3>
+              <p>
+                El impacto es devastador: <strong>1% anual de comisiones reduce el capital final en ~25%
+                en 30 años</strong>. Con 100.000€ al 7% durante 30 años: sin comisiones → 761.000€;
+                con 1% comisiones → 574.000€; con 2% comisiones → 432.000€. La diferencia (187.000€)
+                se la lleva la gestora. Los ETFs de bajo coste tienen TER del 0,07–0,2%.
+              </p>
+            </div>
+
+            <div className={styles.eduFaqItem}>
+              <h3>¿Qué son los REITs y merece la pena incluirlos?</h3>
+              <p>
+                Los <strong>REITs (Real Estate Investment Trusts)</strong> son fondos de inversión inmobiliaria
+                cotizados. Distribuyen el 90% de sus beneficios como dividendos, ofrecen exposición inmobiliaria
+                sin comprar un piso y tienen correlación media con la renta variable. Son especialmente útiles
+                como cobertura contra inflación y para diversificar sin sacrificar liquidez.
+              </p>
+              <p className={styles.eduFaqTip}>
+                💡 Muchos ETFs globales ya incluyen REITs en su composición. Antes de añadirlos
+                por separado, comprueba si tu ETF principal ya tiene exposición inmobiliaria.
+              </p>
+            </div>
+
+            <div className={styles.eduFaqItem}>
+              <h3>¿Cuándo usar el modo Comparador vs la Calculadora?</h3>
+              <p>
+                Usa la <strong>Calculadora</strong> para diseñar tu cartera según tu perfil y ver la proyección.
+                Usa el <strong>Comparador</strong> para analizar distintos capitales con el mismo perfil:
+                por ejemplo, si recibes una herencia y quieres ver si invertir 50.000€, 100.000€ o 150.000€
+                cambia significativamente tu situación a 15 años.
+              </p>
+            </div>
+
+            <div className={styles.eduFaqItem}>
+              <h3>¿Es mejor invertir todo de golpe o en aportaciones periódicas?</h3>
+              <p>
+                Estadísticamente, invertir todo de golpe (<strong>lump sum</strong>) supera al DCA en ~2/3 de los casos
+                porque el mercado sube más tiempo del que baja. Pero si tienes miedo a una caída justo después
+                de invertir, el DCA mensual reduce el riesgo psicológico y garantiza disciplina. Para capitales
+                grandes (herencias, bonus), considera un DCA de 6–12 meses como compromiso.
+              </p>
+            </div>
+
+            <div className={styles.eduFaqItem}>
+              <h3>¿Qué pasa si necesito el dinero antes del horizonte planificado?</h3>
+              <p>
+                Si necesitas retirar antes, hazlo en el siguiente orden de prioridad: <strong>primero liquidez</strong>
+                (sin pérdidas), luego renta fija (pérdidas pequeñas), y solo en último lugar renta variable
+                (puede estar en pérdidas). Por esto, el horizonte temporal es el factor más importante antes
+                de elegir perfil. Si tienes dudas sobre cuándo necesitarás el dinero, sé más conservador.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Guía Paso a Paso */}
+        <section className={styles.eduStepSection}>
+          <h2>Cómo Construir tu Primera Cartera de Inversión en 7 Pasos</h2>
+          <div className={styles.eduStepGuide}>
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber}>1</div>
+              <div className={styles.eduStepContent}>
+                <h3>Define tu objetivo financiero concreto</h3>
+                <p>
+                  No &quot;quiero invertir&quot;, sino <strong>&quot;quiero 200.000€ en 20 años para la jubilación&quot;</strong>.
+                  El objetivo determina el horizonte, que determina el perfil, que determina la distribución.
+                  Sin objetivo claro, tenderás a cambiar de estrategia en cada crisis.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber}>2</div>
+              <div className={styles.eduStepContent}>
+                <h3>Asegura tu colchón de emergencia antes de invertir</h3>
+                <p>
+                  <strong>3–6 meses de gastos fijos</strong> en una cuenta remunerada o fondo monetario.
+                  Este dinero nunca se invierte. Sin colchón, venderás en el peor momento si surge un imprevisto,
+                  cristalizando pérdidas y rompiendo el plan.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber}>3</div>
+              <div className={styles.eduStepContent}>
+                <h3>Realiza el Test de Perfil Inversor honestamente</h3>
+                <p>
+                  Usa el <strong>Test de Perfil Inversor</strong> de meskeIA para obtener tu perfil real.
+                  Responde cómo actuarías de verdad en una caída del 30%, no cómo crees que deberías actuar.
+                  Un perfil agresivo que no puedes mantener en crisis es peor que uno conservador.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber}>4</div>
+              <div className={styles.eduStepContent}>
+                <h3>Selecciona 2–3 ETFs de bajo coste como base</h3>
+                <p>
+                  Una cartera sencilla funciona: <strong>ETF global (MSCI World Acc) + ETF renta fija + liquidez</strong>.
+                  No necesitas 15 fondos. La simplicidad reduce costes, errores y tentaciones de cambiar.
+                  El TER total de tu cartera debería ser inferior al 0,3% anual.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber}>5</div>
+              <div className={styles.eduStepContent}>
+                <h3>Abre una cuenta en un bróker de bajo coste</h3>
+                <p>
+                  Interactive Brokers, Trade Republic, MyInvestor, Indexa Capital o Finizens son opciones
+                  populares en España. Compara <strong>comisiones de custodia, compraventa y cambio de divisa</strong>.
+                  Para carteras pasivas, los robo-advisors como Indexa son una opción excelente para principiantes.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber}>6</div>
+              <div className={styles.eduStepContent}>
+                <h3>Ejecuta y automatiza aportaciones periódicas</h3>
+                <p>
+                  Realiza la inversión inicial y configura <strong>aportaciones mensuales automáticas</strong>.
+                  El DCA automático garantiza disciplina y elimina el &quot;timing&quot;. Trata la inversión como
+                  un gasto fijo más, no como algo opcional que harás cuando &quot;sobre&quot; dinero.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber}>7</div>
+              <div className={styles.eduStepContent}>
+                <h3>Revisa anualmente y rebalancea si es necesario</h3>
+                <p>
+                  Una vez al año, comprueba que la distribución real sigue alineada con tu objetivo.
+                  Si la RV ha crecido del 50% al 60%, <strong>vende RV y compra RF</strong> para volver al 50/50.
+                  No hagas cambios más frecuentes: el exceso de trading destruye rentabilidad.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mejores Prácticas */}
+        <section className={styles.eduTipsSection}>
+          <h2>6 Principios del Inversor Pasivo Exitoso</h2>
+          <div className={styles.eduTipsGrid}>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🌍</span>
+              <h3>Diversifica por activo y geografía</h3>
+              <p>
+                Un ETF global cubre 1.500+ empresas de 23 países. No concentres en España,
+                Europa ni en un solo sector.
+              </p>
+            </div>
+
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🔄</span>
+              <h3>Rebalancea una vez al año</h3>
+              <p>
+                El rebalanceo anual fuerza a comprar barato y vender caro sistemáticamente.
+                Más frecuencia genera costes innecesarios.
+              </p>
+            </div>
+
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>💸</span>
+              <h3>Minimiza el TER total</h3>
+              <p>
+                El coste total de tu cartera debería ser inferior al 0,3% anual. Cada 0,1%
+                adicional reduce significativamente el capital final a 20 años.
+              </p>
+            </div>
+
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>📅</span>
+              <h3>No persigas rentabilidades pasadas</h3>
+              <p>
+                El fondo más rentable del año pasado raramente repite. Mantén tu estrategia
+                y evita el &quot;chasing performance&quot;.
+              </p>
+            </div>
+
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🏦</span>
+              <h3>Separa objetivos por horizonte</h3>
+              <p>
+                Corto plazo (1–3 años) → liquidez/RF. Medio plazo (3–7 años) → mixto.
+                Largo plazo (+10 años) → RV dominante.
+              </p>
+            </div>
+
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🧘</span>
+              <h3>Ignora el ruido del mercado</h3>
+              <p>
+                Las noticias económicas diarias son ruido para el inversor a largo plazo.
+                Revisa tu cartera mensualmente, no diariamente.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Errores Comunes */}
+        <div className={styles.eduWarningBox}>
+          <div className={styles.eduWarningHeader}>
+            <span className={styles.eduWarningIcon}>⚠️</span>
+            <h3>Errores Comunes al Diseñar una Cartera de Inversión</h3>
+          </div>
+          <ul className={styles.eduWarningList}>
+            <li>
+              <strong>Sobreconcentrar en un solo activo o sector:</strong> Tener el 100% en acciones tecnológicas
+              o en un único ETF de mercados emergentes aumenta innecesariamente el riesgo específico. La diversificación
+              es el único &quot;almuerzo gratis&quot; en finanzas.
+            </li>
+            <li>
+              <strong>Ignorar las comisiones de gestión:</strong> Un fondo activo al 2% de TER frente a un ETF al 0,1%
+              supone una diferencia de 600.000€ en una cartera de 100.000€ a 30 años. Las comisiones se pagan siempre,
+              ganes o pierdas.
+            </li>
+            <li>
+              <strong>Rebalancear con demasiada frecuencia:</strong> Rebalancear mensualmente genera costes de transacción
+              y posibles eventos fiscales. Una vez al año (o cuando la desviación supere el 5%) es suficiente y más eficiente.
+            </li>
+            <li>
+              <strong>Perseguir la &quot;inversión del momento&quot;:</strong> Criptomonedas en 2021, tecnología en 2023,
+              IA en 2024... Comprar lo que está de moda después de una gran subida es comprar caro. Tu perfil de riesgo,
+              no las tendencias, debe guiar tu cartera.
+            </li>
+            <li>
+              <strong>Mezclar el fondo de emergencia con la cartera de inversión:</strong> El fondo de emergencia debe
+              estar siempre en liquidez inmediata. Mezclarlo con tu cartera te forzará a vender inversiones en mal momento
+              cuando surja un imprevisto.
+            </li>
+            <li>
+              <strong>Cambiar de estrategia en cada caída del mercado:</strong> Pasar de agresivo a conservador después
+              de una caída del 20% cristaliza las pérdidas y te hace perderte el rebote. Los cambios de perfil deben
+              obedecer a cambios en tu situación vital, no a los movimientos del mercado.
+            </li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-inversiones')} />

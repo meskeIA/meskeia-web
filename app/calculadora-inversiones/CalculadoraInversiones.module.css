@@ -510,6 +510,455 @@
   line-height: 1.6;
 }
 
+/* === SECCIONES PROFESIONALES (prefijo edu para evitar conflictos) === */
+
+.eduComparativaSection {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+}
+
+.eduComparativaSection h2 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.eduComparativaSubtitle {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.eduTableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.eduComparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.eduComparativaTable th {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  border: none;
+}
+
+.eduComparativaTable td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.eduComparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.eduComparativaTable tbody tr:hover {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .eduComparativaTable {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.eduEscenariosSection {
+  margin-bottom: 2rem;
+}
+
+.eduEscenariosSection h2 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.eduEscenariosSubtitle {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.eduEscenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.eduEscenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.eduEscenarioCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.eduEscenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.eduEscenarioIcon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.eduEscenarioHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.eduEscenarioExample {
+  background: #f8f9fa;
+  border-left: 3px solid var(--primary);
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin: 1rem 0;
+}
+
+[data-theme='dark'] .eduEscenarioExample {
+  background: #1e1e1e;
+}
+
+.eduEscenarioExample p {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--primary);
+}
+
+.eduEscenarioExample code {
+  display: block;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: transparent;
+  padding: 0;
+  white-space: pre-wrap;
+}
+
+.eduEscenarioTip {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.eduEscenarioTip strong {
+  color: var(--primary);
+}
+
+.eduFaqSection {
+  margin-bottom: 2rem;
+}
+
+.eduFaqSection h2 {
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.eduFaqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.eduFaqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.eduFaqItem:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.eduFaqItem h3 {
+  margin: 0 0 0.75rem;
+  color: var(--primary);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.eduFaqItem p {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.eduFaqItem p:last-child {
+  margin-bottom: 0;
+}
+
+.eduFaqItem p strong {
+  color: var(--text-primary);
+}
+
+.eduFaqTip {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(46, 134, 171, 0.1);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+[data-theme='dark'] .eduFaqTip {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+.eduStepSection {
+  margin-bottom: 2rem;
+}
+
+.eduStepSection h2 {
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.eduStepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.eduStepItem {
+  display: flex;
+  gap: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.eduStepItem:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.eduStepNumber {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.3);
+}
+
+.eduStepContent {
+  flex: 1;
+}
+
+.eduStepContent h3 {
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.eduStepContent p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.eduStepContent p strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.eduTipsSection {
+  margin-bottom: 2rem;
+}
+
+.eduTipsSection h2 {
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.eduTipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.eduTipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.eduTipCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.eduTipIcon {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.eduTipCard h3 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.eduTipCard p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.eduWarningBox {
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+  border: 2px solid var(--warning);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+[data-theme='dark'] .eduWarningBox {
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.08));
+}
+
+.eduWarningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.eduWarningIcon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.eduWarningHeader h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.eduWarningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.eduWarningList li {
+  padding: 1rem;
+  background: var(--bg-card);
+  border-left: 4px solid var(--warning);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.eduWarningList li strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .eduEscenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .eduTipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .eduComparativaTable {
+    font-size: 0.85rem;
+  }
+
+  .eduComparativaTable th,
+  .eduComparativaTable td {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .eduStepItem {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .eduStepNumber {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .eduTipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .eduComparativaTable {
+    font-size: 0.75rem;
+  }
+
+  .eduComparativaTable th,
+  .eduComparativaTable td {
+    padding: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eduEscenarioCard,
+  .eduFaqItem,
+  .eduStepItem,
+  .eduTipCard {
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Selector de Modo */
 .modoSelector {
   display: flex;
