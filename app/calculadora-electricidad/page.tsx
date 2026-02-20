@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraElectricidad.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, DisclaimerCard } from '@/components';
 import { formatNumber, parseSpanishNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -1101,11 +1101,307 @@ export default function CalculadoraElectricidadPage() {
         </div>
       </div>
 
+      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-electricidad">
+        <p>Esta calculadora realiza cálculos teóricos basados en leyes físicas:</p>
+        <ul className={styles.disclaimerList}>
+          <li><strong>Coste de consumo orientativo</strong>: el precio real del kWh varía según tu tarifa, comercializadora, horario y tramo de consumo. Consulta tu factura eléctrica para el precio exacto.</li>
+          <li><strong>Cálculos teóricos</strong>: en instalaciones reales intervienen factores como temperatura, tipo de cable, longitud y normativa (REBT). Para instalaciones eléctricas, consulta siempre a un profesional cualificado.</li>
+        </ul>
+      </DisclaimerCard>
+
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Electricidad?"
-        subtitle="Descubre conceptos fundamentales, fórmulas y aplicaciones prácticas"
+        title="⚡ Aprende Electricidad: Conceptos, Preguntas y Guías"
+        subtitle="Desde la Ley de Ohm hasta circuitos RC/RL — todo lo que necesitas saber"
       >
+        {/* Tabla Comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Corriente Continua (CC) vs Corriente Alterna (CA)</h2>
+          <p className={styles.introParagraph}>
+            La primera gran pregunta en electricidad: ¿CC o CA? Una pila es CC, el enchufe de casa es CA.
+            Entender la diferencia es fundamental antes de trabajar con cualquier circuito.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Característica</th>
+                  <th>Corriente Continua (CC / DC)</th>
+                  <th>Corriente Alterna (CA / AC)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Dirección del flujo</td>
+                  <td>Un único sentido, constante</td>
+                  <td>Cambia de sentido 50 veces/s (50 Hz)</td>
+                </tr>
+                <tr>
+                  <td>Voltaje típico</td>
+                  <td>1,5 V (pila) – 48 V (solar/baterías)</td>
+                  <td>230 V (monofásico) – 400 V (trifásico)</td>
+                </tr>
+                <tr>
+                  <td>Generación</td>
+                  <td>Pilas, baterías, paneles solares</td>
+                  <td>Alternadores, centrales eléctricas</td>
+                </tr>
+                <tr>
+                  <td>Transporte</td>
+                  <td>Pérdidas elevadas en distancias largas</td>
+                  <td>Eficiente con transformadores (alta tensión)</td>
+                </tr>
+                <tr>
+                  <td>Uso doméstico</td>
+                  <td>Electrónica, LED, carga de dispositivos</td>
+                  <td>Electrodomésticos, motores, iluminación</td>
+                </tr>
+                <tr>
+                  <td>Conversión</td>
+                  <td>CC → CA: inversor / ondulador</td>
+                  <td>CA → CC: rectificador / fuente de alimentación</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de Uso */}
+        <section className={styles.guideSection}>
+          <h2>¿Para quién es esta calculadora?</h2>
+          <p className={styles.introParagraph}>
+            Cuatro perfiles reales que usan esta herramienta y cómo saca partido de ella cada uno.
+          </p>
+          <div className={styles.casosUsoGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoIcon}>🎓</div>
+              <div className={styles.casoTitle}>Estudiante FP Electricidad</div>
+              <div className={styles.casoSubtitle}>Preparando el examen de circuitos</div>
+              <p className={styles.casoDesc}>
+                Usa Ley de Ohm y Serie/Paralelo para verificar ejercicios del libro antes del examen.
+                Entiende por qué la resistencia equivalente en paralelo siempre es menor que la más pequeña
+                del grupo.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoIcon}>🔧</div>
+              <div className={styles.casoTitle}>Electricista Junior en Obra</div>
+              <div className={styles.casoSubtitle}>Cálculos rápidos en campo</div>
+              <p className={styles.casoDesc}>
+                Calcula la corriente que circulará por un circuito antes de elegir la sección del cable.
+                Usa Potencia para verificar que el interruptor automático es el adecuado y Consumo
+                para dar presupuesto al cliente.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoIcon}>🛠️</div>
+              <div className={styles.casoTitle}>Técnico de Mantenimiento</div>
+              <div className={styles.casoSubtitle}>Diagnóstico de averías</div>
+              <p className={styles.casoDesc}>
+                Mide con multímetro y compara con los valores teóricos de la calculadora.
+                Un motor que consume más amperios de los calculados señala un devanado en mal estado
+                o un problema mecánico.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoIcon}>🤖</div>
+              <div className={styles.casoTitle}>Aficionado DIY / Maker</div>
+              <div className={styles.casoSubtitle}>Proyectos Arduino, ESP32, Raspberry</div>
+              <p className={styles.casoDesc}>
+                Calcula la resistencia limitadora de corriente para un LED, diseña un divisor de tensión
+                para adaptar señales de 5 V a 3,3 V, o elige el condensador de filtrado adecuado
+                para su fuente de alimentación casera.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre Electricidad</h2>
+          <p className={styles.introParagraph}>
+            Las 8 dudas que aparecen una y otra vez en clase, en obra y en foros de electrónica.
+          </p>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Por qué en España usamos 230 V y en USA 120 V?</p>
+              <p className={styles.faqRespuesta}>
+                Es una decisión histórica. Europa adoptó 220-240 V porque permite transportar la misma
+                potencia con cables más finos (menos corriente a mayor voltaje, P = V × I). EE.UU. se
+                quedó en 110-120 V por inercia de las primeras instalaciones de Edison (finales del s. XIX).
+                A mayor voltaje, mayor eficiencia en transporte pero mayor peligro en caso de contacto accidental.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Cuándo usar circuito en serie y cuándo en paralelo?</p>
+              <p className={styles.faqRespuesta}>
+                Serie cuando quieres que los componentes compartan la misma corriente (cadenas de LEDs,
+                resistencias limitadoras). Paralelo cuando quieres que cada componente tenga el voltaje
+                completo y funcione de forma independiente (enchufes de casa, bombillas). Si una bombilla
+                del paralelo se funde, las demás siguen encendidas; en serie, todas se apagan.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Por qué se queman los fusibles y los plomos?</p>
+              <p className={styles.faqRespuesta}>
+                El fusible es un sacrificio calculado: un hilo metálico dimensionado para fundirse antes
+                de que el calor dañe el cableado o provoque un incendio. Se quema cuando la corriente
+                supera su calibre (ej: 16 A). Un cortocircuito o demasiados aparatos conectados generan
+                ese exceso. El PIA (interruptor automático) moderno hace lo mismo pero sin consumibles:
+                detecta la sobrecorriente y abre el circuito magnéticamente.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Qué diferencia hay entre Vatios (W) y Voltamperios (VA)?</p>
+              <p className={styles.faqRespuesta}>
+                En CC son iguales. En CA con cargas inductivas (motores, transformadores) o capacitivas
+                hay diferencia: los VA miden la potencia aparente (lo que la red suministra) y los W
+                la potencia activa (la que realmente se convierte en trabajo útil). El cos(φ) o factor
+                de potencia indica la relación: W = VA × cos(φ). Un motor con cos(φ) = 0,8 necesita
+                1,25 kVA de la red para entregar 1 kW de trabajo.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Por qué se calientan los cables cuando pasa mucha corriente?</p>
+              <p className={styles.faqRespuesta}>
+                Por el efecto Joule: todo conductor tiene una resistencia interna y cuando pasa corriente,
+                parte de la energía se disipa como calor (P = I² × R). A mayor corriente, el calor aumenta
+                al cuadrado — doblar la corriente cuadruplica el calor generado. Por eso los cables tienen
+                una sección mínima según la corriente: a mayor sección, menor resistencia y menos calentamiento.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Qué es la constante de tiempo τ (tau) y para qué sirve?</p>
+              <p className={styles.faqRespuesta}>
+                τ es el tiempo que tarda un circuito RC o RL en cargarse al 63,2% de su valor final.
+                Después de 5τ está al 99% y se considera completamente cargado. Es fundamental para
+                diseñar temporizadores (555, monoestables), filtros de audio paso alto/bajo, circuitos
+                de debounce para botones y etapas de acoplamiento AC en amplificadores.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Cómo afecta la temperatura a la resistencia de un conductor?</p>
+              <p className={styles.faqRespuesta}>
+                En la mayoría de los metales (cobre, aluminio), la resistencia aumenta con la temperatura:
+                al calentarse, los átomos vibran más y dificultan el paso de electrones. Se calcula con
+                R(T) = R₀ × [1 + α × (T - T₀)], donde α es el coeficiente de temperatura del material
+                (para cobre: 0,00393 / °C). Por eso un motor en arranque consume más corriente que en
+                régimen: la resistencia de los devanados es menor cuando están fríos.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Cuántos aparatos puedo conectar a un enchufe de 16 A?</p>
+              <p className={styles.faqRespuesta}>
+                Un circuito de 16 A a 230 V puede suministrar hasta 3.680 W (P = V × I). En la práctica
+                se recomienda no superar el 80% (≈ 2.944 W) para evitar calentamiento prolongado. Suma
+                las potencias de todos los aparatos conectados: microondas (1.000 W) + tostadora (900 W)
+                + hervidor (1.500 W) = 3.400 W, ya cerca del límite. Si saltan los plomos, es la señal
+                de que has superado la capacidad del circuito.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo analizar un circuito desconocido: 6 pasos</h2>
+          <p className={styles.introParagraph}>
+            Metodología sistemática para resolver cualquier circuito resistivo, tanto en examen
+            como en el trabajo real.
+          </p>
+          <div className={styles.pasosList}>
+            <div className={styles.paso}>
+              <div className={styles.pasoNum}>1</div>
+              <div className={styles.pasoContent}>
+                <p className={styles.pasoTitle}>Identificar la fuente de alimentación</p>
+                <p className={styles.pasoDesc}>
+                  Anota el voltaje (V) y si es CC o CA. En CC, identifica el polo positivo y negativo.
+                  En CA, anota la frecuencia (50 Hz en España) si es relevante para el circuito.
+                </p>
+              </div>
+            </div>
+            <div className={styles.paso}>
+              <div className={styles.pasoNum}>2</div>
+              <div className={styles.pasoContent}>
+                <p className={styles.pasoTitle}>Localizar y anotar todos los componentes</p>
+                <p className={styles.pasoDesc}>
+                  Lista todas las resistencias con sus valores en ohmios (Ω). Si hay condensadores
+                  o inductores, anótalos también. Lee correctamente el código de colores o el valor marcado.
+                </p>
+              </div>
+            </div>
+            <div className={styles.paso}>
+              <div className={styles.pasoNum}>3</div>
+              <div className={styles.pasoContent}>
+                <p className={styles.pasoTitle}>Determinar la topología de conexión</p>
+                <p className={styles.pasoDesc}>
+                  ¿Están en serie (misma línea), en paralelo (mismos nodos) o en combinación mixta?
+                  Redibuja el circuito simplificado si es necesario. Un circuito mixto siempre
+                  se resuelve de dentro hacia fuera.
+                </p>
+              </div>
+            </div>
+            <div className={styles.paso}>
+              <div className={styles.pasoNum}>4</div>
+              <div className={styles.pasoContent}>
+                <p className={styles.pasoTitle}>Calcular la resistencia equivalente total</p>
+                <p className={styles.pasoDesc}>
+                  Serie: Req = R₁ + R₂ + ... | Paralelo: 1/Req = 1/R₁ + 1/R₂ + ...
+                  En circuitos mixtos, resuelve primero los grupos internos y sustitúyelos por su equivalente.
+                  Usa la calculadora de Mixtos para verificar el resultado.
+                </p>
+              </div>
+            </div>
+            <div className={styles.paso}>
+              <div className={styles.pasoNum}>5</div>
+              <div className={styles.pasoContent}>
+                <p className={styles.pasoTitle}>Calcular la corriente total con Ley de Ohm</p>
+                <p className={styles.pasoDesc}>
+                  I_total = V_fuente / Req. En serie, esta corriente es igual en todos los elementos.
+                  En paralelo, se reparte entre las ramas inversamente proporcional a su resistencia.
+                </p>
+              </div>
+            </div>
+            <div className={styles.paso}>
+              <div className={styles.pasoNum}>6</div>
+              <div className={styles.pasoContent}>
+                <p className={styles.pasoTitle}>Verificar con Leyes de Kirchhoff</p>
+                <p className={styles.pasoDesc}>
+                  Calcula V en cada elemento (V = I × R). Verifica: la suma de tensiones en un lazo
+                  cerrado es 0 (LKT), y la suma de corrientes en un nodo es 0 (LKC). Si cuadra,
+                  el análisis es correcto.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Tips y Errores */}
+        <section className={styles.guideSection}>
+          <h2>Tips Profesionales y Errores Típicos</h2>
+          <div className={styles.tipsErrorsSection}>
+            <div className={styles.tipsColumn}>
+              <h3 className={styles.tipsHeader}>✅ Tips que marcan la diferencia</h3>
+              <div className={styles.tipItem}>Apunta siempre las unidades (Ω, V, A, W, kW). Un número sin unidad no significa nada en electricidad.</div>
+              <div className={styles.tipItem}>En serie la corriente es idéntica en todo el circuito. En paralelo el voltaje es idéntico en todas las ramas. Grábatelo a fuego.</div>
+              <div className={styles.tipItem}>Para calcular consumo, divide los vatios entre 1.000: 1.500 W = 1,5 kW. Luego multiplica por las horas de uso diario.</div>
+              <div className={styles.tipItem}>En circuitos RC/RL, usa 5τ como tiempo de estabilización completa para el diseño práctico de temporizadores y filtros.</div>
+              <div className={styles.tipItem}>Un divisor de tensión solo funciona bien sin carga o con carga de impedancia mucho mayor que R2. Con carga baja, el voltaje de salida cae.</div>
+              <div className={styles.tipItem}>Antes de medir con multímetro, comprueba el modo: voltios para tensión (en paralelo), amperios para corriente (en serie).</div>
+            </div>
+            <div className={styles.tipsColumn}>
+              <h3 className={styles.errorsHeader}>❌ Errores que comete casi todo el mundo</h3>
+              <div className={styles.errorItem}>Confundir CC (pilas, USB, solar) con CA (enchufe de pared). Son circuitos incompatibles — conectar un aparato DC a 230 V CA lo destruye.</div>
+              <div className={styles.errorItem}>Sumar resistencias en paralelo directamente. Error clásico: dos resistencias de 100 Ω en paralelo NO son 200 Ω, son 50 Ω.</div>
+              <div className={styles.errorItem}>Olvidar convertir W a kW al calcular consumo. Un aparato de 2.000 W consume 2 kWh por hora, no 2.000 kWh.</div>
+              <div className={styles.errorItem}>Medir amperios poniendo el multímetro en paralelo. Es un cortocircuito instantáneo: el fusible interno del multímetro salta o el aparato se daña.</div>
+              <div className={styles.errorItem}>Ignorar el cos(φ) en motores y transformadores. Un motor de 1 kW puede necesitar 1,25 kVA de la red si su factor de potencia es 0,8.</div>
+              <div className={styles.errorItem}>Creer que el fusible protege el aparato. El fusible protege el cable. Para proteger aparatos existen varistores y protectores de sobretensión.</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Conceptos Básicos - contenido existente */}
         <section className={styles.guideSection}>
           <h2>Conceptos Básicos de Electricidad</h2>
           <p className={styles.introParagraph}>
@@ -1113,78 +1409,38 @@ export default function CalculadoraElectricidadPage() {
             fundamentales son el voltaje (presión eléctrica), la corriente (flujo de electrones)
             y la resistencia (oposición al flujo).
           </p>
-
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
               <h4>Ley de Ohm</h4>
-              <p>
-                V = I × R relaciona voltaje, corriente y resistencia.
-                Es la base de todos los cálculos eléctricos.
-                1 Voltio = 1 Amperio × 1 Ohmio.
-              </p>
+              <p>V = I × R relaciona voltaje, corriente y resistencia. Es la base de todos los cálculos eléctricos. 1 Voltio = 1 Amperio × 1 Ohmio.</p>
             </div>
-
             <div className={styles.contentCard}>
               <h4>Potencia Eléctrica</h4>
-              <p>
-                P = V × I mide la energía consumida por unidad de tiempo.
-                Se mide en Vatios (W). 1 kW = 1000 W.
-                También: P = I²R = V²/R.
-              </p>
+              <p>P = V × I mide la energía consumida por unidad de tiempo. Se mide en Vatios (W). 1 kW = 1000 W. También: P = I²R = V²/R.</p>
             </div>
-
             <div className={styles.contentCard}>
               <h4>Circuitos Serie</h4>
-              <p>
-                Resistencias conectadas una tras otra.
-                La corriente es igual en todos los puntos.
-                Req = R₁ + R₂ + R₃...
-              </p>
+              <p>Resistencias conectadas una tras otra. La corriente es igual en todos los puntos. Req = R₁ + R₂ + R₃...</p>
             </div>
-
             <div className={styles.contentCard}>
               <h4>Circuitos Paralelo</h4>
-              <p>
-                Resistencias conectadas entre los mismos puntos.
-                El voltaje es igual en todas las ramas.
-                1/Req = 1/R₁ + 1/R₂ + 1/R₃...
-              </p>
+              <p>Resistencias conectadas entre los mismos puntos. El voltaje es igual en todas las ramas. 1/Req = 1/R₁ + 1/R₂ + 1/R₃...</p>
             </div>
-
             <div className={styles.contentCard}>
               <h4>Divisor de Tensión</h4>
-              <p>
-                Vout = Vin × R₂ / (R₁ + R₂).
-                Permite obtener un voltaje menor que la fuente.
-                Muy usado en electrónica para adaptar niveles de señal.
-              </p>
+              <p>Vout = Vin × R₂ / (R₁ + R₂). Permite obtener un voltaje menor que la fuente. Muy usado en electrónica para adaptar niveles de señal.</p>
             </div>
-
             <div className={styles.contentCard}>
               <h4>Divisor de Corriente</h4>
-              <p>
-                La corriente se divide inversamente proporcional a las resistencias.
-                I₁ = Iin × R₂ / (R₁ + R₂).
-                Útil en circuitos paralelo.
-              </p>
+              <p>La corriente se divide inversamente proporcional a las resistencias. I₁ = Iin × R₂ / (R₁ + R₂). Útil en circuitos paralelo.</p>
             </div>
-
             <div className={styles.contentCard}>
               <h4>Circuitos RC</h4>
-              <p>
-                Resistencia + Capacitor. τ = R × C.
-                Usados en filtros, temporizadores, acoplamiento AC.
-                El capacitor almacena energía en campo eléctrico.
-              </p>
+              <p>Resistencia + Capacitor. τ = R × C. Usados en filtros, temporizadores, acoplamiento AC. El capacitor almacena energía en campo eléctrico.</p>
             </div>
-
             <div className={styles.contentCard}>
               <h4>Circuitos RL</h4>
-              <p>
-                Resistencia + Inductor. τ = L / R.
-                Usados en filtros, fuentes conmutadas, motores.
-                El inductor almacena energía en campo magnético.
-              </p>
+              <p>Resistencia + Inductor. τ = L / R. Usados en filtros, fuentes conmutadas, motores. El inductor almacena energía en campo magnético.</p>
             </div>
           </div>
         </section>
@@ -1195,7 +1451,6 @@ export default function CalculadoraElectricidadPage() {
             Cuando se aplica o retira voltaje en un circuito RC o RL, la respuesta no es instantánea.
             El capacitor o inductor se carga/descarga exponencialmente con constante de tiempo τ (tau).
           </p>
-
           <div className={styles.tableWrapper}>
             <table className={styles.factoresTable}>
               <thead>
