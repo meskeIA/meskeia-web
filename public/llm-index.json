@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 230+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 231+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 230,
-  "last_updated": "2026-02-19",
+  "total_tools": 231,
+  "last_updated": "2026-02-21",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -56,7 +56,7 @@
       "name": "Herramientas Técnicas",
       "icon": "🔧",
       "description": "Herramientas especializadas y técnicas",
-      "tool_count": 31
+      "tool_count": 32
     },
     {
       "id": "inmobiliaria",
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 37
+      "tool_count": 38
     },
     {
       "id": "salud",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 89
+      "tool_count": 90
     },
     {
       "id": "estudio",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 72
+      "tool_count": 73
     },
     {
       "id": "dinero",
@@ -135,7 +135,7 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 54
+      "tool_count": 55
     },
     {
       "id": "relax",
@@ -5691,6 +5691,34 @@
         "vecinos gastos"
       ],
       "icon": "🏘️"
+    },
+    {
+      "slug": "extractor-audio-video",
+      "name": "Extractor de Audio de Vídeo",
+      "url": "https://meskeia.com/extractor-audio-video/",
+      "description": "Extrae y recorta fragmentos de audio de tus vídeos (AVI, MP4, MOV, MKV) y conviértelos a MP3 o WAV. Todo se procesa en tu navegador: privacidad total garantizada, ningún archivo sale de tu dispositivo",
+      "suites": [
+        "tecnicas",
+        "productividad"
+      ],
+      "contexts": [
+        "trabajo",
+        "creando",
+        "casa"
+      ],
+      "keywords": [
+        "extractor audio video",
+        "video a mp3",
+        "avi a mp3",
+        "mp4 a wav",
+        "extraer audio video",
+        "convertir video audio",
+        "recortar audio",
+        "webassembly",
+        "ffmpeg online",
+        "privado sin subir"
+      ],
+      "icon": "🎬"
     }
   ],
   "llm_instructions": {

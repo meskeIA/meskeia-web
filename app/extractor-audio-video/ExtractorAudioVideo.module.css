@@ -1,0 +1,697 @@
+/* ============================================
+   Extractor de Audio de Vídeo — CSS Module
+   Paleta meskeIA: #2E86AB · #48A9A6
+   ============================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --success: #28a745;
+  --error: #dc3545;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.titulo {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.subtitulo {
+  font-size: 1rem;
+  opacity: 0.92;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Badge de privacidad ── */
+.privacyBadge {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #e8f5e9;
+  border: 1.5px solid #4caf50;
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+[data-theme='dark'] .privacyBadge {
+  background: #1b3a1f;
+  border-color: #4caf50;
+}
+
+.privacyIcon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.privacyBadge strong {
+  display: block;
+  color: #1b5e20;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+[data-theme='dark'] .privacyBadge strong {
+  color: #81c784;
+}
+
+.privacyBadge p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #2e7d32;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .privacyBadge p {
+  color: #a5d6a7;
+}
+
+/* ── Secciones ── */
+.seccion {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.tituloSeccion {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-primary);
+}
+
+.paso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Drop Zone ── */
+.dropZone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.dropZone:hover,
+.dropZone:focus-visible {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.04);
+  outline: none;
+}
+
+.dropZoneActiva {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+  transform: scale(1.01);
+}
+
+.dropZoneConArchivo {
+  border-style: solid;
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.inputOculto {
+  display: none;
+}
+
+.placeholderUpload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.iconoUpload {
+  font-size: 2.5rem;
+}
+
+.textoUpload {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.formatosAceptados {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.archivoSeleccionado {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+}
+
+.iconoArchivo {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.nombreArchivo {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0 0 0.2rem;
+  word-break: break-all;
+  color: var(--text-primary);
+}
+
+.infoArchivo {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Video Player ── */
+.videoWrapper {
+  width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #000;
+}
+
+.videoPlayer {
+  width: 100%;
+  max-height: 400px;
+  display: block;
+}
+
+.avisoFormato {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: #856404;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+[data-theme='dark'] .avisoFormato {
+  background: #3a2e00;
+  border-color: #ffc107;
+  color: #ffd54f;
+}
+
+/* ── Selector de tiempo ── */
+.selectorTiempo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.campoTiempo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.etiqueta {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.displayTiempo {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  padding: 0.1rem 0.5rem;
+  border-radius: 6px;
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.slider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.duracionFragmento {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+/* ── Inputs manuales ── */
+.inputsManuales {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.inputManualGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.inputNumero {
+  padding: 0.6rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.inputNumero:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ── Opciones de formato ── */
+.opcionesFormato {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.opcionFormato {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.opcionFormato:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.opcionSeleccionada {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.radioOculto {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.iconoFormato {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.opcionFormato > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.opcionFormato strong {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.descFormato {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ── Calidad MP3 ── */
+.calidadMp3 {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.opcionesCalidad {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btnCalidad {
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnCalidad:hover {
+  border-color: var(--primary);
+}
+
+.btnCalidadActivo {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+/* ── Acción principal ── */
+.accionPrincipal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.btnExtraer {
+  padding: 1rem 3rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(46, 134, 171, 0.35);
+  min-width: 220px;
+}
+
+.btnExtraer:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.45);
+}
+
+.btnExtraer:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnExtraer:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* ── Progreso ── */
+.progresoContainer {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.mensajeProcesando {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.barraProgreso {
+  width: 100%;
+  height: 10px;
+  background: var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.barraRelleno {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.porcentaje {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+}
+
+/* ── Error ── */
+.mensajeError {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #fdecea;
+  border: 1.5px solid var(--error);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: #c62828;
+}
+
+[data-theme='dark'] .mensajeError {
+  background: #3b0f0f;
+  color: #ef9a9a;
+}
+
+.mensajeError strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+/* ── Resultado ── */
+.resultadoContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mensajeExito {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--success);
+}
+
+.btnDescargar {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.35);
+  text-align: center;
+  word-break: break-all;
+  max-width: 100%;
+}
+
+.btnDescargar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(40, 167, 69, 0.45);
+}
+
+.btnDescargar:focus-visible {
+  outline: 2px solid #28a745;
+  outline-offset: 3px;
+}
+
+/* ── Aviso de privacidad ── */
+.avisoPrivacidad {
+  background: #fff8e1;
+  border: 1.5px solid #ffc107;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+[data-theme='dark'] .avisoPrivacidad {
+  background: #2a2200;
+  border-color: #ffc107;
+}
+
+.avisoPrivacidad h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: #856404;
+}
+
+[data-theme='dark'] .avisoPrivacidad h3 {
+  color: #ffd54f;
+}
+
+.avisoPrivacidad p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #856404;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .avisoPrivacidad p {
+  color: #ffcc02;
+}
+
+/* ── Sección educativa ── */
+.seccionEdu {
+  margin-bottom: 1.5rem;
+}
+
+.seccionEdu:last-child {
+  margin-bottom: 0;
+}
+
+.seccionEdu h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--primary);
+}
+
+.seccionEdu p,
+.seccionEdu ul {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.seccionEdu ul {
+  padding-left: 1.25rem;
+}
+
+.seccionEdu li {
+  margin-bottom: 0.4rem;
+}
+
+.seccionEdu strong {
+  color: var(--text-primary);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .hero {
+    margin: 70px 0 1.5rem;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .opcionesFormato {
+    grid-template-columns: 1fr;
+  }
+
+  .inputsManuales {
+    grid-template-columns: 1fr;
+  }
+
+  .btnExtraer {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .privacyBadge {
+    flex-direction: column;
+  }
+}
+
+/* ── Accesibilidad: reducir movimiento ── */
+@media (prefers-reduced-motion: reduce) {
+  .dropZoneActiva,
+  .btnExtraer:hover,
+  .btnDescargar:hover,
+  .barraRelleno,
+  .slider::-webkit-slider-thumb:hover {
+    transform: none;
+    transition: none;
+  }
+}

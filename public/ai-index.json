@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 227,
-  "updated": "2026-02-19",
+  "total_tools": 228,
+  "updated": "2026-02-21",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -72,6 +72,7 @@
         { "name": "Validador RegEx", "slug": "validador-regex", "url": "https://meskeia.com/validador-regex/", "description": "Testa y valida expresiones regulares" },
         { "name": "Conversor de Imágenes", "slug": "conversor-imagenes", "url": "https://meskeia.com/conversor-imagenes/", "description": "Convierte formatos de imagen, comprime y redimensiona" },
         { "name": "Compresor de Imágenes por Lotes", "slug": "compresor-imagenes", "url": "https://meskeia.com/compresor-imagenes/", "description": "Comprime múltiples imágenes sin límites ni marcas de agua" },
+        { "name": "Extractor de Audio de Vídeo", "slug": "extractor-audio-video", "url": "https://meskeia.com/extractor-audio-video/", "description": "Extrae y recorta fragmentos de audio de vídeos AVI, MP4, MOV, MKV y convierte a MP3 o WAV. Procesamiento 100% local en el navegador, ningún archivo sale del dispositivo" },
         { "name": "Recortador de Audio", "slug": "recortador-audio", "url": "https://meskeia.com/recortador-audio/", "description": "Recorta y edita audio MP3, WAV, OGG con fade in/out sin límites ni marcas de agua" },
         { "name": "Generador de Ondas y Visualizador", "slug": "generador-ondas", "url": "https://meskeia.com/generador-ondas/", "description": "Genera ondas sonoras (senoidal, cuadrada, triangular, sierra) y visualiza audio de archivos. Herramienta educativa de física del sonido" },
         { "name": "Generador de Enlaces UTM", "slug": "generador-utm", "url": "https://meskeia.com/generador-utm/", "description": "Genera enlaces UTM para Google Analytics" },
