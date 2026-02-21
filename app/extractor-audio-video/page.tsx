@@ -138,11 +138,15 @@ export default function ExtractorAudioVideoPage() {
 
       const tiempoInicio = duracion > 0 ? inicio : 0;
       const tiempoFin = duracion > 0 ? fin : 3600;
+      // Duración del fragmento (siempre inequívoca, evita ambigüedad de -to)
+      const duracionExtraccion = (tiempoFin - tiempoInicio).toFixed(3);
 
       const args: string[] = [
-        '-i', inputName,
+        // -ss ANTES de -i = input seeking (rápido, por keyframe)
+        // -t = duración del output (no timestamp de fin), evita confusión con -to
         '-ss', tiempoInicio.toFixed(3),
-        '-to', tiempoFin.toFixed(3),
+        '-i', inputName,
+        '-t', duracionExtraccion,
         '-vn',
       ];
 
