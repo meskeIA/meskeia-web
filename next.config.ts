@@ -47,6 +47,7 @@ const securityHeaders = [
       "media-src 'self'",
       "worker-src 'self' blob:",
       "frame-ancestors 'none'",
+      "report-uri /api/csp-report",
     ].join('; '),
   },
 ];
