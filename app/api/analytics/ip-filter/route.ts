@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
     console.error('Error al obtener configuración IP:', error);
     return NextResponse.json({
       status: 'error',
-      message: 'Error al obtener configuración',
+      message: 'Error interno del servidor',
     }, { status: 500, headers: getCorsHeaders('GET, POST, OPTIONS', request.headers.get('origin')) });
   }
 }
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
     console.error('Error al guardar IP:', error);
     return NextResponse.json({
       status: 'error',
-      message: 'Error al guardar IP',
+      message: 'Error interno del servidor',
     }, { status: 500, headers: getCorsHeaders('GET, POST, OPTIONS', request.headers.get('origin')) });
   }
 }

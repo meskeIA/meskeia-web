@@ -300,7 +300,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         status: 'error',
-        mensaje: error instanceof Error ? error.message : 'Error desconocido',
+        mensaje: 'Error interno del servidor',
       },
       { status: 500, headers: getCorsHeaders('POST, OPTIONS', origin) }
     );

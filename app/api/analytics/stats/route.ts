@@ -352,10 +352,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error en /api/analytics/stats:', error);
     return NextResponse.json(
-      {
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Error desconocido',
-      },
+      { status: 'error', message: 'Error interno del servidor' },
       { status: 500, headers: getCorsHeaders('GET, OPTIONS', request.headers.get('origin')) }
     );
   }

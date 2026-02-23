@@ -43,6 +43,12 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders('POST, OPTIONS') });
 }
 
+/** Trunca un string a un máximo de caracteres, devuelve null si está vacío */
+function truncar(val: unknown, max: number): string | null {
+  if (!val || typeof val !== 'string') return null;
+  return val.slice(0, max);
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Inicializar DB si es necesario
@@ -51,7 +57,7 @@ export async function POST(request: NextRequest) {
     const datos = await request.json();
 
     // Validar campo obligatorio
-    if (!datos.aplicacion) {
+    if (!datos.aplicacion || typeof datos.aplicacion !== 'string') {
       return NextResponse.json(
         { status: 'error', message: 'El campo "aplicacion" es obligatorio' },
         { status: 400, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
@@ -60,8 +66,8 @@ export async function POST(request: NextRequest) {
 
     const client = getTursoClient();
 
-    // Preparar datos
-    const aplicacion = datos.aplicacion;
+    // Preparar datos con límites de longitud (H5/L1: prevenir abuso con payloads grandes)
+    const aplicacion = datos.aplicacion.slice(0, 100);
     const timestamp = new Date().toLocaleString('es-ES', {
       day: '2-digit',
       month: '2-digit',
@@ -70,13 +76,13 @@ export async function POST(request: NextRequest) {
       minute: '2-digit',
       second: '2-digit',
     });
-    const navegador = datos.navegador || null;
-    const sistema_operativo = datos.sistema_operativo || null;
-    const resolucion = datos.resolucion || null;
-    const tipo_dispositivo = datos.tipo_dispositivo || null;
+    const navegador = truncar(datos.navegador, 200);
+    const sistema_operativo = truncar(datos.sistema_operativo, 200);
+    const resolucion = truncar(datos.resolucion, 50);
+    const tipo_dispositivo = truncar(datos.tipo_dispositivo, 50);
     const es_recurrente = datos.es_recurrente ? 1 : 0;
-    const modo = datos.modo || 'web';
-    const sesion_id = datos.sesion_id || null;
+    const modo = truncar(datos.modo, 20) || 'web';
+    const sesion_id = truncar(datos.sesion_id, 50);
 
     // RGPD: Anonimizar IP (truncar último octeto)
     const rawIP =
@@ -138,10 +144,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error en /api/analytics/track:', error);
     return NextResponse.json(
-      {
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Error desconocido',
-      },
+      { status: 'error', message: 'Error interno del servidor' },
       { status: 500, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
     );
   }

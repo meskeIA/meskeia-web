@@ -308,10 +308,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error en /api/validaciones/nif:', error);
     return NextResponse.json(
-      {
-        status: 'error',
-        mensaje: error instanceof Error ? error.message : 'Error desconocido',
-      },
+      { status: 'error', mensaje: 'Error interno del servidor' },
       { status: 500, headers: getCorsHeaders('POST, OPTIONS', origin) }
     );
   }

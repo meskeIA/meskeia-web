@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const datos = await request.json();
 
     // Validar campos obligatorios
-    if (!datos.aplicacion || datos.duracion_segundos === undefined) {
+    if (!datos.aplicacion || typeof datos.aplicacion !== 'string' || datos.duracion_segundos === undefined) {
       return NextResponse.json(
         {
           status: 'error',
@@ -31,16 +31,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // H5/L1: Validar que la duración sea un número razonable (0s - 24h)
+    const duracion = Number(datos.duracion_segundos);
+    if (isNaN(duracion) || duracion < 0 || duracion > 86400) {
+      return NextResponse.json(
+        { status: 'error', message: 'Duración fuera de rango (0-86400 segundos)' },
+        { status: 400, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
+      );
+    }
+
+    const aplicacion = datos.aplicacion.slice(0, 100);
+    const sesion_id = datos.sesion_id && typeof datos.sesion_id === 'string'
+      ? datos.sesion_id.slice(0, 50)
+      : null;
+
     const client = getTursoClient();
 
     // Buscar el último registro de esta aplicación/sesión para actualizar duración
     // Si hay sesion_id, usarlo para encontrar el registro exacto
-    if (datos.sesion_id) {
+    if (sesion_id) {
       await client.execute({
         sql: `UPDATE uso_aplicaciones
               SET duracion_segundos = ?
               WHERE sesion_id = ? AND aplicacion = ?`,
-        args: [datos.duracion_segundos, datos.sesion_id, datos.aplicacion],
+        args: [duracion, sesion_id, aplicacion],
       });
     } else {
       // Fallback: actualizar el último registro de esta app sin duración
@@ -52,7 +66,7 @@ export async function POST(request: NextRequest) {
                 WHERE aplicacion = ? AND duracion_segundos IS NULL
                 ORDER BY id DESC LIMIT 1
               )`,
-        args: [datos.duracion_segundos, datos.aplicacion],
+        args: [duracion, aplicacion],
       });
     }
 
@@ -60,20 +74,14 @@ export async function POST(request: NextRequest) {
       {
         status: 'success',
         message: 'Duración registrada correctamente',
-        data: {
-          aplicacion: datos.aplicacion,
-          duracion_segundos: datos.duracion_segundos,
-        },
+        data: { aplicacion, duracion_segundos: duracion },
       },
       { status: 200, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
     );
   } catch (error) {
     console.error('Error en /api/analytics/duration:', error);
     return NextResponse.json(
-      {
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Error desconocido',
-      },
+      { status: 'error', message: 'Error interno del servidor' },
       { status: 500, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
     );
   }
