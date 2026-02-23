@@ -851,6 +851,186 @@ export default function CalculadoraNotasPage() {
         title="¿Quieres saber más sobre el sistema de calificaciones?"
         subtitle="Aprende sobre ECTS, EvAU y equivalencias internacionales"
       >
+
+        {/* ── TABLA COMPARATIVA ── */}
+        <section className={styles.guideSection}>
+          <h2>Sistemas de Calificación en España: Comparativa</h2>
+          <p className={styles.introParagraph}>
+            Cada etapa educativa en España tiene sus propias reglas. Esta tabla resume las diferencias clave
+            para que sepas qué esperar y cómo se calcula tu nota en cada nivel.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>ESO / Bachillerato</th>
+                  <th>FP Grado Medio/Superior</th>
+                  <th>Grado Universitario</th>
+                  <th>Máster / Posgrado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Escala de notas</td>
+                  <td>0 – 10</td>
+                  <td>0 – 10</td>
+                  <td>0 – 10 (+ ECTS)</td>
+                  <td>0 – 10 (+ ECTS)</td>
+                </tr>
+                <tr>
+                  <td>Nota mínima para aprobar</td>
+                  <td>5 / 10</td>
+                  <td>5 / 10</td>
+                  <td>5 / 10</td>
+                  <td>5 / 10</td>
+                </tr>
+                <tr>
+                  <td>Sistema de créditos</td>
+                  <td>Por asignatura (igual peso)</td>
+                  <td>Horas por módulo</td>
+                  <td>ECTS (60 por año)</td>
+                  <td>ECTS (60–120 total)</td>
+                </tr>
+                <tr>
+                  <td>Matrícula de Honor</td>
+                  <td>Sí (nota 10)</td>
+                  <td>Sí (nota 10)</td>
+                  <td>Sí (nota 10, máx 5% del grupo)</td>
+                  <td>Sí (según centro)</td>
+                </tr>
+                <tr>
+                  <td>Acceso a siguiente etapa</td>
+                  <td>Bachiller → EvAU</td>
+                  <td>FP Superior → acceso directo a Grado</td>
+                  <td>Acceso a Máster oficial</td>
+                  <td>Acceso a Doctorado</td>
+                </tr>
+                <tr>
+                  <td>Ideal para…</td>
+                  <td>Educación obligatoria y preuniversitaria</td>
+                  <td>Formación profesional específica</td>
+                  <td>Formación superior (3–4 años)</td>
+                  <td>Especialización y posgrado</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── CASOS DE USO ── */}
+        <section className={styles.guideSection}>
+          <h2>¿Cuál es tu situación? Casos de Uso</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>🏫</span>
+                <span className={styles.casoNivel}>ESO / Bachillerato</span>
+              </div>
+              <p>
+                En ESO y Bachillerato todas las asignaturas tienen el <strong>mismo peso</strong> en la nota media.
+                Introduce cada nota con créditos iguales (por ejemplo, 1) para obtener la media aritmética estándar.
+              </p>
+              <span className={styles.casoTip}>→ Pestaña &quot;Media Ponderada&quot;, todos los créditos a 1</span>
+            </div>
+
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>📝</span>
+                <span className={styles.casoNivel}>Aspirante a EvAU</span>
+              </div>
+              <p>
+                Calcula tu <strong>nota de acceso</strong> (60% Bachillerato + 40% fase general) y tu{' '}
+                <strong>nota de admisión</strong> añadiendo la fase específica para la carrera que quieres.
+                La nota máxima posible es 14 puntos.
+              </p>
+              <span className={styles.casoTip}>→ Pestaña &quot;EvAU / Selectividad&quot;</span>
+            </div>
+
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>🎓</span>
+                <span className={styles.casoNivel}>Universitario con ECTS</span>
+              </div>
+              <p>
+                Tu expediente académico usa <strong>créditos ECTS</strong>: una asignatura de 12 créditos
+                pesa el doble que una de 6 en tu media. Introduce cada asignatura con sus créditos reales
+                para obtener la media ponderada correcta de tu expediente.
+              </p>
+              <span className={styles.casoTip}>→ Pestaña &quot;Media Ponderada&quot;, créditos = ECTS reales</span>
+            </div>
+
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>✈️</span>
+                <span className={styles.casoNivel}>Erasmus / Internacional</span>
+              </div>
+              <p>
+                Convierte tu nota española a <strong>GPA</strong> (sistema estadounidense), calificación por
+                letras (A, B, C…) o escala ECTS europea para solicitudes de becas o universidades extranjeras.
+              </p>
+              <span className={styles.casoTip}>→ Pestaña &quot;Conversor de Escalas&quot;</span>
+            </div>
+          </div>
+        </section>
+
+        {/* ── FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Cómo se calcula la nota media ponderada?</p>
+              <p className={styles.faqRespuesta}>
+                Multiplica la nota de cada asignatura por sus créditos, suma todos esos productos y divide
+                entre el total de créditos. Fórmula: <strong>(Σ nota × créditos) ÷ Σ créditos</strong>.
+                Una asignatura de 12 ECTS con un 9 contribuye más a la media que una de 6 ECTS con el mismo 9.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Qué diferencia hay entre media aritmética y media ponderada?</p>
+              <p className={styles.faqRespuesta}>
+                La <strong>media aritmética</strong> suma todas las notas y divide entre el número de
+                asignaturas (todas pesan igual). La <strong>media ponderada</strong> da más importancia a
+                las asignaturas con más créditos. En la universidad, el expediente académico siempre usa
+                la media ponderada por ECTS.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Qué es la Matrícula de Honor y cómo se consigue?</p>
+              <p className={styles.faqRespuesta}>
+                Es la calificación máxima del sistema universitario español (nota 10). Solo puede otorgarse
+                a un máximo del <strong>5% de los alumnos matriculados</strong> en cada asignatura. Como
+                recompensa, da derecho a matrícula gratuita en una asignatura del curso siguiente de igual
+                o menor número de créditos.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Cómo funciona el cálculo de la nota EvAU paso a paso?</p>
+              <p className={styles.faqRespuesta}>
+                <strong>1. Nota de acceso</strong> = 60% nota de Bachillerato + 40% media de la fase general
+                (4 exámenes obligatorios). Máximo: 10 puntos.{' '}
+                <strong>2. Nota de admisión</strong> = Nota de acceso + hasta 4 puntos de la fase específica
+                (las 2 mejores notas voluntarias ≥ 5, multiplicadas por 0,1 o 0,2 según la ponderación
+                de cada grado). Máximo total: 14 puntos.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <p className={styles.faqPregunta}>¿Qué nota de expediente necesito para acceder a un Máster?</p>
+              <p className={styles.faqRespuesta}>
+                Los Másteres oficiales exigen tener un título de Grado o equivalente. La nota de corte varía
+                según máster y universidad: los más demandados pueden requerir una media de expediente de{' '}
+                <strong>7,0 o superior</strong>. Además del expediente, muchos valoran carta de motivación,
+                experiencia profesional o entrevista personal.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── CONTENIDO PREVIO: ECTS, EvAU, Equivalencias ── */}
         <section className={styles.guideSection}>
           <h2>Sistema de Créditos ECTS</h2>
           <p className={styles.introParagraph}>

@@ -582,6 +582,120 @@
   background: var(--hover);
 }
 
+/* Tabla comparativa de sistemas educativos */
+.tableWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-lg) 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  min-width: 600px;
+}
+
+.tablaComparativa th,
+.tablaComparativa td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.tablaComparativa th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tablaComparativa td:first-child {
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--hover);
+  white-space: nowrap;
+}
+
+.tablaComparativa tr:last-child td {
+  border-bottom: none;
+}
+
+/* Casos de uso por perfil */
+.casosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.casoCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--secondary);
+}
+
+.casoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.casoIcon {
+  font-size: 1.8rem;
+}
+
+.casoNivel {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.casoCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 0.4rem;
+}
+
+.casoTip {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  border-left: 4px solid var(--secondary);
+}
+
+.faqPregunta {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.95rem;
+}
+
+.faqRespuesta {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
 /* Empty State */
 .emptyState {
   text-align: center;
