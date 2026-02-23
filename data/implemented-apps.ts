@@ -286,6 +286,10 @@ export const implementedAppsUrls = [
   "/calculadora-rentabilidad-alquiler/", // ROI inversión inmobiliaria: rentabilidad bruta/neta, cash flow, payback
   "/seguimiento-ciclo-menstrual/",       // Ciclo menstrual: ventana fértil, ovulación, próximas fechas (cálculo local)
   "/calculadora-gastos-comunidad/",      // Gastos comunidad propietarios: reparto igual o por coeficiente
+
+  // Nuevas apps (2026-02-23)
+  "/juego-ahorcado/",                    // Juego del ahorcado en español: 4 categorías, 100% local
+  "/checklist-documentos-viaje/",        // Checklist documentos de viaje: España, Europa, internacional
 ];
 
 /**

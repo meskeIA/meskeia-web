@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 231,
+  "total_tools": 236,
   "updated": "2026-02-23",
   "features": {
     "all_free": true,
@@ -925,6 +925,12 @@
           "slug": "sonometro",
           "url": "https://meskeia.com/sonometro/",
           "description": "Mide el nivel de ruido en decibelios (dB) con tu micrófono. Ideal para documentar ruido y contaminación acústica."
+        },
+        {
+          "name": "Juego del Ahorcado",
+          "slug": "juego-ahorcado",
+          "url": "https://meskeia.com/juego-ahorcado/",
+          "description": "Adivina la palabra letra a letra. 4 categorías: animales, países, profesiones y vocabulario"
         }
       ]
     },
@@ -1173,6 +1179,12 @@
           "slug": "golden-hour",
           "url": "https://meskeia.com/golden-hour/",
           "description": "Calcula las horas de luz dorada y azul para fotografía. Amanecer, atardecer y crepúsculos según tu ubicación."
+        },
+        {
+          "name": "Organizador de Documentos de Viaje",
+          "slug": "checklist-documentos-viaje",
+          "url": "https://meskeia.com/checklist-documentos-viaje/",
+          "description": "Checklist personalizable con documentos para España, Europa e internacional"
         }
       ]
     },

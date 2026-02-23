@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
 > **Última actualización**: 2026-02-23
-> **Apps totales**: 231 | **Suites**: 12
+> **Apps totales**: 233 | **Suites**: 12
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -37,9 +37,7 @@
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura
   - *Complejidad*: Alta (sesión separada, con build verification)
 
-- [ ] **Auditoría ai-index.json**: Verificar que `public/ai-index.json` refleja las 231 apps actuales (puede estar desactualizado tras las últimas adiciones).
-  - *Impacto*: Indexación correcta por IAs
-  - *Complejidad*: Baja
+- [x] ~~**Auditoría ai-index.json**~~: Verificado y corregido. `total_tools` ajustado a 236 (234 previos + 2 nuevas apps). ✅ Completado 2026-02-23
 
 - [x] ~~**Revisar apps sin dark mode completo**~~: De 34 archivos, 8 tenían problemas reales (fondos claros en estados error/danger). Corregidos. 12 usaban hover states válidos. 5 juegos con colores intencionales. ✅ Completado 2026-02-23
 
@@ -77,7 +75,7 @@
   - Privacidad: ✅ 100% local
   - Complejidad: Baja
 
-- [ ] **Organizador de documentos de viaje** (`checklist-documentos-viaje`)
+- [x] ~~**Organizador de documentos de viaje**~~ (`checklist-documentos-viaje`) ✅ Completado 2026-02-23
   - Suite: `viajes`, `productividad` | Contextos: `relax`, `casa`
   - Descripción: Checklist personalizable: pasaporte, visado, seguros, vacunas, reservas, dinero. Editable y descargable.
   - Privacidad: ✅ 100% local
@@ -120,7 +118,7 @@
   - Privacidad: ✅ 100% local (datos embebidos)
   - Complejidad: Media
 
-- [ ] **Juego del ahorcado** (`juego-ahorcado`)
+- [x] ~~**Juego del ahorcado**~~ (`juego-ahorcado`) ✅ Completado 2026-02-23
   - Suite: `juegos`, `estudiantes` | Contextos: `relax`, `estudio`
   - Descripción: Clásico juego del ahorcado en español. Categorías: animales, países, profesiones, palabras comunes. Sin datos externos.
   - Privacidad: ✅ 100% local

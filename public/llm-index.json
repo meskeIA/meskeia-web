@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 231+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 233+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 231,
-  "last_updated": "2026-02-21",
+  "total_tools": 233,
+  "last_updated": "2026-02-23",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -35,7 +35,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 49
+      "tool_count": 50
     },
     {
       "id": "finanzas",
@@ -70,7 +70,7 @@
       "name": "Juegos y Ocio",
       "icon": "🎲",
       "description": "Diversión y entretenimiento",
-      "tool_count": 18
+      "tool_count": 19
     },
     {
       "id": "marketing",
@@ -84,7 +84,7 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 38
+      "tool_count": 39
     },
     {
       "id": "salud",
@@ -98,7 +98,7 @@
       "name": "Viajes y Turismo",
       "icon": "✈️",
       "description": "Planifica viajes, divisas, enchufes y presupuestos de viaje",
-      "tool_count": 10
+      "tool_count": 11
     }
   ],
   "moments": [
@@ -114,14 +114,14 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 78
+      "tool_count": 79
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 73
+      "tool_count": 74
     },
     {
       "id": "dinero",
@@ -142,7 +142,7 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 19
+      "tool_count": 21
     },
     {
       "id": "curiosidad",
@@ -3145,6 +3145,30 @@
       "icon": "🎲"
     },
     {
+      "slug": "juego-ahorcado",
+      "name": "Juego del Ahorcado",
+      "url": "https://meskeia.com/juego-ahorcado/",
+      "description": "Clásico juego del ahorcado en español. 4 categorías: animales, países, profesiones y vocabulario. Sin datos externos, 100% local",
+      "suites": [
+        "juegos",
+        "estudiantes"
+      ],
+      "contexts": [
+        "relax",
+        "estudio"
+      ],
+      "keywords": [
+        "ahorcado",
+        "adivinar palabra",
+        "juego letras",
+        "juego español",
+        "vocabulario",
+        "juego educativo",
+        "palabras"
+      ],
+      "icon": "🎯"
+    },
+    {
       "slug": "calculadora-probabilidad",
       "name": "Calculadora de Probabilidad",
       "url": "https://meskeia.com/calculadora-probabilidad/",
@@ -3894,6 +3918,30 @@
         "empacar"
       ],
       "icon": "🧳"
+    },
+    {
+      "slug": "checklist-documentos-viaje",
+      "name": "Organizador de Documentos de Viaje",
+      "url": "https://meskeia.com/checklist-documentos-viaje/",
+      "description": "Checklist personalizable con todos los documentos necesarios para tu viaje. Adaptado según destino: España, Europa o internacional",
+      "suites": [
+        "viajes",
+        "productividad"
+      ],
+      "contexts": [
+        "relax",
+        "casa"
+      ],
+      "keywords": [
+        "documentos viaje",
+        "checklist viaje",
+        "pasaporte",
+        "visado",
+        "seguro viaje",
+        "preparar viaje",
+        "lista documentos"
+      ],
+      "icon": "📋"
     },
     {
       "slug": "conversor-divisas",

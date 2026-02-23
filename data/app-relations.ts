@@ -272,6 +272,7 @@ const productividadApps: RelatedApp[] = [
 
 const viajesApps: RelatedApp[] = [
   { url: '/lista-equipaje/', icon: '🧳', name: 'Lista Equipaje', description: 'Checklist de viaje' },
+  { url: '/checklist-documentos-viaje/', icon: '📋', name: 'Documentos de Viaje', description: 'Pasaporte, visado y más' },
   { url: '/conversor-horarios/', icon: '🌍', name: 'Conversor Horarios', description: 'Zonas horarias' },
   { url: '/conversor-divisas/', icon: '💱', name: 'Conversor Divisas', description: 'Tipos de cambio BCE' },
   { url: '/presupuesto-viaje/', icon: '🗺️', name: 'Presupuesto Viaje', description: 'Planifica y divide gastos' },
@@ -295,6 +296,7 @@ const juegosArcadeApps: RelatedApp[] = [
 const juegosPuzzleApps: RelatedApp[] = [
   { url: '/juego-sudoku/', icon: '🔢', name: 'Sudoku', description: 'Puzzle clásico' },
   { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra' },
+  { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
   { url: '/juego-memoria/', icon: '🧠', name: 'Memoria', description: 'Encuentra parejas' },
   { url: '/juego-puzzle-matematico/', icon: '➕', name: 'Puzzle Matemático', description: 'Retos numéricos' },
 ];
@@ -614,6 +616,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'planificador-turnos': productividadApps.filter(a => a.url !== '/planificador-turnos/'),
   'cronometro': productividadApps,
   'lista-equipaje': viajesApps.filter(a => a.url !== '/lista-equipaje/').slice(0, 4),
+  'checklist-documentos-viaje': viajesApps.filter(a => a.url !== '/checklist-documentos-viaje/').slice(0, 4),
   'conversor-horarios': viajesApps.filter(a => a.url !== '/conversor-horarios/').slice(0, 4),
   'calculadora-combustible': viajesApps.filter(a => a.url !== '/calculadora-combustible/').slice(0, 4),
   'informacion-tiempo': viajesApps.filter(a => a.url !== '/informacion-tiempo/').slice(0, 4),
@@ -628,8 +631,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'juego-space-invaders': juegosArcadeApps.filter(a => a.url !== '/juego-space-invaders/'),
   'juego-platform-runner': juegosArcadeApps.filter(a => a.url !== '/juego-platform-runner/'),
   'juego-2048': [...juegosPuzzleApps.slice(0, 2), ...juegosArcadeApps.slice(0, 2)],
-  'juego-sudoku': juegosPuzzleApps.filter(a => a.url !== '/juego-sudoku/'),
-  'juego-wordle': juegosPuzzleApps.filter(a => a.url !== '/juego-wordle/'),
+  'juego-sudoku': juegosPuzzleApps.filter(a => a.url !== '/juego-sudoku/').slice(0, 4),
+  'juego-wordle': juegosPuzzleApps.filter(a => a.url !== '/juego-wordle/').slice(0, 4),
+  'juego-ahorcado': juegosPuzzleApps.filter(a => a.url !== '/juego-ahorcado/').slice(0, 4),
   'juego-memoria': juegosPuzzleApps.filter(a => a.url !== '/juego-memoria/'),
   'juego-puzzle-matematico': juegosPuzzleApps.filter(a => a.url !== '/juego-puzzle-matematico/'),
   'juego-tres-en-raya': juegosCasualApps.filter(a => a.url !== '/juego-tres-en-raya/'),
