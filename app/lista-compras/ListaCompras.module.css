@@ -643,3 +643,23 @@
     font-size: 0.85rem;
   }
 }
+
+/* Dark Mode */
+[data-theme='dark'] .deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+[data-theme='dark'] .btnAccionDanger {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+[data-theme='dark'] .btnAccionDanger:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+[data-theme='dark'] .btnEliminar {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+[data-theme='dark'] .btnEliminar:hover {
+  background: rgba(239, 68, 68, 0.15);
+}

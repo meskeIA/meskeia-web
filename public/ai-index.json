@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 228,
-  "updated": "2026-02-21",
+  "total_tools": 231,
+  "updated": "2026-02-23",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -20,23 +20,126 @@
       "description": "Herramientas de cálculo para el día a día",
       "icon": "🧮",
       "tools": [
-        { "name": "Calculadora de Propinas", "slug": "calculadora-propinas", "url": "https://meskeia.com/calculadora-propinas/", "description": "Calcula propinas y divide la cuenta entre varias personas fácilmente" },
-        { "name": "Calculadora de IVA", "slug": "calculadora-iva", "url": "https://meskeia.com/calculadora-iva/", "description": "Calcula el IVA español: añade o quita IVA al 21%, 10% o 4% con un clic" },
-        { "name": "Calculadora de Descuentos", "slug": "calculadora-descuentos", "url": "https://meskeia.com/calculadora-descuentos/", "description": "Calcula el precio final con descuento y cuánto ahorras" },
-        { "name": "Calculadora de Porcentajes", "slug": "calculadora-porcentajes", "url": "https://meskeia.com/calculadora-porcentajes/", "description": "Calculadora de porcentajes completa: X% de cantidad, aumentos, disminuciones" },
-        { "name": "Calculadora Regla de Tres", "slug": "calculadora-regla-de-tres", "url": "https://meskeia.com/calculadora-regla-de-tres/", "description": "Regla de tres simple y compuesta con ejemplos prácticos" },
-        { "name": "Calculadora de Fechas", "slug": "calculadora-fechas", "url": "https://meskeia.com/calculadora-fechas/", "description": "Calcula días entre fechas, suma o resta días" },
-        { "name": "Conversor de Tallas", "slug": "conversor-tallas", "url": "https://meskeia.com/conversor-tallas/", "description": "Convierte tallas de ropa y calzado entre sistemas EU, UK, US" },
-        { "name": "Calculadora de Cocina", "slug": "calculadora-cocina", "url": "https://meskeia.com/calculadora-cocina/", "description": "Conversor de unidades de cocina, escalador de recetas" },
-        { "name": "Lista de Compras", "slug": "lista-compras", "url": "https://meskeia.com/lista-compras/", "description": "Lista de compras con organización automática por categorías" },
-        { "name": "Calculadora de Gasto Energético", "slug": "calculadora-gasto-energetico", "url": "https://meskeia.com/calculadora-gasto-energetico/", "description": "Calcula el consumo eléctrico y coste mensual en tu factura" },
-        { "name": "Calculadora Huella de Carbono", "slug": "calculadora-huella-carbono", "url": "https://meskeia.com/calculadora-huella-carbono/", "description": "Calcula tu huella de carbono personal anual" },
-        { "name": "Calculadora de Pintura", "slug": "calculadora-pintura", "url": "https://meskeia.com/calculadora-pintura/", "description": "Calcula cuánta pintura necesitas para paredes y techos" },
-        { "name": "Calculadora Consumo Combustible", "slug": "calculadora-combustible", "url": "https://meskeia.com/calculadora-combustible/", "description": "Calcula consumo en L/100km y coste de viajes" },
-        { "name": "Calculadora Edad Mascotas", "slug": "calculadora-edad-mascotas", "url": "https://meskeia.com/calculadora-edad-mascotas/", "description": "Edad de perros y gatos en años humanos" },
-        { "name": "Planificador de Boda", "slug": "planificador-boda", "url": "https://meskeia.com/planificador-boda/", "description": "Organiza tu boda: checklist, presupuesto y timeline del día" },
-        { "name": "Planificador de Mudanzas", "slug": "planificador-mudanzas", "url": "https://meskeia.com/planificador-mudanzas/", "description": "Organiza tu mudanza: tareas por fases, inventario por habitación y control de presupuesto" },
-        { "name": "Países del Mundo", "slug": "paises-del-mundo", "url": "https://meskeia.com/paises-del-mundo/", "description": "Buscador de 195 países con capitales, banderas, monedas, idiomas y datos clave" }
+        {
+          "name": "Calculadora de Propinas",
+          "slug": "calculadora-propinas",
+          "url": "https://meskeia.com/calculadora-propinas/",
+          "description": "Calcula propinas y divide la cuenta entre varias personas fácilmente"
+        },
+        {
+          "name": "Calculadora de IVA",
+          "slug": "calculadora-iva",
+          "url": "https://meskeia.com/calculadora-iva/",
+          "description": "Calcula el IVA español: añade o quita IVA al 21%, 10% o 4% con un clic"
+        },
+        {
+          "name": "Calculadora de Descuentos",
+          "slug": "calculadora-descuentos",
+          "url": "https://meskeia.com/calculadora-descuentos/",
+          "description": "Calcula el precio final con descuento y cuánto ahorras"
+        },
+        {
+          "name": "Calculadora de Porcentajes",
+          "slug": "calculadora-porcentajes",
+          "url": "https://meskeia.com/calculadora-porcentajes/",
+          "description": "Calculadora de porcentajes completa: X% de cantidad, aumentos, disminuciones"
+        },
+        {
+          "name": "Calculadora Regla de Tres",
+          "slug": "calculadora-regla-de-tres",
+          "url": "https://meskeia.com/calculadora-regla-de-tres/",
+          "description": "Regla de tres simple y compuesta con ejemplos prácticos"
+        },
+        {
+          "name": "Calculadora de Fechas",
+          "slug": "calculadora-fechas",
+          "url": "https://meskeia.com/calculadora-fechas/",
+          "description": "Calcula días entre fechas, suma o resta días"
+        },
+        {
+          "name": "Conversor de Tallas",
+          "slug": "conversor-tallas",
+          "url": "https://meskeia.com/conversor-tallas/",
+          "description": "Convierte tallas de ropa y calzado entre sistemas EU, UK, US"
+        },
+        {
+          "name": "Calculadora de Cocina",
+          "slug": "calculadora-cocina",
+          "url": "https://meskeia.com/calculadora-cocina/",
+          "description": "Conversor de unidades de cocina, escalador de recetas"
+        },
+        {
+          "name": "Lista de Compras",
+          "slug": "lista-compras",
+          "url": "https://meskeia.com/lista-compras/",
+          "description": "Lista de compras con organización automática por categorías"
+        },
+        {
+          "name": "Calculadora de Gasto Energético",
+          "slug": "calculadora-gasto-energetico",
+          "url": "https://meskeia.com/calculadora-gasto-energetico/",
+          "description": "Calcula el consumo eléctrico y coste mensual en tu factura"
+        },
+        {
+          "name": "Calculadora Huella de Carbono",
+          "slug": "calculadora-huella-carbono",
+          "url": "https://meskeia.com/calculadora-huella-carbono/",
+          "description": "Calcula tu huella de carbono personal anual"
+        },
+        {
+          "name": "Calculadora de Pintura",
+          "slug": "calculadora-pintura",
+          "url": "https://meskeia.com/calculadora-pintura/",
+          "description": "Calcula cuánta pintura necesitas para paredes y techos"
+        },
+        {
+          "name": "Calculadora Consumo Combustible",
+          "slug": "calculadora-combustible",
+          "url": "https://meskeia.com/calculadora-combustible/",
+          "description": "Calcula consumo en L/100km y coste de viajes"
+        },
+        {
+          "name": "Calculadora Edad Mascotas",
+          "slug": "calculadora-edad-mascotas",
+          "url": "https://meskeia.com/calculadora-edad-mascotas/",
+          "description": "Edad de perros y gatos en años humanos"
+        },
+        {
+          "name": "Planificador de Boda",
+          "slug": "planificador-boda",
+          "url": "https://meskeia.com/planificador-boda/",
+          "description": "Organiza tu boda: checklist, presupuesto y timeline del día"
+        },
+        {
+          "name": "Planificador de Mudanzas",
+          "slug": "planificador-mudanzas",
+          "url": "https://meskeia.com/planificador-mudanzas/",
+          "description": "Organiza tu mudanza: tareas por fases, inventario por habitación y control de presupuesto"
+        },
+        {
+          "name": "Países del Mundo",
+          "slug": "paises-del-mundo",
+          "url": "https://meskeia.com/paises-del-mundo/",
+          "description": "Buscador de 195 países con capitales, banderas, monedas, idiomas y datos clave"
+        },
+        {
+          "name": "Contador Manual (Tally Counter)",
+          "slug": "contador-manual",
+          "url": "https://meskeia.com/contador-manual/",
+          "description": "Contador manual digital con múltiples contadores independientes, colores personalizables, sonido y vibración."
+        },
+        {
+          "name": "Presupuesto de Viaje",
+          "slug": "presupuesto-viaje",
+          "url": "https://meskeia.com/presupuesto-viaje/",
+          "description": "Planifica el presupuesto de tu viaje por categorías y divide los gastos entre el grupo de viajeros."
+        },
+        {
+          "name": "Calculadora Coste Real a Plazos",
+          "slug": "calculadora-coste-plazos",
+          "url": "https://meskeia.com/calculadora-coste-plazos/",
+          "description": "Descubre el coste real de financiar productos a plazos. Calcula la TAE, los intereses ocultos y cuánto pagas de más."
+        }
       ]
     },
     {
@@ -44,15 +147,60 @@
       "description": "Cifrado de textos y verificación de datos",
       "icon": "🔐",
       "tools": [
-        { "name": "Cifrado Clásico", "slug": "cifrado-clasico", "url": "https://meskeia.com/cifrado-clasico/", "description": "Cifra textos con César, ROT13 y Atbash" },
-        { "name": "Cifrado Vigenère", "slug": "cifrado-vigenere", "url": "https://meskeia.com/cifrado-vigenere/", "description": "Cifrado polialfabético con palabra clave" },
-        { "name": "Cifrado por Transposición", "slug": "cifrado-transposicion", "url": "https://meskeia.com/cifrado-transposicion/", "description": "Cifra reordenando letras: Columnas, Rail Fence y Escítala" },
-        { "name": "Cifrado Playfair", "slug": "cifrado-playfair", "url": "https://meskeia.com/cifrado-playfair/", "description": "Cifrado por digramas con matriz 5x5" },
-        { "name": "Cifrado AES", "slug": "cifrado-aes", "url": "https://meskeia.com/cifrado-aes/", "description": "Cifrado simétrico moderno AES-256" },
-        { "name": "Generador de Hashes", "slug": "generador-hashes", "url": "https://meskeia.com/generador-hashes/", "description": "Genera hashes MD5, SHA-256, SHA-512" },
-        { "name": "Codificador Base64", "slug": "codificador-base64", "url": "https://meskeia.com/codificador-base64/", "description": "Codifica y decodifica texto en Base64, URL encode y Hexadecimal" },
-        { "name": "Curso de Criptografía y Seguridad", "slug": "curso-criptografia-seguridad", "url": "https://meskeia.com/curso-criptografia-seguridad/", "description": "Domina la criptografía: desde César y Vigenère hasta AES y SHA-256. 15 capítulos con herramientas prácticas integradas" },
-        { "name": "Generador de Contraseñas", "slug": "generador-contrasenas", "url": "https://meskeia.com/generador-contrasenas/", "description": "Crea contraseñas seguras y personalizadas" }
+        {
+          "name": "Cifrado Clásico",
+          "slug": "cifrado-clasico",
+          "url": "https://meskeia.com/cifrado-clasico/",
+          "description": "Cifra textos con César, ROT13 y Atbash"
+        },
+        {
+          "name": "Cifrado Vigenère",
+          "slug": "cifrado-vigenere",
+          "url": "https://meskeia.com/cifrado-vigenere/",
+          "description": "Cifrado polialfabético con palabra clave"
+        },
+        {
+          "name": "Cifrado por Transposición",
+          "slug": "cifrado-transposicion",
+          "url": "https://meskeia.com/cifrado-transposicion/",
+          "description": "Cifra reordenando letras: Columnas, Rail Fence y Escítala"
+        },
+        {
+          "name": "Cifrado Playfair",
+          "slug": "cifrado-playfair",
+          "url": "https://meskeia.com/cifrado-playfair/",
+          "description": "Cifrado por digramas con matriz 5x5"
+        },
+        {
+          "name": "Cifrado AES",
+          "slug": "cifrado-aes",
+          "url": "https://meskeia.com/cifrado-aes/",
+          "description": "Cifrado simétrico moderno AES-256"
+        },
+        {
+          "name": "Generador de Hashes",
+          "slug": "generador-hashes",
+          "url": "https://meskeia.com/generador-hashes/",
+          "description": "Genera hashes MD5, SHA-256, SHA-512"
+        },
+        {
+          "name": "Codificador Base64",
+          "slug": "codificador-base64",
+          "url": "https://meskeia.com/codificador-base64/",
+          "description": "Codifica y decodifica texto en Base64, URL encode y Hexadecimal"
+        },
+        {
+          "name": "Curso de Criptografía y Seguridad",
+          "slug": "curso-criptografia-seguridad",
+          "url": "https://meskeia.com/curso-criptografia-seguridad/",
+          "description": "Domina la criptografía: desde César y Vigenère hasta AES y SHA-256. 15 capítulos con herramientas prácticas integradas"
+        },
+        {
+          "name": "Generador de Contraseñas",
+          "slug": "generador-contrasenas",
+          "url": "https://meskeia.com/generador-contrasenas/",
+          "description": "Crea contraseñas seguras y personalizadas"
+        }
       ]
     },
     {
@@ -60,26 +208,126 @@
       "description": "Colores, tipografías y herramientas para diseñadores",
       "icon": "🎨",
       "tools": [
-        { "name": "Conversor de Colores", "slug": "conversor-colores", "url": "https://meskeia.com/conversor-colores/", "description": "Convierte entre HEX, RGB, HSL y CMYK" },
-        { "name": "Calculadora de Contraste", "slug": "contraste-colores", "url": "https://meskeia.com/contraste-colores/", "description": "Verifica accesibilidad WCAG con ratios de contraste" },
-        { "name": "Generador de Gradientes", "slug": "generador-gradientes", "url": "https://meskeia.com/generador-gradientes/", "description": "Crea gradientes CSS lineales, radiales y cónicos" },
-        { "name": "Generador de Sombras", "slug": "generador-sombras", "url": "https://meskeia.com/generador-sombras/", "description": "Genera box-shadow y text-shadow con múltiples capas" },
-        { "name": "Calculadora de Aspectos", "slug": "calculadora-aspectos", "url": "https://meskeia.com/calculadora-aspectos/", "description": "Mantiene proporciones al redimensionar" },
-        { "name": "Generador de Tipografías", "slug": "generador-tipografias", "url": "https://meskeia.com/generador-tipografias/", "description": "Combina Google Fonts con pairings armónicos" },
-        { "name": "Creador de Paletas", "slug": "creador-paletas", "url": "https://meskeia.com/creador-paletas/", "description": "Diseña paletas de colores profesionales" },
-        { "name": "Validador JSON", "slug": "validador-json", "url": "https://meskeia.com/validador-json/", "description": "Valida, formatea y minifica código JSON y XML" },
-        { "name": "Generador de Iconos PWA", "slug": "generador-iconos", "url": "https://meskeia.com/generador-iconos/", "description": "Genera todos los tamaños de iconos para PWA y favicon" },
-        { "name": "Validador RegEx", "slug": "validador-regex", "url": "https://meskeia.com/validador-regex/", "description": "Testa y valida expresiones regulares" },
-        { "name": "Conversor de Imágenes", "slug": "conversor-imagenes", "url": "https://meskeia.com/conversor-imagenes/", "description": "Convierte formatos de imagen, comprime y redimensiona" },
-        { "name": "Compresor de Imágenes por Lotes", "slug": "compresor-imagenes", "url": "https://meskeia.com/compresor-imagenes/", "description": "Comprime múltiples imágenes sin límites ni marcas de agua" },
-        { "name": "Extractor de Audio de Vídeo", "slug": "extractor-audio-video", "url": "https://meskeia.com/extractor-audio-video/", "description": "Extrae y recorta fragmentos de audio de vídeos AVI, MP4, MOV, MKV y convierte a MP3 o WAV. Procesamiento 100% local en el navegador, ningún archivo sale del dispositivo" },
-        { "name": "Recortador de Audio", "slug": "recortador-audio", "url": "https://meskeia.com/recortador-audio/", "description": "Recorta y edita audio MP3, WAV, OGG con fade in/out sin límites ni marcas de agua" },
-        { "name": "Generador de Ondas y Visualizador", "slug": "generador-ondas", "url": "https://meskeia.com/generador-ondas/", "description": "Genera ondas sonoras (senoidal, cuadrada, triangular, sierra) y visualiza audio de archivos. Herramienta educativa de física del sonido" },
-        { "name": "Generador de Enlaces UTM", "slug": "generador-utm", "url": "https://meskeia.com/generador-utm/", "description": "Genera enlaces UTM para Google Analytics" },
-        { "name": "Creador de Thumbnails YouTube", "slug": "creador-thumbnails", "url": "https://meskeia.com/creador-thumbnails/", "description": "Diseña miniaturas profesionales para YouTube con texto, imágenes, formas y exportación PNG 1280x720" },
-        { "name": "Editor EXIF", "slug": "editor-exif", "url": "https://meskeia.com/editor-exif/", "description": "Visualiza y elimina metadatos EXIF de tus fotos: GPS, cámara, fecha, dispositivo. Protege tu privacidad" },
-        { "name": "Generador de Avatares", "slug": "generador-avatares", "url": "https://meskeia.com/generador-avatares/", "description": "Genera avatares únicos desde tu nombre. 8 estilos, descarga PNG, 100% privado" },
-        { "name": "Generador Imágenes OG", "slug": "generador-og-images", "url": "https://meskeia.com/generador-og-images/", "description": "Crea imágenes Open Graph profesionales 1200x630 para Facebook, Twitter, LinkedIn y WhatsApp. Plantillas, editor visual y exportación PNG" }
+        {
+          "name": "Conversor de Colores",
+          "slug": "conversor-colores",
+          "url": "https://meskeia.com/conversor-colores/",
+          "description": "Convierte entre HEX, RGB, HSL y CMYK"
+        },
+        {
+          "name": "Calculadora de Contraste",
+          "slug": "contraste-colores",
+          "url": "https://meskeia.com/contraste-colores/",
+          "description": "Verifica accesibilidad WCAG con ratios de contraste"
+        },
+        {
+          "name": "Generador de Gradientes",
+          "slug": "generador-gradientes",
+          "url": "https://meskeia.com/generador-gradientes/",
+          "description": "Crea gradientes CSS lineales, radiales y cónicos"
+        },
+        {
+          "name": "Generador de Sombras",
+          "slug": "generador-sombras",
+          "url": "https://meskeia.com/generador-sombras/",
+          "description": "Genera box-shadow y text-shadow con múltiples capas"
+        },
+        {
+          "name": "Calculadora de Aspectos",
+          "slug": "calculadora-aspectos",
+          "url": "https://meskeia.com/calculadora-aspectos/",
+          "description": "Mantiene proporciones al redimensionar"
+        },
+        {
+          "name": "Generador de Tipografías",
+          "slug": "generador-tipografias",
+          "url": "https://meskeia.com/generador-tipografias/",
+          "description": "Combina Google Fonts con pairings armónicos"
+        },
+        {
+          "name": "Creador de Paletas",
+          "slug": "creador-paletas",
+          "url": "https://meskeia.com/creador-paletas/",
+          "description": "Diseña paletas de colores profesionales"
+        },
+        {
+          "name": "Validador JSON",
+          "slug": "validador-json",
+          "url": "https://meskeia.com/validador-json/",
+          "description": "Valida, formatea y minifica código JSON y XML"
+        },
+        {
+          "name": "Generador de Iconos PWA",
+          "slug": "generador-iconos",
+          "url": "https://meskeia.com/generador-iconos/",
+          "description": "Genera todos los tamaños de iconos para PWA y favicon"
+        },
+        {
+          "name": "Validador RegEx",
+          "slug": "validador-regex",
+          "url": "https://meskeia.com/validador-regex/",
+          "description": "Testa y valida expresiones regulares"
+        },
+        {
+          "name": "Conversor de Imágenes",
+          "slug": "conversor-imagenes",
+          "url": "https://meskeia.com/conversor-imagenes/",
+          "description": "Convierte formatos de imagen, comprime y redimensiona"
+        },
+        {
+          "name": "Compresor de Imágenes por Lotes",
+          "slug": "compresor-imagenes",
+          "url": "https://meskeia.com/compresor-imagenes/",
+          "description": "Comprime múltiples imágenes sin límites ni marcas de agua"
+        },
+        {
+          "name": "Extractor de Audio de Vídeo",
+          "slug": "extractor-audio-video",
+          "url": "https://meskeia.com/extractor-audio-video/",
+          "description": "Extrae y recorta fragmentos de audio de vídeos AVI, MP4, MOV, MKV y convierte a MP3 o WAV. Procesamiento 100% local en el navegador, ningún archivo sale del dispositivo"
+        },
+        {
+          "name": "Recortador de Audio",
+          "slug": "recortador-audio",
+          "url": "https://meskeia.com/recortador-audio/",
+          "description": "Recorta y edita audio MP3, WAV, OGG con fade in/out sin límites ni marcas de agua"
+        },
+        {
+          "name": "Generador de Ondas y Visualizador",
+          "slug": "generador-ondas",
+          "url": "https://meskeia.com/generador-ondas/",
+          "description": "Genera ondas sonoras (senoidal, cuadrada, triangular, sierra) y visualiza audio de archivos. Herramienta educativa de física del sonido"
+        },
+        {
+          "name": "Generador de Enlaces UTM",
+          "slug": "generador-utm",
+          "url": "https://meskeia.com/generador-utm/",
+          "description": "Genera enlaces UTM para Google Analytics"
+        },
+        {
+          "name": "Creador de Thumbnails YouTube",
+          "slug": "creador-thumbnails",
+          "url": "https://meskeia.com/creador-thumbnails/",
+          "description": "Diseña miniaturas profesionales para YouTube con texto, imágenes, formas y exportación PNG 1280x720"
+        },
+        {
+          "name": "Editor EXIF",
+          "slug": "editor-exif",
+          "url": "https://meskeia.com/editor-exif/",
+          "description": "Visualiza y elimina metadatos EXIF de tus fotos: GPS, cámara, fecha, dispositivo. Protege tu privacidad"
+        },
+        {
+          "name": "Generador de Avatares",
+          "slug": "generador-avatares",
+          "url": "https://meskeia.com/generador-avatares/",
+          "description": "Genera avatares únicos desde tu nombre. 8 estilos, descarga PNG, 100% privado"
+        },
+        {
+          "name": "Generador Imágenes OG",
+          "slug": "generador-og-images",
+          "url": "https://meskeia.com/generador-og-images/",
+          "description": "Crea imágenes Open Graph profesionales 1200x630 para Facebook, Twitter, LinkedIn y WhatsApp. Plantillas, editor visual y exportación PNG"
+        }
       ]
     },
     {
@@ -87,27 +335,138 @@
       "description": "Gestiona tu negocio y optimiza tu presencia online",
       "icon": "💼",
       "tools": [
-        { "name": "Calculadora Tarifa Freelance", "slug": "calculadora-tarifa-freelance", "url": "https://meskeia.com/calculadora-tarifa-freelance/", "description": "Calcula tu tarifa freelance ideal" },
-        { "name": "Calculadora Break-Even", "slug": "calculadora-break-even", "url": "https://meskeia.com/calculadora-break-even/", "description": "Calcula el punto de equilibrio de tus productos" },
-        { "name": "Planificador Cash Flow", "slug": "planificador-cashflow", "url": "https://meskeia.com/planificador-cashflow/", "description": "Proyecta tu flujo de caja a 12 meses" },
-        { "name": "Calculadora ROI Marketing", "slug": "calculadora-roi-marketing", "url": "https://meskeia.com/calculadora-roi-marketing/", "description": "Calcula el ROI por canal de marketing" },
-        { "name": "Generador de Nombres", "slug": "generador-nombres-empresa", "url": "https://meskeia.com/generador-nombres-empresa/", "description": "Genera nombres creativos para tu empresa" },
-        { "name": "Curso de Emprendimiento", "slug": "curso-emprendimiento", "url": "https://meskeia.com/curso-emprendimiento/", "description": "Guía práctica de emprendimiento" },
-        { "name": "Generador de Meta Descripciones", "slug": "generador-meta-descripciones", "url": "https://meskeia.com/generador-meta-descripciones/", "description": "Genera meta descripciones optimizadas para SEO" },
-        { "name": "Analizador de Densidad SEO", "slug": "analizador-densidad-seo", "url": "https://meskeia.com/analizador-densidad-seo/", "description": "Analiza la densidad de palabras clave" },
-        { "name": "Generador de Palabras Clave", "slug": "generador-palabras-clave", "url": "https://meskeia.com/generador-palabras-clave/", "description": "Genera ideas de palabras clave long-tail" },
-        { "name": "Generador de Hashtags", "slug": "generador-hashtags", "url": "https://meskeia.com/generador-hashtags/", "description": "Genera hashtags para redes sociales" },
-        { "name": "Analizador de Títulos SEO", "slug": "analizador-titulos-seo", "url": "https://meskeia.com/analizador-titulos-seo/", "description": "Analiza y optimiza títulos para SEO" },
-        { "name": "Calculadora de Legibilidad", "slug": "calculadora-legibilidad", "url": "https://meskeia.com/calculadora-legibilidad/", "description": "Calcula índices de legibilidad Flesch" },
-        { "name": "Calculadora Tiempo de Lectura", "slug": "calculadora-tiempo-lectura", "url": "https://meskeia.com/calculadora-tiempo-lectura/", "description": "Calcula el tiempo de lectura de tu contenido" },
-        { "name": "Generador de Schema Markup", "slug": "generador-schema-markup", "url": "https://meskeia.com/generador-schema-markup/", "description": "Genera código JSON-LD Schema.org para SEO" },
-        { "name": "Generador de Facturas", "slug": "generador-facturas", "url": "https://meskeia.com/generador-facturas/", "description": "Crea facturas profesionales con IVA y exporta a PDF" },
-        { "name": "Calculadora de Presupuestos", "slug": "calculadora-presupuestos", "url": "https://meskeia.com/calculadora-presupuestos/", "description": "Crea presupuestos profesionales para clientes: servicios, horas, materiales. Exporta a PDF" },
-        { "name": "Generador de Carruseles", "slug": "generador-carruseles", "url": "https://meskeia.com/generador-carruseles/", "description": "Crea carruseles para Instagram y LinkedIn, descarga como PNG" },
-        { "name": "Analizador GEO/AEO", "slug": "analizador-geo", "url": "https://meskeia.com/analizador-geo/", "description": "Analiza y optimiza tu contenido para ser citado por ChatGPT, Perplexity y Gemini" },
-        { "name": "Curso de Optimización para IAs (GEO/AEO)", "slug": "curso-optimizacion-ia", "url": "https://meskeia.com/curso-optimizacion-ia/", "description": "Aprende GEO/AEO: optimiza contenido para ChatGPT, Perplexity y Gemini. LLMs, RAG, E-E-A-T, Schema Markup" },
-        { "name": "Curso de Marketing Digital 2025", "slug": "curso-marketing-digital", "url": "https://meskeia.com/curso-marketing-digital/", "description": "Domina el marketing digital: branding, SEO, redes sociales, Meta Ads, Google Ads, automatización e IA. 30 capítulos prácticos" },
-        { "name": "Guía para Montar un Negocio", "slug": "guia/montar-negocio", "url": "https://meskeia.com/guia/montar-negocio/", "description": "Guía de emprendimiento: valida tu idea, calcula break-even, planifica cashflow y fija tu tarifa desde el primer día" }
+        {
+          "name": "Calculadora Tarifa Freelance",
+          "slug": "calculadora-tarifa-freelance",
+          "url": "https://meskeia.com/calculadora-tarifa-freelance/",
+          "description": "Calcula tu tarifa freelance ideal"
+        },
+        {
+          "name": "Calculadora Break-Even",
+          "slug": "calculadora-break-even",
+          "url": "https://meskeia.com/calculadora-break-even/",
+          "description": "Calcula el punto de equilibrio de tus productos"
+        },
+        {
+          "name": "Planificador Cash Flow",
+          "slug": "planificador-cashflow",
+          "url": "https://meskeia.com/planificador-cashflow/",
+          "description": "Proyecta tu flujo de caja a 12 meses"
+        },
+        {
+          "name": "Calculadora ROI Marketing",
+          "slug": "calculadora-roi-marketing",
+          "url": "https://meskeia.com/calculadora-roi-marketing/",
+          "description": "Calcula el ROI por canal de marketing"
+        },
+        {
+          "name": "Generador de Nombres",
+          "slug": "generador-nombres-empresa",
+          "url": "https://meskeia.com/generador-nombres-empresa/",
+          "description": "Genera nombres creativos para tu empresa"
+        },
+        {
+          "name": "Curso de Emprendimiento",
+          "slug": "curso-emprendimiento",
+          "url": "https://meskeia.com/curso-emprendimiento/",
+          "description": "Guía práctica de emprendimiento"
+        },
+        {
+          "name": "Generador de Meta Descripciones",
+          "slug": "generador-meta-descripciones",
+          "url": "https://meskeia.com/generador-meta-descripciones/",
+          "description": "Genera meta descripciones optimizadas para SEO"
+        },
+        {
+          "name": "Analizador de Densidad SEO",
+          "slug": "analizador-densidad-seo",
+          "url": "https://meskeia.com/analizador-densidad-seo/",
+          "description": "Analiza la densidad de palabras clave"
+        },
+        {
+          "name": "Generador de Palabras Clave",
+          "slug": "generador-palabras-clave",
+          "url": "https://meskeia.com/generador-palabras-clave/",
+          "description": "Genera ideas de palabras clave long-tail"
+        },
+        {
+          "name": "Generador de Hashtags",
+          "slug": "generador-hashtags",
+          "url": "https://meskeia.com/generador-hashtags/",
+          "description": "Genera hashtags para redes sociales"
+        },
+        {
+          "name": "Analizador de Títulos SEO",
+          "slug": "analizador-titulos-seo",
+          "url": "https://meskeia.com/analizador-titulos-seo/",
+          "description": "Analiza y optimiza títulos para SEO"
+        },
+        {
+          "name": "Calculadora de Legibilidad",
+          "slug": "calculadora-legibilidad",
+          "url": "https://meskeia.com/calculadora-legibilidad/",
+          "description": "Calcula índices de legibilidad Flesch"
+        },
+        {
+          "name": "Calculadora Tiempo de Lectura",
+          "slug": "calculadora-tiempo-lectura",
+          "url": "https://meskeia.com/calculadora-tiempo-lectura/",
+          "description": "Calcula el tiempo de lectura de tu contenido"
+        },
+        {
+          "name": "Generador de Schema Markup",
+          "slug": "generador-schema-markup",
+          "url": "https://meskeia.com/generador-schema-markup/",
+          "description": "Genera código JSON-LD Schema.org para SEO"
+        },
+        {
+          "name": "Generador de Facturas",
+          "slug": "generador-facturas",
+          "url": "https://meskeia.com/generador-facturas/",
+          "description": "Crea facturas profesionales con IVA y exporta a PDF"
+        },
+        {
+          "name": "Calculadora de Presupuestos",
+          "slug": "calculadora-presupuestos",
+          "url": "https://meskeia.com/calculadora-presupuestos/",
+          "description": "Crea presupuestos profesionales para clientes: servicios, horas, materiales. Exporta a PDF"
+        },
+        {
+          "name": "Generador de Carruseles",
+          "slug": "generador-carruseles",
+          "url": "https://meskeia.com/generador-carruseles/",
+          "description": "Crea carruseles para Instagram y LinkedIn, descarga como PNG"
+        },
+        {
+          "name": "Analizador GEO/AEO",
+          "slug": "analizador-geo",
+          "url": "https://meskeia.com/analizador-geo/",
+          "description": "Analiza y optimiza tu contenido para ser citado por ChatGPT, Perplexity y Gemini"
+        },
+        {
+          "name": "Curso de Optimización para IAs (GEO/AEO)",
+          "slug": "curso-optimizacion-ia",
+          "url": "https://meskeia.com/curso-optimizacion-ia/",
+          "description": "Aprende GEO/AEO: optimiza contenido para ChatGPT, Perplexity y Gemini. LLMs, RAG, E-E-A-T, Schema Markup"
+        },
+        {
+          "name": "Curso de Marketing Digital 2025",
+          "slug": "curso-marketing-digital",
+          "url": "https://meskeia.com/curso-marketing-digital/",
+          "description": "Domina el marketing digital: branding, SEO, redes sociales, Meta Ads, Google Ads, automatización e IA. 30 capítulos prácticos"
+        },
+        {
+          "name": "Guía para Montar un Negocio",
+          "slug": "guia/montar-negocio",
+          "url": "https://meskeia.com/guia/montar-negocio/",
+          "description": "Guía de emprendimiento: valida tu idea, calcula break-even, planifica cashflow y fija tu tarifa desde el primer día"
+        },
+        {
+          "name": "Asistente de Reclamaciones al Consumidor",
+          "slug": "asistente-reclamaciones",
+          "url": "https://meskeia.com/asistente-reclamaciones/",
+          "description": "Guía interactiva para reclamar tus derechos como consumidor en España con árbol de decisión y modelos de carta."
+        }
       ]
     },
     {
@@ -115,29 +474,192 @@
       "description": "Inversiones, ahorro y planificación financiera",
       "icon": "💰",
       "tools": [
-        { "name": "Simulador de Hipoteca", "slug": "simulador-hipoteca", "url": "https://meskeia.com/simulador-hipoteca/", "description": "Calcula tu hipoteca con cuadro de amortización" },
-        { "name": "Calculadora de Jubilación", "slug": "calculadora-jubilacion", "url": "https://meskeia.com/calculadora-jubilacion/", "description": "Planifica tu jubilación" },
-        { "name": "Calculadora de Inversiones", "slug": "calculadora-inversiones", "url": "https://meskeia.com/calculadora-inversiones/", "description": "Simula el crecimiento de tus inversiones" },
-        { "name": "Calculadora de Interés Compuesto", "slug": "interes-compuesto", "url": "https://meskeia.com/interes-compuesto/", "description": "Calcula el interés compuesto" },
-        { "name": "Test de Perfil Inversor", "slug": "test-perfil-inversor", "url": "https://meskeia.com/test-perfil-inversor/", "description": "Descubre tu tolerancia al riesgo" },
-        { "name": "Control de Gastos", "slug": "control-gastos", "url": "https://meskeia.com/control-gastos/", "description": "Controla tus gastos e ingresos mensuales" },
-        { "name": "Calculadora TIR-VAN", "slug": "calculadora-tir-van", "url": "https://meskeia.com/calculadora-tir-van/", "description": "Calcula TIR y VAN para análisis de inversiones" },
-        { "name": "Simulador de Préstamos", "slug": "simulador-prestamos", "url": "https://meskeia.com/simulador-prestamos/", "description": "Compara sistemas de amortización" },
-        { "name": "Amortización Anticipada Hipoteca", "slug": "amortizacion-hipoteca", "url": "https://meskeia.com/amortizacion-hipoteca/", "description": "Calcula el ahorro al amortizar tu hipoteca" },
-        { "name": "Calculadora de Inflación", "slug": "calculadora-inflacion", "url": "https://meskeia.com/calculadora-inflacion/", "description": "Calcula cómo la inflación afecta tu dinero" },
-        { "name": "Curso Decisiones de Inversión", "slug": "curso-decisiones-inversion", "url": "https://meskeia.com/curso-decisiones-inversion/", "description": "Aprende a tomar decisiones de inversión" },
-        { "name": "Calculadora de Suscripciones", "slug": "calculadora-suscripciones", "url": "https://meskeia.com/calculadora-suscripciones/", "description": "Controla suscripciones: Netflix, Spotify, gym. Gasto mensual y anual" },
-        { "name": "Calculadora Roommates", "slug": "calculadora-roommates", "url": "https://meskeia.com/calculadora-roommates/", "description": "Divide gastos del piso compartido entre compañeros" },
-        { "name": "Calculadora Alquiler vs Compra", "slug": "calculadora-alquiler-vs-compra", "url": "https://meskeia.com/calculadora-alquiler-vs-compra/", "description": "Análisis financiero alquiler vs compra vivienda" },
-        { "name": "Calculadora Fondo de Emergencia", "slug": "calculadora-fondo-emergencia", "url": "https://meskeia.com/calculadora-fondo-emergencia/", "description": "Calcula cuánto dinero necesitas como fondo de emergencia según tu situación" },
-        { "name": "Calculadora Regla 50/30/20", "slug": "calculadora-regla-50-30-20", "url": "https://meskeia.com/calculadora-regla-50-30-20/", "description": "Distribuye tus ingresos: 50% necesidades, 30% deseos, 20% ahorro" },
-        { "name": "Calculadora FIRE", "slug": "calculadora-fire", "url": "https://meskeia.com/calculadora-fire/", "description": "Calcula tu camino a la independencia financiera con la regla del 4%" },
-        { "name": "Comparador Compra Vehículos", "slug": "comparador-vehiculos", "url": "https://meskeia.com/comparador-vehiculos/", "description": "Compara las 4 formas de adquirir un coche: contado, financiación, renting y leasing. Calcula el coste total real de cada opción" },
-        { "name": "Calculadora Coste Vivienda", "slug": "calculadora-coste-vivienda", "url": "https://meskeia.com/calculadora-coste-vivienda/", "description": "Calcula el coste real mensual de mantener una vivienda: hipoteca, IBI, comunidad, seguros, suministros y mantenimiento" },
-        { "name": "Guía para Ahorrar Dinero", "slug": "guia/ahorrar-dinero", "url": "https://meskeia.com/guia/ahorrar-dinero/", "description": "Guía completa: control de gastos, regla 50/30/20, fondo de emergencia y estrategias para eliminar deudas" },
-        { "name": "Guía para Comprar un Coche", "slug": "guia/comprar-coche", "url": "https://meskeia.com/guia/comprar-coche/", "description": "Guía de compra de vehículo: compara contado, financiación y renting. Calcula consumo y coste total real" },
-        { "name": "Calculadora Rentabilidad de Alquiler", "slug": "calculadora-rentabilidad-alquiler", "url": "https://meskeia.com/calculadora-rentabilidad-alquiler/", "description": "Calcula ROI bruto y neto de comprar para alquilar: cash flow mensual, payback, análisis de IBI, comunidad, seguro e hipoteca" },
-        { "name": "Calculadora Gastos de Comunidad", "slug": "calculadora-gastos-comunidad", "url": "https://meskeia.com/calculadora-gastos-comunidad/", "description": "Reparte los gastos de la comunidad de propietarios por partes iguales o según coeficiente de participación" }
+        {
+          "name": "Simulador de Hipoteca",
+          "slug": "simulador-hipoteca",
+          "url": "https://meskeia.com/simulador-hipoteca/",
+          "description": "Calcula tu hipoteca con cuadro de amortización"
+        },
+        {
+          "name": "Calculadora de Jubilación",
+          "slug": "calculadora-jubilacion",
+          "url": "https://meskeia.com/calculadora-jubilacion/",
+          "description": "Planifica tu jubilación"
+        },
+        {
+          "name": "Calculadora de Inversiones",
+          "slug": "calculadora-inversiones",
+          "url": "https://meskeia.com/calculadora-inversiones/",
+          "description": "Simula el crecimiento de tus inversiones"
+        },
+        {
+          "name": "Calculadora de Interés Compuesto",
+          "slug": "interes-compuesto",
+          "url": "https://meskeia.com/interes-compuesto/",
+          "description": "Calcula el interés compuesto"
+        },
+        {
+          "name": "Test de Perfil Inversor",
+          "slug": "test-perfil-inversor",
+          "url": "https://meskeia.com/test-perfil-inversor/",
+          "description": "Descubre tu tolerancia al riesgo"
+        },
+        {
+          "name": "Control de Gastos",
+          "slug": "control-gastos",
+          "url": "https://meskeia.com/control-gastos/",
+          "description": "Controla tus gastos e ingresos mensuales"
+        },
+        {
+          "name": "Calculadora TIR-VAN",
+          "slug": "calculadora-tir-van",
+          "url": "https://meskeia.com/calculadora-tir-van/",
+          "description": "Calcula TIR y VAN para análisis de inversiones"
+        },
+        {
+          "name": "Simulador de Préstamos",
+          "slug": "simulador-prestamos",
+          "url": "https://meskeia.com/simulador-prestamos/",
+          "description": "Compara sistemas de amortización"
+        },
+        {
+          "name": "Amortización Anticipada Hipoteca",
+          "slug": "amortizacion-hipoteca",
+          "url": "https://meskeia.com/amortizacion-hipoteca/",
+          "description": "Calcula el ahorro al amortizar tu hipoteca"
+        },
+        {
+          "name": "Calculadora de Inflación",
+          "slug": "calculadora-inflacion",
+          "url": "https://meskeia.com/calculadora-inflacion/",
+          "description": "Calcula cómo la inflación afecta tu dinero"
+        },
+        {
+          "name": "Curso Decisiones de Inversión",
+          "slug": "curso-decisiones-inversion",
+          "url": "https://meskeia.com/curso-decisiones-inversion/",
+          "description": "Aprende a tomar decisiones de inversión"
+        },
+        {
+          "name": "Calculadora de Suscripciones",
+          "slug": "calculadora-suscripciones",
+          "url": "https://meskeia.com/calculadora-suscripciones/",
+          "description": "Controla suscripciones: Netflix, Spotify, gym. Gasto mensual y anual"
+        },
+        {
+          "name": "Calculadora Roommates",
+          "slug": "calculadora-roommates",
+          "url": "https://meskeia.com/calculadora-roommates/",
+          "description": "Divide gastos del piso compartido entre compañeros"
+        },
+        {
+          "name": "Calculadora Alquiler vs Compra",
+          "slug": "calculadora-alquiler-vs-compra",
+          "url": "https://meskeia.com/calculadora-alquiler-vs-compra/",
+          "description": "Análisis financiero alquiler vs compra vivienda"
+        },
+        {
+          "name": "Calculadora Fondo de Emergencia",
+          "slug": "calculadora-fondo-emergencia",
+          "url": "https://meskeia.com/calculadora-fondo-emergencia/",
+          "description": "Calcula cuánto dinero necesitas como fondo de emergencia según tu situación"
+        },
+        {
+          "name": "Calculadora Regla 50/30/20",
+          "slug": "calculadora-regla-50-30-20",
+          "url": "https://meskeia.com/calculadora-regla-50-30-20/",
+          "description": "Distribuye tus ingresos: 50% necesidades, 30% deseos, 20% ahorro"
+        },
+        {
+          "name": "Calculadora FIRE",
+          "slug": "calculadora-fire",
+          "url": "https://meskeia.com/calculadora-fire/",
+          "description": "Calcula tu camino a la independencia financiera con la regla del 4%"
+        },
+        {
+          "name": "Comparador Compra Vehículos",
+          "slug": "comparador-vehiculos",
+          "url": "https://meskeia.com/comparador-vehiculos/",
+          "description": "Compara las 4 formas de adquirir un coche: contado, financiación, renting y leasing. Calcula el coste total real de cada opción"
+        },
+        {
+          "name": "Calculadora Coste Vivienda",
+          "slug": "calculadora-coste-vivienda",
+          "url": "https://meskeia.com/calculadora-coste-vivienda/",
+          "description": "Calcula el coste real mensual de mantener una vivienda: hipoteca, IBI, comunidad, seguros, suministros y mantenimiento"
+        },
+        {
+          "name": "Guía para Ahorrar Dinero",
+          "slug": "guia/ahorrar-dinero",
+          "url": "https://meskeia.com/guia/ahorrar-dinero/",
+          "description": "Guía completa: control de gastos, regla 50/30/20, fondo de emergencia y estrategias para eliminar deudas"
+        },
+        {
+          "name": "Guía para Comprar un Coche",
+          "slug": "guia/comprar-coche",
+          "url": "https://meskeia.com/guia/comprar-coche/",
+          "description": "Guía de compra de vehículo: compara contado, financiación y renting. Calcula consumo y coste total real"
+        },
+        {
+          "name": "Calculadora Rentabilidad de Alquiler",
+          "slug": "calculadora-rentabilidad-alquiler",
+          "url": "https://meskeia.com/calculadora-rentabilidad-alquiler/",
+          "description": "Calcula ROI bruto y neto de comprar para alquilar: cash flow mensual, payback, análisis de IBI, comunidad, seguro e hipoteca"
+        },
+        {
+          "name": "Calculadora Gastos de Comunidad",
+          "slug": "calculadora-gastos-comunidad",
+          "url": "https://meskeia.com/calculadora-gastos-comunidad/",
+          "description": "Reparte los gastos de la comunidad de propietarios por partes iguales o según coeficiente de participación"
+        },
+        {
+          "name": "Calculadora de Deuda",
+          "slug": "calculadora-deuda",
+          "url": "https://meskeia.com/calculadora-deuda/",
+          "description": "Elimina tus deudas más rápido. Compara el método bola de nieve vs avalancha y descubre cuál te ahorra más."
+        },
+        {
+          "name": "Calculadora de Infraseguro",
+          "slug": "calculadora-infraseguro",
+          "url": "https://meskeia.com/calculadora-infraseguro/",
+          "description": "Calcula cuánto cobrarías en caso de siniestro si tienes infraseguro. Regla proporcional según Ley de Contrato de Seguro."
+        },
+        {
+          "name": "Calculadora Seguro de Vida",
+          "slug": "calculadora-seguro-vida",
+          "url": "https://meskeia.com/calculadora-seguro-vida/",
+          "description": "Calcula cuánto seguro de vida necesitas para proteger a tu familia según ingresos, deudas e hipoteca."
+        },
+        {
+          "name": "Comparador de Coste de Vida",
+          "slug": "comparador-coste-vida",
+          "url": "https://meskeia.com/comparador-coste-vida/",
+          "description": "Compara el coste de vida entre más de 55 ciudades del mundo: alquiler, comida, transporte e internet."
+        },
+        {
+          "name": "Comparador Tipos de Seguros",
+          "slug": "comparador-tipos-seguros",
+          "url": "https://meskeia.com/comparador-tipos-seguros/",
+          "description": "Guía educativa para comparar tipos de seguros en España: vida, auto, hogar y salud con coberturas y recomendaciones."
+        },
+        {
+          "name": "Checklist Coberturas de Seguros",
+          "slug": "checklist-coberturas-seguros",
+          "url": "https://meskeia.com/checklist-coberturas-seguros/",
+          "description": "Descubre qué seguros necesitas según tu perfil: autónomo, familia, jubilado, propietario."
+        },
+        {
+          "name": "Simulador de Cartera de Inversión",
+          "slug": "simulador-cartera-inversion",
+          "url": "https://meskeia.com/simulador-cartera-inversion/",
+          "description": "Simula la evolución de tu cartera con Monte Carlo. Sharpe, volatilidad, percentiles y probabilidad de alcanzar objetivos."
+        },
+        {
+          "name": "Simulador de Compraventa Inmobiliaria",
+          "slug": "simulador-compraventa-inmueble",
+          "url": "https://meskeia.com/simulador-compraventa-inmueble/",
+          "description": "Calcula todos los gastos de compra y venta de inmuebles en España: ITP/IVA por CCAA, notaría, registro y más."
+        }
       ]
     },
     {
@@ -145,25 +667,132 @@
       "description": "Ciencias, física, química y productividad de estudio",
       "icon": "🎓",
       "tools": [
-        { "name": "Calculadora de Movimiento", "slug": "calculadora-movimiento", "url": "https://meskeia.com/calculadora-movimiento/", "description": "Cinemática: MRU, MRUA, caída libre y tiro parabólico" },
-        { "name": "Simulador de Física", "slug": "simulador-fisica", "url": "https://meskeia.com/simulador-fisica/", "description": "Simulador interactivo con animaciones: caída libre, péndulo, proyectiles, ondas y resorte (MAS)" },
-        { "name": "Tabla Periódica Interactiva", "slug": "tabla-periodica", "url": "https://meskeia.com/tabla-periodica/", "description": "118 elementos con calculadora de masa molar" },
-        { "name": "Glosario de Física y Química", "slug": "glosario-fisica-quimica", "url": "https://meskeia.com/glosario-fisica-quimica/", "description": "Glosario interactivo con quizzes" },
-        { "name": "Calculadora de Electricidad", "slug": "calculadora-electricidad", "url": "https://meskeia.com/calculadora-electricidad/", "description": "Ley de Ohm, potencia y circuitos" },
-        { "name": "Calculadora de Notas", "slug": "calculadora-notas", "url": "https://meskeia.com/calculadora-notas/", "description": "Calcula tu media académica ponderada" },
-        { "name": "Generador de Horarios de Estudio", "slug": "generador-horarios-estudio", "url": "https://meskeia.com/generador-horarios-estudio/", "description": "Genera horarios de estudio personalizados" },
-        { "name": "Creador de Flashcards", "slug": "creador-flashcards", "url": "https://meskeia.com/creador-flashcards/", "description": "Crea y estudia con flashcards" },
-        { "name": "Curso de Empresa Familiar", "slug": "curso-empresa-familiar", "url": "https://meskeia.com/curso-empresa-familiar/", "description": "Gestión de empresas familiares: gobierno, sucesión, profesionalización" },
-        { "name": "Curso de Negociación Exitosa", "slug": "curso-negociacion", "url": "https://meskeia.com/curso-negociacion/", "description": "Domina BATNA, ZOPA, tácticas de persuasión y cierre de acuerdos" },
-        { "name": "Curso de Pensamiento Sistémico", "slug": "curso-pensamiento-sistemico", "url": "https://meskeia.com/curso-pensamiento-sistemico/", "description": "Aprende a entender el mundo como sistemas interconectados: redes, retroalimentación, emergencia, antifragilidad. 20 capítulos" },
-        { "name": "Curso de Estrategia Empresarial", "slug": "curso-estrategia-empresarial", "url": "https://meskeia.com/curso-estrategia-empresarial/", "description": "Pensamiento estratégico para la era de la incertidumbre: Porter actualizado, nuevos moats, experimentación vs planificación. 10 capítulos" },
-        { "name": "Curso de Redacción Académica", "slug": "curso-redaccion-academica", "url": "https://meskeia.com/curso-redaccion-academica/", "description": "Guía práctica para escribir textos académicos: TFG, TFM, tesis, artículos. Citas APA, coherencia, estilo. 13 capítulos" },
-        { "name": "Guía Cuidado de Mascotas", "slug": "guia-cuidado-mascota", "url": "https://meskeia.com/guia-cuidado-mascota/", "description": "Todo sobre cuidado de perros y gatos: alimentación, salud, parásitos, emergencias. 8 capítulos fáciles y cercanos" },
-        { "name": "Minerales del Mundo", "slug": "minerales-del-mundo", "url": "https://meskeia.com/minerales-del-mundo/", "description": "Guía de 50 minerales esenciales: composición química, dureza Mohs, sistema cristalino, brillo, usos industriales y curiosidades. Incluye escala Mohs y sistemas cristalinos" },
-        { "name": "Huesos del Cuerpo Humano", "slug": "huesos-cuerpo-humano", "url": "https://meskeia.com/huesos-cuerpo-humano/", "description": "Guía completa de los 206 huesos del esqueleto humano: nombre latino, tipo de hueso, región, articulaciones, función y curiosidades. Ideal para estudiantes de medicina y anatomía" },
-        { "name": "Constelaciones del Cielo", "slug": "constelaciones-del-cielo", "url": "https://meskeia.com/constelaciones-del-cielo/", "description": "Guía de 32 constelaciones famosas: zodiacales, boreales y australes con estrellas principales, mitología griega y curiosidades. Ideal para aficionados a la astronomía" },
-        { "name": "Instrumentos Musicales", "slug": "instrumentos-musicales", "url": "https://meskeia.com/instrumentos-musicales/", "description": "Guía de 45 instrumentos musicales del mundo: cuerda, viento, percusión, teclado y electrónicos con origen, materiales, registro y curiosidades" },
-        { "name": "Entrenador Tablas Multiplicar", "slug": "tablas-multiplicar", "url": "https://meskeia.com/tablas-multiplicar/", "description": "Juego educativo para aprender las tablas de multiplicar: niveles, puntuación, rachas y medallas para niños" }
+        {
+          "name": "Calculadora de Movimiento",
+          "slug": "calculadora-movimiento",
+          "url": "https://meskeia.com/calculadora-movimiento/",
+          "description": "Cinemática: MRU, MRUA, caída libre y tiro parabólico"
+        },
+        {
+          "name": "Simulador de Física",
+          "slug": "simulador-fisica",
+          "url": "https://meskeia.com/simulador-fisica/",
+          "description": "Simulador interactivo con animaciones: caída libre, péndulo, proyectiles, ondas y resorte (MAS)"
+        },
+        {
+          "name": "Tabla Periódica Interactiva",
+          "slug": "tabla-periodica",
+          "url": "https://meskeia.com/tabla-periodica/",
+          "description": "118 elementos con calculadora de masa molar"
+        },
+        {
+          "name": "Glosario de Física y Química",
+          "slug": "glosario-fisica-quimica",
+          "url": "https://meskeia.com/glosario-fisica-quimica/",
+          "description": "Glosario interactivo con quizzes"
+        },
+        {
+          "name": "Calculadora de Electricidad",
+          "slug": "calculadora-electricidad",
+          "url": "https://meskeia.com/calculadora-electricidad/",
+          "description": "Ley de Ohm, potencia y circuitos"
+        },
+        {
+          "name": "Calculadora de Notas",
+          "slug": "calculadora-notas",
+          "url": "https://meskeia.com/calculadora-notas/",
+          "description": "Calcula tu media académica ponderada"
+        },
+        {
+          "name": "Generador de Horarios de Estudio",
+          "slug": "generador-horarios-estudio",
+          "url": "https://meskeia.com/generador-horarios-estudio/",
+          "description": "Genera horarios de estudio personalizados"
+        },
+        {
+          "name": "Creador de Flashcards",
+          "slug": "creador-flashcards",
+          "url": "https://meskeia.com/creador-flashcards/",
+          "description": "Crea y estudia con flashcards"
+        },
+        {
+          "name": "Curso de Empresa Familiar",
+          "slug": "curso-empresa-familiar",
+          "url": "https://meskeia.com/curso-empresa-familiar/",
+          "description": "Gestión de empresas familiares: gobierno, sucesión, profesionalización"
+        },
+        {
+          "name": "Curso de Negociación Exitosa",
+          "slug": "curso-negociacion",
+          "url": "https://meskeia.com/curso-negociacion/",
+          "description": "Domina BATNA, ZOPA, tácticas de persuasión y cierre de acuerdos"
+        },
+        {
+          "name": "Curso de Pensamiento Sistémico",
+          "slug": "curso-pensamiento-sistemico",
+          "url": "https://meskeia.com/curso-pensamiento-sistemico/",
+          "description": "Aprende a entender el mundo como sistemas interconectados: redes, retroalimentación, emergencia, antifragilidad. 20 capítulos"
+        },
+        {
+          "name": "Curso de Estrategia Empresarial",
+          "slug": "curso-estrategia-empresarial",
+          "url": "https://meskeia.com/curso-estrategia-empresarial/",
+          "description": "Pensamiento estratégico para la era de la incertidumbre: Porter actualizado, nuevos moats, experimentación vs planificación. 10 capítulos"
+        },
+        {
+          "name": "Curso de Redacción Académica",
+          "slug": "curso-redaccion-academica",
+          "url": "https://meskeia.com/curso-redaccion-academica/",
+          "description": "Guía práctica para escribir textos académicos: TFG, TFM, tesis, artículos. Citas APA, coherencia, estilo. 13 capítulos"
+        },
+        {
+          "name": "Guía Cuidado de Mascotas",
+          "slug": "guia-cuidado-mascota",
+          "url": "https://meskeia.com/guia-cuidado-mascota/",
+          "description": "Todo sobre cuidado de perros y gatos: alimentación, salud, parásitos, emergencias. 8 capítulos fáciles y cercanos"
+        },
+        {
+          "name": "Minerales del Mundo",
+          "slug": "minerales-del-mundo",
+          "url": "https://meskeia.com/minerales-del-mundo/",
+          "description": "Guía de 50 minerales esenciales: composición química, dureza Mohs, sistema cristalino, brillo, usos industriales y curiosidades. Incluye escala Mohs y sistemas cristalinos"
+        },
+        {
+          "name": "Huesos del Cuerpo Humano",
+          "slug": "huesos-cuerpo-humano",
+          "url": "https://meskeia.com/huesos-cuerpo-humano/",
+          "description": "Guía completa de los 206 huesos del esqueleto humano: nombre latino, tipo de hueso, región, articulaciones, función y curiosidades. Ideal para estudiantes de medicina y anatomía"
+        },
+        {
+          "name": "Constelaciones del Cielo",
+          "slug": "constelaciones-del-cielo",
+          "url": "https://meskeia.com/constelaciones-del-cielo/",
+          "description": "Guía de 32 constelaciones famosas: zodiacales, boreales y australes con estrellas principales, mitología griega y curiosidades. Ideal para aficionados a la astronomía"
+        },
+        {
+          "name": "Instrumentos Musicales",
+          "slug": "instrumentos-musicales",
+          "url": "https://meskeia.com/instrumentos-musicales/",
+          "description": "Guía de 45 instrumentos musicales del mundo: cuerda, viento, percusión, teclado y electrónicos con origen, materiales, registro y curiosidades"
+        },
+        {
+          "name": "Entrenador Tablas Multiplicar",
+          "slug": "tablas-multiplicar",
+          "url": "https://meskeia.com/tablas-multiplicar/",
+          "description": "Juego educativo para aprender las tablas de multiplicar: niveles, puntuación, rachas y medallas para niños"
+        },
+        {
+          "name": "Curso de Pensamiento Científico",
+          "slug": "curso-pensamiento-cientifico",
+          "url": "https://meskeia.com/curso-pensamiento-cientifico/",
+          "description": "Aprende el método científico, pensamiento crítico, falacias lógicas y cómo aplicarlos en tu vida cotidiana."
+        },
+        {
+          "name": "Curso de Introducción a la Teoría Política",
+          "slug": "curso-teoria-politica",
+          "url": "https://meskeia.com/curso-teoria-politica/",
+          "description": "Aprende los fundamentos del pensamiento político: desde Platón y Aristóteles hasta Marx y Rawls."
+        }
       ]
     },
     {
@@ -171,22 +800,132 @@
       "description": "Diviértete mientras aprendes",
       "icon": "🎮",
       "tools": [
-        { "name": "Test de Velocidad de Escritura", "slug": "test-velocidad-escritura", "url": "https://meskeia.com/test-velocidad-escritura/", "description": "Mide tu velocidad de escritura en PPM" },
-        { "name": "Radio meskeIA", "slug": "radio-meskeia", "url": "https://meskeia.com/radio-meskeia/", "description": "Escucha emisoras de radio del mundo" },
-        { "name": "Juego Wordle", "slug": "juego-wordle", "url": "https://meskeia.com/juego-wordle/", "description": "Adivina la palabra del día en español" },
-        { "name": "Juego Sudoku", "slug": "juego-sudoku", "url": "https://meskeia.com/juego-sudoku/", "description": "Resuelve puzzles Sudoku" },
-        { "name": "Juego Tres en Raya", "slug": "juego-tres-en-raya", "url": "https://meskeia.com/juego-tres-en-raya/", "description": "Juega al clásico tres en raya" },
-        { "name": "Juego de Memoria", "slug": "juego-memoria", "url": "https://meskeia.com/juego-memoria/", "description": "Entrena tu memoria con parejas de cartas" },
-        { "name": "Juego Piedra Papel Tijera", "slug": "juego-piedra-papel-tijera", "url": "https://meskeia.com/juego-piedra-papel-tijera/", "description": "Piedra, papel o tijera" },
-        { "name": "Juego 2048", "slug": "juego-2048", "url": "https://meskeia.com/juego-2048/", "description": "Desliza y combina números" },
-        { "name": "Juego Puzzle Matemático", "slug": "juego-puzzle-matematico", "url": "https://meskeia.com/juego-puzzle-matematico/", "description": "Resuelve puzzles matemáticos" },
-        { "name": "Juego Asteroids", "slug": "juego-asteroids", "url": "https://meskeia.com/juego-asteroids/", "description": "Arcade clásico: destruye asteroides y OVNIs" },
-        { "name": "Juego Space Invaders", "slug": "juego-space-invaders", "url": "https://meskeia.com/juego-space-invaders/", "description": "Arcade clásico: defiende la Tierra de los invasores" },
-        { "name": "Juego Platform Runner", "slug": "juego-platform-runner", "url": "https://meskeia.com/juego-platform-runner/", "description": "Plataformas: corre, salta y recolecta monedas" },
-        { "name": "Ruleta Aleatoria", "slug": "ruleta-aleatoria", "url": "https://meskeia.com/ruleta-aleatoria/", "description": "Ruleta personalizable para sorteos, decisiones y selección al azar" },
-        { "name": "Generador de Lotería", "slug": "generador-loteria", "url": "https://meskeia.com/generador-loteria/", "description": "Genera números para Primitiva, Euromillones, Bonoloto, El Gordo y Lototurf" },
-        { "name": "Cara o Cruz", "slug": "cara-o-cruz", "url": "https://meskeia.com/cara-o-cruz/", "description": "Lanza una moneda virtual con animación realista, historial y estadísticas de probabilidad" },
-        { "name": "Tirador de Dados", "slug": "tirador-dados", "url": "https://meskeia.com/tirador-dados/", "description": "Dados virtuales para D&D, Pathfinder y juegos de mesa. D4, D6, D8, D10, D12, D20 y D100 con historial y estadísticas" }
+        {
+          "name": "Test de Velocidad de Escritura",
+          "slug": "test-velocidad-escritura",
+          "url": "https://meskeia.com/test-velocidad-escritura/",
+          "description": "Mide tu velocidad de escritura en PPM"
+        },
+        {
+          "name": "Radio meskeIA",
+          "slug": "radio-meskeia",
+          "url": "https://meskeia.com/radio-meskeia/",
+          "description": "Escucha emisoras de radio del mundo"
+        },
+        {
+          "name": "Juego Wordle",
+          "slug": "juego-wordle",
+          "url": "https://meskeia.com/juego-wordle/",
+          "description": "Adivina la palabra del día en español"
+        },
+        {
+          "name": "Juego Sudoku",
+          "slug": "juego-sudoku",
+          "url": "https://meskeia.com/juego-sudoku/",
+          "description": "Resuelve puzzles Sudoku"
+        },
+        {
+          "name": "Juego Tres en Raya",
+          "slug": "juego-tres-en-raya",
+          "url": "https://meskeia.com/juego-tres-en-raya/",
+          "description": "Juega al clásico tres en raya"
+        },
+        {
+          "name": "Juego de Memoria",
+          "slug": "juego-memoria",
+          "url": "https://meskeia.com/juego-memoria/",
+          "description": "Entrena tu memoria con parejas de cartas"
+        },
+        {
+          "name": "Juego Piedra Papel Tijera",
+          "slug": "juego-piedra-papel-tijera",
+          "url": "https://meskeia.com/juego-piedra-papel-tijera/",
+          "description": "Piedra, papel o tijera"
+        },
+        {
+          "name": "Juego 2048",
+          "slug": "juego-2048",
+          "url": "https://meskeia.com/juego-2048/",
+          "description": "Desliza y combina números"
+        },
+        {
+          "name": "Juego Puzzle Matemático",
+          "slug": "juego-puzzle-matematico",
+          "url": "https://meskeia.com/juego-puzzle-matematico/",
+          "description": "Resuelve puzzles matemáticos"
+        },
+        {
+          "name": "Juego Asteroids",
+          "slug": "juego-asteroids",
+          "url": "https://meskeia.com/juego-asteroids/",
+          "description": "Arcade clásico: destruye asteroides y OVNIs"
+        },
+        {
+          "name": "Juego Space Invaders",
+          "slug": "juego-space-invaders",
+          "url": "https://meskeia.com/juego-space-invaders/",
+          "description": "Arcade clásico: defiende la Tierra de los invasores"
+        },
+        {
+          "name": "Juego Platform Runner",
+          "slug": "juego-platform-runner",
+          "url": "https://meskeia.com/juego-platform-runner/",
+          "description": "Plataformas: corre, salta y recolecta monedas"
+        },
+        {
+          "name": "Ruleta Aleatoria",
+          "slug": "ruleta-aleatoria",
+          "url": "https://meskeia.com/ruleta-aleatoria/",
+          "description": "Ruleta personalizable para sorteos, decisiones y selección al azar"
+        },
+        {
+          "name": "Generador de Lotería",
+          "slug": "generador-loteria",
+          "url": "https://meskeia.com/generador-loteria/",
+          "description": "Genera números para Primitiva, Euromillones, Bonoloto, El Gordo y Lototurf"
+        },
+        {
+          "name": "Cara o Cruz",
+          "slug": "cara-o-cruz",
+          "url": "https://meskeia.com/cara-o-cruz/",
+          "description": "Lanza una moneda virtual con animación realista, historial y estadísticas de probabilidad"
+        },
+        {
+          "name": "Tirador de Dados",
+          "slug": "tirador-dados",
+          "url": "https://meskeia.com/tirador-dados/",
+          "description": "Dados virtuales para D&D, Pathfinder y juegos de mesa. D4, D6, D8, D10, D12, D20 y D100 con historial y estadísticas"
+        },
+        {
+          "name": "Diapasón Digital (La 440Hz)",
+          "slug": "diapason",
+          "url": "https://meskeia.com/diapason/",
+          "description": "Diapasón digital que genera el La 440Hz de referencia estándar. Incluye frecuencias alternativas y tipos de onda."
+        },
+        {
+          "name": "Afinador de Instrumentos",
+          "slug": "afinador-instrumentos",
+          "url": "https://meskeia.com/afinador-instrumentos/",
+          "description": "Afinador cromático digital que detecta la nota que tocas usando el micrófono. Presets para guitarra, bajo, ukelele y violín."
+        },
+        {
+          "name": "Generador de Tonos de Audio",
+          "slug": "generador-tonos",
+          "url": "https://meskeia.com/generador-tonos/",
+          "description": "Genera tonos de audio de 20Hz a 20kHz con diferentes tipos de onda. Incluye frecuencias de barrido y presets musicales."
+        },
+        {
+          "name": "Metrónomo Online",
+          "slug": "metronomo",
+          "url": "https://meskeia.com/metronomo/",
+          "description": "Metrónomo online con tempo ajustable (40-220 BPM), tap tempo y múltiples compases. Ideal para práctica musical."
+        },
+        {
+          "name": "Sonómetro / Decibelímetro",
+          "slug": "sonometro",
+          "url": "https://meskeia.com/sonometro/",
+          "description": "Mide el nivel de ruido en decibelios (dB) con tu micrófono. Ideal para documentar ruido y contaminación acústica."
+        }
       ]
     },
     {
@@ -194,20 +933,90 @@
       "description": "Álgebra, cálculo, probabilidad y análisis de datos",
       "icon": "📐",
       "tools": [
-        { "name": "Calculadora de Probabilidad", "slug": "calculadora-probabilidad", "url": "https://meskeia.com/calculadora-probabilidad/", "description": "Probabilidades con teoría y simulaciones" },
-        { "name": "Calculadora MCD y MCM", "slug": "calculadora-mcd-mcm", "url": "https://meskeia.com/calculadora-mcd-mcm/", "description": "Máximo Común Divisor y Mínimo Común Múltiplo" },
-        { "name": "Calculadora Estadística", "slug": "calculadora-estadistica", "url": "https://meskeia.com/calculadora-estadistica/", "description": "Media, mediana, desviación estándar" },
-        { "name": "Estadística Avanzada", "slug": "estadistica-avanzada", "url": "https://meskeia.com/estadistica-avanzada/", "description": "Tests t-Student, Chi², regresión, correlación, intervalos de confianza" },
-        { "name": "Calculadora Matemática Avanzada", "slug": "calculadora-matematica", "url": "https://meskeia.com/calculadora-matematica/", "description": "Ecuaciones, matrices, derivadas e integrales" },
-        { "name": "Calculadora de Ecuaciones", "slug": "algebra-ecuaciones", "url": "https://meskeia.com/algebra-ecuaciones/", "description": "Ecuaciones lineales, cuadráticas y sistemas" },
-        { "name": "Calculadora de Geometría", "slug": "calculadora-geometria", "url": "https://meskeia.com/calculadora-geometria/", "description": "Áreas, perímetros y volúmenes" },
-        { "name": "Calculadora de Cálculo", "slug": "calculadora-calculo", "url": "https://meskeia.com/calculadora-calculo/", "description": "Derivadas, integrales y límites" },
-        { "name": "Calculadora de Trigonometría", "slug": "calculadora-trigonometria", "url": "https://meskeia.com/calculadora-trigonometria/", "description": "Funciones trigonométricas" },
-        { "name": "Calculadora Teoría de Números", "slug": "calculadora-teoria-numeros", "url": "https://meskeia.com/calculadora-teoria-numeros/", "description": "Números primos y factorización" },
-        { "name": "Calculadora Álgebra Abstracta", "slug": "calculadora-algebra-abstracta", "url": "https://meskeia.com/calculadora-algebra-abstracta/", "description": "Grupos, anillos y campos" },
-        { "name": "Calculadora Teoría de Colas", "slug": "calculadora-teoria-colas", "url": "https://meskeia.com/calculadora-teoria-colas/", "description": "Métricas de sistemas de colas M/M/1" },
-        { "name": "Calculadora de Distribuciones", "slug": "calculadora-distribuciones", "url": "https://meskeia.com/calculadora-distribuciones/", "description": "Calcula probabilidades con distribuciones Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t-Student" },
-        { "name": "Inferencia Bayesiana", "slug": "inferencia-bayesiana", "url": "https://meskeia.com/inferencia-bayesiana/", "description": "Teorema de Bayes paso a paso: prior, likelihood, posterior y tests diagnósticos" }
+        {
+          "name": "Calculadora de Probabilidad",
+          "slug": "calculadora-probabilidad",
+          "url": "https://meskeia.com/calculadora-probabilidad/",
+          "description": "Probabilidades con teoría y simulaciones"
+        },
+        {
+          "name": "Calculadora MCD y MCM",
+          "slug": "calculadora-mcd-mcm",
+          "url": "https://meskeia.com/calculadora-mcd-mcm/",
+          "description": "Máximo Común Divisor y Mínimo Común Múltiplo"
+        },
+        {
+          "name": "Calculadora Estadística",
+          "slug": "calculadora-estadistica",
+          "url": "https://meskeia.com/calculadora-estadistica/",
+          "description": "Media, mediana, desviación estándar"
+        },
+        {
+          "name": "Estadística Avanzada",
+          "slug": "estadistica-avanzada",
+          "url": "https://meskeia.com/estadistica-avanzada/",
+          "description": "Tests t-Student, Chi², regresión, correlación, intervalos de confianza"
+        },
+        {
+          "name": "Calculadora Matemática Avanzada",
+          "slug": "calculadora-matematica",
+          "url": "https://meskeia.com/calculadora-matematica/",
+          "description": "Ecuaciones, matrices, derivadas e integrales"
+        },
+        {
+          "name": "Calculadora de Ecuaciones",
+          "slug": "algebra-ecuaciones",
+          "url": "https://meskeia.com/algebra-ecuaciones/",
+          "description": "Ecuaciones lineales, cuadráticas y sistemas"
+        },
+        {
+          "name": "Calculadora de Geometría",
+          "slug": "calculadora-geometria",
+          "url": "https://meskeia.com/calculadora-geometria/",
+          "description": "Áreas, perímetros y volúmenes"
+        },
+        {
+          "name": "Calculadora de Cálculo",
+          "slug": "calculadora-calculo",
+          "url": "https://meskeia.com/calculadora-calculo/",
+          "description": "Derivadas, integrales y límites"
+        },
+        {
+          "name": "Calculadora de Trigonometría",
+          "slug": "calculadora-trigonometria",
+          "url": "https://meskeia.com/calculadora-trigonometria/",
+          "description": "Funciones trigonométricas"
+        },
+        {
+          "name": "Calculadora Teoría de Números",
+          "slug": "calculadora-teoria-numeros",
+          "url": "https://meskeia.com/calculadora-teoria-numeros/",
+          "description": "Números primos y factorización"
+        },
+        {
+          "name": "Calculadora Álgebra Abstracta",
+          "slug": "calculadora-algebra-abstracta",
+          "url": "https://meskeia.com/calculadora-algebra-abstracta/",
+          "description": "Grupos, anillos y campos"
+        },
+        {
+          "name": "Calculadora Teoría de Colas",
+          "slug": "calculadora-teoria-colas",
+          "url": "https://meskeia.com/calculadora-teoria-colas/",
+          "description": "Métricas de sistemas de colas M/M/1"
+        },
+        {
+          "name": "Calculadora de Distribuciones",
+          "slug": "calculadora-distribuciones",
+          "url": "https://meskeia.com/calculadora-distribuciones/",
+          "description": "Calcula probabilidades con distribuciones Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t-Student"
+        },
+        {
+          "name": "Inferencia Bayesiana",
+          "slug": "inferencia-bayesiana",
+          "url": "https://meskeia.com/inferencia-bayesiana/",
+          "description": "Teorema de Bayes paso a paso: prior, likelihood, posterior y tests diagnósticos"
+        }
       ]
     },
     {
@@ -215,28 +1024,156 @@
       "description": "Optimiza tu tiempo y organización",
       "icon": "⚡",
       "tools": [
-        { "name": "Notas", "slug": "notas", "url": "https://meskeia.com/notas/", "description": "Guarda notas organizadas por categorías" },
-        { "name": "Temporizador Pomodoro", "slug": "temporizador-pomodoro", "url": "https://meskeia.com/temporizador-pomodoro/", "description": "Técnica Pomodoro con estadísticas" },
-        { "name": "Lista de Tareas", "slug": "lista-tareas", "url": "https://meskeia.com/lista-tareas/", "description": "Organiza tareas con prioridades" },
-        { "name": "Cronómetro y Temporizador", "slug": "cronometro", "url": "https://meskeia.com/cronometro/", "description": "Cronómetro con vueltas y temporizador" },
-        { "name": "Conversor de Horarios", "slug": "conversor-horarios", "url": "https://meskeia.com/conversor-horarios/", "description": "Convierte horarios entre 25+ ciudades" },
-        { "name": "Información del Tiempo", "slug": "informacion-tiempo", "url": "https://meskeia.com/informacion-tiempo/", "description": "Pronóstico del tiempo mundial" },
-        { "name": "Generador de Códigos QR", "slug": "generador-qr", "url": "https://meskeia.com/generador-qr/", "description": "Crea códigos QR para URLs, WiFi, vCard" },
-        { "name": "Generador de Códigos de Barras", "slug": "generador-codigos-barras", "url": "https://meskeia.com/generador-codigos-barras/", "description": "Genera EAN-13, EAN-8, UPC-A, Code128" },
-        { "name": "Generador de Firmas Email", "slug": "generador-firma-email", "url": "https://meskeia.com/generador-firma-email/", "description": "Crea firmas de email profesionales" },
-        { "name": "Time Tracker", "slug": "time-tracker", "url": "https://meskeia.com/time-tracker/", "description": "Registra tiempo por proyecto y cliente" },
-        { "name": "Calculadora de Productividad", "slug": "calculadora-productividad", "url": "https://meskeia.com/calculadora-productividad/", "description": "Calcula tu productividad real como freelance: ingresos por hora efectiva descontando tiempo no facturable" },
-        { "name": "Matriz Eisenhower", "slug": "matriz-eisenhower", "url": "https://meskeia.com/matriz-eisenhower/", "description": "Prioriza tareas con la matriz urgente/importante. Decide qué hacer, planificar, delegar o eliminar" },
-        { "name": "Planificador de Turnos", "slug": "planificador-turnos", "url": "https://meskeia.com/planificador-turnos/", "description": "Planifica turnos de trabajo para equipos pequeños" },
-        { "name": "Conversor de Unidades", "slug": "conversor-unidades", "url": "https://meskeia.com/conversor-unidades/", "description": "Conversor científico: 14 categorías" },
-        { "name": "Conversor de Unidades RF", "slug": "conversor-unidades-rf", "url": "https://meskeia.com/conversor-unidades-rf/", "description": "Conversor RF: dBm↔Watts, VSWR, Return Loss, frecuencia↔longitud de onda. Para ingenieros RF y radioaficionados" },
-        { "name": "Lista de Equipaje", "slug": "lista-equipaje", "url": "https://meskeia.com/lista-equipaje/", "description": "Genera lista de equipaje según tipo de viaje" },
-        { "name": "Generador de Actas de Reunión", "slug": "generador-actas", "url": "https://meskeia.com/generador-actas/", "description": "Crea actas profesionales con plantillas, asistentes, orden del día y tareas" },
-        { "name": "Prueba de Cámara Web", "slug": "prueba-camara", "url": "https://meskeia.com/prueba-camara/", "description": "Prueba tu webcam antes de videollamadas, ajusta configuración y toma fotos" },
-        { "name": "Prueba de Micrófono", "slug": "prueba-microfono", "url": "https://meskeia.com/prueba-microfono/", "description": "Prueba tu micrófono, visualiza niveles de audio y graba tu voz" },
-        { "name": "Mi IP y Conexión", "slug": "mi-ip", "url": "https://meskeia.com/mi-ip/", "description": "Descubre tu IP pública, ubicación aproximada, proveedor de internet, tipo de conexión y velocidad" },
-        { "name": "Analizador de Espectro", "slug": "analizador-espectro", "url": "https://meskeia.com/analizador-espectro/", "description": "Visualiza frecuencias de audio en tiempo real con FFT. Ideal para músicos y técnicos de sonido" },
-        { "name": "Nivel de Burbuja Digital", "slug": "nivel-burbuja", "url": "https://meskeia.com/nivel-burbuja/", "description": "Nivel de burbuja e inclinómetro con sensores del móvil. Mide ángulos y pendientes para bricolaje" }
+        {
+          "name": "Notas",
+          "slug": "notas",
+          "url": "https://meskeia.com/notas/",
+          "description": "Guarda notas organizadas por categorías"
+        },
+        {
+          "name": "Temporizador Pomodoro",
+          "slug": "temporizador-pomodoro",
+          "url": "https://meskeia.com/temporizador-pomodoro/",
+          "description": "Técnica Pomodoro con estadísticas"
+        },
+        {
+          "name": "Lista de Tareas",
+          "slug": "lista-tareas",
+          "url": "https://meskeia.com/lista-tareas/",
+          "description": "Organiza tareas con prioridades"
+        },
+        {
+          "name": "Cronómetro y Temporizador",
+          "slug": "cronometro",
+          "url": "https://meskeia.com/cronometro/",
+          "description": "Cronómetro con vueltas y temporizador"
+        },
+        {
+          "name": "Conversor de Horarios",
+          "slug": "conversor-horarios",
+          "url": "https://meskeia.com/conversor-horarios/",
+          "description": "Convierte horarios entre 25+ ciudades"
+        },
+        {
+          "name": "Información del Tiempo",
+          "slug": "informacion-tiempo",
+          "url": "https://meskeia.com/informacion-tiempo/",
+          "description": "Pronóstico del tiempo mundial"
+        },
+        {
+          "name": "Generador de Códigos QR",
+          "slug": "generador-qr",
+          "url": "https://meskeia.com/generador-qr/",
+          "description": "Crea códigos QR para URLs, WiFi, vCard"
+        },
+        {
+          "name": "Generador de Códigos de Barras",
+          "slug": "generador-codigos-barras",
+          "url": "https://meskeia.com/generador-codigos-barras/",
+          "description": "Genera EAN-13, EAN-8, UPC-A, Code128"
+        },
+        {
+          "name": "Generador de Firmas Email",
+          "slug": "generador-firma-email",
+          "url": "https://meskeia.com/generador-firma-email/",
+          "description": "Crea firmas de email profesionales"
+        },
+        {
+          "name": "Time Tracker",
+          "slug": "time-tracker",
+          "url": "https://meskeia.com/time-tracker/",
+          "description": "Registra tiempo por proyecto y cliente"
+        },
+        {
+          "name": "Calculadora de Productividad",
+          "slug": "calculadora-productividad",
+          "url": "https://meskeia.com/calculadora-productividad/",
+          "description": "Calcula tu productividad real como freelance: ingresos por hora efectiva descontando tiempo no facturable"
+        },
+        {
+          "name": "Matriz Eisenhower",
+          "slug": "matriz-eisenhower",
+          "url": "https://meskeia.com/matriz-eisenhower/",
+          "description": "Prioriza tareas con la matriz urgente/importante. Decide qué hacer, planificar, delegar o eliminar"
+        },
+        {
+          "name": "Planificador de Turnos",
+          "slug": "planificador-turnos",
+          "url": "https://meskeia.com/planificador-turnos/",
+          "description": "Planifica turnos de trabajo para equipos pequeños"
+        },
+        {
+          "name": "Conversor de Unidades",
+          "slug": "conversor-unidades",
+          "url": "https://meskeia.com/conversor-unidades/",
+          "description": "Conversor científico: 14 categorías"
+        },
+        {
+          "name": "Conversor de Unidades RF",
+          "slug": "conversor-unidades-rf",
+          "url": "https://meskeia.com/conversor-unidades-rf/",
+          "description": "Conversor RF: dBm↔Watts, VSWR, Return Loss, frecuencia↔longitud de onda. Para ingenieros RF y radioaficionados"
+        },
+        {
+          "name": "Lista de Equipaje",
+          "slug": "lista-equipaje",
+          "url": "https://meskeia.com/lista-equipaje/",
+          "description": "Genera lista de equipaje según tipo de viaje"
+        },
+        {
+          "name": "Generador de Actas de Reunión",
+          "slug": "generador-actas",
+          "url": "https://meskeia.com/generador-actas/",
+          "description": "Crea actas profesionales con plantillas, asistentes, orden del día y tareas"
+        },
+        {
+          "name": "Prueba de Cámara Web",
+          "slug": "prueba-camara",
+          "url": "https://meskeia.com/prueba-camara/",
+          "description": "Prueba tu webcam antes de videollamadas, ajusta configuración y toma fotos"
+        },
+        {
+          "name": "Prueba de Micrófono",
+          "slug": "prueba-microfono",
+          "url": "https://meskeia.com/prueba-microfono/",
+          "description": "Prueba tu micrófono, visualiza niveles de audio y graba tu voz"
+        },
+        {
+          "name": "Mi IP y Conexión",
+          "slug": "mi-ip",
+          "url": "https://meskeia.com/mi-ip/",
+          "description": "Descubre tu IP pública, ubicación aproximada, proveedor de internet, tipo de conexión y velocidad"
+        },
+        {
+          "name": "Analizador de Espectro",
+          "slug": "analizador-espectro",
+          "url": "https://meskeia.com/analizador-espectro/",
+          "description": "Visualiza frecuencias de audio en tiempo real con FFT. Ideal para músicos y técnicos de sonido"
+        },
+        {
+          "name": "Nivel de Burbuja Digital",
+          "slug": "nivel-burbuja",
+          "url": "https://meskeia.com/nivel-burbuja/",
+          "description": "Nivel de burbuja e inclinómetro con sensores del móvil. Mide ángulos y pendientes para bricolaje"
+        },
+        {
+          "name": "Generador de .gitignore",
+          "slug": "generador-gitignore",
+          "url": "https://meskeia.com/generador-gitignore/",
+          "description": "Genera archivos .gitignore profesionales combinando plantillas para Node.js, Python, Java, React y más tecnologías."
+        },
+        {
+          "name": "Espejo Digital",
+          "slug": "espejo",
+          "url": "https://meskeia.com/espejo/",
+          "description": "Espejo digital que usa la cámara frontal. Imagen espejada real, ajustes de brillo y zoom, y modo pantalla completa."
+        },
+        {
+          "name": "Golden Hour - Hora Dorada",
+          "slug": "golden-hour",
+          "url": "https://meskeia.com/golden-hour/",
+          "description": "Calcula las horas de luz dorada y azul para fotografía. Amanecer, atardecer y crepúsculos según tu ubicación."
+        }
       ]
     },
     {
@@ -244,26 +1181,138 @@
       "description": "Cuida tu salud con herramientas especializadas",
       "icon": "🏥",
       "tools": [
-        { "name": "Calculadora IMC", "slug": "calculadora-imc", "url": "https://meskeia.com/calculadora-imc/", "description": "Índice de Masa Corporal según OMS" },
-        { "name": "Calculadora de Colesterol", "slug": "calculadora-colesterol", "url": "https://meskeia.com/calculadora-colesterol/", "description": "Analiza niveles de colesterol: ratios CT/HDL, LDL/HDL, fórmula Friedewald y riesgo cardiovascular" },
-        { "name": "Calculadora de Calorías", "slug": "calculadora-calorias-ejercicio", "url": "https://meskeia.com/calculadora-calorias-ejercicio/", "description": "Calorías quemadas por actividad" },
-        { "name": "Calculadora de Macros", "slug": "calculadora-macros", "url": "https://meskeia.com/calculadora-macros/", "description": "Macronutrientes diarios según objetivo: volumen, definición o mantenimiento" },
-        { "name": "Calculadora de Hidratación", "slug": "calculadora-hidratacion", "url": "https://meskeia.com/calculadora-hidratacion/", "description": "Cuánta agua necesitas diariamente" },
-        { "name": "Calculadora de Sueño", "slug": "calculadora-sueno", "url": "https://meskeia.com/calculadora-sueno/", "description": "Ciclos de sueño ideales" },
-        { "name": "Curso de Nutrición", "slug": "curso-nutrisalud", "url": "https://meskeia.com/curso-nutrisalud/", "description": "Curso de nutrición avanzado basado en ciencia" },
-        { "name": "Seguimiento de Hábitos", "slug": "seguimiento-habitos", "url": "https://meskeia.com/seguimiento-habitos/", "description": "Rastrea hábitos con rachas" },
-        { "name": "Planificador de Menú Semanal", "slug": "planificador-menu", "url": "https://meskeia.com/planificador-menu/", "description": "Planifica menú equilibrado" },
-        { "name": "Calculadora de Porciones", "slug": "calculadora-porciones", "url": "https://meskeia.com/calculadora-porciones/", "description": "Mide porciones con tu mano" },
-        { "name": "Test de Hábitos Saludables", "slug": "test-habitos-saludables", "url": "https://meskeia.com/test-habitos-saludables/", "description": "Evalúa tus hábitos de vida" },
-        { "name": "Planificador Embarazo y Bebé", "slug": "planificador-embarazo", "url": "https://meskeia.com/planificador-embarazo/", "description": "Planificador completo: calculadora FPP, checklist por trimestre, lista compras bebé y vacunas España 2024" },
-        { "name": "Planificador de Mascota", "slug": "planificador-mascota", "url": "https://meskeia.com/planificador-mascota/", "description": "Organiza la llegada de tu cachorro o gatito: perfil, checklist por etapas, lista de compras y vacunas para perros y gatos" },
-        { "name": "Calculadora de Alimentación Mascotas", "slug": "calculadora-alimentacion-mascotas", "url": "https://meskeia.com/calculadora-alimentacion-mascotas/", "description": "Cantidad diaria de comida para perros y gatos, alimentos tóxicos y guía de transición de pienso" },
-        { "name": "Calculadora de Medicamentos Mascotas", "slug": "calculadora-medicamentos-mascotas", "url": "https://meskeia.com/calculadora-medicamentos-mascotas/", "description": "Dosis de antiparasitarios para perros y gatos según peso, frecuencia y síntomas" },
-        { "name": "Calculadora Tamaño Adulto Cachorro", "slug": "calculadora-tamano-adulto-perro", "url": "https://meskeia.com/calculadora-tamano-adulto-perro/", "description": "Predice el peso adulto de tu cachorro según edad, peso actual y tamaño de raza" },
-        { "name": "Calculadora Percentiles Infantiles", "slug": "calculadora-percentiles", "url": "https://meskeia.com/calculadora-percentiles/", "description": "Percentil de peso y talla según tablas OMS" },
-        { "name": "Vitaminas y Minerales", "slug": "vitaminas-minerales", "url": "https://meskeia.com/vitaminas-minerales/", "description": "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso" },
-        { "name": "Guía para Vivir Más Sano", "slug": "guia/vivir-sano", "url": "https://meskeia.com/guia/vivir-sano/", "description": "Guía de salud integral: IMC, macros, calorías, hidratación, sueño y hábitos. Sin dietas milagro, con herramientas basadas en datos" },
-        { "name": "Seguimiento Ciclo Menstrual y Fertilidad", "slug": "seguimiento-ciclo-menstrual", "url": "https://meskeia.com/seguimiento-ciclo-menstrual/", "description": "Calcula ventana fértil, ovulación y próximas fechas. Privacidad total: cálculo 100% local en tu navegador" }
+        {
+          "name": "Calculadora IMC",
+          "slug": "calculadora-imc",
+          "url": "https://meskeia.com/calculadora-imc/",
+          "description": "Índice de Masa Corporal según OMS"
+        },
+        {
+          "name": "Calculadora de Colesterol",
+          "slug": "calculadora-colesterol",
+          "url": "https://meskeia.com/calculadora-colesterol/",
+          "description": "Analiza niveles de colesterol: ratios CT/HDL, LDL/HDL, fórmula Friedewald y riesgo cardiovascular"
+        },
+        {
+          "name": "Calculadora de Calorías",
+          "slug": "calculadora-calorias-ejercicio",
+          "url": "https://meskeia.com/calculadora-calorias-ejercicio/",
+          "description": "Calorías quemadas por actividad"
+        },
+        {
+          "name": "Calculadora de Macros",
+          "slug": "calculadora-macros",
+          "url": "https://meskeia.com/calculadora-macros/",
+          "description": "Macronutrientes diarios según objetivo: volumen, definición o mantenimiento"
+        },
+        {
+          "name": "Calculadora de Hidratación",
+          "slug": "calculadora-hidratacion",
+          "url": "https://meskeia.com/calculadora-hidratacion/",
+          "description": "Cuánta agua necesitas diariamente"
+        },
+        {
+          "name": "Calculadora de Sueño",
+          "slug": "calculadora-sueno",
+          "url": "https://meskeia.com/calculadora-sueno/",
+          "description": "Ciclos de sueño ideales"
+        },
+        {
+          "name": "Curso de Nutrición",
+          "slug": "curso-nutrisalud",
+          "url": "https://meskeia.com/curso-nutrisalud/",
+          "description": "Curso de nutrición avanzado basado en ciencia"
+        },
+        {
+          "name": "Seguimiento de Hábitos",
+          "slug": "seguimiento-habitos",
+          "url": "https://meskeia.com/seguimiento-habitos/",
+          "description": "Rastrea hábitos con rachas"
+        },
+        {
+          "name": "Planificador de Menú Semanal",
+          "slug": "planificador-menu",
+          "url": "https://meskeia.com/planificador-menu/",
+          "description": "Planifica menú equilibrado"
+        },
+        {
+          "name": "Calculadora de Porciones",
+          "slug": "calculadora-porciones",
+          "url": "https://meskeia.com/calculadora-porciones/",
+          "description": "Mide porciones con tu mano"
+        },
+        {
+          "name": "Test de Hábitos Saludables",
+          "slug": "test-habitos-saludables",
+          "url": "https://meskeia.com/test-habitos-saludables/",
+          "description": "Evalúa tus hábitos de vida"
+        },
+        {
+          "name": "Planificador Embarazo y Bebé",
+          "slug": "planificador-embarazo",
+          "url": "https://meskeia.com/planificador-embarazo/",
+          "description": "Planificador completo: calculadora FPP, checklist por trimestre, lista compras bebé y vacunas España 2024"
+        },
+        {
+          "name": "Planificador de Mascota",
+          "slug": "planificador-mascota",
+          "url": "https://meskeia.com/planificador-mascota/",
+          "description": "Organiza la llegada de tu cachorro o gatito: perfil, checklist por etapas, lista de compras y vacunas para perros y gatos"
+        },
+        {
+          "name": "Calculadora de Alimentación Mascotas",
+          "slug": "calculadora-alimentacion-mascotas",
+          "url": "https://meskeia.com/calculadora-alimentacion-mascotas/",
+          "description": "Cantidad diaria de comida para perros y gatos, alimentos tóxicos y guía de transición de pienso"
+        },
+        {
+          "name": "Calculadora de Medicamentos Mascotas",
+          "slug": "calculadora-medicamentos-mascotas",
+          "url": "https://meskeia.com/calculadora-medicamentos-mascotas/",
+          "description": "Dosis de antiparasitarios para perros y gatos según peso, frecuencia y síntomas"
+        },
+        {
+          "name": "Calculadora Tamaño Adulto Cachorro",
+          "slug": "calculadora-tamano-adulto-perro",
+          "url": "https://meskeia.com/calculadora-tamano-adulto-perro/",
+          "description": "Predice el peso adulto de tu cachorro según edad, peso actual y tamaño de raza"
+        },
+        {
+          "name": "Calculadora Percentiles Infantiles",
+          "slug": "calculadora-percentiles",
+          "url": "https://meskeia.com/calculadora-percentiles/",
+          "description": "Percentil de peso y talla según tablas OMS"
+        },
+        {
+          "name": "Vitaminas y Minerales",
+          "slug": "vitaminas-minerales",
+          "url": "https://meskeia.com/vitaminas-minerales/",
+          "description": "Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso"
+        },
+        {
+          "name": "Guía para Vivir Más Sano",
+          "slug": "guia/vivir-sano",
+          "url": "https://meskeia.com/guia/vivir-sano/",
+          "description": "Guía de salud integral: IMC, macros, calorías, hidratación, sueño y hábitos. Sin dietas milagro, con herramientas basadas en datos"
+        },
+        {
+          "name": "Seguimiento Ciclo Menstrual y Fertilidad",
+          "slug": "seguimiento-ciclo-menstrual",
+          "url": "https://meskeia.com/seguimiento-ciclo-menstrual/",
+          "description": "Calcula ventana fértil, ovulación y próximas fechas. Privacidad total: cálculo 100% local en tu navegador"
+        },
+        {
+          "name": "Lupa Digital con Cámara",
+          "slug": "lupa-digital",
+          "url": "https://meskeia.com/lupa-digital/",
+          "description": "Lupa digital que usa la cámara trasera con zoom hasta 5x. Incluye filtros de accesibilidad y ajustes de brillo."
+        },
+        {
+          "name": "Luxómetro / Fotómetro",
+          "slug": "luxometro",
+          "url": "https://meskeia.com/luxometro/",
+          "description": "Mide la intensidad de luz en lux con tu dispositivo. Ideal para fotógrafos con recomendaciones de ISO y apertura."
+        }
       ]
     },
     {
@@ -271,21 +1320,114 @@
       "description": "Procesa, formatea y convierte texto",
       "icon": "📝",
       "tools": [
-        { "name": "Contador de Palabras", "slug": "contador-palabras", "url": "https://meskeia.com/contador-palabras/", "description": "Cuenta palabras, caracteres y párrafos" },
-        { "name": "Conversor de Texto", "slug": "conversor-texto", "url": "https://meskeia.com/conversor-texto/", "description": "MAYÚSCULAS, minúsculas, Capitalizado" },
-        { "name": "Limpiador de Texto", "slug": "limpiador-texto", "url": "https://meskeia.com/limpiador-texto/", "description": "Elimina espacios y caracteres extras" },
-        { "name": "Comparador de Textos", "slug": "comparador-textos", "url": "https://meskeia.com/comparador-textos/", "description": "Compara dos textos línea por línea" },
-        { "name": "Conversor Markdown-HTML", "slug": "conversor-markdown-html", "url": "https://meskeia.com/conversor-markdown-html/", "description": "Convierte Markdown a HTML" },
-        { "name": "Conversor de Código Morse", "slug": "conversor-morse", "url": "https://meskeia.com/conversor-morse/", "description": "Texto a Morse con audio" },
-        { "name": "Conversor Números Romanos", "slug": "conversor-numeros-romanos", "url": "https://meskeia.com/conversor-numeros-romanos/", "description": "Arábigos a romanos y viceversa" },
-        { "name": "Detector de Idioma", "slug": "detector-idioma", "url": "https://meskeia.com/detector-idioma/", "description": "Detecta el idioma de cualquier texto" },
-        { "name": "Conversor Binario", "slug": "conversor-binario", "url": "https://meskeia.com/conversor-binario/", "description": "Texto a binario, hex, octal" },
-        { "name": "Conversor Braille", "slug": "conversor-braille", "url": "https://meskeia.com/conversor-braille/", "description": "Texto a Braille español" },
-        { "name": "Generador de Anagramas", "slug": "generador-anagramas", "url": "https://meskeia.com/generador-anagramas/", "description": "Encuentra palabras con tus letras" },
-        { "name": "Generador Lorem Ipsum", "slug": "generador-lorem-ipsum", "url": "https://meskeia.com/generador-lorem-ipsum/", "description": "Genera texto Lorem Ipsum" },
-        { "name": "Contador de Sílabas", "slug": "contador-silabas", "url": "https://meskeia.com/contador-silabas/", "description": "Cuenta y separa sílabas en español" },
-        { "name": "Conversor de Formatos", "slug": "conversor-formatos", "url": "https://meskeia.com/conversor-formatos/", "description": "Convierte entre JSON, CSV, Excel, XML y YAML" },
-        { "name": "Conjugador de Verbos Español", "slug": "conjugador-verbos", "url": "https://meskeia.com/conjugador-verbos/", "description": "Conjuga verbos en todos los tiempos: indicativo, subjuntivo e imperativo con 60+ irregulares" }
+        {
+          "name": "Contador de Palabras",
+          "slug": "contador-palabras",
+          "url": "https://meskeia.com/contador-palabras/",
+          "description": "Cuenta palabras, caracteres y párrafos"
+        },
+        {
+          "name": "Conversor de Texto",
+          "slug": "conversor-texto",
+          "url": "https://meskeia.com/conversor-texto/",
+          "description": "MAYÚSCULAS, minúsculas, Capitalizado"
+        },
+        {
+          "name": "Limpiador de Texto",
+          "slug": "limpiador-texto",
+          "url": "https://meskeia.com/limpiador-texto/",
+          "description": "Elimina espacios y caracteres extras"
+        },
+        {
+          "name": "Comparador de Textos",
+          "slug": "comparador-textos",
+          "url": "https://meskeia.com/comparador-textos/",
+          "description": "Compara dos textos línea por línea"
+        },
+        {
+          "name": "Conversor Markdown-HTML",
+          "slug": "conversor-markdown-html",
+          "url": "https://meskeia.com/conversor-markdown-html/",
+          "description": "Convierte Markdown a HTML"
+        },
+        {
+          "name": "Conversor de Código Morse",
+          "slug": "conversor-morse",
+          "url": "https://meskeia.com/conversor-morse/",
+          "description": "Texto a Morse con audio"
+        },
+        {
+          "name": "Conversor Números Romanos",
+          "slug": "conversor-numeros-romanos",
+          "url": "https://meskeia.com/conversor-numeros-romanos/",
+          "description": "Arábigos a romanos y viceversa"
+        },
+        {
+          "name": "Detector de Idioma",
+          "slug": "detector-idioma",
+          "url": "https://meskeia.com/detector-idioma/",
+          "description": "Detecta el idioma de cualquier texto"
+        },
+        {
+          "name": "Conversor Binario",
+          "slug": "conversor-binario",
+          "url": "https://meskeia.com/conversor-binario/",
+          "description": "Texto a binario, hex, octal"
+        },
+        {
+          "name": "Conversor Braille",
+          "slug": "conversor-braille",
+          "url": "https://meskeia.com/conversor-braille/",
+          "description": "Texto a Braille español"
+        },
+        {
+          "name": "Generador de Anagramas",
+          "slug": "generador-anagramas",
+          "url": "https://meskeia.com/generador-anagramas/",
+          "description": "Encuentra palabras con tus letras"
+        },
+        {
+          "name": "Generador Lorem Ipsum",
+          "slug": "generador-lorem-ipsum",
+          "url": "https://meskeia.com/generador-lorem-ipsum/",
+          "description": "Genera texto Lorem Ipsum"
+        },
+        {
+          "name": "Contador de Sílabas",
+          "slug": "contador-silabas",
+          "url": "https://meskeia.com/contador-silabas/",
+          "description": "Cuenta y separa sílabas en español"
+        },
+        {
+          "name": "Conversor de Formatos",
+          "slug": "conversor-formatos",
+          "url": "https://meskeia.com/conversor-formatos/",
+          "description": "Convierte entre JSON, CSV, Excel, XML y YAML"
+        },
+        {
+          "name": "Conjugador de Verbos Español",
+          "slug": "conjugador-verbos",
+          "url": "https://meskeia.com/conjugador-verbos/",
+          "description": "Conjuga verbos en todos los tiempos: indicativo, subjuntivo e imperativo con 60+ irregulares"
+        },
+        {
+          "name": "Conversor Base64",
+          "slug": "conversor-base64",
+          "url": "https://meskeia.com/conversor-base64/",
+          "description": "Codifica y decodifica texto, imágenes y archivos en Base64. Genera data URI para desarrollo web."
+        },
+        {
+          "name": "Conversor de Divisas",
+          "slug": "conversor-divisas",
+          "url": "https://meskeia.com/conversor-divisas/",
+          "description": "Convierte entre más de 30 divisas con tipos de cambio actualizados diariamente. Orientativo, no apto para trading."
+        },
+        {
+          "name": "Enchufes por País",
+          "slug": "enchufes-por-pais",
+          "url": "https://meskeia.com/enchufes-por-pais/",
+          "description": "Consulta qué tipo de enchufe y adaptador necesitas para cada país. Voltaje, frecuencia y tipos A-M."
+        }
       ]
     },
     {
@@ -293,15 +1435,60 @@
       "description": "Algoritmos, estructuras de datos y herramientas para desarrolladores",
       "icon": "💻",
       "tools": [
-        { "name": "Visualizador de Algoritmos", "slug": "visualizador-algoritmos", "url": "https://meskeia.com/visualizador-algoritmos/", "description": "Visualiza paso a paso algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort" },
-        { "name": "Playground SQL", "slug": "playground-sql", "url": "https://meskeia.com/playground-sql/", "description": "Editor SQL interactivo en el navegador. Practica con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada" },
-        { "name": "Simulador de Puertas Lógicas", "slug": "simulador-puertas-logicas", "url": "https://meskeia.com/simulador-puertas-logicas/", "description": "Simula puertas lógicas (AND, OR, NOT, NAND, XOR), genera tablas de verdad, prueba circuitos digitales y evalúa expresiones booleanas" },
-        { "name": "Glosario de Programación", "slug": "glosario-programacion", "url": "https://meskeia.com/glosario-programacion/", "description": "Diccionario de términos de desarrollo web con más de 100 conceptos: API, componente, hook, props, state. Filtro A-Z, búsqueda y categorías" },
-        { "name": "Calculadora de Sistemas Numéricos", "slug": "calculadora-sistemas-numericos", "url": "https://meskeia.com/calculadora-sistemas-numericos/", "description": "Convierte entre binario, octal, decimal y hexadecimal con explicación paso a paso. Incluye operaciones bit a bit: AND, OR, XOR, NOT, shifts" },
-        { "name": "Calculadora de Subredes IP", "slug": "calculadora-subredes", "url": "https://meskeia.com/calculadora-subredes/", "description": "Calcula subredes IP: máscara de red, CIDR, broadcast, rango de hosts. Incluye tabla de máscaras comunes y explicaciones de networking" },
-        { "name": "Visualizador de Estructuras de Datos", "slug": "visualizador-estructuras-datos", "url": "https://meskeia.com/visualizador-estructuras-datos/", "description": "Visualiza arrays, pilas, colas, listas enlazadas y árboles BST con animaciones interactivas. Operaciones paso a paso para entender cada estructura" },
-        { "name": "Conversor IEEE 754", "slug": "conversor-ieee754", "url": "https://meskeia.com/conversor-ieee754/", "description": "Convierte números decimales a formato IEEE 754 (punto flotante) en precisión simple (32 bits) y doble (64 bits). Visualiza signo, exponente y mantisa" },
-        { "name": "Calculadora de Álgebra Booleana", "slug": "calculadora-algebra-booleana", "url": "https://meskeia.com/calculadora-algebra-booleana/", "description": "Simplifica expresiones booleanas con mapas de Karnaugh de 2, 3 y 4 variables. Genera tablas de verdad, forma mínima SOP/POS y visualiza agrupaciones" }
+        {
+          "name": "Visualizador de Algoritmos",
+          "slug": "visualizador-algoritmos",
+          "url": "https://meskeia.com/visualizador-algoritmos/",
+          "description": "Visualiza paso a paso algoritmos de ordenación: Bubble, Selection, Insertion, Quick y Merge Sort"
+        },
+        {
+          "name": "Playground SQL",
+          "slug": "playground-sql",
+          "url": "https://meskeia.com/playground-sql/",
+          "description": "Editor SQL interactivo en el navegador. Practica con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada"
+        },
+        {
+          "name": "Simulador de Puertas Lógicas",
+          "slug": "simulador-puertas-logicas",
+          "url": "https://meskeia.com/simulador-puertas-logicas/",
+          "description": "Simula puertas lógicas (AND, OR, NOT, NAND, XOR), genera tablas de verdad, prueba circuitos digitales y evalúa expresiones booleanas"
+        },
+        {
+          "name": "Glosario de Programación",
+          "slug": "glosario-programacion",
+          "url": "https://meskeia.com/glosario-programacion/",
+          "description": "Diccionario de términos de desarrollo web con más de 100 conceptos: API, componente, hook, props, state. Filtro A-Z, búsqueda y categorías"
+        },
+        {
+          "name": "Calculadora de Sistemas Numéricos",
+          "slug": "calculadora-sistemas-numericos",
+          "url": "https://meskeia.com/calculadora-sistemas-numericos/",
+          "description": "Convierte entre binario, octal, decimal y hexadecimal con explicación paso a paso. Incluye operaciones bit a bit: AND, OR, XOR, NOT, shifts"
+        },
+        {
+          "name": "Calculadora de Subredes IP",
+          "slug": "calculadora-subredes",
+          "url": "https://meskeia.com/calculadora-subredes/",
+          "description": "Calcula subredes IP: máscara de red, CIDR, broadcast, rango de hosts. Incluye tabla de máscaras comunes y explicaciones de networking"
+        },
+        {
+          "name": "Visualizador de Estructuras de Datos",
+          "slug": "visualizador-estructuras-datos",
+          "url": "https://meskeia.com/visualizador-estructuras-datos/",
+          "description": "Visualiza arrays, pilas, colas, listas enlazadas y árboles BST con animaciones interactivas. Operaciones paso a paso para entender cada estructura"
+        },
+        {
+          "name": "Conversor IEEE 754",
+          "slug": "conversor-ieee754",
+          "url": "https://meskeia.com/conversor-ieee754/",
+          "description": "Convierte números decimales a formato IEEE 754 (punto flotante) en precisión simple (32 bits) y doble (64 bits). Visualiza signo, exponente y mantisa"
+        },
+        {
+          "name": "Calculadora de Álgebra Booleana",
+          "slug": "calculadora-algebra-booleana",
+          "url": "https://meskeia.com/calculadora-algebra-booleana/",
+          "description": "Simplifica expresiones booleanas con mapas de Karnaugh de 2, 3 y 4 variables. Genera tablas de verdad, forma mínima SOP/POS y visualiza agrupaciones"
+        }
       ]
     },
     {
@@ -309,8 +1496,18 @@
       "description": "Genética, biología molecular y herramientas para ciencias de la salud",
       "icon": "🧬",
       "tools": [
-        { "name": "Simulador de Genética Mendeliana", "slug": "simulador-genetica", "url": "https://meskeia.com/simulador-genetica/", "description": "Simula cruces genéticos con cuadros de Punnett, herencia ligada al sexo y árboles genealógicos" },
-        { "name": "Calculadora de Estadística Médica", "slug": "calculadora-estadistica-medica", "url": "https://meskeia.com/calculadora-estadistica-medica/", "description": "Calcula sensibilidad, especificidad, VPP, VPN, razones de verosimilitud, odds ratio, riesgo relativo y NNT con intervalos de confianza" }
+        {
+          "name": "Simulador de Genética Mendeliana",
+          "slug": "simulador-genetica",
+          "url": "https://meskeia.com/simulador-genetica/",
+          "description": "Simula cruces genéticos con cuadros de Punnett, herencia ligada al sexo y árboles genealógicos"
+        },
+        {
+          "name": "Calculadora de Estadística Médica",
+          "slug": "calculadora-estadistica-medica",
+          "url": "https://meskeia.com/calculadora-estadistica-medica/",
+          "description": "Calcula sensibilidad, especificidad, VPP, VPN, razones de verosimilitud, odds ratio, riesgo relativo y NNT con intervalos de confianza"
+        }
       ]
     }
   ],

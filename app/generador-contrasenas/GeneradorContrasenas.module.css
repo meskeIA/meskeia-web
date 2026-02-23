@@ -623,3 +623,17 @@
     color: #51cf66;
   }
 }
+
+/* Dark Mode */
+[data-theme='dark'] .historyStrength2 {
+  background: rgba(211, 84, 0, 0.2);
+  color: #f39c12;
+}
+[data-theme='dark'] .historyStrength3 {
+  background: rgba(230, 126, 34, 0.15);
+  color: #e67e22;
+}
+[data-theme='dark'] .historyStrength4 {
+  background: rgba(22, 160, 133, 0.15);
+  color: #1abc9c;
+}

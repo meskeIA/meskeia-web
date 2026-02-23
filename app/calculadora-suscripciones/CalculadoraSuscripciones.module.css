@@ -525,3 +525,8 @@
     font-size: 1.2rem;
   }
 }
+
+/* Dark Mode */
+[data-theme='dark'] .btnEliminar:hover {
+  background: rgba(239, 68, 68, 0.15);
+}

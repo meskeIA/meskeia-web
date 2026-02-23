@@ -533,3 +533,12 @@
     flex: 1;
   }
 }
+
+/* Dark Mode */
+[data-theme='dark'] .btnDelete {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+[data-theme='dark'] .btnDelete:hover {
+  background: rgba(239, 68, 68, 0.25);
+}

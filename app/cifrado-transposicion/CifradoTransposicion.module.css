@@ -523,3 +523,9 @@
     font-size: 1.4rem;
   }
 }
+
+/* Dark Mode */
+[data-theme='dark'] .escitalaLetra {
+  background: #2d2a1f;
+  color: #d4b896;
+}

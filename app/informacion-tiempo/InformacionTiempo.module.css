@@ -471,3 +471,10 @@
     display: none;
   }
 }
+
+/* Dark Mode */
+[data-theme='dark'] .errorPanel {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}

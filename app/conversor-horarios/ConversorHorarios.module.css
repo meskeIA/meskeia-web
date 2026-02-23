@@ -575,3 +575,9 @@
     padding: 15px;
   }
 }
+
+/* Dark Mode */
+[data-theme='dark'] .btnRemover:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
