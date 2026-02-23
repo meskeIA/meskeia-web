@@ -107,10 +107,40 @@ export default function ConversorFormatosPage() {
 
   // Parsear Excel
   const parseExcel = async (buffer: ArrayBuffer): Promise<Record<string, unknown>[]> => {
-    const XLSX = await import('xlsx');
-    const workbook = XLSX.read(buffer, { type: 'array' });
-    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-    return XLSX.utils.sheet_to_json(firstSheet);
+    const ExcelJS = (await import('exceljs')).default;
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
+    const worksheet = workbook.worksheets[0];
+    if (!worksheet) return [];
+
+    // Extraer cabeceras de la primera fila
+    const headers: string[] = [];
+    worksheet.getRow(1).eachCell({ includeEmpty: false }, (cell, colNumber) => {
+      headers[colNumber - 1] = String(cell.value ?? `col${colNumber}`);
+    });
+
+    // Extraer filas de datos
+    const data: Record<string, unknown>[] = [];
+    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      if (rowNumber === 1) return;
+      const rowData: Record<string, unknown> = {};
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        const header = headers[colNumber - 1];
+        if (!header) return;
+        // ExcelJS puede devolver objetos complejos (fórmulas, rich text)
+        const val = cell.value;
+        if (val !== null && typeof val === 'object' && 'result' in val) {
+          rowData[header] = (val as { result: unknown }).result;
+        } else if (val !== null && typeof val === 'object' && 'richText' in val) {
+          rowData[header] = (val as { richText: { text: string }[] }).richText.map(r => r.text).join('');
+        } else {
+          rowData[header] = val;
+        }
+      });
+      data.push(rowData);
+    });
+
+    return data;
   };
 
   // Parsear XML
@@ -262,12 +292,20 @@ export default function ConversorFormatosPage() {
 
   // Convertir a Excel
   const toExcel = async (data: Record<string, unknown>[]): Promise<Blob> => {
-    const XLSX = await import('xlsx');
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos');
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    return new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const ExcelJS = (await import('exceljs')).default;
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Datos');
+
+    if (data.length > 0) {
+      const keys = Object.keys(data[0]);
+      worksheet.columns = keys.map(key => ({ header: key, key, width: 15 }));
+      data.forEach(row => worksheet.addRow(row));
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return new Blob([buffer as ArrayBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
   };
 
   // Convertir a XML

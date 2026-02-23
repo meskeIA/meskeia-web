@@ -26,6 +26,7 @@
     "@trpc/server": "^11.10.0",
     "algebrite": "^1.4.0",
     "chart.js": "^4.5.1",
+    "exceljs": "^4.4.0",
     "flag-icons": "^7.5.0",
     "fuse.js": "^7.1.0",
     "hls.js": "^1.6.15",
@@ -44,7 +45,6 @@
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.4",
     "sql.js": "^1.13.0",
-    "xlsx": "^0.18.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {
