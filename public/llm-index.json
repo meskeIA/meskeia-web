@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 233+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 235+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 233,
+  "total_tools": 235,
   "last_updated": "2026-02-23",
   "features": {
     "all_free": true,
@@ -21,7 +21,7 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 43
+      "tool_count": 44
     },
     {
       "id": "diseno",
@@ -35,7 +35,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 50
+      "tool_count": 51
     },
     {
       "id": "finanzas",
@@ -70,7 +70,7 @@
       "name": "Juegos y Ocio",
       "icon": "🎲",
       "description": "Diversión y entretenimiento",
-      "tool_count": 19
+      "tool_count": 20
     },
     {
       "id": "marketing",
@@ -91,14 +91,14 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 25
+      "tool_count": 26
     },
     {
       "id": "viajes",
       "name": "Viajes y Turismo",
       "icon": "✈️",
       "description": "Planifica viajes, divisas, enchufes y presupuestos de viaje",
-      "tool_count": 11
+      "tool_count": 12
     }
   ],
   "moments": [
@@ -107,14 +107,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 90
+      "tool_count": 91
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 79
+      "tool_count": 80
     },
     {
       "id": "casa",
@@ -142,14 +142,14 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 21
+      "tool_count": 23
     },
     {
       "id": "curiosidad",
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 38
+      "tool_count": 39
     }
   ],
   "tools": [
@@ -3944,6 +3944,31 @@
       "icon": "📋"
     },
     {
+      "slug": "simulador-jet-lag",
+      "name": "Simulador de Jet Lag",
+      "url": "https://meskeia.com/simulador-jet-lag/",
+      "description": "Calcula el impacto del cambio horario en tu viaje. Días de adaptación, síntomas esperados y recomendaciones personalizadas según la dirección del vuelo",
+      "suites": [
+        "viajes",
+        "salud"
+      ],
+      "contexts": [
+        "relax",
+        "trabajo"
+      ],
+      "keywords": [
+        "jet lag",
+        "cambio horario",
+        "desfase horario",
+        "viaje largo",
+        "adaptacion viaje",
+        "vuelo internacional",
+        "zona horaria",
+        "recuperar jet lag"
+      ],
+      "icon": "✈️"
+    },
+    {
       "slug": "conversor-divisas",
       "name": "Conversor de Divisas",
       "url": "https://meskeia.com/conversor-divisas/",
@@ -5197,6 +5222,32 @@
         "mundo",
         "atlas",
         "continentes"
+      ],
+      "icon": "🌍"
+    },
+    {
+      "slug": "quiz-paises-capitales",
+      "name": "Quiz Países y Capitales",
+      "url": "https://meskeia.com/quiz-paises-capitales/",
+      "description": "Quiz de geografía: adivina capitales, identifica países por su capital o bandera. 195 países, 3 modos, 5 dificultades",
+      "suites": [
+        "juegos",
+        "cultura",
+        "estudiantes"
+      ],
+      "contexts": [
+        "relax",
+        "estudio",
+        "curiosidad"
+      ],
+      "keywords": [
+        "quiz paises capitales",
+        "adivinar capital",
+        "quiz geografia",
+        "capitales mundo",
+        "banderas paises",
+        "quiz banderas",
+        "juego geografia"
       ],
       "icon": "🌍"
     },
