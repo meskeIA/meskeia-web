@@ -348,6 +348,114 @@
   border-color: var(--border);
 }
 
+/* Tabla comparativa variantes FIRE */
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: var(--spacing-lg);
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tablaComparativa th {
+  background: var(--hover);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 0.65rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.tablaComparativa td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.tablaComparativa tr:last-child td {
+  border-bottom: none;
+}
+
+.tablaComparativa tr:hover td {
+  background: var(--hover);
+}
+
+/* Casos de uso */
+.casosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.casoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.casoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.casoIcon {
+  font-size: 1.3rem;
+}
+
+.casoNivel {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.casoTip {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faqItem {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.faqPregunta {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 0.85rem var(--spacing-md);
+  background: var(--hover);
+  margin: 0;
+  cursor: default;
+}
+
+.faqRespuesta {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding: 0.85rem var(--spacing-md);
+  margin: 0;
+  border-top: 1px solid var(--border);
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .mainContent {
@@ -355,6 +463,10 @@
   }
 
   .contentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .casosGrid {
     grid-template-columns: 1fr;
   }
 }

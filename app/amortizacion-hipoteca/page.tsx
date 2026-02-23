@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './AmortizacionHipoteca.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -860,6 +860,154 @@ export default function AmortizacionHipotecaPage() {
           Consulta con tu entidad bancaria antes de realizar cualquier amortización anticipada.
         </p>
       </div>
+
+      <EducationalSection
+        title="Guía de amortización anticipada de hipoteca"
+        subtitle="Compara estrategias, entiende las ventajas y elige la mejor opción para tu situación"
+        icon="📚"
+      >
+        {/* Tabla comparativa: reducir cuota vs reducir plazo */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa: reducir cuota vs reducir plazo</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Factor</th>
+                  <th>🔽 Reducir cuota</th>
+                  <th>⏰ Reducir plazo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Intereses ahorrados</td>
+                  <td>Menos ahorro</td>
+                  <td><strong>Más ahorro total</strong></td>
+                </tr>
+                <tr>
+                  <td>Liquidez mensual</td>
+                  <td><strong>Mejora inmediata</strong></td>
+                  <td>Sin cambio hasta cancelación</td>
+                </tr>
+                <tr>
+                  <td>Termina antes</td>
+                  <td>No</td>
+                  <td><strong>Sí</strong></td>
+                </tr>
+                <tr>
+                  <td>Ideal para...</td>
+                  <td>Quien necesita más renta disponible</td>
+                  <td>Quien quiere pagar menos intereses</td>
+                </tr>
+                <tr>
+                  <td>Seguridad ante imprevistos</td>
+                  <td><strong>Mayor</strong> (cuota más baja)</td>
+                  <td>Menor (cuota igual)</td>
+                </tr>
+                <tr>
+                  <td>Comisión por amortización</td>
+                  <td colSpan={2}>Igual en ambos casos (máx. 0,25-0,5% según ley)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.guideSection}>
+          <h2>¿Cuándo usar cada modo de cálculo?</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>💰</span>
+                <span className={styles.casoNivel}>Amortización puntual</span>
+              </div>
+              <p className={styles.casoTip}>
+                Tienes un extra de dinero (bonus, herencia, ahorro). Calcula cuánto ahorras
+                amortizando ahora vs. dejarlo en depósito o inversión.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>📅</span>
+                <span className={styles.casoNivel}>Amortización periódica</span>
+              </div>
+              <p className={styles.casoTip}>
+                Puedes aportar una cantidad fija cada mes o año además de tu cuota habitual.
+                Ideal para calcular el efecto de un pequeño esfuerzo sostenido.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>📊</span>
+                <span className={styles.casoNivel}>Comparar escenarios</span>
+              </div>
+              <p className={styles.casoTip}>
+                Contrasta hasta 3 importes de amortización simultáneamente. Ve de un vistazo
+                cuál es la mejor estrategia según tus objetivos.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>⚠️</span>
+                <span className={styles.casoNivel}>Antes de amortizar</span>
+              </div>
+              <p className={styles.casoTip}>
+                Compara el TAE de tu hipoteca con la rentabilidad de invertir ese dinero.
+                Si inviertes al 6% y pagas intereses al 2%, puede no valer la pena amortizar.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes</h2>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Cuándo conviene amortizar hipoteca vs. invertir?</dt>
+              <dd className={styles.faqRespuesta}>
+                Depende del tipo de interés de tu hipoteca vs. la rentabilidad esperada de tu inversión.
+                Si tu hipoteca está al 3% y puedes invertir al 7%, invertir puede ser más rentable a largo plazo.
+                Si tu hipoteca está al 5-6%, amortizar es más seguro y suele compensar más.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Qué comisión me pueden cobrar por amortizar?</dt>
+              <dd className={styles.faqRespuesta}>
+                La Ley Hipotecaria (Ley 5/2019) limita las comisiones de amortización anticipada:
+                máx. 0,25% los primeros 3 años o 0,15% entre el 3.º y 5.º año para tipo variable;
+                0,25% los primeros 5 años o 0,5% los primeros 3 para tipo fijo. Muchos bancos
+                las han eliminado en sus hipotecas variables.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Puedo deducir la amortización en el IRPF?</dt>
+              <dd className={styles.faqRespuesta}>
+                Solo si compraste antes del 1 de enero de 2013 y tienes derecho a la deducción por
+                inversión en vivienda habitual. En ese caso, las amortizaciones anticipadas pueden
+                ser deducibles. Consulta con un asesor fiscal.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Es lo mismo amortizar a principio o final de año?</dt>
+              <dd className={styles.faqRespuesta}>
+                No. Amortizar antes en el año te ahorra más intereses porque el capital pendiente
+                sobre el que se calculan los intereses es menor durante más meses. La diferencia
+                puede ser significativa en hipotecas grandes.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Qué es el sistema de amortización francés?</dt>
+              <dd className={styles.faqRespuesta}>
+                Es el sistema estándar en España: cuota mensual fija donde al principio pagas
+                más intereses y menos capital, y al final más capital y menos intereses. Este
+                simulador usa el sistema francés para todos sus cálculos.
+              </dd>
+            </div>
+          </dl>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('amortizacion-hipoteca')} />
       <Footer appName="amortizacion-hipoteca" />

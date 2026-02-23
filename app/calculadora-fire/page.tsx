@@ -283,6 +283,155 @@ export default function CalculadoraFIREPage() {
         subtitle="Descubre el movimiento de independencia financiera y retiro anticipado"
         icon="📚"
       >
+        {/* Tabla comparativa variantes FIRE */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de variantes FIRE</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Variante</th>
+                  <th>Gastos anuales</th>
+                  <th>Capital necesario</th>
+                  <th>Estilo de vida</th>
+                  <th>Dificultad</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Lean FIRE</strong></td>
+                  <td>&lt; 20.000 €</td>
+                  <td>&lt; 500.000 €</td>
+                  <td>Frugal, minimalista</td>
+                  <td>⭐⭐⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>FIRE estándar</strong></td>
+                  <td>20.000–40.000 €</td>
+                  <td>500.000–1 M €</td>
+                  <td>Cómodo, clase media</td>
+                  <td>⭐⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>Fat FIRE</strong></td>
+                  <td>&gt; 60.000 €</td>
+                  <td>&gt; 1,5 M €</td>
+                  <td>Holgado, sin restricciones</td>
+                  <td>⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>Barista FIRE</strong></td>
+                  <td>Variable</td>
+                  <td>Menor capital + ingresos parciales</td>
+                  <td>Semi-retiro, trabajo a tiempo parcial</td>
+                  <td>⭐⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>Coast FIRE</strong></td>
+                  <td>Variable</td>
+                  <td>Alcanzado un umbral, el interés compuesto hace el resto</td>
+                  <td>Deja de ahorrar agresivamente</td>
+                  <td>⭐⭐⭐</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.guideSection}>
+          <h2>¿Cuándo usar esta calculadora?</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>💼</span>
+                <span className={styles.casoNivel}>Empleado con ahorro</span>
+              </div>
+              <p className={styles.casoTip}>
+                Introduce tu sueldo neto, gastos mensuales y rentabilidad esperada (7% histórico de mercado).
+                Descubre en cuántos años podrías dejar de trabajar.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>🏠</span>
+                <span className={styles.casoNivel}>Con patrimonio inicial</span>
+              </div>
+              <p className={styles.casoTip}>
+                Si ya tienes ahorros o inversiones, úsalos como capital inicial. El interés compuesto
+                acelera considerablemente la fecha FIRE.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>📉</span>
+                <span className={styles.casoNivel}>Simulación de inflación</span>
+              </div>
+              <p className={styles.casoTip}>
+                Ajusta la rentabilidad real restando la inflación (p. ej. 7% – 3% = 4% real).
+                Así obtienes un escenario conservador y más realista.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>🎯</span>
+                <span className={styles.casoNivel}>Encontrar tu tasa de ahorro</span>
+              </div>
+              <p className={styles.casoTip}>
+                Prueba distintas tasas de ahorro (20%, 40%, 60%) para ver cómo cambian los años.
+                Doblar la tasa puede reducir el tiempo a la mitad.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes</h2>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Es realista un 7% de rentabilidad anual?</dt>
+              <dd className={styles.faqRespuesta}>
+                El S&P 500 ha rentado históricamente ~10% nominal (~7% real descontando inflación).
+                Un fondo indexado global como MSCI World ha dado resultados similares en periodos largos.
+                Usar 6-7% real es un supuesto conservador y razonable, aunque el pasado no garantiza el futuro.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Qué pasa con los impuestos al retirar?</dt>
+              <dd className={styles.faqRespuesta}>
+                En España, las plusvalías tributan al 19-28% según tramo. Al calcular tu número FIRE,
+                considera retirar un 20-25% más para cubrir la fiscalidad, o usa cuentas de ahorro
+                como planes de pensiones con diferimiento fiscal.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿La regla del 4% funciona en España?</dt>
+              <dd className={styles.faqRespuesta}>
+                La regla del 4% viene del Trinity Study (carteras USA a 30 años). Para Europa y
+                horizontes superiores a 30 años, muchos expertos recomiendan usar el 3-3,5%
+                para mayor seguridad, lo que implica un número FIRE de 29-33× los gastos anuales.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Qué inversiones usar para FIRE?</dt>
+              <dd className={styles.faqRespuesta}>
+                La estrategia más popular son los fondos indexados de bajo coste (Vanguard, iShares,
+                Amundi). En España, son accesibles a través de brokers como Indexa Capital, MyInvestor
+                o DEGIRO. Diversifica entre acciones globales y algo de renta fija según tu horizonte.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Cuánto necesito realmente para FIRE?</dt>
+              <dd className={styles.faqRespuesta}>
+                Multiplica tus gastos anuales actuales por 25 (regla del 4%) o por 30-33 si quieres
+                mayor seguridad. Si gastas 2.000 €/mes (24.000 €/año), tu número FIRE estándar
+                es 600.000 €. Usa esta calculadora para personalizar según tu situación real.
+              </dd>
+            </div>
+          </dl>
+        </section>
+
         <section className={styles.guideSection}>
           <h2>¿Qué es FIRE?</h2>
           <p className={styles.introParagraph}>
