@@ -33,19 +33,24 @@ const securityHeaders = [
     key: 'Permissions-Policy',
     value: 'camera=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
   },
-  // CSP en modo report-only (no bloquea, solo registra violaciones)
-  // Una vez verificado que no hay violaciones, cambiar a Content-Security-Policy
+  // CSP enforcement activo desde 23/02/2026 (período report-only superado sin incidencias)
+  // Dominios adicionales identificados en auditoría de seguridad:
+  // - ipapi.co, api64.ipify.org → app mi-ip (geolocalización cliente)
+  // - api.openweathermap.org   → app informacion-tiempo
+  // - cdn.jsdelivr.net         → app extractor-audio-video (ffmpeg.wasm scripts)
+  // - www.openstreetmap.org    → app editor-exif (iframe mapa)
   {
-    key: 'Content-Security-Policy-Report-Only',
+    key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self'",
-      "connect-src 'self' https://meskeia.com",
+      "connect-src 'self' https://meskeia.com https://ipapi.co https://api64.ipify.org https://api.openweathermap.org",
       "media-src 'self'",
       "worker-src 'self' blob:",
+      "frame-src 'self' https://www.openstreetmap.org",
       "frame-ancestors 'none'",
       "report-uri /api/csp-report",
     ].join('; '),
