@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
 > **Última actualización**: 2026-02-23
-> **Apps totales**: 234 | **Suites**: 12
+> **Apps totales**: 235 | **Suites**: 12
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -112,8 +112,8 @@
 
 ### 🎲 Juegos y Ocio (18 apps — GAP, objetivo: +3 apps)
 
-- [ ] **Quiz de países y capitales** (`juego-paises-capitales`)
-  - Suite: `juegos`, `cultura` | Contextos: `relax`, `curiosidad`
+- [x] ~~**Quiz de países y capitales**~~ (`quiz-paises-capitales`) ✅ Completado 2026-02-23
+  - Suite: `juegos`, `cultura`, `estudiantes` | Contextos: `relax`, `curiosidad`, `estudio`
   - Descripción: Quiz geográfico con los 195 países del mundo. Modos: adivina capital, adivina país, adivina bandera. Con puntuación.
   - Privacidad: ✅ 100% local (datos embebidos)
   - Complejidad: Media

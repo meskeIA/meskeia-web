@@ -636,6 +636,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'juego-sudoku': juegosPuzzleApps.filter(a => a.url !== '/juego-sudoku/').slice(0, 4),
   'juego-wordle': juegosPuzzleApps.filter(a => a.url !== '/juego-wordle/').slice(0, 4),
   'juego-ahorcado': juegosPuzzleApps.filter(a => a.url !== '/juego-ahorcado/').slice(0, 4),
+  'quiz-paises-capitales': [
+    { url: '/paises-del-mundo/', icon: '🌍', name: 'Países del Mundo', description: 'Buscador de 195 países' },
+    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra' },
+    { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
+    { url: '/simulador-jet-lag/', icon: '✈️', name: 'Jet Lag', description: 'Calculadora de adaptación' },
+  ],
   'juego-memoria': juegosPuzzleApps.filter(a => a.url !== '/juego-memoria/'),
   'juego-puzzle-matematico': juegosPuzzleApps.filter(a => a.url !== '/juego-puzzle-matematico/'),
   'juego-tres-en-raya': juegosCasualApps.filter(a => a.url !== '/juego-tres-en-raya/'),
@@ -739,10 +745,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // REFERENCIA Y CULTURA GENERAL
   'paises-del-mundo': [
+    { url: '/quiz-paises-capitales/', icon: '🌍', name: 'Quiz Países', description: 'Pon a prueba tu geografía' },
     { url: '/conversor-divisas/', icon: '💱', name: 'Conversor Divisas', description: 'Tipos de cambio BCE' },
     { url: '/enchufes-por-pais/', icon: '🔌', name: 'Enchufes por País', description: 'Qué adaptador llevar' },
     { url: '/conversor-horarios/', icon: '🕐', name: 'Conversor Horarios', description: 'Zonas horarias' },
-    { url: '/presupuesto-viaje/', icon: '🗺️', name: 'Presupuesto Viaje', description: 'Planifica gastos' },
   ],
   'minerales-del-mundo': [
     { url: '/constelaciones-del-cielo/', icon: '🌌', name: 'Constelaciones', description: '32 constelaciones famosas' },

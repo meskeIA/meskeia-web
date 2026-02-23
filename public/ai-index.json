@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 237,
+  "total_tools": 238,
   "updated": "2026-02-23",
   "features": {
     "all_free": true,
@@ -931,8 +931,22 @@
           "slug": "juego-ahorcado",
           "url": "https://meskeia.com/juego-ahorcado/",
           "description": "Adivina la palabra letra a letra. 4 categorías: animales, países, profesiones y vocabulario"
+        },
+        {
+          "name": "Quiz Paises y Capitales",
+          "url": "/quiz-paises-capitales/",
+          "description": "Quiz de geografia: adivina capitales, paises por capital o bandera. 195 paises, 3 modos, 5 dificultades",
+          "keywords": [
+            "quiz",
+            "paises",
+            "capitales",
+            "banderas",
+            "geografia",
+            "adivinar"
+          ]
         }
-      ]
+      ],
+      "count": 23
     },
     {
       "name": "Matemáticas y Estadística",

@@ -291,6 +291,7 @@ export const implementedAppsUrls = [
   "/juego-ahorcado/",                    // Juego del ahorcado en español: 4 categorías, 100% local
   "/checklist-documentos-viaje/",        // Checklist documentos de viaje: España, Europa, internacional
   "/simulador-jet-lag/",                 // Calculadora jet lag: diferencia horaria, días adaptación, recomendaciones
+  "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
 ];
 
 /**
