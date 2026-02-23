@@ -11,17 +11,17 @@
 | Suite | Apps | Estado |
 |-------|------|--------|
 | 🧮 Estudiantes | 49 | ✅ Bien cubierta |
-| 📚 Cultura General | 43 | ✅ Bien cubierta |
-| ⚡ Productividad | 38 | ✅ Bien cubierta |
+| 📚 Cultura General | 44 | ✅ Bien cubierta |
+| ⚡ Productividad | 39 | ✅ Bien cubierta |
 | 📈 Finanzas | 34 | ✅ Bien cubierta |
 | 🔧 Herramientas Técnicas | 32 | ✅ Bien cubierta |
 | 🎨 Diseño y Desarrollo | 28 | 🟡 Aceptable |
-| 🏥 Salud y Bienestar | 25 | 🟡 Aceptable |
+| 🏥 Salud y Bienestar | 26 | 🟡 Aceptable |
 | 📢 Marketing y Contenido | 25 | 🟡 Aceptable |
 | 🏘️ Inmobiliaria y Hogar | 23 | 🟡 Aceptable |
-| 🎲 Juegos y Ocio | 18 | 🔴 GAP |
+| 🎲 Juegos y Ocio | 20 | 🟡 Aceptable |
 | 💼 Freelance y Autónomo | 17 | 🔴 GAP |
-| ✈️ Viajes y Turismo | 10 | 🔴 GAP CRÍTICO |
+| ✈️ Viajes y Turismo | 13 | 🔴 GAP |
 
 **Valor diferencial meskeIA**: Gratuito · Sin registro · 100% local en el PC · Total confidencialidad
 
@@ -31,17 +31,9 @@
 
 > Tareas técnicas que afectan la calidad y seguridad de toda la plataforma.
 
-- [x] ~~**CSP Enforcement**: Cambiar `Content-Security-Policy-Report-Only` → `Content-Security-Policy` en `vercel.json` y `next.config.ts`.~~ ✅ Completado 2026-02-23
-
 - [ ] **Actualizar dependencias (Fase 6)**: `npm outdated` → evaluar actualizaciones. Priorizar: Next.js, React, Chart.js. Sesión dedicada por alto riesgo de breaking changes.
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura
   - *Complejidad*: Alta (sesión separada, con build verification)
-
-- [x] ~~**Auditoría ai-index.json**~~: Verificado y corregido. `total_tools` ajustado a 236 (234 previos + 2 nuevas apps). ✅ Completado 2026-02-23
-
-- [x] ~~**Revisar apps sin dark mode completo**~~: De 34 archivos, 8 tenían problemas reales (fondos claros en estados error/danger). Corregidos. 12 usaban hover states válidos. 5 juegos con colores intencionales. ✅ Completado 2026-02-23
-
-- [x] ~~**ai-index.json desactualizado**~~: 27 apps añadidas a sus categorías. `total_tools` actualizado a 231. ✅ Completado 2026-02-23
 
 ---
 
@@ -49,7 +41,7 @@
 
 > Suites con menos cobertura. Cada app nueva en estas suites tiene mayor impacto relativo.
 
-### ✈️ Viajes y Turismo (10 apps — GAP CRÍTICO, objetivo: +5 apps)
+### ✈️ Viajes y Turismo (13 apps — GAP, objetivo: +3 apps más)
 
 - [ ] **Planificador de itinerario de viaje** (`planificador-itinerario`)
   - Suite: `viajes` | Contextos: `relax`, `casa`
@@ -69,18 +61,6 @@
   - Privacidad: ✅ 100% local (datos embebidos)
   - Complejidad: Media (requiere investigar y embeber datos)
 
-- [x] ~~**Simulador de jet lag**~~ (`simulador-jet-lag`) ✅ Completado 2026-02-23
-  - Suite: `viajes`, `salud` | Contextos: `relax`, `trabajo`
-  - Descripción: Calcula el impacto del jet lag según zonas horarias cruzadas y da recomendaciones de adaptación.
-  - Privacidad: ✅ 100% local
-  - Complejidad: Baja
-
-- [x] ~~**Organizador de documentos de viaje**~~ (`checklist-documentos-viaje`) ✅ Completado 2026-02-23
-  - Suite: `viajes`, `productividad` | Contextos: `relax`, `casa`
-  - Descripción: Checklist personalizable: pasaporte, visado, seguros, vacunas, reservas, dinero. Editable y descargable.
-  - Privacidad: ✅ 100% local
-  - Complejidad: Baja
-
 ### 💼 Freelance y Autónomo (17 apps — GAP, objetivo: +4 apps)
 
 - [ ] **Calculadora cuota autónomo 2026** (`calculadora-cuota-autonomo`)
@@ -88,13 +68,6 @@
   - Descripción: Nueva tarifa plana por tramos de rendimiento neto. Cuota mensual según ingresos esperados, con simulación anual.
   - Privacidad: ✅ 100% local
   - Complejidad: Media (fórmulas SS 2024+)
-
-- [ ] **Simulador declaración trimestral** (`simulador-declaracion-trimestral`)
-  - Suite: `freelance`, `finanzas` | Contextos: `trabajo`, `dinero`
-  - Descripción: Modelo 303 (IVA trimestral) y Modelo 130 (IRPF estimación directa). Calcula qué pagar cada trimestre.
-  - Privacidad: ✅ 100% local
-  - Complejidad: Alta (legislación fiscal española)
-  - DisclaimerCard: `financial` obligatorio
 
 - [ ] **Comparador asalariado vs autónomo** (`comparador-asalariado-autonomo`)
   - Suite: `freelance`, `finanzas` | Contextos: `trabajo`, `dinero`
@@ -110,19 +83,9 @@
   - Complejidad: Baja
   - DisclaimerCard: `financial`
 
-### 🎲 Juegos y Ocio (18 apps — GAP, objetivo: +3 apps)
+> ⚠️ **Nota**: `simulador-declaracion-trimestral` (Modelo 303+130) descartado por riesgo de responsabilidad legal en cálculos fiscales complejos.
 
-- [x] ~~**Quiz de países y capitales**~~ (`quiz-paises-capitales`) ✅ Completado 2026-02-23
-  - Suite: `juegos`, `cultura`, `estudiantes` | Contextos: `relax`, `curiosidad`, `estudio`
-  - Descripción: Quiz geográfico con los 195 países del mundo. Modos: adivina capital, adivina país, adivina bandera. Con puntuación.
-  - Privacidad: ✅ 100% local (datos embebidos)
-  - Complejidad: Media
-
-- [x] ~~**Juego del ahorcado**~~ (`juego-ahorcado`) ✅ Completado 2026-02-23
-  - Suite: `juegos`, `estudiantes` | Contextos: `relax`, `estudio`
-  - Descripción: Clásico juego del ahorcado en español. Categorías: animales, países, profesiones, palabras comunes. Sin datos externos.
-  - Privacidad: ✅ 100% local
-  - Complejidad: Baja
+### 🎲 Juegos y Ocio (20 apps — objetivo: +2 apps más)
 
 - [ ] **Quiz de cultura general** (`quiz-cultura-general`)
   - Suite: `juegos`, `cultura` | Contextos: `relax`, `curiosidad`
@@ -176,62 +139,42 @@
 
 ## 🟣 PROFESIONALIZACIÓN DE APPS EXISTENTES
 
-> Aplicar el patrón v2.0 de PROFESIONALIZACION.md (7 secciones: tabla comparativa, casos de uso, FAQ, guía paso a paso, tips, warning box, HTML exportable).
-> **Estado actual**: 25 apps profesionalizadas de 231 (~11%). Metodología en [PROFESIONALIZACION.md](PROFESIONALIZACION.md).
+> Aplicar el patrón v2.0: tabla comparativa, casos de uso, FAQ, guía paso a paso, tips, warning box.
+> **Estado actual**: 28 apps profesionalizadas de 235 (~12%).
 > **No aplica a**: juegos, cursos, utilidades triviales (cronómetro, dado, espejo, nivel burbuja).
 
 ### 🔴 Candidatos prioritarios (mayor impacto)
 
-- [ ] **calculadora-fire** — Planificación financiera a largo plazo, alta implicación económica, muy popular entre comunidad FIRE española.
-  - Secciones clave: Tabla comparativa (FIRE vs inversión tradicional), Casos de uso (4 perfiles edad/capital), FAQ (¿cuánto necesito realmente?), Warning (errores de cálculo de inflación)
-  - DisclaimerCard: `financial`
-
-- [ ] **calculadora-seguro-vida** — Decisión financiera con implicaciones legales y familiares. Alta carga educativa necesaria.
+- [ ] **calculadora-seguro-vida** — Decisión financiera con implicaciones legales y familiares.
   - Secciones clave: Tabla comparativa (temporal vs entera vs unit-linked), Casos de uso (joven sin hijos, familia con hipoteca, autónomo, jubilado), FAQ (8 preguntas sobre exclusiones y capitales), Warning (infraasegurarse)
   - DisclaimerCard: `financial`
 
-- [ ] **comparador-tipos-seguros** — App con múltiples alternativas: perfecta para tabla comparativa. Alta utilidad para usuarios que no conocen los tipos.
+- [ ] **comparador-tipos-seguros** — App con múltiples alternativas: perfecta para tabla comparativa.
   - Secciones clave: Tabla comparativa (vida/hogar/coche/salud/viaje × 6 criterios), Casos de uso, FAQ legal, Guía paso a paso (cómo elegir el seguro correcto)
   - DisclaimerCard: `financial`
 
-- [ ] **generador-facturas** — Output exportable, uso profesional, alta recurrencia. Pendiente también: añadir campo retención IRPF (ver sección 🔵).
+- [ ] **generador-facturas** — Output exportable, uso profesional, alta recurrencia. Pendiente también: añadir campo retención IRPF.
   - Secciones clave: HTML exportable, Tabla comparativa (factura con IVA / sin IVA / con retención), Casos de uso (autónomo, SL, internacional), FAQ fiscal, Warning (errores en facturación que generan sanciones)
-  - DisclaimerCard: `financial`
-
-- [ ] **calculadora-amortizacion-hipoteca** — Complemento natural del simulador-hipoteca (ya profesionalizado). Alta búsqueda en España.
-  - Secciones clave: Tabla comparativa (amortizar cuota vs plazo), Casos de uso (3 perfiles según años restantes y capital), Guía paso a paso (cuándo y cómo amortizar), Warning (penalizaciones, 2% vs 0.15%)
   - DisclaimerCard: `financial`
 
 ### 🟡 Candidatos de media prioridad
 
-- [ ] **calculadora-notas** — Top 5 analytics (22 usos). Usada por estudiantes. Añadir tabla comparativa sistemas de calificación, casos de uso (ESO, Bachiller, Universidad), FAQ (cómo calcular nota media ponderada).
-  - *Añadido por analytics*: 2026-02-23
-
 - [ ] **calculadora-deuda** — Método bola de nieve vs avalancha. Decisión con gran impacto en finanzas personales.
-
 - [ ] **calculadora-fondo-emergencia** — Regla de las 3-6 nóminas. Educational value muy alto para usuarios con deudas.
-
-- [ ] **calculadora-tir-van** — App técnica usada por estudiantes y profesionales. Tabla comparativa TIR vs VAN vs Payback muy útil.
-
+- [ ] **calculadora-tir-van** — App técnica usada por estudiantes y profesionales. Tabla comparativa TIR vs VAN vs Payback.
 - [ ] **simulador-compraventa-inmueble** — Gran decisión financiera, complemento de calculadora-coste-vivienda (ya profesionalizada).
-
-- [ ] **calculadora-regla-50-30-20** — Regla de presupuesto personal. Alta búsqueda, fácil de enriquecer con casos de uso reales.
-
+- [ ] **calculadora-regla-50-30-20** — Alta búsqueda, fácil de enriquecer con casos de uso reales.
 - [ ] **planificador-cashflow** — Herramienta para autónomos/empresas. Casos de uso: freelance, startup, pyme.
-
 - [ ] **calculadora-break-even** — Herramienta de negocio con alto valor educativo para emprendedores.
-
-- [ ] **generador-utm** — Output exportable, uso de marketing. HTML colapsable con ejemplos de implementación GA4.
-
+- [ ] **generador-utm** — Output exportable. HTML colapsable con ejemplos de implementación GA4.
 - [ ] **analizador-densidad-seo** — Herramienta de contenido, casos de uso para bloggers/redactores/SEOs.
-
-- [ ] **calculadora-electricidad** — Alta demanda en España por precio de la luz. Warning: errores de interpretación de la factura eléctrica.
+- [ ] **calculadora-electricidad** — Alta demanda en España por precio de la luz.
 
 ### 🟢 Candidatos de baja prioridad (pero válidos)
 
-- [ ] **calculadora-calorias-ejercicio** — Salud, casos de uso (pérdida peso, mantenimiento, ganancia muscular). DisclaimerCard: `medical`.
-- [ ] **calculadora-colesterol** — Salud, interpretación de valores con tabla comparativa LDL/HDL/triglicéridos. DisclaimerCard: `medical`.
-- [ ] **calculadora-estadistica** — Estudiantes, tabla comparativa de medidas de centralización vs dispersión.
+- [ ] **calculadora-calorias-ejercicio** — DisclaimerCard: `medical`.
+- [ ] **calculadora-colesterol** — Tabla comparativa LDL/HDL/triglicéridos. DisclaimerCard: `medical`.
+- [ ] **calculadora-estadistica** — Tabla comparativa medidas centralización vs dispersión.
 - [ ] **generador-og-images** — Output exportable, casos de uso (blog, ecommerce, redes).
 - [ ] **checklist-coberturas-seguros** — Guía paso a paso para revisar si estás bien cubierto.
 
@@ -258,7 +201,6 @@
 - **Guía interactiva "Montar una SL en España"**: Journey completo con calculadoras integradas (costes, impuestos, pasos legales).
 - **Simulador de cartera de ETFs con rebalanceo**: Más avanzado que el simulador actual. Requiere datos históricos embebidos.
 - **Generador de plan de negocio básico**: Plantilla estructurada exportable a PDF/texto.
-- **Juego de banderas del mundo**: Adivina el país por su bandera (SVG embebido, sin APIs).
 - **Calculadora de huella hídrica**: Complemento a la calculadora de huella de carbono existente.
 - **Comparador de operadoras de móvil en España**: Datos embebidos actualizados trimestralmente.
 
@@ -266,16 +208,28 @@
 
 ## ✅ COMPLETADAS (archivo histórico)
 
-> Mover aquí cada tarea al finalizarla, con fecha de completado.
+> Historial de tareas finalizadas con fecha de completado.
 
-- [x] **CSP Enforcement** — Activado enforcement en `vercel.json` + `next.config.ts`. Dominios añadidos: cdn.jsdelivr.net, ipapi.co, api64.ipify.org, api.openweathermap.org, openstreetmap.org. *(2026-02-23)*
-- [x] **Seguridad API analytics** — Endpoints `/api/analytics/stats` y `/api/analytics/ip-filter` protegidos con `x-api-key: ANALYTICS_SECRET`. *(2026-02-23)*
-- [x] **Sanitización mensajes de error** — 7 API routes ya no exponen `error.message` interno. *(2026-02-23)*
+### Apps nuevas
+- [x] **simulador-jet-lag** — Jet lag por diferencia horaria, 35 ciudades, 5 niveles de impacto, recomendaciones por dirección. *(2026-02-23)*
+- [x] **quiz-paises-capitales** — Quiz geografía 195 países, 3 modos (capital/país/bandera), 5 dificultades. *(2026-02-23)*
+- [x] **checklist-documentos-viaje** — Checklist documentos por tipo destino (España/Europa/Internacional). *(2026-02-23)*
+- [x] **juego-ahorcado** — Ahorcado en español, 4 categorías × 30 palabras, SVG progresivo, stats localStorage. *(2026-02-23)*
+
+### Profesionalizaciones
+- [x] **calculadora-fire** — Tabla comparativa 5 variantes FIRE, 4 casos de uso, FAQ 5 preguntas. *(2026-02-23)*
+- [x] **calculadora-amortizacion-hipoteca** — Tabla cuota vs plazo, 4 casos de uso, FAQ 5 preguntas (comisiones Ley 5/2019, IRPF, sistema francés). *(2026-02-23)*
+- [x] **calculadora-notas** — Tabla comparativa sistemas calificación, 4 casos de uso (ESO/EvAU/ECTS/Erasmus), FAQ 5 preguntas. *(2026-02-23)*
+
+### Mantenimiento técnico
+- [x] **CSP Enforcement** — Activado enforcement en `vercel.json` + `next.config.ts`. *(2026-02-23)*
+- [x] **Seguridad API analytics** — Endpoints protegidos con `x-api-key: ANALYTICS_SECRET`. *(2026-02-23)*
+- [x] **Sanitización errores API** — 7 API routes ya no exponen `error.message` interno. *(2026-02-23)*
 - [x] **Validación inputs analytics** — Límites de longitud y rango en `track` y `duration`. *(2026-02-23)*
-- [x] **Reemplazar xlsx por exceljs** — CVEs críticos de xlsx eliminados. `conversor-formatos` migrado a ExcelJS. *(2026-02-23)*
+- [x] **Reemplazar xlsx por exceljs** — CVEs críticos eliminados en `conversor-formatos`. *(2026-02-23)*
 - [x] **Fix CVEs jsPDF** — 3 CVEs eliminados con `npm audit fix`. *(2026-02-23)*
-- [x] **ai-index.json actualizado** — 27 apps añadidas a categorías. `total_tools: 231`. *(2026-02-23)*
-- [x] **Dark mode corregido** — 8 CSS modules con fondos claros en estados error/danger: calculadora-suscripciones, conversor-horarios, informacion-tiempo, lista-compras, lista-tareas, notas, cifrado-transposicion, generador-contrasenas. *(2026-02-23)*
+- [x] **ai-index.json auditado** — 27 apps añadidas. `total_tools` corregido y actualizado a 238. *(2026-02-23)*
+- [x] **Dark mode corregido** — 8 CSS modules con fondos claros en estados error/danger corregidos. *(2026-02-23)*
 
 ---
 
@@ -286,7 +240,7 @@ Al iniciar sesión, seguir este orden:
 2. Tomar la primera tarea disponible en 🔴 (si hay urgentes)
 3. Si no hay urgentes, tomar la primera tarea en 🟡
 4. Ejecutar el checklist completo de CLAUDE.md al crear apps
-5. Marcar como completada moviendo la tarea a la sección ✅ con fecha
+5. Marcar como completada añadiéndola a la sección ✅ con fecha
 6. Actualizar el contador de apps totales en la cabecera de este fichero
 
 **Criterio de prioridad**: 🔴 → 🟡 → 🟢 → 🔵
