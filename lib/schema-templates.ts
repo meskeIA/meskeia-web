@@ -85,13 +85,6 @@ export function generateWebAppSchema(config: BaseAppConfig): WithContext<WebAppl
     dateModified: new Date().toISOString().split('T')[0],
     isAccessibleForFree: true,
     keywords: config.keywords?.join(', '),
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '150',
-      bestRating: '5',
-      worstRating: '1',
-    },
   };
 }
 
@@ -130,11 +123,6 @@ export function generateSoftwareAppSchema(config: BaseAppConfig & {
     datePublished: '2025-01-22',
     dateModified: new Date().toISOString().split('T')[0],
     isAccessibleForFree: true,
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '150',
-    },
   };
 }
 
