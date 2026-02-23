@@ -18,11 +18,29 @@ import { getCorsHeaders } from '@/lib/cors';
 // Configuración para edge runtime
 export const runtime = 'edge';
 
+/**
+ * Verifica que la petición incluye la API key correcta.
+ * Header requerido: x-api-key: ANALYTICS_SECRET
+ */
+function isAuthorized(request: NextRequest): boolean {
+  const apiKey = request.headers.get('x-api-key');
+  const secret = process.env.ANALYTICS_SECRET;
+  if (!secret || !apiKey) return false;
+  return apiKey === secret;
+}
+
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders('GET, OPTIONS') });
 }
 
 export async function GET(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json(
+      { status: 'error', message: 'No autorizado' },
+      { status: 401, headers: getCorsHeaders('GET, OPTIONS', request.headers.get('origin')) }
+    );
+  }
+
   try {
     // Inicializar DB si es necesario
     await initializeDatabase();

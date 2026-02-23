@@ -33,6 +33,17 @@ function anonymizeIP(ip: string): string {
   return 'anonymous';
 }
 
+/**
+ * Verifica que la petición incluye la API key correcta.
+ * Header requerido: x-api-key: ANALYTICS_SECRET
+ */
+function isAuthorized(request: NextRequest): boolean {
+  const apiKey = request.headers.get('x-api-key');
+  const secret = process.env.ANALYTICS_SECRET;
+  if (!secret || !apiKey) return false;
+  return apiKey === secret;
+}
+
 // Obtener IP anonimizada del request
 function getClientIP(request: NextRequest): string {
   const forwarded = request.headers.get('x-forwarded-for');
@@ -50,6 +61,13 @@ function getClientIP(request: NextRequest): string {
 
 // GET: Obtener configuración de IP
 export async function GET(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json(
+      { status: 'error', message: 'No autorizado' },
+      { status: 401, headers: getCorsHeaders('GET, POST, OPTIONS', request.headers.get('origin')) }
+    );
+  }
+
   try {
     await initializeDatabase();
     const client = getTursoClient();
@@ -93,6 +111,13 @@ export async function GET(request: NextRequest) {
 
 // POST: Guardar IP actual como excluida
 export async function POST(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json(
+      { status: 'error', message: 'No autorizado' },
+      { status: 401, headers: getCorsHeaders('GET, POST, OPTIONS', request.headers.get('origin')) }
+    );
+  }
+
   try {
     await initializeDatabase();
     const client = getTursoClient();
