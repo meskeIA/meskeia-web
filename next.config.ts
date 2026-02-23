@@ -31,7 +31,7 @@ const securityHeaders = [
   // Restringir APIs del navegador innecesarias
   {
     key: 'Permissions-Policy',
-    value: 'camera=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
+    value: 'camera=(), geolocation=(self), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
   },
   // CSP enforcement activo desde 23/02/2026 (período report-only superado sin incidencias)
   // Dominios adicionales identificados en auditoría de seguridad:
