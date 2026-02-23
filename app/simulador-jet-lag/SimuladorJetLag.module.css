@@ -1,0 +1,526 @@
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --hover: #333333;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+}
+
+/* Layout principal */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Panel de selección */
+.panelSelector {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.panelTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.selectGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.selectLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.selectIcon {
+  font-size: 1.1rem;
+}
+
+.select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 2.5rem;
+}
+
+.select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.flechaViaje {
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.diferenciaInfo {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.diferenciaLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.diferenciaValor {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.diferenciaValor span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+}
+
+/* Panel de resultados */
+.panelResultados {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Card de impacto */
+.impactoCard {
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  border: 2px solid;
+  text-align: center;
+}
+
+.impactoNinguno {
+  background: #F0FFF4;
+  border-color: #48BB78;
+  color: #276749;
+}
+
+.impactoLeve {
+  background: #FFFBEB;
+  border-color: #F6AD55;
+  color: #744210;
+}
+
+.impactoModerado {
+  background: #FFF5E6;
+  border-color: #ED8936;
+  color: #7B341E;
+}
+
+.impactoSignificativo {
+  background: #FFF0F0;
+  border-color: #FC8181;
+  color: #742A2A;
+}
+
+.impactoSevero {
+  background: #FFF0F0;
+  border-color: #E53E3E;
+  color: #63171B;
+}
+
+[data-theme='dark'] .impactoNinguno {
+  background: rgba(39, 103, 73, 0.15);
+  color: #68D391;
+}
+
+[data-theme='dark'] .impactoLeve {
+  background: rgba(116, 66, 16, 0.2);
+  color: #F6AD55;
+}
+
+[data-theme='dark'] .impactoModerado {
+  background: rgba(123, 52, 30, 0.2);
+  color: #FC8181;
+}
+
+[data-theme='dark'] .impactoSignificativo {
+  background: rgba(116, 42, 42, 0.2);
+  color: #FC8181;
+}
+
+[data-theme='dark'] .impactoSevero {
+  background: rgba(99, 23, 27, 0.25);
+  color: #FC8181;
+}
+
+.impactoEmoji {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.impactoNivel {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.impactoDesc {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+/* Estadísticas */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.statCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+}
+
+.statIcono {
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.statValor {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.15rem;
+}
+
+/* Panel de recomendaciones */
+.recomendacionesCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+}
+
+.recomTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recomLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.recomItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.recomBullet {
+  color: var(--primary);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Dirección vuelo badge */
+.direccionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+.direccionEste {
+  background: rgba(229, 62, 62, 0.1);
+  color: #C53030;
+}
+
+.direccionOeste {
+  background: rgba(72, 169, 166, 0.15);
+  color: #2C7A7B;
+}
+
+.direccionLocal {
+  background: rgba(72, 187, 120, 0.15);
+  color: #276749;
+}
+
+[data-theme='dark'] .direccionEste {
+  background: rgba(229, 62, 62, 0.2);
+  color: #FC8181;
+}
+
+[data-theme='dark'] .direccionOeste {
+  background: rgba(72, 169, 166, 0.2);
+  color: #81E6D9;
+}
+
+[data-theme='dark'] .direccionLocal {
+  background: rgba(72, 187, 120, 0.2);
+  color: #68D391;
+}
+
+/* Secciones educativas */
+.sectionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.infoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+}
+
+.infoCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.fasesLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.faseItem {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.faseNum {
+  width: 1.6rem;
+  height: 1.6rem;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.faseTxt {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.faseTxt strong {
+  color: var(--primary);
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tablaComparativa th {
+  background: var(--hover);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+
+.tablaComparativa th:not(:first-child),
+.tablaComparativa td:not(:first-child) {
+  text-align: center;
+}
+
+.tablaComparativa td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.tablaComparativa tr:last-child td {
+  border-bottom: none;
+}
+
+.tablaComparativa tr:hover td {
+  background: var(--hover);
+}
+
+/* Clases utilitarias */
+.statValorSmall {
+  font-size: 0.9rem;
+}
+
+.sintomasLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.recomListaSintomas {
+  margin-bottom: 1rem;
+}
+
+.infoParrafo {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+.infoParrafoSecundario {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .sectionGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

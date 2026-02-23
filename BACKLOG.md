@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
 > **Última actualización**: 2026-02-23
-> **Apps totales**: 233 | **Suites**: 12
+> **Apps totales**: 234 | **Suites**: 12
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -69,7 +69,7 @@
   - Privacidad: ✅ 100% local (datos embebidos)
   - Complejidad: Media (requiere investigar y embeber datos)
 
-- [ ] **Simulador de jet lag** (`simulador-jet-lag`)
+- [x] ~~**Simulador de jet lag**~~ (`simulador-jet-lag`) ✅ Completado 2026-02-23
   - Suite: `viajes`, `salud` | Contextos: `relax`, `trabajo`
   - Descripción: Calcula el impacto del jet lag según zonas horarias cruzadas y da recomendaciones de adaptación.
   - Privacidad: ✅ 100% local

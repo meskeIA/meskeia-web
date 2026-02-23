@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 236,
+  "total_tools": 237,
   "updated": "2026-02-23",
   "features": {
     "all_free": true,
@@ -1185,8 +1185,21 @@
           "slug": "checklist-documentos-viaje",
           "url": "https://meskeia.com/checklist-documentos-viaje/",
           "description": "Checklist personalizable con documentos para España, Europa e internacional"
+        },
+        {
+          "name": "Simulador de Jet Lag",
+          "url": "/simulador-jet-lag/",
+          "description": "Calcula el impacto del cambio horario: dias de adaptacion, sintomas y recomendaciones",
+          "keywords": [
+            "jet lag",
+            "cambio horario",
+            "desfase horario",
+            "viaje largo",
+            "adaptacion viaje"
+          ]
         }
-      ]
+      ],
+      "count": 27
     },
     {
       "name": "Salud y Bienestar",
@@ -1562,5 +1575,6 @@
     "tools_api": "https://meskeia.com/api/tools",
     "llm_index": "https://meskeia.com/llm-index.json",
     "sitemap": "https://meskeia.com/sitemap.xml"
-  }
+  },
+  "last_updated": "2026-02-23"
 }

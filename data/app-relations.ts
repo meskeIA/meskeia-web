@@ -273,6 +273,7 @@ const productividadApps: RelatedApp[] = [
 const viajesApps: RelatedApp[] = [
   { url: '/lista-equipaje/', icon: '🧳', name: 'Lista Equipaje', description: 'Checklist de viaje' },
   { url: '/checklist-documentos-viaje/', icon: '📋', name: 'Documentos de Viaje', description: 'Pasaporte, visado y más' },
+  { url: '/simulador-jet-lag/', icon: '✈️', name: 'Simulador Jet Lag', description: 'Impacto del cambio horario' },
   { url: '/conversor-horarios/', icon: '🌍', name: 'Conversor Horarios', description: 'Zonas horarias' },
   { url: '/conversor-divisas/', icon: '💱', name: 'Conversor Divisas', description: 'Tipos de cambio BCE' },
   { url: '/presupuesto-viaje/', icon: '🗺️', name: 'Presupuesto Viaje', description: 'Planifica y divide gastos' },
@@ -624,6 +625,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'presupuesto-viaje': viajesApps.filter(a => a.url !== '/presupuesto-viaje/').slice(0, 4),
   'enchufes-por-pais': viajesApps.filter(a => a.url !== '/enchufes-por-pais/').slice(0, 4),
   'comparador-coste-vida': viajesApps.filter(a => a.url !== '/comparador-coste-vida/').slice(0, 4),
+  'simulador-jet-lag': viajesApps.filter(a => a.url !== '/simulador-jet-lag/').slice(0, 4),
   'generador-actas': [...productividadApps.slice(0, 2), ...textoApps.slice(0, 2)],
 
   // JUEGOS
