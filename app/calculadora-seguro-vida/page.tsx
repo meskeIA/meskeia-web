@@ -247,7 +247,7 @@ export default function CalculadoraSeguroVidaPage() {
             </div>
           </div>
 
-          <button onClick={limpiarFormulario} className={styles.btnSecondary}>
+          <button type="button" onClick={limpiarFormulario} className={styles.btnSecondary}>
             🔄 Limpiar formulario
           </button>
         </div>
@@ -339,7 +339,6 @@ export default function CalculadoraSeguroVidaPage() {
         variant="financial"
         severity="high"
         context="calculadora-seguro-vida"
-        collapsible={true}
       />
 
       
@@ -414,6 +413,62 @@ export default function CalculadoraSeguroVidaPage() {
               <p><strong>Consideración:</strong> Evalúa por separado el seguro y la inversión. A veces es mejor contratarlos por separado.</p>
             </div>
           </div>
+        </section>
+
+        <section className={styles.guideSection}>
+          <h2>Comparativa: Tipos de Seguro de Vida</h2>
+          <div className={styles.tablaWrapper}>
+            <table className={styles.tabla}>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Duración</th>
+                  <th>Prima</th>
+                  <th>Componente ahorro</th>
+                  <th>¿Pago garantizado?</th>
+                  <th>Ideal para</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Temporal (riesgo)</strong></td>
+                  <td>10–30 años</td>
+                  <td>Baja</td>
+                  <td>No</td>
+                  <td>Solo si falleces en el plazo</td>
+                  <td>Familias con hipoteca e hijos pequeños</td>
+                </tr>
+                <tr>
+                  <td><strong>Vida Entera</strong></td>
+                  <td>Vitalicia</td>
+                  <td>Alta</td>
+                  <td>Sí (bajo)</td>
+                  <td>Siempre (garantizado)</td>
+                  <td>Planificación sucesoria y herencia</td>
+                </tr>
+                <tr>
+                  <td><strong>Unit Linked</strong></td>
+                  <td>Variable</td>
+                  <td>Media-Alta</td>
+                  <td>Sí (variable según mercado)</td>
+                  <td>Mínimo garantizado</td>
+                  <td>Inversores a largo plazo</td>
+                </tr>
+                <tr>
+                  <td><strong>PIAS</strong></td>
+                  <td>5+ años</td>
+                  <td>Variable</td>
+                  <td>Sí (garantizado o fondos)</td>
+                  <td>Capital acumulado</td>
+                  <td>Complemento a la jubilación</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className={styles.tablaNota}>
+            💡 Para la mayoría de familias con hipoteca e hijos, el <strong>seguro temporal</strong> ofrece la mejor relación protección/coste.
+            La vida entera y el unit-linked tienen sentido en contextos de planificación patrimonial avanzada.
+          </p>
         </section>
 
         <section className={styles.guideSection}>
@@ -537,6 +592,54 @@ export default function CalculadoraSeguroVidaPage() {
             </div>
           </div>
         </section>
+
+        <section className={styles.guideSection}>
+          <h2>Casos de Uso: ¿Cuánto seguro necesito?</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <span className={styles.casoIcono}>🧑</span>
+              <h4>Joven sin hijos (28 años)</h4>
+              <p><strong>Situación</strong>: Soltero, sin hipoteca, sin dependientes.</p>
+              <p><strong>Necesidad</strong>: Baja. Solo si tiene deudas compartidas o quiere cubrir gastos funerarios.</p>
+              <p><strong>Recomendación</strong>: Puede esperar. Si contrata, un temporal de 50.000–100.000 € cubre lo básico.</p>
+            </div>
+            <div className={styles.casoCard}>
+              <span className={styles.casoIcono}>👨‍👩‍👧</span>
+              <h4>Familia con hipoteca e hijos (35-45 años)</h4>
+              <p><strong>Situación</strong>: Pareja, 2 hijos, hipoteca de 180.000 €, ingreso único o doble con disparidad.</p>
+              <p><strong>Necesidad</strong>: Alta. Sin seguro, la familia puede perder la vivienda y el nivel de vida.</p>
+              <p><strong>Recomendación</strong>: Seguro temporal de 250.000–400.000 € a 20-25 años. Revisar al liquidar la hipoteca.</p>
+            </div>
+            <div className={styles.casoCard}>
+              <span className={styles.casoIcono}>💼</span>
+              <h4>Autónomo (40 años)</h4>
+              <p><strong>Situación</strong>: Sin nómina garantizada, sin cobertura laboral de empresa. Puede tener créditos del negocio.</p>
+              <p><strong>Necesidad</strong>: Alta. La falta de red de seguridad laboral aumenta el riesgo familiar.</p>
+              <p><strong>Recomendación</strong>: Seguro temporal de 200.000–350.000 € cubriendo deudas del negocio + necesidades familiares.</p>
+            </div>
+            <div className={styles.casoCard}>
+              <span className={styles.casoIcono}>👴</span>
+              <h4>Jubilado o cercano a la jubilación (60+ años)</h4>
+              <p><strong>Situación</strong>: Hijos independientes, hipoteca casi o completamente pagada.</p>
+              <p><strong>Necesidad</strong>: Baja-media. La necesidad de sustitución de ingresos se reduce.</p>
+              <p><strong>Recomendación</strong>: Si tiene dependientes (cónyuge sin pensión propia), valorar vida entera o un seguro menor. Consultar con asesor.</p>
+            </div>
+          </div>
+        </section>
+
+        <div className={styles.warningBox}>
+          <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
+          <div>
+            <strong>El error más común: infraasegurarse</strong>
+            <p>
+              Muchas familias contratan solo el capital que exige el banco para la hipoteca — equivalente al
+              capital pendiente del préstamo. Ese seguro cubre la deuda, pero no la pérdida de ingresos
+              durante años, los gastos de educación de los hijos ni el fondo de emergencia. El resultado:
+              la familia salda la hipoteca pero no puede mantener su nivel de vida. Usa esta calculadora
+              para estimar tus necesidades reales, no solo las del banco.
+            </p>
+          </div>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-seguro-vida')} />

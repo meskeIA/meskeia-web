@@ -393,6 +393,120 @@
   font-size: 0.95rem;
 }
 
+/* Tabla comparativa */
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius, 8px);
+  border: 1px solid var(--border);
+  margin-top: 1rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  font-size: 0.88rem;
+}
+
+.tabla th,
+.tabla td {
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.tabla th {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 600;
+}
+
+.tabla td {
+  color: var(--text-secondary);
+}
+
+.tabla tbody tr:hover {
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
+}
+
+.tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tablaNota {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.75rem;
+  line-height: 1.5;
+}
+
+/* Casos de uso */
+.casosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.casoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.casoIcono {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.casoCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.casoCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.3rem;
+  line-height: 1.45;
+}
+
+/* Warning box */
+.warningBox {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1.5px solid rgba(245, 158, 11, 0.45);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin-top: 1.5rem;
+}
+
+.warningIcono {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.warningBox strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.warningBox p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
 /* Dark Mode */
 [data-theme='dark'] .disclaimer {
   background: rgba(255, 193, 7, 0.15);
@@ -429,7 +543,8 @@
 
   .contentGrid,
   .factoresGrid,
-  .faqGrid {
+  .faqGrid,
+  .casosGrid {
     grid-template-columns: 1fr;
   }
 }

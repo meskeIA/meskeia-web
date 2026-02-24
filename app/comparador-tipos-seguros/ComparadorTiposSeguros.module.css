@@ -331,6 +331,93 @@
   margin: 0;
 }
 
+/* Guía paso a paso */
+.guiaSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.guiaSection h2 {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--primary);
+}
+
+.pasosList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pasoItem {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.pasoNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 50%;
+}
+
+.pasoItem strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.95rem;
+}
+
+.pasoItem p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* FAQ Grid */
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.faqItem h4 {
+  font-size: 1rem;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.faqItem p {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
 /* Dark Mode */
 [data-theme='dark'] .disclaimer {
   background: rgba(14, 165, 233, 0.15);
@@ -361,6 +448,10 @@
   }
 
   .tipoDetalles {
+    grid-template-columns: 1fr;
+  }
+
+  .faqGrid {
     grid-template-columns: 1fr;
   }
 }

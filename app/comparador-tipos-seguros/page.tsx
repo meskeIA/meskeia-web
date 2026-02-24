@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ComparadorTiposSeguros.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type SeguroCategoria = 'vida' | 'auto' | 'hogar' | 'salud';
@@ -234,6 +234,7 @@ export default function ComparadorTiposSegurosPage() {
         {(Object.keys(segurosData) as SeguroCategoria[]).map((cat) => (
           <button
             key={cat}
+            type="button"
             className={`${styles.categoryBtn} ${categoriaActiva === cat ? styles.categoryBtnActive : ''}`}
             onClick={() => {
               setCategoriaActiva(cat);
@@ -259,9 +260,10 @@ export default function ComparadorTiposSegurosPage() {
               className={`${styles.tipoCard} ${tipoExpandido === tipo.nombre ? styles.tipoCardExpanded : ''}`}
             >
               <button
+                type="button"
                 className={styles.tipoHeader}
                 onClick={() => toggleTipo(tipo.nombre)}
-                aria-expanded={tipoExpandido === tipo.nombre}
+                aria-expanded={tipoExpandido === tipo.nombre ? true : false}
               >
                 <div className={styles.tipoHeaderLeft}>
                   <span className={styles.tipoIcon}>{tipo.icon}</span>
@@ -325,10 +327,9 @@ export default function ComparadorTiposSegurosPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
-        variant="educational"
+        variant="financial"
         severity="medium"
         context="comparador-tipos-seguros"
-        collapsible={true}
       />
 
       
@@ -548,6 +549,89 @@ export default function ComparadorTiposSegurosPage() {
           </div>
         </div>
       </div>
+
+      <EducationalSection
+        title="Guía para elegir y contratar seguros"
+        subtitle="Cómo decidir qué seguro necesitas, qué revisar antes de firmar y preguntas frecuentes"
+      >
+        <section className={styles.guiaSection}>
+          <h2>Guía paso a paso: cómo elegir el seguro correcto</h2>
+          <ol className={styles.pasosList}>
+            <li className={styles.pasoItem}>
+              <span className={styles.pasoNum}>1</span>
+              <div>
+                <strong>Identifica qué quieres proteger</strong>
+                <p>¿Tu familia ante tu fallecimiento? ¿Tu vehículo ante accidentes? ¿Tu vivienda ante daños? Cada riesgo tiene su seguro. No trates de cubrirlo todo con uno genérico.</p>
+              </div>
+            </li>
+            <li className={styles.pasoItem}>
+              <span className={styles.pasoNum}>2</span>
+              <div>
+                <strong>Calcula el capital asegurado real que necesitas</strong>
+                <p>No asegures de menos (insuficiente protección) ni de más (primas innecesarias). Usa calculadoras específicas: capital de seguro de vida, valor real del vehículo, metros cuadrados y contenido real del hogar.</p>
+              </div>
+            </li>
+            <li className={styles.pasoItem}>
+              <span className={styles.pasoNum}>3</span>
+              <div>
+                <strong>Pide al menos 3 presupuestos</strong>
+                <p>Los precios varían enormemente entre aseguradoras para el mismo perfil. Usa comparadores online como primer filtro, pero verifica siempre las condiciones particulares.</p>
+              </div>
+            </li>
+            <li className={styles.pasoItem}>
+              <span className={styles.pasoNum}>4</span>
+              <div>
+                <strong>Lee las exclusiones antes de firmar</strong>
+                <p>Las exclusiones son lo más importante del contrato. Un seguro de vida puede excluir enfermedades preexistentes. Un seguro de auto puede excluir ciertos conductores. Un seguro de salud puede tener carencias de 6 meses para cirugías.</p>
+              </div>
+            </li>
+            <li className={styles.pasoItem}>
+              <span className={styles.pasoNum}>5</span>
+              <div>
+                <strong>Verifica el procedimiento de siniestros</strong>
+                <p>Antes de contratar: ¿cómo y en qué plazo se comunica un siniestro? ¿Hay peritaje previo? ¿Qué documentación se exige? Una aseguradora barata con siniestros complicados puede salir más cara.</p>
+              </div>
+            </li>
+            <li className={styles.pasoItem}>
+              <span className={styles.pasoNum}>6</span>
+              <div>
+                <strong>Revisa tu póliza cada año</strong>
+                <p>Tu vida cambia: hijos, hipoteca nueva, coche más moderno, sueldo diferente. Revisa anualmente si tu cobertura sigue siendo adecuada. El seguro que era perfecto a los 30 puede ser insuficiente a los 40.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section className={styles.guiaSection}>
+          <h2>Preguntas Frecuentes (y legales)</h2>
+          <div className={styles.faqGrid}>
+            <div className={styles.faqItem}>
+              <h4>¿Qué pasa si el seguro rechaza mi siniestro?</h4>
+              <p>Tienes derecho a reclamar. Primero, acude al Servicio de Atención al Cliente de la aseguradora (plazo de respuesta: 2 meses). Si no te satisface, puedes reclamar ante la Dirección General de Seguros y Fondos de Pensiones (DGSFP). Para daños patrimoniales, también puedes acudir a arbitraje de consumo o vía judicial.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Puedo cancelar mi seguro antes de que venza?</h4>
+              <p>Sí. Tienes derecho a no renovar comunicándolo con al menos 1 mes de antelación antes del vencimiento (Ley 50/1980 de Contrato de Seguro). En seguros con ahorro, la cancelación anticipada puede tener penalización. Verifica las condiciones de tu póliza.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el período de carencia?</h4>
+              <p>El tiempo desde que contratas el seguro hasta que puedes usar ciertas coberturas. Común en seguros de salud (6-12 meses para cirugías, maternidad) y seguros de vida (suicidio excluido 1 año). No existe en seguros de auto. Lee siempre las carencias antes de contratar.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué ocurre si tengo dos seguros para el mismo riesgo?</h4>
+              <p>Por principio de indemnización, los seguros no pueden ser fuente de lucro. Si tienes dos seguros de hogar y sufres un daño, entre ambas aseguradoras cubren el 100% del daño, pero no el 200%. Debes comunicar siempre la existencia de otros seguros al declarar un siniestro.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿El seguro del banco es obligatorio y tiene que ser el suyo?</h4>
+              <p>El seguro de vida y el seguro de hogar vinculados a una hipoteca son <em>prácticamente</em> obligatorios, pero NO tienes obligación de contratarlos con el banco. Puedes contratar con cualquier aseguradora siempre que las coberturas sean equivalentes. El banco no puede penalizarte por ello (Ley 5/2019 de crédito inmobiliario).</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es la franquicia y cómo funciona?</h4>
+              <p>La franquicia es la cantidad que pagas de tu bolsillo en cada siniestro antes de que actúe el seguro. Una franquicia de 300 € significa que si el daño es de 800 €, el seguro paga 500 € y tú 300 €. Si el daño es menor que la franquicia, el seguro no paga nada. Las franquicias reducen la prima significativamente.</p>
+            </div>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('comparador-tipos-seguros')} />
       <Footer appName="comparador-tipos-seguros" />
