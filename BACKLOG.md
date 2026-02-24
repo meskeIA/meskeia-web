@@ -81,14 +81,13 @@
 ## 🟣 PROFESIONALIZACIÓN DE APPS EXISTENTES
 
 > Aplicar el patrón v2.0: tabla comparativa, casos de uso, FAQ, guía paso a paso, tips, warning box.
-> **Estado actual**: 31 apps profesionalizadas de 243 (~13%).
+> **Estado actual**: 32 apps profesionalizadas de 243 (~13%).
 > **No aplica a**: juegos, cursos, utilidades triviales (cronómetro, dado, espejo, nivel burbuja).
 
 ### 🔴 Candidatos prioritarios (mayor impacto)
 
 ### 🟡 Candidatos de media prioridad
 
-- [ ] **calculadora-deuda** — Método bola de nieve vs avalancha. Decisión con gran impacto en finanzas personales.
 - [ ] **calculadora-fondo-emergencia** — Regla de las 3-6 nóminas. Educational value muy alto para usuarios con deudas.
 - [ ] **calculadora-tir-van** — App técnica usada por estudiantes y profesionales. Tabla comparativa TIR vs VAN vs Payback.
 - [ ] **simulador-compraventa-inmueble** — Gran decisión financiera, complemento de calculadora-coste-vivienda (ya profesionalizada).
@@ -172,6 +171,7 @@
 - [x] **calculadora-seguro-vida** — Tabla comparativa (temporal/entera/unit-linked/PIAS), 4 casos de uso (joven/familia/autónomo/jubilado), warning infraasegurarse. DisclaimerCard corregida (no collapsible). *(2026-02-25)*
 - [x] **comparador-tipos-seguros** — Guía paso a paso 6 pasos, FAQ legal 6 preguntas. DisclaimerCard variant financial corregida. *(2026-02-25)*
 - [x] **generador-facturas** — Tabla comparativa 5 tipos de factura, 4 casos de uso (autónomo/SL/UE/minorista), FAQ fiscal 6 preguntas, warning sanciones LGT. DisclaimerCard sin collapsible. *(2026-02-25)*
+- [x] **calculadora-deuda** — Tabla comparativa (Bola de Nieve/Avalancha/Solo Mínimos × 5 criterios), 4 casos de uso, FAQ 6 preguntas (pago mínimo/hipoteca/consolidar/mora), warning ejemplo 5.000€ al 20% TAE. Fix collapsible + type="button". *(2026-02-25)*
 
 ### Mantenimiento técnico
 - [x] **CSP Enforcement** — Activado enforcement en `vercel.json` + `next.config.ts`. *(2026-02-23)*
