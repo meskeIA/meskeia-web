@@ -500,6 +500,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
           <li><strong>Resistencias a antiparasitarios</strong>: El uso inadecuado genera resistencias en pulgas/garrapatas</li>
         </ul>
         <p className={styles.highlight}><strong>🐾 Esta calculadora es orientativa. Tu veterinario debe prescribir tratamientos según el peso exacto, estado de salud y historial de tu mascota.</strong></p>
+        <p>meskeIA no asume ninguna responsabilidad por decisiones tomadas en base a los resultados de esta herramienta, ni por un uso inadecuado de la misma.</p>
       </DisclaimerCard>
 
       <RelatedApps

@@ -271,6 +271,7 @@ export default function CalculadoraSuenoPage() {
           <li><strong>Calidad vs cantidad</strong>: Dormir 8 horas con despertares frecuentes es peor que 6 horas continuas</li>
         </ul>
         <p className={styles.highlight}><strong>⚕️ Si tienes insomnio crónico, somnolencia diurna excesiva o ronquidos intensos, consulta con un médico especialista en sueño.</strong></p>
+        <p>meskeIA no asume ninguna responsabilidad por decisiones tomadas en base a los resultados de esta herramienta, ni por un uso inadecuado de la misma.</p>
       </DisclaimerCard>
 
       <EducationalSection

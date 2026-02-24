@@ -653,6 +653,7 @@ export default function CalculadoraEstadisticaMedicaPage() {
           <li><strong>Interpretación requiere formación</strong>: Sensibilidad, especificidad, VPP y VPN dependen de la prevalencia de la enfermedad en la población estudiada</li>
         </ul>
         <p className={styles.highlight}><strong>⚕️ Solo para fines educativos y académicos.</strong> Las decisiones diagnósticas y terapéuticas deben tomarlas médicos con acceso a la historia clínica completa del paciente.</p>
+        <p>meskeIA no asume ninguna responsabilidad por decisiones tomadas en base a los resultados de esta herramienta, ni por un uso inadecuado de la misma.</p>
       </DisclaimerCard>
 
       {/* Contenido educativo */}
