@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-02-23
-> **Apps totales**: 235 | **Suites**: 12
+> **Última actualización**: 2026-02-24
+> **Apps totales**: 242 | **Suites**: 12
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -13,15 +13,15 @@
 | 🧮 Estudiantes | 49 | ✅ Bien cubierta |
 | 📚 Cultura General | 44 | ✅ Bien cubierta |
 | ⚡ Productividad | 39 | ✅ Bien cubierta |
-| 📈 Finanzas | 34 | ✅ Bien cubierta |
+| 📈 Finanzas | 35 | ✅ Bien cubierta |
 | 🔧 Herramientas Técnicas | 32 | ✅ Bien cubierta |
 | 🎨 Diseño y Desarrollo | 28 | 🟡 Aceptable |
-| 🏥 Salud y Bienestar | 26 | 🟡 Aceptable |
+| 🏥 Salud y Bienestar | 28 | 🟡 Aceptable |
 | 📢 Marketing y Contenido | 25 | 🟡 Aceptable |
 | 🏘️ Inmobiliaria y Hogar | 23 | 🟡 Aceptable |
 | 🎲 Juegos y Ocio | 20 | 🟡 Aceptable |
+| ✈️ Viajes y Turismo | 15 | 🟡 Aceptable (era GAP) |
 | 💼 Freelance y Autónomo | 17 | 🔴 GAP |
-| ✈️ Viajes y Turismo | 13 | 🔴 GAP |
 
 **Valor diferencial meskeIA**: Gratuito · Sin registro · 100% local en el PC · Total confidencialidad
 
@@ -41,19 +41,7 @@
 
 > Suites con menos cobertura. Cada app nueva en estas suites tiene mayor impacto relativo.
 
-### ✈️ Viajes y Turismo (13 apps — GAP, objetivo: +3 apps más)
-
-- [ ] **Planificador de itinerario de viaje** (`planificador-itinerario`)
-  - Suite: `viajes` | Contextos: `relax`, `casa`
-  - Descripción: Organiza días, actividades y tiempos de un viaje. Exportable como texto.
-  - Privacidad: ✅ 100% local
-  - Complejidad: Media
-
-- [ ] **Calculadora de seguro de viaje** (`calculadora-seguro-viaje`)
-  - Suite: `viajes`, `finanzas` | Contextos: `relax`, `dinero`
-  - Descripción: Estima coste de seguro según destino, duración, edad y cobertura deseada. Con explicación de qué cubre cada tipo.
-  - Privacidad: ✅ 100% local
-  - Complejidad: Media
+### ✈️ Viajes y Turismo (15 apps — mejorado, objetivo: +2 apps más)
 
 - [ ] **Guía de visados desde España** (`guia-visados-espana`)
   - Suite: `viajes`, `cultura` | Contextos: `relax`, `curiosidad`
@@ -113,20 +101,6 @@
   - Privacidad: ✅ 100% local | DisclaimerCard: `financial`
   - Complejidad: Media
 
-### 🏥 Salud y Bienestar
-
-- [ ] **Calculadora de tensión arterial** (`calculadora-tension-arterial`)
-  - Suite: `salud` | Contextos: `casa`, `curiosidad`
-  - Descripción: Interpreta valores de tensión sistólica/diastólica. Clasifica el resultado (normal, elevada, hipertensión I/II). Con recomendaciones generales.
-  - Privacidad: ✅ 100% local | DisclaimerCard: `medical`
-  - Complejidad: Baja
-
-- [ ] **Planificador de chequeos médicos** (`planificador-chequeos-medicos`)
-  - Suite: `salud`, `productividad` | Contextos: `casa`, `curiosidad`
-  - Descripción: Chequeos y revisiones médicas recomendadas por edad y sexo en España (basado en calendarios del Ministerio de Sanidad). Lista personalizable.
-  - Privacidad: ✅ 100% local | DisclaimerCard: `medical`
-  - Complejidad: Media
-
 ### 🏘️ Inmobiliaria y Hogar
 
 - [ ] **Calculadora de reformas del hogar** (`calculadora-reformas-hogar`)
@@ -140,7 +114,7 @@
 ## 🟣 PROFESIONALIZACIÓN DE APPS EXISTENTES
 
 > Aplicar el patrón v2.0: tabla comparativa, casos de uso, FAQ, guía paso a paso, tips, warning box.
-> **Estado actual**: 28 apps profesionalizadas de 235 (~12%).
+> **Estado actual**: 28 apps profesionalizadas de 242 (~12%).
 > **No aplica a**: juegos, cursos, utilidades triviales (cronómetro, dado, espejo, nivel burbuja).
 
 ### 🔴 Candidatos prioritarios (mayor impacto)
@@ -184,13 +158,15 @@
 
 > Apps ya publicadas que pueden mejorar en calidad, contenido educativo o experiencia.
 
-- [ ] **lista-equipaje**: Añadir categorías personalizables y modo "por días de viaje". Actualmente demasiado básica vs. el potencial de la suite viajes.
+- [ ] **lista-equipaje**: Añadir modo "por días de viaje" (vista alternativa agrupada por día). *(categorías personalizables ya implementadas — 2026-02-24)*
 
 - [ ] **calculadora-jubilacion**: Revisar si los cálculos reflejan la reforma del sistema de pensiones 2024. Añadir DisclaimerCard `financial` si no la tiene.
 
 - [ ] **simulador-hipoteca**: Comparativa fija vs variable vs mixta en un mismo visualizador. Actualmente solo simula un tipo.
 
 - [ ] **generador-facturas**: Añadir soporte para IRPF en la factura (campo retención). Es la queja más común en apps de facturación para autónomos.
+
+- [ ] **DisclaimerCard medical (Grupo B)**: Revisar las 8 apps con children custom de baja prioridad (`test-habitos-saludables`, `curso-nutrisalud`, `calculadora-porciones`, `calculadora-edad-mascotas`, `calculadora-tamano-adulto-perro`, `planificador-mascota`, `guia-cuidado-mascota`, `guia/vivir-sano`) para añadir cláusula de exoneración si se considera necesario.
 
 ---
 
@@ -211,10 +187,20 @@
 > Historial de tareas finalizadas con fecha de completado.
 
 ### Apps nuevas
+- [x] **planificador-itinerario** — Organiza días, actividades, horarios y notas de viaje. Exporta a .txt. 100% local. *(2026-02-24)*
+- [x] **calculadora-tension-arterial** — Clasificación ESH/ESC 2018 (9 categorías), TAM, presión de pulso, historial localStorage. *(2026-02-24)*
+- [x] **planificador-chequeos-medicos** — Checklist 16 revisiones preventivas filtrado por grupo de edad y sexo. Fuente: Ministerio de Sanidad y SEMFyC. *(2026-02-24)*
+- [x] **guia-seguro-viaje** — Coberturas recomendadas por destino (Europa/mundo/riesgo) y tipo de viaje. Checklist 12 puntos pre-contratación. *(nota: `calculadora-seguro-viaje` descartada por inviabilidad de estimación de costes — implementada como guía)* *(2026-02-24)*
 - [x] **simulador-jet-lag** — Jet lag por diferencia horaria, 35 ciudades, 5 niveles de impacto, recomendaciones por dirección. *(2026-02-23)*
 - [x] **quiz-paises-capitales** — Quiz geografía 195 países, 3 modos (capital/país/bandera), 5 dificultades. *(2026-02-23)*
 - [x] **checklist-documentos-viaje** — Checklist documentos por tipo destino (España/Europa/Internacional). *(2026-02-23)*
 - [x] **juego-ahorcado** — Ahorcado en español, 4 categorías × 30 palabras, SVG progresivo, stats localStorage. *(2026-02-23)*
+
+### Mejoras apps existentes
+- [x] **lista-equipaje** — Categorías personalizables: eliminar items (✕), añadir a categoría existente, nueva categoría personalizada, persistencia localStorage. *(2026-02-24)*
+
+### Mantenimiento y correcciones
+- [x] **DisclaimerCard medical — exoneración responsabilidad** — Añadida cláusula explícita en `DefaultContent` (10 apps) y en `calculadora-estadistica-medica`, `calculadora-sueno`, `calculadora-medicamentos-mascotas`. *(2026-02-24)*
 
 ### Profesionalizaciones
 - [x] **calculadora-fire** — Tabla comparativa 5 variantes FIRE, 4 casos de uso, FAQ 5 preguntas. *(2026-02-23)*
