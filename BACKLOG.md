@@ -1,6 +1,6 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-02-24
+> **Última actualización**: 2026-02-25
 > **Apps totales**: 242 | **Suites**: 12
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
@@ -41,45 +41,24 @@
 
 > Suites con menos cobertura. Cada app nueva en estas suites tiene mayor impacto relativo.
 
-### ✈️ Viajes y Turismo (15 apps — mejorado, objetivo: +2 apps más)
+### ✈️ Viajes y Turismo (15 apps — objetivo cubierto)
 
-- [ ] **Guía de visados desde España** (`guia-visados-espana`)
-  - Suite: `viajes`, `cultura` | Contextos: `relax`, `curiosidad`
-  - Descripción: Base de datos local de requisitos de visado para ciudadanos españoles por país de destino. Sin API externa.
-  - Privacidad: ✅ 100% local (datos embebidos)
-  - Complejidad: Media (requiere investigar y embeber datos)
+> ⚠️ `guia-visados-espana` **descartada**: políticas de visados cambian frecuentemente por motivos imprevistos (diplomacia, pandemias, reciprocidad). Inviable mantener actualizado sin riesgo de dar información errónea en un tema crítico para el viajero.
 
-### 💼 Freelance y Autónomo (17 apps — GAP, objetivo: +4 apps)
+### 💼 Freelance y Autónomo (17 apps — reducir gap con mejoras en apps existentes)
 
-- [ ] **Calculadora cuota autónomo 2026** (`calculadora-cuota-autonomo`)
-  - Suite: `freelance`, `finanzas` | Contextos: `trabajo`, `dinero`
-  - Descripción: Nueva tarifa plana por tramos de rendimiento neto. Cuota mensual según ingresos esperados, con simulación anual.
-  - Privacidad: ✅ 100% local
-  - Complejidad: Media (fórmulas SS 2024+)
+> ⚠️ Apps fiscales con datos dinámicos **descartadas**:
+> - `calculadora-cuota-autonomo` — Cuota SS por tramos se revisa anualmente (ya hubo 2 cambios en 2 años). Alta probabilidad de quedar desactualizada.
+> - `comparador-asalariado-autonomo` — Cálculo depende de gastos deducibles individuales muy variables; simplificación excesiva con riesgo de malinterpretación.
+> - `simulador-declaracion-trimestral` — Modelo 303+130, riesgo legal.
+>
+> **Estrategia**: Cubrir Freelance mediante mejoras en apps existentes (ver sección 🔵), no con nuevas apps fiscales dinámicas.
 
-- [ ] **Comparador asalariado vs autónomo** (`comparador-asalariado-autonomo`)
-  - Suite: `freelance`, `finanzas` | Contextos: `trabajo`, `dinero`
-  - Descripción: Dado el mismo ingreso bruto, compara neto final como asalariado vs autónomo. Incluye cuotas, impuestos, gastos deducibles.
-  - Privacidad: ✅ 100% local
-  - Complejidad: Media
-  - DisclaimerCard: `financial`
+### 🎲 Juegos y Ocio (20 apps — objetivo: quizzes de universo acotado)
 
-- [ ] **Calculadora de retención IRPF en facturas** (`calculadora-retencion-irpf`)
-  - Suite: `freelance`, `finanzas` | Contextos: `trabajo`, `dinero`
-  - Descripción: Calcula la retención IRPF a aplicar en facturas (7% nuevos, 15% general, 19% profesionales). Con desglose de IVA.
-  - Privacidad: ✅ 100% local
-  - Complejidad: Baja
-  - DisclaimerCard: `financial`
-
-> ⚠️ **Nota**: `simulador-declaracion-trimestral` (Modelo 303+130) descartado por riesgo de responsabilidad legal en cálculos fiscales complejos.
-
-### 🎲 Juegos y Ocio (20 apps — objetivo: +2 apps más)
-
-- [ ] **Quiz de cultura general** (`quiz-cultura-general`)
-  - Suite: `juegos`, `cultura` | Contextos: `relax`, `curiosidad`
-  - Descripción: 500+ preguntas por categorías (historia, ciencia, arte, deporte, geografía). Modo timed y modo calma.
-  - Privacidad: ✅ 100% local (preguntas embebidas)
-  - Complejidad: Media
+> ⚠️ `quiz-cultura-general` **descartado**: universo abierto (historia/ciencia/arte/deporte/geografía) es a la vez demasiado amplio para curar bien y demasiado pequeño para ser representativo. El modelo correcto es universo cerrado y verificable (como `quiz-paises-capitales`).
+>
+> **Candidatos válidos para próximas sesiones**: quiz de símbolos químicos, quiz de tablas de multiplicar, quiz de presidentes/reyes de España, quiz de capitales europeas.
 
 ---
 
@@ -127,7 +106,7 @@
   - Secciones clave: Tabla comparativa (vida/hogar/coche/salud/viaje × 6 criterios), Casos de uso, FAQ legal, Guía paso a paso (cómo elegir el seguro correcto)
   - DisclaimerCard: `financial`
 
-- [ ] **generador-facturas** — Output exportable, uso profesional, alta recurrencia. Pendiente también: añadir campo retención IRPF.
+- [ ] **generador-facturas** — Output exportable, uso profesional, alta recurrencia. Incluye: campo retención IRPF (7%/15%/19%) integrado en la factura *(absorbe `calculadora-retencion-irpf`, descartada como app independiente por trivialidad)*.
   - Secciones clave: HTML exportable, Tabla comparativa (factura con IVA / sin IVA / con retención), Casos de uso (autónomo, SL, internacional), FAQ fiscal, Warning (errores en facturación que generan sanciones)
   - DisclaimerCard: `financial`
 
@@ -198,6 +177,13 @@
 
 ### Mejoras apps existentes
 - [x] **lista-equipaje** — Categorías personalizables: eliminar items (✕), añadir a categoría existente, nueva categoría personalizada, persistencia localStorage. *(2026-02-24)*
+
+### Apps descartadas (con justificación)
+- [x] **guia-visados-espana** — Descartada: políticas de visados cambian con frecuencia imprevisible (diplomacia, pandemias). Inviable mantener datos fiables. *(2026-02-25)*
+- [x] **calculadora-cuota-autonomo** — Descartada: cuota SS por tramos revisada anualmente. Alta probabilidad de quedarse desactualizada con riesgo real para el usuario. *(2026-02-25)*
+- [x] **comparador-asalariado-autonomo** — Descartada: depende de gastos deducibles individuales muy variables; simplificación con riesgo de malinterpretación. *(2026-02-25)*
+- [x] **calculadora-retencion-irpf** — Descartada como app independiente (demasiado trivial). Lógica integrada en profesionalización de `generador-facturas`. *(2026-02-25)*
+- [x] **quiz-cultura-general** — Descartado: universo abierto inabarcable. Modelo correcto = quizzes de universo acotado (como `quiz-paises-capitales`). *(2026-02-25)*
 
 ### Mantenimiento y correcciones
 - [x] **DisclaimerCard medical — exoneración responsabilidad** — Añadida cláusula explícita en `DefaultContent` (10 apps) y en `calculadora-estadistica-medica`, `calculadora-sueno`, `calculadora-medicamentos-mascotas`. *(2026-02-24)*
