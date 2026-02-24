@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
 > **Última actualización**: 2026-02-25
-> **Apps totales**: 242 | **Suites**: 12
+> **Apps totales**: 243 | **Suites**: 12
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -18,7 +18,7 @@
 | 🎨 Diseño y Desarrollo | 28 | 🟡 Aceptable |
 | 🏥 Salud y Bienestar | 28 | 🟡 Aceptable |
 | 📢 Marketing y Contenido | 25 | 🟡 Aceptable |
-| 🏘️ Inmobiliaria y Hogar | 23 | 🟡 Aceptable |
+| 🏘️ Inmobiliaria y Hogar | 24 | 🟡 Aceptable |
 | 🎲 Juegos y Ocio | 20 | 🟡 Aceptable |
 | ✈️ Viajes y Turismo | 15 | 🟡 Aceptable (era GAP) |
 | 💼 Freelance y Autónomo | 17 | 🔴 GAP |
@@ -68,25 +68,13 @@
 
 ### 📈 Finanzas
 
-- [ ] **Simulador de pensión pública** (`simulador-pension-publica`)
-  - Suite: `finanzas`, `salud` | Contextos: `dinero`, `trabajo`
-  - Descripción: Estimación de pensión basada en años cotizados, base reguladora y edad de jubilación. Con comparativa según distintos escenarios.
-  - Privacidad: ✅ 100% local | DisclaimerCard: `financial`
-  - Complejidad: Media
-
-- [ ] **Calculadora IRPF nómina 2026** (`calculadora-irpf-nomina`)
-  - Suite: `finanzas`, `freelance` | Contextos: `trabajo`, `dinero`
-  - Descripción: Retención IRPF en nómina actualizada a 2026. Salario bruto → neto mensual con desglose SS + IRPF.
-  - Privacidad: ✅ 100% local | DisclaimerCard: `financial`
-  - Complejidad: Media
+> ⚠️ Apps fiscales con datos dinámicos **descartadas**:
+> - `simulador-pension-publica` — La Seguridad Social ya ofrece simulador oficial con datos reales de cotización del usuario (Mi SS). Nuestra estimación genérica no puede competir y tiene alto riesgo de desactualización con cada reforma del sistema.
+> - `calculadora-irpf-nomina` — Tablas de retención IRPF se actualizan con cada Presupuestos Generales. La AEAT tiene su propio simulador oficial. Sin ventaja diferencial.
 
 ### 🏘️ Inmobiliaria y Hogar
 
-- [ ] **Calculadora de reformas del hogar** (`calculadora-reformas-hogar`)
-  - Suite: `inmobiliaria` | Contextos: `casa`, `dinero`
-  - Descripción: Presupuesto estimado de reformas por tipo (cocina, baño, pintura, suelos) y metros cuadrados. Precios de referencia España 2026.
-  - Privacidad: ✅ 100% local | DisclaimerCard: `financial`
-  - Complejidad: Media
+> ✅ `calculadora-reformas-hogar` **implementada** — ver sección ✅
 
 ---
 
@@ -184,6 +172,9 @@
 - [x] **comparador-asalariado-autonomo** — Descartada: depende de gastos deducibles individuales muy variables; simplificación con riesgo de malinterpretación. *(2026-02-25)*
 - [x] **calculadora-retencion-irpf** — Descartada como app independiente (demasiado trivial). Lógica integrada en profesionalización de `generador-facturas`. *(2026-02-25)*
 - [x] **quiz-cultura-general** — Descartado: universo abierto inabarcable. Modelo correcto = quizzes de universo acotado (como `quiz-paises-capitales`). *(2026-02-25)*
+- [x] **simulador-pension-publica** — Descartado: la SS tiene simulador oficial con datos reales del usuario (Mi SS). Sin ventaja diferencial. *(2026-02-25)*
+- [x] **calculadora-irpf-nomina** — Descartado: tablas IRPF se actualizan con PGE. AEAT tiene simulador oficial. Sin ventaja diferencial. *(2026-02-25)*
+- [x] **calculadora-reformas-hogar** — Presupuesto estimado por tipo de reforma (10 partidas) y nivel de calidad (básica/estándar/premium). Precios referencia España 2026. DisclaimerCard financial. *(2026-02-25)*
 
 ### Mantenimiento y correcciones
 - [x] **DisclaimerCard medical — exoneración responsabilidad** — Añadida cláusula explícita en `DefaultContent` (10 apps) y en `calculadora-estadistica-medica`, `calculadora-sueno`, `calculadora-medicamentos-mascotas`. *(2026-02-24)*

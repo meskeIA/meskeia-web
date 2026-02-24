@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 239+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 240+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 239,
+  "total_tools": 240,
   "last_updated": "2026-02-24",
   "features": {
     "all_free": true,
@@ -42,7 +42,7 @@
       "name": "Finanzas e Inversión",
       "icon": "📈",
       "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 35
+      "tool_count": 36
     },
     {
       "id": "freelance",
@@ -63,7 +63,7 @@
       "name": "Inmobiliaria y Hogar",
       "icon": "🏘️",
       "description": "Hipotecas, alquiler y gestión del hogar",
-      "tool_count": 23
+      "tool_count": 24
     },
     {
       "id": "juegos",
@@ -121,14 +121,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 78
+      "tool_count": 79
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 46
+      "tool_count": 47
     },
     {
       "id": "creando",
@@ -533,6 +533,31 @@
         "traslado"
       ],
       "icon": "📦"
+    },
+    {
+      "slug": "calculadora-reformas-hogar",
+      "name": "Calculadora de Reformas del Hogar",
+      "url": "https://meskeia.com/calculadora-reformas-hogar/",
+      "description": "Estima el presupuesto de tus reformas: cocina, baño, pintura, suelos, eléctrica y más. Precios de referencia España 2026 por m²",
+      "suites": [
+        "inmobiliaria",
+        "finanzas"
+      ],
+      "contexts": [
+        "casa",
+        "dinero"
+      ],
+      "keywords": [
+        "calculadora reformas",
+        "presupuesto reforma",
+        "coste reforma cocina",
+        "precio reforma baño",
+        "reforma integral precio",
+        "reformas hogar",
+        "presupuesto reforma vivienda",
+        "precio pintura interior"
+      ],
+      "icon": "🏗️"
     },
     {
       "slug": "cifrado-clasico",

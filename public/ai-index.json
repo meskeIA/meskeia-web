@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 242,
+  "total_tools": 243,
   "updated": "2026-02-24",
   "features": {
     "all_free": true,
@@ -115,6 +115,12 @@
           "slug": "planificador-mudanzas",
           "url": "https://meskeia.com/planificador-mudanzas/",
           "description": "Organiza tu mudanza: tareas por fases, inventario por habitación y control de presupuesto"
+        },
+        {
+          "name": "Calculadora de Reformas del Hogar",
+          "slug": "calculadora-reformas-hogar",
+          "url": "https://meskeia.com/calculadora-reformas-hogar/",
+          "description": "Estima el presupuesto de reformas del hogar: cocina, baño, pintura, suelos, eléctrica y más. Precios de referencia España 2026 por m²"
         },
         {
           "name": "Países del Mundo",

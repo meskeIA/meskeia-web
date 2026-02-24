@@ -708,6 +708,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros de pintura' },
     { url: '/control-gastos/', icon: '💳', name: 'Control Gastos', description: 'Gestiona presupuesto' },
   ],
+  'calculadora-reformas-hogar': [
+    { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios por m²' },
+    { url: '/simulador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/calculadora-coste-vivienda/', icon: '🏠', name: 'Coste Real Vivienda', description: 'Gasto mensual total del hogar' },
+    { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
+  ],
 
   // FAMILIA
   'planificador-embarazo': saludFemeninaApps.filter(a => a.url !== '/planificador-embarazo/'),

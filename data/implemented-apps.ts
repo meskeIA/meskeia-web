@@ -54,6 +54,7 @@ export const implementedAppsUrls = [
   "/calculadora-edad-mascotas/",     // Edad perros/gatos en años humanos
   "/planificador-boda/",             // Wedding planner: checklist, presupuesto, timeline
   "/planificador-mudanzas/",         // Mudanza: tareas, inventario, presupuesto
+  "/calculadora-reformas-hogar/",    // Reformas: presupuesto estimado por tipo y m²
   "/calculadora-huella-carbono/",    // Huella de carbono personal
 
   // Matemáticas y Estadística (13 implementadas)
