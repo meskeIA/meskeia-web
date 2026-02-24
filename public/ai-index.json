@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 240,
+  "total_tools": 241,
   "updated": "2026-02-24",
   "features": {
     "all_free": true,
@@ -1226,6 +1226,12 @@
       "description": "Cuida tu salud con herramientas especializadas",
       "icon": "🏥",
       "tools": [
+        {
+          "name": "Chequeos Médicos Preventivos",
+          "slug": "planificador-chequeos-medicos",
+          "url": "https://meskeia.com/planificador-chequeos-medicos/",
+          "description": "Consulta qué revisiones preventivas te corresponden según edad y sexo. Basado en guías del Ministerio de Sanidad y SEMFyC. Filtra por grupo de edad y marca las revisiones completadas"
+        },
         {
           "name": "Calculadora de Tensión Arterial",
           "slug": "calculadora-tension-arterial",

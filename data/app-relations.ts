@@ -100,6 +100,7 @@ const fiscalApps: RelatedApp[] = [
 // FAMILIA: SALUD Y BIENESTAR
 // ==========================================
 const saludApps: RelatedApp[] = [
+  { url: '/planificador-chequeos-medicos/', icon: '🏥', name: 'Chequeos Médicos', description: 'Revisiones preventivas por edad' },
   { url: '/calculadora-tension-arterial/', icon: '🩺', name: 'Tensión Arterial', description: 'Clasifica tu presión (ESH/ESC)' },
   { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice de masa corporal' },
   { url: '/calculadora-colesterol/', icon: '🫀', name: 'Calculadora Colesterol', description: 'Ratios y riesgo cardiovascular' },
@@ -500,6 +501,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas' },
   ],
   // SALUD
+  'planificador-chequeos-medicos': saludApps.filter(a => a.url !== '/planificador-chequeos-medicos/').slice(0, 4),
   'calculadora-tension-arterial': saludApps.filter(a => a.url !== '/calculadora-tension-arterial/').slice(0, 4),
   'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/').slice(0, 4),
   'calculadora-colesterol': saludApps.filter(a => a.url !== '/calculadora-colesterol/').slice(0, 4),

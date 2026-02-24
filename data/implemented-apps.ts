@@ -294,6 +294,7 @@ export const implementedAppsUrls = [
   "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
   "/planificador-itinerario/",           // Organiza días y actividades de viaje con horarios y notas
   "/calculadora-tension-arterial/",      // Clasificación ESH/ESC 2018: TAM, presión de pulso e historial local
+  "/planificador-chequeos-medicos/",     // Chequeos preventivos por edad/sexo: referencia Ministerio Sanidad y SEMFyC
 ];
 
 /**
