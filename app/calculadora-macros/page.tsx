@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 import styles from './CalculadoraMacros.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -562,6 +562,7 @@ export default function CalculadoraMacrosPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-macros')} />
+      <ShareCard appName="calculadora-macros" />
       <Footer appName="calculadora-macros" />
     </div>
   );

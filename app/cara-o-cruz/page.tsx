@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './CaraOCruz.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -324,6 +324,7 @@ export default function CaraOCruzPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('cara-o-cruz')} />
+      <ShareCard appName="cara-o-cruz" />
       <Footer appName="cara-o-cruz" />
     </div>
   );

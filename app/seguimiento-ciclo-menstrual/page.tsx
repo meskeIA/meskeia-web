@@ -9,6 +9,7 @@ import {
   RelatedApps,
   LegalNotice,
   DisclaimerCard,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -372,6 +373,7 @@ export default function SeguimientoCicloMenstrualPage() {
 
       <RelatedApps apps={getRelatedApps('seguimiento-ciclo-menstrual')} />
 
+      <ShareCard appName="seguimiento-ciclo-menstrual" />
       <Footer appName="seguimiento-ciclo-menstrual" />
     </div>
   );

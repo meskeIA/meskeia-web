@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './TeoriaColas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -695,6 +695,7 @@ RESULTADOS DE SIMULACIÓN
 
       <RelatedApps apps={getRelatedApps('calculadora-teoria-colas')} />
 
+      <ShareCard appName="calculadora-teoria-colas" />
       <Footer appName="calculadora-teoria-colas" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoPlatformRunner.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -843,6 +843,7 @@ export default function JuegoPlatformRunnerPage() {
 
       <RelatedApps apps={getRelatedApps('juego-platform-runner')} />
 
+      <ShareCard appName="juego-platform-runner" />
       <Footer appName="juego-platform-runner" />
     </div>
   );

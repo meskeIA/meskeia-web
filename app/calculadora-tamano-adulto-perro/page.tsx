@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraTamanoAdultoPerro.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -428,6 +428,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
         </section>
       </EducationalSection>
 
+      <ShareCard appName="calculadora-tamano-adulto-perro" />
       <Footer appName="calculadora-tamano-adulto-perro" />
     </div>
   );

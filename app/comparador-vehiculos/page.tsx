@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorVehiculos.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -821,6 +821,7 @@ export default function ComparadorVehiculosPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('comparador-vehiculos')} />
+      <ShareCard appName="comparador-vehiculos" />
       <Footer appName="comparador-vehiculos" />
     </div>
   );

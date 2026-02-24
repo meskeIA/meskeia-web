@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './CalculadoraPresupuestos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, EducationalSection, LegalNotice } from '@/components';
+import { RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -815,6 +815,7 @@ export default function CalculadoraPresupuestosPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-presupuestos')} />
+      <ShareCard appName="calculadora-presupuestos" />
       <Footer appName="calculadora-presupuestos" />
     </div>
   );

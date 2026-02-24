@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './Notas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Categorías disponibles
@@ -429,6 +429,7 @@ export default function NotasPage() {
 
       <RelatedApps apps={getRelatedApps('notas')} />
 
+      <ShareCard appName="notas" />
       <Footer appName="notas" />
     </div>
   );

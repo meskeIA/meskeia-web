@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraMcdMcm.module.css';
-import { MeskeiaLogo, Footer, ResultCard, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -317,6 +317,7 @@ export default function CalculadoraMcdMcmPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-mcd-mcm')} />
 
+      <ShareCard appName="calculadora-mcd-mcm" />
       <Footer appName="calculadora-mcd-mcm" />
     </div>
   );

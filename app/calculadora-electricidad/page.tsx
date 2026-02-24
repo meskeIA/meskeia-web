@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraElectricidad.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice, DisclaimerCard } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -1489,6 +1489,7 @@ export default function CalculadoraElectricidadPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-electricidad')} />
 
+      <ShareCard appName="calculadora-electricidad" />
       <Footer appName="calculadora-electricidad" />
     </div>
   );

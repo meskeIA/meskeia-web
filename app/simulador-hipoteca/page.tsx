@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './SimuladorHipoteca.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -1000,6 +1000,7 @@ export default function SimuladorHipotecaPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('simulador-hipoteca')} />
+      <ShareCard appName="simulador-hipoteca" />
       <Footer appName="simulador-hipoteca" />
     </div>
   );

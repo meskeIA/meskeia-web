@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraSuscripciones.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -456,6 +456,7 @@ export default function CalculadoraSuscripcionesPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-suscripciones')} />
 
+      <ShareCard appName="calculadora-suscripciones" />
       <Footer appName="calculadora-suscripciones" />
     </div>
   );

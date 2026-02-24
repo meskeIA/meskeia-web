@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './PlanificadorChequeosMedicos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, EducationalSection, DisclaimerCard } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection, DisclaimerCard, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
@@ -524,6 +524,7 @@ export default function PlanificadorChequeosMedicos() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('planificador-chequeos-medicos')} />
+      <ShareCard appName="planificador-chequeos-medicos" />
       <Footer appName="planificador-chequeos-medicos" />
     </div>
   );

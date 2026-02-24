@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './GeneradorLoremIpsum.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Párrafos de Lorem Ipsum clásicos
@@ -253,6 +253,7 @@ export default function GeneradorLoremIpsumPage() {
 
       <RelatedApps apps={getRelatedApps('generador-lorem-ipsum')} />
 
+      <ShareCard appName="generador-lorem-ipsum" />
       <Footer appName="generador-lorem-ipsum" />
     </div>
   );

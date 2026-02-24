@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import FixedHeader from '@/components/FixedHeader';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import ResultCard from '@/components/ResultCard';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { jsonLd } from './metadata';
@@ -682,6 +682,7 @@ export default function GeneradorContrasenas() {
 
       {/* Footer meskeIA */}
       <RelatedApps apps={getRelatedApps('Generador de Contraseñas Seguras')} />
+      <ShareCard appName="Generador de Contraseñas Seguras" />
       <Footer appName="Generador de Contraseñas Seguras" />
     </>
   );

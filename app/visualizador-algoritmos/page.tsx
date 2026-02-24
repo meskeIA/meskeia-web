@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import styles from './VisualizadorAlgoritmos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   SortingCanvas,
@@ -630,6 +630,7 @@ export default function VisualizadorAlgoritmosPage() {
       {/* Apps Relacionadas */}
       <RelatedApps apps={getRelatedApps('visualizador-algoritmos')} />
 
+      <ShareCard appName="visualizador-algoritmos" />
       <Footer appName="visualizador-algoritmos" />
     </div>
   );

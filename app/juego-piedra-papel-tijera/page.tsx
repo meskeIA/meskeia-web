@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './JuegoPiedraPapelTijera.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Opcion = 'piedra' | 'papel' | 'tijera';
@@ -313,6 +313,7 @@ export default function JuegoPiedraPapelTijeraPage() {
 
       <RelatedApps apps={getRelatedApps('juego-piedra-papel-tijera')} />
 
+      <ShareCard appName="juego-piedra-papel-tijera" />
       <Footer appName="juego-piedra-papel-tijera" />
     </div>
   );

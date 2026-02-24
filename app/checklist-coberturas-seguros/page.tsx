@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ChecklistCoberturasSeguro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type PerfilType = 'joven-soltero' | 'pareja-sin-hijos' | 'familia-hijos' | 'autonomo' | 'jubilado' | 'propietario-alquila';
@@ -310,6 +310,7 @@ export default function ChecklistCoberturasSeguroPage() {
       
 
       <RelatedApps apps={getRelatedApps('checklist-coberturas-seguros')} />
+      <ShareCard appName="checklist-coberturas-seguros" />
       <Footer appName="checklist-coberturas-seguros" />
     </div>
   );

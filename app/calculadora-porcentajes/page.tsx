@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraPorcentajes.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -238,6 +238,7 @@ export default function CalculadoraPorcentajesPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-porcentajes')} />
 
+      <ShareCard appName="calculadora-porcentajes" />
       <Footer appName="calculadora-porcentajes" />
     </div>
   );

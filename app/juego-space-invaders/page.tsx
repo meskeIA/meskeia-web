@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoSpaceInvaders.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -733,6 +733,7 @@ export default function JuegoSpaceInvadersPage() {
 
       <RelatedApps apps={getRelatedApps('juego-space-invaders')} />
 
+      <ShareCard appName="juego-space-invaders" />
       <Footer appName="juego-space-invaders" />
     </div>
   );

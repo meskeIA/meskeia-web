@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ReglaDeTres.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -514,6 +514,7 @@ export default function CalculadoraReglaDeTresPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-regla-de-tres')} />
 
+      <ShareCard appName="calculadora-regla-de-tres" />
       <Footer appName="calculadora-regla-de-tres" />
     </div>
   );

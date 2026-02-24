@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './Regla503020.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, parseSpanishNumber, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -359,6 +359,7 @@ export default function CalculadoraRegla503020Page() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-regla-50-30-20')} />
+      <ShareCard appName="calculadora-regla-50-30-20" />
       <Footer appName="calculadora-regla-50-30-20" />
     </div>
   );

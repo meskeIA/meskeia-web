@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ConversorTexto.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 export default function ConversorTextoPage() {
@@ -268,6 +268,7 @@ export default function ConversorTextoPage() {
 
       <RelatedApps apps={getRelatedApps('conversor-texto')} />
 
+      <ShareCard appName="conversor-texto" />
       <Footer appName="conversor-texto" />
     </div>
   );

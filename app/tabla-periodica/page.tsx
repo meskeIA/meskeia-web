@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './TablaPeriodica.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { elementos, elementosPorSimbolo, FAMILIAS, ESTADOS, Elemento } from './elementos-data';
 import { getRelatedApps } from '@/data/app-relations';
@@ -1013,6 +1013,7 @@ export default function TablaPerodicaPage() {
 
       <RelatedApps apps={getRelatedApps('tabla-periodica')} />
 
+      <ShareCard appName="tabla-periodica" />
       <Footer appName="tabla-periodica" />
     </div>
   );

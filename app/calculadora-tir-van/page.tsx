@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraTIRVAN.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -507,6 +507,7 @@ export default function CalculadoraTIRVANPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-tir-van')} />
 
+      <ShareCard appName="calculadora-tir-van" />
       <Footer appName="calculadora-tir-van" />
     </div>
   );

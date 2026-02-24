@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './FondoEmergencia.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -319,6 +319,7 @@ export default function CalculadoraFondoEmergenciaPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-fondo-emergencia')} />
+      <ShareCard appName="calculadora-fondo-emergencia" />
       <Footer appName="calculadora-fondo-emergencia" />
     </div>
   );

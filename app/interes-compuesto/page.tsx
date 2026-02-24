@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './InteresCompuesto.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -829,6 +829,7 @@ export default function InteresCompuestoPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('interes-compuesto')} />
+      <ShareCard appName="interes-compuesto" />
       <Footer appName="interes-compuesto" />
     </div>
   );

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './TimeTracker.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -542,6 +542,7 @@ export default function TimeTrackerPage() {
 
       <RelatedApps apps={getRelatedApps('time-tracker')} />
 
+      <ShareCard appName="time-tracker" />
       <Footer appName="time-tracker" />
     </div>
   );

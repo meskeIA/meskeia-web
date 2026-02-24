@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './CreadorFlashcards.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -793,6 +793,7 @@ export default function CreadorFlashcardsPage() {
         icon="📚"
       />
 
+      <ShareCard appName="creador-flashcards" />
       <Footer appName="creador-flashcards" />
     </div>
   );

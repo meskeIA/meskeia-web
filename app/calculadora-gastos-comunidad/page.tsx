@@ -8,6 +8,7 @@ import {
   EducationalSection,
   RelatedApps,
   LegalNotice,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
@@ -415,6 +416,7 @@ export default function CalculadoraGastosComunidadPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-gastos-comunidad')} />
 
+      <ShareCard appName="calculadora-gastos-comunidad" />
       <Footer appName="calculadora-gastos-comunidad" />
     </div>
   );

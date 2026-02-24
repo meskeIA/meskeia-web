@@ -5,7 +5,7 @@ import Chart from 'chart.js/auto';
 import styles from './CalculadoraInflacion.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -780,6 +780,7 @@ export default function CalculadoraInflacionPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-inflacion')} />
 
+      <ShareCard appName="calculadora-inflacion" />
       <Footer appName="calculadora-inflacion" />
     </div>
   );

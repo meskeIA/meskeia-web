@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './RadioMeskeia.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import Hls from 'hls.js';
 
@@ -594,6 +594,7 @@ export default function RadioMeskeiaPage() {
 
       <RelatedApps apps={getRelatedApps('radio-meskeia')} />
 
+      <ShareCard appName="radio-meskeia" />
       <Footer appName="radio-meskeia" />
     </div>
   );

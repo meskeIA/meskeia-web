@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoAhorcado.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Categoria = 'animales' | 'paises' | 'profesiones' | 'vocabulario';
@@ -337,6 +337,7 @@ export default function JuegoAhorcadoPage() {
       </div>
 
       <RelatedApps apps={getRelatedApps('juego-ahorcado')} />
+      <ShareCard appName="juego-ahorcado" />
       <Footer appName="juego-ahorcado" />
     </div>
   );

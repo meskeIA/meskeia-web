@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './PlanificadorMascota.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -1034,6 +1034,7 @@ export default function PlanificadorMascotaPage() {
         icon="🐾"
       />
 
+      <ShareCard appName="planificador-mascota" />
       <Footer appName="planificador-mascota" />
     </div>
   );

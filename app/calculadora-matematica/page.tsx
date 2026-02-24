@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraMatematica.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -627,6 +627,7 @@ export default function CalculadoraMatematicaPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-matematica')} />
 
+      <ShareCard appName="calculadora-matematica" />
       <Footer appName="calculadora-matematica" />
     </div>
   );

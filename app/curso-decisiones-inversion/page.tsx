@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoInversion.module.css';
-import { MeskeiaLogo, Footer, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { CHAPTERS, TOOLS, RESOURCES, useCourse } from './CourseContext';
 
 export default function CursoDecisionesInversionPage() {
@@ -239,6 +239,7 @@ export default function CursoDecisionesInversionPage() {
         </Link>
       </section>
 
+      <ShareCard appName="curso-decisiones-inversion" />
       <Footer appName="curso-decisiones-inversion" />
     </div>
   );

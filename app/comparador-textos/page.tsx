@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorTextos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -363,6 +363,7 @@ Nueva línea agregada
 
       <RelatedApps apps={getRelatedApps('comparador-textos')} />
 
+      <ShareCard appName="comparador-textos" />
       <Footer appName="comparador-textos" />
     </div>
   );

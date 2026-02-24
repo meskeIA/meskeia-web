@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ConversorTallas.module.css';
-import { Footer, ResultCard, MeskeiaLogo, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { Footer, ResultCard, MeskeiaLogo, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -817,6 +817,7 @@ export default function ConversorTallasPage() {
 
       <RelatedApps apps={getRelatedApps('conversor-tallas')} />
 
+      <ShareCard appName="conversor-tallas" />
       <Footer appName="conversor-tallas" />
     </div>
   );

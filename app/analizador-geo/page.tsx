@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './AnalizadorGeo.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -683,6 +683,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('analizador-geo')} />
+      <ShareCard appName="analizador-geo" />
       <Footer appName="analizador-geo" />
     </div>
   );

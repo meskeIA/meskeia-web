@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './Espejo.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 export default function EspejoPage() {
@@ -228,6 +228,7 @@ export default function EspejoPage() {
       </div>
 
       <RelatedApps apps={getRelatedApps('espejo')} />
+      <ShareCard appName="espejo" />
       <Footer appName="espejo" />
     </div>
   );

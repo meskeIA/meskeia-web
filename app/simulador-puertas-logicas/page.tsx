@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './SimuladorPuertasLogicas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
@@ -712,6 +712,7 @@ export default function SimuladorPuertasLogicasPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('simulador-puertas-logicas')} />
+      <ShareCard appName="simulador-puertas-logicas" />
       <Footer appName="simulador-puertas-logicas" />
     </div>
   );

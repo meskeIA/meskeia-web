@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './SeguimientoHabitos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -891,6 +891,7 @@ export default function SeguimientoHabitosPage() {
 
       <RelatedApps apps={getRelatedApps('seguimiento-habitos')} />
 
+      <ShareCard appName="seguimiento-habitos" />
       <Footer appName="seguimiento-habitos" />
     </div>
   );

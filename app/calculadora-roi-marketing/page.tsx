@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './CalculadoraROIMarketing.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber, formatPercentage } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
@@ -1010,6 +1010,7 @@ export default function CalculadoraROIMarketingPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-roi-marketing')} />
 
+      <ShareCard appName="calculadora-roi-marketing" />
       <Footer appName="calculadora-roi-marketing" />
     </div>
   );

@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import styles from './ConversorMarkdown.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Ejemplos predefinidos
@@ -569,6 +569,7 @@ console.log('Hola mundo');
 
       <RelatedApps apps={getRelatedApps('conversor-markdown-html')} />
 
+      <ShareCard appName="conversor-markdown-html" />
       <Footer appName="conversor-markdown-html" />
     </div>
   );

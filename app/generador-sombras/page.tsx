@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorSombras.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ShadowType = 'box' | 'text';
@@ -457,6 +457,7 @@ export default function GeneradorSombrasPage() {
 
       <RelatedApps apps={getRelatedApps('generador-sombras')} />
 
+      <ShareCard appName="generador-sombras" />
       <Footer appName="generador-sombras" />
     </div>
   );

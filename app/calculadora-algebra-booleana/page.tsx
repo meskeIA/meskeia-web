@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import styles from './CalculadoraAlgebraBooleana.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type NumVariables = 2 | 3 | 4;
@@ -750,6 +750,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-algebra-booleana')} />
+      <ShareCard appName="calculadora-algebra-booleana" />
       <Footer appName="calculadora-algebra-booleana" />
     </div>
   );

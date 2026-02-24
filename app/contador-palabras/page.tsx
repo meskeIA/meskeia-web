@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ContadorPalabras.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -331,6 +331,7 @@ export default function ContadorPalabrasPage() {
 
       <RelatedApps apps={getRelatedApps('contador-palabras')} />
 
+      <ShareCard appName="contador-palabras" />
       <Footer appName="contador-palabras" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraGastoEnergetico.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -678,6 +678,7 @@ export default function CalculadoraGastoEnergeticoPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-gasto-energetico')} />
 
+      <ShareCard appName="calculadora-gasto-energetico" />
       <Footer appName="calculadora-gasto-energetico" />
     </div>
   );

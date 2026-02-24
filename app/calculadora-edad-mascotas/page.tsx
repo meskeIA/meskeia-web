@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraEdadMascotas.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -326,6 +326,7 @@ export default function CalculadoraEdadMascotasPage() {
         icon="🐾"
       />
 
+      <ShareCard appName="calculadora-edad-mascotas" />
       <Footer appName="calculadora-edad-mascotas" />
     </div>
   );

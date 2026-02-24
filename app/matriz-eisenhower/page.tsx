@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './MatrizEisenhower.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -339,6 +339,7 @@ export default function MatrizEisenhowerPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('matriz-eisenhower')} />
+      <ShareCard appName="matriz-eisenhower" />
       <Footer appName="matriz-eisenhower" />
     </div>
   );

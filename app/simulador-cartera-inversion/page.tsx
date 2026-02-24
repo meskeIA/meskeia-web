@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './SimuladorCartera.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import {
@@ -1366,6 +1366,7 @@ export default function SimuladorCarteraPage() {
 
       <RelatedApps apps={getRelatedApps('simulador-cartera-inversion')} />
 
+      <ShareCard appName="simulador-cartera-inversion" />
       <Footer appName="simulador-cartera-inversion" />
     </div>
   );

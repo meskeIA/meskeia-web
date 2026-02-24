@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './InformacionTiempo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // API Key de OpenWeatherMap (límite gratuito: 1000 calls/día)
@@ -503,6 +503,7 @@ export default function InformacionTiempoPage() {
 
       <RelatedApps apps={getRelatedApps('informacion-tiempo')} />
 
+      <ShareCard appName="informacion-tiempo" />
       <Footer appName="informacion-tiempo" />
     </div>
   );

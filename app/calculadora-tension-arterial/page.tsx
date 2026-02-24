@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './CalculadoraTensionArterial.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, EducationalSection, DisclaimerCard } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection, DisclaimerCard, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatDate } from '@/lib';
 
@@ -658,6 +658,7 @@ export default function CalculadoraTensionArterial() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-tension-arterial')} />
+      <ShareCard appName="calculadora-tension-arterial" />
       <Footer appName="calculadora-tension-arterial" />
     </div>
   );

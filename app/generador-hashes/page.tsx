@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorHashes.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type AlgoritmoType = 'MD5' | 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512';
@@ -450,6 +450,7 @@ export default function GeneradorHashesPage() {
 
       <RelatedApps apps={getRelatedApps('generador-hashes')} />
 
+      <ShareCard appName="generador-hashes" />
       <Footer appName="generador-hashes" />
     </div>
   );

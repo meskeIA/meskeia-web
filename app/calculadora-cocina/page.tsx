@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCocina.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -741,6 +741,7 @@ export default function CalculadoraCocinaPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-cocina')} />
 
+      <ShareCard appName="calculadora-cocina" />
       <Footer appName="calculadora-cocina" />
     </div>
   );

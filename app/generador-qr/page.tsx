@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import styles from './GeneradorQR.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -1392,6 +1392,7 @@ export default function GeneradorQRPage() {
 
       <RelatedApps apps={getRelatedApps('generador-qr')} />
 
+      <ShareCard appName="generador-qr" />
       <Footer appName="generador-qr" />
     </div>
   );

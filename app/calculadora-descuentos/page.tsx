@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraDescuentos.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -206,6 +206,7 @@ export default function CalculadoraDescuentosPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-descuentos')} />
 
+      <ShareCard appName="calculadora-descuentos" />
       <Footer appName="calculadora-descuentos" />
     </div>
   );

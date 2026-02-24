@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './ContadorManual.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Contador {
@@ -280,6 +280,7 @@ export default function ContadorManualPage() {
       </div>
 
       <RelatedApps apps={getRelatedApps('contador-manual')} />
+      <ShareCard appName="contador-manual" />
       <Footer appName="contador-manual" />
     </div>
   );

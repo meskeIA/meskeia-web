@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import styles from './PaisesDelMundo.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   countries,
@@ -319,6 +319,7 @@ export default function PaisesDelMundoPage() {
       </div>
 
       <RelatedApps apps={getRelatedApps('paises-del-mundo')} />
+      <ShareCard appName="paises-del-mundo" />
       <Footer appName="paises-del-mundo" />
     </div>
   );

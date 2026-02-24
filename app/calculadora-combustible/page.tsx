@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraCombustible.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -368,6 +368,7 @@ export default function CalculadoraCombustiblePage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-combustible')} />
 
+      <ShareCard appName="calculadora-combustible" />
       <Footer appName="calculadora-combustible" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ConversorUnidadesRF.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -718,6 +718,7 @@ export default function ConversorUnidadesRFPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('conversor-unidades-rf')} />
+      <ShareCard appName="conversor-unidades-rf" />
       <Footer appName="conversor-unidades-rf" />
     </div>
   );

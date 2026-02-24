@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstadisticaAvanzada.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import jStat from 'jstat';
@@ -1159,6 +1159,7 @@ export default function EstadisticaAvanzadaPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('estadistica-avanzada')} />
+      <ShareCard appName="estadistica-avanzada" />
       <Footer appName="estadistica-avanzada" />
     </div>
   );

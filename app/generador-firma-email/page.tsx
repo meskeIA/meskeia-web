@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorFirmaEmail.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Template = 'minimal' | 'corporate' | 'creative' | 'social';
@@ -388,6 +388,7 @@ export default function GeneradorFirmaEmailPage() {
 
       <RelatedApps apps={getRelatedApps('generador-firma-email')} />
 
+      <ShareCard appName="generador-firma-email" />
       <Footer appName="generador-firma-email" />
     </div>
   );

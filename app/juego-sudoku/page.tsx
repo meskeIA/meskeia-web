@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoSudoku.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Dificultad = 'facil' | 'medio' | 'dificil';
@@ -537,6 +537,7 @@ export default function JuegoSudokuPage() {
 
       <RelatedApps apps={getRelatedApps('juego-sudoku')} />
 
+      <ShareCard appName="juego-sudoku" />
       <Footer appName="juego-sudoku" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './CalculadoraColesterol.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -509,6 +509,7 @@ export default function CalculadoraColesterolPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-colesterol')} />
+      <ShareCard appName="calculadora-colesterol" />
       <Footer appName="calculadora-colesterol" />
     </div>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatNumber } from '@/lib/formatters';
 import { jsonLd } from './metadata';
@@ -366,7 +366,8 @@ export default function ComparadorCosteVida() {
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('comparador-coste-vida')} />
-        <Footer appName="comparador-coste-vida" />
+        <ShareCard appName="comparador-coste-vida" />
+      <Footer appName="comparador-coste-vida" />
       </main>
     </div>
   );

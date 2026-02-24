@@ -5,7 +5,7 @@ import 'flag-icons/css/flag-icons.min.css';
 import styles from './QuizPaisesCapitales.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { countries, Country } from '@/data/countries';
 
@@ -357,6 +357,7 @@ export default function QuizPaisesCapitalesPage() {
 
       <RelatedApps apps={getRelatedApps('quiz-paises-capitales')} />
 
+      <ShareCard appName="quiz-paises-capitales" />
       <Footer appName="quiz-paises-capitales" />
     </div>
   );

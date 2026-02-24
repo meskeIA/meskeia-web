@@ -5,7 +5,7 @@ import styles from './AnalizadorDensidadSeo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import EducationalSection from '@/components/EducationalSection';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -462,6 +462,7 @@ export default function AnalizadorDensidadSeoPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('analizador-densidad-seo')} />
+      <ShareCard appName="analizador-densidad-seo" />
       <Footer appName="analizador-densidad-seo" />
     </div>
   );

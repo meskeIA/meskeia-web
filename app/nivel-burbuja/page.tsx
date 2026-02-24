@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './NivelBurbuja.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -560,6 +560,7 @@ export default function NivelBurbujaPage() {
 
       <RelatedApps apps={getRelatedApps('nivel-burbuja')} />
 
+      <ShareCard appName="nivel-burbuja" />
       <Footer appName="nivel-burbuja" />
     </div>
   );

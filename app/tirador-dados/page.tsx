@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './TiradorDados.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de dados disponibles
@@ -523,6 +523,7 @@ export default function TiradorDadosPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('tirador-dados')} />
+      <ShareCard appName="tirador-dados" />
       <Footer appName="tirador-dados" />
     </div>
   );

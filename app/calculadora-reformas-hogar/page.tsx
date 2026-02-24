@@ -9,6 +9,7 @@ import {
   RelatedApps,
   DisclaimerCard,
   EducationalSection,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency } from '@/lib';
@@ -378,7 +379,8 @@ export default function CalculadoraReformasHogar() {
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('calculadora-reformas-hogar')} />
-        <Footer appName="calculadora-reformas-hogar" />
+        <ShareCard appName="calculadora-reformas-hogar" />
+      <Footer appName="calculadora-reformas-hogar" />
       </div>
     </div>
   );

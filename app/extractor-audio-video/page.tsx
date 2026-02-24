@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { FFmpeg } from '@ffmpeg/ffmpeg';
 import styles from './ExtractorAudioVideo.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type FormatoSalida = 'mp3' | 'wav';
@@ -584,6 +584,7 @@ export default function ExtractorAudioVideoPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('extractor-audio-video')} />
+      <ShareCard appName="extractor-audio-video" />
       <Footer appName="extractor-audio-video" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Diapason.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface FrecuenciaPreset {
@@ -275,6 +275,7 @@ export default function DiapasonPage() {
       </div>
 
       <RelatedApps apps={getRelatedApps('diapason')} />
+      <ShareCard appName="diapason" />
       <Footer appName="diapason" />
     </div>
   );

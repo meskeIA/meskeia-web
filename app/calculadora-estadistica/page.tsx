@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraEstadistica.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -702,6 +702,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
 
       <RelatedApps apps={getRelatedApps('calculadora-estadistica')} />
 
+      <ShareCard appName="calculadora-estadistica" />
       <Footer appName="calculadora-estadistica" />
     </div>
   );

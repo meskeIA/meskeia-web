@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AnalizadorEspectro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -643,6 +643,7 @@ export default function AnalizadorEspectroPage() {
 
       <RelatedApps apps={getRelatedApps('analizador-espectro')} />
 
+      <ShareCard appName="analizador-espectro" />
       <Footer appName="analizador-espectro" />
     </div>
   );

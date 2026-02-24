@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './CifradoAES.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'cifrar' | 'descifrar';
@@ -449,6 +449,7 @@ export default function CifradoAESPage() {
 
       <RelatedApps apps={getRelatedApps('cifrado-aes')} />
 
+      <ShareCard appName="cifrado-aes" />
       <Footer appName="cifrado-aes" />
     </div>
   );

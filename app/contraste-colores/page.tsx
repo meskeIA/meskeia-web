@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import styles from './ContrasteColores.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface ContrastResult {
@@ -1015,6 +1015,7 @@ export default function ContrasteColoresPage() {
 
       <RelatedApps apps={getRelatedApps('contraste-colores')} />
 
+      <ShareCard appName="contraste-colores" />
       <Footer appName="contraste-colores" />
     </div>
   );

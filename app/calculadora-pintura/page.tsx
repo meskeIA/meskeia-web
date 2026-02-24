@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraPintura.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -296,6 +296,7 @@ export default function CalculadoraPinturaPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-pintura')} />
 
+      <ShareCard appName="calculadora-pintura" />
       <Footer appName="calculadora-pintura" />
     </div>
   );

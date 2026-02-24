@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './RuletaAleatoria.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface WheelItem {
@@ -448,6 +448,7 @@ export default function RuletaAleatoriaPage() {
 
       <RelatedApps apps={getRelatedApps('ruleta-aleatoria')} />
 
+      <ShareCard appName="ruleta-aleatoria" />
       <Footer appName="ruleta-aleatoria" />
     </div>
   );

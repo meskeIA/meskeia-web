@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import styles from './AlgebraEcuaciones.module.css';
-import { Footer, MeskeiaLogo, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { Footer, MeskeiaLogo, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import * as Algebrite from 'algebrite';
@@ -950,6 +950,7 @@ export default function AlgebraEcuacionesPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('algebra-ecuaciones')} />
+      <ShareCard appName="algebra-ecuaciones" />
       <Footer appName="algebra-ecuaciones" />
     </div>
   );

@@ -9,6 +9,7 @@ import {
   RelatedApps,
   LegalNotice,
   DisclaimerCard,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
@@ -595,6 +596,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-rentabilidad-alquiler')} />
 
+      <ShareCard appName="calculadora-rentabilidad-alquiler" />
       <Footer appName="calculadora-rentabilidad-alquiler" />
     </div>
   );

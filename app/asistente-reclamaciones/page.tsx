@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './AsistenteReclamaciones.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   PROBLEM_OPTIONS,
@@ -452,6 +452,7 @@ export default function AsistenteReclamacionesPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('asistente-reclamaciones')} />
+      <ShareCard appName="asistente-reclamaciones" />
       <Footer appName="asistente-reclamaciones" />
     </div>
   );

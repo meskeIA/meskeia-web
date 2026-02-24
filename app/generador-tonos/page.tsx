@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorTonos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface FrecuenciaPreset {
@@ -377,6 +377,7 @@ export default function GeneradorTonosPage() {
       </div>
 
       <RelatedApps apps={getRelatedApps('generador-tonos')} />
+      <ShareCard appName="generador-tonos" />
       <Footer appName="generador-tonos" />
     </div>
   );

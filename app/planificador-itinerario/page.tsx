@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import styles from './PlanificadorItinerario.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
@@ -521,6 +521,7 @@ export default function PlanificadorItinerario() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('planificador-itinerario')} />
+      <ShareCard appName="planificador-itinerario" />
       <Footer appName="planificador-itinerario" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraSueno.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoCalculo = 'despertar' | 'dormir';
@@ -361,6 +361,7 @@ export default function CalculadoraSuenoPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-sueno')} />
 
+      <ShareCard appName="calculadora-sueno" />
       <Footer appName="calculadora-sueno" />
     </div>
   );

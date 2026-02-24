@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Sonometro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -440,6 +440,7 @@ export default function SonometroPage() {
 
       <RelatedApps apps={getRelatedApps('sonometro')} />
 
+      <ShareCard appName="sonometro" />
       <Footer appName="sonometro" />
     </div>
   );

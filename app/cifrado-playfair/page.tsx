@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CifradoPlayfair.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'cifrar' | 'descifrar';
@@ -356,6 +356,7 @@ export default function CifradoPlayfairPage() {
 
       <RelatedApps apps={getRelatedApps('cifrado-playfair')} />
 
+      <ShareCard appName="cifrado-playfair" />
       <Footer appName="cifrado-playfair" />
     </div>
   );

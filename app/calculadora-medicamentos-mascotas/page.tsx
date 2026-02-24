@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraMedicamentosMascotas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -550,6 +550,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
         </section>
       </EducationalSection>
 
+      <ShareCard appName="calculadora-medicamentos-mascotas" />
       <Footer appName="calculadora-medicamentos-mascotas" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import styles from './ConversorFormatos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de formato soportados
@@ -1291,6 +1291,7 @@ export default function ConversorFormatosPage() {
 
       <RelatedApps apps={getRelatedApps('conversor-formatos')} />
 
+      <ShareCard appName="conversor-formatos" />
       <Footer appName="conversor-formatos" />
     </div>
   );

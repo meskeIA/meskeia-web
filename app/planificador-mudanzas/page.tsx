@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './PlanificadorMudanzas.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
 
@@ -916,6 +916,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
       </main>
 
       <RelatedApps apps={getRelatedApps('planificador-mudanzas')} />
+      <ShareCard appName="planificador-mudanzas" />
       <Footer appName="planificador-mudanzas" />
     </div>
   );

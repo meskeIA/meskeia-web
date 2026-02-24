@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './Juego2048.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Tablero = number[][];
@@ -356,6 +356,7 @@ export default function Juego2048Page() {
 
       <RelatedApps apps={getRelatedApps('juego-2048')} />
 
+      <ShareCard appName="juego-2048" />
       <Footer appName="juego-2048" />
     </div>
   );

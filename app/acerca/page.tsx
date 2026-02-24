@@ -1,6 +1,6 @@
 'use client';
 
-import { LegalNotice } from '@/components';
+import { LegalNotice, ShareCard } from '@/components';
 import Link from 'next/link';
 import FixedHeader from '@/components/FixedHeader';
 import Footer from '@/components/Footer';
@@ -177,6 +177,7 @@ export default function AcercaPage() {
         </div>
       </main>
 
+      <ShareCard appName="meskeIA" />
       <Footer appName="meskeIA" />
     </>
   );

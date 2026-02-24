@@ -4,7 +4,7 @@ import { useState, useEffect, KeyboardEvent } from 'react';
 import styles from './ListaEquipaje.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type TipoViaje = 'playa' | 'montana' | 'ciudad' | 'negocios' | 'aventura';
@@ -527,6 +527,7 @@ export default function ListaEquipajePage() {
       </div>
 
       <RelatedApps apps={getRelatedApps('lista-equipaje')} />
+      <ShareCard appName="lista-equipaje" />
       <Footer appName="lista-equipaje" />
     </div>
   );

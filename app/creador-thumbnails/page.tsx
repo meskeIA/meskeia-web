@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './CreadorThumbnails.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Constantes del canvas
@@ -1190,6 +1190,7 @@ export default function CreadorThumbnailsPage() {
 
       <RelatedApps apps={getRelatedApps('creador-thumbnails')} />
 
+      <ShareCard appName="creador-thumbnails" />
       <Footer appName="creador-thumbnails" />
     </div>
   );

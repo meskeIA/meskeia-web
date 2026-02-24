@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { jsonLd, faqSchema } from './metadata';
 import styles from './CalculadoraFechas.module.css';
@@ -1074,6 +1074,7 @@ export default function CalculadoraFechas() {
 
       {/* Footer meskeIA */}
       <RelatedApps apps={getRelatedApps('Calculadora de Fechas')} />
+      <ShareCard appName="Calculadora de Fechas" />
       <Footer appName="Calculadora de Fechas" />
     </>
   );

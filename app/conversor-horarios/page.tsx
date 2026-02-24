@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './ConversorHorarios.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Importar estilos de flag-icons
@@ -473,6 +473,7 @@ export default function ConversorHorariosPage() {
 
       <RelatedApps apps={getRelatedApps('conversor-horarios')} />
 
+      <ShareCard appName="conversor-horarios" />
       <Footer appName="conversor-horarios" />
     </div>
   );

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraPercentiles.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Sexo = 'nino' | 'nina';
@@ -355,6 +355,7 @@ export default function CalculadoraPercentilesPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-percentiles')} />
 
+      <ShareCard appName="calculadora-percentiles" />
       <Footer appName="calculadora-percentiles" />
     </div>
   );

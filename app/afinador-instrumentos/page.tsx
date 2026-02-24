@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AfinadorInstrumentos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Notas y frecuencias (A4 = 440Hz)
@@ -357,6 +357,7 @@ export default function AfinadorInstrumentosPage() {
       </div>
 
       <RelatedApps apps={getRelatedApps('afinador-instrumentos')} />
+      <ShareCard appName="afinador-instrumentos" />
       <Footer appName="afinador-instrumentos" />
     </div>
   );

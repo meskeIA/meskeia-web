@@ -1,6 +1,6 @@
 'use client';
 
-import { LegalNotice } from '@/components';
+import { LegalNotice, ShareCard } from '@/components';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import FixedHeader from '@/components/FixedHeader';
@@ -122,6 +122,7 @@ export default function AppsPage() {
         </div>
       </main>
 
+      <ShareCard appName="meskeIA" />
       <Footer appName="meskeIA" />
     </>
   );

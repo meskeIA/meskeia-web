@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './RecortadorAudio.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -862,6 +862,7 @@ export default function RecortadorAudioPage() {
 
       <RelatedApps apps={getRelatedApps('recortador-audio')} />
 
+      <ShareCard appName="recortador-audio" />
       <Footer appName="recortador-audio" />
     </div>
   );

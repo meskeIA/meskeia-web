@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './PruebaMicrofono.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface MicrophoneInfo {
@@ -575,6 +575,7 @@ export default function PruebaMicrofonoPage() {
 
       <RelatedApps apps={getRelatedApps('prueba-microfono')} />
 
+      <ShareCard appName="prueba-microfono" />
       <Footer appName="prueba-microfono" />
     </div>
   );

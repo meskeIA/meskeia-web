@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './ChecklistDocumentosViaje.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type TipoViaje = 'espana' | 'europa' | 'internacional';
@@ -291,6 +291,7 @@ export default function ChecklistDocumentosViajePage() {
       </div>
 
       <RelatedApps apps={getRelatedApps('checklist-documentos-viaje')} />
+      <ShareCard appName="checklist-documentos-viaje" />
       <Footer appName="checklist-documentos-viaje" />
     </div>
   );

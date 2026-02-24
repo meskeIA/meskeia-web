@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import styles from './CalculadoraNotas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -1133,6 +1133,7 @@ export default function CalculadoraNotasPage() {
         icon="📚"
       />
 
+      <ShareCard appName="calculadora-notas" />
       <Footer appName="calculadora-notas" />
     </div>
   );

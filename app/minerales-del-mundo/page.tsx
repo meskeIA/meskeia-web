@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './MineralesDelMundo.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   MINERALS,
@@ -390,6 +390,7 @@ export default function MineralesDelMundoPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('minerales-del-mundo')} />
+      <ShareCard appName="minerales-del-mundo" />
       <Footer appName="minerales-del-mundo" />
     </div>
   );

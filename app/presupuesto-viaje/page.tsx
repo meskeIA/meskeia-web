@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import { jsonLd } from './metadata';
@@ -431,7 +431,8 @@ export default function PresupuestoViaje() {
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('presupuesto-viaje')} />
-        <Footer appName="presupuesto-viaje" />
+        <ShareCard appName="presupuesto-viaje" />
+      <Footer appName="presupuesto-viaje" />
       </main>
     </div>
   );

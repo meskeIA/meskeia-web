@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Cronometro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
@@ -409,6 +409,7 @@ export default function CronometroPage() {
 
       <RelatedApps apps={getRelatedApps('cronometro')} />
 
+      <ShareCard appName="cronometro" />
       <Footer appName="cronometro" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './Fire.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -492,6 +492,7 @@ export default function CalculadoraFIREPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-fire')} />
+      <ShareCard appName="calculadora-fire" />
       <Footer appName="calculadora-fire" />
     </div>
   );

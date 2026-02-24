@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import styles from './GeneradorGradientes.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type GradientType = 'linear' | 'radial' | 'conic';
@@ -378,6 +378,7 @@ export default function GeneradorGradientesPage() {
 
       <RelatedApps apps={getRelatedApps('generador-gradientes')} />
 
+      <ShareCard appName="generador-gradientes" />
       <Footer appName="generador-gradientes" />
     </div>
   );

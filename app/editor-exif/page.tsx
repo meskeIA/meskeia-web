@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import styles from './EditorExif.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Categorías de metadatos con explicaciones educativas
@@ -791,6 +791,7 @@ export default function EditorExifPage() {
 
       <RelatedApps apps={getRelatedApps('editor-exif')} />
 
+      <ShareCard appName="editor-exif" />
       <Footer appName="editor-exif" />
     </div>
   );

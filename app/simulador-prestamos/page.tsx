@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import styles from './SimuladorPrestamos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
@@ -1766,6 +1766,7 @@ export default function SimuladorPrestamosPage() {
 
       <RelatedApps apps={getRelatedApps('simulador-prestamos')} />
 
+      <ShareCard appName="simulador-prestamos" />
       <Footer appName="simulador-prestamos" />
     </div>
   );

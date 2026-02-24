@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './Partners.module.css';
-import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
 
 type SectorType = 'gestorias' | 'autonomos' | 'inmobiliarias' | 'educacion';
 
@@ -364,6 +364,7 @@ ${tools.map(tool => `    <a href="https://meskeia.com${tool.url}" target="_blank
         </div>
       </section>
 
+      <ShareCard appName="partners" />
       <Footer appName="partners" />
     </div>
   );

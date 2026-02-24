@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoEmpresaFamiliar.module.css';
-import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
 import { useCourse, COURSE_MODULES } from './CourseContext';
 
 const MODULE_ICONS: Record<string, string> = {
@@ -233,6 +233,7 @@ export default function CursoEmpresaFamiliarPage() {
         )}
       </section>
 
+      <ShareCard appName="curso-empresa-familiar" />
       <Footer appName="curso-empresa-familiar" />
     </div>
   );

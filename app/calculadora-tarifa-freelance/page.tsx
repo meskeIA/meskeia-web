@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraTarifaFreelance.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -1175,6 +1175,7 @@ export default function CalculadoraTarifaFreelancePage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-tarifa-freelance')} />
 
+      <ShareCard appName="calculadora-tarifa-freelance" />
       <Footer appName="calculadora-tarifa-freelance" />
     </div>
   );

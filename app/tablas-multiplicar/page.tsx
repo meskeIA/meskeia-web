@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './TablasMultiplicar.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Dificultad = 'facil' | 'medio' | 'dificil';
@@ -508,6 +508,7 @@ export default function TablasMultiplicarPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('tablas-multiplicar')} />
+      <ShareCard appName="tablas-multiplicar" />
       <Footer appName="tablas-multiplicar" />
     </div>
   );

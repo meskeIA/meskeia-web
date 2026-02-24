@@ -33,3 +33,6 @@ export { default as DailyApps } from './DailyApps';
 
 // Banner de transparencia (localStorage)
 export { default as TransparencyBanner } from './TransparencyBanner';
+
+// Tarjeta de compartir slide-up (crecimiento orgánico)
+export { default as ShareCard } from './ShareCard';

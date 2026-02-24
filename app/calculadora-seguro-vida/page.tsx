@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraSeguroVida.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -643,6 +643,7 @@ export default function CalculadoraSeguroVidaPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-seguro-vida')} />
+      <ShareCard appName="calculadora-seguro-vida" />
       <Footer appName="calculadora-seguro-vida" />
     </div>
   );

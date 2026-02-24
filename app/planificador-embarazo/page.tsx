@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './PlanificadorEmbarazo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -971,6 +971,7 @@ export default function CalculadoraFechaPartoPage() {
 
       <RelatedApps apps={getRelatedApps('planificador-embarazo')} />
 
+      <ShareCard appName="planificador-embarazo" />
       <Footer appName="planificador-embarazo" />
     </div>
   );

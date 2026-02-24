@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoAsteroids.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -913,6 +913,7 @@ export default function JuegoAsteroidsPage() {
 
       <RelatedApps apps={getRelatedApps('juego-asteroids')} />
 
+      <ShareCard appName="juego-asteroids" />
       <Footer appName="juego-asteroids" />
     </div>
   );

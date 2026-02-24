@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraInfraseguro.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -348,6 +348,7 @@ export default function CalculadoraInfraseguroPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-infraseguro')} />
+      <ShareCard appName="calculadora-infraseguro" />
       <Footer appName="calculadora-infraseguro" />
     </div>
   );

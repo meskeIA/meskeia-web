@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import styles from './ConversorUnidades.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -1181,6 +1181,7 @@ Cinta USA marca millas
 
       <RelatedApps apps={getRelatedApps('conversor-unidades')} />
 
+      <ShareCard appName="conversor-unidades" />
       <Footer appName="conversor-unidades" />
     </div>
   );

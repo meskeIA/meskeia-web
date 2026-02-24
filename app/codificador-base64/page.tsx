@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './CodificadorBase64.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'texto' | 'archivo';
@@ -332,6 +332,7 @@ export default function CodificadorBase64Page() {
 
       <RelatedApps apps={getRelatedApps('codificador-base64')} />
 
+      <ShareCard appName="codificador-base64" />
       <Footer appName="codificador-base64" />
     </div>
   );

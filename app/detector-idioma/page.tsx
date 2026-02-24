@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './DetectorIdioma.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Patrones de palabras frecuentes por idioma
@@ -227,6 +227,7 @@ export default function DetectorIdiomaPage() {
 
       <RelatedApps apps={getRelatedApps('detector-idioma')} />
 
+      <ShareCard appName="detector-idioma" />
       <Footer appName="detector-idioma" />
     </div>
   );

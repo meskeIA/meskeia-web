@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ConversorNumerosRomanos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -242,6 +242,7 @@ export default function ConversorNumerosRomanosPage() {
 
       <RelatedApps apps={getRelatedApps('conversor-numeros-romanos')} />
 
+      <ShareCard appName="conversor-numeros-romanos" />
       <Footer appName="conversor-numeros-romanos" />
     </div>
   );

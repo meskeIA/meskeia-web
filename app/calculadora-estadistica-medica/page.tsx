@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraEstadisticaMedica.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -745,6 +745,7 @@ export default function CalculadoraEstadisticaMedicaPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-estadistica-medica')} />
+      <ShareCard appName="calculadora-estadistica-medica" />
       <Footer appName="calculadora-estadistica-medica" />
     </div>
   );

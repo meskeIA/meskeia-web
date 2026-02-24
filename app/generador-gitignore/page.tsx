@@ -9,6 +9,7 @@ import {
   RelatedApps,
   LegalNotice,
   DisclaimerCard,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -1055,6 +1056,7 @@ export default function GeneradorGitignorePage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-gitignore')} />
+      <ShareCard appName="generador-gitignore" />
       <Footer appName="generador-gitignore" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './SimuladorGenetica.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   useGeneticSimulation,
@@ -1040,6 +1040,7 @@ Hija portadora × marido sano:
       {/* Apps Relacionadas */}
       <RelatedApps apps={getRelatedApps('simulador-genetica')} />
 
+      <ShareCard appName="simulador-genetica" />
       <Footer appName="simulador-genetica" />
     </div>
   );

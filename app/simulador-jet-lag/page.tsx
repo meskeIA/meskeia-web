@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './SimuladorJetLag.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Ciudad {
@@ -397,6 +397,7 @@ export default function SimuladorJetLagPage() {
 
       <RelatedApps apps={getRelatedApps('simulador-jet-lag')} />
 
+      <ShareCard appName="simulador-jet-lag" />
       <Footer appName="simulador-jet-lag" />
     </div>
   );

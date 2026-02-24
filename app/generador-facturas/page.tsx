@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorFacturas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice, EducationalSection } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { formatCurrency, formatDate } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -1296,6 +1296,7 @@ export default function GeneradorFacturasPage() {
 
       <RelatedApps apps={getRelatedApps('generador-facturas')} />
 
+      <ShareCard appName="generador-facturas" />
       <Footer appName="generador-facturas" />
 
       {/* Estilos para impresión */}

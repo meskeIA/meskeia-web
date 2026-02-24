@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorAvatares.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de estilos de avatar disponibles
@@ -802,6 +802,7 @@ export default function GeneradorAvataresPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-avatares')} />
+      <ShareCard appName="generador-avatares" />
       <Footer appName="generador-avatares" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './CalculadoraSistemasNumericos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Base = 2 | 8 | 10 | 16;
@@ -516,6 +516,7 @@ export default function CalculadoraSistemasNumericosPage() {
       </section>
 
       <RelatedApps apps={getRelatedApps('calculadora-sistemas-numericos')} />
+      <ShareCard appName="calculadora-sistemas-numericos" />
       <Footer appName="calculadora-sistemas-numericos" />
     </div>
   );

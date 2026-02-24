@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraGeometria.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -1082,6 +1082,7 @@ export default function CalculadoraGeometriaPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-geometria')} />
 
+      <ShareCard appName="calculadora-geometria" />
       <Footer appName="calculadora-geometria" />
     </div>
   );

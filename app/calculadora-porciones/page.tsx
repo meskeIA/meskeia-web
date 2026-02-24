@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraPorciones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface PortionMethod {
@@ -361,6 +361,7 @@ export default function CalculadoraPorcionesPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-porciones')} />
 
+      <ShareCard appName="calculadora-porciones" />
       <Footer appName="calculadora-porciones" />
     </div>
   );

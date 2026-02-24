@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency } from '@/lib/formatters';
 import { jsonLd } from './metadata';
@@ -334,6 +334,7 @@ export default function CalculadoraPropinas() {
 
       {/* Footer meskeIA */}
       <RelatedApps apps={getRelatedApps('Calculadora de Propinas')} />
+      <ShareCard appName="Calculadora de Propinas" />
       <Footer appName="Calculadora de Propinas" />
     </>
   );

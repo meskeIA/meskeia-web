@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './PlaygroundSQL.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { DATASETS, getDatasetById, EXERCISES, getExerciseById } from './components';
 import type { Dataset, QueryResult, Exercise, ExerciseProgress } from './components/types';
@@ -652,6 +652,7 @@ WHERE precio > (
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('playground-sql')} />
+      <ShareCard appName="playground-sql" />
       <Footer appName="playground-sql" />
     </div>
   );

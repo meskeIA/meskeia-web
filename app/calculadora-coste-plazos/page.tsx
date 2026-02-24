@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCostePlazos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -403,6 +403,7 @@ export default function CalculadoraCostePlazosPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-coste-plazos')} />
+      <ShareCard appName="calculadora-coste-plazos" />
       <Footer appName="calculadora-coste-plazos" />
     </div>
   );

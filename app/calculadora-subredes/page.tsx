@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraSubredes.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -466,6 +466,7 @@ export default function CalculadoraSubredesPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-subredes')} />
+      <ShareCard appName="calculadora-subredes" />
       <Footer appName="calculadora-subredes" />
     </div>
   );

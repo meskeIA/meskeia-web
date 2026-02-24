@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoRedaccionAcademica.module.css';
-import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
 import { useCourse } from './CourseContext';
 
 const MODULE_ICONS: Record<string, string> = {
@@ -223,6 +223,7 @@ export default function CursoRedaccionAcademicaPage() {
         </div>
       </section>
 
+      <ShareCard appName="curso-redaccion-academica" />
       <Footer appName="curso-redaccion-academica" />
     </div>
   );

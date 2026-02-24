@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraProbabilidad.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -895,6 +895,7 @@ export default function CalculadoraProbabilidadPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-probabilidad')} />
 
+      <ShareCard appName="calculadora-probabilidad" />
       <Footer appName="calculadora-probabilidad" />
     </div>
   );

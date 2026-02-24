@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './GoldenHour.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Constantes astronómicas
@@ -825,6 +825,7 @@ export default function GoldenHourPage() {
 
       <RelatedApps apps={getRelatedApps('golden-hour')} />
 
+      <ShareCard appName="golden-hour" />
       <Footer appName="golden-hour" />
     </div>
   );

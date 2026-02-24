@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoTresEnRaya.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Casilla = 'X' | 'O' | null;
@@ -339,6 +339,7 @@ export default function JuegoTresEnRayaPage() {
 
       <RelatedApps apps={getRelatedApps('juego-tres-en-raya')} />
 
+      <ShareCard appName="juego-tres-en-raya" />
       <Footer appName="juego-tres-en-raya" />
     </div>
   );

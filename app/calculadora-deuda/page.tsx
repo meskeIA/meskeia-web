@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraDeuda.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -760,6 +760,7 @@ export default function CalculadoraDeudaPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-deuda')} />
+      <ShareCard appName="calculadora-deuda" />
       <Footer appName="calculadora-deuda" />
     </div>
   );

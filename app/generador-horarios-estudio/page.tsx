@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './GeneradorHorarios.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ============ TIPOS ============
@@ -1053,6 +1053,7 @@ export default function GeneradorHorariosPage() {
         icon="📚"
       />
 
+      <ShareCard appName="generador-horarios-estudio" />
       <Footer appName="generador-horarios-estudio" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './GlosarioProgramacion.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   TERMINOS,
@@ -632,6 +632,7 @@ export default function GlosarioProgramacionPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('glosario-programacion')} />
+      <ShareCard appName="glosario-programacion" />
       <Footer appName="glosario-programacion" />
     </div>
   );

@@ -1,0 +1,184 @@
+/* ShareCard meskeIA — Slide-up desde el borde inferior */
+
+.slideCard {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100; /* Por encima del footer (z-index: 1000) */
+
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+
+  padding: 1rem 1.25rem 1rem 1.25rem;
+
+  /* Animación slide-up */
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.18);
+}
+
+.slideCard.visible {
+  transform: translateY(0);
+}
+
+/* ─── Botón cerrar ─────────────────────────────────────────────── */
+
+.cerrar {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.875rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.cerrar:hover {
+  color: white;
+}
+
+.cerrar:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ─── Contenido ────────────────────────────────────────────────── */
+
+.contenido {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
+  padding-right: 1.5rem; /* espacio para el botón cerrar */
+}
+
+.icono {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.textos {
+  flex: 1;
+}
+
+.titulo {
+  margin: 0 0 0.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: white;
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.4;
+}
+
+/* ─── Botones ──────────────────────────────────────────────────── */
+
+.botones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 0.875rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: inherit;
+  transition: opacity 0.15s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btnWhatsapp {
+  background: #25D366;
+  color: white;
+}
+
+.btnCopiar {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.btnEmail {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+/* ─── Dark mode ────────────────────────────────────────────────── */
+/* El gradiente meskeIA mantiene el aspecto en ambos modos */
+
+[data-theme='dark'] .slideCard {
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ─── Desktop: tarjeta centrada ────────────────────────────────── */
+
+@media (min-width: 640px) {
+  .slideCard {
+    left: 50%;
+    right: auto;
+    width: min(560px, 90vw);
+    transform: translate(-50%, 100%);
+    border-radius: 12px 12px 0 0;
+    padding: 1.125rem 1.5rem 1.125rem 1.5rem;
+  }
+
+  .slideCard.visible {
+    transform: translate(-50%, 0);
+  }
+
+  .titulo {
+    font-size: 0.9375rem;
+  }
+
+  .subtitulo {
+    font-size: 0.8125rem;
+  }
+
+  .btn {
+    font-size: 0.8125rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* ─── Respetar preferencia de movimiento reducido ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .slideCard {
+    transition: none;
+  }
+}

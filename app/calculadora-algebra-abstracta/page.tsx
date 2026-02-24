@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraAlgebraAbstracta.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -670,6 +670,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-algebra-abstracta')} />
 
+      <ShareCard appName="calculadora-algebra-abstracta" />
       <Footer appName="calculadora-algebra-abstracta" />
     </div>
   );

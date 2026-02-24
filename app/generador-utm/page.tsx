@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import styles from './GeneradorUTM.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface UTMParams {
@@ -420,6 +420,7 @@ export default function GeneradorUTMPage() {
 
       <RelatedApps apps={getRelatedApps('generador-utm')} />
 
+      <ShareCard appName="generador-utm" />
       <Footer appName="generador-utm" />
     </div>
   );

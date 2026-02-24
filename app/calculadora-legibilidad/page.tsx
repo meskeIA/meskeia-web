@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './CalculadoraLegibilidad.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -472,6 +472,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
 
       <RelatedApps apps={getRelatedApps('calculadora-legibilidad')} />
 
+      <ShareCard appName="calculadora-legibilidad" />
       <Footer appName="calculadora-legibilidad" />
     </div>
   );

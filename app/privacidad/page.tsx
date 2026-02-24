@@ -1,6 +1,6 @@
 'use client';
 
-import { LegalNotice } from '@/components';
+import { LegalNotice, ShareCard } from '@/components';
 import { useState } from 'react';
 import Link from 'next/link';
 import FixedHeader from '@/components/FixedHeader';
@@ -211,6 +211,7 @@ export default function PrivacidadPage() {
         </article>
       </main>
 
+      <ShareCard appName="meskeIA" />
       <Footer appName="meskeIA" />
     </>
   );

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCalorias.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -360,6 +360,7 @@ export default function CalculadoraCaloriasPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-calorias-ejercicio')} />
+      <ShareCard appName="calculadora-calorias-ejercicio" />
       <Footer appName="calculadora-calorias-ejercicio" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './CalculadoraHuellaCarbono.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -893,6 +893,7 @@ export default function CalculadoraHuellaCarbono() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-huella-carbono')} />
+      <ShareCard appName="calculadora-huella-carbono" />
       <Footer appName="calculadora-huella-carbono" />
     </div>
   );

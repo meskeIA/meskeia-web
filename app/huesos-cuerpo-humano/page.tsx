@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './HuesosCuerpoHumano.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   BONES,
@@ -739,6 +739,7 @@ export default function HuesosCuerpoHumanoPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('huesos-cuerpo-humano')} />
+      <ShareCard appName="huesos-cuerpo-humano" />
       <Footer appName="huesos-cuerpo-humano" />
     </div>
   );

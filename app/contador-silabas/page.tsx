@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './ContadorSilabas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Algoritmo de silabeo en español
@@ -292,6 +292,7 @@ export default function ContadorSilabasPage() {
 
       <RelatedApps apps={getRelatedApps('contador-silabas')} />
 
+      <ShareCard appName="contador-silabas" />
       <Footer appName="contador-silabas" />
     </div>
   );

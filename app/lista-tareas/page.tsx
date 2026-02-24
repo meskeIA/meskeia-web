@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './ListaTareas.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
@@ -403,6 +403,7 @@ export default function ListaTareasPage() {
       </section>
 
       <RelatedApps apps={getRelatedApps('lista-tareas')} />
+      <ShareCard appName="lista-tareas" />
       <Footer appName="lista-tareas" />
     </div>
   );

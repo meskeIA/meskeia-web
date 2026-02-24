@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ConversorIEEE754.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Precision = 'single' | 'double';
@@ -651,6 +651,7 @@ export default function ConversorIEEE754Page() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('conversor-ieee754')} />
+      <ShareCard appName="conversor-ieee754" />
       <Footer appName="conversor-ieee754" />
     </div>
   );

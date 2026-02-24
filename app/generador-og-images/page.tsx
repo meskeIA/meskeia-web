@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './GeneradorOGImages.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Constantes del canvas OG estándar
@@ -1272,6 +1272,7 @@ export default function GeneradorOGImagesPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-og-images')} />
+      <ShareCard appName="generador-og-images" />
       <Footer appName="generador-og-images" />
     </div>
   );

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoWordle.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Palabras de 5 letras en español (sin tildes para simplificar)
@@ -340,6 +340,7 @@ export default function JuegoWordlePage() {
 
       <RelatedApps apps={getRelatedApps('juego-wordle')} />
 
+      <ShareCard appName="juego-wordle" />
       <Footer appName="juego-wordle" />
     </div>
   );

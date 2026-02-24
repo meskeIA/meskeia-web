@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorHashtags.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -362,6 +362,7 @@ export default function GeneradorHashtagsPage() {
 
       <RelatedApps apps={getRelatedApps('generador-hashtags')} />
 
+      <ShareCard appName="generador-hashtags" />
       <Footer appName="generador-hashtags" />
     </div>
   );

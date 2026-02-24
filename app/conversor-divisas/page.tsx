@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatNumber } from '@/lib/formatters';
 import { jsonLd } from './metadata';
@@ -265,7 +265,8 @@ export default function ConversionDivisas() {
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('conversor-divisas')} />
-        <Footer appName="conversor-divisas" />
+        <ShareCard appName="conversor-divisas" />
+      <Footer appName="conversor-divisas" />
       </main>
     </div>
   );

@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './CalculadoraInversiones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
@@ -1199,6 +1199,7 @@ export default function CalculadoraInversionesPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-inversiones')} />
 
+      <ShareCard appName="calculadora-inversiones" />
       <Footer appName="calculadora-inversiones" />
     </div>
   );

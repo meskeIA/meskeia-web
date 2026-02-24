@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CifradoVigenere.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'cifrar' | 'descifrar';
@@ -332,6 +332,7 @@ export default function CifradoVigenerePage() {
 
       <RelatedApps apps={getRelatedApps('cifrado-vigenere')} />
 
+      <ShareCard appName="cifrado-vigenere" />
       <Footer appName="cifrado-vigenere" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ComparadorTiposSeguros.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type SeguroCategoria = 'vida' | 'auto' | 'hogar' | 'salud';
@@ -634,6 +634,7 @@ export default function ComparadorTiposSegurosPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('comparador-tipos-seguros')} />
+      <ShareCard appName="comparador-tipos-seguros" />
       <Footer appName="comparador-tipos-seguros" />
     </div>
   );

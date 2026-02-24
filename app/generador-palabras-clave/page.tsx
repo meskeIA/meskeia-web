@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorPalabrasClave.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -410,6 +410,7 @@ export default function GeneradorPalabrasClavePage() {
 
       <RelatedApps apps={getRelatedApps('generador-palabras-clave')} />
 
+      <ShareCard appName="generador-palabras-clave" />
       <Footer appName="generador-palabras-clave" />
     </div>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { jsonLd } from './metadata';
 import styles from './EnchufesPais.module.css';
@@ -275,7 +275,8 @@ export default function EnchufesPais() {
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('enchufes-por-pais')} />
-        <Footer appName="enchufes-por-pais" />
+        <ShareCard appName="enchufes-por-pais" />
+      <Footer appName="enchufes-por-pais" />
       </main>
     </div>
   );

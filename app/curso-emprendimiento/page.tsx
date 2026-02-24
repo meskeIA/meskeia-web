@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoEmprendimiento.module.css';
-import { MeskeiaLogo, Footer, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
 import { CHAPTERS, TOOLS, useCourse } from './CourseContext';
 
 export default function CursoEmprendimientoPage() {
@@ -182,6 +182,7 @@ export default function CursoEmprendimientoPage() {
         </Link>
       </section>
 
+      <ShareCard appName="curso-emprendimiento" />
       <Footer appName="curso-emprendimiento" />
     </div>
   );

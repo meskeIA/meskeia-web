@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraDistribuciones.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import jStat from 'jstat';
@@ -829,6 +829,7 @@ export default function CalculadoraDistribucionesPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-distribuciones')} />
+      <ShareCard appName="calculadora-distribuciones" />
       <Footer appName="calculadora-distribuciones" />
     </div>
   );

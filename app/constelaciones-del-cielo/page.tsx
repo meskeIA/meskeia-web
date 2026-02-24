@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ConstelacionesDelCielo.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   CONSTELLATIONS,
@@ -334,6 +334,7 @@ export default function ConstelacionesDelCieloPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('constelaciones-del-cielo')} />
+      <ShareCard appName="constelaciones-del-cielo" />
       <Footer appName="constelaciones-del-cielo" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './PruebaCamara.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface CameraInfo {
@@ -438,6 +438,7 @@ export default function PruebaCamaraPage() {
 
       <RelatedApps apps={getRelatedApps('prueba-camara')} />
 
+      <ShareCard appName="prueba-camara" />
       <Footer appName="prueba-camara" />
     </div>
   );

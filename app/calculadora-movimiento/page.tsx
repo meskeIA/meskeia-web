@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraMovimiento.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -474,6 +474,7 @@ export default function CalculadoraMovimientoPage() {
 
       <RelatedApps apps={getRelatedApps('calculadora-movimiento')} />
 
+      <ShareCard appName="calculadora-movimiento" />
       <Footer appName="calculadora-movimiento" />
     </div>
   );

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './CursoNutrisalud.module.css';
-import { MeskeiaLogo, Footer, DisclaimerCard, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, DisclaimerCard, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   MODULES,
@@ -333,6 +333,7 @@ export default function CursoNutrisaludPage() {
 
       <RelatedApps apps={getRelatedApps('curso-nutrisalud')} />
 
+      <ShareCard appName="curso-nutrisalud" />
       <Footer appName="curso-nutrisalud" />
     </div>
   );

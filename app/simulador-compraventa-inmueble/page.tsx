@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './SimuladorCompraventa.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
@@ -823,6 +823,7 @@ export default function SimuladorCompraventaPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('simulador-compraventa-inmueble')} />
+      <ShareCard appName="simulador-compraventa-inmueble" />
       <Footer appName="simulador-compraventa-inmueble" />
     </div>
   );

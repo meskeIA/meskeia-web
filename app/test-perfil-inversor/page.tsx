@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './TestPerfilInversor.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Definición de preguntas con puntuaciones
@@ -871,7 +871,8 @@ export default function TestPerfilInversorPage() {
 
         <RelatedApps apps={getRelatedApps('test-perfil-inversor')} />
 
-        <Footer appName="test-perfil-inversor" />
+        <ShareCard appName="test-perfil-inversor" />
+      <Footer appName="test-perfil-inversor" />
       </div>
     );
   }

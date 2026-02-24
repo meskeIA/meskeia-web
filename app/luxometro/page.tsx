@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './Luxometro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -615,6 +615,7 @@ export default function LuxometroPage() {
 
       <RelatedApps apps={getRelatedApps('luxometro')} />
 
+      <ShareCard appName="luxometro" />
       <Footer appName="luxometro" />
     </div>
   );

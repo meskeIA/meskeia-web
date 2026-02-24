@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './GuiaCuidadoMascota.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { CourseProvider, useCourse, COURSE_MODULES } from './CourseContext';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -144,6 +144,7 @@ function GuideContent() {
 
       <RelatedApps apps={getRelatedApps('guia-cuidado-mascota')} />
 
+      <ShareCard appName="guia-cuidado-mascota" />
       <Footer appName="guia-cuidado-mascota" />
     </div>
   );

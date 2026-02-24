@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraCosteVivienda.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -820,6 +820,7 @@ export default function CalculadoraCosteViviendaPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-coste-vivienda')} />
+      <ShareCard appName="calculadora-coste-vivienda" />
       <Footer appName="calculadora-coste-vivienda" />
     </div>
   );

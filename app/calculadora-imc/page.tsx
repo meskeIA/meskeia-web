@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import styles from './CalculadoraIMC.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps, getRelatedAppsTitle } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
@@ -1200,6 +1200,7 @@ export default function CalculadoraIMCPage() {
         icon={getRelatedAppsTitle('calculadora-imc').icon}
       />
 
+      <ShareCard appName="calculadora-imc" />
       <Footer appName="calculadora-imc" />
     </div>
   );

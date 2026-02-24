@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import styles from './GeneradorCarruseles.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -494,6 +494,7 @@ export default function GeneradorCarruselesPage() {
 
       <RelatedApps apps={getRelatedApps('generador-carruseles')} />
 
+      <ShareCard appName="generador-carruseles" />
       <Footer appName="generador-carruseles" />
     </div>
   );

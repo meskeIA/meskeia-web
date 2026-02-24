@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './LimpiadorTexto.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -292,6 +292,7 @@ export default function LimpiadorTextoPage() {
 
       <RelatedApps apps={getRelatedApps('limpiador-texto')} />
 
+      <ShareCard appName="limpiador-texto" />
       <Footer appName="limpiador-texto" />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './ConjugadorVerbos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   conjugarVerbo,
@@ -640,6 +640,7 @@ export default function ConjugadorVerbosPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('conjugador-verbos')} />
+      <ShareCard appName="conjugador-verbos" />
       <Footer appName="conjugador-verbos" />
     </div>
   );

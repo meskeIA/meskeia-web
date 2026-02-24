@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './PlanificadorBoda.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -792,6 +792,7 @@ export default function PlanificadorBodaPage() {
 
       <RelatedApps apps={getRelatedApps('planificador-boda')} />
 
+      <ShareCard appName="planificador-boda" />
       <Footer appName="planificador-boda" />
     </div>
   );

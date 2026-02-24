@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './GuiaReclamarSeguroCoche.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de situaciones
@@ -449,6 +449,7 @@ export default function GuiaReclamarSeguroCochePage() {
 
       {/* Apps relacionadas */}
       <RelatedApps apps={getRelatedApps('guia-reclamar-seguro-coche')} />
+      <ShareCard appName="guia-reclamar-seguro-coche" />
       <Footer appName="guia-reclamar-seguro-coche" />
     </div>
   );
