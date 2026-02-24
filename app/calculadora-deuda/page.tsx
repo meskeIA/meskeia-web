@@ -260,6 +260,7 @@ export default function CalculadoraDeudaPage() {
                     </select>
                     {deudas.length > 1 && (
                       <button
+                        type="button"
                         onClick={() => eliminarDeuda(deuda.id)}
                         className={styles.deleteBtn}
                         title="Eliminar deuda"
@@ -316,7 +317,7 @@ export default function CalculadoraDeudaPage() {
               ))}
             </div>
 
-            <button onClick={agregarDeuda} className={styles.addBtn}>
+            <button type="button" onClick={agregarDeuda} className={styles.addBtn}>
               + Añadir otra deuda
             </button>
           </section>
@@ -341,7 +342,7 @@ export default function CalculadoraDeudaPage() {
               </div>
             </div>
 
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               📊 Comparar Métodos
             </button>
           </section>
@@ -538,14 +539,13 @@ export default function CalculadoraDeudaPage() {
         variant="financial"
         severity="high"
         context="calculadora-deuda"
-        collapsible={true}
       />
 
 
       {/* Sección educativa */}
       <EducationalSection
-        title="¿Cómo funcionan estos métodos?"
-        subtitle="Aprende las estrategias más efectivas para eliminar deudas"
+        title="Guía completa: Cómo eliminar deudas"
+        subtitle="Estrategias, comparativas y casos reales para salir de deudas en España"
         icon="📚"
       >
         <div className={styles.guideContent}>
@@ -639,6 +639,123 @@ export default function CalculadoraDeudaPage() {
               </li>
             </ul>
           </section>
+
+          {/* Tabla comparativa */}
+          <section className={styles.guideSection}>
+            <h3>📊 Comparativa: Bola de Nieve vs Avalancha vs Solo Mínimos</h3>
+            <div className={styles.tablaWrapper}>
+              <table className={styles.tabla}>
+                <thead>
+                  <tr>
+                    <th>Criterio</th>
+                    <th>⚪ Bola de Nieve</th>
+                    <th>🏔️ Avalancha</th>
+                    <th>Solo Mínimos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Intereses totales</td>
+                    <td>Medios</td>
+                    <td>Mínimos ✅</td>
+                    <td>Máximos ❌</td>
+                  </tr>
+                  <tr>
+                    <td>Tiempo de liquidación</td>
+                    <td>Medio</td>
+                    <td>Más corto ✅</td>
+                    <td>Más largo ❌</td>
+                  </tr>
+                  <tr>
+                    <td>Motivación psicológica</td>
+                    <td>Alta ✅</td>
+                    <td>Media</td>
+                    <td>Baja ❌</td>
+                  </tr>
+                  <tr>
+                    <td>Victorias rápidas</td>
+                    <td>Sí ✅</td>
+                    <td>Depende</td>
+                    <td>No ❌</td>
+                  </tr>
+                  <tr>
+                    <td>Complejidad de seguimiento</td>
+                    <td>Fácil ✅</td>
+                    <td>Fácil ✅</td>
+                    <td>Muy fácil</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className={styles.tablaNota}>* Comparativa con el mismo pago mensual total en los tres escenarios.</p>
+          </section>
+
+          {/* Casos de uso */}
+          <section className={styles.guideSection}>
+            <h3>🎯 Casos Reales</h3>
+            <div className={styles.casosGrid}>
+              <div className={styles.casoCard}>
+                <span className={styles.casoIcono} aria-hidden="true">💳</span>
+                <h4>Joven con 3 tarjetas</h4>
+                <p>María tiene 3 tarjetas con saldos de 500€, 1.200€ y 3.000€ al 20% TAE. Elige Bola de Nieve y liquida la primera en 3 meses. La victoria inmediata le da energía para continuar.</p>
+              </div>
+              <div className={styles.casoCard}>
+                <span className={styles.casoIcono} aria-hidden="true">🏠</span>
+                <h4>Familia con deuda cara</h4>
+                <p>La familia García tiene un crédito al consumo al 24% TAE y un préstamo personal al 8%. Con Avalancha atacan primero el crédito caro y ahorran 1.800€ en intereses.</p>
+              </div>
+              <div className={styles.casoCard}>
+                <span className={styles.casoIcono} aria-hidden="true">💰</span>
+                <h4>Ingreso extra puntual</h4>
+                <p>Carlos recibe 2.000€ de bonus. En lugar de gastarlos, los aplica íntegros a su deuda más cara. Ese pago único reduce su tiempo de liquidación en 8 meses.</p>
+              </div>
+              <div className={styles.casoCard}>
+                <span className={styles.casoIcono} aria-hidden="true">🚨</span>
+                <h4>Sobreendeudamiento grave</h4>
+                <p>Si los pagos mínimos ya superan el 40% de tus ingresos, contacta con un asesor de deudas o el servicio de mediación de tu banco antes de aplicar cualquier método por tu cuenta.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className={styles.guideSection}>
+            <h3>❓ Preguntas Frecuentes</h3>
+            <div className={styles.faqGrid}>
+              <div className={styles.faqItem}>
+                <h4>¿Qué pasa si solo pago el mínimo de la tarjeta?</h4>
+                <p>Pagarás principalmente intereses y muy poco capital. Una deuda de 3.000€ al 20% TAE con pago mínimo del 3% puede tardar más de 10 años en liquidarse, pagando más de 3.000€ solo en intereses.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Incluyo la hipoteca en la calculadora?</h4>
+                <p>No es recomendable. La hipoteca tiene tasas bajas (Euribor + diferencial) y beneficios fiscales. Está diseñada para ser deuda a largo plazo. Prioriza las deudas de consumo con tasas altas.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Debo cancelar la tarjeta al pagarla?</h4>
+                <p>Depende. Cancelar reduce la tentación de volver a endeudarse, pero puede afectar negativamente a tu historial crediticio. Una opción intermedia: guarda la tarjeta y no la uses habitualmente.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Puedo combinar Bola de Nieve y Avalancha?</h4>
+                <p>Sí. Puedes empezar con Bola de Nieve para ganar confianza y cambiar a Avalancha cuando te queden pocas deudas. Lo importante es mantener la consistencia mes a mes.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Qué es la consolidación de deudas?</h4>
+                <p>Reunificar todas las deudas en un solo préstamo a menor tipo de interés. Puede reducir la cuota mensual, pero alarga el plazo. Solo recomendable si la diferencia de tipos es significativa.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Qué ocurre si entro en mora?</h4>
+                <p>En España, tras 90 días de impago el banco puede reportarlo a ficheros de morosos (ASNEF, RAI). Esto dificulta obtener créditos futuros. Si tienes dificultades, contacta con tu banco antes de ese plazo.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Warning box */}
+          <div className={styles.warningBox}>
+            <span className={styles.warningIcono} aria-hidden="true">🚨</span>
+            <div>
+              <strong>El peligro silencioso de pagar solo el mínimo</strong>
+              <p>Un saldo de 5.000€ en una tarjeta al 20% TAE, pagando solo el mínimo (3% mensual), puede tardar más de 12 años en liquidarse y generar más de 5.800€ en intereses — más que el propio capital inicial. El pago extra mensual es la herramienta más poderosa para salir de deudas.</p>
+            </div>
+          </div>
         </div>
       </EducationalSection>
 

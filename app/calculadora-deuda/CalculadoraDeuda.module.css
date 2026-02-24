@@ -733,6 +733,158 @@
   border-bottom: none;
 }
 
+/* Tabla comparativa */
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+}
+
+.tabla th,
+.tabla td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.tabla th {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.tabla td {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.tabla tbody tr:hover {
+  background: var(--hover);
+}
+
+.tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tablaNota {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: var(--spacing-sm) 0 0;
+}
+
+/* Casos de uso */
+.casosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.casoCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.casoIcono {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.casoCard h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.casoCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* FAQ */
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.faqItem h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.faqItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Warning box */
+.warningBox {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.warningIcono {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.warningBox strong {
+  display: block;
+  font-size: 1rem;
+  color: #92400e;
+  margin-bottom: var(--spacing-xs);
+}
+
+[data-theme='dark'] .warningBox strong {
+  color: #fcd34d;
+}
+
+.warningBox p {
+  font-size: 0.9rem;
+  color: #78350f;
+  margin: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .warningBox p {
+  color: #fde68a;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .mainContent {
@@ -740,6 +892,11 @@
   }
 
   .metodosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .casosGrid,
+  .faqGrid {
     grid-template-columns: 1fr;
   }
 }
