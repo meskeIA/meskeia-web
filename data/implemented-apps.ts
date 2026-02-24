@@ -292,6 +292,7 @@ export const implementedAppsUrls = [
   "/checklist-documentos-viaje/",        // Checklist documentos de viaje: España, Europa, internacional
   "/simulador-jet-lag/",                 // Calculadora jet lag: diferencia horaria, días adaptación, recomendaciones
   "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
+  "/planificador-itinerario/",           // Organiza días y actividades de viaje con horarios y notas
 ];
 
 /**

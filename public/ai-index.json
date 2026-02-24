@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 238,
-  "updated": "2026-02-23",
+  "total_tools": 239,
+  "updated": "2026-02-24",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -1211,9 +1211,15 @@
             "viaje largo",
             "adaptacion viaje"
           ]
+        },
+        {
+          "name": "Planificador de Itinerario",
+          "slug": "planificador-itinerario",
+          "url": "https://meskeia.com/planificador-itinerario/",
+          "description": "Organiza tu viaje dia a dia: actividades, horarios, lugares y notas. Exporta el itinerario completo. 100% local"
         }
       ],
-      "count": 27
+      "count": 28
     },
     {
       "name": "Salud y Bienestar",
