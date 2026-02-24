@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, KeyboardEvent } from 'react';
 import styles from './ListaEquipaje.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -17,6 +17,15 @@ interface ItemEquipaje {
   categoria: string;
   checked: boolean;
 }
+
+interface EstadoGuardado {
+  items: ItemEquipaje[];
+  tipoViaje: TipoViaje;
+  clima: Clima;
+  duracion: Duracion;
+}
+
+const STORAGE_KEY = 'meskeia-equipaje';
 
 const ITEMS_BASE: Record<string, string[]> = {
   'Documentos': [
@@ -173,96 +182,137 @@ export default function ListaEquipajePage() {
   const [items, setItems] = useState<ItemEquipaje[]>([]);
   const [listaGenerada, setListaGenerada] = useState(false);
 
+  // Inputs para añadir items/categorías
+  const [inputCategoria, setInputCategoria] = useState<Record<string, string>>({});
+  const [nuevaCategoriaInput, setNuevaCategoriaInput] = useState('');
+  const [nuevaCategoriaItemInput, setNuevaCategoriaItemInput] = useState('');
+
+  // Cargar desde localStorage al montar
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved) as EstadoGuardado;
+        setItems(data.items ?? []);
+        setTipoViaje(data.tipoViaje ?? 'ciudad');
+        setClima(data.clima ?? 'templado');
+        setDuracion(data.duracion ?? 'corto');
+        setListaGenerada(true);
+      }
+    } catch {
+      // datos corruptos, ignorar
+    }
+  }, []);
+
+  // Guardar en localStorage cuando cambia la lista
+  useEffect(() => {
+    if (!listaGenerada) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ items, tipoViaje, clima, duracion }));
+  }, [items, tipoViaje, clima, duracion, listaGenerada]);
+
   const generarLista = () => {
     const nuevosItems: ItemEquipaje[] = [];
     let idCounter = 0;
 
-    // Añadir items base
     Object.entries(ITEMS_BASE).forEach(([categoria, itemsList]) => {
       itemsList.forEach(nombre => {
-        nuevosItems.push({
-          id: `item-${idCounter++}`,
-          nombre,
-          categoria,
-          checked: false,
-        });
+        nuevosItems.push({ id: `item-${idCounter++}`, nombre, categoria, checked: false });
       });
     });
 
-    // Añadir items por tipo de viaje
     const itemsTipo = ITEMS_POR_TIPO[tipoViaje];
     Object.entries(itemsTipo).forEach(([categoria, itemsList]) => {
       itemsList.forEach(nombre => {
         if (!nuevosItems.some(item => item.nombre === nombre)) {
-          nuevosItems.push({
-            id: `item-${idCounter++}`,
-            nombre,
-            categoria,
-            checked: false,
-          });
+          nuevosItems.push({ id: `item-${idCounter++}`, nombre, categoria, checked: false });
         }
       });
     });
 
-    // Añadir items por clima
     ITEMS_POR_CLIMA[clima].forEach(nombre => {
       if (!nuevosItems.some(item => item.nombre === nombre)) {
-        nuevosItems.push({
-          id: `item-${idCounter++}`,
-          nombre,
-          categoria: 'Clima',
-          checked: false,
-        });
+        nuevosItems.push({ id: `item-${idCounter++}`, nombre, categoria: 'Clima', checked: false });
       }
     });
 
-    // Añadir items extra según duración
     if (duracion === 'medio' || duracion === 'largo') {
-      const extrasMedia = ['Libro / E-reader', 'Bolsa de lavandería'];
-      extrasMedia.forEach(nombre => {
-        nuevosItems.push({
-          id: `item-${idCounter++}`,
-          nombre,
-          categoria: 'Extras',
-          checked: false,
-        });
+      ['Libro / E-reader', 'Bolsa de lavandería'].forEach(nombre => {
+        nuevosItems.push({ id: `item-${idCounter++}`, nombre, categoria: 'Extras', checked: false });
       });
     }
 
     if (duracion === 'largo') {
-      const extrasLarga = ['Detergente de viaje', 'Costurero pequeño', 'Candado para maleta'];
-      extrasLarga.forEach(nombre => {
-        nuevosItems.push({
-          id: `item-${idCounter++}`,
-          nombre,
-          categoria: 'Extras',
-          checked: false,
-        });
+      ['Detergente de viaje', 'Costurero pequeño', 'Candado para maleta'].forEach(nombre => {
+        nuevosItems.push({ id: `item-${idCounter++}`, nombre, categoria: 'Extras', checked: false });
       });
     }
 
     setItems(nuevosItems);
     setListaGenerada(true);
+    setInputCategoria({});
   };
 
   const toggleItem = (id: string) => {
-    setItems(prev => prev.map(item =>
-      item.id === id ? { ...item, checked: !item.checked } : item
-    ));
+    setItems(prev => prev.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
+  };
+
+  const eliminarItem = (id: string) => {
+    setItems(prev => prev.filter(item => item.id !== id));
+  };
+
+  const añadirItemACategoria = (categoria: string) => {
+    const texto = (inputCategoria[categoria] ?? '').trim();
+    if (!texto) return;
+    setItems(prev => [...prev, {
+      id: `custom-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      nombre: texto,
+      categoria,
+      checked: false,
+    }]);
+    setInputCategoria(prev => ({ ...prev, [categoria]: '' }));
+  };
+
+  const onKeyAddItem = (e: KeyboardEvent<HTMLInputElement>, categoria: string) => {
+    if (e.key === 'Enter') añadirItemACategoria(categoria);
+  };
+
+  const añadirCategoria = () => {
+    const nombre = nuevaCategoriaInput.trim();
+    const primerItem = nuevaCategoriaItemInput.trim();
+    if (!nombre || !primerItem) return;
+    if (itemsPorCategoria[nombre]) return; // ya existe
+    setItems(prev => [...prev, {
+      id: `custom-cat-${Date.now()}`,
+      nombre: primerItem,
+      categoria: nombre,
+      checked: false,
+    }]);
+    setNuevaCategoriaInput('');
+    setNuevaCategoriaItemInput('');
+  };
+
+  const onKeyNuevaCategoria = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') añadirCategoria();
   };
 
   const marcarTodos = (checked: boolean) => {
     setItems(prev => prev.map(item => ({ ...item, checked })));
   };
 
+  const resetearLista = () => {
+    setItems([]);
+    setListaGenerada(false);
+    setInputCategoria({});
+    setNuevaCategoriaInput('');
+    setNuevaCategoriaItemInput('');
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
   const itemsCompletados = items.filter(item => item.checked).length;
   const porcentajeCompletado = items.length > 0 ? Math.round((itemsCompletados / items.length) * 100) : 0;
 
-  // Agrupar items por categoría
   const itemsPorCategoria = items.reduce((acc, item) => {
-    if (!acc[item.categoria]) {
-      acc[item.categoria] = [];
-    }
+    if (!acc[item.categoria]) acc[item.categoria] = [];
     acc[item.categoria].push(item);
     return acc;
   }, {} as Record<string, ItemEquipaje[]>);
@@ -286,8 +336,10 @@ export default function ListaEquipajePage() {
           <h2 className={styles.panelTitle}>Configura tu viaje</h2>
 
           <div className={styles.inputGroup}>
-            <label>Tipo de viaje</label>
+            <label htmlFor="tipo-viaje">Tipo de viaje</label>
             <select
+              id="tipo-viaje"
+              title="Tipo de viaje"
               value={tipoViaje}
               onChange={(e) => setTipoViaje(e.target.value as TipoViaje)}
               className={styles.select}
@@ -301,8 +353,10 @@ export default function ListaEquipajePage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label>Clima del destino</label>
+            <label htmlFor="clima">Clima del destino</label>
             <select
+              id="clima"
+              title="Clima del destino"
               value={clima}
               onChange={(e) => setClima(e.target.value as Clima)}
               className={styles.select}
@@ -314,8 +368,10 @@ export default function ListaEquipajePage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label>Duración del viaje</label>
+            <label htmlFor="duracion">Duración del viaje</label>
             <select
+              id="duracion"
+              title="Duración del viaje"
               value={duracion}
               onChange={(e) => setDuracion(e.target.value as Duracion)}
               className={styles.select}
@@ -326,9 +382,14 @@ export default function ListaEquipajePage() {
             </select>
           </div>
 
-          <button onClick={generarLista} className={styles.btnGenerar}>
-            Generar Lista
+          <button type="button" onClick={generarLista} className={styles.btnGenerar}>
+            {listaGenerada ? '🔄 Regenerar lista' : '✨ Generar lista'}
           </button>
+          {listaGenerada && (
+            <p className={styles.avisoRegenerar}>
+              Regenerar reemplazará los items actuales y perderás las personalizaciones.
+            </p>
+          )}
         </div>
 
         {/* Panel de lista */}
@@ -338,34 +399,31 @@ export default function ListaEquipajePage() {
               {/* Barra de progreso */}
               <div className={styles.progreso}>
                 <div className={styles.progresoInfo}>
-                  <span>{itemsCompletados} de {items.length} items</span>
+                  <span>{itemsCompletados} de {items.length} items empaquetados</span>
                   <span>{porcentajeCompletado}%</span>
                 </div>
                 <div className={styles.progresoBar}>
                   <div
                     className={styles.progresoFill}
-                    style={{ width: `${porcentajeCompletado}%` }}
+                    style={{ '--fill-width': `${porcentajeCompletado}%` } as React.CSSProperties}
                   />
                 </div>
               </div>
 
               {/* Acciones rápidas */}
               <div className={styles.acciones}>
-                <button
-                  onClick={() => marcarTodos(true)}
-                  className={styles.btnAccion}
-                >
+                <button type="button" onClick={() => marcarTodos(true)} className={styles.btnAccion}>
                   ✓ Marcar todo
                 </button>
-                <button
-                  onClick={() => marcarTodos(false)}
-                  className={styles.btnAccion}
-                >
+                <button type="button" onClick={() => marcarTodos(false)} className={styles.btnAccion}>
                   ✗ Desmarcar todo
+                </button>
+                <button type="button" onClick={resetearLista} className={styles.btnReset}>
+                  🗑 Vaciar lista
                 </button>
               </div>
 
-              {/* Lista de items por categoría */}
+              {/* Lista por categoría */}
               <div className={styles.categorias}>
                 {Object.entries(itemsPorCategoria).map(([categoria, itemsList]) => (
                   <div key={categoria} className={styles.categoriaBloque}>
@@ -375,17 +433,88 @@ export default function ListaEquipajePage() {
                         <li
                           key={item.id}
                           className={`${styles.item} ${item.checked ? styles.itemChecked : ''}`}
-                          onClick={() => toggleItem(item.id)}
                         >
-                          <span className={styles.checkbox}>
+                          <span
+                            className={styles.checkbox}
+                            onClick={() => toggleItem(item.id)}
+                            role="checkbox"
+                            aria-checked={item.checked}
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' || e.key === ' ' ? toggleItem(item.id) : undefined}
+                          >
                             {item.checked ? '✓' : ''}
                           </span>
-                          <span className={styles.itemNombre}>{item.nombre}</span>
+                          <span
+                            className={styles.itemNombre}
+                            onClick={() => toggleItem(item.id)}
+                          >
+                            {item.nombre}
+                          </span>
+                          <button
+                            className={styles.itemBorrar}
+                            onClick={() => eliminarItem(item.id)}
+                            aria-label={`Eliminar ${item.nombre}`}
+                            title="Eliminar item"
+                          >
+                            ✕
+                          </button>
                         </li>
                       ))}
                     </ul>
+
+                    {/* Añadir item a esta categoría */}
+                    <div className={styles.addItemRow}>
+                      <input
+                        type="text"
+                        placeholder={`Añadir a ${categoria}...`}
+                        value={inputCategoria[categoria] ?? ''}
+                        onChange={(e) => setInputCategoria(prev => ({ ...prev, [categoria]: e.target.value }))}
+                        onKeyDown={(e) => onKeyAddItem(e, categoria)}
+                        className={styles.inputAdd}
+                        aria-label={`Añadir item a ${categoria}`}
+                      />
+                      <button
+                        onClick={() => añadirItemACategoria(categoria)}
+                        className={styles.btnAdd}
+                        aria-label={`Añadir a ${categoria}`}
+                      >
+                        + Añadir
+                      </button>
+                    </div>
                   </div>
                 ))}
+
+                {/* Nueva categoría personalizada */}
+                <div className={styles.nuevaCategoriaSection}>
+                  <p className={styles.nuevaCategoriaTitulo}>＋ Nueva categoría personalizada</p>
+                  <div className={styles.nuevaCategoriaForm}>
+                    <input
+                      type="text"
+                      placeholder="Nombre de categoría"
+                      value={nuevaCategoriaInput}
+                      onChange={(e) => setNuevaCategoriaInput(e.target.value)}
+                      onKeyDown={onKeyNuevaCategoria}
+                      className={styles.inputAdd}
+                      aria-label="Nombre de la nueva categoría"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Primer item"
+                      value={nuevaCategoriaItemInput}
+                      onChange={(e) => setNuevaCategoriaItemInput(e.target.value)}
+                      onKeyDown={onKeyNuevaCategoria}
+                      className={styles.inputAdd}
+                      aria-label="Primer item de la nueva categoría"
+                    />
+                    <button
+                      onClick={añadirCategoria}
+                      className={styles.btnAdd}
+                      disabled={!nuevaCategoriaInput.trim() || !nuevaCategoriaItemInput.trim()}
+                    >
+                      Crear
+                    </button>
+                  </div>
+                </div>
               </div>
             </>
           ) : (
@@ -398,7 +527,6 @@ export default function ListaEquipajePage() {
       </div>
 
       <RelatedApps apps={getRelatedApps('lista-equipaje')} />
-
       <Footer appName="lista-equipaje" />
     </div>
   );
