@@ -278,6 +278,20 @@ export const analyticsRouter = router({
       const anteayer = new Date(hoy); anteayer.setDate(hoy.getDate() - 2);
       const usosAnteayer = await contarEnRango(anteayer, anteayer);
 
+      // Visitas que llegaron por un enlace compartido (?ref=share)
+      let sharesSql = `
+        SELECT COUNT(*) as total
+        FROM uso_aplicaciones
+        WHERE datos_adicionales LIKE '%"ref":"share"%'
+      `;
+      const sharesArgs: string[] = [];
+      if (ipExcluida) {
+        sharesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+        sharesArgs.push(ipExcluida);
+      }
+      const sharesResult = await client.execute({ sql: sharesSql, args: sharesArgs });
+      const totalPorCompartir = Number(sharesResult.rows[0]?.total) || 0;
+
       const comparativa = {
         hoy: {
           usos: usosHoy,
@@ -334,6 +348,7 @@ export const analyticsRouter = router({
             nuevos: { total: totalNuevos, porcentaje: Math.round((100 - porcentajeRecurrentes) * 10) / 10 },
             recurrentes: { total: totalRecurrentes, porcentaje: porcentajeRecurrentes },
           },
+          por_compartir: totalPorCompartir,
           geografia: {
             paises: paisesResult.rows,
             ciudades: ciudadesResult.rows,

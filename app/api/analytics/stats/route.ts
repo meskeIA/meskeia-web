@@ -214,6 +214,23 @@ export async function GET(request: NextRequest) {
     const ciudadesResult = await client.execute({ sql: ciudadesSql, args: ciudadesArgs });
 
     // ============================================
+    // VISITAS POR COMPARTIR (?ref=share)
+    // ============================================
+
+    let sharesSql = `
+      SELECT COUNT(*) as total
+      FROM uso_aplicaciones
+      WHERE datos_adicionales LIKE '%"ref":"share"%'
+    `;
+    const sharesArgs: string[] = [];
+    if (ipExcluida) {
+      sharesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+      sharesArgs.push(ipExcluida);
+    }
+    const sharesResult = await client.execute({ sql: sharesSql, args: sharesArgs });
+    const totalPorCompartir = Number(sharesResult.rows[0]?.total) || 0;
+
+    // ============================================
     // COMPARATIVA TEMPORAL (nuevo en v3.1)
     // ============================================
 
@@ -337,6 +354,7 @@ export async function GET(request: NextRequest) {
             nuevos: { total: totalNuevos, porcentaje: Math.round((100 - porcentajeRecurrentes) * 10) / 10 },
             recurrentes: { total: totalRecurrentes, porcentaje: porcentajeRecurrentes },
           },
+          por_compartir: totalPorCompartir,
           geografia: {
             paises: paisesResult.rows,
             ciudades: ciudadesResult.rows,

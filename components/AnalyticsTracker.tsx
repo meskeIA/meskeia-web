@@ -55,6 +55,10 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     let sessionStartTime = Date.now();
     let isActive = true;
 
+    // Detectar si llegó por un enlace compartido (?ref=share)
+    const urlParams = new URLSearchParams(window.location.search);
+    const refParam = urlParams.get('ref');
+
     // Datos de entrada (registro inicial)
     const entryData = {
       aplicacion: finalAppName,
@@ -65,6 +69,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       tipo_dispositivo: deviceType,
       es_recurrente: isRecurrent,
       sesion_id: sessionId,
+      datos_adicionales: refParam ? { ref: refParam } : undefined,
     };
 
     // Registrar entrada (nueva API Turso)

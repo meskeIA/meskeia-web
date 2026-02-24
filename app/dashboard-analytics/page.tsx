@@ -66,6 +66,7 @@ interface EstadisticasData {
       nuevos: { total: number; porcentaje: number };
       recurrentes: { total: number; porcentaje: number };
     };
+    por_compartir: number;
     geografia: {
       paises: Array<{ pais: string; total: number }>;
       ciudades: Array<{ ciudad: string; total: number }>;
@@ -646,6 +647,14 @@ export default function DashboardAnalyticsPage() {
               <div className={styles.statContent}>
                 <h3>{datos.estadisticas.usuarios.recurrentes.porcentaje}%</h3>
                 <p>Usuarios Recurrentes</p>
+              </div>
+            </div>
+
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}>🔗</div>
+              <div className={styles.statContent}>
+                <h3>{formatearNumero(datos.estadisticas.por_compartir ?? 0)}</h3>
+                <p>Llegaron por Compartir</p>
               </div>
             </div>
           </section>
