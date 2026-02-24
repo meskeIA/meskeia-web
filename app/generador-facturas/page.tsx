@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorFacturas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, EducationalSection } from '@/components';
 import { formatCurrency, formatDate } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -560,7 +560,6 @@ export default function GeneradorFacturasPage() {
         variant="financial"
         severity="high"
         context="generador-facturas"
-        collapsible={true}
       />
 
       
@@ -1131,33 +1130,169 @@ export default function GeneradorFacturasPage() {
         </div>
       )}
 
-      {/* Info Panel */}
-      <div className={styles.infoPanel}>
-        <h3>💡 ¿Cómo funciona?</h3>
-        <div className={styles.infoGrid}>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>1️⃣</span>
-            <div>
-              <strong>Rellena tus datos</strong>
-              <p>Se guardan automáticamente para futuras facturas</p>
+      <EducationalSection
+        title="Guía completa de facturación para autónomos y empresas"
+        subtitle="Tipos de factura, obligaciones legales, casos de uso y errores que evitar"
+      >
+        {/* Cómo funciona */}
+        <section className={styles.guideSection}>
+          <h2>Cómo usar el generador</h2>
+          <div className={styles.infoGrid}>
+            <div className={styles.infoItem}>
+              <span className={styles.infoIcon}>1️⃣</span>
+              <div>
+                <strong>Rellena tus datos</strong>
+                <p>Se guardan automáticamente para futuras facturas</p>
+              </div>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.infoIcon}>2️⃣</span>
+              <div>
+                <strong>Añade los conceptos</strong>
+                <p>El IVA y los totales se calculan automáticamente</p>
+              </div>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.infoIcon}>3️⃣</span>
+              <div>
+                <strong>Genera el PDF</strong>
+                <p>Usa el diálogo de impresión para guardar como PDF</p>
+              </div>
             </div>
           </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>2️⃣</span>
-            <div>
-              <strong>Añade los conceptos</strong>
-              <p>El IVA y los totales se calculan automáticamente</p>
+        </section>
+
+        {/* Tabla comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Tipos de factura: cuándo usar cada una</h2>
+          <div className={styles.tablaWrapper}>
+            <table className={styles.tabla}>
+              <thead>
+                <tr>
+                  <th>Tipo de factura</th>
+                  <th>IVA</th>
+                  <th>IRPF</th>
+                  <th>Cuándo usarla</th>
+                  <th>Ejemplo práctico</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Con IVA (general)</strong></td>
+                  <td>21% / 10% / 4%</td>
+                  <td>No</td>
+                  <td>Autónomo → empresa o particular sin retención</td>
+                  <td>Venta de productos, servicios técnicos</td>
+                </tr>
+                <tr>
+                  <td><strong>Con IVA + IRPF</strong></td>
+                  <td>21%</td>
+                  <td>15% (7% nuevos)</td>
+                  <td>Autónomo profesional → empresa española</td>
+                  <td>Consultoría, diseño, programación</td>
+                </tr>
+                <tr>
+                  <td><strong>Exenta de IVA</strong></td>
+                  <td>0%</td>
+                  <td>Depende</td>
+                  <td>Actividades exentas por Ley del IVA</td>
+                  <td>Enseñanza, sanidad, servicios financieros</td>
+                </tr>
+                <tr>
+                  <td><strong>Intracomunitaria (UE)</strong></td>
+                  <td>0% inversión</td>
+                  <td>No</td>
+                  <td>B2B entre países de la Unión Europea</td>
+                  <td>Servicios a empresa alemana con VAT number</td>
+                </tr>
+                <tr>
+                  <td><strong>Exportación (fuera UE)</strong></td>
+                  <td>0%</td>
+                  <td>No</td>
+                  <td>Cliente fuera de la Unión Europea</td>
+                  <td>Software vendido a empresa de EE.UU.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className={styles.tablaNota}>💡 El IRPF solo aplica cuando el cliente es una empresa o autónomo español obligado a retener. Los clientes particulares no retienen IRPF.</p>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.guideSection}>
+          <h2>Casos de uso frecuentes</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <span className={styles.casoIcono}>👨‍💻</span>
+              <h4>Autónomo de servicios</h4>
+              <p><strong>Situación:</strong> Consultor o freelance que factura a empresas españolas.</p>
+              <p><strong>Configuración:</strong> IVA 21% + IRPF 15% (7% si llevas menos de 2 años de alta).</p>
+              <p><strong>Consejo:</strong> Declara trimestralmente los modelos 303 (IVA) y 130 (IRPF).</p>
+            </div>
+            <div className={styles.casoCard}>
+              <span className={styles.casoIcono}>🏢</span>
+              <h4>Sociedad Limitada (SL)</h4>
+              <p><strong>Situación:</strong> SL que vende bienes o servicios a otras empresas.</p>
+              <p><strong>Configuración:</strong> IVA 21%. Las sociedades no aplican retención IRPF.</p>
+              <p><strong>Consejo:</strong> Incluye siempre el CIF de la SL y numeración correlativa sin saltos.</p>
+            </div>
+            <div className={styles.casoCard}>
+              <span className={styles.casoIcono}>🌍</span>
+              <h4>Facturación a empresa UE</h4>
+              <p><strong>Situación:</strong> Autónomo que presta servicios a empresa con VAT number europeo.</p>
+              <p><strong>Configuración:</strong> IVA 0% (inversión del sujeto pasivo). Sin IRPF.</p>
+              <p><strong>Consejo:</strong> Incluye en notas: &quot;Operación exenta IVA — art. 69 y 70 LIVA. Inversión sujeto pasivo&quot;.</p>
+            </div>
+            <div className={styles.casoCard}>
+              <span className={styles.casoIcono}>🛒</span>
+              <h4>Comerciante minorista</h4>
+              <p><strong>Situación:</strong> Autónomo en recargo de equivalencia que vende al público.</p>
+              <p><strong>Configuración:</strong> No repercute IVA desglosado en sus ventas al público.</p>
+              <p><strong>Consejo:</strong> Confirma con tu gestor si estás en este régimen especial.</p>
             </div>
           </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>3️⃣</span>
-            <div>
-              <strong>Genera el PDF</strong>
-              <p>Usa el diálogo de impresión para guardar como PDF</p>
+        </section>
+
+        {/* FAQ fiscal */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre facturación</h2>
+          <div className={styles.faqGrid}>
+            <div className={styles.faqItem}>
+              <h4>¿Cuándo debo aplicar retención IRPF?</h4>
+              <p>Cuando eres autónomo con actividad profesional y facturas a una empresa o autónomo español. Si tu cliente es un particular, no aplica retención.</p>
             </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué porcentaje de IRPF me corresponde?</h4>
+              <p>15% con carácter general. 7% para nuevos autónomos durante el año de alta y los dos siguientes. 19% para actividades artísticas o deportivas específicas.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué datos son obligatorios en una factura?</h4>
+              <p>Número correlativo, fecha de emisión, datos del emisor (nombre y NIF), datos del receptor, descripción del servicio, base imponible, tipo y cuota de IVA, y total a pagar.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo corrijo una factura ya emitida?</h4>
+              <p>Emitiendo una factura rectificativa que haga referencia a la original. Nunca modifiques una factura ya entregada; hacerlo constituye fraude fiscal.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuánto tiempo debo conservar las facturas?</h4>
+              <p>Mínimo 4 años para Hacienda (prescripción tributaria) y 6 años para el Código de Comercio. Por seguridad práctica, guarda todo durante 6 años.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Puedo facturar a clientes UE sin IVA?</h4>
+              <p>Sí, si el cliente tiene número VAT europeo válido y la operación es B2B. El IVA se aplica en el país del cliente (inversión del sujeto pasivo).</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning box */}
+        <div className={styles.warningBox}>
+          <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
+          <div>
+            <strong>Errores de facturación que generan sanciones</strong>
+            <p>Saltarse la numeración correlativa, omitir datos obligatorios, modificar facturas ya emitidas o no declararlas trimestralmente puede acarrear sanciones de entre 150 € y 6.000 € según la Ley General Tributaria.</p>
           </div>
         </div>
-      </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-facturas')} />
 
