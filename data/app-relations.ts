@@ -100,8 +100,9 @@ const fiscalApps: RelatedApp[] = [
 // FAMILIA: SALUD Y BIENESTAR
 // ==========================================
 const saludApps: RelatedApp[] = [
+  { url: '/calculadora-tension-arterial/', icon: '🩺', name: 'Tensión Arterial', description: 'Clasifica tu presión (ESH/ESC)' },
   { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice de masa corporal' },
-  { url: '/calculadora-colesterol/', icon: '🩺', name: 'Calculadora Colesterol', description: 'Ratios y riesgo cardiovascular' },
+  { url: '/calculadora-colesterol/', icon: '🫀', name: 'Calculadora Colesterol', description: 'Ratios y riesgo cardiovascular' },
   { url: '/calculadora-calorias-ejercicio/', icon: '🔥', name: 'Calorías Diarias', description: 'Necesidades calóricas' },
   { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora Macros', description: 'Proteínas, carbos, grasas' },
   { url: '/calculadora-hidratacion/', icon: '💧', name: 'Hidratación', description: 'Agua recomendada' },
@@ -499,8 +500,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas' },
   ],
   // SALUD
-  'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/'),
-  'calculadora-colesterol': saludApps.filter(a => a.url !== '/calculadora-colesterol/'),
+  'calculadora-tension-arterial': saludApps.filter(a => a.url !== '/calculadora-tension-arterial/').slice(0, 4),
+  'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/').slice(0, 4),
+  'calculadora-colesterol': saludApps.filter(a => a.url !== '/calculadora-colesterol/').slice(0, 4),
   'calculadora-calorias-ejercicio': saludApps.filter(a => a.url !== '/calculadora-calorias-ejercicio/'),
   'calculadora-macros': saludApps.filter(a => a.url !== '/calculadora-macros/'),
   'calculadora-hidratacion': saludApps.filter(a => a.url !== '/calculadora-hidratacion/'),

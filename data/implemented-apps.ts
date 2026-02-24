@@ -293,6 +293,7 @@ export const implementedAppsUrls = [
   "/simulador-jet-lag/",                 // Calculadora jet lag: diferencia horaria, días adaptación, recomendaciones
   "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
   "/planificador-itinerario/",           // Organiza días y actividades de viaje con horarios y notas
+  "/calculadora-tension-arterial/",      // Clasificación ESH/ESC 2018: TAM, presión de pulso e historial local
 ];
 
 /**

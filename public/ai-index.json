@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 239,
+  "total_tools": 240,
   "updated": "2026-02-24",
   "features": {
     "all_free": true,
@@ -1226,6 +1226,12 @@
       "description": "Cuida tu salud con herramientas especializadas",
       "icon": "🏥",
       "tools": [
+        {
+          "name": "Calculadora de Tensión Arterial",
+          "slug": "calculadora-tension-arterial",
+          "url": "https://meskeia.com/calculadora-tension-arterial/",
+          "description": "Clasifica la presion arterial segun guias ESH/ESC 2018: optima, normal, HTA Grado 1/2/3 o crisis hipertensiva. Calcula TAM e historial local"
+        },
         {
           "name": "Calculadora IMC",
           "slug": "calculadora-imc",

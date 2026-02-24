@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 236+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 237+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 236,
+  "total_tools": 237,
   "last_updated": "2026-02-24",
   "features": {
     "all_free": true,
@@ -91,7 +91,7 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 26
+      "tool_count": 27
     },
     {
       "id": "viajes",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 75
+      "tool_count": 76
     },
     {
       "id": "dinero",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 39
+      "tool_count": 40
     }
   ],
   "tools": [
@@ -3992,6 +3992,33 @@
         "organizador vacaciones"
       ],
       "icon": "🗓️"
+    },
+    {
+      "slug": "calculadora-tension-arterial",
+      "name": "Calculadora de Tensión Arterial",
+      "url": "https://meskeia.com/calculadora-tension-arterial/",
+      "description": "Clasifica tu presión arterial según guías ESH/ESC 2018: óptima, normal, normal-alta, HTA Grado 1/2/3 o crisis hipertensiva. Calcula TAM, presión de pulso y guarda historial local",
+      "suites": [
+        "salud"
+      ],
+      "contexts": [
+        "casa",
+        "curiosidad"
+      ],
+      "keywords": [
+        "tension arterial",
+        "presion arterial",
+        "hipertension",
+        "sistolica",
+        "diastolica",
+        "TAM",
+        "clasificacion tension",
+        "ESH",
+        "ESC",
+        "hipotension",
+        "hipertension grado 1"
+      ],
+      "icon": "🩺"
     },
     {
       "slug": "conversor-divisas",
