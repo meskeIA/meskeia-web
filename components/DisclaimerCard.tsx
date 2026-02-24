@@ -184,6 +184,10 @@ function DefaultContent({ variant }: { variant: DisclaimerVariant }) {
             <strong>EMERGENCIAS MÉDICAS:</strong> En caso de síntomas graves, contacta
             inmediatamente con servicios de emergencia (112 en España).
           </p>
+          <p className={styles.limitation}>
+            meskeIA no asume ninguna responsabilidad por decisiones tomadas en base a los
+            resultados de esta herramienta, ni por un uso inadecuado de la misma.
+          </p>
         </>
       );
 
