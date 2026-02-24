@@ -1,0 +1,513 @@
+'use client';
+
+import { useState } from 'react';
+import styles from './GuiaSeguroViaje.module.css';
+import {
+  MeskeiaLogo,
+  Footer,
+  EducationalSection,
+  RelatedApps,
+  DisclaimerCard,
+  LegalNotice,
+} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
+
+type ZonaDestino = 'europa' | 'mundo' | 'riesgo';
+type TipoViaje = 'turismo' | 'aventura' | 'negocio' | 'larga';
+type NivelCobertura = 'imprescindible' | 'recomendable' | 'opcional';
+
+interface Cobertura {
+  id: string;
+  nombre: string;
+  icono: string;
+  descripcion: string;
+  nota: string;
+  getNivel: (zona: ZonaDestino, tipo: TipoViaje) => NivelCobertura;
+}
+
+type CoberturaActiva = Omit<Cobertura, 'getNivel'> & { nivel: NivelCobertura };
+
+interface ItemChecklist {
+  id: string;
+  texto: string;
+  detalle: string;
+}
+
+const ORDEN_NIVEL: Record<NivelCobertura, number> = {
+  imprescindible: 0,
+  recomendable: 1,
+  opcional: 2,
+};
+
+const NIVEL_LABEL: Record<NivelCobertura, string> = {
+  imprescindible: 'Imprescindible',
+  recomendable: 'Recomendable',
+  opcional: 'Opcional',
+};
+
+const COBERTURAS: Cobertura[] = [
+  {
+    id: 'medicos',
+    nombre: 'Gastos médicos',
+    icono: '🏥',
+    descripcion: 'Hospitalización, urgencias, cirugía y medicación en el destino. Complemento esencial a la TSJE fuera de la UE.',
+    nota: 'Mínimos recomendados: UE 30.000 €, resto del mundo 50.000 €, EEUU/Canadá/Japón 150.000 €. Los precios hospitalarios en EEUU pueden superar 10.000 $/día.',
+    getNivel: (zona, tipo) => {
+      if (zona === 'europa' && tipo === 'turismo') return 'recomendable';
+      if (zona === 'europa') return 'recomendable';
+      return 'imprescindible';
+    },
+  },
+  {
+    id: 'repatriacion',
+    nombre: 'Repatriación sanitaria',
+    icono: '✈️',
+    descripcion: 'Traslado médico en ambulancia aérea al país de origen en caso de enfermedad grave o fallecimiento.',
+    nota: 'Sin seguro puede costar 20.000–80.000 €. La TSJE no la cubre. Verifica que incluya "avión medicalizado", no solo "traslado sanitario".',
+    getNivel: (zona, tipo) => {
+      if (zona === 'europa' && tipo === 'turismo') return 'recomendable';
+      return 'imprescindible';
+    },
+  },
+  {
+    id: 'deportes',
+    nombre: 'Deportes y actividades de riesgo',
+    icono: '🏄',
+    descripcion: 'Cubre accidentes durante senderismo, esquí, surf, buceo, ciclismo de montaña y actividades similares.',
+    nota: 'La mayoría de seguros básicos excluyen deportes de riesgo. Senderismo por encima de 3.000 m, ciclismo de montaña y buceo suelen requerir cobertura específica.',
+    getNivel: (zona, tipo) => {
+      if (tipo === 'aventura') return 'imprescindible';
+      return 'opcional';
+    },
+  },
+  {
+    id: 'cancelacion',
+    nombre: 'Cancelación del viaje',
+    icono: '🚫',
+    descripcion: 'Reembolso de gastos no recuperables si cancelas por enfermedad, fallecimiento familiar u otras causas cubiertas.',
+    nota: '"Cancelación por cualquier motivo" es más cara pero cubre causas laborales y personales. La básica solo cubre enfermedad grave o fallecimiento de familiar directo.',
+    getNivel: (zona, tipo) => {
+      if (zona === 'riesgo') return 'imprescindible';
+      if (zona === 'mundo' || tipo === 'larga' || tipo === 'negocio') return 'recomendable';
+      return 'opcional';
+    },
+  },
+  {
+    id: 'equipaje',
+    nombre: 'Equipaje y efectos personales',
+    icono: '🧳',
+    descripcion: 'Cubre pérdida, robo o daño del equipaje facturado y objetos personales durante el viaje.',
+    nota: 'Los límites globales suelen ser bajos (600–1.500 €). Electrónica, joyas y dinero tienen sublímites o están excluidos. Comprueba si tu tarjeta de crédito ya lo cubre.',
+    getNivel: (zona, tipo) => {
+      if (zona === 'europa' && tipo === 'turismo') return 'opcional';
+      return 'recomendable';
+    },
+  },
+  {
+    id: 'civil',
+    nombre: 'Responsabilidad civil',
+    icono: '⚖️',
+    descripcion: 'Cubre daños accidentales a terceras personas o propiedades que causes durante el viaje.',
+    nota: 'Especialmente útil en deportes de riesgo, alquiler de vehículos o estancias largas. Verifica si tu seguro del hogar ya incluye responsabilidad civil fuera de España.',
+    getNivel: (zona, tipo) => {
+      if (tipo === 'aventura' || tipo === 'larga' || tipo === 'negocio') return 'recomendable';
+      if (zona === 'mundo' || zona === 'riesgo') return 'recomendable';
+      return 'opcional';
+    },
+  },
+  {
+    id: 'accidentes',
+    nombre: 'Accidentes personales',
+    icono: '🩹',
+    descripcion: 'Indemnización por muerte o invalidez permanente a consecuencia de un accidente durante el viaje.',
+    nota: 'Especialmente relevante en deportes de aventura y viajes de negocios. Comprueba si tu seguro de vida ya cubre accidentes en el extranjero.',
+    getNivel: (zona, tipo) => {
+      if (tipo === 'aventura') return 'imprescindible';
+      if (tipo === 'negocio' || zona === 'riesgo') return 'recomendable';
+      return 'opcional';
+    },
+  },
+  {
+    id: 'juridica',
+    nombre: 'Asistencia jurídica',
+    icono: '📋',
+    descripcion: 'Asesoría legal, fianza y gastos judiciales ante conflictos legales, accidentes de tráfico o detención en el extranjero.',
+    nota: 'Muy recomendable en estancias largas, viajes de negocios o países con sistemas legales complejos. Puede incluir intérprete.',
+    getNivel: (zona, tipo) => {
+      if (zona === 'riesgo' || tipo === 'larga' || tipo === 'negocio') return 'recomendable';
+      return 'opcional';
+    },
+  },
+];
+
+const CHECKLIST: ItemChecklist[] = [
+  {
+    id: 'limite-medico',
+    texto: 'El límite de gastos médicos es suficiente para el destino',
+    detalle: 'UE: mínimo 30.000 €. Resto del mundo: 50.000 €. EEUU, Canadá, Japón: mínimo 150.000 €.',
+  },
+  {
+    id: 'repatriacion-aerea',
+    texto: 'Incluye repatriación en avión medicalizado',
+    detalle: 'No basta con "traslado sanitario". Confirma que cubre el vuelo en ambulancia aérea si es necesario.',
+  },
+  {
+    id: 'covid',
+    texto: 'Cubre enfermedades infecciosas y pandemias',
+    detalle: 'Muchas pólizas antiguas las excluyen. Verifica que COVID-19 y otras enfermedades infecciosas están incluidas.',
+  },
+  {
+    id: 'actividades',
+    texto: 'Las actividades que vas a hacer están cubiertas',
+    detalle: 'Comprueba el listado exacto. Senderismo, esquí, buceo y ciclismo de montaña suelen requerir cobertura específica.',
+  },
+  {
+    id: 'preexistentes',
+    texto: 'Tus condiciones médicas preexistentes están cubiertas',
+    detalle: 'La mayoría excluye enfermedades previas salvo declaración expresa. Decláralo al contratar para evitar que rechacen el siniestro.',
+  },
+  {
+    id: 'franquicia',
+    texto: 'Conoces la franquicia y puedes asumirla',
+    detalle: 'Es el importe que pagas de tu bolsillo antes de que el seguro cubra. A mayor franquicia, menor prima anual.',
+  },
+  {
+    id: 'cancelacion-causas',
+    texto: 'Las causas de cancelación cubren tus riesgos reales',
+    detalle: '"Cancelación básica" solo cubre enfermedad grave o fallecimiento familiar. "Por cualquier motivo" es más cara pero mucho más flexible.',
+  },
+  {
+    id: 'asistencia-24h',
+    texto: 'Tiene central de asistencia 24h en español',
+    detalle: 'Apunta el número internacional antes de salir. En urgencias llamas directamente a ellos, no a tu agencia de viajes.',
+  },
+  {
+    id: 'destino',
+    texto: 'El destino concreto está incluido en la cobertura',
+    detalle: 'Algunos países en conflicto o zonas específicas están excluidos. Verifica el listado de territorios cubiertos en las condiciones generales.',
+  },
+  {
+    id: 'equipaje-limite',
+    texto: 'El límite de equipaje cubre lo que llevas',
+    detalle: 'Los límites globales suelen ser 600–1.500 €. Si llevas equipamiento electrónico caro, busca pólizas con sublímites más altos.',
+  },
+  {
+    id: 'tarjeta',
+    texto: 'Has comprobado si tu tarjeta de crédito ya incluye cobertura',
+    detalle: 'Muchas Visa/Mastercard Gold y premium incluyen cobertura básica de equipaje y accidentes. Evita pagar dos veces por lo mismo.',
+  },
+  {
+    id: 'carencias',
+    texto: 'No hay periodos de carencia que afecten a tu viaje',
+    detalle: 'Los seguros anuales pueden tener carencias para cancelación. Los seguros por viaje puntual normalmente no las tienen.',
+  },
+];
+
+const ZONAS: { id: ZonaDestino; label: string; icono: string; detalle: string }[] = [
+  { id: 'europa', label: 'Europa / Schengen', icono: '🇪🇺', detalle: 'UE, EEE, Suiza, Reino Unido' },
+  { id: 'mundo', label: 'Resto del mundo', icono: '🌍', detalle: 'América, Asia, África, Oceanía' },
+  { id: 'riesgo', label: 'Zona de conflicto / alerta', icono: '⚠️', detalle: 'Países con alerta del MAEC' },
+];
+
+const TIPOS: { id: TipoViaje; label: string; icono: string }[] = [
+  { id: 'turismo', label: 'Turismo / vacaciones', icono: '🏖️' },
+  { id: 'aventura', label: 'Aventura / deportes', icono: '🧗' },
+  { id: 'negocio', label: 'Viaje de negocios', icono: '💼' },
+  { id: 'larga', label: 'Estancia larga (+30 días)', icono: '📅' },
+];
+
+export default function GuiaSeguroViaje() {
+  const [zona, setZona] = useState<ZonaDestino | null>(null);
+  const [tipo, setTipo] = useState<TipoViaje | null>(null);
+  const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [notasAbiertas, setNotasAbiertas] = useState<Set<string>>(new Set());
+
+  const coberturasFiltradas: CoberturaActiva[] | null =
+    zona !== null && tipo !== null
+      ? COBERTURAS
+          .map(({ getNivel, ...rest }) => ({ ...rest, nivel: getNivel(zona, tipo) }))
+          .sort((a, b) => ORDEN_NIVEL[a.nivel] - ORDEN_NIVEL[b.nivel])
+      : null;
+
+  const toggleChecked = (id: string) => {
+    setChecked(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleNota = (id: string) => {
+    setNotasAbiertas(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const imprescindibles = coberturasFiltradas?.filter(c => c.nivel === 'imprescindible').length ?? 0;
+
+  return (
+    <div className={styles.container}>
+      <MeskeiaLogo />
+
+      <header className={styles.hero}>
+        <h1 className={styles.heroTitulo}>Guía de Seguro de Viaje</h1>
+        <p className={styles.heroSubtitulo}>
+          ¿Qué cobertura necesitas según tu destino? Selecciona tu viaje y obtén recomendaciones personalizadas
+          junto con un checklist completo antes de contratar.
+        </p>
+      </header>
+
+      <div className={styles.wrapper}>
+        <LegalNotice />
+
+        {/* ── Selector ─────────────────────────────────────── */}
+        <section className={styles.selectorSection}>
+          <div className={styles.selectorBloque}>
+            <h2 className={styles.selectorTitulo}>¿A dónde viajas?</h2>
+            <div className={styles.opcionesGrid}>
+              {ZONAS.map(z => (
+                <button
+                  key={z.id}
+                  onClick={() => setZona(z.id)}
+                  className={`${styles.opcionBtn} ${zona === z.id ? styles.opcionActiva : ''}`}
+                  aria-pressed={zona === z.id}
+                >
+                  <span className={styles.opcionIcono} aria-hidden="true">{z.icono}</span>
+                  <span className={styles.opcionLabel}>{z.label}</span>
+                  <span className={styles.opcionDetalle}>{z.detalle}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.selectorBloque}>
+            <h2 className={styles.selectorTitulo}>¿Qué tipo de viaje?</h2>
+            <div className={styles.opcionesGrid}>
+              {TIPOS.map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => setTipo(t.id)}
+                  className={`${styles.opcionBtn} ${tipo === t.id ? styles.opcionActiva : ''}`}
+                  aria-pressed={tipo === t.id}
+                >
+                  <span className={styles.opcionIcono} aria-hidden="true">{t.icono}</span>
+                  <span className={styles.opcionLabel}>{t.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Resultados ───────────────────────────────────── */}
+        {coberturasFiltradas === null ? (
+          <div className={styles.placeholder} role="status">
+            <span aria-hidden="true">☝️</span>
+            <p>Selecciona tu destino y tipo de viaje para ver las coberturas recomendadas.</p>
+          </div>
+        ) : (
+          <section className={styles.resultSection}>
+            <div className={styles.resultHeader}>
+              <h2 className={styles.seccionTitulo}>Coberturas recomendadas</h2>
+              {imprescindibles > 0 && (
+                <span className={styles.alertaImprescindible} role="note">
+                  {imprescindibles} coberturas imprescindibles para tu viaje
+                </span>
+              )}
+            </div>
+
+            {zona === 'europa' && (
+              <div className={styles.tsjeInfo} role="note">
+                <span aria-hidden="true">💡</span>
+                <div>
+                  <strong>Recuerda solicitar tu TSJE gratis</strong> — La Tarjeta Sanitaria Europea cubre
+                  urgencias en la sanidad pública de la UE. Solicítala en el INSS o la app{' '}
+                  <em>Carpeta Ciudadana</em> antes de salir.
+                </div>
+              </div>
+            )}
+
+            <div className={styles.coberturasGrid}>
+              {coberturasFiltradas.map(c => (
+                <div
+                  key={c.id}
+                  className={`${styles.coberturaCard} ${styles[`nivel${c.nivel.charAt(0).toUpperCase() + c.nivel.slice(1)}`]}`}
+                >
+                  <div className={styles.coberturaHead}>
+                    <span className={styles.coberturaIcono} aria-hidden="true">{c.icono}</span>
+                    <div>
+                      <span className={`${styles.nivelBadge} ${styles[`badge${c.nivel.charAt(0).toUpperCase() + c.nivel.slice(1)}`]}`}>
+                        {NIVEL_LABEL[c.nivel]}
+                      </span>
+                      <h3 className={styles.coberturaNombre}>{c.nombre}</h3>
+                    </div>
+                  </div>
+                  <p className={styles.coberturaDesc}>{c.descripcion}</p>
+                  <button
+                    className={styles.notaToggle}
+                    onClick={() => toggleNota(c.id)}
+                    aria-expanded={notasAbiertas.has(c.id)}
+                  >
+                    {notasAbiertas.has(c.id) ? '▲ Ocultar detalle' : '▼ Ver detalle'}
+                  </button>
+                  {notasAbiertas.has(c.id) && (
+                    <p className={styles.coberturaNota}>{c.nota}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Checklist ────────────────────────────────────── */}
+        <section className={styles.checklistSection}>
+          <div className={styles.checklistHeader}>
+            <h2 className={styles.seccionTitulo}>
+              Checklist antes de contratar
+            </h2>
+            {checked.size > 0 && (
+              <span className={styles.checkProgreso} role="status">
+                {checked.size}/{CHECKLIST.length} verificados
+              </span>
+            )}
+          </div>
+          <p className={styles.checklistIntro}>
+            Verifica estos puntos en las condiciones generales de cualquier póliza antes de confirmar la compra.
+          </p>
+
+          <div className={styles.checklistItems}>
+            {CHECKLIST.map(item => (
+              <div
+                key={item.id}
+                className={`${styles.checkItem} ${checked.has(item.id) ? styles.checkItemDone : ''}`}
+              >
+                <label className={styles.checkLabel}>
+                  <input
+                    type="checkbox"
+                    checked={checked.has(item.id)}
+                    onChange={() => toggleChecked(item.id)}
+                    className={styles.checkInput}
+                    aria-describedby={`detalle-${item.id}`}
+                  />
+                  <span className={`${styles.checkBox} ${checked.has(item.id) ? styles.checkBoxDone : ''}`} aria-hidden="true">
+                    {checked.has(item.id) ? '✓' : ''}
+                  </span>
+                  <span className={styles.checkTexto}>{item.texto}</span>
+                </label>
+                <p id={`detalle-${item.id}`} className={styles.checkDetalle}>{item.detalle}</p>
+              </div>
+            ))}
+          </div>
+
+          {checked.size === CHECKLIST.length && (
+            <p className={styles.checklistCompleto} role="status">
+              ✅ ¡Checklist completo! Has verificado todos los puntos clave antes de contratar.
+            </p>
+          )}
+        </section>
+
+        {/* ── Disclaimer ───────────────────────────────────── */}
+        <DisclaimerCard variant="general" severity="medium">
+          <p>
+            <strong>Esta guía es orientativa e informativa.</strong> Las recomendaciones se basan
+            en criterios generales y pueden no reflejar el contenido exacto de una póliza concreta.
+          </p>
+          <ul>
+            <li><strong>✗ NO es asesoramiento de seguros</strong> personalizado</li>
+            <li>Lee siempre las condiciones generales y particulares antes de contratar</li>
+            <li>Consulta con un corredor de seguros o compara en plataformas especializadas</li>
+          </ul>
+          <p>
+            meskeIA no asume ninguna responsabilidad por decisiones de contratación de seguros
+            tomadas en base a esta guía, ni por un uso inadecuado de la misma.
+          </p>
+        </DisclaimerCard>
+
+        {/* ── Contenido educativo ──────────────────────────── */}
+        <EducationalSection
+          title="¿Quieres entender mejor los seguros de viaje?"
+          subtitle="TSJE, tipos de pólizas, exclusiones frecuentes y glosario"
+          icon="🎓"
+        >
+          <section>
+            <h2>¿Qué es la TSJE y qué cubre realmente?</h2>
+            <p>
+              La Tarjeta Sanitaria Europea (TSJE) o Tarjeta de Seguro de Enfermedad (TASE) permite
+              recibir asistencia sanitaria <strong>pública y de urgencias</strong> en cualquier país
+              de la Unión Europea, el Espacio Económico Europeo y Suiza, en las mismas condiciones
+              que los ciudadanos del país visitado.
+            </p>
+            <p><strong>Lo que NO cubre la TSJE:</strong></p>
+            <ul>
+              <li>Repatriación ni traslado sanitario a España</li>
+              <li>Asistencia en clínicas privadas</li>
+              <li>Países fuera de la UE/EEE</li>
+              <li>Turismo sanitario (no es para tratamientos programados)</li>
+              <li>Cancelación del viaje ni pérdida de equipaje</li>
+            </ul>
+            <p>
+              Solicítala gratuitamente en el INSS, en tu mutua de trabajo, o a través de la app
+              <em> Carpeta Ciudadana</em>. Tiene validez de 1-2 años.
+            </p>
+          </section>
+
+          <section>
+            <h2>Tipos de seguro de viaje</h2>
+            <ul>
+              <li>
+                <strong>Por viaje puntual:</strong> cubre un único viaje con fechas definidas.
+                Ideal si viajas 1-2 veces al año.
+              </li>
+              <li>
+                <strong>Anual multiviaje:</strong> cubre todos los viajes en un año hasta X días
+                por viaje (normalmente 30-90 días). Rentable si viajas más de 3 veces al año.
+              </li>
+              <li>
+                <strong>Solo cancelación:</strong> sin asistencia médica. Útil si tienes seguro
+                médico internacional propio.
+              </li>
+              <li>
+                <strong>Incluido en tarjeta de crédito:</strong> algunas tarjetas Gold y premium
+                incluyen cobertura básica de accidentes y equipaje. Revisa las condiciones.
+              </li>
+              <li>
+                <strong>Seguro de estudiante internacional:</strong> para estancias largas de
+                estudio. Suele ser más económico que el turístico.
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Exclusiones más frecuentes</h2>
+            <ul>
+              <li>Deportes de riesgo no declarados o no incluidos en la póliza</li>
+              <li>Enfermedades preexistentes no declaradas al contratar</li>
+              <li>Conflictos bélicos o zonas con alerta de viaje del MAEC</li>
+              <li>Objetos dejados sin vigilancia (equipaje no supervisado)</li>
+              <li>Conducción sin carnet válido o bajo efectos de alcohol/drogas</li>
+              <li>Viajes a países sancionados internacionalmente</li>
+              <li>Embarazos a partir de la semana 28-32 (varía por póliza)</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Glosario básico</h2>
+            <ul>
+              <li><strong>Franquicia:</strong> importe que pagas tú antes de que el seguro empiece a cubrir.</li>
+              <li><strong>Sublímite:</strong> límite específico para una categoría dentro del límite global (ej: máximo 300 € en electrónica dentro de un límite total de equipaje de 1.500 €).</li>
+              <li><strong>Carencia:</strong> periodo desde la contratación hasta que una cobertura entra en vigor.</li>
+              <li><strong>Prima:</strong> precio que pagas por el seguro.</li>
+              <li><strong>Siniestro:</strong> el evento que activa la cobertura (accidente, robo, cancelación...).</li>
+              <li><strong>Repatriación:</strong> traslado del asegurado (vivo o fallecido) a su país de origen.</li>
+              <li><strong>MAEC:</strong> Ministerio de Asuntos Exteriores. Publica alertas y recomendaciones de viaje por países.</li>
+            </ul>
+          </section>
+        </EducationalSection>
+
+        <RelatedApps apps={getRelatedApps('guia-seguro-viaje')} />
+        <Footer appName="guia-seguro-viaje" />
+      </div>
+    </div>
+  );
+}

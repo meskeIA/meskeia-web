@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 241,
+  "total_tools": 242,
   "updated": "2026-02-24",
   "features": {
     "all_free": true,
@@ -1211,6 +1211,12 @@
             "viaje largo",
             "adaptacion viaje"
           ]
+        },
+        {
+          "name": "Guía de Seguro de Viaje",
+          "slug": "guia-seguro-viaje",
+          "url": "https://meskeia.com/guia-seguro-viaje/",
+          "description": "Coberturas de seguro recomendadas segun destino y tipo de viaje (Europa, mundo, zona de riesgo). Checklist de 12 puntos para verificar antes de contratar cualquier poliza"
         },
         {
           "name": "Planificador de Itinerario",
