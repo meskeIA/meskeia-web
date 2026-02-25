@@ -295,6 +295,7 @@ export const implementedAppsUrls = [
   "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
   "/quiz-verbos-irregulares/",           // Quiz verbos irregulares inglés: 75 verbos A1-B2, opción múltiple
   "/quiz-figuras-retoricas/",            // Quiz figuras retóricas: 27 figuras ESO/Bach/Selectividad con feedback educativo
+  "/quiz-reinos-naturaleza/",            // Quiz Reinos de la Naturaleza: 43 organismos sorprendentes, clasificación por grupos
   "/guia-seguro-viaje/",                 // Coberturas recomendadas por destino/tipo de viaje + checklist 12 puntos
   "/planificador-itinerario/",           // Organiza días y actividades de viaje con horarios y notas
   "/calculadora-tension-arterial/",      // Clasificación ESH/ESC 2018: TAM, presión de pulso e historial local

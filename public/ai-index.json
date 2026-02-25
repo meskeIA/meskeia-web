@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 245,
+  "total_tools": 246,
   "updated": "2026-02-25",
   "features": {
     "all_free": true,
@@ -979,9 +979,23 @@
             "selectividad",
             "bachillerato"
           ]
+        },
+        {
+          "name": "Quiz Reinos de la Naturaleza",
+          "url": "/quiz-reinos-naturaleza/",
+          "description": "43 organismos sorprendentes clasificados por reinos: animales, plantas, hongos, protistas y virus. Feedback con razon de confusion y curiosidad cientifica",
+          "keywords": [
+            "reinos naturaleza",
+            "clasificacion seres vivos",
+            "quiz biologia",
+            "animales sorprendentes",
+            "hongos plantas algas",
+            "virus bacteria",
+            "biologia ESO"
+          ]
         }
       ],
-      "count": 25
+      "count": 26
     },
     {
       "name": "Matemáticas y Estadística",
