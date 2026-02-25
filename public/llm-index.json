@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 240+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 241+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 240,
-  "last_updated": "2026-02-24",
+  "total_tools": 241,
+  "last_updated": "2026-02-25",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -35,7 +35,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 51
+      "tool_count": 52
     },
     {
       "id": "finanzas",
@@ -70,7 +70,7 @@
       "name": "Juegos y Ocio",
       "icon": "🎲",
       "description": "Diversión y entretenimiento",
-      "tool_count": 20
+      "tool_count": 21
     },
     {
       "id": "marketing",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 80
+      "tool_count": 81
     },
     {
       "id": "casa",
@@ -142,14 +142,14 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 25
+      "tool_count": 26
     },
     {
       "id": "curiosidad",
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 41
+      "tool_count": 42
     }
   ],
   "tools": [
@@ -5381,6 +5381,32 @@
         "juego geografia"
       ],
       "icon": "🌍"
+    },
+    {
+      "slug": "quiz-verbos-irregulares",
+      "name": "Quiz Verbos Irregulares Inglés",
+      "url": "https://meskeia.com/quiz-verbos-irregulares/",
+      "description": "Aprende los verbos irregulares en inglés con este quiz interactivo. 75 verbos clasificados por nivel MCER (A1-B2), opción múltiple con conjugación completa",
+      "suites": [
+        "juegos",
+        "estudiantes"
+      ],
+      "contexts": [
+        "estudio",
+        "relax",
+        "curiosidad"
+      ],
+      "keywords": [
+        "verbos irregulares ingles",
+        "quiz ingles",
+        "past simple ejercicios",
+        "past participle",
+        "aprender ingles",
+        "quiz verbos",
+        "ingles niveles",
+        "MCER A1 B2"
+      ],
+      "icon": "📝"
     },
     {
       "slug": "conjugador-verbos",

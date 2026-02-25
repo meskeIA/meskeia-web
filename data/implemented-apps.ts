@@ -293,6 +293,7 @@ export const implementedAppsUrls = [
   "/checklist-documentos-viaje/",        // Checklist documentos de viaje: España, Europa, internacional
   "/simulador-jet-lag/",                 // Calculadora jet lag: diferencia horaria, días adaptación, recomendaciones
   "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
+  "/quiz-verbos-irregulares/",           // Quiz verbos irregulares inglés: 75 verbos A1-B2, opción múltiple
   "/guia-seguro-viaje/",                 // Coberturas recomendadas por destino/tipo de viaje + checklist 12 puntos
   "/planificador-itinerario/",           // Organiza días y actividades de viaje con horarios y notas
   "/calculadora-tension-arterial/",      // Clasificación ESH/ESC 2018: TAM, presión de pulso e historial local

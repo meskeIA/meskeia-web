@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 243,
-  "updated": "2026-02-24",
+  "total_tools": 244,
+  "updated": "2026-02-25",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -950,9 +950,23 @@
             "geografia",
             "adivinar"
           ]
+        },
+        {
+          "name": "Quiz Verbos Irregulares Ingles",
+          "url": "/quiz-verbos-irregulares/",
+          "description": "Aprende los verbos irregulares en ingles con opcion multiple. 75 verbos clasificados por nivel MCER A1-B2 con conjugacion completa",
+          "keywords": [
+            "verbos irregulares",
+            "ingles",
+            "past simple",
+            "quiz ingles",
+            "A1",
+            "B2",
+            "aprender ingles"
+          ]
         }
       ],
-      "count": 23
+      "count": 24
     },
     {
       "name": "Matemáticas y Estadística",
