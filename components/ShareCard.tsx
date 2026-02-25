@@ -3,7 +3,8 @@
  *
  * Tarjeta de compartir slide-up — aparece al llegar al final de la página.
  * - 4 mensajes rotativos según número de visitas del usuario
- * - Control global: no se muestra si ya apareció en los últimos 3 días (cualquier app)
+ * - Cooldown por app: no se muestra más de una vez cada 24h en la misma app
+ * - Cada app es independiente — no bloquea otras apps
  * - URL con ?ref=share para medir impacto en analytics
  * - Sin tracking de resultados ni datos del usuario (localStorage local)
  */
@@ -40,12 +41,17 @@ const MENSAJES = {
 
 // ─── Constantes localStorage ──────────────────────────────────────────────────
 
-const LAST_SHOWN_KEY = 'meskeia_share_last_shown';
-const GLOBAL_COOLDOWN_MS = 3 * 24 * 60 * 60 * 1000; // 3 días
+// Cooldown por app: 24h desde la última vez que se mostró en ESA app concreta.
+// Cada app es independiente — visitar app-B no bloquea app-A.
+const PER_APP_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 horas
 const MIN_TIME_ON_PAGE_MS = 10_000; // 10 segundos mínimo en la página
 
 function getVisitKey(appName: string): string {
   return `meskeia_share_visits_${appName}`;
+}
+
+function getShownKey(appName: string): string {
+  return `meskeia_share_shown_${appName}`;
 }
 
 function getMensajeTipo(visits: number): 1 | 2 | 3 | 4 {
@@ -67,13 +73,13 @@ function registrarVisita(appName: string): number {
   }
 }
 
-function debesMostrar(visits: number): boolean {
+function debesMostrar(visits: number, appName: string): boolean {
   try {
-    // Cooldown global: no mostrar si se mostró en los últimos 3 días (cualquier app)
-    const lastShown = localStorage.getItem(LAST_SHOWN_KEY);
-    if (lastShown) {
-      const elapsed = Date.now() - parseInt(lastShown, 10);
-      if (elapsed < GLOBAL_COOLDOWN_MS) return false;
+    // Cooldown por app: no mostrar si ya apareció en esta app en las últimas 24h
+    const lastShownForApp = localStorage.getItem(getShownKey(appName));
+    if (lastShownForApp) {
+      const elapsed = Date.now() - parseInt(lastShownForApp, 10);
+      if (elapsed < PER_APP_COOLDOWN_MS) return false;
     }
 
     // Para visitas 10+: solo mostrar cada 10 visitas
@@ -85,9 +91,9 @@ function debesMostrar(visits: number): boolean {
   }
 }
 
-function registrarMostrado(): void {
+function registrarMostrado(appName: string): void {
   try {
-    localStorage.setItem(LAST_SHOWN_KEY, String(Date.now()));
+    localStorage.setItem(getShownKey(appName), String(Date.now()));
   } catch {
     // ignorar errores de localStorage
   }
@@ -104,7 +110,7 @@ export default function ShareCard({ appName }: ShareCardProps) {
   useEffect(() => {
     const visits = registrarVisita(appName);
 
-    if (!debesMostrar(visits)) return;
+    if (!debesMostrar(visits, appName)) return;
 
     const t = getMensajeTipo(visits);
     setTipo(t);
@@ -113,7 +119,7 @@ export default function ShareCard({ appName }: ShareCardProps) {
 
     const mostrarTarjeta = () => {
       setVisible(true);
-      registrarMostrado();
+      registrarMostrado(appName);
     };
 
     const handleScroll = () => {
