@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 241+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 242+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 241,
+  "total_tools": 242,
   "last_updated": "2026-02-25",
   "features": {
     "all_free": true,
@@ -21,7 +21,7 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 44
+      "tool_count": 45
     },
     {
       "id": "diseno",
@@ -35,7 +35,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 52
+      "tool_count": 53
     },
     {
       "id": "finanzas",
@@ -70,7 +70,7 @@
       "name": "Juegos y Ocio",
       "icon": "🎲",
       "description": "Diversión y entretenimiento",
-      "tool_count": 21
+      "tool_count": 22
     },
     {
       "id": "marketing",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 81
+      "tool_count": 82
     },
     {
       "id": "casa",
@@ -149,7 +149,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 42
+      "tool_count": 43
     }
   ],
   "tools": [
@@ -5407,6 +5407,32 @@
         "MCER A1 B2"
       ],
       "icon": "📝"
+    },
+    {
+      "slug": "quiz-figuras-retoricas",
+      "name": "Quiz Figuras Retóricas",
+      "url": "https://meskeia.com/quiz-figuras-retoricas/",
+      "description": "Identifica figuras retóricas a partir de ejemplos reales: 27 figuras organizadas en básico, bachillerato y selectividad. Feedback con definición, distinción y nuevo ejemplo",
+      "suites": [
+        "juegos",
+        "estudiantes",
+        "cultura"
+      ],
+      "contexts": [
+        "estudio",
+        "curiosidad"
+      ],
+      "keywords": [
+        "figuras retoicas",
+        "quiz figuras literarias",
+        "metafora hiperbole simil",
+        "recursos literarios",
+        "lengua española",
+        "selectividad lengua",
+        "bachillerato",
+        "figuras poeticas"
+      ],
+      "icon": "✍️"
     },
     {
       "slug": "conjugador-verbos",

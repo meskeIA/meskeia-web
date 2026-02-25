@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 220+ aplicaciones web educativas organizadas en 14 categorías: Calculadoras Prácticas, Criptografía y Seguridad, Diseño Web, Emprendimiento y SEO, Finanzas Personales, Herramientas Académicas, Informática y Programación, Juegos y Entretenimiento, Matemáticas y Estadística, Productividad, Salud y Bienestar, Texto y Conversores, y Biomedicina. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 244,
+  "total_tools": 245,
   "updated": "2026-02-25",
   "features": {
     "all_free": true,
@@ -964,9 +964,24 @@
             "B2",
             "aprender ingles"
           ]
+        },
+        {
+          "name": "Quiz Figuras Retoicas",
+          "url": "/quiz-figuras-retoricas/",
+          "description": "Identifica figuras retoicas a partir de ejemplos reales: 27 figuras en tres niveles (ESO, Bachillerato, Selectividad) con feedback educativo completo",
+          "keywords": [
+            "figuras retoicas",
+            "metafora",
+            "hiperbole",
+            "simil",
+            "recursos literarios",
+            "lengua espanola",
+            "selectividad",
+            "bachillerato"
+          ]
         }
       ],
-      "count": 24
+      "count": 25
     },
     {
       "name": "Matemáticas y Estadística",
