@@ -52,7 +52,6 @@ export default function PrivacidadPage() {
 
           <h2>1. Información del Responsable</h2>
           <p><strong>Responsable del tratamiento:</strong> meskeIA</p>
-          <p><strong>Contacto para privacidad:</strong> meskeia24@gmail.com</p>
           <p><strong>Ámbito de aplicación:</strong> Esta política se aplica a todas las utilidades web disponibles en meskeIA.</p>
 
           <h2>2. Qué Datos Recopilamos y Qué NO</h2>
@@ -195,15 +194,6 @@ export default function PrivacidadPage() {
               <li>NO compartimos datos con terceros a través de cookies</li>
             </ul>
           </InfoBox>
-
-          <h2>8. Contacto y Ejercicio de Derechos</h2>
-
-          <div className={styles.contactInfo}>
-            <p><strong>Para consultas sobre privacidad y protección de datos:</strong></p>
-            <p>📧 Email: <strong>meskeia24@gmail.com</strong></p>
-            <p>🌐 Web: <strong>meskeIA</strong></p>
-            <p><em>Responderemos en un plazo máximo de 30 días</em></p>
-          </div>
 
           <InfoBox type="success" title="NUESTRO COMPROMISO" icon="🤝">
             <p><strong>meskeIA se compromete con la privacidad por diseño.</strong> Creemos que las herramientas útiles no requieren recopilar datos personales. Sus cálculos, sus contraseñas y su información sensible permanecen siempre bajo su control.</p>

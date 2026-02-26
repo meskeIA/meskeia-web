@@ -13,15 +13,6 @@ export default function HomeFooter() {
           <p className={styles.tagline}>Aplicaciones desarrolladas para simplificar tu día a día</p>
         </div>
 
-        {/* Ubicación y contacto */}
-        <div className={styles.contact}>
-          <span>📍 Mataró (Barcelona), España</span>
-          <span className={styles.separator}>|</span>
-          <a href="mailto:meskeia24@gmail.com" className={styles.email}>
-            ✉️ meskeia24@gmail.com
-          </a>
-        </div>
-
         {/* Enlaces de navegación */}
         <nav className={styles.links}>
           <Link href="/apps" className={styles.link}>

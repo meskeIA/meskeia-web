@@ -242,15 +242,6 @@ export default function TerminosPage() {
             <li><strong>Actualizar algoritmos de cálculo médico según nuevos estándares científicos</strong></li>
           </ul>
 
-          <h2>8. Contacto</h2>
-
-          <div className={styles.contactInfo}>
-            <p><strong>Para consultas sobre estos términos:</strong></p>
-            <p>📧 Email: <strong>meskeia24@gmail.com</strong></p>
-            <p>🌐 Web: <strong>meskeIA</strong></p>
-            <p><em>Responderemos a la mayor brevedad posible</em></p>
-          </div>
-
           <InfoBox type="info" title="RECONOCIMIENTO" icon="✅">
             <p><strong>Al utilizar nuestras herramientas, usted reconoce que ha leído, entendido y acepta quedar vinculado por estos Términos de Uso.</strong></p>
 

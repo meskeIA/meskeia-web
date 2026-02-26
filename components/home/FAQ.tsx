@@ -25,7 +25,7 @@ export default function FAQ() {
     },
     {
       question: '¿Cómo puedo sugerir nuevas herramientas?',
-      answer: 'Puedes contactarnos en meskeia24@gmail.com con tus sugerencias. Estamos constantemente añadiendo nuevas aplicaciones basadas en las necesidades de nuestros usuarios.'
+      answer: 'Estamos constantemente añadiendo nuevas aplicaciones basadas en las necesidades de los usuarios. ¡Mantente atento a las novedades!'
     },
     {
       question: '¿Las aplicaciones funcionan en móvil?',

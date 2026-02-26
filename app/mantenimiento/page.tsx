@@ -18,13 +18,6 @@ export default function MantenimientoPage() {
         {/* Separador */}
         <div className={styles.divider}></div>
 
-        {/* Contacto */}
-        <div className={styles.contact}>
-          <p className={styles.contactText}>¿Necesitas algo urgente?</p>
-          <a href="mailto:meskeia24@gmail.com" className={styles.email}>
-            meskeia24@gmail.com
-          </a>
-        </div>
       </div>
 
       {/* Footer mínimo */}
