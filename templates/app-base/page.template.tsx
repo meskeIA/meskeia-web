@@ -10,7 +10,8 @@ import {
   EducationalSection,
   RelatedApps,
   LegalNotice,
-  DisclaimerCard
+  DisclaimerCard,
+  ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -95,6 +96,9 @@ export default function [NombreApp]Page(): JSX.Element {
 
         {/* Apps relacionadas */}
         <RelatedApps apps={getRelatedApps('[nombre-app]')} />
+
+        {/* Tarjeta de compartir */}
+        <ShareCard appName="[nombre-app]" />
 
         {/* Footer */}
         <Footer appName="[nombre-app]" />
