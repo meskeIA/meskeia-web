@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 242+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 243+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 242,
-  "last_updated": "2026-02-25",
+  "total_tools": 243,
+  "last_updated": "2026-02-26",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -21,7 +21,7 @@
       "name": "Cultura General",
       "icon": "📚",
       "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 45
+      "tool_count": 46
     },
     {
       "id": "diseno",
@@ -35,7 +35,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 53
+      "tool_count": 54
     },
     {
       "id": "finanzas",
@@ -70,7 +70,7 @@
       "name": "Juegos y Ocio",
       "icon": "🎲",
       "description": "Diversión y entretenimiento",
-      "tool_count": 22
+      "tool_count": 23
     },
     {
       "id": "marketing",
@@ -114,7 +114,7 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 82
+      "tool_count": 83
     },
     {
       "id": "casa",
@@ -142,14 +142,14 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 26
+      "tool_count": 27
     },
     {
       "id": "curiosidad",
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 43
+      "tool_count": 44
     }
   ],
   "tools": [
@@ -5433,6 +5433,32 @@
         "figuras poeticas"
       ],
       "icon": "✍️"
+    },
+    {
+      "slug": "quiz-reinos-naturaleza",
+      "name": "Quiz Reinos de la Naturaleza",
+      "url": "https://meskeia.com/quiz-reinos-naturaleza/",
+      "description": "¿Animal, planta, hongo o bacteria? 43 organismos sorprendentes clasificados por grupos: desde el murciélago mamífero hasta el virus que no es ser vivo",
+      "suites": [
+        "juegos",
+        "estudiantes",
+        "cultura"
+      ],
+      "contexts": [
+        "estudio",
+        "curiosidad",
+        "relax"
+      ],
+      "keywords": [
+        "reinos naturaleza",
+        "clasificacion seres vivos",
+        "quiz biologia",
+        "animales sorprendentes",
+        "hongos plantas algas",
+        "virus bacteria",
+        "biologia ESO"
+      ],
+      "icon": "🔬"
     },
     {
       "slug": "conjugador-verbos",
