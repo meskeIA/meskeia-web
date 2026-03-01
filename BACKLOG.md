@@ -38,6 +38,7 @@
     - ✅ `@types/node` 20→22 **completado** (build 459 páginas OK, commit b527402). Alineado con Node.js v22 local + Vercel. No actualizar a v25 (no es LTS).
     - ⏸️ `eslint` 9→10 **suspendido indefinidamente** hasta que `eslint-config-next` soporte oficialmente ESLint 10. No revisar en audits hasta que haya confirmación oficial de compatibilidad. Riesgo: lint se rompe completamente si se actualiza antes.
     - ✅ Next.js/React al día.
+    - 🟢 `@trpc/*` 11.10.0 → 11.11.0 patch disponible (4 paquetes). Bajo riesgo, actualizable en cualquier momento. *(detectado: 2026-03-01)*
 
 - [x] **ai-index.json: texto desactualizado** — Corregido a 250 apps, suites actualizadas, fecha 2026-03-01. *(resuelto: 2026-03-01)*
 
@@ -89,8 +90,8 @@
 ## 🟣 PROFESIONALIZACIÓN DE APPS EXISTENTES
 
 > Aplicar el patrón v2.0: tabla comparativa, casos de uso, FAQ, guía paso a paso, tips, warning box.
-> **Estado actual**: 153 apps profesionalizadas de 250 (61%). *(actualizado 2026-03-01)*
-> **No aplica a**: juegos, cursos, utilidades triviales (cronómetro, dado, espejo, nivel burbuja).
+> **Estado actual**: ≥164 apps profesionalizadas de 250 (≥66%). *(actualizado: 2026-03-01 — +3 apps: combustible, porcentajes, roommates)*
+> **No aplica a**: juegos, cursos, guías (sub-apps), utilidades triviales (cronómetro, dado, espejo, lupa, diapasón, notas, contador-manual, ruleta, radio).
 
 ### 🟡 Pendientes confirmados (genuinamente sin EducationalSection)
 
@@ -101,14 +102,41 @@
 
 > Apps reales con potencial educativo que no están en el patrón v2.0 aún.
 
-- [ ] **calculadora-alquiler-vs-compra** — Decisión financiera de alto impacto. Tabla comparativa escenarios, casos de uso, FAQ. DisclaimerCard financial.
-- [ ] **calculadora-suscripciones** — Conciencia financiera. Tabla comparativa costes anuales vs mensuales, tips de auditoría de suscripciones.
-- [ ] **generador-contrasenas** — Educación en seguridad: entropía, ataques de diccionario, gestores de contraseñas. FAQ.
-- [ ] **validador-regex** — Referencia técnica: tabla comparativa sintaxis regex (JS/Python/PCRE), casos de uso, errores comunes.
-- [ ] **calculadora-mcd-mcm** — Herramienta académica (ESO/Bachillerato): visualización algoritmo de Euclides, casos de uso, FAQ.
-- [ ] **paises-del-mundo** — Referencia geográfica: datos comparativos por región, casos de uso (viajes/estudios/trabajo).
-- [ ] **seguimiento-habitos** — Ciencia del hábito: bucle hábito (señal/rutina/recompensa), casos de uso, FAQ formación de hábitos.
-- [ ] **planificador-menu** — Nutrición práctica: tabla comparativa grupos alimentarios, casos de uso, FAQ planificación semanal.
+- [x] **calculadora-alquiler-vs-compra** — Ya tiene EducationalSection. *(verificado: 2026-03-01)*
+- [x] **calculadora-suscripciones** — Ya tiene EducationalSection. *(verificado: 2026-03-01)*
+- [x] **generador-contrasenas** — Ya tiene EducationalSection. *(verificado: 2026-03-01)*
+- [x] **validador-regex** — Ya tiene EducationalSection. *(verificado: 2026-03-01)*
+- [x] **calculadora-mcd-mcm** — Ya tiene EducationalSection. *(verificado: 2026-03-01)*
+- [x] **paises-del-mundo** — Ya tiene EducationalSection. *(verificado: 2026-03-01)*
+- [x] **seguimiento-habitos** — Ya tiene EducationalSection. *(verificado: 2026-03-01)*
+- [x] **planificador-menu** — Ya tiene EducationalSection. *(verificado: 2026-03-01)*
+
+### 🟡 Nuevos candidatos reales (barrido 2026-03-01 — genuinamente sin EducationalSection)
+
+> Filtrado: excluidos juegos, cursos, guías y utilidades triviales. Ordenados por potencial educativo + audiencia.
+
+**Alta prioridad** (audiencia amplia, alto valor educativo):
+- [x] **calculadora-combustible** — Tabla comparativa gasolina/diésel/GLP/eléctrico, 4 casos de uso, FAQ 6 preguntas, guía 6 pasos, 6 tips eficiencia, warning 6 errores. *(2026-03-01)*
+- [x] **calculadora-porcentajes** — Tabla comparativa 5 modos de cálculo, 4 casos de uso (IVA/descuentos/inflación/notas), FAQ 6 preguntas, guía 5 pasos, 6 trucos mentales, warning 5 errores. *(2026-03-01)*
+- [x] **calculadora-roommates** — Tabla comparativa 4 métodos de división, 4 casos de uso (estudiantes/viaje/oficina/pareja), FAQ 6 preguntas, guía 5 pasos, 6 consejos convivencia, warning 6 errores. *(2026-03-01)*
+- [ ] **contador-palabras** — SEO/escritura: longitud óptima por tipo de contenido (artículo/tweet/CV/TFG), tabla comparativa plataformas, tips de legibilidad.
+- [ ] **generador-firma-email** — Freelance/marketing: qué incluir, errores comunes, tabla comparativa estilos (mínimo/completo/creativo). DisclaimerCard RGPD.
+- [ ] **lista-equipaje** — Viajes: reglas equipaje de mano por aerolínea, packing tips, table comparativa destinos (playa/montaña/ciudad/negocios).
+
+**Media prioridad** (potencial educativo sólido):
+- [ ] **calculadora-descuentos** — Educación financiera: trampas del marketing en descuentos, precio psicológico, cómo calcular precio real.
+- [ ] **calculadora-pintura** — Hogar: tipos de pintura, cómo calcular correctamente (manos + superficie), consejos de aplicación.
+- [ ] **calculadora-porciones** — Nutrición: porciones recomendadas por alimento, diferencia ración vs porción, casos de uso (dieta/evento/bebé).
+- [ ] **generador-carruseles** — Marketing/RRSS: anatomía del carrusel perfecto, tabla comparativa formatos por plataforma.
+- [ ] **planificador-mudanzas** — Hogar: fases de una mudanza, checklist por semanas, tabla comparativa contratar empresa vs mudanza propia.
+- [ ] **calculadora-percentiles** — Estadística/salud: qué es un percentil, uso en pediatría/estadística, tabla interpretación.
+
+**Potencial educativo específico**:
+- [ ] **conversor-binario** — Técnica educativa: por qué los ordenadores usan binario, hexadecimal, tabla comparativa sistemas numéricos.
+- [ ] **calculadora-sistemas-numericos** — Similar a anterior; ver si se pueden fusionar o son suficientemente distintas.
+- [ ] **conversor-morse** — Cultura: historia del código Morse, uso real hoy, tabla comparativa alfabeto/código.
+- [ ] **calculadora-edad-mascotas** — Salud mascotas: mito "1 año = 7 perro", diferencia por razas, tabla etapas vitales.
+- [ ] **calculadora-aspectos** — Diseño: relaciones de aspecto estándar (16:9/4:3/1:1), casos de uso (cine/TV/RRSS/impresión).
 
 ### ✅ Verificadas como ya profesionalizadas (barrido 2026-03-01)
 
@@ -129,6 +157,9 @@
 - [x] **calculadora-colesterol** — ✅ ya implementada.
 - [x] **calculadora-estadistica** — ✅ ya implementada.
 - [x] **generador-og-images** — ✅ ya implementada.
+- [x] **calculadora-tarifa-freelance** — ✅ ya implementada. *(verificado: 2026-03-01)*
+- [x] **calculadora-imc** — ✅ ya implementada. *(verificado: 2026-03-01)*
+- [x] **calculadora-iva** — ✅ ya implementada. *(verificado: 2026-03-01)*
 
 ---
 

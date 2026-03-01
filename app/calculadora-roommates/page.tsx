@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraRoommates.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -597,6 +597,209 @@ export default function CalculadoraRoommatesPage() {
           </div>
         </div>
       )}
+
+      <EducationalSection title="Guía para gestionar gastos compartidos" subtitle="Métodos para dividir gastos de forma justa, cómo evitar conflictos y organizar las finanzas del piso desde cero">
+
+        {/* Tabla comparativa métodos */}
+        <h3 className={styles.eduTitle}>⚖️ Métodos para dividir gastos entre roommates</h3>
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Método</th>
+                <th>Cómo funciona</th>
+                <th>Ventaja</th>
+                <th>Inconveniente</th>
+                <th>Ideal para</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Partes iguales</strong></td>
+                <td>Total ÷ nº personas</td>
+                <td>Simple y transparente</td>
+                <td>Ignora diferencias de uso</td>
+                <td>Gastos fijos (alquiler, internet)</td>
+              </tr>
+              <tr>
+                <td><strong>Proporcional al uso</strong></td>
+                <td>Cada uno paga según consume</td>
+                <td>Justo si el uso varía mucho</td>
+                <td>Difícil de medir (agua, luz)</td>
+                <td>Gastos variables, viajes grupales</td>
+              </tr>
+              <tr>
+                <td><strong>Proporcional al ingreso</strong></td>
+                <td>Paga más quien más gana</td>
+                <td>Equitativo en términos de esfuerzo</td>
+                <td>Requiere compartir datos personales</td>
+                <td>Convivencia larga con ingresos muy distintos</td>
+              </tr>
+              <tr>
+                <td><strong>Híbrido (esta app)</strong></td>
+                <td>Cada gasto tiene participantes</td>
+                <td>Flexible y detallado</td>
+                <td>Requiere registrar cada gasto</td>
+                <td>Pisos compartidos con gastos irregulares</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Casos de uso */}
+        <h3 className={styles.eduTitle}>💼 Situaciones típicas de gastos compartidos</h3>
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎓</span>
+              <h4>Piso de estudiantes</h4>
+            </div>
+            <p className={styles.escenarioDesc}>4 estudiantes comparten piso a 800 €/mes. El alquiler (partes iguales) son <strong>200 €/persona</strong>. La luz varía: quien tiene PC encendido más horas paga más. Registra la compra de la semana pagada por quien fue al super — la app lo distribuye automáticamente.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>✈️</span>
+              <h4>Viaje grupal</h4>
+            </div>
+            <p className={styles.escenarioDesc}>5 amigos en una escapada: Ana paga el apartamento (600 €), Carlos paga las entradas (75 €), María paga la cena (180 €). La app calcula quién debe a quién para saldar todas las cuentas con el <strong>mínimo número de transferencias</strong>, en lugar de hacer múltiples pagos cruzados.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🏢</span>
+              <h4>Compañeros de oficina</h4>
+            </div>
+            <p className={styles.escenarioDesc}>3 freelancers comparten oficina: alquiler (800 €), internet fibra (60 €) y café/consumibles (120 €). Total: 980 €. A partes iguales: <strong>326,67 €/mes</strong>. Si uno usa la oficina solo 3 días/semana, puede acordarse un porcentaje proporcional (p.ej. 60%) y registrarlo como participante parcial.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>👫</span>
+              <h4>Pareja que comparte gastos</h4>
+            </div>
+            <p className={styles.escenarioDesc}>Cuando los ingresos son distintos (uno gana 2.000 €, otro 1.200 €), puede acordarse pagar en proporción (62,5% / 37,5%). En gastos de 1.500 €/mes: uno paga <strong>937,50 €</strong> y el otro <strong>562,50 €</strong>. Registra cada factura y la app sabe quién tiene saldo positivo o negativo al final del mes.</p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <h3 className={styles.eduTitle}>❓ Preguntas frecuentes sobre gastos compartidos</h3>
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <h4>¿Qué hago si alguien debe dinero y no paga?</h4>
+            <p>Lo primero es tener los datos bien registrados (en esta app) para mostrar el cálculo exacto sin discusiones. Si el importe es significativo, formalízalo por escrito (WhatsApp con confirmación explícita tiene valor probatorio). Para importes mayores, se puede hacer una transferencia parcial o establecer un plan de amortización. Si la persona abandona el piso, salda deudas antes de devolver la fianza.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Cómo gestionar gastos cuando alguien se va del piso a mitad de mes?</h4>
+            <p>Prorratea los gastos fijos por días: si el alquiler es 200 €/mes y la persona se va el día 15, debe pagar 100 € (15/30 días). Para las facturas de suministros, usa el total del mes dividido entre los días de cada período. Es más justo que dividir a partes iguales sin tener en cuenta el tiempo real de uso.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Debo incluir el alquiler en la app o solo los gastos variables?</h4>
+            <p>Depende de cómo gestionéis el alquiler. Si uno cobra y reparte, incluirlo ayuda a tener el balance total en un sitio. Si cada uno paga directamente al casero, solo necesitas registrar los gastos variables (facturas, compra, etc.). La app funciona bien en ambos casos.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Qué hacer con los gastos de solo algunos roommates?</h4>
+            <p>Para eso sirven los «participantes» de cada gasto. Si 3 de 4 roommates van al cine juntos, añade el gasto y selecciona solo esos 3 como participantes. El cuarto no participa en ese gasto. La app distribuye el coste solo entre los participantes marcados, sin afectar al balance del que no fue.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Con qué frecuencia deberíamos hacer la liquidación?</h4>
+            <p>Lo más práctico es una liquidación mensual, el mismo día que se paga el alquiler. Así los balances no se acumulan y las deudas son manejables. Para viajes o eventos específicos, liquida al terminar. Evita acumular meses — cuando alguien se va del piso con deudas antiguas, la gestión se complica mucho.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿La app guarda los datos si cierro el navegador?</h4>
+            <p>Sí, los datos se guardan en el navegador (localStorage) de forma automática. Mientras uses el mismo navegador y no borres los datos del sitio, permanecerán. Para compartir con tus roommates, cada uno debe introducir los mismos datos en su dispositivo, o designar una persona que lleve el registro. No hay sincronización en la nube — todos los datos son 100% locales y privados.</p>
+          </div>
+        </div>
+
+        {/* Guía paso a paso */}
+        <h3 className={styles.eduTitle}>📋 Cómo organizar las finanzas del piso desde cero</h3>
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h4>Acuerda las reglas básicas entre todos</h4>
+              <p>Antes de registrar nada, consensúa: ¿cómo se dividen los gastos fijos? ¿Partes iguales o proporcional al ingreso? ¿Hay gastos personales excluidos (el streaming individual de cada uno)? Una conversación de 20 minutos al principio evita conflictos meses después.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h4>Añade a todos los compañeros en la app</h4>
+              <p>Crea un perfil por cada persona que comparte gastos. Usa nombres cortos que identifiquéis fácilmente. La app les asigna colores automáticamente para diferenciarlos visualmente en la lista de gastos.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h4>Registra cada gasto en el momento</h4>
+              <p>El secreto del éxito es registrar al pagar, no una semana después. Tienes el ticket en la mano: intro descripción, importe, quién pagó y quiénes participan. Tarda 30 segundos. Hacerlo de memoria después generará errores y discusiones.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h4>Revisa los balances semanalmente</h4>
+              <p>Una vez a la semana, abre la sección «Quién debe a quién». Si alguien acumula más de 50–100 € de deuda, haz una transferencia parcial para mantener balances manejables. No esperes a que sean cientos de euros.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h4>Liquida y limpia el registro cada mes</h4>
+              <p>Cuando todos hayan pagado sus deudas del mes, usa el botón «Limpiar todo» para empezar el mes siguiente desde cero. Antes de limpiar, revisa que todos los balances estén en 0 o cerca. Guarda una captura de pantalla si quieres historial.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tips */}
+        <h3 className={styles.eduTitle}>✅ 6 consejos para convivir sin conflictos económicos</h3>
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📲</span>
+            <h4>Registra en el momento</h4>
+            <p>No esperes al final del día. El ticket en mano y la app abierta: 30 segundos. Registrar de memoria genera errores y discusiones sobre si fue 12 € o 14 €.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🗓️</span>
+            <h4>Fija un día de liquidación</h4>
+            <p>El mismo día cada mes (ej: el 1). Todos transfieren lo que deben. Así no hay deudas acumuladas y el ambiente del piso es más relajado.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>💬</span>
+            <h4>Habla de dinero desde el principio</h4>
+            <p>Acuerda en el primer mes: ¿se comparten todos los suministros? ¿El café individual o común? ¿Qué pasa si alguien no está un mes? Las reglas claras desde el inicio evitan el 90% de los conflictos.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📊</span>
+            <h4>Crea una cuenta compartida para gastos fijos</h4>
+            <p>Para pisos estables, considera una cuenta bancaria compartida (Bizum grupal o cuenta conjunta en Revolut/N26). Cada uno aporta su parte el 1 de mes; los recibos se cargan automáticamente. Elimina el problema de «quién adelanta».</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🧾</span>
+            <h4>Guarda los tickets más grandes</h4>
+            <p>Para facturas de suministros, alquiler o compras de más de 50 €, guarda el ticket o la factura digital. Si hay discrepancia posterior, tienes prueba del gasto real.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🤝</span>
+            <h4>Sé flexible con pequeños importes</h4>
+            <p>Si la diferencia es menos de 2–3 €, redondea. El tiempo y el mal ambiente que genera cobrar 1,37 € de más no compensa. Guarda la energía de negociación para los gastos que realmente importan.</p>
+          </div>
+        </div>
+
+        {/* Warning */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Errores que generan conflictos en el piso</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>❌ No hablar de dinero hasta que ya hay deuda:</strong> El silencio sobre quién adelantó qué genera resentimiento silencioso. Registra y habla en el momento, no meses después.</li>
+            <li><strong>❌ Mezclar gastos personales con gastos del piso:</strong> La botella de vino que te bebiste tú solo no es gasto compartido. Define claramente qué es de todos y qué es individual antes de registrar.</li>
+            <li><strong>❌ Dejar que las deudas se acumulen más de un mes:</strong> Una deuda de 30 € es fácil de saldar; una de 300 € acumulada en 6 meses crea tensión. Liquidaciones mensuales, sin excepción.</li>
+            <li><strong>❌ Olvidar registrar gastos «pequeños» que suman:</strong> El detergente (8 €), el papel higiénico (6 €), la bombilla (4 €)... si siempre los paga la misma persona, en un año son más de 200 €. Regístralos todos.</li>
+            <li><strong>❌ Asumir que «ya lo ajustaremos después»:</strong> «Después» rara vez llega. O se registra en el momento o se pierde. La app está pensada para ser rápida de usar; úsala inmediatamente.</li>
+            <li><strong>❌ No actualizar la app cuando alguien se va o llega:</strong> Si entra un nuevo roommate, añádelo desde el principio. Si alguien se va, salda sus deudas y elimínalo. Un perfil de alguien que ya no vive en el piso contamina todos los cálculos futuros.</li>
+          </ul>
+        </div>
+
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-roommates')} />
 
