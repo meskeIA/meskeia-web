@@ -56,10 +56,12 @@ export default function GeneradorContrasenas() {
     }
   }, []);
 
-  // Guardar historial en localStorage
+  // Guardar/limpiar historial en localStorage
   useEffect(() => {
     if (history.length > 0) {
       localStorage.setItem('password-history', JSON.stringify(history));
+    } else {
+      localStorage.removeItem('password-history');
     }
   }, [history]);
 
@@ -198,6 +200,13 @@ export default function GeneradorContrasenas() {
       console.error('Error al copiar:', err);
       alert('No se pudo copiar la contraseña');
     }
+  };
+
+  /**
+   * Borrar historial de contraseñas del estado y localStorage
+   */
+  const clearHistory = () => {
+    setHistory([]);
   };
 
   /**
@@ -419,7 +428,17 @@ export default function GeneradorContrasenas() {
         {/* Historial */}
         {history.length > 0 && (
           <div className={styles.historySection}>
-            <h3 className={styles.sectionTitle}>📜 Historial (últimas 10)</h3>
+            <div className={styles.historySectionHeader}>
+              <h3 className={styles.sectionTitle}>📜 Historial (últimas 10)</h3>
+              <button
+                type="button"
+                onClick={clearHistory}
+                className={styles.btnClearHistory}
+                aria-label="Borrar historial de contraseñas almacenado"
+              >
+                🗑️ Borrar historial
+              </button>
+            </div>
             <div className={styles.historyList}>
               {history.map((item, index) => (
                 <div key={item.timestamp} className={styles.historyItem}>

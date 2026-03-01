@@ -294,6 +294,47 @@
   margin-bottom: 32px;
 }
 
+.historySectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.historySectionHeader .sectionTitle {
+  margin-bottom: 0;
+}
+
+.btnClearHistory {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1.5px solid #c0392b;
+  color: #c0392b;
+  border-radius: var(--radius);
+  font-size: 0.875em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btnClearHistory:hover {
+  background: #c0392b;
+  color: white;
+}
+
+[data-theme='dark'] .btnClearHistory {
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+[data-theme='dark'] .btnClearHistory:hover {
+  background: #e74c3c;
+  color: white;
+}
+
 .historyList {
   display: flex;
   flex-direction: column;
