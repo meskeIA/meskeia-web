@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorFirmaEmail.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Template = 'minimal' | 'corporate' | 'creative' | 'social';
@@ -385,6 +385,205 @@ export default function GeneradorFirmaEmailPage() {
           </div>
         </div>
       </div>
+
+      <EducationalSection
+        title="Guía de firmas de email profesionales"
+        subtitle="Qué incluir, qué plantilla elegir según tu perfil y cómo instalar tu firma en los principales clientes de correo"
+      >
+        <h3 className={styles.eduTitle}>Comparativa de plantillas</h3>
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Plantilla</th>
+                <th>Ideal para</th>
+                <th>Característica principal</th>
+                <th>Complejidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Minimalista</td>
+                <td>Freelancers, consultores</td>
+                <td>Solo datos esenciales, máxima compatibilidad</td>
+                <td>Básica</td>
+              </tr>
+              <tr>
+                <td>Corporativa</td>
+                <td>Empresas medianas y grandes</td>
+                <td>Con foto de perfil y separador visual</td>
+                <td>Media</td>
+              </tr>
+              <tr>
+                <td>Creativa</td>
+                <td>Diseñadores, agencias</td>
+                <td>Diseño horizontal con fondo degradado</td>
+                <td>Media</td>
+              </tr>
+              <tr>
+                <td>Social</td>
+                <td>Creadores de contenido, marketing</td>
+                <td>Iconos de redes sociales integrados</td>
+                <td>Media</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className={styles.eduTitle}>Casos de uso por perfil profesional</h3>
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>💼</span>
+              <strong>Freelance o autónomo</strong>
+            </div>
+            <p className={styles.escenarioDesc}>
+              Usa la plantilla Minimalista con nombre, cargo, teléfono y web. Evita sobrecargar la firma: tu profesionalidad habla por sí sola. Un color que coincida con tu marca personal suma mucho.
+            </p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🏢</span>
+              <strong>Empresa o corporación</strong>
+            </div>
+            <p className={styles.escenarioDesc}>
+              La plantilla Corporativa con foto de perfil proyecta confianza. Usa el color institucional de la empresa y asegúrate de que todos los miembros del equipo usen la misma versión.
+            </p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>📣</span>
+              <strong>Marketing y ventas</strong>
+            </div>
+            <p className={styles.escenarioDesc}>
+              La plantilla Social con LinkedIn incluido facilita que los leads te encuentren. Añade tu URL de perfil para generar conexiones directamente desde cada email enviado.
+            </p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎨</span>
+              <strong>Diseñador o creativo</strong>
+            </div>
+            <p className={styles.escenarioDesc}>
+              La plantilla Creativa con fondo degradado refleja tu personalidad visual. Personaliza el color principal con tu identidad de marca y verifica que se ve correctamente en Gmail y Outlook.
+            </p>
+          </div>
+        </div>
+
+        <h3 className={styles.eduTitle}>Preguntas frecuentes</h3>
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <strong>¿Qué información debe incluir una firma profesional?</strong>
+            <p>Lo esencial es: nombre completo, cargo, empresa, teléfono y email. Opcionales según perfil: web, LinkedIn y logo. Evita incluir más de 6-7 líneas para no restar protagonismo al mensaje.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Funciona la firma HTML en todos los clientes de correo?</strong>
+            <p>Gmail y Outlook aceptan HTML básico con estilos inline, que es exactamente lo que generamos. Apple Mail también es compatible. Los clientes más antiguos o restrictivos pueden mostrarla sin estilos, pero el texto siempre es legible.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Puedo usar imágenes en mi firma?</strong>
+            <p>Sí, pero con moderación. Muchos filtros de spam aumentan la puntuación si la firma tiene más de 2 imágenes. La foto de perfil debe estar hospedada en una URL pública (no adjunta), y no debe pesar más de 50 KB.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Debo incluir el aviso legal obligatorio?</strong>
+            <p>En España, los emails profesionales de empresas deben incluir datos de identificación del empresario o sociedad según la Ley de Servicios de la Sociedad de la Información (LSSI). Para autónomos, se recomienda aunque no siempre es obligatorio.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Se verá igual la firma en móvil?</strong>
+            <p>Depende del cliente. Gmail en Android y iOS respeta bien el HTML de la firma. Outlook Mobile puede simplificar el diseño. Prueba siempre enviándote un email a ti mismo desde un móvil antes de distribuirla.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Con qué frecuencia debo actualizar mi firma?</strong>
+            <p>Revísala cada 6 meses o cuando cambien tus datos de contacto, cargo, empresa o imagen de marca. Una firma desactualizada puede confundir a los clientes y proyectar falta de atención al detalle.</p>
+          </div>
+        </div>
+
+        <h3 className={styles.eduTitle}>Cómo crear e instalar tu firma en 5 pasos</h3>
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>1</span>
+            <div className={styles.stepContent}>
+              <strong>Completa tus datos personales</strong>
+              <p>Rellena los campos del formulario con tu información de contacto. El nombre y el email son obligatorios; el resto es opcional según tu caso.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>2</span>
+            <div className={styles.stepContent}>
+              <strong>Elige la plantilla adecuada para tu perfil</strong>
+              <p>Selecciona entre Minimalista, Corporativa, Creativa o Social según el tipo de comunicación que vayas a mantener. Puedes cambiar de plantilla en cualquier momento.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>3</span>
+            <div className={styles.stepContent}>
+              <strong>Personaliza el color principal</strong>
+              <p>Usa el selector de color para ajustar el color de tu marca. Este color afecta al nombre, los iconos y el separador visual de la firma.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>4</span>
+            <div className={styles.stepContent}>
+              <strong>Copia el código HTML</strong>
+              <p>Haz clic en &quot;Copiar HTML&quot; para guardar el código en el portapapeles. Este HTML está optimizado para máxima compatibilidad con los principales clientes de correo.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>5</span>
+            <div className={styles.stepContent}>
+              <strong>Instala la firma en tu cliente de correo</strong>
+              <p>Sigue las instrucciones de instalación para Gmail, Outlook o Apple Mail que aparecen en la sección superior. Envíate un email de prueba para verificar que se ve correctamente.</p>
+            </div>
+          </div>
+        </div>
+
+        <h3 className={styles.eduTitle}>Buenas prácticas de firma de email</h3>
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>✂️</span>
+            <strong>Menos es más</strong>
+            <p>Limita la firma a 5-6 líneas de información. Una firma demasiado larga distrae del contenido del email.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📞</span>
+            <strong>Formato de teléfono completo</strong>
+            <p>Incluye siempre el prefijo internacional (+34 para España) para facilitar el contacto a clientes o colaboradores internacionales.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🎨</span>
+            <strong>Coherencia de marca</strong>
+            <p>El color de la firma debe coincidir con el de tu web, tarjetas y materiales corporativos para reforzar la identidad visual.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📱</span>
+            <strong>Prueba en móvil</strong>
+            <p>Antes de distribuir la firma a tu equipo, verifica que se ve correctamente en iOS y Android, donde se leen más del 60% de los emails.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🔄</span>
+            <strong>Actualización periódica</strong>
+            <p>Revisa tu firma cada 6 meses. Un cargo desactualizado o un número de teléfono incorrecto genera desconfianza en el receptor.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>👥</span>
+            <strong>Consistencia en el equipo</strong>
+            <p>Si gestionas un equipo, usa una plantilla unificada para toda la empresa. La coherencia refuerza la imagen profesional de la organización.</p>
+          </div>
+        </div>
+
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores que hay que evitar en firmas de email</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Demasiadas imágenes</strong> — Más de 2 imágenes en la firma aumenta la probabilidad de que el email sea marcado como spam por los filtros automáticos.</li>
+            <li><strong>Fuentes no estándar</strong> — Tipografías como Open Sans o Roboto no están disponibles en todos los clientes de correo. Usa siempre Arial, Helvetica o Georgia.</li>
+            <li><strong>Datos personales innecesarios</strong> — Por cumplimiento del RGPD, no incluyas datos de terceros ni información sensible en la firma sin consentimiento explícito.</li>
+            <li><strong>No probar antes de distribuir</strong> — Envíate siempre un email de prueba a Gmail y Outlook antes de que toda la empresa use la nueva firma.</li>
+          </ul>
+        </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-firma-email')} />
 

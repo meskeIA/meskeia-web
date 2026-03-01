@@ -4,7 +4,7 @@ import { useState, useEffect, KeyboardEvent } from 'react';
 import styles from './ListaEquipaje.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type TipoViaje = 'playa' | 'montana' | 'ciudad' | 'negocios' | 'aventura';
@@ -525,6 +525,211 @@ export default function ListaEquipajePage() {
           )}
         </div>
       </div>
+
+      <EducationalSection
+        title="Guía completa de equipaje de viaje"
+        subtitle="Reglas de equipaje de mano por aerolínea, cómo empacar de forma inteligente y los errores más comunes que retrasan en el aeropuerto"
+      >
+        <h3 className={styles.eduTitle}>Reglas de equipaje de mano por aerolínea</h3>
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Aerolínea</th>
+                <th>Dimensiones máximas</th>
+                <th>Peso máximo</th>
+                <th>Nota importante</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Vueling</td>
+                <td>55 × 40 × 20 cm</td>
+                <td>10 kg</td>
+                <td>Incluido en billete básico</td>
+              </tr>
+              <tr>
+                <td>Ryanair</td>
+                <td>40 × 20 × 25 cm (gratis) / 55 × 40 × 20 cm (de pago)</td>
+                <td>10 kg (con pago)</td>
+                <td>Solo 1 bolso pequeño gratis</td>
+              </tr>
+              <tr>
+                <td>Iberia</td>
+                <td>56 × 45 × 25 cm</td>
+                <td>10 kg</td>
+                <td>Más bolso pequeño bajo asiento</td>
+              </tr>
+              <tr>
+                <td>EasyJet</td>
+                <td>56 × 45 × 25 cm</td>
+                <td>Sin límite de peso</td>
+                <td>Incluido en todos los billetes</td>
+              </tr>
+              <tr>
+                <td>Wizz Air</td>
+                <td>40 × 30 × 20 cm</td>
+                <td>10 kg</td>
+                <td>Maleta en cabina solo con WIZZ Go+</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className={styles.eduTitle}>Casos de uso por tipo de viaje</h3>
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>💼</span>
+              <strong>Viaje de negocios de 2-3 días</strong>
+            </div>
+            <p className={styles.escenarioDesc}>
+              Selecciona tipo &quot;Negocios&quot; y duración &quot;Corto&quot;. La lista incluirá traje, portátil, tarjetas y lo esencial. Con maleta de mano cabina y un poco de organización, evitarás facturar.
+            </p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🏖️</span>
+              <strong>Escapada de fin de semana a playa</strong>
+            </div>
+            <p className={styles.escenarioDesc}>
+              Configura tipo &quot;Playa&quot;, clima &quot;Cálido&quot; y duración &quot;Corto&quot;. La herramienta generará una lista completa sin olvidar protector solar, bañador ni adaptador de enchufe.
+            </p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎒</span>
+              <strong>Mochilero por Europa</strong>
+            </div>
+            <p className={styles.escenarioDesc}>
+              Usa tipo &quot;Ciudad&quot; o &quot;Aventura&quot; con duración &quot;Largo&quot;. Añade categorías personalizadas para cada país que visites, con las cosas específicas que necesites en cada destino.
+            </p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+              <strong>Viaje familiar con niños</strong>
+            </div>
+            <p className={styles.escenarioDesc}>
+              Crea una lista base para adultos y añade una categoría personalizada &quot;Niños&quot; con pañales, juguetes, snacks y medicamentos. La lista se guarda automáticamente para tu próximo viaje.
+            </p>
+          </div>
+        </div>
+
+        <h3 className={styles.eduTitle}>Preguntas frecuentes</h3>
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <strong>¿Qué líquidos puedo llevar en el avión?</strong>
+            <p>En vuelos dentro de la UE y desde aeropuertos europeos, los líquidos deben ir en envases de máximo 100 ml cada uno, dentro de una bolsa de plástico transparente y resellable de máximo 1 litro. Cada pasajero puede llevar una sola bolsa.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Cómo evitar que me facturen el equipaje de mano?</strong>
+            <p>Verifica las dimensiones exactas de la aerolínea antes de volar. Usa una maleta de cabina de talla estándar (55 × 40 × 20 cm para la mayoría). Lleva ropa comprimida con bolsas de vacío y aprovecha el espacio de los zapatos para guardar objetos pequeños.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Puedo llevar medicamentos en el avión?</strong>
+            <p>Sí. Los medicamentos con prescripción médica se permiten en cantidades razonables para el viaje, incluso líquidos por encima de 100 ml si tienes la receta médica. Conviene llevar la documentación del médico o farmacéutico, especialmente en vuelos internacionales.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Qué documentos debo llevar siempre en la mochila de mano?</strong>
+            <p>Nunca factures: DNI o pasaporte, tarjeta de embarque, tarjetas de crédito, dinero en efectivo, seguro de viaje, medicamentos esenciales y dispositivos electrónicos de valor. Si la maleta se pierde, estos objetos son irreemplazables a corto plazo.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Se guarda mi lista automáticamente?</strong>
+            <p>Sí. La lista se guarda en el almacenamiento local de tu navegador. La próxima vez que abras la aplicación en el mismo dispositivo, la lista aparecerá con el estado que dejaste. Los datos nunca salen de tu dispositivo.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Cómo añadir items específicos que no están en la lista?</strong>
+            <p>Usa el campo de texto debajo de cada categoría para añadir items personalizados, o crea una categoría completamente nueva con el formulario de la parte inferior. Todos los items personalizados también se guardan automáticamente.</p>
+          </div>
+        </div>
+
+        <h3 className={styles.eduTitle}>Cómo usar la lista de equipaje</h3>
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>1</span>
+            <div className={styles.stepContent}>
+              <strong>Configura tu viaje</strong>
+              <p>Selecciona el tipo de viaje (playa, montaña, negocios...), el clima del destino y la duración. Estos tres factores determinan la lista base generada.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>2</span>
+            <div className={styles.stepContent}>
+              <strong>Genera la lista personalizada</strong>
+              <p>Pulsa &quot;Generar lista&quot; para crear un checklist adaptado a tu viaje. Incluye elementos básicos (documentos, higiene, tecnología) más los específicos del tipo de viaje y clima seleccionados.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>3</span>
+            <div className={styles.stepContent}>
+              <strong>Personaliza con tus propios items</strong>
+              <p>Añade items adicionales dentro de cada categoría existente o crea categorías completamente nuevas para necesidades específicas (medicamentos, artículos de bebé, material deportivo...).</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>4</span>
+            <div className={styles.stepContent}>
+              <strong>Empaca y marca cada item</strong>
+              <p>A medida que vayas empacando, haz clic en cada item para marcarlo como completado. La barra de progreso te indica cuánto te falta para terminar.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>5</span>
+            <div className={styles.stepContent}>
+              <strong>Revisa antes de salir</strong>
+              <p>Antes de cerrar la maleta, repasa la lista una última vez. Los items sin marcar destacan visualmente para que no se te escape nada importante.</p>
+            </div>
+          </div>
+        </div>
+
+        <h3 className={styles.eduTitle}>Trucos para empacar de forma inteligente</h3>
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🌀</span>
+            <strong>Enrolla la ropa</strong>
+            <p>Enrollar camisetas y pantalones en lugar de doblarlos ocupa hasta un 30% menos de espacio y reduce las arrugas.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🫙</span>
+            <strong>Bolsas de compresión</strong>
+            <p>Ideal para ropa de abrigo o de cama. Una bolsa de compresión puede reducir el volumen a la mitad sin aumentar el peso.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>👟</span>
+            <strong>Aprovecha el interior</strong>
+            <p>Mete calcetines y objetos pequeños dentro de los zapatos para aprovechar el espacio muerto y proteger la forma del calzado.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>⚖️</span>
+            <strong>Lo pesado abajo</strong>
+            <p>Coloca los objetos más pesados (zapatos, portátil, libros) cerca de las ruedas para que la maleta sea más estable al desplazarla.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🔢</span>
+            <strong>La regla del 3</strong>
+            <p>Solo lleva ropa que puedas combinar al menos 3 veces. Un pantalón neutro + 3 camisetas = 9 combinaciones distintas.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📸</span>
+            <strong>Fotografía la lista</strong>
+            <p>Antes de cerrar la maleta, haz una foto de la lista completa. Si en el destino dudas sobre si llevaste algo, tienes la referencia.</p>
+          </div>
+        </div>
+
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores que pueden hacerte perder el vuelo o el equipaje</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>No verificar las restricciones de líquidos</strong> — Los controles de seguridad confiscan líquidos que superen los 100 ml aunque estén en un envase más grande. Transfiere siempre a envases pequeños.</li>
+            <li><strong>No revisar las reglas específicas de tu aerolínea</strong> — Las dimensiones y el peso varían significativamente entre aerolíneas. Una maleta válida para Vueling puede cobrarse como equipaje extra en Ryanair.</li>
+            <li><strong>Baterías de litio en el facturado</strong> — Las baterías externas y de portátiles deben viajar siempre en el equipaje de mano, nunca en bodega. Pueden ser confiscadas o causar problemas en el control.</li>
+            <li><strong>Medicamentos sin documentación</strong> — En vuelos internacionales, algunos países requieren receta médica para ciertos medicamentos. Lleva siempre la prescripción y el prospecto original.</li>
+          </ul>
+        </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('lista-equipaje')} />
       <ShareCard appName="lista-equipaje" />
