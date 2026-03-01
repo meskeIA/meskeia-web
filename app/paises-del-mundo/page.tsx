@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import styles from './PaisesDelMundo.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   countries,
@@ -317,6 +317,59 @@ export default function PaisesDelMundoPage() {
           </div>
         )}
       </div>
+
+      <EducationalSection
+        title="Geografía Mundial: Datos y Curiosidades"
+        subtitle="Récords mundiales, datos comparativos por continente y curiosidades geopolíticas de los 195 países"
+        icon="🌍"
+      >
+        <section>
+          <h4>Los récords geográficos del mundo</h4>
+          <ul>
+            <li><strong>🏆 País más grande</strong>: Rusia (17,1 millones km²) — equivale a casi dos veces EE.UU. o 34 veces España.</li>
+            <li><strong>🔬 País más pequeño</strong>: Ciudad del Vaticano (0,44 km²) — cabe 11 veces en el Parque del Retiro de Madrid.</li>
+            <li><strong>👥 Más poblado</strong>: India (1.428 millones, superó a China en 2023).</li>
+            <li><strong>🏜️ Menos poblado (continente)</strong>: Nauru en Oceanía (unos 10.000 habitantes) es el estado independiente menos poblado.</li>
+            <li><strong>🏔️ País más alto</strong>: Lesotho — su punto más bajo está a 1.400 m sobre el nivel del mar, completamente rodeado por Sudáfrica.</li>
+            <li><strong>📐 Mayor densidad de población</strong>: Mónaco (~26.000 hab/km²), seguido de Singapur y Bahréin.</li>
+            <li><strong>🌊 Mayor número de islas</strong>: Suecia (221.800 islas), seguida de Noruega y Finlandia.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Curiosidades geopolíticas</h4>
+          <ul>
+            <li><strong>Países sin litoral (landlocked)</strong>: 44 países no tienen acceso directo al mar. Bolivia y Paraguay son los únicos en América del Sur. Kazajistán es el país interior más grande del mundo.</li>
+            <li><strong>Países dentro de otros países</strong>: San Marino y Ciudad del Vaticano están rodeados completamente por Italia. Lesotho está dentro de Sudáfrica. Se llaman «enclaves».</li>
+            <li><strong>Micronaciones reconocidas</strong>: Los 195 países son los reconocidos por la ONU. Existen además Taiwán, Kosovo y otros territorios con estatus disputado.</li>
+            <li><strong>El país con más países vecinos</strong>: Rusia y China comparten fronteras con 14 países distintos cada uno.</li>
+            <li><strong>Países que no existen en mapas tradicionales</strong>: Sudán del Sur (independiente en 2011) es el país más joven reconocido por la ONU.</li>
+            <li><strong>Monedas compartidas</strong>: El euro lo usan 20 países de la UE. El dólar estadounidense es moneda oficial en 11 países además de EE.UU.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Los 5 continentes en cifras</h4>
+          <ul>
+            <li><strong>🌍 África</strong>: 54 países, 1.400 millones de habitantes, el continente con mayor crecimiento demográfico. Nigeria será el 3.er país más poblado del mundo en 2050.</li>
+            <li><strong>🌏 Asia</strong>: 49 países, 4.700 millones de habitantes (60% de la humanidad). Incluye las dos civilizaciones más antiguas continuas (China e India) y el país con la economía que más rápido creció en el siglo XXI.</li>
+            <li><strong>🌎 América</strong>: 35 países, 1.000 millones de habitantes. Brasil es el 5.º país más grande del mundo y tiene el mayor número de hablantes de portugués.</li>
+            <li><strong>🌍 Europa</strong>: 44 países en apenas 10,5 millones km². Alta densidad media (~73 hab/km²). Tiene la mayor integración supranacional del mundo (UE).</li>
+            <li><strong>🌏 Oceanía</strong>: 14 países. Australia ocupa el 92% del área continental. Muchos estados son pequeñas islas del Pacífico con soberanía sobre grandes zonas económicas exclusivas (ZEE).</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Cómo se cuentan los países</h4>
+          <p>La cifra de «195 países» tiene matices:</p>
+          <ul>
+            <li><strong>193 miembros de pleno derecho</strong> de la ONU + 2 estados observadores permanentes (Ciudad del Vaticano y Palestina) = 195.</li>
+            <li><strong>Territorios no autónomos</strong>: Existen ~17 territorios bajo administración de otros países que la ONU considera pendientes de descolonización (Gibraltar, Nueva Caledonia, Sahara Occidental...).</li>
+            <li><strong>Reconocimiento parcial</strong>: Kosovo es reconocido por 100+ países pero no por España, China o Rusia. Taiwán es reconocido formalmente por solo 12 países, aunque mantiene relaciones comerciales con casi todos.</li>
+            <li><strong>Pasaportes más poderosos (2025)</strong>: Los de Singapur, Japón y Francia permiten entrar sin visa a más de 190 destinos. El más restrictivo, Afganistán, da acceso libre a menos de 30.</li>
+          </ul>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('paises-del-mundo')} />
       <ShareCard appName="paises-del-mundo" />

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraMcdMcm.module.css';
-import { MeskeiaLogo, Footer, ResultCard, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -293,27 +293,80 @@ export default function CalculadoraMcdMcmPage() {
         </div>
       </div>
 
-      <section className={styles.infoSection}>
-        <h2>¿Qué son el MCD y el MCM?</h2>
-        <div className={styles.infoGrid}>
-          <div className={styles.infoCard}>
-            <h3>MCD - Máximo Común Divisor</h3>
-            <p>Es el mayor número que divide exactamente a todos los números dados. Se usa para simplificar fracciones.</p>
-            <div className={styles.example}>
-              <strong>Ejemplo:</strong> MCD(12, 18) = 6<br />
-              Porque 6 es el mayor número que divide a 12 y a 18.
-            </div>
-          </div>
-          <div className={styles.infoCard}>
-            <h3>MCM - Mínimo Común Múltiplo</h3>
-            <p>Es el menor número que es múltiplo de todos los números dados. Se usa para sumar fracciones con distinto denominador.</p>
-            <div className={styles.example}>
-              <strong>Ejemplo:</strong> MCM(4, 6) = 12<br />
-              Porque 12 es el menor número divisible por 4 y por 6.
-            </div>
-          </div>
-        </div>
-      </section>
+      <EducationalSection
+        title="MCD y MCM: Guía Completa"
+        subtitle="Entiende el algoritmo de Euclides, la factorización en primos y las aplicaciones del MCD y MCM en matemáticas y programación"
+        icon="🔢"
+      >
+        <section>
+          <h4>¿Qué son el MCD y el MCM?</h4>
+          <ul>
+            <li><strong>MCD (Máximo Común Divisor)</strong>: El mayor número entero positivo que divide exactamente a todos los números dados sin dejar resto. También llamado GCD en inglés (Greatest Common Divisor).</li>
+            <li><strong>MCM (Mínimo Común Múltiplo)</strong>: El menor número entero positivo que es múltiplo de todos los números dados. También llamado LCM (Least Common Multiple).</li>
+          </ul>
+          <p><strong>Relación entre MCD y MCM</strong> (para dos números a y b): <code>MCD(a,b) × MCM(a,b) = a × b</code></p>
+          <p>Ejemplo: MCD(12,18) = 6 y MCM(12,18) = 36 → 6 × 36 = 216 = 12 × 18 ✓</p>
+        </section>
+
+        <section>
+          <h4>El algoritmo de Euclides: la forma más eficiente</h4>
+          <p>El <strong>algoritmo de Euclides</strong> (≈300 a.C.) es uno de los algoritmos más antiguos conocidos y sigue siendo el más eficiente para calcular el MCD. Su principio: <em>MCD(a, b) = MCD(b, a mod b)</em>, y se repite hasta que el resto es 0.</p>
+          <p><strong>Ejemplo paso a paso: MCD(48, 18)</strong></p>
+          <ul>
+            <li>MCD(48, 18): 48 = 2×18 + 12 → resto 12</li>
+            <li>MCD(18, 12): 18 = 1×12 + 6 → resto 6</li>
+            <li>MCD(12, 6): 12 = 2×6 + 0 → resto 0 → ¡MCD = 6!</li>
+          </ul>
+          <p>Esta herramienta usa el algoritmo de Euclides internamente. Para más de dos números: MCD(a,b,c) = MCD(MCD(a,b), c).</p>
+        </section>
+
+        <section>
+          <h4>Método de factorización en primos</h4>
+          <p>Alternativa al algoritmo de Euclides, más visual para aprender:</p>
+          <ul>
+            <li><strong>Para el MCD</strong>: Descompone cada número en factores primos. Toma los factores <em>comunes</em> con el <em>menor</em> exponente.</li>
+            <li><strong>Para el MCM</strong>: Toma <em>todos</em> los factores (comunes y no comunes) con el <em>mayor</em> exponente.</li>
+          </ul>
+          <p><strong>Ejemplo: MCD y MCM de 12 y 18</strong></p>
+          <ul>
+            <li>12 = 2² × 3¹</li>
+            <li>18 = 2¹ × 3²</li>
+            <li>MCD = 2¹ × 3¹ = <strong>6</strong> (factores comunes, menor exponente)</li>
+            <li>MCM = 2² × 3² = <strong>36</strong> (todos los factores, mayor exponente)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Aplicaciones en matemáticas</h4>
+          <ul>
+            <li><strong>Simplificar fracciones</strong>: Divide numerador y denominador por su MCD. Ej: 18/24 → MCD(18,24)=6 → 18/6 / 24/6 = 3/4.</li>
+            <li><strong>Sumar fracciones con distinto denominador</strong>: El mínimo común denominador es el MCM de los denominadores. Ej: 1/4 + 1/6 → MCM(4,6)=12 → 3/12 + 2/12 = 5/12.</li>
+            <li><strong>Problemas de distribución equitativa</strong>: ¿Cuántos grupos iguales máximos puedes formar con 24 manzanas y 36 naranjas? MCD(24,36) = 12 grupos, cada uno con 2 manzanas y 3 naranjas.</li>
+            <li><strong>Números primos entre sí (coprimos)</strong>: Dos números son coprimos si su MCD = 1. Ej: MCD(8,9) = 1 → son coprimos aunque ninguno sea primo.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Aplicaciones en programación y tecnología</h4>
+          <ul>
+            <li><strong>Sincronización de ciclos</strong>: Si un proceso A se repite cada 6 segundos y B cada 4 segundos, ¿cuándo coinciden? MCM(6,4) = 12 segundos.</li>
+            <li><strong>Reducción de razones en interfaces</strong>: Las relaciones de aspecto de pantallas (16:9, 4:3) se expresan reduciendo por su MCD. 1920×1080: MCD(1920,1080)=120 → 16:9.</li>
+            <li><strong>Criptografía RSA</strong>: El algoritmo de Euclides extendido es fundamental para calcular el inverso modular, que es la base del cifrado RSA.</li>
+            <li><strong>Algoritmos de fracciones en software</strong>: Calculadoras, hojas de cálculo y lenguajes de programación con tipos racionales (Python <code>fractions.Fraction</code>) usan el MCD para mantener fracciones en forma reducida.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Curiosidades y propiedades</h4>
+          <ul>
+            <li>MCD(a, 0) = a (cualquier número divide a 0)</li>
+            <li>MCD(a, a) = a</li>
+            <li>Si a divide a b, entonces MCD(a, b) = a y MCM(a, b) = b</li>
+            <li>El algoritmo de Euclides tiene complejidad O(log min(a,b)) — extremadamente eficiente incluso con números muy grandes</li>
+            <li>El MCD de los n primeros números naturales crece lentamente: MCD(1,2,...,n) = 1 para n &gt; 2, pero el MCM crece aproximadamente como e^n (función del primo más grande ≤ n)</li>
+          </ul>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-mcd-mcm')} />
 
