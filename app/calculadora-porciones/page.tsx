@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraPorciones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface PortionMethod {
@@ -358,6 +358,203 @@ export default function CalculadoraPorcionesPage() {
           <li><strong>Consulta con un dietista-nutricionista</strong>: Para un plan nutricional personalizado y adaptado a tu situación</li>
         </ul>
       </DisclaimerCard>
+
+      <EducationalSection
+        title="Conceptos nutricionales: porciones, raciones y métodos de medición"
+        subtitle="Entiende la diferencia entre porción y ración, conoce los métodos de medición y adapta las porciones a diferentes situaciones vitales"
+      >
+        <h3 className={styles.eduTitle}>⚖️ Métodos de medición comparados</h3>
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Método</th>
+                <th>Precisión</th>
+                <th>Facilidad</th>
+                <th>Ideal para</th>
+                <th>Coste</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mano (visual)</td>
+                <td>±20–30%</td>
+                <td>Muy fácil</td>
+                <td>Día a día sin pesarlo todo</td>
+                <td>Gratis</td>
+              </tr>
+              <tr>
+                <td>Tazas medidoras</td>
+                <td>±5–10%</td>
+                <td>Fácil</td>
+                <td>Líquidos, cereales, legumbres</td>
+                <td>Muy bajo</td>
+              </tr>
+              <tr>
+                <td>Báscula digital</td>
+                <td>±1–2%</td>
+                <td>Moderada</td>
+                <td>Control estricto, objetivos</td>
+                <td>Bajo</td>
+              </tr>
+              <tr>
+                <td>Cucharas medidoras</td>
+                <td>±2–5%</td>
+                <td>Fácil</td>
+                <td>Condimentos, aceite, especias</td>
+                <td>Muy bajo</td>
+              </tr>
+              <tr>
+                <td>Estimación visual</td>
+                <td>±30–40%</td>
+                <td>Muy fácil</td>
+                <td>Restaurantes, viajes</td>
+                <td>Gratis</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className={styles.eduTitle}>🎯 Situaciones de uso</h3>
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>📉</span>
+              <h4>Control de peso gradual</h4>
+            </div>
+            <p className={styles.escenarioDesc}>Reduce ligeramente la porción de carbohidratos (de 1 puño a 3/4) y aumenta las verduras. Sin contar calorías estrictamente.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎉</span>
+              <h4>Preparación evento especial</h4>
+            </div>
+            <p className={styles.escenarioDesc}>Ajuste temporal de 4–8 semanas. Sigue el método de la mano de forma más estricta; aumenta proteína y verdura, reduce grasas.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>👶</span>
+              <h4>Alimentación infantil</h4>
+            </div>
+            <p className={styles.escenarioDesc}>Los niños tienen manos más pequeñas, lo que ajusta automáticamente sus porciones. No presiones a terminar el plato.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🏋️</span>
+              <h4>Deportista activo</h4>
+            </div>
+            <p className={styles.escenarioDesc}>Aumenta la porción de proteína a 1,5 palmas y los carbohidratos a 1,5 puños en días de entrenamiento intenso. Consulta con un nutricionista.</p>
+          </div>
+        </div>
+
+        <h3 className={styles.eduTitle}>❓ Preguntas frecuentes sobre porciones</h3>
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <strong>¿Cuál es la diferencia entre ración y porción?</strong>
+            <p>La ración es la cantidad recomendada por organismos de salud (OMS, EFSA). La porción es lo que realmente sirves en el plato. En restaurantes, la porción suele ser 2–3 veces mayor que la ración recomendada.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Las porciones de la mano cambian con el tiempo?</strong>
+            <p>La mano no cambia mucho, pero tus necesidades sí. Si adelgazas o ganas musculatura significativa, recalibra consultando con un nutricionista. Para cambios pequeños, el método de la mano sigue siendo válido.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Báscula o método de la mano: cuál es mejor?</strong>
+            <p>Cada uno tiene su lugar. La báscula es más precisa para objetivos concretos; el método de la mano es más sostenible en el día a día y funciona en cualquier lugar, incluso en restaurantes.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿La información nutricional del envase es la porción recomendada?</strong>
+            <p>No necesariamente. La ración del envase es la porción &quot;de referencia&quot; para mostrar las calorías, no la cantidad que debes comer. Puede ser menor o mayor que la porción saludable real.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Cómo medir porciones al comer fuera de casa?</strong>
+            <p>Usa tu mano como referencia visual en el plato del restaurante. Si la proteína supera tu palma, es más de lo necesario. Pide media ración o guarda parte para llevar.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Las personas embarazadas necesitan más cantidad?</strong>
+            <p>Sí, las necesidades energéticas y de ciertos nutrientes aumentan durante el embarazo. Consulta con tu médico o matrona para recomendaciones específicas adaptadas a tu caso.</p>
+          </div>
+        </div>
+
+        <h3 className={styles.eduTitle}>📋 Cómo desarrollar el hábito de porciones adecuadas</h3>
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>1</span>
+            <div className={styles.stepContent}>
+              <strong>Identifica el grupo del alimento</strong>
+              <p>¿Es proteína, carbohidrato, verdura o grasa? Cada grupo tiene su propio método de medición con la mano.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>2</span>
+            <div className={styles.stepContent}>
+              <strong>Usa el método de medición correspondiente</strong>
+              <p>Palma para proteínas, puño para carbohidratos y verduras cocidas, dos manos para ensaladas, pulgar para grasas.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>3</span>
+            <div className={styles.stepContent}>
+              <strong>Construye el plato 50/25/25</strong>
+              <p>La mitad del plato de verduras, un cuarto de proteína y un cuarto de carbohidratos. Añade una cucharada de aceite de oliva.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>4</span>
+            <div className={styles.stepContent}>
+              <strong>Come despacio y escucha tu cuerpo</strong>
+              <p>Espera 20 minutos antes de repetir. Tu cerebro tarda ese tiempo en registrar la saciedad. Mastica bien cada bocado.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>5</span>
+            <div className={styles.stepContent}>
+              <strong>Ajusta según tus señales de hambre real</strong>
+              <p>Si tienes hambre real (no ansiedad), añade más verduras. Si estás saciado, no acabes el plato por costumbre.</p>
+            </div>
+          </div>
+        </div>
+
+        <h3 className={styles.eduTitle}>💡 Hábitos para mejorar la conciencia de porciones</h3>
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📸</span>
+            <p>Fotografía tu plato antes de comer durante una semana. Te dará conciencia visual de tus porciones habituales.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🍽️</span>
+            <p>Usa platos más pequeños. El efecto psicológico hace que un plato lleno parezca más abundante que uno grande semivacío.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🫘</span>
+            <p>Las legumbres cuentan como proteína Y carbohidrato a la vez. Son el grupo más versátil de la dieta mediterránea.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🍃</span>
+            <p>Mastica 20–30 veces por bocado. Mejora la digestión y ayuda a que el cerebro registre la saciedad antes de acabar el plato.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>❤️</span>
+            <p>El hambre emocional no se calma con porciones perfectas. Si notas que comes por estrés, trabájalo con un profesional.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🔄</span>
+            <p>Un día fuera de la rutina no arruina nada. La constancia a largo plazo importa más que la perfección diaria.</p>
+          </div>
+        </div>
+
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores frecuentes al estimar porciones</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li>Confundir la ración del etiquetado del envase con la porción saludable real: son referencias comerciales, no nutricionales.</li>
+            <li>Medir solo los alimentos &quot;prohibidos&quot; (pasta, arroz) e ignorar las grasas saludables, que también suman calorías.</li>
+            <li>Creer que &quot;light&quot;, &quot;0% grasa&quot; o &quot;sin azúcar&quot; significa comer sin límite. Revisa siempre el etiquetado completo.</li>
+            <li>Obsesionarse con la báscula diaria: el peso fluctúa 1–2 kg al día por agua, digestión y retención. Usa medias semanales.</li>
+          </ul>
+        </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-porciones')} />
 
