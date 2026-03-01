@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './PlanificadorMenu.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type DayOfWeek = 'lunes' | 'martes' | 'miercoles' | 'jueves' | 'viernes' | 'sabado' | 'domingo';
@@ -320,32 +320,64 @@ export default function PlanificadorMenuPage() {
         </div>
       )}
 
-      {/* Principios del menú equilibrado */}
-      <div className={styles.principles}>
-        <h3>💡 Principios de un Menú Equilibrado</h3>
-        <div className={styles.principlesGrid}>
-          <div className={styles.principleCard}>
-            <span className={styles.principleIcon}>🥗</span>
-            <h4>Variedad</h4>
-            <p>Incluye diferentes grupos de alimentos cada día</p>
-          </div>
-          <div className={styles.principleCard}>
-            <span className={styles.principleIcon}>🐟</span>
-            <h4>Pescado 2-3x</h4>
-            <p>Al menos 2-3 raciones de pescado por semana</p>
-          </div>
-          <div className={styles.principleCard}>
-            <span className={styles.principleIcon}>🫘</span>
-            <h4>Legumbres 2-3x</h4>
-            <p>Incluye legumbres varias veces por semana</p>
-          </div>
-          <div className={styles.principleCard}>
-            <span className={styles.principleIcon}>🥬</span>
-            <h4>Verduras diarias</h4>
-            <p>Verduras en almuerzo y cena cada día</p>
-          </div>
-        </div>
-      </div>
+      <EducationalSection
+        title="Guía de Nutrición y Planificación Semanal"
+        subtitle="La dieta mediterránea, grupos alimentarios, frecuencias recomendadas y consejos de meal prep"
+        icon="🥗"
+      >
+        <section>
+          <h4>La Dieta Mediterránea: el estándar de referencia</h4>
+          <p>La dieta mediterránea es el patrón alimentario con mayor evidencia científica sobre beneficios para la salud cardiovascular, longevidad y prevención de enfermedades crónicas. La <strong>pirámide mediterránea</strong> recomienda:</p>
+          <ul>
+            <li><strong>Base diaria</strong>: Verduras (2+ raciones), frutas (3+ piezas), legumbres (al menos 2x/semana), cereales integrales, aceite de oliva virgen extra, agua.</li>
+            <li><strong>Varias veces a la semana</strong>: Pescado (2-3x), aves sin piel (2x), huevos (2-4 unidades), lácteos fermentados (yogur, queso en moderación).</li>
+            <li><strong>Ocasionalmente</strong>: Carne roja (máx. 2x/semana), embutidos curados con moderación.</li>
+            <li><strong>Mínimo o nada</strong>: Ultraprocesados, azúcares añadidos, bollería industrial, refrescos azucarados.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Frecuencias recomendadas por grupo alimentario</h4>
+          <ul>
+            <li><strong>🥗 Verduras y hortalizas</strong>: Al menos 2 raciones diarias. Una en almuerzo y otra en cena. Variadas y de temporada.</li>
+            <li><strong>🐟 Pescado</strong>: 2-3 veces por semana. Alterna blanco (merluza, dorada) y azul (salmón, sardinas, atún). El pescado azul aporta omega-3.</li>
+            <li><strong>🫘 Legumbres</strong>: 2-4 veces por semana. Lentejas, garbanzos, alubias y guisantes son proteína vegetal económica y con alto contenido en fibra.</li>
+            <li><strong>🍗 Aves</strong>: 2-3 veces por semana. Pollo y pavo sin piel son proteínas magras con bajo contenido en grasas saturadas.</li>
+            <li><strong>🥩 Carne roja</strong>: Máximo 2 veces por semana y en raciones moderadas (&lt;150g). Preferir carnes magras (lomo, ternera magra).</li>
+            <li><strong>🥚 Huevos</strong>: 3-5 unidades por semana. Completos nutricionalmente y muy versátiles en cocina.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Estructura de las comidas: la importancia del horario</h4>
+          <ul>
+            <li><strong>🌅 Desayuno</strong>: No saltarlo. Activa el metabolismo. Aportar proteína (huevo, yogur) + hidratos complejos (avena, pan integral) + fruta. Evitar azúcares simples en ayunas.</li>
+            <li><strong>☀️ Almuerzo (la comida principal)</strong>: En España, el almuerzo es la ingesta más importante del día. Debe ser completa: proteína + verduras + hidratos. Comer antes de las 15h mejora el control glucémico.</li>
+            <li><strong>🌙 Cena (ligera y temprana)</strong>: Cenar ligero y al menos 2h antes de acostarse. Priorizar verduras, huevos y pescado blanco sobre carnes pesadas o pasta abundante.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Meal prep: cocinar en lote para ahorrar tiempo</h4>
+          <ul>
+            <li><strong>Legumbres</strong>: Cocínalas en grandes cantidades y congela en porciones. Una vez cocidas aguantan 4-5 días en nevera.</li>
+            <li><strong>Cereales</strong>: Quinoa, arroz o pasta integral cocinados en lote se conservan 3-4 días en nevera y son base para múltiples platos.</li>
+            <li><strong>Proteínas</strong>: El pollo marinado congelado en porciones individuales permite descongelar solo lo necesario.</li>
+            <li><strong>Verduras asadas</strong>: Una bandeja de verduras de temporada al horno (calabacín, pimiento, berenjena, cebolla) dura varios días y combina con cualquier proteína.</li>
+            <li><strong>Caldos caseros</strong>: Aprovecha recortes de verduras para hacer caldo base. Congelado en cubiteras es útil para cualquier guiso.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Compra eficiente y de temporada</h4>
+          <ul>
+            <li><strong>Productos de temporada</strong>: Son más baratos, más nutritivos y tienen mejor sabor. En invierno: espinacas, coliflor, alcachofas, naranjas. En verano: tomates, pimientos, calabacín, melocotones.</li>
+            <li><strong>Congelados</strong>: Guisantes, espinacas, judías verdes y pescado congelado son tan nutritivos como frescos y reducen el desperdicio alimentario.</li>
+            <li><strong>Legumbres en bote</strong>: Los garbanzos o lentejas en conserva (enjuagados) son igualmente válidos y ahorran tiempo de cocción.</li>
+            <li><strong>Lista estructurada</strong>: Organiza la lista por secciones del supermercado: frescos (frutas/verduras → carnes/pescados → lácteos) + secos/conservas. Reduce tiempo y compras impulsivas.</li>
+          </ul>
+        </section>
+      </EducationalSection>
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard

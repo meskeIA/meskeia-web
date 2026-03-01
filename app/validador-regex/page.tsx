@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import styles from './ValidadorRegex.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Match {
@@ -284,6 +284,68 @@ export default function ValidadorRegexPage() {
           </div>
         </div>
       </div>
+
+      <EducationalSection
+        title="Guía de Expresiones Regulares"
+        subtitle="Sintaxis avanzada, diferencias entre motores (JS, Python, PCRE) y patrones para casos comunes"
+        icon="🔍"
+      >
+        <section>
+          <h4>¿Qué son las expresiones regulares?</h4>
+          <p>Las expresiones regulares (regex o regexp) son secuencias de caracteres que definen un patrón de búsqueda. Desarrolladas en los años 50 por el matemático Stephen Kleene, hoy son omnipresentes en programación, validación de formularios, procesamiento de texto y herramientas de línea de comandos.</p>
+          <ul>
+            <li><strong>Validación de formularios</strong>: Email, teléfono, código postal, DNI.</li>
+            <li><strong>Búsqueda y reemplazo avanzado</strong>: En editores de código, procesadores de texto, scripts.</li>
+            <li><strong>Extracción de datos (scraping)</strong>: Capturar fechas, precios o URLs de texto no estructurado.</li>
+            <li><strong>Procesamiento de logs</strong>: Filtrar y analizar millones de líneas de log de servidores.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Sintaxis avanzada: más allá del cheatsheet</h4>
+          <ul>
+            <li><strong>Grupos de captura nombrados</strong>: <code>(?&lt;nombre&gt;patrón)</code> — en lugar de referirse al grupo por número (<code>\1</code>), usa el nombre (<code>\k&lt;nombre&gt;</code>). Más legible y mantenible.</li>
+            <li><strong>Grupos de no captura</strong>: <code>(?:patrón)</code> — agrupa sin crear un grupo de captura. Útil cuando necesitas alternancia pero no quieres el overhead de captura.</li>
+            <li><strong>Lookahead positivo</strong>: <code>(?=patrón)</code> — asegura que el texto va seguido de algo, sin incluirlo en la coincidencia. Ej: <code>\d+(?= €)</code> captura el número antes del símbolo del euro.</li>
+            <li><strong>Lookahead negativo</strong>: <code>(?!patrón)</code> — asegura que el texto NO va seguido de algo. Ej: <code>foo(?!bar)</code> captura &quot;foo&quot; solo cuando no va seguido de &quot;bar&quot;.</li>
+            <li><strong>Lookbehind positivo</strong>: <code>(?&lt;=patrón)</code> — asegura que el texto va precedido de algo. Ej: <code>(?&lt;=€)\d+</code> captura el número después del euro.</li>
+            <li><strong>Cuantificadores perezosos</strong>: <code>*?</code>, <code>+?</code>, <code>??</code> — por defecto los cuantificadores son «voraces» (greedy) y capturan lo máximo posible. El <code>?</code> los hace «perezosos» y capturan lo mínimo posible.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Diferencias entre motores de regex</h4>
+          <ul>
+            <li><strong>JavaScript</strong>: Motor ECMA. Soporta lookahead/lookbehind (ES2018+), grupos nombrados (ES2018+), flag <code>s</code> (dotAll, ES2018+), flag <code>d</code> (indices, ES2022+). <strong>No soporta</strong>: lookbehind de longitud variable en motores antiguos.</li>
+            <li><strong>Python (re)</strong>: Motor similar a PCRE. Soporta lookbehind de longitud variable limitada (<code>re.fullmatch</code>), <code>re.VERBOSE</code> para comentarios en el patrón. Sintaxis de grupos: <code>(?P&lt;nombre&gt;)</code>.</li>
+            <li><strong>PCRE (PHP, Nginx, grep -P)</strong>: El más completo. Soporta lookbehind variable, recursión (<code>(?R)</code>), condicionales, posesivos (<code>a++</code>), atómicos.</li>
+            <li><strong>POSIX (grep básico, sed)</strong>: El más limitado. No soporta <code>\d</code>, <code>\w</code>. Usa <code>[0-9]</code>, <code>[a-zA-Z0-9_]</code>. No tiene grupos de no captura ni lookaheads.</li>
+          </ul>
+          <p><strong>Nota</strong>: Esta herramienta usa el motor de JavaScript (navegador).</p>
+        </section>
+
+        <section>
+          <h4>Errores comunes y cómo evitarlos</h4>
+          <ul>
+            <li><strong>Catastrophic backtracking</strong>: Patrones como <code>(a+)+</code> con texto largo pueden bloquear el navegador. Ocurre cuando el motor explora exponencialmente todas las combinaciones posibles. Evita anidar cuantificadores sobre clases ambiguas.</li>
+            <li><strong>Olvidar escapar metacaracteres</strong>: Los caracteres <code>. * + ? ^ $ { } [ ] | ( ) \</code> tienen significado especial. Para buscarlos literalmente, escápalos con <code>\</code>.</li>
+            <li><strong>Anclas incorrectas</strong>: Sin <code>^</code> y <code>$</code>, el patrón puede coincidir en cualquier parte del texto. Para validación, siempre ancla: <code>^\d{5}$</code> valida exactamente 5 dígitos.</li>
+            <li><strong>Flag global con exec() en bucle</strong>: En JavaScript, <code>regex.exec()</code> con flag <code>g</code> mantiene estado. Si reseteas el texto sin resetear el regex, el índice queda desalineado. Usa <code>regex.lastIndex = 0</code> o crea una nueva instancia.</li>
+            <li><strong>Asumir que regex valida semántica</strong>: Un regex puede validar que un email tiene el formato correcto, pero no que el dominio existe o que el buzón acepta correo. La validación completa requiere envío de email de confirmación.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Patrones avanzados de uso frecuente</h4>
+          <ul>
+            <li><strong>Contraseña segura</strong>: <code>^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&amp;])[A-Za-z\d@$!%*?&amp;]{'{8,}'}$</code> — al menos 8 caracteres con minúscula, mayúscula, número y símbolo.</li>
+            <li><strong>Slug de URL</strong>: <code>^[a-z0-9]+(?:-[a-z0-9]+)*$</code> — solo minúsculas, números y guiones intermedios.</li>
+            <li><strong>Dirección MAC</strong>: <code>^([0-9A-Fa-f]{'{2}'}[:-]){'{5}'}[0-9A-Fa-f]{'{2}'}$</code></li>
+            <li><strong>Número decimal con coma</strong>: <code>^\d+([.,]\d{'{1,2}'})?$</code> — admite tanto punto como coma decimal.</li>
+            <li><strong>Hashtag</strong>: <code>#[a-zA-ZÀ-ÿ\w]+</code> — incluye caracteres acentuados.</li>
+          </ul>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('validador-regex')} />
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraSuscripciones.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -426,33 +426,53 @@ export default function CalculadoraSuscripcionesPage() {
         )}
       </div>
 
-      {/* Info panel */}
-      <section className={styles.infoPanel}>
-        <h3>Sobre esta herramienta</h3>
-        <div className={styles.infoGrid}>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>💾</span>
-            <div>
-              <strong>Guardado local</strong>
-              <p>Tus datos se guardan en tu navegador</p>
-            </div>
-          </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>📊</span>
-            <div>
-              <strong>Análisis por categoría</strong>
-              <p>Ve dónde se va tu dinero</p>
-            </div>
-          </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>⏸️</span>
-            <div>
-              <strong>Pausa suscripciones</strong>
-              <p>Sin eliminarlas del registro</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <EducationalSection
+        title="La Economía de las Suscripciones"
+        subtitle="Entiende cómo funcionan los modelos de suscripción, por qué tendemos a olvidarlas y cómo recuperar el control"
+        icon="💳"
+      >
+        <section>
+          <h4>El fenómeno de la «subscription fatigue»</h4>
+          <p>El modelo de negocio basado en suscripciones (SaaS, streaming, apps) creció un 437% entre 2012 y 2022. El usuario medio subestima su gasto en suscripciones en un <strong>40%</strong> según estudios de West Monroe Partners:</p>
+          <ul>
+            <li>Los usuarios creen gastar ~86 €/mes en suscripciones cuando la media real supera los 230 €.</li>
+            <li>El 42% de los usuarios paga suscripciones que no han usado en el último mes.</li>
+            <li>Los ciclos de facturación anuales hacen que el coste sea menos visible hasta que llega el cargo.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Trampas psicológicas de los modelos de suscripción</h4>
+          <ul>
+            <li><strong>Precio de prueba gratuita</strong>: El 60% de los usuarios que se apuntan a una prueba gratuita olvidan cancelarla antes del cargo automático.</li>
+            <li><strong>Precio anual fraccionado</strong>: &quot;Solo 1,99 €/mes&quot; oculta que el compromiso es 23,88 €/año, más difícil de cancelar.</li>
+            <li><strong>Fricción de cancelación</strong>: Diseños que requieren llamar por teléfono, confirmar 3 veces o esperar días. No es casual.</li>
+            <li><strong>Precio ancla</strong>: Planes de 3 niveles donde el intermedio parece razonable junto al premium caro, aunque el básico cubría tus necesidades.</li>
+            <li><strong>Sunk cost</strong>: &quot;Ya llevo 6 meses pagando, sería un desperdicio cancelar&quot;. El coste pasado no importa; lo que importa es el valor futuro.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Cómo hacer una auditoría de suscripciones</h4>
+          <ul>
+            <li><strong>Paso 1: Inventario completo</strong>: Revisa los extractos bancarios de los últimos 3 meses buscando cargos recurrentes. Muchos se disfrazan bajo nombres de empresa distintos al servicio.</li>
+            <li><strong>Paso 2: Clasificar por valor</strong>: Para cada suscripción, pregúntate: ¿Lo he usado esta semana? ¿Lo usaré en los próximos 30 días? ¿Me aportaría valor una alternativa gratuita?</li>
+            <li><strong>Paso 3: Consolidar</strong>: ¿Tienes Spotify y YouTube Premium? ¿Netflix y HBO y Disney+? Evalúa si realmente usas los catálogos de todos.</li>
+            <li><strong>Paso 4: Ciclo de revisión</strong>: Establece un recordatorio trimestral. Las necesidades cambian y los precios suben silenciosamente.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>El coste real: el valor del tiempo y el dinero</h4>
+          <p>Una suscripción de 10 €/mes parece insignificante. Pero acumuladas:</p>
+          <ul>
+            <li>10 suscripciones de 10 €/mes = <strong>1.200 €/año</strong></li>
+            <li>Si esos 100 €/mes se invirtiesen al 7% anual durante 10 años = <strong>~17.400 €</strong></li>
+            <li>El coste de oportunidad de las suscripciones no usadas es real y compuesto</li>
+          </ul>
+          <p>No se trata de eliminar suscripciones útiles, sino de pagar solo por las que realmente aportan valor a tu vida.</p>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-suscripciones')} />
 
