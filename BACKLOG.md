@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-02-25
-> **Apps totales**: 243 | **Suites**: 12
+> **Última actualización**: 2026-03-01
+> **Apps totales**: 250 | **Suites**: 12
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -34,6 +34,11 @@
 - [ ] **Actualizar dependencias (Fase 6)**: `npm outdated` → evaluar actualizaciones. Priorizar: Next.js, React, Chart.js. Sesión dedicada por alto riesgo de breaking changes.
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura
   - *Complejidad*: Alta (sesión separada, con build verification)
+  - *Estado 2026-03-01*: `@types/node` 20→25 disponible (bajo riesgo). `eslint` 9→10 disponible (dev dep). Next.js/React al día.
+
+- [x] **ai-index.json: texto desactualizado** — Corregido a 250 apps, suites actualizadas, fecha 2026-03-01. *(resuelto: 2026-03-01)*
+
+- [x] **Dark mode (verificado)** — Los 25 CSS modules sin `[data-theme]` son falsos positivos: usan colores de marca o semánticos intencionales (juegos, espejo, hero). Resto de interfaz usa variables CSS de globals.css. Dark mode funciona correctamente en toda la plataforma. *(verificado: 2026-03-01)*
 
 ---
 
@@ -81,30 +86,46 @@
 ## 🟣 PROFESIONALIZACIÓN DE APPS EXISTENTES
 
 > Aplicar el patrón v2.0: tabla comparativa, casos de uso, FAQ, guía paso a paso, tips, warning box.
-> **Estado actual**: 32 apps profesionalizadas de 243 (~13%).
+> **Estado actual**: 153 apps profesionalizadas de 250 (61%). *(actualizado 2026-03-01)*
 > **No aplica a**: juegos, cursos, utilidades triviales (cronómetro, dado, espejo, nivel burbuja).
 
-### 🔴 Candidatos prioritarios (mayor impacto)
+### 🟡 Pendientes confirmados (genuinamente sin EducationalSection)
 
-### 🟡 Candidatos de media prioridad
+- [x] **generador-utm** — Tabla comparativa 5 parámetros, 4 casos de uso (Google Ads/Email/Instagram/Black Friday), FAQ 5 preguntas, guía 6 pasos, tips + errores comunes. *(2026-03-01)*
+- [x] **checklist-coberturas-seguros** — Tabla comparativa 8 tipos de seguros, 4 casos de uso (freelance/familia/hipoteca/jubilación), FAQ 5 preguntas, guía 6 pasos, tips + errores. DisclaimerCard corregida (collapsible: false). *(2026-03-01)*
 
-- [ ] **calculadora-fondo-emergencia** — Regla de las 3-6 nóminas. Educational value muy alto para usuarios con deudas.
-- [ ] **calculadora-tir-van** — App técnica usada por estudiantes y profesionales. Tabla comparativa TIR vs VAN vs Payback.
-- [ ] **simulador-compraventa-inmueble** — Gran decisión financiera, complemento de calculadora-coste-vivienda (ya profesionalizada).
-- [ ] **calculadora-regla-50-30-20** — Alta búsqueda, fácil de enriquecer con casos de uso reales.
-- [ ] **planificador-cashflow** — Herramienta para autónomos/empresas. Casos de uso: freelance, startup, pyme.
-- [ ] **calculadora-break-even** — Herramienta de negocio con alto valor educativo para emprendedores.
-- [ ] **generador-utm** — Output exportable. HTML colapsable con ejemplos de implementación GA4.
-- [ ] **analizador-densidad-seo** — Herramienta de contenido, casos de uso para bloggers/redactores/SEOs.
-- [ ] **calculadora-electricidad** — Alta demanda en España por precio de la luz.
+### 🟡 Nuevos candidatos detectados en barrido (sin EducationalSection)
 
-### 🟢 Candidatos de baja prioridad (pero válidos)
+> Apps reales con potencial educativo que no están en el patrón v2.0 aún.
 
-- [ ] **calculadora-calorias-ejercicio** — DisclaimerCard: `medical`.
-- [ ] **calculadora-colesterol** — Tabla comparativa LDL/HDL/triglicéridos. DisclaimerCard: `medical`.
-- [ ] **calculadora-estadistica** — Tabla comparativa medidas centralización vs dispersión.
-- [ ] **generador-og-images** — Output exportable, casos de uso (blog, ecommerce, redes).
-- [ ] **checklist-coberturas-seguros** — Guía paso a paso para revisar si estás bien cubierto.
+- [ ] **calculadora-alquiler-vs-compra** — Decisión financiera de alto impacto. Tabla comparativa escenarios, casos de uso, FAQ. DisclaimerCard financial.
+- [ ] **calculadora-suscripciones** — Conciencia financiera. Tabla comparativa costes anuales vs mensuales, tips de auditoría de suscripciones.
+- [ ] **generador-contrasenas** — Educación en seguridad: entropía, ataques de diccionario, gestores de contraseñas. FAQ.
+- [ ] **validador-regex** — Referencia técnica: tabla comparativa sintaxis regex (JS/Python/PCRE), casos de uso, errores comunes.
+- [ ] **calculadora-mcd-mcm** — Herramienta académica (ESO/Bachillerato): visualización algoritmo de Euclides, casos de uso, FAQ.
+- [ ] **paises-del-mundo** — Referencia geográfica: datos comparativos por región, casos de uso (viajes/estudios/trabajo).
+- [ ] **seguimiento-habitos** — Ciencia del hábito: bucle hábito (señal/rutina/recompensa), casos de uso, FAQ formación de hábitos.
+- [ ] **planificador-menu** — Nutrición práctica: tabla comparativa grupos alimentarios, casos de uso, FAQ planificación semanal.
+
+### ✅ Verificadas como ya profesionalizadas (barrido 2026-03-01)
+
+> Estaban marcadas como pendientes pero ya tenían EducationalSection implementada.
+
+- [x] **tabla-periodica** — Historia, comparativa metales/no metales, casos de uso ESO/Bachillerato/Universidad, FAQ, guía estequiometría, tips. 1.020 líneas.
+- [x] **creador-paletas** — Comparativa armonías, casos de uso profesionales, FAQ, tips, errores. 733 líneas.
+- [x] **calculadora-coste-vivienda** — DisclaimerCard financial, EducationalSection, FAQ avanzado. 827 líneas.
+- [x] **calculadora-fondo-emergencia** — ✅ ya implementada.
+- [x] **calculadora-tir-van** — ✅ ya implementada.
+- [x] **simulador-compraventa-inmueble** — ✅ ya implementada.
+- [x] **calculadora-regla-50-30-20** — ✅ ya implementada.
+- [x] **planificador-cashflow** — ✅ ya implementada.
+- [x] **calculadora-break-even** — ✅ ya implementada.
+- [x] **analizador-densidad-seo** — ✅ ya implementada.
+- [x] **calculadora-electricidad** — ✅ ya implementada.
+- [x] **calculadora-calorias-ejercicio** — ✅ ya implementada.
+- [x] **calculadora-colesterol** — ✅ ya implementada.
+- [x] **calculadora-estadistica** — ✅ ya implementada.
+- [x] **generador-og-images** — ✅ ya implementada.
 
 ---
 

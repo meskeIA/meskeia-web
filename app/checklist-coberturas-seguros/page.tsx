@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ChecklistCoberturasSeguro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type PerfilType = 'joven-soltero' | 'pareja-sin-hijos' | 'familia-hijos' | 'autonomo' | 'jubilado' | 'propietario-alquila';
@@ -304,10 +304,267 @@ export default function ChecklistCoberturasSeguroPage() {
         variant="financial"
         severity="medium"
         context="checklist-coberturas-seguros"
-        collapsible={true}
+        collapsible={false}
       />
 
-      
+      <EducationalSection
+        title="Guía completa de seguros en España"
+        subtitle="Tipos de seguros, cómo compararlos y los errores más comunes al contratar"
+      >
+        {/* ====== SECCIÓN 1: TABLA COMPARATIVA ====== */}
+        <section className={styles.comparativaSection}>
+          <h2>📊 Los 8 seguros principales: comparativa rápida</h2>
+          <p className={styles.comparativaSubtitle}>
+            Referencia orientativa de seguros en España. Los precios varían según edad, perfil y aseguradora.
+          </p>
+          <div className={styles.comparativaTableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo de seguro</th>
+                  <th>¿Obligatorio?</th>
+                  <th>Precio anual orientativo</th>
+                  <th>¿Para quién es prioritario?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Seguro de coche (RC)</td>
+                  <td><span className={styles.badgeObl}>⚠️ Sí (RC)</span></td>
+                  <td>300 – 800 €</td>
+                  <td>Cualquier conductor</td>
+                </tr>
+                <tr>
+                  <td>Seguro de hogar</td>
+                  <td><span className={styles.badgeYes}>Con hipoteca</span></td>
+                  <td>150 – 400 €</td>
+                  <td>Propietarios e inquilinos</td>
+                </tr>
+                <tr>
+                  <td>Seguro de vida</td>
+                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td>150 – 600 €</td>
+                  <td>Padres con hijos, hipotecas</td>
+                </tr>
+                <tr>
+                  <td>Seguro de salud</td>
+                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td>400 – 1.200 €</td>
+                  <td>Todos (especialmente autónomos)</td>
+                </tr>
+                <tr>
+                  <td>Seguro de decesos</td>
+                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td>50 – 150 €</td>
+                  <td>Mayores de 50, familias</td>
+                </tr>
+                <tr>
+                  <td>RC profesional</td>
+                  <td><span className={styles.badgeYes}>En muchas profesiones</span></td>
+                  <td>200 – 800 €</td>
+                  <td>Autónomos, profesiones liberales</td>
+                </tr>
+                <tr>
+                  <td>Seguro de dependencia</td>
+                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td>100 – 500 €</td>
+                  <td>Mayores de 50 (mejor contratar joven)</td>
+                </tr>
+                <tr>
+                  <td>Impago de alquiler</td>
+                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td>3 – 5% renta anual</td>
+                  <td>Propietarios que alquilan</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ====== SECCIÓN 2: CASOS DE USO ====== */}
+        <section className={styles.casosSection}>
+          <h2>💼 Situaciones reales: cuando el checklist marca la diferencia</h2>
+          <div className={styles.casoGrid}>
+
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>💼</span>
+                <div>
+                  <h3>María, 30 años — Freelance sin RC profesional</h3>
+                  <span className={styles.casoTag}>Autónomo</span>
+                </div>
+              </div>
+              <p>María diseña webs y nunca había contratado RC profesional. Un cliente le reclamó 8.000€ por un error en una entrega. Al revisar este checklist descubrió que le faltaba la cobertura más crítica para su perfil.</p>
+              <p className={styles.casoResultado}><strong>Aprendizaje:</strong> La RC profesional cubre errores, negligencias y omisiones en el ejercicio de tu actividad. Para autónomos es la cobertura #1, por encima del seguro de salud.</p>
+            </div>
+
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🏠</span>
+                <div>
+                  <h3>Carlos, 45 años — Hogar sin RC familiar</h3>
+                  <span className={styles.casoTag}>Familia con hijos</span>
+                </div>
+              </div>
+              <p>Carlos tenía seguro de hogar básico. Su hijo de 10 años rompió accidentalmente el cristal de una terraza del vecino (2.400€). Descubrió que su póliza no incluía Responsabilidad Civil familiar.</p>
+              <p className={styles.casoResultado}><strong>Aprendizaje:</strong> El multirriesgo de hogar con RC familiar cubre daños que causen tus hijos, tu mascota o cualquier miembro del hogar a terceros. Es la ampliación más recomendable para familias.</p>
+            </div>
+
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🏡</span>
+                <div>
+                  <h3>Ana, 35 años — Primera hipoteca</h3>
+                  <span className={styles.casoTag}>Propietaria</span>
+                </div>
+              </div>
+              <p>Al firmar la hipoteca, el banco le &quot;ofreció&quot; su seguro de hogar y de vida vinculados. Ana aceptó sin comparar. Dos años después revisó el mercado y descubrió que pagaba un 60% más de lo necesario.</p>
+              <p className={styles.casoResultado}><strong>Aprendizaje:</strong> El banco no puede obligarte a contratar sus seguros (Ley 5/2019). Puedes contratar cualquier seguro equivalente y el banco debe aceptarlo. Compara siempre antes de firmar.</p>
+            </div>
+
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>👴</span>
+                <div>
+                  <h3>Pedro, 62 años — Planificando la jubilación</h3>
+                  <span className={styles.casoTag}>Jubilado</span>
+                </div>
+              </div>
+              <p>Pedro revisó sus seguros antes de jubilarse. Tenía un seguro de vida con capital alto (ya sin deudas ni hijos dependientes) pero no tenía seguro de dependencia. Reajustó: redujo el capital de vida y contrató dependencia.</p>
+              <p className={styles.casoResultado}><strong>Aprendizaje:</strong> Las necesidades de cobertura cambian con la etapa de vida. Revisar el checklist cada 5 años (o tras un evento vital grande) evita pagar de más en coberturas innecesarias y quedarse sin las que más importan.</p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ====== SECCIÓN 3: FAQ ====== */}
+        <section className={styles.faqSection}>
+          <h2>❓ Preguntas frecuentes sobre seguros</h2>
+          <div className={styles.faqGrid}>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿El banco puede obligarme a contratar su seguro con la hipoteca?</h3>
+              <p className={styles.faqAnswer}>No. La Ley 5/2019 (LCCI) prohíbe la venta vinculada obligatoria de seguros con hipotecas. El banco puede ofrecerte condiciones mejores (como reducir el diferencial del tipo de interés) si contratas con ellos, pero <strong>no puede negarte la hipoteca</strong> porque elijas otra aseguradora.</p>
+              <p className={styles.faqAnswer}>Compara siempre el coste real: ahorro en diferencial vs sobrecoste del seguro bancario.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Qué diferencia hay entre seguro de vida y seguro de decesos?</h3>
+              <p className={styles.faqAnswer}>Son dos seguros completamente distintos:</p>
+              <ul className={styles.faqList}>
+                <li><strong>Seguro de vida:</strong> Paga un capital a los beneficiarios si el asegurado fallece. Protege ingresos y deudas.</li>
+                <li><strong>Seguro de decesos:</strong> Cubre los gastos del funeral, traslados, trámites. No es un capital, es un servicio.</li>
+              </ul>
+              <p className={styles.faqAnswer}>Pueden complementarse: el seguro de decesos cubre el entierro (3.000-8.000€) y el seguro de vida cubre el futuro económico de la familia.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Puedo tener dos seguros de salud y cobrar dos veces?</h3>
+              <p className={styles.faqAnswer}>No. Los seguros de salud son de <strong>prestación de servicios</strong>, no de indemnización. Cada uno te da acceso a su red de médicos, pero no se acumulan para pagar lo mismo dos veces.</p>
+              <p className={styles.faqAnswer}>Puede tener sentido tener dos si tienen redes distintas (por ejemplo, uno para trabajo y otro de empresa), pero en general es dinero duplicado innecesariamente.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿A qué edad conviene contratar el seguro de dependencia?</h3>
+              <p className={styles.faqAnswer}>Cuanto antes, mejor: las primas son mucho más bajas si lo contratas joven (40-50 años) y ya estás protegido si se produce antes de lo esperado.</p>
+              <p className={styles.faqAnswer}>A partir de los 65 años las primas se disparan o directamente hay exclusiones por edad o enfermedades preexistentes. El sistema público de dependencia (Ley 39/2006) puede tardar años en tramitarse.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿El seguro multirriesgo de hogar cubre lo que hay dentro (muebles, ropa)?</h3>
+              <p className={styles.faqAnswer}>Depende de qué hayas asegurado:</p>
+              <ul className={styles.faqList}>
+                <li><strong>Continente:</strong> La estructura del edificio (paredes, suelo, instalaciones). Obligatorio para propietarios.</li>
+                <li><strong>Contenido:</strong> Los muebles, electrodomésticos, ropa, electrónica. Recomendable para todos.</li>
+                <li><strong>Multirriesgo completo:</strong> Continente + contenido + RC familiar. El más habitual y recomendable.</li>
+              </ul>
+              <p className={styles.faqAnswer}>Si estás de alquiler, el propietario asegura el continente; tú deberías asegurar el contenido.</p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ====== SECCIÓN 4: GUÍA PASO A PASO ====== */}
+        <section className={styles.guiaSection}>
+          <h2>📋 Cómo revisar y contratar seguros correctamente</h2>
+          <div className={styles.guiaSteps}>
+            <div className={styles.guiaStep}>
+              <span className={styles.guiaNum}>1</span>
+              <div>
+                <h4>Usa el checklist según tu perfil actual</h4>
+                <p>Selecciona el perfil que mejor te representa y marca las coberturas que ya tienes. El progreso te indica cuánta protección tienes actualmente.</p>
+              </div>
+            </div>
+            <div className={styles.guiaStep}>
+              <span className={styles.guiaNum}>2</span>
+              <div>
+                <h4>Identifica los gaps (coberturas que faltan)</h4>
+                <p>Las marcadas como <strong>Obligatorio</strong> o <strong>Muy recomendable</strong> que no tengas son tu prioridad. Las recomendables son el siguiente nivel.</p>
+              </div>
+            </div>
+            <div className={styles.guiaStep}>
+              <span className={styles.guiaNum}>3</span>
+              <div>
+                <h4>Pide al menos 3 presupuestos</h4>
+                <p>Usa comparadores online (Acierto, Rastreator, Rankia) y también contacta directamente con aseguradoras. Los precios pueden variar un 40-60% por el mismo producto.</p>
+              </div>
+            </div>
+            <div className={styles.guiaStep}>
+              <span className={styles.guiaNum}>4</span>
+              <div>
+                <h4>Lee las exclusiones, no solo las coberturas</h4>
+                <p>Lo importante no es qué cubre, sino qué <strong>no</strong> cubre. Las exclusiones están en letra pequeña pero son las que determinan si el seguro sirve en el momento del siniestro.</p>
+              </div>
+            </div>
+            <div className={styles.guiaStep}>
+              <span className={styles.guiaNum}>5</span>
+              <div>
+                <h4>Verifica los límites de cobertura</h4>
+                <p>Un seguro de hogar puede tener un límite de 60.000€ en contenido cuando tus bienes valen más. Asegúrate de que el capital asegurado refleja el valor real.</p>
+              </div>
+            </div>
+            <div className={styles.guiaStep}>
+              <span className={styles.guiaNum}>6</span>
+              <div>
+                <h4>Revisa y compara cada año en la renovación</h4>
+                <p>Las aseguradoras suben primas anualmente. Compara en cada renovación: la fidelidad no siempre es el mejor negocio. Muchas ofrecen mejor precio a clientes nuevos.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ====== SECCIÓN 5: TIPS Y ERRORES ====== */}
+        <section className={styles.tipsSection}>
+          <h2>💡 Tips y errores que debes evitar</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <h4>✅ Agrupa seguros en una aseguradora</h4>
+              <p>Tener hogar, vida y coche en la misma compañía puede dar descuentos de un 10-20% (multiproducto). Pregunta siempre por esta opción.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <h4>✅ Revisa coberturas ante eventos vitales</h4>
+              <p>Matrimonio, nacimiento de un hijo, hipoteca, jubilación: cada cambio vital puede requerir actualizar coberturas. Revisa el checklist en cada momento.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <h4>✅ Actualiza beneficiarios del seguro de vida</h4>
+              <p>Si tienes pareja nueva, hijos, o has vivido un divorcio, comprueba que los beneficiarios del seguro de vida están correctamente designados.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <h4>❌ No canceles el seguro antiguo antes del nuevo</h4>
+              <p>Espera a tener la póliza nueva activa antes de cancelar la antigua. Incluso un día sin cobertura puede ser muy costoso si ocurre un siniestro.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <h4>❌ Infraasegurarse en el hogar</h4>
+              <p>Si aseguras el contenido por 20.000€ pero tienes bienes por 50.000€, en un siniestro total solo cobras 20.000€ (o menos, por la regla de proporcionalidad).</p>
+            </div>
+            <div className={styles.tipCard}>
+              <h4>❌ No declarar cambios de situación</h4>
+              <p>Una reforma importante, un local en casa, una mascota nueva de raza peligrosa: no declarar cambios puede anular la cobertura en el momento del siniestro.</p>
+            </div>
+          </div>
+        </section>
+
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('checklist-coberturas-seguros')} />
       <ShareCard appName="checklist-coberturas-seguros" />
