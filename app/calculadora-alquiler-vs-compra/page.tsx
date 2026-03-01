@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraAlquilerVsCompra.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -549,44 +549,61 @@ export default function CalculadoraAlquilerVsCompraPage() {
         </div>
       )}
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona estimaciones orientativas basadas en proyecciones financieras simplificadas.
-          Los resultados NO constituyen asesoramiento financiero profesional. Los mercados inmobiliarios y de inversión
-          son impredecibles y los resultados reales pueden variar significativamente.
-          Consulta con un asesor financiero antes de tomar decisiones importantes.
-        </p>
-      </div>
+      <EducationalSection
+        title="Guía: ¿Alquilar o Comprar en España?"
+        subtitle="Entiende el coste de oportunidad, los gastos ocultos y cuándo conviene cada opción según tu situación"
+        icon="🏠"
+      >
+        <section>
+          <h4>¿Qué calcula esta herramienta?</h4>
+          <p>La calculadora compara el <strong>patrimonio neto</strong> que acumulas en cada escenario a lo largo del tiempo, no solo los pagos mensuales.</p>
+          <ul>
+            <li><strong>🏠 Compra</strong>: Cuota hipotecaria (fórmula francesa), IBI, comunidad de propietarios, seguro de hogar y mantenimiento (~1% del valor anual).</li>
+            <li><strong>🏢 Alquiler</strong>: Renta mensual con incremento anual estimado según evolución del mercado.</li>
+            <li><strong>📈 Coste de oportunidad</strong>: Si alquilas, la entrada (más gastos de compra) y el ahorro mensual frente a la hipoteca se invierten a la rentabilidad que indiques. Tu patrimonio crece por otra vía.</li>
+          </ul>
+        </section>
 
-      {/* Info Panel */}
-      <div className={styles.infoPanel}>
-        <h3>💡 ¿Qué tiene en cuenta esta calculadora?</h3>
-        <div className={styles.infoGrid}>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🏠</span>
-            <div>
-              <strong>Compra</strong>
-              <p>Hipoteca, IBI, comunidad, seguro, mantenimiento y revalorización</p>
-            </div>
-          </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🏢</span>
-            <div>
-              <strong>Alquiler</strong>
-              <p>Renta mensual con incremento anual según IPC estimado</p>
-            </div>
-          </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>📈</span>
-            <div>
-              <strong>Coste oportunidad</strong>
-              <p>Si alquilas, inviertes la entrada y el ahorro mensual</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        <section>
+          <h4>El error más común: comparar cuota con alquiler</h4>
+          <p>Muchas personas comparan directamente la cuota hipotecaria con el alquiler mensual. Esto es incorrecto por tres razones:</p>
+          <ul>
+            <li><strong>Gastos adicionales del propietario</strong>: IBI, comunidad, seguro y mantenimiento añaden entre 100-300 €/mes al coste real de ser propietario.</li>
+            <li><strong>La entrada inmoviliza capital</strong>: 50.000 € en una hipoteca podrían invertirse en un índice bursátil con rentabilidades históricas del 6-8% anual.</li>
+            <li><strong>Los gastos de compra (~10%)</strong>: Impuesto de Transmisiones Patrimoniales (ITP), notaría, registro e IVA (obra nueva) suponen 20.000-30.000 € en una vivienda media que nunca se recuperan a corto plazo.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>¿Cuándo suele convenir más comprar?</h4>
+          <ul>
+            <li>Horizonte temporal largo (+10-15 años): los gastos de compra se diluyen y la hipoteca se amortiza.</li>
+            <li>Estabilidad laboral y geográfica garantizada: cambios de ciudad o trabajo fuerzan una venta anticipada con pérdidas.</li>
+            <li>Mercado de alquiler tensionado: si el alquiler sube mucho más que la inflación, la hipoteca fija se vuelve más competitiva.</li>
+            <li>Revalorización del inmueble superior a la inversión alternativa: zonas con alta demanda estructural.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>¿Cuándo suele convenir más alquilar?</h4>
+          <ul>
+            <li>Horizonte corto o incertidumbre vital: los gastos de compra-venta destruyen rentabilidad en plazos inferiores a 5-7 años.</li>
+            <li>Flexibilidad laboral o personal: movilidad frecuente, posibilidad de trabajo remoto desde otro país o ciudad.</li>
+            <li>Alta rentabilidad de la inversión alternativa: si el mercado bursátil supera la revalorización inmobiliaria, el alquiler puede ser más rentable.</li>
+            <li>Precios muy altos en relación al alquiler (PER elevado): si el PER &gt; 25 (precio = 25 veces la renta anual), alquilar suele ser más eficiente.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Glosario de términos</h4>
+          <ul>
+            <li><strong>Cuota francesa</strong>: Sistema de amortización donde la cuota es constante pero la proporción de intereses/capital varía. Al principio se pagan más intereses.</li>
+            <li><strong>IBI</strong>: Impuesto sobre Bienes Inmuebles. Lo paga el propietario anualmente al ayuntamiento. Entre 0,4% y 1,1% del valor catastral.</li>
+            <li><strong>Punto de equilibrio</strong>: Año en que el patrimonio del comprador supera al del inquilino-inversor. Antes de ese punto, alquilar e invertir puede ser más rentable.</li>
+            <li><strong>PER inmobiliario</strong>: Price-to-Earnings Ratio. Precio de la vivienda dividido entre la renta anual. Un PER de 20 significa que pagarías 20 años de alquiler para comprar el piso.</li>
+          </ul>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-alquiler-vs-compra')} />
 

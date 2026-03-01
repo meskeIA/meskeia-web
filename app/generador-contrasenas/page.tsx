@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import FixedHeader from '@/components/FixedHeader';
+import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import ResultCard from '@/components/ResultCard';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { jsonLd } from './metadata';
@@ -42,7 +42,6 @@ export default function GeneradorContrasenas() {
   const [strength, setStrength] = useState<number>(0);
   const [history, setHistory] = useState<PasswordHistoryItem[]>([]);
   const [copyFeedback, setCopyFeedback] = useState<boolean>(false);
-  const [showEducationalContent, setShowEducationalContent] = useState<boolean>(false);
 
   // Cargar historial desde localStorage
   useEffect(() => {
@@ -263,7 +262,7 @@ export default function GeneradorContrasenas() {
       <AnalyticsTracker applicationName="generador-contrasenas" />
 
       {/* Header meskeIA */}
-      <FixedHeader />
+      <MeskeiaLogo />
 
       <main className={styles.container}>
         {/* Header */}
@@ -273,6 +272,8 @@ export default function GeneradorContrasenas() {
             Crea contraseñas criptográficamente seguras con opciones personalizables
           </p>
         </header>
+
+        <LegalNotice />
 
         {/* Resultado Principal */}
         <div className={styles.resultSection}>
@@ -448,236 +449,63 @@ export default function GeneradorContrasenas() {
           </div>
         )}
 
-        {/* Toggle de Contenido Educativo */}
-        <div className={styles.educationalToggle}>
-          <h3>📚 ¿Quieres aprender más sobre Contraseñas Seguras?</h3>
-          <p className={styles.educationalSubtitle}>
-            Descubre mejores prácticas, estrategias de seguridad, gestores de contraseñas y
-            respuestas a las preguntas más frecuentes
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowEducationalContent(!showEducationalContent)}
-            className={styles.btnSecondary}
-          >
-            {showEducationalContent ? '⬆️ Ocultar Guía Educativa' : '⬇️ Ver Guía Completa'}
-          </button>
-        </div>
+        <EducationalSection
+          title="Guía de Seguridad Digital: Contraseñas"
+          subtitle="Aprende sobre entropía, ataques de fuerza bruta, gestores de contraseñas y mejores prácticas"
+          icon="🔐"
+        >
+          <section>
+            <h4>¿Por qué son importantes las contraseñas seguras?</h4>
+            <p>Las contraseñas son la primera línea de defensa para proteger tu información personal, cuentas bancarias, correos electrónicos y datos sensibles. Una contraseña débil puede ser descifrada en segundos por herramientas automatizadas.</p>
+            <ul>
+              <li><strong>🚨 El 81% de las brechas</strong>: Se deben a contraseñas débiles o reutilizadas (Verizon Data Breach Report). Los atacantes usan diccionarios, fuerza bruta y listas de contraseñas filtradas.</li>
+              <li><strong>⏱️ Tiempo de descifrado</strong>: Una contraseña de 8 caracteres solo con minúsculas puede descifrarse en minutos. Con mayúsculas, números y símbolos, el tiempo aumenta a años o incluso siglos.</li>
+              <li><strong>🔐 Protección multicapa</strong>: Contraseñas fuertes + autenticación de dos factores (2FA) multiplica exponencialmente la seguridad.</li>
+              <li><strong>💡 Unicidad es clave</strong>: Reutilizar la misma contraseña es extremadamente peligroso. Si un sitio sufre una brecha, todas tus cuentas quedan comprometidas.</li>
+            </ul>
+          </section>
 
-        {/* Contenido educativo colapsable */}
-        {showEducationalContent && (
-          <div className={styles.educationalContent}>
-            {/* ¿Por qué son importantes las contraseñas seguras? */}
-            <section className={styles.guideSection}>
-              <h2>¿Por qué son importantes las contraseñas seguras?</h2>
-              <p>
-                Las contraseñas son la primera línea de defensa para proteger tu información
-                personal, cuentas bancarias, correos electrónicos y datos sensibles. Una
-                contraseña débil puede ser descifrada en segundos por herramientas
-                automatizadas, poniendo en riesgo tu identidad digital.
-              </p>
-              <div className={styles.contentGrid}>
-                <div className={styles.contentCard}>
-                  <h4>🚨 Riesgos de contraseñas débiles</h4>
-                  <p>
-                    El 81% de las brechas de seguridad se deben a contraseñas débiles o
-                    reutilizadas. Los atacantes usan diccionarios, fuerza bruta y listas
-                    de contraseñas filtradas para acceder a cuentas.
-                  </p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>⏱️ Tiempo de descifrado</h4>
-                  <p>
-                    Una contraseña de 8 caracteres solo con minúsculas puede descifrarse en
-                    minutos. Con mayúsculas, números y símbolos, el tiempo aumenta a años
-                    o incluso siglos.
-                  </p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🔐 Protección multicapa</h4>
-                  <p>
-                    Combinar contraseñas fuertes con autenticación de dos factores (2FA)
-                    multiplica exponencialmente la seguridad de tus cuentas online.
-                  </p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>💡 Unicidad es clave</h4>
-                  <p>
-                    Usar la misma contraseña en múltiples sitios es extremadamente peligroso.
-                    Si un sitio sufre una brecha, todas tus cuentas quedan comprometidas.
-                  </p>
-                </div>
-              </div>
-            </section>
+          <section>
+            <h4>Características de una contraseña fuerte</h4>
+            <ul>
+              <li><strong>📏 Longitud adecuada</strong>: Mínimo 12 caracteres, idealmente 16 o más. Cada carácter adicional aumenta exponencialmente la dificultad de descifrado.</li>
+              <li><strong>🔤 Diversidad de caracteres</strong>: Combina mayúsculas, minúsculas, números y símbolos. Esto multiplica las combinaciones posibles de 26 a más de 90 caracteres disponibles.</li>
+              <li><strong>🎲 Aleatoriedad total</strong>: Evita patrones predecibles como &quot;123456&quot;, &quot;qwerty&quot; o fechas de nacimiento. Esta herramienta usa <code>crypto.getRandomValues()</code> (API criptográfica del navegador).</li>
+              <li><strong>🚫 Sin información personal</strong>: No incluyas tu nombre, apellidos, fechas importantes o datos obtenibles de redes sociales.</li>
+            </ul>
+          </section>
 
-            {/* Características de una contraseña fuerte */}
-            <section className={styles.guideSection}>
-              <h2>Características de una contraseña fuerte</h2>
-              <div className={styles.contentGrid}>
-                <div className={styles.contentCard}>
-                  <h4>📏 Longitud adecuada</h4>
-                  <p>
-                    <strong>Mínimo 12 caracteres</strong>, idealmente 16 o más. Cada
-                    carácter adicional aumenta exponencialmente la dificultad de descifrado.
-                  </p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🔤 Diversidad de caracteres</h4>
-                  <p>
-                    Combina <strong>mayúsculas, minúsculas, números y símbolos</strong>.
-                    Esto multiplica las combinaciones posibles de 26 a más de 90 caracteres
-                    disponibles.
-                  </p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🎲 Aleatoriedad total</h4>
-                  <p>
-                    Evita patrones predecibles como &quot;123456&quot;, &quot;qwerty&quot; o fechas de
-                    nacimiento. Usa generadores criptográficos para máxima seguridad.
-                  </p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🚫 Sin información personal</h4>
-                  <p>
-                    No incluyas tu nombre, apellidos, fechas importantes o datos que
-                    puedan obtenerse de redes sociales o registros públicos.
-                  </p>
-                </div>
-              </div>
-            </section>
+          <section>
+            <h4>Gestores de Contraseñas: Tu mejor aliado</h4>
+            <p>Con contraseñas únicas de 16+ caracteres para cada cuenta, es imposible recordarlas todas. Los <strong>gestores de contraseñas</strong> resuelven este problema de forma segura.</p>
+            <ul>
+              <li><strong>🗄️ ¿Qué es un gestor?</strong>: Aplicación que almacena todas tus contraseñas en una bóveda cifrada, protegida por una única contraseña maestra. Solo necesitas recordar una.</li>
+              <li><strong>🛡️ Seguridad</strong>: Usa cifrado AES-256 (estándar militar). Ni siquiera la empresa del gestor puede acceder a tus contraseñas. Todo se descifra localmente.</li>
+              <li><strong>📱 Opciones recomendadas</strong>: <strong>Bitwarden</strong> (open-source, gratuito), <strong>1Password</strong>, <strong>KeePassXC</strong> (local, sin nube), o los gestores integrados en navegadores (con limitaciones).</li>
+            </ul>
+          </section>
 
-            {/* Gestores de contraseñas */}
-            <section className={styles.guideSection}>
-              <h2>Gestores de Contraseñas: Tu mejor aliado</h2>
-              <p>
-                Con contraseñas únicas de 16+ caracteres para cada cuenta, es imposible
-                recordarlas todas. Los <strong>gestores de contraseñas</strong> resuelven
-                este problema de forma segura.
-              </p>
-              <div className={styles.contentGrid}>
-                <div className={styles.contentCard}>
-                  <h4>🗄️ ¿Qué es un gestor?</h4>
-                  <p>
-                    Aplicación que almacena todas tus contraseñas en una bóveda cifrada,
-                    protegida por una única contraseña maestra. Solo necesitas recordar una.
-                  </p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>✨ Ventajas principales</h4>
-                  <p>
-                    Genera contraseñas aleatorias fuertes, las guarda automáticamente,
-                    autocompleta formularios de login y sincroniza entre dispositivos.
-                  </p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>🛡️ Seguridad</h4>
-                  <p>
-                    Usa cifrado AES-256 (estándar militar). Ni siquiera la empresa del gestor
-                    puede acceder a tus contraseñas. Todo se descifra localmente.
-                  </p>
-                </div>
-                <div className={styles.contentCard}>
-                  <h4>📱 Opciones populares</h4>
-                  <p>
-                    <strong>Bitwarden</strong> (open-source, gratuito),{' '}
-                    <strong>1Password</strong>, <strong>LastPass</strong>, o gestores
-                    integrados en navegadores (con limitaciones).
-                  </p>
-                </div>
-              </div>
-            </section>
+          <section>
+            <h4>Mejores prácticas de seguridad</h4>
+            <ul>
+              <li><strong>Una contraseña por servicio</strong>: Nunca reutilices. Si un sitio sufre una brecha, solo esa cuenta se verá comprometida.</li>
+              <li><strong>Contraseña maestra memorable</strong>: Para tu gestor, usa una frase de 4-5 palabras aleatorias (&quot;Caballo-Batería-Grapadora-Correcta&quot;). Fácil de recordar, imposible de adivinar.</li>
+              <li><strong>Activa 2FA siempre</strong>: Google Authenticator, Authy o claves físicas (YubiKey). El 2FA protege incluso si la contraseña es robada.</li>
+              <li><strong>Cambia contraseñas comprometidas</strong>: Comprueba regularmente en <em>haveibeenpwned.com</em> si tu email aparece en filtraciones.</li>
+              <li><strong>Cuidado con el phishing</strong>: Verifica siempre la URL antes de introducir credenciales. Los ataques de phishing son la técnica más común hoy en día.</li>
+            </ul>
+          </section>
 
-            {/* Mejores prácticas */}
-            <section className={styles.guideSection}>
-              <h2>Mejores Prácticas de Seguridad</h2>
-              <ul>
-                <li>
-                  <strong>Una contraseña por servicio</strong>: Nunca reutilices contraseñas.
-                  Si un sitio sufre una brecha, solo esa cuenta se verá comprometida.
-                </li>
-                <li>
-                  <strong>Contraseña maestra memorable</strong>: Si usas un gestor, crea una
-                  contraseña maestra larga pero fácil de recordar. Ejemplo: frase de 4-5
-                  palabras aleatorias (&quot;Caballo Batería Grapadora Correcta&quot;).
-                </li>
-                <li>
-                  <strong>Activa 2FA siempre que sea posible</strong>: Autenticación de dos
-                  factores con apps como Google Authenticator, Authy o claves físicas (YubiKey).
-                </li>
-                <li>
-                  <strong>Cambia contraseñas comprometidas</strong>: Si un servicio anuncia
-                  una brecha de seguridad, cambia tu contraseña inmediatamente.
-                </li>
-                <li>
-                  <strong>No compartas contraseñas</strong>: Ni por email, mensaje o llamada.
-                  Empresas legítimas nunca te pedirán tu contraseña.
-                </li>
-                <li>
-                  <strong>Cuidado con el phishing</strong>: Verifica siempre la URL antes de
-                  introducir credenciales. Los ataques de phishing son la técnica más común.
-                </li>
-              </ul>
-            </section>
-
-            {/* FAQ */}
-            <section className={styles.guideSection}>
-              <h2>Preguntas Frecuentes (FAQ)</h2>
-              <div className={styles.faqGrid}>
-                <div className={styles.faqItem}>
-                  <h4>¿Es seguro usar un generador online?</h4>
-                  <p>
-                    Sí, si usa <strong>crypto.getRandomValues()</strong> (API del navegador)
-                    como esta herramienta. La generación ocurre 100% en tu dispositivo, sin
-                    enviar datos a servidores. Evita generadores que requieran conexión a
-                    internet para funcionar.
-                  </p>
-                </div>
-                <div className={styles.faqItem}>
-                  <h4>¿Cuánto tiempo dura una contraseña segura?</h4>
-                  <p>
-                    Una contraseña de 16 caracteres con mayúsculas, minúsculas, números y
-                    símbolos tardaría <strong>miles de años</strong> en descifrarse con
-                    tecnología actual. El problema real son las brechas de datos, no la
-                    fuerza bruta.
-                  </p>
-                </div>
-                <div className={styles.faqItem}>
-                  <h4>¿Debo cambiar contraseñas regularmente?</h4>
-                  <p>
-                    No es necesario si usas contraseñas únicas y fuertes. Cambios frecuentes
-                    fuerzan a elegir contraseñas más simples. Solo cámbialas si hay sospecha
-                    de compromiso o brecha anunciada.
-                  </p>
-                </div>
-                <div className={styles.faqItem}>
-                  <h4>¿Qué hago si olvido mi contraseña maestra?</h4>
-                  <p>
-                    Los gestores de contraseñas no pueden recuperarla (por diseño de
-                    seguridad). Por eso es crítico: <strong>escríbela en papel</strong> y
-                    guárdala en un lugar físico seguro como backup inicial.
-                  </p>
-                </div>
-                <div className={styles.faqItem}>
-                  <h4>¿Son seguros los gestores de navegadores?</h4>
-                  <p>
-                    Chrome, Firefox y Edge tienen gestores básicos aceptables para uso
-                    personal. Sin embargo, gestores dedicados como Bitwarden ofrecen más
-                    funciones: auditoría de contraseñas débiles, compartir seguro, 2FA
-                    integrado.
-                  </p>
-                </div>
-                <div className={styles.faqItem}>
-                  <h4>¿Qué es mejor: frase o caracteres aleatorios?</h4>
-                  <p>
-                    Para la <strong>contraseña maestra</strong> de un gestor: frase larga y
-                    memorable (4-5 palabras aleatorias). Para el resto: caracteres aleatorios
-                    de 16+ generados por herramienta (no necesitas recordarlas).
-                  </p>
-                </div>
-              </div>
-            </section>
-          </div>
-        )}
+          <section>
+            <h4>Preguntas frecuentes</h4>
+            <ul>
+              <li><strong>¿Es seguro usar un generador online?</strong> Sí, si usa <code>crypto.getRandomValues()</code> como esta herramienta. La generación ocurre 100% en tu dispositivo, sin enviar datos a servidores.</li>
+              <li><strong>¿Debo cambiar contraseñas regularmente?</strong> No es necesario si usas contraseñas únicas y fuertes. Solo cámbialas si hay sospecha de compromiso o brecha anunciada.</li>
+              <li><strong>¿Qué hago si olvido mi contraseña maestra?</strong> Los gestores no pueden recuperarla por diseño. Escríbela en papel y guárdala en un lugar físico seguro como backup inicial.</li>
+              <li><strong>¿Frase o caracteres aleatorios?</strong> Para la contraseña maestra del gestor: frase larga y memorable. Para el resto: caracteres aleatorios de 16+ generados por herramienta (no necesitas recordarlas).</li>
+            </ul>
+          </section>
+        </EducationalSection>
       </main>
 
       {/* Footer meskeIA */}

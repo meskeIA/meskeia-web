@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './SeguimientoHabitos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -888,6 +888,64 @@ export default function SeguimientoHabitosPage() {
           </div>
         </div>
       )}
+
+      <EducationalSection
+        title="La Ciencia detrás de los Hábitos"
+        subtitle="Entiende cómo se forman los hábitos, cuánto tiempo llevan y estrategias para que sean permanentes"
+        icon="🧠"
+      >
+        <section>
+          <h4>El bucle del hábito: señal → rutina → recompensa</h4>
+          <p>Según el neurocientífico <strong>Charles Duhigg</strong> (El poder de los hábitos), todo hábito sigue un mismo bucle de tres pasos:</p>
+          <ul>
+            <li><strong>Señal (trigger)</strong>: Un disparador que indica al cerebro que active el modo automático. Puede ser una hora del día, un lugar, una emoción, una persona o una acción previa.</li>
+            <li><strong>Rutina</strong>: El comportamiento en sí — físico, mental o emocional — que ejecutas de forma más o menos automática.</li>
+            <li><strong>Recompensa</strong>: Lo que obtiene tu cerebro al completar la rutina. Refuerza el bucle y hace que el hábito se consolide.</li>
+          </ul>
+          <p><strong>Clave práctica</strong>: Para crear un hábito nuevo, ancla la rutina a una señal existente y asegura una recompensa inmediata. Para romper un hábito, identifica la señal y sustituye la rutina manteniendo la misma recompensa.</p>
+        </section>
+
+        <section>
+          <h4>¿Cuánto se tarda realmente en formar un hábito?</h4>
+          <p>El mito popular dice "21 días". La investigación real es diferente:</p>
+          <ul>
+            <li><strong>21 días</strong>: Tiempo mínimo en condiciones ideales para hábitos muy simples. Este número procede de un cirujano plástico (Maxwell Maltz, 1960) que observó que sus pacientes tardaban ~21 días en acostumbrarse a su nueva apariencia — ¡no tiene base neurocientífica en hábitos conductuales!</li>
+            <li><strong>66 días</strong>: Media real según el estudio de Phillippa Lally (University College London, 2010) con 96 participantes. El rango fue de 18 a 254 días.</li>
+            <li><strong>La meseta de automatismo</strong>: Los hábitos físicos (deporte) tardan más que los cognitivos (leer). La complejidad del comportamiento importa más que el tiempo.</li>
+          </ul>
+          <p><strong>Conclusión</strong>: No te rindas al mes. Los <strong>66 días</strong> de objetivo en esta app están basados en evidencia científica.</p>
+        </section>
+
+        <section>
+          <h4>Estrategias para no romper la racha</h4>
+          <ul>
+            <li><strong>Nunca falles dos veces seguidas</strong>: Un día perdido es accidente; dos seguidos es el inicio de un nuevo hábito (el de no hacerlo). Si fallas un día, el siguiente es obligatorio.</li>
+            <li><strong>Escala gradual</strong>: Empieza con la versión mínima del hábito. "Salir a correr" puede comenzar como "ponerme las zapatillas". El movimiento se añade solo.</li>
+            <li><strong>Apilamiento de hábitos (habit stacking)</strong>: Conecta el nuevo hábito a uno ya consolidado. "Después de cepillarme los dientes (señal), meditaré 5 minutos (rutina)."</li>
+            <li><strong>Diseña el entorno</strong>: Haz lo correcto más fácil y lo incorrecto más difícil. Deja las zapatillas junto a la cama; borra las apps del móvil que te distraen.</li>
+            <li><strong>El efecto Seinfeld</strong>: Jerry Seinfeld marcaba con una X cada día que escribía chistes. El objetivo visual de "no romper la cadena" activa la motivación extrínseca.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Hábitos de construcción vs. hábitos de eliminación</h4>
+          <p>Esta app distingue dos tipos de hábitos porque requieren estrategias diferentes:</p>
+          <ul>
+            <li><strong>Construir (hacer más)</strong>: Más sencillos de medir y reforzar. La recompensa es inmediata: marcar el día completado. Ejemplos: ejercicio, meditación, lectura.</li>
+            <li><strong>Evitar (dejar de hacer)</strong>: Más difíciles. El "éxito" es la ausencia de conducta. Estrategia recomendada: sustituir por un hábito alternativo (en lugar de fumar → respirar profundo o mascar chicle). El cerebro necesita algo que hacer con la señal original.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>El poder de las pequeñas mejoras: regla del 1%</h4>
+          <p>James Clear, en <strong>Hábitos Atómicos</strong> (2018), popularizó la matemática de las mejoras marginales:</p>
+          <ul>
+            <li>Mejorar un 1% cada día durante un año = <strong>37 veces mejor</strong> (1,01^365 = 37,78)</li>
+            <li>Empeorar un 1% cada día durante un año = <strong>casi nada</strong> (0,99^365 = 0,03)</li>
+          </ul>
+          <p>La clave no es la magnitud del hábito, sino la <strong>consistencia</strong>. Un hábito mediocre realizado todos los días supera a uno perfecto que se abandona a las tres semanas.</p>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('seguimiento-habitos')} />
 
