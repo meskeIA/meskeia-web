@@ -34,7 +34,10 @@
 - [ ] **Actualizar dependencias (Fase 6)**: `npm outdated` → evaluar actualizaciones. Priorizar: Next.js, React, Chart.js. Sesión dedicada por alto riesgo de breaking changes.
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura
   - *Complejidad*: Alta (sesión separada, con build verification)
-  - *Estado 2026-03-01*: `@types/node` 20→25 disponible (bajo riesgo). `eslint` 9→10 disponible (dev dep). Next.js/React al día.
+  - *Estado 2026-03-01*:
+    - ✅ `@types/node` 20→22 **completado** (build 459 páginas OK, commit b527402). Alineado con Node.js v22 local + Vercel. No actualizar a v25 (no es LTS).
+    - ⏸️ `eslint` 9→10 **suspendido indefinidamente** hasta que `eslint-config-next` soporte oficialmente ESLint 10. No revisar en audits hasta que haya confirmación oficial de compatibilidad. Riesgo: lint se rompe completamente si se actualiza antes.
+    - ✅ Next.js/React al día.
 
 - [x] **ai-index.json: texto desactualizado** — Corregido a 250 apps, suites actualizadas, fecha 2026-03-01. *(resuelto: 2026-03-01)*
 
