@@ -1104,3 +1104,393 @@
     page-break-inside: avoid;
   }
 }
+
+/* ===== SECCIÓN EDUCATIVA v2.0 ===== */
+
+.eduComparativa,
+.eduEscenarios,
+.eduFaq,
+.eduGuia,
+.eduTips,
+.eduWarning {
+  margin-bottom: 2.5rem;
+}
+
+.eduComparativa h2,
+.eduEscenarios h2,
+.eduFaq h2,
+.eduGuia h2,
+.eduTips h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 0.75rem;
+}
+
+.eduIntro {
+  color: var(--text-secondary, #666666);
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Tabla Comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable thead tr {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+}
+
+.comparativaTable th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border-color, #E5E5E5);
+  color: var(--text-primary, #1A1A1A);
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #3A3A3A;
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .tableWrapper {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Escenarios/Casos de Uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.escenarioCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.12);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.escenarioHeader h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0;
+}
+
+.escenarioIcon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  background: var(--bg-primary, #FAFAFA);
+  border-left: 3px solid #2E86AB;
+  border-radius: 0 6px 6px 0;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.escenarioExample p {
+  margin: 0 0 0.5rem;
+  color: var(--text-secondary, #666666);
+}
+
+.escenarioExample code {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #2E86AB;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.escenarioTip {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666666);
+  margin: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: rgba(255,255,255,0.05);
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faqItem {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.faqItem:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.1);
+}
+
+.faqItem h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 0 0 0.75rem;
+}
+
+.faqItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+}
+
+.faqTip {
+  font-size: 0.875rem;
+  color: #48A9A6;
+  background: rgba(72, 169, 166, 0.08);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.5rem !important;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+}
+
+/* Guía Paso a Paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.step:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.1);
+}
+
+.stepNumber {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.stepContent h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0 0 0.4rem;
+}
+
+.stepContent p {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+}
+
+/* Tips / Mejores Prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.tipCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 10px;
+  padding: 1.1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tipCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.12);
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.tipCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0 0 0.4rem;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.5;
+  margin: 0;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+}
+
+/* Warning Box */
+.warningBox {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.08) 0%, rgba(255, 152, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  border-left: 4px solid #FF9800;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.warningHeader h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #E65100;
+  margin: 0;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.5;
+  padding-left: 0.75rem;
+  border-left: 2px solid rgba(255, 152, 0, 0.5);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 152, 0, 0.06);
+  border-color: rgba(255, 152, 0, 0.2);
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #FFB74D;
+}
+
+[data-theme='dark'] .warningList li {
+  color: var(--text-primary, #E5E5E5);
+}
+
+/* Responsive educativa */
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+/* Animación reducida */
+@media (prefers-reduced-motion: reduce) {
+  .escenarioCard,
+  .tipCard,
+  .step,
+  .faqItem {
+    transition: none;
+  }
+}

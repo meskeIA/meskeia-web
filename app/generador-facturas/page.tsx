@@ -1134,163 +1134,331 @@ export default function GeneradorFacturasPage() {
         title="Guía completa de facturación para autónomos y empresas"
         subtitle="Tipos de factura, obligaciones legales, casos de uso y errores que evitar"
       >
-        {/* Cómo funciona */}
-        <section className={styles.guideSection}>
-          <h2>Cómo usar el generador</h2>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
-              <span className={styles.infoIcon}>1️⃣</span>
-              <div>
-                <strong>Rellena tus datos</strong>
-                <p>Se guardan automáticamente para futuras facturas</p>
-              </div>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoIcon}>2️⃣</span>
-              <div>
-                <strong>Añade los conceptos</strong>
-                <p>El IVA y los totales se calculan automáticamente</p>
-              </div>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoIcon}>3️⃣</span>
-              <div>
-                <strong>Genera el PDF</strong>
-                <p>Usa el diálogo de impresión para guardar como PDF</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Tabla comparativa */}
-        <section className={styles.guideSection}>
-          <h2>Tipos de factura: cuándo usar cada una</h2>
-          <div className={styles.tablaWrapper}>
-            <table className={styles.tabla}>
+        {/* TABLA COMPARATIVA */}
+        <section className={styles.eduComparativa}>
+          <h2>📋 Tipos de factura en España: cuándo y cómo usar cada una</h2>
+          <p className={styles.eduIntro}>
+            Elegir el tipo de factura incorrecto puede costarte sanciones de 150–6.000 €. Esta tabla te ayuda a identificar qué configuración necesitas según tu situación real.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
               <thead>
                 <tr>
                   <th>Tipo de factura</th>
-                  <th>IVA</th>
-                  <th>IRPF</th>
+                  <th>IVA aplicable</th>
+                  <th>Retención IRPF</th>
                   <th>Cuándo usarla</th>
                   <th>Ejemplo práctico</th>
+                  <th>Ideal para</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Con IVA (general)</strong></td>
+                  <td><strong>Estándar (con IVA)</strong></td>
                   <td>21% / 10% / 4%</td>
-                  <td>No</td>
-                  <td>Autónomo → empresa o particular sin retención</td>
-                  <td>Venta de productos, servicios técnicos</td>
+                  <td>❌ No aplica</td>
+                  <td>Autónomo o empresa → cliente español</td>
+                  <td>Venta de productos, servicios técnicos, consultoría a particulares</td>
+                  <td>Mayoría de autónomos y SLs</td>
                 </tr>
                 <tr>
-                  <td><strong>Con IVA + IRPF</strong></td>
+                  <td><strong>Con IVA + retención IRPF</strong></td>
                   <td>21%</td>
-                  <td>15% (7% nuevos)</td>
-                  <td>Autónomo profesional → empresa española</td>
-                  <td>Consultoría, diseño, programación</td>
+                  <td>✅ 15% (7% nuevos)</td>
+                  <td>Autónomo profesional → empresa/autónomo español</td>
+                  <td>Diseñador web, consultor, abogado que factura a empresa</td>
+                  <td>Autónomos con actividad profesional</td>
                 </tr>
                 <tr>
                   <td><strong>Exenta de IVA</strong></td>
-                  <td>0%</td>
-                  <td>Depende</td>
-                  <td>Actividades exentas por Ley del IVA</td>
-                  <td>Enseñanza, sanidad, servicios financieros</td>
+                  <td>0% (exenta)</td>
+                  <td>Depende actividad</td>
+                  <td>Actividades exentas por Ley del IVA (art. 20 LIVA)</td>
+                  <td>Formación reglada, servicios sanitarios, actividades financieras</td>
+                  <td>Educadores, médicos, aseguradoras</td>
                 </tr>
                 <tr>
                   <td><strong>Intracomunitaria (UE)</strong></td>
-                  <td>0% inversión</td>
-                  <td>No</td>
-                  <td>B2B entre países de la Unión Europea</td>
-                  <td>Servicios a empresa alemana con VAT number</td>
+                  <td>0% inversión sujeto pasivo</td>
+                  <td>❌ No aplica</td>
+                  <td>B2B entre países de la UE (cliente con VAT number)</td>
+                  <td>Servicios de software a empresa alemana con DE123456789</td>
+                  <td>Freelances y empresas con clientes europeos</td>
                 </tr>
                 <tr>
                   <td><strong>Exportación (fuera UE)</strong></td>
-                  <td>0%</td>
-                  <td>No</td>
-                  <td>Cliente fuera de la Unión Europea</td>
-                  <td>Software vendido a empresa de EE.UU.</td>
+                  <td>0% (exportación)</td>
+                  <td>❌ No aplica</td>
+                  <td>Cliente en país no perteneciente a la UE</td>
+                  <td>SaaS vendido a empresa de EE.UU. o cliente en Japón</td>
+                  <td>Empresas con clientes globales</td>
+                </tr>
+                <tr>
+                  <td><strong>Factura rectificativa</strong></td>
+                  <td>La del original</td>
+                  <td>La del original</td>
+                  <td>Corrección de errores en factura ya emitida</td>
+                  <td>Error en el importe, datos del cliente o IVA aplicado</td>
+                  <td>Cualquier emisor que deba corregir</td>
+                </tr>
+                <tr>
+                  <td><strong>Factura simplificada (ticket)</strong></td>
+                  <td>21% / 10% / 4%</td>
+                  <td>❌ No aplica</td>
+                  <td>Venta directa al público (B2C) en comercio minorista</td>
+                  <td>Tienda física, restaurante, bar con TPV</td>
+                  <td>Comercios minoristas al público</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <p className={styles.tablaNota}>💡 El IRPF solo aplica cuando el cliente es una empresa o autónomo español obligado a retener. Los clientes particulares no retienen IRPF.</p>
         </section>
 
-        {/* Casos de uso */}
-        <section className={styles.guideSection}>
-          <h2>Casos de uso frecuentes</h2>
-          <div className={styles.casosGrid}>
-            <div className={styles.casoCard}>
-              <span className={styles.casoIcono}>👨‍💻</span>
-              <h4>Autónomo de servicios</h4>
-              <p><strong>Situación:</strong> Consultor o freelance que factura a empresas españolas.</p>
-              <p><strong>Configuración:</strong> IVA 21% + IRPF 15% (7% si llevas menos de 2 años de alta).</p>
-              <p><strong>Consejo:</strong> Declara trimestralmente los modelos 303 (IVA) y 130 (IRPF).</p>
+        {/* CASOS DE USO */}
+        <section className={styles.eduEscenarios}>
+          <h2>💼 Situaciones reales: cómo facturar según tu perfil</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👨‍💻</span>
+                <h3>Freelance de servicios digitales</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Situación:</strong> Desarrollador web autónomo. Factura 2.500 € a empresa española.</p>
+                <code>Base: 2.500 € | IVA 21%: +525 € | IRPF 15%: -375 € | TOTAL: 2.650 €</code>
+              </div>
+              <p className={styles.escenarioTip}><strong>Clave:</strong> El cliente ingresa 2.650 € y retiene 375 € que ingresa a Hacienda en tu nombre. Tú los recuperas (o no) en la declaración anual de IRPF.</p>
             </div>
-            <div className={styles.casoCard}>
-              <span className={styles.casoIcono}>🏢</span>
-              <h4>Sociedad Limitada (SL)</h4>
-              <p><strong>Situación:</strong> SL que vende bienes o servicios a otras empresas.</p>
-              <p><strong>Configuración:</strong> IVA 21%. Las sociedades no aplican retención IRPF.</p>
-              <p><strong>Consejo:</strong> Incluye siempre el CIF de la SL y numeración correlativa sin saltos.</p>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏢</span>
+                <h3>Sociedad Limitada (SL)</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Situación:</strong> SL de marketing factura 8.000 € a otra empresa.</p>
+                <code>Base: 8.000 € | IVA 21%: +1.680 € | IRPF: N/A | TOTAL: 9.680 €</code>
+              </div>
+              <p className={styles.escenarioTip}><strong>Clave:</strong> Las sociedades no tienen retención IRPF. El IVA cobrado lo declaras en modelo 303 trimestral y lo compensas con el IVA soportado de tus gastos.</p>
             </div>
-            <div className={styles.casoCard}>
-              <span className={styles.casoIcono}>🌍</span>
-              <h4>Facturación a empresa UE</h4>
-              <p><strong>Situación:</strong> Autónomo que presta servicios a empresa con VAT number europeo.</p>
-              <p><strong>Configuración:</strong> IVA 0% (inversión del sujeto pasivo). Sin IRPF.</p>
-              <p><strong>Consejo:</strong> Incluye en notas: &quot;Operación exenta IVA — art. 69 y 70 LIVA. Inversión sujeto pasivo&quot;.</p>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🌍</span>
+                <h3>Servicio a empresa europea</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Situación:</strong> Consultora española factura 3.000 € a empresa francesa (VAT: FR12345).</p>
+                <code>Base: 3.000 € | IVA: 0% (inversión sujeto pasivo) | TOTAL: 3.000 €</code>
+              </div>
+              <p className={styles.escenarioTip}><strong>Clave:</strong> Incluye en notas: &quot;Operación exenta IVA — art. 69 y 70 LIVA. Inversión del sujeto pasivo.&quot; Declara en modelo 349 (operaciones intracomunitarias).</p>
             </div>
-            <div className={styles.casoCard}>
-              <span className={styles.casoIcono}>🛒</span>
-              <h4>Comerciante minorista</h4>
-              <p><strong>Situación:</strong> Autónomo en recargo de equivalencia que vende al público.</p>
-              <p><strong>Configuración:</strong> No repercute IVA desglosado en sus ventas al público.</p>
-              <p><strong>Consejo:</strong> Confirma con tu gestor si estás en este régimen especial.</p>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📚</span>
+                <h3>Formador o educador autónomo</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Situación:</strong> Profesor que da cursos de formación continua a una empresa.</p>
+                <code>Base: 1.200 € | IVA: 0% (exento art. 20 LIVA) | TOTAL: 1.200 €</code>
+              </div>
+              <p className={styles.escenarioTip}><strong>Clave:</strong> La formación para el empleo y la enseñanza reglada están exentas de IVA. Consulta con tu gestor si tu actividad específica cumple los requisitos del artículo 20.1.9 LIVA.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🆕</span>
+                <h3>Nuevo autónomo (primer año)</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Situación:</strong> Diseñadora dada de alta hace 6 meses. Factura 1.500 € a empresa.</p>
+                <code>Base: 1.500 € | IVA 21%: +315 € | IRPF 7%: -105 € | TOTAL: 1.710 €</code>
+              </div>
+              <p className={styles.escenarioTip}><strong>Clave:</strong> El tipo reducido del 7% aplica el año de alta y los dos siguientes. Comunícaselo al cliente y haz constar en la factura: &quot;IRPF reducido 7% — nuevo autónomo (art. 95.1 RIRPF)&quot;.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🛒</span>
+                <h3>Tienda online o e-commerce</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Situación:</strong> Tienda online vende producto físico a cliente particular por 89,99 €.</p>
+                <code>Base: 74,37 € | IVA 21%: 15,62 € | TOTAL: 89,99 €</code>
+              </div>
+              <p className={styles.escenarioTip}><strong>Clave:</strong> Los clientes particulares no retienen IRPF. Para UE puedes emitir factura simplificada (ticket) salvo que el cliente la solicite completa. En ventas digitales B2C UE, aplica IVA del país del comprador si superas 10.000 € anuales.</p>
             </div>
           </div>
         </section>
 
-        {/* FAQ fiscal */}
-        <section className={styles.guideSection}>
-          <h2>Preguntas frecuentes sobre facturación</h2>
-          <div className={styles.faqGrid}>
+        {/* FAQ */}
+        <section className={styles.eduFaq}>
+          <h2>❓ Preguntas frecuentes sobre facturación</h2>
+          <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>¿Cuándo debo aplicar retención IRPF?</h4>
-              <p>Cuando eres autónomo con actividad profesional y facturas a una empresa o autónomo español. Si tu cliente es un particular, no aplica retención.</p>
+              <h4>❓ ¿Cuándo debo aplicar retención IRPF y cuándo no?</h4>
+              <p>
+                La retención IRPF la aplicas cuando eres autónomo con actividad profesional (o artística/deportiva) y facturas a una <strong>empresa o autónomo español obligado a retener</strong>. Si tu cliente es un particular, nunca aplica retención. Si tu cliente es una empresa extranjera, tampoco. Las sociedades limitadas (SL, SA) tampoco retienen en sus facturas, solo los autónomos en actividades profesionales.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Regla práctica:</strong> Si tu cliente tiene CIF (empresa) y eres autónomo con actividad profesional = aplica retención. Si tiene DNI (particular) o es empresa extranjera = sin retención.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Qué porcentaje de IRPF me corresponde?</h4>
-              <p>15% con carácter general. 7% para nuevos autónomos durante el año de alta y los dos siguientes. 19% para actividades artísticas o deportivas específicas.</p>
+              <h4>❓ ¿Qué pasa si me olvido de incluir datos obligatorios en la factura?</h4>
+              <p>
+                Una factura incompleta puede ser rechazada por el cliente para deducir el IVA, y Hacienda puede imponer sanciones entre <strong>150 € y 600 €</strong> por cada factura incorrecta (art. 201 LGT). Los datos obligatorios son: número correlativo, fecha, datos del emisor y receptor (nombre + NIF/CIF + domicilio), descripción del servicio, base imponible, tipo de IVA, cuota de IVA y total. Si el receptor es persona jurídica, también su domicilio.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Tip:</strong> El generador de meskeIA incluye automáticamente todos los campos obligatorios según la normativa española (RD 1619/2012).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Qué datos son obligatorios en una factura?</h4>
-              <p>Número correlativo, fecha de emisión, datos del emisor (nombre y NIF), datos del receptor, descripción del servicio, base imponible, tipo y cuota de IVA, y total a pagar.</p>
+              <h4>❓ ¿Cómo corrijo un error en una factura ya emitida?</h4>
+              <p>
+                <strong>Nunca modifiques una factura ya entregada.</strong> Hacerlo es falsificación de documento mercantil. La solución correcta es emitir una <strong>factura rectificativa</strong> que: haga referencia al número y fecha de la factura original, indique el motivo de la rectificación, y corrija los datos erróneos. La factura rectificativa lleva su propio número correlativo en la serie de rectificativas (ej: R-001, R-002...).
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Puedes emitir facturas rectificativas tanto para corregir errores como para emitir abonos (cuando devuelves dinero al cliente).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Cómo corrijo una factura ya emitida?</h4>
-              <p>Emitiendo una factura rectificativa que haga referencia a la original. Nunca modifiques una factura ya entregada; hacerlo constituye fraude fiscal.</p>
+              <h4>❓ ¿Qué es la numeración correlativa y por qué es tan importante?</h4>
+              <p>
+                La numeración correlativa significa que las facturas deben emitirse en orden secuencial sin saltos ni repeticiones (2024-001, 2024-002, 2024-003...). <strong>Hacienda considera un salto en la numeración como indicio de facturas ocultas.</strong> Puedes usar prefijos anuales (2025-001) o reiniciar la numeración cada ejercicio fiscal. Si detectas un salto, consúltalo con tu asesor antes de la próxima declaración.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Puedes tener series distintas para distintos tipos de facturas (ej: serie A para nacionales, serie E para exportación, serie R para rectificativas).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Cuánto tiempo debo conservar las facturas?</h4>
-              <p>Mínimo 4 años para Hacienda (prescripción tributaria) y 6 años para el Código de Comercio. Por seguridad práctica, guarda todo durante 6 años.</p>
+              <h4>❓ ¿Cuánto tiempo debo conservar las facturas?</h4>
+              <p>
+                Mínimo <strong>4 años</strong> según la Ley General Tributaria (prescripción tributaria). Sin embargo, el Código de Comercio exige <strong>6 años</strong> para documentos contables. La recomendación práctica es guardar todo durante <strong>6 años</strong>. Si tienes pérdidas que compensar en ejercicios futuros, conserva la documentación hasta que se hayan compensado completamente.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Desde el 1 de julio de 2025, la obligación de factura electrónica (Ley Crea y Crece) se está implementando gradualmente. Prepárate para adoptar software certificado.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Puedo facturar a clientes UE sin IVA?</h4>
-              <p>Sí, si el cliente tiene número VAT europeo válido y la operación es B2B. El IVA se aplica en el país del cliente (inversión del sujeto pasivo).</p>
+              <h4>❓ ¿Puedo incluir mi cuenta bancaria en la factura para cobrar por transferencia?</h4>
+              <p>
+                Sí, es práctica habitual y recomendable incluir el IBAN en la factura para facilitar el pago. No es dato obligatorio según el reglamento de facturación, pero sí muy práctico. Asegúrate de indicar también el plazo de pago acordado. La Ley de Morosidad (Ley 3/2004) establece un plazo máximo de 30 días para empresas y 60 días para Administraciones Públicas.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Si el cliente tarda en pagar, puedes añadir intereses de demora (el tipo legal del dinero + 8 puntos para operaciones comerciales B2B).</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué diferencia hay entre factura ordinaria y factura simplificada?</h4>
+              <p>
+                La <strong>factura simplificada (ticket)</strong> puede emitirse cuando el destinatario es un particular o el importe es inferior a 400 € IVA incluido. No es necesario indicar los datos del receptor. Los comercios con autorización especial pueden usar tickets hasta 3.000 €. La factura <strong>ordinaria completa</strong> es obligatoria cuando el destinatario es una empresa o cuando supera los umbrales anteriores.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Regla:</strong> Si el cliente va a deducirse el IVA, necesita sí o sí una factura ordinaria completa con sus datos.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué es la factura electrónica y cuándo es obligatoria?</h4>
+              <p>
+                La factura electrónica es una factura emitida y recibida en formato digital estructurado (XML, Facturae) con garantías de autenticidad e integridad. Ya es <strong>obligatoria para facturar a la Administración Pública</strong> desde 2015. Para el sector privado, la Ley &quot;Crea y Crece&quot; (Ley 18/2022) la hará obligatoria para empresas con facturación &gt;8M€ en 2025 y para el resto (incluidos autónomos) en 2026.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Anticípate:</strong> Adopta un software de facturación compatible con Facturae antes de que sea obligatorio para evitar prisas y costes de adaptación de última hora.</p>
             </div>
           </div>
         </section>
 
-        {/* Warning box */}
+        {/* GUÍA PASO A PASO */}
+        <section className={styles.eduGuia}>
+          <h2>📋 Cómo emitir una factura correcta paso a paso</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Asigna un número correlativo único</h4>
+                <p>Usa el formato AAAA-NNN (ej: 2025-001). Asegúrate de que no hay saltos en la secuencia. Si tienes distintos tipos de facturas, crea series separadas: serie N para nacionales, E para exportación, R para rectificativas. El número nunca puede repetirse ni omitirse.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Comprueba los datos del emisor (tú)</h4>
+                <p>Nombre o razón social completo, NIF/CIF válido, domicilio fiscal, y opcionalmente teléfono y email. Si eres autónomo persona física, tu nombre completo tal como aparece en el IAE. Si es SL/SA, la denominación social exacta del Registro Mercantil.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Verifica los datos del cliente (receptor)</h4>
+                <p>Solicita siempre el NIF/CIF antes de emitir. Para empresas europeas, verifica el VAT number en el registro VIES (ec.europa.eu/vies). Un VAT incorrecto puede anular la exención de IVA y obligarte a regularizar con intereses. Para clientes extranjeros fuera de UE, el pasaporte o número de identificación nacional.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Describe el servicio/producto con precisión</h4>
+                <p>La descripción debe ser suficientemente detallada para identificar qué se factura. Evita descripciones genéricas como &quot;servicios varios&quot;. Incluye: qué has hecho, para qué proyecto o periodo, y cualquier acuerdo específico. Una descripción clara evita reclamaciones y facilita la deducción del IVA por el cliente.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Aplica el IVA y la retención correctos</h4>
+                <p>Aplica el tipo de IVA correcto según la naturaleza del servicio (21% general, 10% bienes de primera necesidad, 4% libros/medicamentos, 0% intracomunitario/exportación). Si corresponde retención IRPF, aplica 15% (o 7% si llevas menos de 3 años de alta como autónomo profesional). Calcula siempre: Base imponible → +IVA → -Retención = Total a cobrar.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Indica la fecha de emisión y vencimiento</h4>
+                <p>La fecha de emisión es la fecha real en que la emites. Si has entregado el servicio en un mes diferente, considera indicar también la &quot;fecha del devengo&quot;. El plazo de pago estándar en B2B es 30 días (60 para grandes empresas). Indicarlo reduce los retrasos: &quot;Vencimiento: 30 días fecha factura&quot;.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Guarda y envía correctamente</h4>
+                <p>Guarda una copia en PDF en una carpeta organizada por año y mes. Envíala por email con asunto claro (&quot;Factura 2025-042 — [Tu empresa]&quot;). Conserva el justificante del envío. Registra en tu libro de facturas emitidas (requerido para el modelo 303 de IVA). Si el cliente pide formato electrónico estructurado, usa Facturae (XML).</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* MEJORES PRÁCTICAS */}
+        <section className={styles.eduTips}>
+          <h2>✅ Buenas prácticas de facturación profesional</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <h4>Emite facturas el mismo día del servicio</h4>
+              <p>La factura debe emitirse el día del devengo (cuando se realiza el servicio) o como máximo el último día del mes natural siguiente. Emitirla el mismo día acelera el cobro.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔢</span>
+              <h4>Nunca rompas la correlación numérica</h4>
+              <p>Si cancelas una factura antes de enviarla, emite igualmente una factura con importe 0 o una rectificativa. Un salto en la numeración es motivo de inspección en Hacienda.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📁</span>
+              <h4>Organiza en carpetas por año y mes</h4>
+              <p>Estructura: /Facturas/2025/01-Enero, /Facturas/2025/02-Febrero... Guarda tanto las emitidas como las recibidas. Facilita enormemente la preparación del trimestre.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Verifica el NIF antes de emitir, no después</h4>
+              <p>Un NIF incorrecto invalida la factura y puede impedir que el cliente deduzca el IVA. Usa la herramienta de validación NIF de meskeIA antes de crear cada factura nueva.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💶</span>
+              <h4>Usa IBAN y plazo de pago explícito</h4>
+              <p>Indicar el IBAN y &quot;Pago en 30 días&quot; reduce el tiempo medio de cobro en 7-10 días. Los clientes con flujo de caja ajustado pagan primero las facturas con fecha límite clara.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <h4>Reconcilia con el libro de facturas mensualmente</h4>
+              <p>Al cerrar cada mes, cruza las facturas emitidas con los cobros recibidos. Detectar impagos en menos de 30 días duplica la probabilidad de cobro. Pasados 90 días, el riesgo de impago se dispara.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* WARNING BOX */}
         <div className={styles.warningBox}>
-          <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
-          <div>
-            <strong>Errores de facturación que generan sanciones</strong>
-            <p>Saltarse la numeración correlativa, omitir datos obligatorios, modificar facturas ya emitidas o no declararlas trimestralmente puede acarrear sanciones de entre 150 € y 6.000 € según la Ley General Tributaria.</p>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Errores de facturación que generan sanciones o pérdida de derechos</h3>
           </div>
+          <ul className={styles.warningList}>
+            <li><strong>❌ Saltarse números en la secuencia:</strong> Hacienda lo interpreta como ocultación de ingresos. Sanción mínima 300 € y puede derivar en inspección completa.</li>
+            <li><strong>❌ Modificar una factura ya entregada:</strong> Es falsificación de documento mercantil (delito penal). La corrección correcta es siempre mediante factura rectificativa.</li>
+            <li><strong>❌ Aplicar IRPF del 7% fuera de plazo:</strong> El tipo reducido solo es válido durante el año de alta y los dos siguientes. Pasado ese plazo, usar 7% es error y Hacienda regularizará con intereses.</li>
+            <li><strong>❌ Facturar a empresa UE sin verificar VAT number:</strong> Si el VAT del cliente es incorrecto o ficticio, la exención de IVA es inválida. Deberás regularizar el IVA más intereses de demora.</li>
+            <li><strong>❌ No declarar facturas en el trimestre correcto:</strong> La factura debe declararse en el trimestre en que se emite (criterio de devengo), no cuando se cobra. Declarar en trimestre incorrecto = sanción por extemporaneidad.</li>
+            <li><strong>❌ Omitir datos obligatorios:</strong> Una factura sin NIF del cliente, sin descripción suficiente o sin fecha es una factura inválida. El cliente no puede deducir el IVA y tú puedes ser sancionado entre 150 y 600 € por factura.</li>
+            <li><strong>❌ No conservar facturas el tiempo mínimo:</strong> Destruir facturas antes de 4 años (tributario) o 6 años (mercantil) impide defenderte en una inspección y puede considerarse obstrucción.</li>
+            <li><strong>❌ Usar facturas sin numeración propia como SL:</strong> Las sociedades mercantiles deben llevar libros contables oficiales. Usar hojas sueltas sin registro contable formal puede invalidar la contabilidad completa.</li>
+          </ul>
         </div>
       </EducationalSection>
 
