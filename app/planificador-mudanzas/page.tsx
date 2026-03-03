@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './PlanificadorMudanzas.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
 
@@ -914,6 +914,371 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
           </section>
         )}
       </main>
+
+      {/* ========== SECCIÓN EDUCATIVA ========== */}
+      <EducationalSection title="📦 Guía completa para organizar tu mudanza sin estrés" subtitle="Todo lo que necesitas saber para planificar, presupuestar y ejecutar tu mudanza con éxito en España">
+
+        {/* TABLA COMPARATIVA */}
+        <section className={styles.eduComparativa}>
+          <h2>⚖️ ¿Contratar empresa, alquilar furgoneta o mudanza propia?</h2>
+          <p className={styles.eduIntro}>
+            La decisión más importante de tu mudanza. Cada opción tiene ventajas según tu volumen de pertenencias, distancia y presupuesto disponible.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>🏢 Empresa mudanzas</th>
+                  <th>🚐 Furgoneta alquilada</th>
+                  <th>🚗 Mudanza propia</th>
+                  <th>📦 Empresa básica (solo transporte)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Coste aproximado</strong></td>
+                  <td>800-3.000 €</td>
+                  <td>150-400 €/día</td>
+                  <td>0-100 € (combustible)</td>
+                  <td>400-900 €</td>
+                </tr>
+                <tr>
+                  <td><strong>Esfuerzo físico</strong></td>
+                  <td>Mínimo</td>
+                  <td>Muy alto</td>
+                  <td>Muy alto</td>
+                  <td>Alto (tú embala y sube)</td>
+                </tr>
+                <tr>
+                  <td><strong>Seguro de daños</strong></td>
+                  <td>✅ Incluido</td>
+                  <td>⚠️ Opcional extra</td>
+                  <td>❌ No incluido</td>
+                  <td>⚠️ Limitado</td>
+                </tr>
+                <tr>
+                  <td><strong>Distancia óptima</strong></td>
+                  <td>Cualquier distancia</td>
+                  <td>Local o regional</td>
+                  <td>Muy local (&lt;20km)</td>
+                  <td>Local o provincial</td>
+                </tr>
+                <tr>
+                  <td><strong>Volumen de objetos</strong></td>
+                  <td>Cualquier volumen</td>
+                  <td>Piso completo (4-6 viajes)</td>
+                  <td>Estudio o pocos muebles</td>
+                  <td>Piso completo sin muebles grandes</td>
+                </tr>
+                <tr>
+                  <td><strong>Muebles grandes</strong></td>
+                  <td>✅ Desmontan/remontan</td>
+                  <td>⚠️ Tú te encargas</td>
+                  <td>❌ Complicado</td>
+                  <td>⚠️ Solo transporte</td>
+                </tr>
+                <tr>
+                  <td><strong>Ideal para</strong></td>
+                  <td>Familia completa, distancias largas, poco tiempo</td>
+                  <td>Persona joven con ayuda de amigos</td>
+                  <td>Estudiante con pocos objetos</td>
+                  <td>Quien puede embalar pero no cargar</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* CASOS DE USO */}
+        <section className={styles.eduEscenarios}>
+          <h2>💼 4 perfiles de mudanza y sus estrategias</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎓</span>
+                <h3>Estudiante (piso compartido)</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Situación típica:</strong></p>
+                <code>{`- Volumen: 5-10 cajas + maletas\n- Distancia: 50-500km\n- Presupuesto: 200-400 €\n- Tiempo disponible: fin de semana`}</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>Estrategia óptima:</strong> Alquiler de furgoneta + amigos. Vende muebles pesados antes (Facebook Marketplace) y compra nuevos en destino (Ikea). Muchas empresas como BlaBlaCar Cargo ofrecen transporte de cajas a bajo coste. Reserva con 3-4 semanas de antelación, especialmente en septiembre (temporada alta universitaria).
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👔</span>
+                <h3>Profesional soltero (cambio de ciudad)</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Situación típica:</strong></p>
+                <code>{`- Volumen: 1 dormitorio + salón completo\n- Distancia: 200-800km\n- Presupuesto: 600-1.200 €\n- Tiempo: muy limitado (trabaja)`}</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>Estrategia óptima:</strong> Empresa de mudanzas básica (solo transporte) o servicio completo si el trabajo lo paga. Pide 3-5 presupuestos con 4-6 semanas de antelación. Muchas empresas negocian el precio si hay flexibilidad en la fecha (lunes-martes suelen ser 15-20% más baratos que fines de semana).
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+                <h3>Familia con niños (primera vivienda)</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Situación típica:</strong></p>
+                <code>{`- Volumen: 3-4 dormitorios\n- Distancia: cualquier\n- Presupuesto: 1.500-3.500 €\n- Complejidad: muy alta (niños, mascotas)`}</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>Estrategia óptima:</strong> Empresa de mudanzas completa con servicio de embalaje incluido. Vale la pena el extra porque protege los objetos con cobertura de seguro. Planifica con 8+ semanas de antelación. Organiza el cuidado de los niños para el día D (no pueden estar en casa durante la mudanza). Reserva un colchón de 500-1.000 € para gastos imprevistos de la nueva vivienda.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👴</span>
+                <h3>Persona mayor (vaciado de vivienda)</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Situación típica:</strong></p>
+                <code>{`- Volumen: piso completo 40-60 años de objetos\n- Proceso: 3-6 semanas de organización\n- Necesidad: vaciado + donación + venta\n- Presupuesto variable`}</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>Estrategia óptima:</strong> Empezar por el vaciado de objetos innecesarios (servicios de recogida gratuita de Cruz Roja, Caritas o Humana para ropa/libros). Para muebles de valor, considerar subastas online (Catawiki, eBay). Muchas empresas de mudanza ofrecen "servicio de vaciado" todo incluido por 500-1.500 €. Reservar contenedor de escombros si hay electrodomésticos viejos.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.eduFaq}>
+          <h2>❓ Preguntas frecuentes sobre mudanzas</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cuánto tiempo de antelación necesito para planificar una mudanza?</h4>
+              <p>
+                Depende del tamaño y distancia. Para mudanzas locales pequeñas (estudiante), con <strong>2-3 semanas</strong> es suficiente. Para mudanzas de piso completo, lo ideal son <strong>6-8 semanas</strong>. Para mudanzas internacionales o de empresa, se recomienda <strong>3-6 meses</strong>. En temporada alta (junio-septiembre y enero-febrero), las empresas se reservan antes; planifica con el doble de tiempo habitual.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Consejo práctico:</strong> Solicita presupuestos de al menos 3-5 empresas en cuanto tengas la fecha confirmada. Las empresas suelen dar mejor precio cuando ven que estás comparando.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué documentos necesito cambiar al hacer una mudanza?</h4>
+              <p>
+                Los obligatorios por ley son: <strong>empadronamiento</strong> (30 días desde el cambio, Ayuntamiento), <strong>DNI/carnet de conducir</strong> (3 meses desde el empadronamiento), <strong>Hacienda/AEAT</strong> (antes de la siguiente declaración) y <strong>Seguridad Social</strong> (30 días). Los recomendados: banco, seguro del hogar, suscripciones (Amazon, Netflix), trabajo, médico de cabecera y colegio de los hijos.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Consejo práctico:</strong> Usa el planificador de tareas para no olvidar ninguna notificación. El cambio de empadronamiento es la base: muchos trámites posteriores lo requieren.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cómo sé si una empresa de mudanzas es fiable?</h4>
+              <p>
+                Verifica estos puntos antes de contratar: <strong>CIF/NIF visible</strong> en presupuesto, <strong>seguro de responsabilidad civil</strong> (mínimo 600.000 €, pídelo por escrito), <strong>reseñas verificadas</strong> en Google Maps (mínimo 20 reseñas, media &gt;4.0), <strong>presupuesto por escrito</strong> (nunca verbal), y <strong>dirección física verificable</strong> de la empresa. Desconfía de precios muy por debajo de la media: suelen añadir extras no comunicados.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Consejo práctico:</strong> Pide al menos 3 presupuestos. Si uno es más del 30% más barato que los demás, pregunta exactamente qué no incluye.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué debo hacer con los electrodomésticos antes de la mudanza?</h4>
+              <p>
+                <strong>Nevera/congelador:</strong> Vaciar y descongelar con 48 horas de antelación (coloca toallas para absorber el agua). <strong>Lavadora:</strong> Vaciar el tambor y poner los tornillos de transporte (si los conservas). <strong>Lavavajillas:</strong> Vaciar completamente. <strong>Horno:</strong> Limpiar bien para evitar olores. Los electrodomésticos deben transportarse en vertical (lavadora, nevera). Si la empresa de mudanzas los tumbara, pueden sufrir daños internos.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Consejo práctico:</strong> Si tu lavadora ya no tiene los tornillos de transporte, puedes comprarlos genéricos online por 5-15 €. Transportarla sin ellos puede dañar el tambor.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cómo empacar correctamente para que no se rompa nada?</h4>
+              <p>
+                Reglas básicas: <strong>objetos pesados en cajas pequeñas</strong> (libros, vajilla); <strong>objetos frágiles con papel de burbujas</strong> (mínimo 3 capas); <strong>ropa como relleno</strong> en cajas con objetos de vidrio; <strong>cajas siempre llenas</strong> (no dejar huecos, rellenar con papel periódico para que no se muevan). Etiqueta cada caja con: habitación de destino, contenido básico y si es frágil.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Consejo práctico:</strong> Supermercados y librerías regalan cajas de buena calidad. Solo compra el papel burbuja y la cinta de embalar. Ahorra 50-100 € en material de embalaje.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Es necesario hacer fotos de la vivienda antes de irse?</h4>
+              <p>
+                <strong>Sí, es fundamental si tienes contrato de alquiler.</strong> Documenta con fotos y vídeo (con fecha visible) el estado de cada habitación, electrodomésticos y paredes. Envía el archivo por email al propietario el mismo día de entrega de llaves. En caso de conflicto sobre la fianza, estas pruebas son determinantes. Si eres propietario que vende, las fotos del estado original también protegen ante posibles reclamaciones del comprador.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Consejo práctico:</strong> Fotografía especialmente los desperfectos ya existentes antes de tu mudanza de entrada. Son los que más conflictos generan al salir.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cómo gestiono los suministros (luz, agua, gas) en el cambio?</h4>
+              <p>
+                Para la vivienda que abandonas: solicita la <strong>baja</strong> o cambio de titular 15-30 días antes. Para la nueva vivienda: solicita el <strong>alta</strong> o cambio de titular 15-30 días antes. El día de la mudanza, anota las lecturas de los contadores (agua, luz, gas) con foto del marcador. Esto evita disputas sobre el consumo del período de transición. Los nuevos suministros pueden tardar 7-15 días laborables en darse de alta.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Consejo práctico:</strong> Compara tarifas de luz y gas antes de dar el alta en la nueva vivienda. Es el momento perfecto para cambiar a un proveedor más barato sin penalización.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cuánto dinero debo reservar como colchón extra para la mudanza?</h4>
+              <p>
+                Calcula el <strong>presupuesto de la empresa + 20-30% adicional</strong> para imprevistos. Los más frecuentes: piso origen con ascensor averiado (requiere más personal: +150-300 €), furgoneta adicional por volumen mayor al estimado (+200-400 €), reparaciones urgentes en vivienda nueva (cerradura, humedades, etc.), gastos de primeros días (comidas fuera, hotel si la mudanza se retrasa). Para una mudanza media de familia, reserva mínimo 500-1.000 € de colchón.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Consejo práctico:</strong> Usa la pestaña Presupuesto de este planificador para registrar estimados y reales. Así detectas desviaciones a tiempo.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* GUÍA PASO A PASO */}
+        <section className={styles.eduGuia}>
+          <h2>📋 Plan de acción: 7 semanas para una mudanza perfecta</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>8 semanas antes: Decisiones estratégicas</h4>
+                <p>
+                  Decide si contratas empresa o te lo gestionas. Solicita 3-5 presupuestos. Define qué te llevas y qué vendes/donas/tiras. Haz el inventario general para estimar el volumen real. Este paso determina el presupuesto final: una mala estimación puede aumentar el coste un 30%.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>6 semanas antes: Contratación y notificaciones</h4>
+                <p>
+                  Contrata la empresa de mudanzas o reserva la furgoneta. Notifica el cambio de dirección a: banco, trabajo, Hacienda, Seguridad Social y suscripciones. Solicita la baja de suministros en origen y el alta en destino (los suministros tardan 2-4 semanas).
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>4 semanas antes: Embalaje progresivo</h4>
+                <p>
+                  Empieza a embalar por los objetos que menos usas: libros, decoración, ropa de temporada, electrodomésticos secundarios. Etiqueta cada caja con habitación destino y contenido. Aprovecha para donar o vender objetos que no usas en Facebook Marketplace o Wallapop.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>1 semana antes: Preparación final</h4>
+                <p>
+                  Prepara la "maleta de emergencia": documentos importantes, medicamentos, cargadores, muda de ropa para 3 días, artículos de aseo. Descongela nevera y congelador (48h antes). Desmonta muebles que requieran. Confirma hora exacta con la empresa. Haz fotos del estado de la vivienda.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Día D: Supervisión y control</h4>
+                <p>
+                  Supervisa la carga del camión. Anota las lecturas de contadores (foto con fecha). Haz el inventario final de cajas. Revisa cada habitación antes de irte. Entrega las llaves con acta notarial o email confirmando el estado (crucial para la fianza). Supervisa también la descarga en destino.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Primeros 3 días: Esenciales primero</h4>
+                <p>
+                  Monta primero las camas y la cocina básica. Desembala por prioridades (no por habitaciones). Localiza: médico de cabecera más cercano, supermercado, farmacia y parada de transporte público. Haz el empadronamiento en los primeros 30 días (es obligatorio y base para otros trámites).
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Primera semana: Trámites administrativos</h4>
+                <p>
+                  Actualiza el DNI/carnet de conducir (con cita previa, puede tardar 2-4 semanas). Actualiza la dirección en Hacienda (www.sede.hacienda.gob.es). Cambia la tarjeta sanitaria al centro de salud del nuevo domicilio. Notifica a tu seguro del hogar el cambio de dirección para mantener la cobertura.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* MEJORES PRÁCTICAS */}
+        <section className={styles.eduTips}>
+          <h2>✅ 6 hábitos del mudador inteligente</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Etiqueta con colores por habitación</h4>
+              <p>Asigna un color de cinta adhesiva a cada habitación destino. Los mozos de mudanza sabrán exactamente dónde colocar cada caja sin tener que preguntar. Ahorra 1-2 horas en la descarga.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Fotografía el interior de cada caja</h4>
+              <p>Antes de cerrar cada caja, fotografía el contenido. Si algo llega roto, tienes prueba del estado original para reclamar al seguro o a la empresa. También ayuda a encontrar objetos sin abrir todas las cajas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Crea una "caja de primer día"</h4>
+              <p>Una caja especial (color diferente, marcada como urgente) con: cafetera, tazas, sábanas, toallas, jabón, papel higiénico, servilletas, snacks y cargadores. Ábrela primero. El resto puede esperar días.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Pesa las cajas antes de cerrarlas</h4>
+              <p>Las cajas no deben superar los 20kg (para poder manejarlas con seguridad). Cajas muy pesadas aumentan el riesgo de rotura y lesiones. Si supera 20kg, divide el contenido en dos cajas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Negocia el precio con flexibilidad de fecha</h4>
+              <p>Las mudanzas de lunes a jueves cuestan un 15-25% menos que los fines de semana. Si puedes elegir la fecha, ahorra en este concepto. Algunas empresas también ofrecen descuento por pago al contado.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Guarda todos los recibos de gastos</h4>
+              <p>Si cambias de ciudad por motivos laborales, muchos gastos de mudanza son deducibles en el IRPF. Guarda facturas de: empresa de mudanzas, alquiler de furgoneta, material de embalaje, viaje, alojamiento temporal.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* WARNING BOX */}
+        <section className={styles.eduWarning}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Errores costosos que arruinan las mudanzas</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>❌ Contratar sin pedir presupuesto por escrito:</strong> Un presupuesto verbal no tiene validez legal. Si la empresa añade extras no pactados el día de la mudanza, estarás en una posición muy débil para negarte. Siempre exige presupuesto detallado por email o documento firmado antes de confirmar.
+              </li>
+              <li>
+                <strong>❌ No verificar el seguro de daños:</strong> Las empresas de mudanzas tienen cobertura limitada por defecto (suele ser solo 2-5 € por kilo transportado). Si tienes objetos valiosos (obras de arte, electrónica cara, instrumentos musicales), contrata cobertura adicional o un seguro específico de mudanza.
+              </li>
+              <li>
+                <strong>❌ Olvidar notificar el cambio de dirección a Hacienda:</strong> Si no actualizas la dirección fiscal, las notificaciones importantes de la AEAT irán a tu domicilio anterior. Puedes perderte requerimientos con multas por no responder. El plazo legal es antes de la siguiente declaración de la renta.
+              </li>
+              <li>
+                <strong>❌ Dejar los suministros sin gestionar:</strong> Si no solicitas la baja en la vivienda que abandonas, pueden seguir cargándote cuotas mínimas. Peor aún: si el nuevo inquilino/propietario no da de alta los suyos, los gastos se acumularán en tu nombre hasta que solicites la baja.
+              </li>
+              <li>
+                <strong>❌ Transportar la nevera o lavadora tumbadas sin precaución:</strong> La nevera transportada tumbada necesita estar en vertical durante 24-48 horas antes de enchufarse (el compresor necesita que el aceite vuelva a su posición). La lavadora sin tornillos de transporte puede sufrir daños en el tambor que no son visibles inmediatamente.
+              </li>
+              <li>
+                <strong>❌ No hacer inventario del nuevo piso antes de entrar:</strong> Documenta el estado de la vivienda nueva antes de llevar tus muebles. Si hay desperfectos preexistentes (manchas, grietas, electrodomésticos averiados), notifícalo al propietario ese mismo día. De lo contrario, al salir, pueden hacerte responsable de daños que ya existían.
+              </li>
+              <li>
+                <strong>❌ Infravalorar el tiempo necesario para desembalar:</strong> El 80% de las familias subestima el tiempo de instalación. Una mudanza de piso completo requiere 1-3 semanas de trabajo parcial para quedar completamente organizada. No planifiques eventos sociales ni compromisos importantes en las dos semanas posteriores a la mudanza.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('planificador-mudanzas')} />
       <ShareCard appName="planificador-mudanzas" />
