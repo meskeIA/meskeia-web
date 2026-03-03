@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import styles from './CalculadoraTIRVAN.module.css';
+import styles from './CalculadoraTirVan.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
@@ -431,78 +431,315 @@ export default function CalculadoraTIRVANPage() {
 
       {/* Contenido Educativo */}
       <EducationalSection
-        title="📚 ¿Quieres entender mejor el VAN y la TIR?"
-        subtitle="Aprende los conceptos fundamentales del análisis de inversiones y cómo interpretar estos indicadores"
+        title="📚 Guía completa de análisis de inversiones: VAN, TIR y Payback"
+        subtitle="Aprende a evaluar proyectos de inversión con los indicadores más usados en finanzas y toma decisiones con datos reales"
       >
-        <section className={styles.guideSection}>
-          <h2>¿Qué son el VAN y la TIR?</h2>
-          <p className={styles.introParagraph}>
-            El VAN (Valor Actual Neto) y la TIR (Tasa Interna de Retorno) son las dos herramientas
-            más utilizadas en finanzas para evaluar la viabilidad de proyectos de inversión. Permiten
-            comparar diferentes alternativas y decidir si una inversión merece la pena.
-          </p>
+        {/* TABLA COMPARATIVA */}
+        <section className={styles.eduComparativa}>
+          <h2>⚖️ VAN vs TIR vs Payback: comparativa de indicadores</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>VAN</th>
+                  <th>TIR</th>
+                  <th>Payback Descontado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>¿Qué mide?</strong></td>
+                  <td>Valor creado en € de hoy</td>
+                  <td>Rentabilidad intrínseca (%)</td>
+                  <td>Tiempo de recuperación</td>
+                </tr>
+                <tr>
+                  <td><strong>Unidad</strong></td>
+                  <td>Euros (€)</td>
+                  <td>Porcentaje (%)</td>
+                  <td>Años / meses</td>
+                </tr>
+                <tr>
+                  <td><strong>Criterio aceptar</strong></td>
+                  <td>VAN &gt; 0</td>
+                  <td>TIR &gt; tasa descuento</td>
+                  <td>Payback &lt; período máximo</td>
+                </tr>
+                <tr>
+                  <td><strong>Ventaja clave</strong></td>
+                  <td>Más fiable para proyectos excluyentes</td>
+                  <td>Fácil de comparar con coste capital</td>
+                  <td>Mide liquidez y recuperación</td>
+                </tr>
+                <tr>
+                  <td><strong>Limitación</strong></td>
+                  <td>Depende de la tasa de descuento elegida</td>
+                  <td>Asume reinversión a la misma TIR</td>
+                  <td>Ignora flujos después del payback</td>
+                </tr>
+                <tr>
+                  <td><strong>Uso recomendado</strong></td>
+                  <td>Decisión final siempre</td>
+                  <td>Comparación entre proyectos similares</td>
+                  <td>Complemento de liquidez</td>
+                </tr>
+                <tr>
+                  <td><strong>Proyectos idóneos</strong></td>
+                  <td>Todos (el más universal)</td>
+                  <td>Proyectos independientes</td>
+                  <td>Proyectos con riesgo de liquidez</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>💵 Valor Actual Neto (VAN)</h4>
-              <p>
-                El VAN calcula cuánto valor genera (o destruye) un proyecto en términos de dinero de hoy.
-                Descuenta los flujos futuros a una tasa que representa el coste de oportunidad del capital.
-                Si el VAN es positivo, el proyecto genera valor; si es negativo, lo destruye.
+        {/* ESCENARIOS */}
+        <section className={styles.eduEscenarios}>
+          <h2>🎯 Casos reales de análisis de inversión</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏭</span>
+                <h3>Maquinaria industrial (PYME)</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Inversión inicial: 80.000 €. Flujos anuales: 25.000 € durante 5 años. Tasa descuento: 8%.
+                <br /><strong>VAN = +19.800 € → Aceptar. TIR = 16,9% &gt; 8% → Rentable.</strong>
               </p>
-              <code className={styles.formula}>VAN = -I₀ + Σ(FC_t / (1+r)^t)</code>
+              <p className={styles.escenarioTip}>💡 La maquinaria se amortiza en 3,8 años y genera valor adicional.</p>
             </div>
-            <div className={styles.contentCard}>
-              <h4>📈 Tasa Interna de Retorno (TIR)</h4>
-              <p>
-                La TIR es la tasa de descuento que hace que el VAN sea exactamente cero.
-                Representa la rentabilidad intrínseca del proyecto. Si la TIR supera el
-                coste del capital (tasa de descuento), el proyecto es rentable.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏗️</span>
+                <h3>Proyecto inmobiliario (promotor)</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Inversión: 500.000 €. Venta en año 3: 750.000 €. Sin flujos intermedios. Tasa: 12%.
+                <br /><strong>VAN = +33.500 € → Aceptar. TIR = 14,5% &gt; 12%.</strong>
               </p>
-              <code className={styles.formula}>TIR = r cuando VAN = 0</code>
+              <p className={styles.escenarioTip}>💡 Payback de 3 años. Clave: certeza en precio de venta.</p>
             </div>
-            <div className={styles.contentCard}>
-              <h4>⏱️ Payback Descontado</h4>
-              <p>
-                Es el tiempo necesario para recuperar la inversión inicial, considerando
-                el valor temporal del dinero. A diferencia del payback simple, tiene en cuenta
-                que un euro hoy vale más que un euro mañana.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>☀️</span>
+                <h3>Placas solares (particular)</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Inversión: 12.000 €. Ahorro anual en electricidad: 1.800 € durante 20 años. Tasa: 4%.
+                <br /><strong>VAN = +12.450 € → Muy rentable. TIR = 14,4%.</strong>
               </p>
+              <p className={styles.escenarioTip}>💡 Payback: 7,5 años. A largo plazo, excelente inversión.</p>
             </div>
-            <div className={styles.contentCard}>
-              <h4>📊 Tasa de Descuento</h4>
-              <p>
-                Representa el coste de oportunidad del capital: la rentabilidad que obtendrías
-                invirtiendo en una alternativa de riesgo similar. Puede ser el coste de financiación
-                (WACC) o la rentabilidad mínima exigida por los accionistas.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🛑</span>
+                <h3>Expansión tienda física (VAN negativo)</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Inversión: 60.000 €. Flujos anuales: 8.000 € durante 10 años. Tasa: 12%.
+                <br /><strong>VAN = -14.800 € → Rechazar. TIR = 5,2% &lt; 12%.</strong>
               </p>
+              <p className={styles.escenarioTip}>⚠️ Destruye valor aunque genera caja positiva anual.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📱</span>
+                <h3>App SaaS (startup tecnológica)</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Inversión: 150.000 €. Flujos crecientes: 10k, 30k, 60k, 90k, 120k €. Tasa: 18%.
+                <br /><strong>VAN = +32.400 € → Aceptar. TIR = 26,1%.</strong>
+              </p>
+              <p className={styles.escenarioTip}>💡 Crecimiento exponencial justifica alta tasa de descuento.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔀</span>
+                <h3>Elegir entre 2 proyectos excluyentes</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Proyecto A: VAN=45.000 €, TIR=22%. Proyecto B: VAN=65.000 €, TIR=18%.
+                <br /><strong>Decisión: Proyecto B (mayor VAN, aunque menor TIR).</strong>
+              </p>
+              <p className={styles.escenarioTip}>💡 Siempre elige por VAN, no por TIR, en proyectos excluyentes.</p>
             </div>
           </div>
         </section>
 
-        <section className={styles.guideSection}>
-          <h2>Criterios de Decisión</h2>
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>✅ Aceptar el proyecto si:</h4>
+        {/* FAQ */}
+        <section className={styles.eduFaq}>
+          <h2>❓ Preguntas frecuentes sobre VAN, TIR y análisis de inversiones</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué tasa de descuento debo usar?</h4>
               <p>
-                • VAN &gt; 0 (genera valor añadido)<br />
-                • TIR &gt; tasa de descuento<br />
-                • Payback &lt; período máximo aceptable<br />
-                Los tres criterios deberían cumplirse simultáneamente.
+                Depende del tipo de decisión. Para una empresa, usa el WACC (coste medio ponderado del capital): coste del capital propio × porcentaje propio + coste de deuda × porcentaje deuda. Para inversión personal, usa la rentabilidad alternativa: si podrías obtener un 5% en renta fija, usa esa como referencia. Para proyectos con riesgo alto (startups), aplica primas de riesgo del 15-25%.
               </p>
+              <p className={styles.faqTip}>💡 <strong>Regla práctica:</strong> Empieza con el 8-10% para proyectos empresariales estándar. Ajusta según el riesgo específico del sector y momento económico.</p>
             </div>
-            <div className={styles.contentCard}>
-              <h4>❌ Rechazar el proyecto si:</h4>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cuándo puede dar señales incorrectas la TIR?</h4>
               <p>
-                • VAN &lt; 0 (destruye valor)<br />
-                • TIR &lt; tasa de descuento<br />
-                • Payback &gt; período máximo aceptable<br />
-                El VAN es el criterio más fiable para proyectos mutuamente excluyentes.
+                La TIR tiene 3 limitaciones críticas: (1) En proyectos con flujos que cambian de signo varias veces, puede haber múltiples TIR matemáticas. (2) Asume que los flujos intermedios se reinvierten a la misma TIR, lo que raramente ocurre en la práctica. (3) Favorece proyectos pequeños con alta rentabilidad relativa sobre proyectos grandes con mayor valor absoluto. En estos casos, el VAN siempre es más fiable.
               </p>
+              <p className={styles.faqTip}>💡 <strong>Solución:</strong> Para flujos no convencionales, usa la TIRM (Tasa Interna de Retorno Modificada), que asume una tasa de reinversión realista.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué significa un VAN de 0?</h4>
+              <p>
+                Un VAN = 0 significa que el proyecto exactamente compensa el coste del capital: recuperas la inversión inicial más la rentabilidad mínima exigida, pero no creas valor adicional. Es el punto de indiferencia matemática. En la práctica, un proyecto con VAN cercano a 0 probablemente no merece la pena debido al riesgo, el trabajo de gestión y los costes ocultos no modelados.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Umbral recomendado:</strong> Exige un VAN mínimo de 10-15% sobre la inversión inicial como &quot;margen de seguridad&quot; ante incertidumbre.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cómo estimo los flujos de caja futuros?</h4>
+              <p>
+                Los flujos de caja son la parte más difícil y la que más impacto tiene en el resultado. Métodos recomendados: (1) Base histórica: si el negocio ya existe, proyecta con crecimientos conservadores (5-10%). (2) Bottom-up: construye desde unidades × precio × margen. (3) Escenarios: calcula 3 escenarios (pesimista, base, optimista) y promedia con probabilidades. Evita flujos &quot;deseados&quot; sin base analítica.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Usa el escenario pesimista como caso de decisión. Si el VAN es positivo incluso en el peor caso, el proyecto es muy sólido.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿El Payback simple vs descontado: cuál usar?</h4>
+              <p>
+                El payback simple cuenta los años hasta recuperar la inversión sin considerar el valor del dinero en el tiempo. Es fácil pero engañoso. El payback descontado trae los flujos futuros a valor presente antes de acumularlos, siendo más preciso. Siempre usa payback descontado para proyectos de más de 2 años. La diferencia puede ser de 1-3 años en proyectos a largo plazo con altas tasas de descuento.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Límite recomendado:</strong> Para inversiones en maquinaria, máximo 4-5 años. Para inmobiliario, hasta 10-12 años. Para startups, el payback es secundario al VAN.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cómo analizo proyectos con diferente duración?</h4>
+              <p>
+                Comparar un proyecto de 3 años con uno de 8 años directamente por VAN es erróneo. Métodos para igualar duraciones: (1) MCM (Mínimo Común Múltiplo): replica ambos proyectos hasta la misma duración total. (2) EAA (Equivalent Annual Annuity): convierte el VAN de cada proyecto en una anualidad equivalente. El proyecto con mayor EAA es el mejor cuando puedes repetir el ciclo.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Regla práctica:</strong> Si los proyectos son únicos (no repetibles), compara VAN directamente. Si son repetibles (renovar maquinaria cada X años), usa EAA.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Debo incluir la inflación en el análisis?</h4>
+              <p>
+                Hay dos enfoques consistentes: (1) Flujos reales + tasa real: proyecta flujos sin inflación y descuenta a tasa real (tasa nominal - inflación). (2) Flujos nominales + tasa nominal: incluye inflación en los flujos y descuenta a tasa nominal. NUNCA mezcles: flujos reales con tasa nominal (ni al revés) da resultados incorrectos. En España, con inflación variable, es más práctico el enfoque nominal con proyecciones conservadoras.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Para proyectos &gt;5 años, la inflación tiene impacto muy significativo. Una inflación del 3% durante 10 años reduce el valor real de un flujo al 74%.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué es el índice de rentabilidad (IR) y cuándo usarlo?</h4>
+              <p>
+                El Índice de Rentabilidad (IR) = (VAN + Inversión) / Inversión = VAN / Inversión + 1. Mide el valor creado por cada euro invertido. Es útil cuando tienes capital limitado y debes elegir entre varios proyectos: prioriza los de mayor IR, no los de mayor VAN absoluto. Ejemplo: Proyecto A (VAN=100k, IR=1.8), Proyecto B (VAN=150k, IR=1.3). Con 200k disponibles: A genera más valor por euro invertido.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Cuándo usarlo:</strong> Siempre que tengas restricción de capital y varios proyectos alternativos. El IR optimiza la cartera de proyectos.</p>
             </div>
           </div>
         </section>
+
+        {/* GUÍA PASO A PASO */}
+        <section className={styles.eduGuia}>
+          <h2>📋 Cómo analizar una inversión paso a paso</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Define claramente la inversión inicial (I₀)</h4>
+                <p>Incluye TODOS los costes: compra de activo, instalación, formación, capital circulante necesario, y posibles costes de desmantelamiento al final. Un error común es olvidar el capital de trabajo (stock inicial, créditos a clientes). Para proyectos complejos, I₀ puede extenderse varios años.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Estima los flujos de caja libres (FCF)</h4>
+                <p>FCF = EBITDA - Impuestos - CAPEX - Variación de capital circulante. No uses beneficio contable: las amortizaciones no son salidas de caja, pero sí afectan a los impuestos. Distingue entre flujos ciertos (contratos firmados) y proyecciones (estímalos conservadoramente, con -20% sobre lo &quot;esperado&quot;).</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Determina la tasa de descuento apropiada</h4>
+                <p>Para empresas: WACC (Ke × %equity + Kd × (1-t) × %deuda). Para inversiones personales: rentabilidad alternativa + prima de riesgo. Añade 2-5 puntos extra si el proyecto tiene alta incertidumbre. La tasa elegida tiene enorme impacto: pasar del 8% al 12% puede cambiar un VAN de +50k a -10k.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Calcula VAN, TIR y Payback descontado</h4>
+                <p>Introduce todos los datos en la calculadora meskeIA. El VAN te da el valor en euros de hoy. La TIR te dice la rentabilidad anual equivalente. El Payback descontado te indica cuándo recuperas la inversión en términos reales. Los tres indicadores juntos dan una visión completa.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Realiza análisis de sensibilidad</h4>
+                <p>Cambia los supuestos clave uno a uno: ¿qué pasa si los ingresos son un 20% menores? ¿Si la tasa de descuento sube 2 puntos? ¿Si el proyecto dura 2 años menos? Un buen proyecto debe mantener VAN positivo en todos los escenarios razonables. Si el VAN solo es positivo en el mejor caso, el proyecto es demasiado arriesgado.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Considera los factores cualitativos</h4>
+                <p>El análisis financiero no lo es todo. Evalúa también: ¿encaja con la estrategia de la empresa? ¿Hay riesgos regulatorios o tecnológicos? ¿Qué pasa si un competidor lanza algo similar? ¿Es reversible si sale mal? Un proyecto con VAN positivo marginal y muchos riesgos cualitativos puede ser peor que uno con VAN menor pero más seguro.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Documenta y presenta la decisión</h4>
+                <p>Registra los supuestos utilizados, los escenarios analizados y la justificación de la decisión. Esto es crucial para: aprender de proyectos anteriores, justificar la decisión ante inversores o directivos, y revisitar el análisis si cambia el contexto. Un buen análisis documentado puede reutilizarse para proyectos similares futuros.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* TIPS */}
+        <section className={styles.eduTips}>
+          <h2>✅ Mejores prácticas en análisis de inversiones</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <h4>VAN manda sobre TIR</h4>
+              <p>En proyectos mutuamente excluyentes, elige siempre el de mayor VAN. La TIR puede ser engañosa cuando los proyectos tienen diferente tamaño o duración.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <h4>Analiza escenarios, no solo el base</h4>
+              <p>Calcula siempre 3 escenarios: pesimista, base y optimista. El proyecto debe ser rentable en el pesimista, no solo en el base. El análisis de sensibilidad es obligatorio.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💰</span>
+              <h4>Usa flujos de caja, no beneficios</h4>
+              <p>El VAN trabaja con dinero real que entra y sale. Las amortizaciones son un gasto contable pero no una salida de caja. Siempre parte del EBITDA, no del beneficio neto.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⏱️</span>
+              <h4>El payback es un complemento, no un criterio principal</h4>
+              <p>El payback no mide rentabilidad, solo liquidez. Un proyecto con payback largo puede ser más rentable. Úsalo para evaluar riesgo de recuperación, no como decisión final.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔢</span>
+              <h4>Sé conservador con los flujos</h4>
+              <p>Los flujos optimistas raramente se cumplen. Aplica un &quot;haircut&quot; del 10-20% a tus estimaciones de ingresos y un 10-20% de exceso en costes. El margen de seguridad salva proyectos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📋</span>
+              <h4>Documenta todos los supuestos</h4>
+              <p>¿Por qué elegiste esa tasa de descuento? ¿En qué se basan los flujos proyectados? Documentar supuestos permite revisarlos si el contexto cambia y aprender de proyectos anteriores.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Errores frecuentes en el análisis de inversiones que cuestan dinero real</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>❌ Usar la TIR como único criterio:</strong> La TIR puede dar múltiples valores matemáticos en proyectos con flujos irregulares, y favorece proyectos pequeños con alta rentabilidad relativa frente a proyectos grandes con mayor valor absoluto. El VAN siempre es el árbitro final.</li>
+            <li><strong>❌ Olvidar el capital circulante en I₀:</strong> El stock inicial, los créditos a clientes y las fianzas a proveedores son parte de la inversión pero se olvidan frecuentemente. Su omisión infla artificialmente el VAN y crea problemas de liquidez desde el inicio.</li>
+            <li><strong>❌ No incluir el valor residual:</strong> Al final del proyecto, los activos aún tienen valor (maquinaria, inmuebles, patentes). Olvidar el valor terminal puede hacer que un proyecto rentable parezca no serlo. Para proyectos inmobiliarios, el valor residual puede ser el 60-80% del VAN total.</li>
+            <li><strong>❌ Usar flujos nominales con tasa real (o viceversa):</strong> Si proyectas flujos creciendo con inflación, debes descontar con tasa nominal. Si proyectas flujos en € constantes, usa tasa real. Mezclar ambos enfoques invalida completamente el análisis.</li>
+            <li><strong>❌ Ignorar los costes hundidos:</strong> Los costes ya incurridos (estudio previo, prototipo) no deben incluirse en el análisis prospectivo. Solo importan los flujos futuros. Incluir costes hundidos sesga el VAN y puede llevar a seguir proyectos que deberían abandonarse.</li>
+            <li><strong>❌ Tasa de descuento demasiado baja:</strong> Usar un 5% para un proyecto de startup de alto riesgo es un error grave. Una tasa demasiado baja infla artificialmente el VAN y hace que proyectos insostenibles parezcan atractivos. La tasa debe reflejar el riesgo real del proyecto.</li>
+            <li><strong>❌ No revisar el análisis si cambian las condiciones:</strong> Un análisis hecho con tipos al 2% y hecho hace 3 años puede ser completamente inválido hoy. Actualiza el análisis si cambia significativamente la inflación, los tipos de interés o el entorno competitivo.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-tir-van')} />

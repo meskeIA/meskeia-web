@@ -469,61 +469,324 @@ export default function GeneradorContrasenas() {
         )}
 
         <EducationalSection
-          title="Guía de Seguridad Digital: Contraseñas"
-          subtitle="Aprende sobre entropía, ataques de fuerza bruta, gestores de contraseñas y mejores prácticas"
+          title="🔐 Guía completa de seguridad digital: contraseñas y autenticación"
+          subtitle="Aprende sobre entropía, ataques de fuerza bruta, gestores de contraseñas y mejores prácticas para proteger tus cuentas"
           icon="🔐"
         >
-          <section>
-            <h4>¿Por qué son importantes las contraseñas seguras?</h4>
-            <p>Las contraseñas son la primera línea de defensa para proteger tu información personal, cuentas bancarias, correos electrónicos y datos sensibles. Una contraseña débil puede ser descifrada en segundos por herramientas automatizadas.</p>
-            <ul>
-              <li><strong>🚨 El 81% de las brechas</strong>: Se deben a contraseñas débiles o reutilizadas (Verizon Data Breach Report). Los atacantes usan diccionarios, fuerza bruta y listas de contraseñas filtradas.</li>
-              <li><strong>⏱️ Tiempo de descifrado</strong>: Una contraseña de 8 caracteres solo con minúsculas puede descifrarse en minutos. Con mayúsculas, números y símbolos, el tiempo aumenta a años o incluso siglos.</li>
-              <li><strong>🔐 Protección multicapa</strong>: Contraseñas fuertes + autenticación de dos factores (2FA) multiplica exponencialmente la seguridad.</li>
-              <li><strong>💡 Unicidad es clave</strong>: Reutilizar la misma contraseña es extremadamente peligroso. Si un sitio sufre una brecha, todas tus cuentas quedan comprometidas.</li>
-            </ul>
+          {/* TABLA COMPARATIVA */}
+          <section className={styles.eduComparativa}>
+            <h2>⚖️ Tipos de contraseña: seguridad vs. memorabilidad</h2>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Ejemplo</th>
+                    <th>Entropía</th>
+                    <th>Tiempo descifrado</th>
+                    <th>Memorabilidad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>8 chars, solo letras</strong></td>
+                    <td>contraseñ</td>
+                    <td>~38 bits</td>
+                    <td>Minutos</td>
+                    <td>Alta</td>
+                  </tr>
+                  <tr>
+                    <td><strong>8 chars, mixto</strong></td>
+                    <td>C0ntr4s3!</td>
+                    <td>~52 bits</td>
+                    <td>Horas-días</td>
+                    <td>Media</td>
+                  </tr>
+                  <tr>
+                    <td><strong>12 chars, mixto</strong></td>
+                    <td>X#9mK$pL2&amp;qR</td>
+                    <td>~78 bits</td>
+                    <td>Siglos</td>
+                    <td>Baja</td>
+                  </tr>
+                  <tr>
+                    <td><strong>16 chars, mixto</strong></td>
+                    <td>4@Tz!9xPmL#2vQ&amp;k</td>
+                    <td>~104 bits</td>
+                    <td>Inviable</td>
+                    <td>Ninguna (gestor)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Frase de paso (4 palabras)</strong></td>
+                    <td>Caballo-Batería-Rosa-7</td>
+                    <td>~70 bits</td>
+                    <td>Cientos de años</td>
+                    <td>Muy alta</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Frase de paso (5+ palabras)</strong></td>
+                    <td>Lluvia-Mesa-Cohete-Azul-42</td>
+                    <td>~90 bits</td>
+                    <td>Inviable</td>
+                    <td>Alta</td>
+                  </tr>
+                  <tr>
+                    <td><strong>PIN de 6 dígitos</strong></td>
+                    <td>482901</td>
+                    <td>~20 bits</td>
+                    <td>Segundos</td>
+                    <td>Alta</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
-          <section>
-            <h4>Características de una contraseña fuerte</h4>
-            <ul>
-              <li><strong>📏 Longitud adecuada</strong>: Mínimo 12 caracteres, idealmente 16 o más. Cada carácter adicional aumenta exponencialmente la dificultad de descifrado.</li>
-              <li><strong>🔤 Diversidad de caracteres</strong>: Combina mayúsculas, minúsculas, números y símbolos. Esto multiplica las combinaciones posibles de 26 a más de 90 caracteres disponibles.</li>
-              <li><strong>🎲 Aleatoriedad total</strong>: Evita patrones predecibles como &quot;123456&quot;, &quot;qwerty&quot; o fechas de nacimiento. Esta herramienta usa <code>crypto.getRandomValues()</code> (API criptográfica del navegador).</li>
-              <li><strong>🚫 Sin información personal</strong>: No incluyas tu nombre, apellidos, fechas importantes o datos obtenibles de redes sociales.</li>
-            </ul>
+          {/* ESCENARIOS */}
+          <section className={styles.eduEscenarios}>
+            <h2>🎯 Situaciones reales de seguridad de contraseñas</h2>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🏦</span>
+                  <h3>Cuenta bancaria online</h3>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Riesgo: máximo. Un atacante con tu contraseña bancaria puede vaciar tu cuenta en minutos. El banco puede no reembolsar si hay &quot;negligencia&quot; (contraseña débil o reutilizada).
+                  <br /><strong>Recomendación: 16+ chars únicos + 2FA con app (no SMS). Guardar en gestor.</strong>
+                </p>
+                <p className={styles.escenarioTip}>💡 Activa siempre las notificaciones de transacción por email/SMS como segunda capa de alerta.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>📧</span>
+                  <h3>Email principal (cuenta maestra)</h3>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Riesgo: crítico. Tu email es la llave de todo: quien controla tu email puede resetear TODAS tus otras contraseñas. Es la cuenta más importante de proteger.
+                  <br /><strong>Recomendación: contraseña única de 20+ chars, 2FA con YubiKey o app TOTP, nunca SMS.</strong>
+                </p>
+                <p className={styles.escenarioTip}>💡 El email es la &quot;cuenta madre&quot;. Si cae, caen todas. Prioriza su seguridad sobre cualquier otra.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🎮</span>
+                  <h3>Cuenta de videojuegos / streaming</h3>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Riesgo: medio. Las cuentas gaming con skins o ítems de valor real son objetivo frecuente. Las cuentas de streaming se revenden en mercados negros cuando se reutiliza la contraseña de otra filtración.
+                  <br /><strong>Recomendación: contraseña única de 12+ chars. 2FA si la plataforma lo permite.</strong>
+                </p>
+                <p className={styles.escenarioTip}>💡 La reutilización de contraseñas es el vector más común de robo de cuentas gaming. Una filtración en un sitio menor compromete todas.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>💼</span>
+                  <h3>Acceso VPN / cuentas corporativas</h3>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Riesgo: muy alto para tu empresa. Un empleado con contraseña corporativa débil o reutilizada puede ser el punto de entrada de un ransomware que paralice toda la organización.
+                  <br /><strong>Recomendación: gestor corporativo (1Password Teams, Bitwarden Enterprise), política de rotación + 2FA obligatorio.</strong>
+                </p>
+                <p className={styles.escenarioTip}>💡 El 95% de los ataques de ransomware comienzan por credenciales robadas o débiles. La inversión en un gestor corporativo es la mejor ROI en ciberseguridad.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>☁️</span>
+                  <h3>Servicios cloud (AWS, Google Cloud)</h3>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Riesgo: extremo. Credenciales de AWS expuestas accidentalmente (en GitHub, por ejemplo) pueden generar facturas de miles de euros en horas por mineros de criptomonedas.
+                  <br /><strong>Recomendación: NUNCA contraseñas en código. Usar IAM roles, MFA obligatorio para root, alertas de billing.</strong>
+                </p>
+                <p className={styles.escenarioTip}>💡 Activa alertas de facturación en AWS/GCP con umbral de 10€. Si aparecen cargos inesperados, actúa en minutos.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🏠</span>
+                  <h3>WiFi doméstica y router</h3>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Riesgo: frecuentemente ignorado. Un router con contraseña por defecto o débil permite a vecinos o atacantes acceder a tu red, interceptar tráfico, y comprometer todos los dispositivos conectados.
+                  <br /><strong>Recomendación: WPA3 o WPA2, contraseña de 20+ chars aleatoria, cambiar usuario admin del router.</strong>
+                </p>
+                <p className={styles.escenarioTip}>💡 Cambia siempre las credenciales por defecto del router (usuario &quot;admin&quot; + contraseña &quot;admin&quot; o &quot;1234&quot;). Es el primer paso de cualquier auditoría de seguridad doméstica.</p>
+              </div>
+            </div>
           </section>
 
-          <section>
-            <h4>Gestores de Contraseñas: Tu mejor aliado</h4>
-            <p>Con contraseñas únicas de 16+ caracteres para cada cuenta, es imposible recordarlas todas. Los <strong>gestores de contraseñas</strong> resuelven este problema de forma segura.</p>
-            <ul>
-              <li><strong>🗄️ ¿Qué es un gestor?</strong>: Aplicación que almacena todas tus contraseñas en una bóveda cifrada, protegida por una única contraseña maestra. Solo necesitas recordar una.</li>
-              <li><strong>🛡️ Seguridad</strong>: Usa cifrado AES-256 (estándar militar). Ni siquiera la empresa del gestor puede acceder a tus contraseñas. Todo se descifra localmente.</li>
-              <li><strong>📱 Opciones recomendadas</strong>: <strong>Bitwarden</strong> (open-source, gratuito), <strong>1Password</strong>, <strong>KeePassXC</strong> (local, sin nube), o los gestores integrados en navegadores (con limitaciones).</li>
-            </ul>
+          {/* FAQ */}
+          <section className={styles.eduFaq}>
+            <h2>❓ Preguntas frecuentes sobre contraseñas y seguridad digital</h2>
+            <div className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <h4>❓ ¿Es seguro usar un generador de contraseñas online?</h4>
+                <p>
+                  Depende de cómo funcione. Esta herramienta usa <code>crypto.getRandomValues()</code>, la API criptográfica del navegador, que genera números verdaderamente aleatorios usando el hardware del dispositivo. La generación ocurre 100% en tu dispositivo, sin enviar ningún dato a servidores. Para verificar: abre DevTools → Network y comprueba que no hay requests al generar. Los generadores que generan en el servidor (con seed predecible o sin HTTPS) sí son peligrosos.
+                </p>
+                <p className={styles.faqTip}>💡 <strong>Cómo verificar:</strong> Busca que el generador use <code>crypto.getRandomValues()</code> (JavaScript) o equivalente. Si envía datos a un servidor para generar, no lo uses.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>❓ ¿Debo cambiar mis contraseñas regularmente?</h4>
+                <p>
+                  La recomendación moderna (NIST 2023) es NO cambiar contraseñas regularmente si son únicas y fuertes. El cambio periódico obligatorio lleva a los usuarios a crear contraseñas débiles con pequeñas variaciones (Contraseña1 → Contraseña2). Sí debes cambiarlas cuando: hay sospecha de compromiso, el servicio anuncia una brecha, o aparece tu email en haveibeenpwned.com. Para cuentas críticas (banco, email), cambia cada 12-18 meses como buena práctica.
+                </p>
+                <p className={styles.faqTip}>💡 <strong>Comprueba hoy:</strong> Ve a haveibeenpwned.com e introduce tu email para ver si aparece en filtraciones conocidas. Es gratuito y muy revelador.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>❓ ¿Los gestores de contraseñas son seguros? ¿Qué pasa si los hackean?</h4>
+                <p>
+                  Los gestores de contraseñas de referencia (Bitwarden, 1Password, KeePassXC) usan arquitectura zero-knowledge: ni la empresa puede ver tus contraseñas. Todo se cifra localmente con AES-256 antes de enviarse al servidor. Si hackean el servidor, solo obtienen datos cifrados ilegibles. El riesgo real es tu contraseña maestra: si es débil o la pierdes, pierdes el acceso. 1Password sufrió un incidente en 2022 y solo se expusieron metadatos cifrados, no contraseñas.
+                </p>
+                <p className={styles.faqTip}>💡 <strong>Recomendación:</strong> Bitwarden (open-source, auditable, gratuito) o 1Password. Usa una contraseña maestra de 5+ palabras aleatorias y guarda una copia física en lugar seguro.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>❓ ¿Qué es la autenticación de dos factores (2FA) y cuál es mejor?</h4>
+                <p>
+                  El 2FA añade un segundo factor de verificación: algo que sabes (contraseña) + algo que tienes (código temporal). Opciones ordenadas de menor a mayor seguridad: SMS (vulnerable a SIM swapping) &lt; Email OTP &lt; App TOTP (Google Authenticator, Authy) &lt; Passkeys &lt; Llaves físicas (YubiKey). El SMS 2FA es 99% mejor que nada, pero puede vulnerarse mediante intercambio de SIM (llamar al operador haciéndose pasar por ti). Las apps TOTP son seguras y gratuitas.
+                </p>
+                <p className={styles.faqTip}>💡 <strong>Empieza aquí:</strong> Activa 2FA con app TOTP (Authy, Google Authenticator) en email, banco y redes sociales. Es el mayor impacto en seguridad por el menor esfuerzo.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>❓ ¿Qué es el SIM swapping y cómo protegerse?</h4>
+                <p>
+                  El SIM swapping es un ataque donde el atacante llama a tu operador móvil, se hace pasar por ti y transfiere tu número a una nueva SIM que él controla. A partir de ese momento, recibe todos tus SMS, incluyendo los códigos 2FA por SMS. Para protegerte: usa 2FA por app (no SMS) en cuentas críticas, activa un PIN de seguridad con tu operador para cambios de SIM, y usa contraseñas fuertes y únicas para la cuenta del operador.
+                </p>
+                <p className={styles.faqTip}>💡 <strong>Acción inmediata:</strong> Llama a tu operador y pide activar &quot;bloqueo de portabilidad&quot; o &quot;PIN de seguridad de SIM&quot;. Muchos operadores ofrecen esta protección adicional gratuita.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>❓ ¿Qué son las passkeys y van a reemplazar las contraseñas?</h4>
+                <p>
+                  Las passkeys son el futuro de la autenticación. Funcionan con criptografía de clave pública: tu dispositivo guarda la clave privada (protegida por biometría o PIN local) y el servidor guarda solo la clave pública. No hay contraseña que robar. No son vulnerables a phishing (la autenticación está vinculada al dominio específico). Apple, Google y Microsoft ya las soportan. Se estima que en 5-7 años substituirán las contraseñas en la mayoría de servicios.
+                </p>
+                <p className={styles.faqTip}>💡 <strong>Empieza ya:</strong> Servicios como Google, Apple, Microsoft, GitHub, PayPal y Amazon ya ofrecen passkeys. Actívalas donde estén disponibles para máxima seguridad sin fricción.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>❓ ¿Cómo sé si mi contraseña ha sido filtrada en una brecha de datos?</h4>
+                <p>
+                  haveibeenpwned.com (de Troy Hunt, experto en seguridad) es el servicio de referencia. Busca tu email y comprueba si aparece en las bases de datos de filtraciones conocidas. Para contraseñas, usa el servicio de contraseñas de HIBP: aplica k-anonymity (solo envía los primeros 5 caracteres del hash SHA-1 de tu contraseña, nunca la contraseña completa). Firefox Monitor y Google Password Checkup hacen lo mismo de forma integrada.
+                </p>
+                <p className={styles.faqTip}>💡 <strong>Acción:</strong> Comprueba tu email en haveibeenpwned.com ahora mismo. Si aparece en alguna filtración, cambia la contraseña de ese servicio y de cualquier otro donde la hayas reutilizado.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>❓ ¿Frase de paso vs. contraseña aleatoria: cuál es mejor para la contraseña maestra del gestor?</h4>
+                <p>
+                  Para la contraseña maestra del gestor (la única que debes recordar): una frase de 4-5 palabras aleatorias es mejor porque tiene suficiente entropía (~70-90 bits), es memorizable y resistente a ataques de diccionario si las palabras son realmente aleatorias (usa dados o un generador). Para el resto de contraseñas (guardadas en el gestor): usa caracteres aleatorios de 16+ caracteres generados por esta herramienta, ya que no necesitas recordarlas.
+                </p>
+                <p className={styles.faqTip}>💡 <strong>Método Diceware:</strong> Tira 5 dados 5 veces y busca las palabras correspondientes en una lista Diceware. El resultado es una frase verdaderamente aleatoria con ~65 bits de entropía. Muy segura y recordable.</p>
+              </div>
+            </div>
           </section>
 
-          <section>
-            <h4>Mejores prácticas de seguridad</h4>
-            <ul>
-              <li><strong>Una contraseña por servicio</strong>: Nunca reutilices. Si un sitio sufre una brecha, solo esa cuenta se verá comprometida.</li>
-              <li><strong>Contraseña maestra memorable</strong>: Para tu gestor, usa una frase de 4-5 palabras aleatorias (&quot;Caballo-Batería-Grapadora-Correcta&quot;). Fácil de recordar, imposible de adivinar.</li>
-              <li><strong>Activa 2FA siempre</strong>: Google Authenticator, Authy o claves físicas (YubiKey). El 2FA protege incluso si la contraseña es robada.</li>
-              <li><strong>Cambia contraseñas comprometidas</strong>: Comprueba regularmente en <em>haveibeenpwned.com</em> si tu email aparece en filtraciones.</li>
-              <li><strong>Cuidado con el phishing</strong>: Verifica siempre la URL antes de introducir credenciales. Los ataques de phishing son la técnica más común hoy en día.</li>
-            </ul>
+          {/* GUÍA PASO A PASO */}
+          <section className={styles.eduGuia}>
+            <h2>📋 Cómo proteger tus cuentas digitales paso a paso</h2>
+            <div className={styles.stepGuide}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <h4>Instala un gestor de contraseñas hoy mismo</h4>
+                  <p>Bitwarden (gratuito, open-source) o 1Password (de pago, interfaz superior). Instala la extensión de navegador y la app móvil. Crea una contraseña maestra fuerte con una frase de 4-5 palabras aleatorias. Guarda esta contraseña maestra en papel físico en un lugar seguro (no en el móvil ni en otro servicio digital).</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <h4>Cambia primero las contraseñas de tus cuentas críticas</h4>
+                  <p>Prioridad: email principal → banco → otras cuentas financieras → redes sociales → resto. Genera una contraseña nueva de 16+ caracteres con esta herramienta, guárdala en el gestor y úsala en el servicio. Haz esto para las 5-10 cuentas más importantes antes de hacer nada más.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <h4>Activa 2FA en email y banco</h4>
+                  <p>Instala Authy o Google Authenticator. Activa 2FA en tu email primero (es la cuenta más crítica), luego en el banco, y después en el resto de cuentas donde sea posible. Prefiere siempre app TOTP sobre SMS. Guarda los códigos de recuperación del 2FA en tu gestor de contraseñas.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepContent}>
+                  <h4>Comprueba si tus cuentas han sido filtradas</h4>
+                  <p>Ve a haveibeenpwned.com e introduce tus emails. Para cada cuenta que aparezca en una filtración, cambia la contraseña inmediatamente (aunque ya lo hayas hecho, por si la antigua está en la lista). Si el gestor de contraseñas lo permite (Bitwarden, 1Password), usa su función de monitoreo de brechas integrado.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>5</div>
+                <div className={styles.stepContent}>
+                  <h4>Migra gradualmente el resto de cuentas al gestor</h4>
+                  <p>No intentes cambiar todo de golpe. Cada vez que uses un servicio, si la contraseña no está en el gestor o es débil/reutilizada, cámbiala en ese momento. En 1-2 meses, la mayoría de tus cuentas activas tendrán contraseñas únicas y fuertes sin esfuerzo adicional concentrado.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>6</div>
+                <div className={styles.stepContent}>
+                  <h4>Protege el dispositivo y la red</h4>
+                  <p>PIN o biometría en el móvil (sin él, quien lo tenga tiene acceso a tu gestor). Contraseña WiFi fuerte en casa (WPA2/WPA3, 20+ chars). Cambia las credenciales por defecto del router. Usa HTTPS siempre (el candado verde en la URL). En WiFi públicas, usa VPN antes de acceder a cuentas sensibles.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>7</div>
+                <div className={styles.stepContent}>
+                  <h4>Mantén el sistema y revisa anualmente</h4>
+                  <p>Actualiza el gestor de contraseñas y las apps 2FA regularmente. Una vez al año: revisa en haveibeenpwned.com si aparecen nuevas filtraciones, cambia contraseñas de cuentas críticas como precaución, y desactiva cuentas en servicios que ya no uses (cuentas abandonadas con tu contraseña reutilizada son vectores de ataque).</p>
+                </div>
+              </div>
+            </div>
           </section>
 
-          <section>
-            <h4>Preguntas frecuentes</h4>
-            <ul>
-              <li><strong>¿Es seguro usar un generador online?</strong> Sí, si usa <code>crypto.getRandomValues()</code> como esta herramienta. La generación ocurre 100% en tu dispositivo, sin enviar datos a servidores.</li>
-              <li><strong>¿Debo cambiar contraseñas regularmente?</strong> No es necesario si usas contraseñas únicas y fuertes. Solo cámbialas si hay sospecha de compromiso o brecha anunciada.</li>
-              <li><strong>¿Qué hago si olvido mi contraseña maestra?</strong> Los gestores no pueden recuperarla por diseño. Escríbela en papel y guárdala en un lugar físico seguro como backup inicial.</li>
-              <li><strong>¿Frase o caracteres aleatorios?</strong> Para la contraseña maestra del gestor: frase larga y memorable. Para el resto: caracteres aleatorios de 16+ generados por herramienta (no necesitas recordarlas).</li>
-            </ul>
+          {/* TIPS */}
+          <section className={styles.eduTips}>
+            <h2>✅ Mejores prácticas de seguridad digital</h2>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🔑</span>
+                <h4>Una contraseña por servicio</h4>
+                <p>Nunca reutilices. Si un sitio sufre una brecha, solo esa cuenta se ve comprometida. Con un gestor, reutilizar no tiene ningún sentido ni ventaja.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📱</span>
+                <h4>2FA siempre que sea posible</h4>
+                <p>Actívalo en cada servicio que lo ofrezca. Incluso un 2FA por SMS es infinitamente mejor que ninguno. La app TOTP (Authy) es la mejor opción gratuita.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🎯</span>
+                <h4>Longitud &gt; Complejidad</h4>
+                <p>&quot;x#Km!&quot; (5 chars) es infinitamente más débil que &quot;correctocaballobateria&quot; (21 chars). La longitud es el factor más importante en la entropía de una contraseña.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🚨</span>
+                <h4>Desconfía del phishing</h4>
+                <p>El 80% de robos de cuentas son por phishing, no por fuerza bruta. Verifica siempre la URL antes de introducir credenciales. Los gestores no autocompletarán en dominios falsos.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📋</span>
+                <h4>Backup de los códigos 2FA</h4>
+                <p>Guarda los códigos de recuperación de cada servicio 2FA en el gestor de contraseñas. Si pierdes el móvil sin estos códigos, perderás acceso permanente a esas cuentas.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🔍</span>
+                <h4>Monitorea las filtraciones</h4>
+                <p>Comprueba haveibeenpwned.com mensualmente o activa las alertas de Firefox Monitor. Actuar rápido tras una filtración limita el daño al mínimo.</p>
+              </div>
+            </div>
           </section>
+
+          {/* WARNING BOX */}
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Errores críticos de seguridad que debes evitar</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li><strong>❌ Reutilizar contraseñas entre servicios:</strong> Es el error más común y peligroso. Si un servicio sufre una brecha (y ocurren miles al año), los atacantes prueban las credenciales en todos los sitios importantes (credential stuffing). Una filtración de un foro de videojuegos puede comprometer tu banco si usas la misma contraseña.</li>
+              <li><strong>❌ Guardar contraseñas en el navegador sin protección:</strong> Las contraseñas guardadas en Chrome o Firefox sin contraseña maestra configurada se almacenan en texto plano (o con cifrado débil) en el disco. Cualquier malware con acceso al sistema puede extraerlas en segundos. Usa un gestor dedicado con cifrado AES-256.</li>
+              <li><strong>❌ Usar información personal como contraseña:</strong> Nombre + año de nacimiento, apellidos, fecha de aniversario, nombre de mascota. Todo esto es predecible mediante ingeniería social o búsquedas en redes sociales. Los atacantes prueban primero las contraseñas basadas en información pública de la víctima.</li>
+              <li><strong>❌ Confiar en el 2FA por SMS como única protección:</strong> El SIM swapping permite a un atacante recibir tus SMS en su propia SIM. Para cuentas críticas (banco, email), usa siempre 2FA por app TOTP o llave física, nunca solo SMS.</li>
+              <li><strong>❌ No configurar respuestas de seguridad con información real:</strong> Las preguntas de seguridad (&quot;¿Cuál es el apellido de tu madre?&quot;) son vectores de ataque. Responde con respuestas inventadas y aleatorias que guardes en el gestor. &quot;¿Ciudad de nacimiento?&quot; → &quot;K#9xP!mL&quot; (guardado en el gestor).</li>
+              <li><strong>❌ Introducir contraseñas en WiFi públicas sin VPN:</strong> Las redes WiFi abiertas (cafeterías, aeropuertos) pueden ser monitoreadas o falsificadas. Sin VPN, el tráfico puede interceptarse. Usa siempre VPN en WiFi pública antes de acceder a cualquier cuenta sensible.</li>
+              <li><strong>❌ Perder acceso al gestor de contraseñas sin backup:</strong> Si olvidas la contraseña maestra y no tienes backup, pierdes acceso a TODAS tus cuentas. Guarda la contraseña maestra en papel físico en lugar seguro (caja fuerte, banco). Configura un método de recuperación de emergencia.</li>
+            </ul>
+          </div>
         </EducationalSection>
       </main>
 

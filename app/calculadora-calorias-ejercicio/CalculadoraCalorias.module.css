@@ -542,3 +542,351 @@
     font-size: 1.25rem;
   }
 }
+
+/* ===================== EDUCATIONAL SECTION v2.0 ===================== */
+
+.eduComparativa,
+.eduEscenarios,
+.eduFaq,
+.eduGuia,
+.eduTips {
+  margin-bottom: 2.5rem;
+}
+
+.eduComparativa h2,
+.eduEscenarios h2,
+.eduFaq h2,
+.eduGuia h2,
+.eduTips h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable thead tr {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+}
+
+.comparativaTable th {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e8e8e8;
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: box-shadow 0.2s;
+}
+
+.escenarioCard:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.escenarioHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.escenarioIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-style: italic;
+  margin: 0;
+}
+
+[data-theme='dark'] .escenarioCard {
+  border-color: #3a3a3a;
+  background: #2a2a2a;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e8e8e8;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1.1rem 1.25rem;
+}
+
+.faqItem h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.6rem 0;
+}
+
+.faqItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 0.5rem 0;
+}
+
+.faqTip {
+  background: rgba(72, 169, 166, 0.1);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem !important;
+  color: var(--secondary) !important;
+  border-left: 3px solid var(--secondary);
+}
+
+[data-theme='dark'] .faqItem {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+  border-left-color: var(--primary);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 1.1rem;
+}
+
+.stepNumber {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepContent h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem 0;
+}
+
+.stepContent p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+[data-theme='dark'] .step {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 1.1rem;
+  text-align: center;
+}
+
+.tipIcon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.tipCard h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem 0;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+[data-theme='dark'] .tipCard {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+}
+
+.warningBox {
+  background: #fff8e1;
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.warningHeader h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: #78350f;
+  line-height: 1.6;
+  padding-left: 0.75rem;
+  border-left: 3px solid #f59e0b;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fcd34d;
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+  .tipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+  .step {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .escenarioCard,
+  .step {
+    transition: none;
+  }
+}

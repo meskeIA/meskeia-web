@@ -276,87 +276,322 @@ export default function CalculadoraCaloriasPage() {
       </DisclaimerCard>
 
       <EducationalSection
-        title="¿Quieres aprender más sobre calorías y ejercicio?"
-        subtitle="Descubre cómo funcionan los MET, optimiza tu entrenamiento y entiende el gasto energético"
+        title="📚 Guía completa de calorías, ejercicio y gasto energético"
+        subtitle="Aprende cómo funcionan los MET, el EPOC y cómo optimizar tu entrenamiento para tus objetivos reales"
       >
-        <section className={styles.guideSection}>
-          <h2>Conceptos Clave</h2>
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>🔥 ¿Qué son los MET?</h4>
-              <p>
-                MET significa Equivalente Metabólico de Tarea. 1 MET equivale al consumo de
-                oxígeno en reposo (3,5 ml O₂/kg/min). Una actividad de 5 MET significa que
-                quemas 5 veces más calorías que estando en reposo absoluto.
+        {/* TABLA COMPARATIVA */}
+        <section className={styles.eduComparativa}>
+          <h2>⚖️ Comparativa de actividades: MET, calorías y beneficios</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Actividad</th>
+                  <th>MET</th>
+                  <th>Kcal/hora (70kg)</th>
+                  <th>EPOC</th>
+                  <th>Mejor para...</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Caminar suave</strong></td>
+                  <td>2.5-3.5</td>
+                  <td>175-245 kcal</td>
+                  <td>Mínimo</td>
+                  <td>Salud cardiovascular básica, recuperación</td>
+                </tr>
+                <tr>
+                  <td><strong>Ciclismo moderado</strong></td>
+                  <td>6-8</td>
+                  <td>420-560 kcal</td>
+                  <td>Bajo</td>
+                  <td>Resistencia, articulaciones</td>
+                </tr>
+                <tr>
+                  <td><strong>Running moderado</strong></td>
+                  <td>8-10</td>
+                  <td>560-700 kcal</td>
+                  <td>Moderado</td>
+                  <td>Pérdida de peso, resistencia</td>
+                </tr>
+                <tr>
+                  <td><strong>HIIT</strong></td>
+                  <td>10-14</td>
+                  <td>700-980 kcal</td>
+                  <td>Alto (24-48h)</td>
+                  <td>Pérdida de grasa, tiempo limitado</td>
+                </tr>
+                <tr>
+                  <td><strong>Natación intensa</strong></td>
+                  <td>8-10</td>
+                  <td>560-700 kcal</td>
+                  <td>Moderado</td>
+                  <td>Lesionados, cuerpo completo</td>
+                </tr>
+                <tr>
+                  <td><strong>Pesas / fuerza</strong></td>
+                  <td>5-8</td>
+                  <td>350-560 kcal</td>
+                  <td>Alto (24-48h)</td>
+                  <td>Masa muscular, metabolismo largo plazo</td>
+                </tr>
+                <tr>
+                  <td><strong>Yoga / pilates</strong></td>
+                  <td>2-4</td>
+                  <td>140-280 kcal</td>
+                  <td>Mínimo</td>
+                  <td>Flexibilidad, estrés, recuperación activa</td>
+                </tr>
+                <tr>
+                  <td><strong>Fútbol / baloncesto</strong></td>
+                  <td>7-10</td>
+                  <td>490-700 kcal</td>
+                  <td>Moderado</td>
+                  <td>Adherencia, motivación, social</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ESCENARIOS */}
+        <section className={styles.eduEscenarios}>
+          <h2>🎯 Ejemplos reales de gasto calórico por objetivo</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>⚖️</span>
+                <h3>Perder 1 kg de grasa al mes</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Déficit necesario: ~7.700 kcal/mes = 257 kcal/día. Estrategia mixta: correr 30 min (280 kcal) + reducir 100 kcal en dieta. Persona de 75kg en 30 días.
+                <br /><strong>Sin matarte en el gimnasio: media hora de running diaria combinada con pequeños ajustes alimentarios.</strong>
               </p>
+              <p className={styles.escenarioTip}>💡 El 70-80% del déficit calórico debe venir de la dieta, no del ejercicio.</p>
             </div>
-            <div className={styles.contentCard}>
-              <h4>⚡ Efecto EPOC</h4>
-              <p>
-                El EPOC (Excess Post-exercise Oxygen Consumption) es el consumo extra de
-                calorías después del ejercicio. El entrenamiento HIIT y pesas generan mayor
-                EPOC que el cardio suave, quemando calorías hasta 24-48h después.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💪</span>
+                <h3>Ganar músculo (recomposición)</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Superávit: +300 kcal/día sobre el TDEE. Fuerza 3x/semana (450 kcal × 3 = 1.350 kcal/sem gastadas). El EPOC de las pesas eleva el metabolismo basal en 50-100 kcal/día.
+                <br /><strong>Resultado: el ejercicio consume calorías Y el músculo ganado quema más en reposo.</strong>
               </p>
+              <p className={styles.escenarioTip}>💡 Cada kg de músculo quema 13 kcal/día adicionales en reposo (metabolismo basal).</p>
             </div>
-            <div className={styles.contentCard}>
-              <h4>📊 Factores que afectan al gasto</h4>
-              <p>
-                El gasto calórico real depende de: peso corporal (más peso = más gasto),
-                intensidad real (no solo tipo de ejercicio), condición física (más eficiente
-                = menos gasto), temperatura ambiente y altitud.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏃</span>
+                <h3>Corredor de 10k (principiante)</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Persona de 70kg, 10km en 60 min (ritmo 6 min/km). MET: ~10. Gasto: 10 × 70 × 0.0175 × 60 min = ~735 kcal. Con EPOC adicional: ~800 kcal totales.
+                <br /><strong>Equivalente calórico: 2 hamburguesas. El ejercicio ayuda, pero la dieta decide.</strong>
               </p>
+              <p className={styles.escenarioTip}>💡 A mayor condición física, el cuerpo se vuelve más eficiente y quema MENOS calorías en la misma distancia.</p>
             </div>
-            <div className={styles.contentCard}>
-              <h4>🎯 Déficit vs Superávit</h4>
-              <p>
-                Para perder 1 kg de grasa necesitas un déficit de ~7.700 kcal. Para ganar
-                músculo, un superávit moderado de 300-500 kcal con entrenamiento de fuerza.
-                El ejercicio ayuda, pero la alimentación es el factor principal.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🕐</span>
+                <h3>Trabajador sedentario activo en pausas</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                8h sentado (trabajo) + 3 pausas activas de 10 min (caminar, sentadillas). Gasto extra pausa activa: ~80 kcal × 3 = 240 kcal adicionales al día. En un mes: ~7.200 kcal = casi 1 kg de grasa.
+                <br /><strong>Sin ir al gimnasio: las pausas activas tienen un impacto real acumulado.</strong>
               </p>
+              <p className={styles.escenarioTip}>💡 El NEAT (gasto calórico no deportivo: andar, subir escaleras, moverse) puede suponer 300-600 kcal/día.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔥</span>
+                <h3>Sesión HIIT de 20 minutos</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Persona de 80kg, HIIT intenso 20 min. Durante: ~350 kcal (MET≈14). EPOC en 24h: +150-200 kcal adicionales. Total real: ~520 kcal con solo 20 min de ejercicio.
+                <br /><strong>El HIIT es el más eficiente por tiempo: quema más calorías en menos tiempo incluyendo el EPOC.</strong>
+              </p>
+              <p className={styles.escenarioTip}>💡 HIIT no es para todos: no recomendado con lesiones articulares o principiantes sin base cardio.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👵</span>
+                <h3>Persona mayor (65+) con objetivo salud</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Mujer de 68 años, 62kg. Natación 45 min (MET=8): ~325 kcal. Caminar 30 min diarios: ~160 kcal. Total semanal: ~1.600 kcal ejercicio. Objetivo: mantener masa muscular y salud cardiovascular.
+                <br /><strong>El objetivo no es quemar calorías sino preservar función muscular y calidad de vida.</strong>
+              </p>
+              <p className={styles.escenarioTip}>💡 La pérdida de músculo (sarcopenia) tras los 60 es el factor de salud más importante. Prioriza fuerza sobre cardio.</p>
             </div>
           </div>
         </section>
 
-        <section className={styles.guideSection}>
-          <h2>Preguntas Frecuentes</h2>
-          <div className={styles.faqGrid}>
-            <details className={styles.faqItem}>
-              <summary>¿Por qué quemo menos calorías que mi amigo haciendo lo mismo?</summary>
+        {/* FAQ */}
+        <section className={styles.eduFaq}>
+          <h2>❓ Preguntas frecuentes sobre calorías y ejercicio</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Por qué quemo menos calorías que mi compañero haciendo lo mismo?</h4>
               <p>
-                El gasto calórico depende principalmente del peso corporal. Una persona de
-                90 kg quema más calorías que una de 60 kg haciendo el mismo ejercicio.
-                También influye la eficiencia: personas entrenadas son más eficientes y
-                pueden quemar menos calorías en la misma actividad.
+                El gasto calórico depende principalmente del peso corporal (más peso = más gasto), la eficiencia metabólica (personas entrenadas son más eficientes y queman menos en la misma actividad), la composición corporal (más músculo = más gasto basal), y factores individuales como la genética y la masa muscular. Una persona de 90 kg quema aproximadamente un 50% más que una de 60 kg haciendo el mismo ejercicio.
               </p>
-            </details>
-            <details className={styles.faqItem}>
-              <summary>¿Es mejor cardio o pesas para quemar calorías?</summary>
+              <p className={styles.faqTip}>💡 <strong>Clave:</strong> Los valores de la calculadora son estimaciones basadas en promedios. Tu gasto real puede variar ±20% según tu fisiología individual.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Es mejor el cardio o la fuerza para quemar grasa?</h4>
               <p>
-                El cardio quema más calorías durante el ejercicio. Pero las pesas generan
-                mayor EPOC y aumentan la masa muscular, lo que eleva el metabolismo basal.
-                Lo ideal es combinar ambos: entrenamiento de fuerza 2-3 veces/semana y
-                cardio 2-3 veces/semana para resultados óptimos.
+                Cardio quema más calorías durante el ejercicio (500-700 kcal/hora vs 300-500 de pesas). Pero las pesas generan mayor EPOC (quema extra 24-48h después), aumentan la masa muscular (que eleva el metabolismo basal permanentemente) y son más efectivas a largo plazo. La combinación óptima para pérdida de grasa: 2-3 sesiones de fuerza + 2-3 de cardio semanal. Solo cardio sin fuerza lleva a pérdida de músculo junto con la grasa.
               </p>
-            </details>
-            <details className={styles.faqItem}>
-              <summary>¿Puedo confiar en las calorías que marca mi smartwatch?</summary>
+              <p className={styles.faqTip}>💡 <strong>Evidencia:</strong> Estudios muestran que añadir 2 sesiones de fuerza semanales a un programa de cardio acelera la pérdida de grasa un 20-30% más que solo cardio.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Puedo confiar en las calorías que marca mi smartwatch o pulsómetro?</h4>
               <p>
-                Los dispositivos wearables tienen un margen de error del 15-30%. Son útiles
-                para comparar entre días o actividades, pero no como valor absoluto. Los
-                pulsómetros de pecho son más precisos que los de muñeca.
+                Los dispositivos wearables tienen un margen de error del 15-30% en el cálculo de calorías. Los pulsómetros de pecho (banda torácica) son más precisos que los de muñeca por la mejor lectura de frecuencia cardíaca. Las máquinas de cardio del gimnasio (sin datos personales) pueden tener errores del 30-40%. Los valores de la calculadora meskeIA basada en MET son tan precisos o más que la mayoría de wearables para la mayoría de actividades.
               </p>
-            </details>
-            <details className={styles.faqItem}>
-              <summary>¿Cuánto ejercicio necesito para compensar una comida?</summary>
+              <p className={styles.faqTip}>💡 <strong>Uso correcto:</strong> Úsalos para comparar entre días (tendencias) o entre actividades, no como valor absoluto exacto. La variabilidad entre sesiones importa más que el número exacto.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cuánto ejercicio necesito para compensar una comida copiosa?</h4>
               <p>
-                Mejor enfoque: no "compensar" comidas con ejercicio (crea una relación
-                insana). Una hamburguesa (~540 kcal) requiere ~1 hora de running. Es más
-                práctico mantener un déficit moderado diario que intentar quemar excesos
-                puntuales.
+                Una hamburguesa completa con patatas y bebida (~900 kcal) requeriría ~75 minutos de running a ritmo moderado. Un trozo de pizza (~280 kcal) equivale a ~25 minutos de carrera. Pero el enfoque de "compensar" comidas con ejercicio es psicológicamente dañino y matemáticamente ineficiente. Es mucho más fácil no comer 300 kcal que quemarlas después. El ejercicio es para la salud; la dieta, para el peso.
               </p>
-            </details>
+              <p className={styles.faqTip}>💡 <strong>Perspectiva sana:</strong> No uses el ejercicio como castigo ni la comida como recompensa. El ejercicio mejora la salud, el estado de ánimo y el metabolismo. La gestión del peso viene de hábitos sostenibles, no de compensaciones puntuales.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué es el NEAT y por qué es tan importante?</h4>
+              <p>
+                El NEAT (Non-Exercise Activity Thermogenesis) es el gasto calórico de todas las actividades físicas que no son ejercicio estructurado: caminar al trabajo, subir escaleras, gesticular, limpiar la casa, hacer recados. Puede representar entre 200 y 800 kcal/día según el estilo de vida. Personas activas en su vida diaria (NEAT alto) pueden quemar hasta 600 kcal/día más que personas sedentarias, aunque ambas hagan la misma sesión de gimnasio.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Hack fácil:</strong> Un podómetro o app de pasos con objetivo de 8.000-10.000 pasos diarios puede añadir 300-400 kcal de gasto extra sin esfuerzo percibido. El NEAT acumulado supera en muchos casos al gasto del gimnasio.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué es el efecto meseta y cómo romperlo?</h4>
+              <p>
+                El efecto meseta ocurre cuando el cuerpo se adapta al ejercicio y la dieta, reduciendo el gasto calórico para compensar el déficit. El metabolismo basal puede bajar un 10-15% en dietas restrictivas prolongadas. Para romperlo: varía la intensidad y tipo de ejercicio cada 4-6 semanas, introduce días de "recarga" calórica (refeed), aumenta el NEAT diario, y asegúrate de dormir 7-9 horas (el sueño insuficiente eleva el cortisol y reduce la quema de grasa).
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Señal de meseta:</strong> Si llevas 3 semanas sin cambios en peso ni medidas pese a mantener déficit y ejercicio, es el momento de variar el estímulo.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cómo influye la temperatura y la altitud en el gasto calórico?</h4>
+              <p>
+                Frío: el cuerpo gasta más energía para mantener la temperatura corporal (termogénesis), especialmente en agua fría (natación en agua fría puede incrementar el gasto un 10-20%). Calor extremo: el gasto también aumenta ligeramente pero la hidratación y el rendimiento se ven más afectados. Altitud: con menos oxígeno disponible, el cuerpo trabaja más para el mismo esfuerzo, incrementando el gasto un 5-15% en altitudes de 2.000-4.000m.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>Dato práctico:</strong> Nadar en piscina exterior en invierno puede quemar un 15% más que en piscina climatizada al mismo ritmo.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cuál es el ejercicio más eficiente para una persona sin tiempo?</h4>
+              <p>
+                Para maximizar el gasto calórico por unidad de tiempo: HIIT (10-20 min, máxima quema incluyendo EPOC), seguido de circuitos de fuerza-resistencia (20-30 min). Para maximizar beneficios de salud con mínimo tiempo: 2 sesiones semanales de fuerza de 30-40 min + 150 min semanales de actividad moderada (puede ser caminar). Para principiantes: caminar 30 min diarios es más sostenible y saludable que una sesión de HIIT que abandones en semana 3.
+              </p>
+              <p className={styles.faqTip}>💡 <strong>La mejor rutina:</strong> La que harás consistentemente durante meses. La adherencia supera siempre a la "eficiencia" teórica de cualquier protocolo.</p>
+            </div>
           </div>
         </section>
+
+        {/* GUÍA PASO A PASO */}
+        <section className={styles.eduGuia}>
+          <h2>📋 Cómo usar el gasto calórico para alcanzar tu objetivo</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Calcula tu gasto energético total diario (TDEE)</h4>
+                <p>El TDEE = Metabolismo Basal (BMR) + Gasto por Actividad Física + NEAT. Usa la calculadora de calorías meskeIA para estimar el gasto de tu ejercicio. Para el BMR, usa la fórmula de Harris-Benedict o Mifflin-St Jeor. Suma ambos para obtener tu TDEE aproximado y úsalo como referencia para planificar tu ingesta.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Define tu objetivo específico y el déficit/superávit necesario</h4>
+                <p>Perder peso: déficit de 300-500 kcal/día (0,5-1 kg/semana sostenible). Ganar músculo: superávit de 200-300 kcal/día con fuerza. Mantenimiento: ingesta = TDEE. Evita déficits mayores de 700-800 kcal/día: pierdes músculo, el metabolismo se adapta a la baja y el rebote es casi inevitable.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Elige actividades adecuadas a tu nivel y objetivo</h4>
+                <p>Principiante (sin base): caminar 30 min + 2 sesiones fuerza básica. Intermedio: 3 sesiones fuerza + 2-3 cardio moderado. Avanzado: programa periodizado con variación de estímulos. Considera también tu historial de lesiones, disponibilidad de tiempo real y qué actividades te resultan más sostenibles a largo plazo.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Registra tu actividad y ajusta según resultados reales</h4>
+                <p>Usa la calculadora para estimar el gasto semanal. Lleva un diario de entrenamiento (app, libreta) durante 4 semanas. Si tu peso no se mueve en la dirección esperada, el problema está en la estimación de calorías consumidas (generalmente se subestima un 20-30%) o en el TDEE real. Ajusta en pasos de ±200 kcal/día.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Optimiza la recuperación: sueño, proteína y descanso</h4>
+                <p>El ejercicio estimula las adaptaciones, pero estas ocurren en la recuperación. 7-9 horas de sueño son no negociables. Proteína adecuada (1,6-2g/kg de peso corporal) para preservar y construir músculo. Al menos 1 día de descanso por cada 2-3 de entrenamiento intenso. Sin recuperación adecuada, el mismo ejercicio produce menos resultado con más riesgo de lesión.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Evalúa progreso con métricas más allá de la báscula</h4>
+                <p>El peso puede mantenerse estable mientras ganas músculo y pierdes grasa (recomposición corporal), especialmente en principiantes. Mide también: perímetro cintura/cadera, fotografías mensuales (misma luz y hora), marcas de rendimiento (velocidad, peso levantado), sensación de energía y calidad del sueño. La báscula es un indicador entre muchos, no el único.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* TIPS */}
+        <section className={styles.eduTips}>
+          <h2>✅ Claves para optimizar tu entrenamiento</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧬</span>
+              <h4>La dieta hace el 70-80%</h4>
+              <p>No puedes superar una mala dieta con ejercicio. Una hora de running quema ~600 kcal; una pizza las repone en 5 minutos. Enfoca la energía en hábitos alimentarios sostenibles.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💤</span>
+              <h4>El sueño es el suplemento gratuito</h4>
+              <p>Dormir 7-9 horas optimiza hormona de crecimiento, cortisol y leptina. Dormir 6h reduce el rendimiento un 20-30% y aumenta el apetito por alimentos calóricos al día siguiente.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <h4>Varía el estímulo cada 4-6 semanas</h4>
+              <p>El cuerpo se adapta al ejercicio repetitivo y reduce su gasto. Cambia intensidad, duración, tipo de ejercicio o patrón de descanso para seguir progresando y evitar la meseta.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏃</span>
+              <h4>Más pasos, no solo más gimnasio</h4>
+              <p>8.000-10.000 pasos diarios (NEAT) pueden quemar más calorías que una sesión de gym semanal. Sube escaleras, aparca lejos, camina en las llamadas. El movimiento cotidiano suma.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🥗</span>
+              <h4>Proteína primero en cada comida</h4>
+              <p>La proteína tiene efecto termogénico (quema el 20-30% de sus calorías en digestión), sacia más y preserva el músculo en déficit. 1,6-2g/kg de peso es el rango óptimo para deportistas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📈</span>
+              <h4>Consistencia supera intensidad</h4>
+              <p>3 sesiones semanales durante 6 meses superan siempre a 6 sesiones semanales durante 3 semanas. El hábito sostenible es la única estrategia que funciona a largo plazo.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Errores frecuentes que sabotean tus resultados de fitness</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>❌ Sobreestimar el gasto calórico del ejercicio:</strong> La mayoría de personas creen quemar el doble de lo real. Una hora de gym suele queman 300-400 kcal (no 800). Esto lleva a comer "de más" justificado por el ejercicio, anulando el déficit creado.</li>
+            <li><strong>❌ Hacer solo cardio para perder peso:</strong> Sin entrenamiento de fuerza, hasta el 30-40% del peso perdido puede ser músculo. Menos músculo = metabolismo más lento = más difícil mantener el peso perdido. El cardio sin fuerza es la receta del "efecto rebote".</li>
+            <li><strong>❌ No comer suficiente proteína en déficit calórico:</strong> Con menos de 1,2g/kg de proteína en déficit, el cuerpo cataboliza músculo para obtener energía. El músculo perdido reduce el metabolismo basal, haciendo cada vez más difícil el déficit. Prioriza proteína aunque reduzcas carbohidratos y grasas.</li>
+            <li><strong>❌ Usar la báscula como único indicador de progreso:</strong> El peso puede aumentar en las primeras semanas de entrenamiento por retención hídrica y ganancia muscular, aunque se esté perdiendo grasa. Abandonar por ver la báscula estancada o subir es el error más común entre principiantes.</li>
+            <li><strong>❌ Entrenar demasiado sin recuperación:</strong> Más no es siempre mejor. El sobreentrenamiento eleva el cortisol, degrada músculo, aumenta el riesgo de lesión y reduce el rendimiento. Señales de alerta: rendimiento decreciente, sueño peor, irritabilidad, lesiones frecuentes. El descanso es parte del entrenamiento.</li>
+            <li><strong>❌ Buscar el ejercicio "que más quema" sin considerar la adherencia:</strong> El mejor ejercicio es el que harás consistentemente. Un running de 30 min que odias y abandonas en 2 semanas vale menos que caminar 45 min al día porque te gusta y lo mantienes un año.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-calorias-ejercicio')} />

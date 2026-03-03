@@ -692,6 +692,81 @@ export default function SimuladorHipotecaPage() {
               Plazo corto para amortizar rápido. El alquiler debe cubrir la cuota + gastos (~900 €/mes).
             </p>
           </div>
+
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioIcon}>🏢</div>
+            <h3>Hipoteca mixta (joven profesional)</h3>
+            <div className={styles.escenarioData}>
+              <div className={styles.escenarioDato}>
+                <span>Precio:</span> <strong>220.000 €</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Entrada:</span> <strong>44.000 € (20%)</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Plazo:</span> <strong>25 años</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Tipo:</span> <strong>Mixta: 5 años fijo 2.8% + variable</strong>
+              </div>
+            </div>
+            <div className={styles.escenarioResultado}>
+              Cuota: <strong>~830 €/mes (fase fija)</strong>
+            </div>
+            <p className={styles.escenarioConsejo}>
+              Hipoteca mixta: previsibilidad inicial con posible ahorro posterior. Ideal para quien espera amortizar anticipadamente en los primeros 5 años.
+            </p>
+          </div>
+
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioIcon}>👴</div>
+            <h3>Hipoteca con entrada alta (55 años)</h3>
+            <div className={styles.escenarioData}>
+              <div className={styles.escenarioDato}>
+                <span>Precio:</span> <strong>350.000 €</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Entrada:</span> <strong>175.000 € (50%)</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Plazo:</span> <strong>10 años</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>TIN:</span> <strong>3.8% fijo</strong>
+              </div>
+            </div>
+            <div className={styles.escenarioResultado}>
+              Cuota: <strong>~1.740 €/mes</strong>
+            </div>
+            <p className={styles.escenarioConsejo}>
+              A partir de los 55 años, los bancos limitan el plazo (hipoteca debe acabar antes de 70-75 años). Necesitas mayor entrada y cuota más alta. Fija para certidumbre cerca de la jubilación.
+            </p>
+          </div>
+
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioIcon}>🌍</div>
+            <h3>No residente (español en el extranjero)</h3>
+            <div className={styles.escenarioData}>
+              <div className={styles.escenarioDato}>
+                <span>Precio:</span> <strong>200.000 €</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Entrada:</span> <strong>70.000 € (35%)</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>Plazo:</span> <strong>20 años</strong>
+              </div>
+              <div className={styles.escenarioDato}>
+                <span>TIN:</span> <strong>4.2% fijo (no residente)</strong>
+              </div>
+            </div>
+            <div className={styles.escenarioResultado}>
+              Cuota: <strong>~855 €/mes</strong>
+            </div>
+            <p className={styles.escenarioConsejo}>
+              Los no residentes necesitan mayor entrada (30-40%) y obtienen tipos algo más altos. Algunos bancos especializados (Sabadell, CaixaBank) tienen productos específicos para emigrantes.
+            </p>
+          </div>
         </div>
         </div>
 
@@ -946,6 +1021,36 @@ export default function SimuladorHipotecaPage() {
               💡 <strong>Truco de negociación:</strong> Lleva ofertas de otros bancos. Si el Banco A
               te cobra 1% de apertura (1.600 €) y el Banco B 0%, muéstraselo al A. Muchos aceptan
               igualarlo para no perder el cliente.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Qué es la hipoteca mixta y cuándo conviene?</h3>
+            <p>
+              La hipoteca mixta combina un período inicial a tipo fijo (normalmente 3-10 años) con el resto a tipo variable (Euríbor + diferencial). Ventajas: tipos fijos del tramo inicial suelen ser menores que una hipoteca fija pura; si amortizas anticipadamente durante el tramo fijo, reduces mucho el coste del tramo variable posterior. Inconveniente: si los tipos suben mucho justo cuando empieza el tramo variable, te quedas sin el escudo de la fija.
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Ideal para:</strong> Quien planea amortizar fuertemente en los primeros 5-7 años (herencia esperada, bonus recurrentes) y así reducir el capital pendiente antes del tramo variable.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Qué es el seguro de vida vinculado a la hipoteca y es obligatorio?</h3>
+            <p>
+              Desde la Ley de Crédito Inmobiliario (2019), el banco no puede obligarte a contratar seguros con ellos. Pero sí pueden ofrecerte un diferencial de interés menor si los contratas (bonificación). El seguro de vida hipotecario garantiza el pago del préstamo si el titular fallece. El seguro de hogar (continente) sí es obligatorio por ley, pero puedes contratarlo con cualquier aseguradora.
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Cálculo clave:</strong> Compara el seguro del banco vs. aseguradoras externas (Mutua, Mapfre, AXA). La bonificación en el diferencial puede ser 0.1-0.3%. Calcula si el ahorro en intereses compensa el sobrecoste del seguro bancario. A menudo, no compensa.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>❓ ¿Cómo afecta el Euríbor a mi hipoteca variable y qué perspectivas hay?</h3>
+            <p>
+              El Euríbor (Euro Interbank Offered Rate) es el tipo al que los bancos europeos se prestan dinero entre sí. Las hipotecas variables en España se referencian principalmente al Euríbor a 12 meses. Cuando el BCE sube los tipos de interés para combatir la inflación, el Euríbor sube; cuando los baja (entorno de recesión o baja inflación), el Euríbor baja. La revisión de tu hipoteca variable ocurre cada 6 o 12 meses según el contrato.
+            </p>
+            <p className={styles.faqTip}>
+              💡 <strong>Perspectiva:</strong> El Euríbor ha oscilado entre -0.5% y +4.2% entre 2016 y 2024. Para hipotecas a 25-30 años, es estadísticamente seguro asumir que atravesará varios ciclos alcistas y bajistas. Usa el simulador con el tipo actual y luego con +2% para ver el impacto en tu cuota.
             </p>
           </div>
 
