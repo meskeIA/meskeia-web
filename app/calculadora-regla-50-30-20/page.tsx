@@ -296,66 +296,271 @@ export default function CalculadoraRegla503020Page() {
         subtitle="Descubre cómo aplicar este método de presupuesto popularizado por Elizabeth Warren"
         icon="📚"
       >
-        <section className={styles.guideSection}>
-          <h2>¿Qué es la regla 50/30/20?</h2>
-          <p className={styles.introParagraph}>
-            Es un método de presupuesto creado por la senadora Elizabeth Warren y su hija Amelia Warren Tyagi
-            en el libro "All Your Worth". Divide tus ingresos netos en tres categorías simples.
-          </p>
+        {/* Tabla Comparativa */}
+        <section className={styles.eduComparativa}>
+          <h2>Comparativa de métodos de presupuesto personal</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Método</th>
+                  <th>Para quién</th>
+                  <th>Dificultad</th>
+                  <th>Control</th>
+                  <th>Recomendado si...</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>50/30/20 clásico</strong></td>
+                  <td>Ingresos medios</td>
+                  <td>Fácil</td>
+                  <td>Equilibrado</td>
+                  <td>Empiezas a presupuestar</td>
+                </tr>
+                <tr>
+                  <td><strong>70/20/10</strong></td>
+                  <td>Ingresos bajos</td>
+                  <td>Muy fácil</td>
+                  <td>Básico</td>
+                  <td>Gastos necesarios muy altos</td>
+                </tr>
+                <tr>
+                  <td><strong>60/20/20</strong></td>
+                  <td>Ciudad cara (Madrid/BCN)</td>
+                  <td>Fácil</td>
+                  <td>Moderado</td>
+                  <td>Alquiler consume más del 50%</td>
+                </tr>
+                <tr>
+                  <td><strong>40/30/30</strong></td>
+                  <td>Alta renta</td>
+                  <td>Moderado</td>
+                  <td>Alto ahorro</td>
+                  <td>Quieres jubilarte anticipado</td>
+                </tr>
+                <tr>
+                  <td><strong>Págate primero</strong></td>
+                  <td>Ahorradores disciplinados</td>
+                  <td>Automático</td>
+                  <td>Alto</td>
+                  <td>Prefieres automatizar todo</td>
+                </tr>
+                <tr>
+                  <td><strong>Presupuesto base cero</strong></td>
+                  <td>Planificadores detallistas</td>
+                  <td>Complejo</td>
+                  <td>Máximo</td>
+                  <td>Quieres control total de cada euro</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>🏠 50% Necesidades</h4>
-              <p>Gastos esenciales que no puedes evitar:</p>
-              <ul>
-                <li>Alquiler o hipoteca</li>
-                <li>Comida básica</li>
-                <li>Suministros (luz, agua, gas)</li>
-                <li>Transporte al trabajo</li>
-                <li>Seguros obligatorios</li>
-                <li>Medicamentos esenciales</li>
-              </ul>
+        {/* Escenarios */}
+        <section className={styles.eduEscenarios}>
+          <h2>La regla 50/30/20 aplicada a diferentes perfiles</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏙️</span>
+                <strong>Mileurista en Madrid</strong>
+              </div>
+              <p className={styles.escenarioExample}>Con 1.000 € netos, el alquiler mínimo ya supera el 50%. Necesita adaptar la regla: 70% necesidades, 15% deseos, 15% ahorro como objetivo realista.</p>
+              <span className={styles.escenarioTip}>Adaptar: 70/15/15</span>
             </div>
-
-            <div className={styles.contentCard}>
-              <h4>🎉 30% Deseos</h4>
-              <p>Gastos que mejoran tu calidad de vida:</p>
-              <ul>
-                <li>Restaurantes y comida a domicilio</li>
-                <li>Suscripciones (Netflix, Spotify...)</li>
-                <li>Viajes y vacaciones</li>
-                <li>Ropa no esencial</li>
-                <li>Hobbies y entretenimiento</li>
-                <li>Gimnasio</li>
-              </ul>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💑</span>
+                <strong>Pareja con hipoteca compartida</strong>
+              </div>
+              <p className={styles.escenarioExample}>Ingresos combinados de 4.000 €. La hipoteca compartida reduce el % de necesidades. Pueden aspirar a la distribución estándar o incluso 40/30/30.</p>
+              <span className={styles.escenarioTip}>Regla: 50/30/20 o mejor</span>
             </div>
-
-            <div className={styles.contentCard}>
-              <h4>💰 20% Ahorro</h4>
-              <p>Dinero para tu futuro:</p>
-              <ul>
-                <li>Fondo de emergencia</li>
-                <li>Ahorro para jubilación</li>
-                <li>Inversiones</li>
-                <li>Pago extra de deudas</li>
-                <li>Ahorro para objetivos</li>
-              </ul>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎓</span>
+                <strong>Joven sin cargas (25-30 años)</strong>
+              </div>
+              <p className={styles.escenarioExample}>Viviendo en casa familiar o con compañeros. Gastos básicos reducidos. Oportunidad de oro para maximizar ahorro e inversión antes de tener más responsabilidades.</p>
+              <span className={styles.escenarioTip}>Objetivo: 40/20/40</span>
             </div>
-
-            <div className={styles.contentCard}>
-              <h4>¿Y si no puedo cumplirla?</h4>
-              <p>
-                La regla es una guía, no una ley. Si vives en una ciudad cara, quizás necesites
-                60% en necesidades y 20% en deseos. Lo importante es:
-              </p>
-              <ul>
-                <li>Mantener el 20% de ahorro como mínimo</li>
-                <li>Reducir deseos antes que ahorro</li>
-                <li>Buscar formas de reducir necesidades a largo plazo</li>
-              </ul>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+                <strong>Familia con hijos en edad escolar</strong>
+              </div>
+              <p className={styles.escenarioExample}>Colegio, actividades extraescolares y gastos médicos aumentan las &quot;necesidades&quot;. El 50% puede quedarse corto. Reclasificar educación como necesidad prioritaria.</p>
+              <span className={styles.escenarioTip}>Adaptar: 60/20/20</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💼</span>
+                <strong>Autónomo con ingresos variables</strong>
+              </div>
+              <p className={styles.escenarioExample}>Aplicar la regla sobre el ingreso mínimo garantizado (peor mes). Los meses buenos, todo el exceso va a ahorro/fondo de emergencia.</p>
+              <span className={styles.escenarioTip}>Base: ingreso mínimo</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🧓</span>
+                <strong>Jubilado con pensión</strong>
+              </div>
+              <p className={styles.escenarioExample}>Hipoteca pagada, hijos independientes. Necesidades reducidas al 30-35%. Mayor margen para deseos (viajes, cultura) y menos necesidad de ahorro agresivo.</p>
+              <span className={styles.escenarioTip}>Adaptar: 35/45/20</span>
             </div>
           </div>
         </section>
+
+        {/* FAQ */}
+        <section className={styles.eduFaq}>
+          <h2>Preguntas frecuentes sobre la regla 50/30/20</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿El 50% se calcula sobre ingresos brutos o netos?</h4>
+              <p>Siempre sobre ingresos NETOS (después de IRPF, Seguridad Social y cualquier deducción). Es el dinero que realmente llega a tu cuenta. Usar el bruto distorsionaría la distribución real.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿El gym es necesidad o deseo?</h4>
+              <p>Depende de tu perspectiva. Si lo usas regularmente para salud, puede considerarse necesidad. Si es un capricho que podrías abandonar, es deseo. Lo importante es ser honesto con uno mismo, no optimizar las categorías para que cuadren.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿El pago de deudas va en necesidades o en ahorro?</h4>
+              <p>Las cuotas mínimas obligatorias (hipoteca, préstamo personal) van en necesidades. Los pagos extra para cancelar deuda más rápido van en ahorro, ya que reducen tu pasivo futuro y es como invertir en ti mismo.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Puedo adaptar los porcentajes a mi situación?</h4>
+              <p>Sí y es completamente normal. La regla 50/30/20 es un marco orientativo, no una ley. Lo crítico es mantener el ahorro como prioridad. Si necesitas 60% en necesidades, reduce deseos antes que ahorro.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo aplico la regla si tengo pareja?</h4>
+              <p>Dos enfoques: (1) Presupuesto conjunto: sumar ambos ingresos y aplicar la regla al total, con una cuenta común. (2) Presupuesto individual: cada uno aplica la regla a sus ingresos y acuerdan cómo cubrir gastos compartidos.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué hago si me sobra dinero al final del mes?</h4>
+              <p>Si ya cubres el 20% de ahorro, el exceso puede ir a un objetivo específico (vacaciones, fondo de emergencia, inversión extra). Si habitualmente te sobra mucho, replantea si estás siendo demasiado conservador en alguna categoría.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿El plan de pensiones privado va en el 20% de ahorro?</h4>
+              <p>Sí. Cualquier forma de ahorro para el futuro entra en ese 20%: fondo de emergencia, plan de pensiones, inversiones en ETFs, fondos indexados o ahorro para objetivos a largo plazo.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo empezar si nunca he llevado un presupuesto?</h4>
+              <p className={styles.faqTip}>El primer mes, solo registra. No cambies nada, solo anota tus gastos en las tres categorías. El segundo mes, ya tienes datos reales para ajustar. La regla 50/30/20 es perfecta para empezar por su simplicidad.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.eduGuia}>
+          <h2>Cómo implementar la regla 50/30/20 en tu vida</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula tu ingreso neto mensual real</strong>
+                <p>Suma todos tus ingresos después de impuestos. Si tienes ingresos variables, usa la media de los últimos 6 meses o el mes más bajo como base conservadora.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Registra todos tus gastos durante un mes</strong>
+                <p>Sin cambiar nada todavía. Apunta cada gasto y clasifícalo: necesidad (no puedo evitarlo), deseo (podría prescindir de él) o ahorro/inversión.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Compara tu distribución real con la ideal</strong>
+                <p>Usa esta calculadora para ver dónde estás. Identifica qué categoría está más desequilibrada y cuánto tendrías que ajustar para acercarte al 50/30/20.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Automatiza el ahorro el día de cobro</strong>
+                <p>Configura una transferencia automática al banco/broker de inversión el mismo día que cobras. &quot;Págate primero a ti mismo&quot; es el secreto de quienes ahorran consistentemente.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Revisa y ajusta mensualmente</strong>
+                <p>Los primeros 3 meses revisa semanalmente. Después mensualmente. Identifica gastos en &quot;deseos&quot; que podrías reducir sin sacrificar calidad de vida.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Trabaja para reducir las necesidades a largo plazo</strong>
+                <p>Si tus necesidades superan el 50%, busca soluciones estructurales: mejor tarifa de luz, cambio de proveedor de internet, negociar el alquiler, o aumentar ingresos.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Invierte el 20% de ahorro con propósito</strong>
+                <p>Primero: fondo de emergencia (3-6 meses). Segundo: deudas de alto interés. Tercero: jubilación (plan pensiones, ETFs). Cuarto: objetivos específicos. Dar prioridades al ahorro multiplica su efecto.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Tips */}
+        <section className={styles.eduTips}>
+          <h2>Tips para aplicar la regla 50/30/20 con éxito</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <strong>Empieza por el 20% de ahorro</strong>
+              <p>Automatiza el ahorro antes de distribuir el resto. Lo que no ves, no lo gastas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📱</span>
+              <strong>Usa una app de seguimiento</strong>
+              <p>Fintonic, Money Manager o una hoja de cálculo. Lo que se mide, se puede mejorar.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔍</span>
+              <strong>Revisa tus suscripciones cada trimestre</strong>
+              <p>Las suscripciones olvidadas son la mayor fuga de la categoría &quot;deseos&quot;. Audítalas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📈</span>
+              <strong>Aumenta el % de ahorro con cada subida</strong>
+              <p>Cuando consigas un aumento, destina la mitad del incremento a ahorro antes de acostumbrarte a gastar más.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏆</span>
+              <strong>Celebra los hitos</strong>
+              <p>Llegar al primer mes con el 20% ahorrado merece reconocimiento. Usa la categoría &quot;deseos&quot; para celebrar el progreso.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <strong>Adapta la regla, no la abandones</strong>
+              <p>Si un mes no puedes cumplirla, analiza por qué. Un gasto extraordinario no es un fracaso, es información.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores comunes al aplicar la regla 50/30/20</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li>Calcular los porcentajes sobre el salario bruto en lugar del neto</li>
+            <li>Clasificar los deseos como necesidades para que los números cuadren</li>
+            <li>Reducir el ahorro en meses difíciles en lugar de reducir los deseos</li>
+            <li>No tener una cuenta de ahorro separada (mezclar ahorro con gastos diarios)</li>
+            <li>Obsesionarse con cumplir exactamente el 50/30/20 en lugar de usarlo como guía</li>
+            <li>No revisar los gastos fijos periódicamente (seguros, suministros, suscripciones)</li>
+            <li>Ignorar los gastos anuales o extraordinarios que descuadran el mes en que ocurren</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-regla-50-30-20')} />
