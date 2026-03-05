@@ -863,3 +863,80 @@
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* ===== EDUCATIONAL SECTION v2.0 ===== */
+
+.eduComparativa {
+  margin-bottom: var(--spacing-xl);
+}
+
+.eduComparativa h2 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.4rem;
+}
+
+.eduEscenarios {
+  margin-bottom: var(--spacing-xl);
+}
+
+.eduEscenarios h2 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.4rem;
+}
+
+.eduFaq {
+  margin-bottom: var(--spacing-xl);
+}
+
+.eduFaq h2 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.4rem;
+}
+
+.eduGuia {
+  margin-bottom: var(--spacing-xl);
+}
+
+.eduGuia h2 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.4rem;
+}
+
+.eduTips {
+  margin-bottom: var(--spacing-xl);
+}
+
+.eduTips h2 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.4rem;
+}
+
+/* Escenario tip as pill badge (v2.0) */
+.escenarioTip {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Warning box v2.0: strong instead of h3 */
+.warningHeader strong {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+[data-theme='dark'] .warningHeader strong {
+  color: #ffc107;
+}
+
+[data-theme='dark'] .warningList li {
+  color: var(--text-secondary);
+}
