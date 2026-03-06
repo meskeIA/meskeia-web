@@ -685,6 +685,235 @@ export default function GeneradorOndasPage() {
         title="📚 ¿Quieres aprender más sobre ondas sonoras?"
         subtitle="Descubre la física del sonido y cómo funcionan las ondas"
       >
+        {/* Tabla comparativa */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Tipo de onda</th>
+                <th>Armónicos</th>
+                <th>Sonido característico</th>
+                <th>Uso musical</th>
+                <th>Uso técnico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Senoidal</strong></td>
+                <td>Ninguno (pura)</td>
+                <td>Suave, fluido, limpio</td>
+                <td>Referencia afinación, sintetizadores</td>
+                <td>Pruebas de audio, calibración</td>
+              </tr>
+              <tr>
+                <td><strong>Cuadrada</strong></td>
+                <td>Solo impares (3ª, 5ª, 7ª...)</td>
+                <td>Metálico, brillante, 8-bit</td>
+                <td>Música electrónica, chiptune</td>
+                <td>Señales digitales, reloj</td>
+              </tr>
+              <tr>
+                <td><strong>Triangular</strong></td>
+                <td>Impares (decaen rápido)</td>
+                <td>Suave, similar a flauta</td>
+                <td>Síntesis substractiva, pad</td>
+                <td>Generadores de rampa</td>
+              </tr>
+              <tr>
+                <td><strong>Diente de sierra</strong></td>
+                <td>Todos (pares e impares)</td>
+                <td>Brillante, rico, complejo</td>
+                <td>Simular cuerdas y vientos</td>
+                <td>Osciladores, LFO</td>
+              </tr>
+              <tr>
+                <td><strong>20 Hz (infrasónico)</strong></td>
+                <td>Variable</td>
+                <td>No audible, solo vibración</td>
+                <td>Efectos sub-graves (cine)</td>
+                <td>Medición de resonancias</td>
+              </tr>
+              <tr>
+                <td><strong>440 Hz (La4)</strong></td>
+                <td>Según tipo</td>
+                <td>Nota de referencia</td>
+                <td>Afinación estándar ISO 16</td>
+                <td>Calibración de afinadores</td>
+              </tr>
+              <tr>
+                <td><strong>1.000–4.000 Hz</strong></td>
+                <td>Variable</td>
+                <td>Zona más sensible del oído</td>
+                <td>Voz, guitarra, piano</td>
+                <td>Test de agudeza auditiva</td>
+              </tr>
+              <tr>
+                <td><strong>20.000 Hz (ultrasónico)</strong></td>
+                <td>Variable</td>
+                <td>Límite del oído humano</td>
+                <td>No aplicable</td>
+                <td>Ecografías, limpieza ultrasónica</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Escenarios de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <h3>🎸 Afinar instrumentos</h3>
+            <p>Genera un La4 a 440 Hz con onda senoidal pura como referencia para afinar guitarra, violín o cualquier instrumento acústico sin necesidad de afinador físico.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🔬 Experimentos de física</h3>
+            <p>Visualiza en tiempo real las diferencias entre ondas senoidal, cuadrada, triangular y diente de sierra. Ideal para clases de acústica o proyectos de laboratorio.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎮 Efectos 8-bit</h3>
+            <p>La onda cuadrada es la base de los sonidos de videojuegos retro (NES, Game Boy). Experimenta con frecuencias para recrear efectos clásicos de chiptune.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🔊 Testing de altavoces</h3>
+            <p>Usa un barrido de frecuencias (de 20 Hz a 20.000 Hz) para identificar resonancias, distorsiones o frecuencias problemáticas en tus altavoces o auriculares.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🧘 Terapia de sonido</h3>
+            <p>Ciertas frecuencias (396 Hz, 528 Hz, 741 Hz) se usan en terapia de sonido. Genera tonos puros para meditación, relajación o técnicas de binaural beats.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎛️ Producción musical</h3>
+            <p>Usa el visualizador para analizar la forma de onda de grabaciones, identificar clipping o comparar la &quot;densidad armónica&quot; de diferentes instrumentos.</p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <ul className={styles.faqList}>
+          <li className={styles.faqItem}>
+            <h3>¿Por qué uso Web Audio API y no un archivo de audio?</h3>
+            <p>La Web Audio API genera las ondas matemáticamente en tiempo real, directamente en tu navegador. Esto permite frecuencias exactas, sin artefactos de compresión MP3 y con latencia mínima, sin necesidad de descargar ningún archivo.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Puedo usar esto para afinar una guitarra?</h3>
+            <p>Sí. Selecciona onda senoidal y ajusta la frecuencia a la nota que necesitas (Mi6=329,6 Hz, Si3=246,9 Hz, Sol3=196 Hz, Re3=146,8 Hz, La2=110 Hz, Mi2=82,4 Hz). Compara el tono que escuchas con tu instrumento.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Por qué la onda cuadrada suena &quot;más fuerte&quot; que la senoidal al mismo volumen?</h3>
+            <p>Porque la onda cuadrada tiene mayor energía RMS. A la misma amplitud de pico, la cuadrada entrega ~1,41 veces más potencia que la senoidal. Por eso parece más intensa.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Qué es la Serie de Fourier que menciona la app?</h3>
+            <p>Es el principio matemático que demuestra que cualquier sonido complejo puede descomponerse en suma de ondas senoidales simples. La onda cuadrada, por ejemplo, es la suma de infinitas senoidales con frecuencias 1f, 3f, 5f, 7f... con amplitudes decrecientes.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿El visualizador de audio funciona con cualquier archivo?</h3>
+            <p>Sí, con cualquier audio que puedas reproducir en el navegador: MP3, WAV, OGG, AAC. El navegador analiza la señal y muestra la forma de onda en tiempo real usando FFT (Transformada Rápida de Fourier).</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Puedo exportar la visualización como imagen?</h3>
+            <p>Sí. La app permite exportar el waveform como PNG. Útil para compartir en redes sociales, incluir en presentaciones o crear carátulas de podcast con forma de onda visual.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿A qué volumen es seguro usar esta herramienta?</h3>
+            <p>La OMS recomienda no superar 85 dB durante más de 8 horas. Con auriculares a máximo volumen puedes superar los 100 dB fácilmente. Usa el generador a un volumen cómodo, nunca al máximo.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Qué diferencia hay entre frecuencia y tono?</h3>
+            <p>La frecuencia es la medida física (Hz). El tono es la percepción subjetiva que tenemos de ella. El oído humano no es lineal: percibimos el doble de &quot;altura&quot; al doblar la frecuencia (una octava), pero no todos los Hz son igual de perceptibles.</p>
+          </li>
+        </ul>
+
+        {/* Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Selecciona el tipo de onda</h3>
+              <p>Elige entre senoidal (pura), cuadrada (brillante), triangular (suave) o diente de sierra (rica en armónicos) según tu objetivo.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Ajusta la frecuencia</h3>
+              <p>Usa el slider (20-2000 Hz) o los botones de notas musicales (Do a Si). Para afinar a La4 estándar, selecciona &quot;La (A4)&quot; = 440 Hz.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Controla el volumen</h3>
+              <p>Ajusta el volumen antes de reproducir. Empieza siempre bajo y súbelo gradualmente para proteger tu oído, especialmente con auriculares.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Pulsa Reproducir</h3>
+              <p>El tono se genera en tiempo real. La onda aparece visualizada en el canvas. Puedes cambiar los parámetros mientras el sonido está activo.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h3>Usa el Visualizador de Audio</h3>
+              <p>Cambia a la pestaña &quot;Visualizador&quot;, carga un archivo de audio y observa su forma de onda. Elige entre los estilos de visualización disponibles.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepContent}>
+              <h3>Personaliza colores y estilo</h3>
+              <p>Cambia el color de la onda, el fondo y el estilo de visualización para conseguir el aspecto que necesitas antes de exportar.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepContent}>
+              <h3>Exporta como imagen PNG</h3>
+              <p>Pulsa el botón de exportar para guardar la visualización como PNG. Ideal para carátulas de podcast, presentaciones o publicaciones en redes.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <h3>🎯 Usa senoidal para afinación</h3>
+            <p>Para afinar instrumentos, la onda senoidal es la más precisa: no tiene armónicos que confundan el oído al comparar tonos.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔉 Empieza con volumen bajo</h3>
+            <p>Especialmente al generar frecuencias agudas (&gt;1000 Hz), empieza al 20-30% de volumen. Las frecuencias altas pueden ser más molestas de lo esperado.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🎵 Aprende las frecuencias de las notas</h3>
+            <p>La4=440Hz, Sol4=392Hz, Mi4=329,6Hz, Do4=261,6Hz, Si3=246,9Hz. Memorizarlas te ayuda a afinar de oído más rápido.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>📊 Combina generador y visualizador</h3>
+            <p>Genera un tono y luego analiza en el visualizador cómo suena mezclado con tu instrumento real. Útil para detectar desafinación.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🎬 Exporta en alta resolución</h3>
+            <p>Para usar el waveform en vídeos o presentaciones, activa pantalla completa antes de exportar para obtener mayor resolución en el PNG.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>⚡ Experimenta con frecuencias extremas</h3>
+            <p>Prueba 20 Hz (sentirás más que oirás), 10.000 Hz (umbral de molestia para muchos) y observa cómo cambia tu percepción del volumen.</p>
+          </div>
+        </div>
+
+        {/* Aviso importante */}
+        <div className={styles.warningBox}>
+          <h3>⚠️ Protege tu audición</h3>
+          <ul className={styles.warningList}>
+            <li>La exposición prolongada a sonidos por encima de 85 dB puede causar daño auditivo permanente.</li>
+            <li>Con auriculares a máximo volumen puedes superar los 100-110 dB fácilmente.</li>
+            <li>Las frecuencias muy agudas (&gt;8000 Hz) son especialmente fatigantes para el oído.</li>
+            <li>Si experimentas pitidos en los oídos después de usar la app, descansa y baja el volumen.</li>
+          </ul>
+        </div>
+
         <section className={styles.guideSection}>
           <h2>¿Qué es una onda sonora?</h2>
           <p className={styles.introParagraph}>
