@@ -256,6 +256,235 @@ export default function VitaminasMineralesPage() {
         subtitle="Aprende sobre los tipos de nutrientes, cómo optimizar su absorción y las necesidades especiales"
         icon="📚"
       >
+        {/* Tabla comparativa */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Nutriente</th>
+                <th>Tipo</th>
+                <th>CDR adulto</th>
+                <th>Síntoma de deficiencia</th>
+                <th>Mejores fuentes alimentarias</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Vitamina D</strong></td>
+                <td>Liposoluble</td>
+                <td>15-20 μg/día</td>
+                <td>Debilidad ósea, fatiga, inmunidad baja</td>
+                <td>Sol, pescado azul, huevos, leche enriquecida</td>
+              </tr>
+              <tr>
+                <td><strong>Vitamina B12</strong></td>
+                <td>Hidrosoluble</td>
+                <td>2,4 μg/día</td>
+                <td>Anemia megaloblástica, daño neurológico</td>
+                <td>Carne, pescado, huevos, lácteos (solo animales)</td>
+              </tr>
+              <tr>
+                <td><strong>Vitamina C</strong></td>
+                <td>Hidrosoluble</td>
+                <td>75-90 mg/día</td>
+                <td>Escorbuto, fatiga, mala cicatrización</td>
+                <td>Pimiento, kiwi, naranja, fresas, brócoli</td>
+              </tr>
+              <tr>
+                <td><strong>Hierro</strong></td>
+                <td>Oligoelemento</td>
+                <td>8-18 mg/día</td>
+                <td>Anemia ferropénica, cansancio extremo</td>
+                <td>Carne roja, lentejas, espinacas, semillas</td>
+              </tr>
+              <tr>
+                <td><strong>Calcio</strong></td>
+                <td>Macromineral</td>
+                <td>1.000-1.200 mg/día</td>
+                <td>Osteoporosis, calambres, palpitaciones</td>
+                <td>Lácteos, tofu, almendras, brócoli, sardinas</td>
+              </tr>
+              <tr>
+                <td><strong>Magnesio</strong></td>
+                <td>Macromineral</td>
+                <td>310-420 mg/día</td>
+                <td>Calambres, ansiedad, insomnio, fatiga</td>
+                <td>Frutos secos, legumbres, cacao, cereales integrales</td>
+              </tr>
+              <tr>
+                <td><strong>Zinc</strong></td>
+                <td>Oligoelemento</td>
+                <td>8-11 mg/día</td>
+                <td>Inmunidad débil, pérdida de gusto/olfato</td>
+                <td>Ostras, carne, semillas de calabaza, legumbres</td>
+              </tr>
+              <tr>
+                <td><strong>Ácido fólico (B9)</strong></td>
+                <td>Hidrosoluble</td>
+                <td>400 μg/día</td>
+                <td>Anemia, defectos tubo neural (embarazo)</td>
+                <td>Legumbres, vegetales de hoja verde, hígado</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Escenarios de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <h3>🌱 Dieta vegana</h3>
+            <p>Busca vitamina B12 (obligatoria suplementar), vitamina D, zinc, hierro, calcio y omega-3. La B12 solo existe en alimentos de origen animal — la suplementación es indispensable.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🤰 Embarazo y lactancia</h3>
+            <p>Ácido fólico desde antes de concebir (previene defectos del tubo neural), hierro, yodo y vitamina D son prioritarios. Muchos médicos recomiendan un suplemento prenatal completo.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🏃 Deportistas</h3>
+            <p>Mayor demanda de hierro (especialmente en mujeres con entrenamiento de resistencia), magnesio (calambres), vitaminas del grupo B (metabolismo energético) y antioxidantes C y E.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>👴 Mayores de 65 años</h3>
+            <p>La absorción de B12 disminuye con la edad. La síntesis de vitamina D por el sol es menos eficiente. El calcio y la vitamina D son críticos para prevenir osteoporosis y caídas.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>💊 Verificar un análisis de sangre</h3>
+            <p>Cuando el médico detecta deficiencia de un nutriente específico, usa las fichas de la app para entender qué función cumple, qué alimentos aportarlo y qué síntomas son de exceso.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🥗 Planificar una dieta saludable</h3>
+            <p>Usa los filtros para identificar los nutrientes más importantes de cada grupo (hidrosolubles, liposolubles, macrominerales) y asegurarte de que tu dieta los cubre desde alimentos reales.</p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <ul className={styles.faqList}>
+          <li className={styles.faqItem}>
+            <h3>¿Necesito tomar un multivitamínico a diario?</h3>
+            <p>Generalmente no, si llevas una dieta variada y equilibrada. Los multivitamínicos pueden dar una falsa sensación de seguridad y no compensan una mala alimentación. Las excepciones son veganos (B12), embarazadas (ácido fólico), mayores de 65 (D y B12) y personas con dietas muy restrictivas.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Cuánto sol necesito para obtener suficiente vitamina D?</h3>
+            <p>Aproximadamente 15-30 minutos de exposición solar en cara, brazos y piernas entre las 10:00 y las 15:00, sin protección solar, 3-4 días por semana. En invierno en latitudes como España, la síntesis es insuficiente de noviembre a febrero, por lo que la suplementación puede estar justificada.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Puedo obtener vitamina B12 de algas o levadura de cerveza?</h3>
+            <p>No de forma fiable. Las algas contienen análogos de B12 que el cuerpo no puede utilizar (pseudovitamina B12). La levadura de cerveza tampoco contiene B12 a menos que esté específicamente enriquecida. Los veganos deben suplementar con cianocobalamina o metilcobalamina.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Cómo obtengo suficiente calcio sin lácteos?</h3>
+            <p>El tofu elaborado con sulfato de calcio, las bebidas vegetales enriquecidas, las almendras, el brócoli, el kale, las sardinas con espinas y los higos secos son buenas fuentes. La absorción mejora con vitamina D. Evita tomar calcio junto con café, té o alimentos ricos en hierro.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿El hierro de las plantas absorbe igual que el de la carne?</h3>
+            <p>No. El hierro hemo (carne, pescado) se absorbe en un 15-35%. El hierro no hemo (legumbres, espinacas) solo un 2-20%. Combinar hierro vegetal con vitamina C multiplica su absorción. Los taninos del café y té la reducen significativamente.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Puede ser peligroso tomar demasiadas vitaminas?</h3>
+            <p>Sí, especialmente las liposolubles (A, D, E, K) que se acumulan en el organismo. El exceso de vitamina A puede causar toxicidad hepática y defectos en el embarazo. El exceso de vitamina D provoca hipercalcemia. Las hidrosolubles (B y C) son más seguras ya que el exceso se elimina por orina, aunque dosis muy altas de B6 pueden causar neuropatía.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Es verdad que el zinc ayuda contra los resfriados?</h3>
+            <p>Hay evidencia moderada de que el zinc (en pastillas o jarabe, tomado en las primeras 24h del resfriado) puede reducir su duración ~1 día. No previene el resfriado, pero puede acortar los síntomas. Las dosis altas a largo plazo pueden interferir con la absorción de cobre.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Cuándo debo tomar suplementos con comida?</h3>
+            <p>Las vitaminas liposolubles (A, D, E, K) deben tomarse con una comida que contenga grasa para optimizar su absorción. El hierro se absorbe mejor en ayunas o con vitamina C, pero puede irritar el estómago — en ese caso, tómalo con algo de comida. El calcio en dosis altas es mejor dividirlo en dos tomas.</p>
+          </li>
+        </ul>
+
+        {/* Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Identifica qué nutrientes te interesan</h3>
+              <p>Usa los filtros de la app: puedes filtrar por tipo (vitamina/mineral) y subtipo (hidrosoluble, liposoluble, macromineral, oligoelemento).</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Lee la CDR (Cantidad Diaria Recomendada)</h3>
+              <p>Cada ficha indica la CDR para adultos. Ten en cuenta que embarazadas, deportistas, veganos y mayores pueden necesitar cantidades diferentes.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Revisa las fuentes alimentarias</h3>
+              <p>Identifica qué alimentos de tu dieta habitual aportan cada nutriente. Si no consumes regularmente esas fuentes, considera si estás cubriendo tus necesidades.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Comprueba los síntomas de deficiencia</h3>
+              <p>Si reconoces síntomas descritos en la ficha de un nutriente, no te autodiagnostiques — consulta con tu médico para que realice un análisis de sangre confirmatorio.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h3>Aprende las interacciones entre nutrientes</h3>
+              <p>Algunos nutrientes se potencian mutuamente (vitamina C + hierro) y otros compiten (calcio vs hierro). Conocer estas interacciones optimiza tu dieta.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepContent}>
+              <h3>Evalúa si tu dieta es completa</h3>
+              <p>Repasa los 30 nutrientes de la guía. Si hay grupos completos de alimentos que no consumes (lácteos, carnes, pescados), identifica qué nutrientes pueden estar en riesgo.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepContent}>
+              <h3>Consulta a un profesional si tienes dudas</h3>
+              <p>Un dietista-nutricionista puede hacer una valoración personalizada de tu dieta y recomendar suplementación específica si es necesario, basándose en analíticas y tu historial.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <h3>🥇 Prioriza alimentos reales</h3>
+            <p>Los nutrientes de los alimentos vienen con fibra, fitoquímicos y cofactores que potencian su absorción. Los suplementos son un complemento, no un sustituto.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>☀️ Vitamina D y sol</h3>
+            <p>La vitamina D del sol es más eficiente que la del suplemento. 15-20 minutos de exposición sin crema solar en cara y brazos al mediodía genera suficiente vitamina D en verano.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🍋 Vitamina C con hierro vegetal</h3>
+            <p>Añade limón a las lentejas, pimiento rojo a los garbanzos o kiwi de postre después de un plato con espinacas para triplicar la absorción del hierro no hemo.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>⏰ Timing de los suplementos</h3>
+            <p>Liposolubles (A, D, E, K) con comida grasa. Hierro en ayunas o con C. No mezcles calcio e hierro en la misma toma. Magnesio por la noche puede mejorar el sueño.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🎨 Variedad de colores en el plato</h3>
+            <p>Cada color de fruta y verdura indica fitoquímicos y vitaminas diferentes. Un plato colorido (verde, naranja, rojo, morado) cubre más vitaminas que uno monocromático.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>📋 Analítica anual</h3>
+            <p>Una analítica básica anual detecta deficiencias antes de que sean sintomáticas. Pide a tu médico que incluya vitamina D, B12, ferritina y hemograma completo.</p>
+          </div>
+        </div>
+
+        {/* Aviso importante */}
+        <div className={styles.warningBox}>
+          <h3>⚠️ Información orientativa, no asesoramiento médico</h3>
+          <ul className={styles.warningList}>
+            <li>Esta guía de nutrientes es informativa y educativa. No reemplaza la consulta con un médico o dietista-nutricionista.</li>
+            <li>Los síntomas de deficiencia o exceso de nutrientes requieren confirmación mediante análisis de sangre realizados por profesionales sanitarios.</li>
+            <li>No inicies suplementación de hierro, vitamina A u otros nutrientes con límite de toxicidad sin prescripción médica.</li>
+            <li>Las cantidades diarias recomendadas (CDR) son referencias para adultos sanos. Embarazadas, enfermos y niños tienen necesidades diferentes.</li>
+          </ul>
+        </div>
+
         <section className={styles.guideSection}>
           <h2>Tipos de Vitaminas</h2>
           <p className={styles.introParagraph}>

@@ -610,6 +610,235 @@ export default function CalculadoraTensionArterial() {
         subtitle="Guía educativa sobre presión arterial, medición correcta y factores de riesgo"
         icon="🩺"
       >
+        {/* Tabla comparativa - Clasificación ESH/ESC 2018 */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Categoría</th>
+                <th>Sistólica (mmHg)</th>
+                <th>Diastólica (mmHg)</th>
+                <th>TAM aprox.</th>
+                <th>Acción recomendada</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Óptima</strong></td>
+                <td>&lt; 120</td>
+                <td>&lt; 80</td>
+                <td>&lt; 93 mmHg</td>
+                <td>Mantener estilo de vida saludable</td>
+              </tr>
+              <tr>
+                <td><strong>Normal</strong></td>
+                <td>120–129</td>
+                <td>80–84</td>
+                <td>93–99 mmHg</td>
+                <td>Revisión periódica, hábitos saludables</td>
+              </tr>
+              <tr>
+                <td><strong>Normal-Alta</strong></td>
+                <td>130–139</td>
+                <td>85–89</td>
+                <td>100–106 mmHg</td>
+                <td>Control, cambios de estilo de vida</td>
+              </tr>
+              <tr>
+                <td><strong>HTA Grado 1</strong></td>
+                <td>140–159</td>
+                <td>90–99</td>
+                <td>107–119 mmHg</td>
+                <td>Consultar médico; posible tratamiento</td>
+              </tr>
+              <tr>
+                <td><strong>HTA Grado 2</strong></td>
+                <td>160–179</td>
+                <td>100–109</td>
+                <td>120–133 mmHg</td>
+                <td>Tratamiento farmacológico recomendado</td>
+              </tr>
+              <tr>
+                <td><strong>HTA Grado 3</strong></td>
+                <td>≥ 180</td>
+                <td>≥ 110</td>
+                <td>≥ 133 mmHg</td>
+                <td>Tratamiento urgente; riesgo muy alto</td>
+              </tr>
+              <tr>
+                <td><strong>HTA sistólica aislada</strong></td>
+                <td>≥ 140</td>
+                <td>&lt; 90</td>
+                <td>Variable</td>
+                <td>Frecuente en mayores; consultar médico</td>
+              </tr>
+              <tr>
+                <td><strong>Crisis hipertensiva</strong></td>
+                <td>≥ 180</td>
+                <td>≥ 120</td>
+                <td>≥ 140 mmHg</td>
+                <td>🚨 Urgencias / llamar al 112</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Escenarios de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <h3>🩺 Hipertenso en tratamiento</h3>
+            <p>Si tomas antihipertensivos, monitoriza si tus valores están en el rango objetivo (&lt;130/80 mmHg según las guías ESH/ESC 2018 para pacientes en tratamiento). Lleva un registro para tu médico.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🏠 Medición domiciliaria</h3>
+            <p>La medición en casa evita el efecto de &quot;bata blanca&quot; (tensión alta solo en la consulta). Toma mediciones a las mismas horas durante 7 días y calcula la media para un resultado más fiable.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🏃 Deportista</h3>
+            <p>Los deportistas de resistencia suelen tener tensión sistólica ligeramente más alta en reposo pero excelente respuesta al ejercicio. La presión de pulso amplia puede ser normal en atletas con buena forma cardíaca.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>👴 Persona mayor</h3>
+            <p>En mayores de 65 años es frecuente la hipertensión sistólica aislada (sistólica ≥140 con diastólica normal). Los objetivos de tratamiento pueden ser menos estrictos para evitar hipotensión ortostática.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🤰 Embarazada</h3>
+            <p>La tensión arterial se controla estrechamente durante el embarazo. La preeclampsia (sistólica ≥140 o diastólica ≥90 después de la semana 20) es una emergencia obstétrica que requiere atención inmediata.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>📱 Primera medición</h3>
+            <p>Si es tu primera vez midiendo la tensión y obtienes un valor elevado, no te alarmes: el estrés de la situación puede subir temporalmente la tensión (&quot;hipertensión de bata blanca&quot;). Repite la medición varios días en reposo.</p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <ul className={styles.faqList}>
+          <li className={styles.faqItem}>
+            <h3>¿Cuál es la diferencia entre hipertensión grado 1 y grado 2?</h3>
+            <p>La HTA Grado 1 (140-159/90-99 mmHg) puede manejarse inicialmente con cambios de estilo de vida durante 3-6 meses si no hay factores de riesgo adicionales. La HTA Grado 2 (≥160/100 mmHg) generalmente requiere tratamiento farmacológico inmediato desde el diagnóstico, además de cambios en el estilo de vida.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Es mejor medir la tensión por la mañana o por la noche?</h3>
+            <p>Las guías recomiendan medir por la mañana (antes de tomar medicación, antes de desayunar) y por la noche (antes de dormir). La tensión tiene un ritmo circadiano: sube al levantarse, alcanza su pico a media mañana, y baja por la noche. Las guías ESH/ESC recomiendan la media de ambas sesiones durante 7 días.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Qué es la &quot;hipertensión de bata blanca&quot;?</h3>
+            <p>Es un fenómeno por el que la tensión sube de forma ansiosa solo en el entorno médico, pero es normal en casa. Afecta al 15-30% de personas. Se diagnostica comparando mediciones en consulta con el MAPA (monitor ambulatorio de 24h) o con mediciones domiciliarias sistemáticas. No siempre requiere tratamiento.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Puedo tomar la tensión con tensiómetro de muñeca?</h3>
+            <p>Los tensiómetros de muñeca son menos precisos que los de brazo porque la posición de la muñeca puede variar. Si usas uno de muñeca, mantén el brazo a la altura del corazón durante la medición. Para seguimiento médico formal, los tensiómetros de brazo validados (brazo no dominante) son más fiables.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿La hipertensión se puede curar definitivamente?</h3>
+            <p>En la mayoría de casos, la hipertensión esencial (sin causa identificable, el 90% de los casos) es crónica y requiere control de por vida. Sin embargo, con cambios en el estilo de vida (reducción de peso, ejercicio, dieta baja en sodio) algunos pacientes con HTA leve consiguen normalizar sus valores sin medicación. La hipertensión secundaria (5-10%) puede resolverse tratando la causa subyacente.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Cuánto sodio debo limitar si tengo hipertensión?</h3>
+            <p>Las guías recomiendan menos de 5 g de sal al día (2 g de sodio) para la población general, y especialmente para hipertensos. El 70-75% del sodio que consumimos viene de alimentos procesados, pan y embutidos, no del salero. Leer etiquetas y reducir alimentos procesados es más efectivo que simplemente no añadir sal al cocinar.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Cuándo debo ir a urgencias por la tensión arterial?</h3>
+            <p>Ante una crisis hipertensiva (sistólica ≥180 mmHg O diastólica ≥120 mmHg), especialmente si va acompañada de síntomas: dolor de cabeza intenso, visión borrosa o doble, dolor en el pecho, dificultad para respirar, confusión, debilidad unilateral. Llama al 112. Sin síntomas, una lectura elevada aislada puede repetirse tras descansar 15-30 minutos antes de actuar.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Qué es la TAM (Tensión Arterial Media) y por qué importa?</h3>
+            <p>La TAM estima la presión de perfusión promedio de los órganos durante un ciclo cardíaco completo. Se calcula como: TAM = Diastólica + (Sistólica − Diastólica) / 3. Una TAM normal está entre 70 y 105 mmHg. En medicina intensiva, mantener una TAM superior a 65 mmHg es el objetivo mínimo de perfusión en pacientes críticos.</p>
+          </li>
+        </ul>
+
+        {/* Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Reposa 5 minutos antes de medir</h3>
+              <p>Siéntate en silencio con la espalda apoyada, pies en el suelo, sin cruzar las piernas. El estrés o el ejercicio reciente pueden elevar la tensión hasta 20-30 mmHg temporalmente.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Prepara las condiciones correctas</h3>
+              <p>No comas, fumes, ni consumas cafeína en los 30 minutos previos. Vacía la vejiga (una vejiga llena puede subir la sistólica ~10 mmHg). No hables durante la medición.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Coloca el manguito correctamente</h3>
+              <p>El borde inferior del manguito debe quedar 2-3 cm por encima del codo. El brazo apoyado a la altura del corazón. El manguito debe quedar ni muy apretado ni muy suelto (cabe 1-2 dedos).</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Toma 2-3 mediciones con 1 minuto de pausa</h3>
+              <p>La primera medición suele ser algo más alta (efecto de alerta). La media de 2-3 mediciones consecutivas es más representativa que una sola lectura.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h3>Introduce los valores en la calculadora</h3>
+              <p>Usa la media de tus mediciones. Introduce sistólica, diastólica y opcionalmente el pulso. La app calculará la clasificación ESH/ESC 2018, la TAM y la presión de pulso.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepContent}>
+              <h3>Interpreta la clasificación</h3>
+              <p>Consulta la tabla de clasificación ESH/ESC 2018 para entender en qué categoría estás. Recuerda que un valor aislado no es diagnóstico — se necesitan mediciones repetidas.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepContent}>
+              <h3>Lleva un registro y compártelo con tu médico</h3>
+              <p>Anota fecha, hora, brazo y valores de cada medición. Un registro de 7 días (mañana y noche) es mucho más informativo para tu médico que una sola medición en consulta.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <h3>🕐 Mide a la misma hora</h3>
+            <p>La tensión varía a lo largo del día. Para comparar valores, mide siempre a las mismas horas: típicamente por la mañana (antes del desayuno) y por la noche (antes de dormir).</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>💪 Siempre el mismo brazo</h3>
+            <p>Puede haber diferencias de 5-10 mmHg entre brazos. Mide ambos en la primera ocasión y usa siempre el que dé valores más altos para el seguimiento.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🧂 Reduce el sodio</h3>
+            <p>Reducir el sodio de 3,5 g/día a 2 g/día puede bajar la sistólica entre 5-8 mmHg. El impacto es mayor en personas &quot;sal-sensibles&quot;, especialmente mayores y personas con diabetes.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🏃 Ejercicio aeróbico regular</h3>
+            <p>150 minutos/semana de actividad moderada reduce la sistólica entre 5-8 mmHg en hipertensos. Caminar a paso rápido, nadar o montar en bici son opciones excelentes y seguras.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🍷 Limita el alcohol</h3>
+            <p>El consumo de más de 2 unidades de alcohol al día (hombres) o 1 unidad (mujeres) eleva la tensión arterial de forma consistente. La reducción tiene efecto en 2-4 semanas.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>😴 Duerme bien</h3>
+            <p>Dormir menos de 6 horas aumenta el riesgo de hipertensión. La apnea del sueño no tratada es una causa frecuente de hipertensión resistente al tratamiento.</p>
+          </div>
+        </div>
+
+        {/* Aviso médico importante */}
+        <div className={styles.warningBox}>
+          <h3>⚠️ Esta herramienta no reemplaza la atención médica</h3>
+          <ul className={styles.warningList}>
+            <li>Los resultados son orientativos basados en guías ESH/ESC 2018. No constituyen diagnóstico ni prescripción médica.</li>
+            <li>Ante lecturas repetidamente elevadas (HTA Grado 1 o superior), consulta a tu médico. No modifiques ni suspendas medicación antihipertensiva por tu cuenta.</li>
+            <li>En crisis hipertensiva (sistólica ≥180 o diastólica ≥120), especialmente con síntomas (dolor de cabeza intenso, visión borrosa, dolor en el pecho), llama al 112 o acude a urgencias inmediatamente.</li>
+            <li>Una sola medición elevada no es diagnóstico de hipertensión. Se requieren mediciones repetidas en condiciones correctas a lo largo de varios días.</li>
+          </ul>
+        </div>
+
         <h3>¿Qué es la tensión arterial?</h3>
         <p>
           La tensión arterial mide la fuerza con la que la sangre empuja contra las paredes de las arterias.
