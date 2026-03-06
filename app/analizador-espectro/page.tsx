@@ -550,6 +550,235 @@ export default function AnalizadorEspectroPage() {
         subtitle="Aprende sobre frecuencias, FFT y el mundo del audio"
         icon="📚"
       >
+        {/* Tabla comparativa */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Banda</th>
+                <th>Rango Hz</th>
+                <th>Características auditivas</th>
+                <th>Instrumentos / Fuentes</th>
+                <th>Uso en ecualización</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sub-graves</strong></td>
+                <td>20 – 60 Hz</td>
+                <td>Se siente más que se oye; vibración física</td>
+                <td>Bajo eléctrico (fundamental), órgano, bombo</td>
+                <td>Cortar si hay ruido, potenciar para impacto</td>
+              </tr>
+              <tr>
+                <td><strong>Graves</strong></td>
+                <td>60 – 250 Hz</td>
+                <td>Calidez y cuerpo del sonido</td>
+                <td>Bajo, guitarra rítmica, voz masculina</td>
+                <td>Ajustar para evitar que &quot;enmudezca&quot; la mezcla</td>
+              </tr>
+              <tr>
+                <td><strong>Medios-bajos</strong></td>
+                <td>250 – 500 Hz</td>
+                <td>Plenitud; exceso causa sonido &quot;embarrado&quot;</td>
+                <td>Guitarra acústica, piano, voz</td>
+                <td>Cortar ligeramente para mezclas más limpias</td>
+              </tr>
+              <tr>
+                <td><strong>Medios</strong></td>
+                <td>500 Hz – 2 kHz</td>
+                <td>Zona de máxima sensibilidad del oído</td>
+                <td>Voz, guitarra, snare, piano</td>
+                <td>Zona crítica; cambios pequeños tienen gran impacto</td>
+              </tr>
+              <tr>
+                <td><strong>Medios-altos</strong></td>
+                <td>2 – 4 kHz</td>
+                <td>Presencia y ataque; puede ser fatigante</td>
+                <td>Voz (consonantes), guitarra eléctrica</td>
+                <td>Potenciar para presencia; cortar para fatiga auditiva</td>
+              </tr>
+              <tr>
+                <td><strong>Presencia</strong></td>
+                <td>4 – 6 kHz</td>
+                <td>Definición y claridad vocales</td>
+                <td>Voz, platillos, hi-hat</td>
+                <td>Clave para que la voz &quot;se escuche&quot; en la mezcla</td>
+              </tr>
+              <tr>
+                <td><strong>Brillo</strong></td>
+                <td>6 – 12 kHz</td>
+                <td>Aire y transparencia; exceso da sibilancia</td>
+                <td>Platillos, acústica de sala, respiraciones</td>
+                <td>De-esser en voces; potenciar con cuidado</td>
+              </tr>
+              <tr>
+                <td><strong>Aire</strong></td>
+                <td>12 – 20 kHz</td>
+                <td>Sensación de espacio y apertura</td>
+                <td>Armónicos de violín, campanas, reverb</td>
+                <td>Pequeño boost da &quot;aire&quot; a mezclas planas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Escenarios de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <h3>🎤 Eliminar feedback en directo</h3>
+            <p>Identifica visualmente qué frecuencia genera el pitido de retroalimentación (feedback) antes de que escale. Suele aparecer como un pico estrecho y muy alto en el espectro.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎛️ Ecualizar una mezcla</h3>
+            <p>Analiza si graves y bajos están saturados (exceso de energía en 60-250 Hz) o si falta presencia (2-6 kHz). El espectro te da una referencia visual objetiva para tus decisiones de EQ.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🏛️ Analizar acústica de salas</h3>
+            <p>Reproduce un tono de barrido o ruido rosa y analiza el espectro. Las resonancias de la sala aparecen como picos: revelan frecuencias problemáticas que necesitan tratamiento acústico.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎓 Física del sonido (educación)</h3>
+            <p>Visualiza en tiempo real los armónicos de instrumentos: toca una nota en guitarra y observa la frecuencia fundamental más todos sus armónicos (múltiplos) apareciendo en el espectro.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🔍 Detectar ruidos no deseados</h3>
+            <p>Identifica zumbidos eléctricos (50 Hz en Europa, 60 Hz en América), ruido de ventiladores, interferencias de WiFi o cualquier frecuencia parasita en una grabación o entorno.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎸 Comparar timbres de instrumentos</h3>
+            <p>Toca la misma nota en guitarra acústica, eléctrica y piano. Observa cómo cada instrumento tiene una &quot;huella espectral&quot; diferente: diferente distribución de armónicos.</p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <ul className={styles.faqList}>
+          <li className={styles.faqItem}>
+            <h3>¿Qué es exactamente la FFT y por qué se usa?</h3>
+            <p>La FFT (Fast Fourier Transform) es un algoritmo que convierte una señal de audio (dominio del tiempo) en su representación de frecuencias (dominio de la frecuencia). Es el corazón de todos los analizadores de espectro. Permite saber &quot;cuánta energía hay en cada frecuencia&quot; en un instante dado.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Por qué las frecuencias se muestran en escala logarítmica?</h3>
+            <p>Porque el oído humano percibe el sonido de forma logarítmica: duplicar la frecuencia sube exactamente una octava. En escala lineal, los 10.000-20.000 Hz ocuparían la mitad del gráfico aunque el oído los percibe como una sola octava, lo mismo que 20-40 Hz.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Cuántas barras/bins de frecuencia tiene el análisis?</h3>
+            <p>Depende del tamaño del buffer FFT. Con un buffer de 2048 muestras a 48.000 Hz, obtienes 1024 bins separados por ~23 Hz. Buffers mayores dan mejor resolución frecuencial pero mayor latencia. La Web Audio API usa típicamente 2048 o 4096 muestras.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Qué diferencia hay entre un analizador de espectro y un osciloscopio?</h3>
+            <p>El osciloscopio muestra la amplitud en función del tiempo (forma de onda). El analizador de espectro muestra la amplitud en función de la frecuencia. Son complementarios: el osciloscopio dice &quot;cómo varía&quot; el sonido; el espectro dice &quot;de qué frecuencias está hecho&quot;.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Qué es el &quot;ruido rosa&quot; y para qué se usa?</h3>
+            <p>El ruido rosa tiene igual energía por octava (a diferencia del ruido blanco, que tiene igual energía por Hz). En un analizador de espectro logarítmico, el ruido rosa aparece como una línea plana. Por eso se usa como señal de prueba estándar para calibrar sistemas de sonido y analizar acústica de salas.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Puedo usar esto para afinar mi instrumento?</h3>
+            <p>El analizador muestra qué frecuencias están presentes, pero no tiene un indicador de &quot;cents&quot; de desviación como un afinador. Para afinar, usa el Afinador Cromático de meskeIA. El analizador de espectro es más útil para entender la composición frecuencial del sonido.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Por qué la zona 2-5 kHz es tan importante en la voz?</h3>
+            <p>Es la zona de mayor sensibilidad del oído humano (curva de igual sonoridad ISO 226). Las consonantes del habla se forman principalmente en 2-4 kHz. Por eso un boost en esa zona hace que la voz &quot;se corte&quot; en la mezcla. Un exceso, sin embargo, genera fatiga auditiva rápidamente.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿El análisis funciona con audio de archivos o solo micrófono?</h3>
+            <p>El analizador usa el micrófono del dispositivo en tiempo real. Para analizar archivos de audio, puedes reproducirlos cerca del micrófono, o conectar la salida de audio a la entrada del micrófono. Algunas interfaces de audio permiten el loopback directo sin pérdida de calidad.</p>
+          </li>
+        </ul>
+
+        {/* Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Pulsa &quot;Iniciar análisis&quot;</h3>
+              <p>El navegador pedirá permiso para usar el micrófono. Concédelo. El análisis de espectro comenzará en tiempo real.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Elige el modo de visualización</h3>
+              <p>Barras: muestra energía instantánea por banda. Línea: muestra la curva espectral continua con más detalle en las transiciones.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Ajusta la sensibilidad</h3>
+              <p>Si las barras están siempre al máximo, baja la sensibilidad. Si apenas se mueven con señal clara, súbela. El objetivo es usar el rango dinámico completo.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Activa &quot;Mostrar picos&quot;</h3>
+              <p>Los marcadores de pico se quedan en la posición máxima durante unos segundos. Útil para capturar frecuencias problemáticas que aparecen brevemente.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h3>Identifica la distribución de energía</h3>
+              <p>Observa en qué zonas hay más energía. Demasiados graves acumulados indican posible &quot;embarrado&quot;. Poco contenido en 2-6 kHz puede hacer el sonido opaco.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepContent}>
+              <h3>Compara con el panel de bandas de frecuencia</h3>
+              <p>Usa la tabla de bandas (Sub-graves, Graves, Medios...) para identificar qué banda corresponde a cada zona del espectro y qué instrumentos o fuentes la ocupan.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepContent}>
+              <h3>Toma decisiones de EQ o tratamiento</h3>
+              <p>Con la información visual, ajusta tu ecualizador, cambia posición del micrófono, añade tratamiento acústico o modifica la mezcla para conseguir un espectro más equilibrado.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <h3>🎯 Busca un espectro &quot;plano&quot;</h3>
+            <p>Una mezcla bien balanceada tiene energía distribuida de forma relativamente uniforme, sin picos pronunciados ni valles profundos en ninguna banda.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>👂 Confía más en tu oído que en el gráfico</h3>
+            <p>El espectro es una herramienta visual de apoyo, no el árbitro final. Si algo suena bien, está bien aunque el gráfico no sea &quot;perfecto&quot;.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔇 Analiza en silencio primero</h3>
+            <p>Inicia el analizador con silencio para ver el ruido de fondo de tu entorno. Así puedes identificar qué frecuencias son ruido ambiental antes de analizar tu fuente.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>📊 Usa ruido rosa para calibrar</h3>
+            <p>Reproduce ruido rosa cerca del micrófono. En una sala ideal debe aparecer como línea descendente. Las desviaciones revelan resonancias y problemas acústicos del espacio.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🎚️ Compara antes y después del EQ</h3>
+            <p>Analiza el espectro antes de ecualizar, anota mentalmente los picos problemáticos, aplica el EQ y compara de nuevo. El analizador confirma si tus ajustes tuvieron el efecto esperado.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔊 Pon el micrófono cerca de la fuente</h3>
+            <p>Para analizar un instrumento específico, el micrófono del dispositivo debe estar cerca de la fuente. A mayor distancia, capta más ambiente y el espectro refleja la sala, no el instrumento.</p>
+          </div>
+        </div>
+
+        {/* Aviso importante */}
+        <div className={styles.warningBox}>
+          <h3>⚠️ Uso orientativo, no profesional</h3>
+          <ul className={styles.warningList}>
+            <li>El analizador usa el micrófono del dispositivo, que tiene su propia respuesta en frecuencia no calibrada. Los resultados son orientativos, no mediciones de laboratorio.</li>
+            <li>Para mediciones acústicas profesionales (homologación de salas, certificación de equipos, estudios de ruido laboral) se requieren micrófonos calibrados y software específico.</li>
+            <li>La resolución frecuencial depende del tamaño del buffer FFT del navegador. Frecuencias muy cercanas pueden aparecer como un solo pico.</li>
+            <li>El procesamiento de audio ocurre completamente en tu navegador: no se envía audio a ningún servidor.</li>
+          </ul>
+        </div>
+
         <section className={styles.guideSection}>
           <h2>¿Qué es el espectro de frecuencias?</h2>
           <p className={styles.introParagraph}>

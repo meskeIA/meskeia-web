@@ -511,6 +511,235 @@ export default function LuxometroPage() {
         subtitle="Descubre conceptos de iluminación y fotografía"
         icon="📚"
       >
+        {/* Tabla comparativa */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Entorno</th>
+                <th>Lux (lx)</th>
+                <th>Valor EV</th>
+                <th>Configuración foto recomendada</th>
+                <th>Bienestar visual</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Noche sin luna</strong></td>
+                <td>0,001 lx</td>
+                <td>EV -6</td>
+                <td>Larga exposición, trípode, ISO máximo</td>
+                <td>Inadecuado para trabajo visual</td>
+              </tr>
+              <tr>
+                <td><strong>Luna llena</strong></td>
+                <td>0,1 – 1 lx</td>
+                <td>EV -2 / 0</td>
+                <td>ISO 3200+, f/1.8, 30s</td>
+                <td>Solo orientación básica</td>
+              </tr>
+              <tr>
+                <td><strong>Interior muy oscuro</strong></td>
+                <td>5 – 50 lx</td>
+                <td>EV 2 – 5</td>
+                <td>ISO 800-3200, f/1.4-2, velocidad lenta</td>
+                <td>Mínimo para lectura (50 lx)</td>
+              </tr>
+              <tr>
+                <td><strong>Oficina / hogar</strong></td>
+                <td>100 – 500 lx</td>
+                <td>EV 6 – 9</td>
+                <td>ISO 400-800, f/2.8-4, 1/60s</td>
+                <td>Normativa UE: 500 lx escritorio</td>
+              </tr>
+              <tr>
+                <td><strong>Exterior nublado</strong></td>
+                <td>1.000 – 10.000 lx</td>
+                <td>EV 10 – 13</td>
+                <td>ISO 100-400, f/4-8, 1/125s</td>
+                <td>Óptimo para trabajo prolongado</td>
+              </tr>
+              <tr>
+                <td><strong>Exterior sol difuso</strong></td>
+                <td>10.000 – 30.000 lx</td>
+                <td>EV 13 – 15</td>
+                <td>ISO 100, f/8-11, 1/250s</td>
+                <td>Usar gafas de sol recomendable</td>
+              </tr>
+              <tr>
+                <td><strong>Sol directo (mediodía)</strong></td>
+                <td>50.000 – 100.000 lx</td>
+                <td>EV 15 – 17</td>
+                <td>ISO 100, f/16, 1/1000s (Sunny 16)</td>
+                <td>Dañino sin protección UV</td>
+              </tr>
+              <tr>
+                <td><strong>Cirugía / estudio TV</strong></td>
+                <td>10.000 – 100.000 lx</td>
+                <td>EV 13 – 17</td>
+                <td>Iluminación artificial controlada</td>
+                <td>Diseñado para trabajo de precisión</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Escenarios de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <h3>📸 Fotografía en exteriores</h3>
+            <p>Mide la luz antes de configurar tu cámara. El luxómetro te da el EV (Exposure Value) que necesitas, ahorrando disparos de prueba. Especialmente útil al cambiar de sombra a sol directo.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🏠 Diseño de interiores</h3>
+            <p>Verifica que el nivel de iluminación cumple los estándares de bienestar visual. La normativa europea (EN 12464-1) establece mínimos por actividad: 500 lx para oficinas, 300 lx para salas de reunión.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>💻 Ergonomía en el trabajo</h3>
+            <p>Niveles de luz inadecuados causan fatiga visual, dolores de cabeza y reducen la productividad. Mide tu puesto de trabajo y compara con los 500 lx recomendados por el INSST (España).</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🌱 Cultivo de plantas de interior</h3>
+            <p>Las plantas necesitan distintos niveles de luz: suculentas (10.000+ lx), plantas de sombra (500-2.000 lx), hierbas aromáticas (5.000-10.000 lx). Verifica si tu ventana da suficiente luz natural.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎬 Producción audiovisual</h3>
+            <p>Antes de iluminar un set, mide la luz ambiente. Conocer el nivel base te ayuda a decidir cuánta iluminación artificial añadir y dónde colocar los focos para conseguir la exposición objetivo.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🔬 Experimento educativo</h3>
+            <p>Compara cómo varía la iluminancia a distintas distancias de una bombilla (ley del cuadrado inverso: duplicar la distancia divide la iluminación por 4). Ideal para clases de física óptica.</p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <ul className={styles.faqList}>
+          <li className={styles.faqItem}>
+            <h3>¿Es preciso el luxómetro del navegador comparado con uno profesional?</h3>
+            <p>Depende del dispositivo. Los sensores de luz ambiente integrados en móviles y portátiles tienen una respuesta espectral y rango limitados. Son útiles para estimaciones orientativas pero no para mediciones certificadas. Un luxómetro profesional calibrado (como los de Konica Minolta o Testo) tiene precisión de ±3-5%.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Qué diferencia hay entre lux, lumen y candela?</h3>
+            <p>Lumen (lm) = flujo luminoso total emitido por una fuente. Candela (cd) = intensidad luminosa en una dirección. Lux (lx) = iluminancia, es decir, cuántos lúmenes caen por metro cuadrado de superficie. Una vela emite ~1 candela; una bombilla LED de 10W emite ~1.000 lúmenes; a 1 metro de distancia produce ~80 lux en esa superficie.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Qué es el EV (Exposure Value) y cómo se relaciona con los lux?</h3>
+            <p>El EV es una escala logarítmica usada en fotografía que combina apertura y velocidad de obturación. La relación aproximada con lux (a ISO 100) es: EV = log₂(lux / 2,5). Por ejemplo, 2.500 lx ≈ EV 10, que corresponde a f/8 a 1/125s a ISO 100. Esta fórmula es la base del fotómetro.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Por qué mi sensor no funciona en mi dispositivo?</h3>
+            <p>La API de sensor de luz ambiente (AmbientLightSensor) no está disponible en todos los navegadores ni dispositivos. Firefox la soporta con configuración especial; Chrome la soporta en Android con sensor hardware presente. En muchos portátiles y tablets el sensor está pero el navegador no lo expone por defecto.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Cuántos lux necesito en mi oficina según la normativa española?</h3>
+            <p>El Real Decreto 486/1997 y la norma UNE-EN 12464-1 establecen: zonas de paso 100 lx, trabajos de oficina general 500 lx, trabajo con pantallas 500 lx (con control de deslumbramiento), planos de dibujo técnico 750 lx. El INSST recomienda medir con el luxómetro a la altura del plano de trabajo.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿La luz artificial afecta igual que la natural al bienestar?</h3>
+            <p>No completamente. La luz natural tiene un espectro completo y varía a lo largo del día (temperatura de color de 2.000K al amanecer a 6.500K al mediodía), lo que regula el ritmo circadiano. La luz artificial LED fría (&gt;5.000K) puede suprimir la melatonina por la noche. Los luxes son iguales en cantidad, pero el espectro y la dinámica importan para la salud.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Cómo afecta la distancia a la iluminancia?</h3>
+            <p>Sigue la ley del inverso del cuadrado: si duplicas la distancia a la fuente de luz, la iluminancia se divide por 4. A 1 metro de una bombilla de 1.000 lúmenes obtienes ~80 lx; a 2 metros, ~20 lx; a 4 metros, ~5 lx. Por eso la posición de los focos es crítica en fotografía y diseño de interiores.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Qué es la regla &quot;Sunny 16&quot; y cuándo la uso?</h3>
+            <p>Es una regla empírica de fotografía: en un día soleado con luz directa, usa apertura f/16 y velocidad de obturación = 1/ISO. A ISO 100, usa 1/100s; a ISO 200, 1/200s. Con el luxómetro confirmando &gt;50.000 lx, sabes cuándo aplicar esta regla sin necesidad de fotómetro.</p>
+          </li>
+        </ul>
+
+        {/* Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Abre el luxómetro en tu dispositivo</h3>
+              <p>El sensor de luz ambiente debe estar disponible en tu dispositivo. El navegador puede pedir permiso para acceder al sensor. Concédelo.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Coloca el dispositivo en el punto de medición</h3>
+              <p>El sensor suele estar en el frontal del dispositivo (junto a la cámara frontal). Orienta la pantalla hacia la fuente de luz que quieres medir.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Lee el valor en lux</h3>
+              <p>Espera 2-3 segundos a que el sensor se estabilice. Anota el valor. Para mayor precisión, toma varias lecturas y calcula la media.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Consulta la tabla de referencia</h3>
+              <p>Compara el valor medido con la tabla de entornos (oficina, exterior nublado, sol directo...) para interpretar qué tipo de iluminación tienes.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h3>Obtén la configuración fotográfica</h3>
+              <p>La app calcula el EV y sugiere una combinación ISO/apertura/velocidad. Úsala como punto de partida y ajusta según tu preferencia creativa.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepContent}>
+              <h3>Aplica la Regla Sunny 16 si aplica</h3>
+              <p>Si el luxómetro marca &gt;50.000 lx (sol directo), aplica directamente f/16 a 1/ISO s. Es la configuración base desde la que ajustar creativamente.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepContent}>
+              <h3>Verifica el bienestar visual en interiores</h3>
+              <p>Si mides tu puesto de trabajo o aula, compara con los mínimos normativos (500 lx para oficina). Si hay menos luz, considera añadir iluminación suplementaria.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <h3>📍 Mide en el plano de trabajo</h3>
+            <p>Para evaluar iluminación de oficina, mide a la altura de la superficie de trabajo (70-75 cm del suelo), no en el suelo ni en el techo.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>⏱️ Espera la estabilización</h3>
+            <p>Los sensores de luz ambiente tienen un tiempo de respuesta. Espera 2-3 segundos tras cambiar de posición para que el valor se estabilice antes de leerlo.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🌡️ Nota la temperatura de color</h3>
+            <p>Lux mide cantidad, no calidad. Dos fuentes con los mismos lux pueden dar sensaciones muy diferentes si una es cálida (2.700K) y otra fría (6.500K).</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>📷 Usa el EV como punto de partida</h3>
+            <p>El EV calculado da la exposición &quot;técnicamente correcta&quot;. En fotografía creativa, sobreexponer o subexponer 1-2 EV es una decisión artística válida.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔄 Mide en varios puntos</h3>
+            <p>La iluminación varía dentro de una misma habitación. Toma mediciones en varios puntos para obtener un mapa de la distribución lumínica del espacio.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🌿 Cuida las plantas con datos</h3>
+            <p>Si tus plantas no florecen o tienen hojas amarillas, puede ser falta de luz. Mide en el punto donde están y compara con sus necesidades específicas.</p>
+          </div>
+        </div>
+
+        {/* Aviso importante */}
+        <div className={styles.warningBox}>
+          <h3>⚠️ Limitaciones del sensor del navegador</h3>
+          <ul className={styles.warningList}>
+            <li>El sensor de luz ambiente del dispositivo no está calibrado para uso profesional. Los valores son orientativos.</li>
+            <li>Para mediciones con validez legal (certificación de puestos de trabajo, cumplimiento normativo UNE-EN 12464) se requiere un luxómetro calibrado con certificado de trazabilidad.</li>
+            <li>La disponibilidad del sensor varía según dispositivo y navegador. No todos los dispositivos exponen este sensor al navegador.</li>
+            <li>Las configuraciones fotográficas sugeridas son puntos de partida basados en la ley de exposición; las condiciones reales pueden requerir ajustes.</li>
+          </ul>
+        </div>
+
         <section className={styles.guideSection}>
           <h2>¿Qué es un Lux?</h2>
           <p className={styles.introParagraph}>

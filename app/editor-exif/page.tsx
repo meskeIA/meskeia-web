@@ -713,6 +713,235 @@ export default function EditorExifPage() {
         title="📚 ¿Qué son los metadatos EXIF y por qué importan?"
         subtitle="Aprende sobre seguridad digital y protege tu privacidad"
       >
+        {/* Tabla comparativa */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Campo EXIF</th>
+                <th>Datos que contiene</th>
+                <th>Riesgo privacidad</th>
+                <th>Quién puede verlo</th>
+                <th>¿Cuándo eliminarlo?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>GPS (coordenadas)</strong></td>
+                <td>Latitud, longitud, altitud exacta</td>
+                <td>🔴 Muy alto</td>
+                <td>Cualquiera que abra el archivo</td>
+                <td>Siempre antes de publicar</td>
+              </tr>
+              <tr>
+                <td><strong>Fecha y hora</strong></td>
+                <td>Cuándo se tomó la foto (y modificó)</td>
+                <td>🟠 Alto</td>
+                <td>Software de visualización, metabuscadores</td>
+                <td>Al compartir fotos personales</td>
+              </tr>
+              <tr>
+                <td><strong>Dispositivo (Make/Model)</strong></td>
+                <td>Marca, modelo, número de serie</td>
+                <td>🟡 Medio</td>
+                <td>Motores de búsqueda de imágenes</td>
+                <td>Fotos publicadas online</td>
+              </tr>
+              <tr>
+                <td><strong>Software</strong></td>
+                <td>App o cámara que tomó/editó la foto</td>
+                <td>🟡 Bajo-medio</td>
+                <td>Herramientas forenses digitales</td>
+                <td>Contextos de anonimato</td>
+              </tr>
+              <tr>
+                <td><strong>Autor / Copyright</strong></td>
+                <td>Nombre del fotógrafo, empresa, derechos</td>
+                <td>🟠 Variable</td>
+                <td>Adobe Bridge, Lightroom, buscadores</td>
+                <td>Si no quieres ser identificado</td>
+              </tr>
+              <tr>
+                <td><strong>Configuración cámara</strong></td>
+                <td>ISO, apertura, velocidad, flash, focal</td>
+                <td>🟢 Bajo</td>
+                <td>Fotógrafos, editores, plataformas foto</td>
+                <td>Solo si hay info sensible implícita</td>
+              </tr>
+              <tr>
+                <td><strong>Miniatura (thumbnail)</strong></td>
+                <td>Previsualización incrustada en el archivo</td>
+                <td>🟠 Medio</td>
+                <td>Exploradores de archivos, apps de galería</td>
+                <td>Si la imagen original fue editada/recortada</td>
+              </tr>
+              <tr>
+                <td><strong>Datos XMP/IPTC</strong></td>
+                <td>Palabras clave, descripción, ciudad, país</td>
+                <td>🟡 Medio</td>
+                <td>Agencias de prensa, stock fotográfico</td>
+                <td>Al redistribuir fuera de su contexto</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Escenarios de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <h3>🛒 Venta de segunda mano</h3>
+            <p>Al publicar fotos de artículos en Wallapop, eBay o Milanuncios, las imágenes tomadas en casa incluyen tus coordenadas GPS exactas. Elimina siempre el EXIF antes de subir fotos de ventas.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>📰 Periodismo y fuentes</h3>
+            <p>Un periodista que comparte fotos con información sensible puede exponer la ubicación de una fuente confidencial. Eliminar metadatos GPS antes de publicar o enviar es una medida básica de seguridad.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>✊ Activismo y protestas</h3>
+            <p>Fotos de manifestaciones o reuniones privadas con GPS activo pueden revelar la ubicación de participantes. Eliminar metadatos protege a los presentes y sus familias.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🏢 Empresa (protección de clientes)</h3>
+            <p>Al entregar fotografías de clientes o de instalaciones, los metadatos pueden revelar información de negocio sensible (ubicación de almacenes, identidad del cliente, horarios de trabajo).</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>⚖️ Documentación legal</h3>
+            <p>En procesos legales, los metadatos EXIF (fecha, hora, GPS) pueden ser evidencia. Antes de compartir fotos en contextos legales, consulta con un abogado si debes preservarlos o eliminarlos.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>📸 Fotógrafo profesional</h3>
+            <p>Elimina los metadatos de identificación personal antes de entregar fotos a clientes, pero considera conservar datos de copyright (autor, licencia) para proteger tu propiedad intelectual.</p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <ul className={styles.faqList}>
+          <li className={styles.faqItem}>
+            <h3>¿Las fotos subidas a redes sociales mantienen el EXIF?</h3>
+            <p>Depende de la plataforma. Instagram, Facebook y Twitter/X eliminan los metadatos al subir una foto (por privacidad). Sin embargo, WhatsApp y Telegram suelen preservar los metadatos en las fotos enviadas como &quot;archivo&quot;. Al compartir como imagen comprimida, muchas apps los eliminan, pero no siempre.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Puedo ver los metadatos EXIF de una foto antes de eliminarlos?</h3>
+            <p>Sí. El Editor EXIF de meskeIA muestra todos los metadatos antes de que decidas eliminarlos. También puedes verlos en Windows haciendo clic derecho → Propiedades → Detalles, en Mac con Vista previa → Herramientas → Inspector, o con herramientas online como Jeffrey&apos;s Exif Viewer.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Eliminar EXIF reduce la calidad de la imagen?</h3>
+            <p>Mínimamente. El Editor EXIF de meskeIA usa compresión JPEG al 95% para la imagen limpia, lo que es prácticamente indistinguible del original a simple vista. Los metadatos representan solo 1-50 KB en una foto típica de 3-8 MB, así que el tamaño del archivo también se reduce ligeramente.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Puedo recuperar los metadatos EXIF una vez eliminados?</h3>
+            <p>No, una vez eliminados son irrecuperables en la copia limpia. El editor siempre crea una COPIA nueva sin metadatos; el archivo original no se modifica. Guarda siempre el original con metadatos si necesitas preservarlos para uso posterior.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿El GPS en las fotos siempre es exacto?</h3>
+            <p>En móviles modernos, el GPS puede ser preciso hasta 3-10 metros. En interiores, usa wifi triangulation o cell tower data con precisión de 50-500 metros. La fecha y hora del GPS es siempre exacta (sincronización satelital). Incluso en el peor caso, el barrio o ciudad es identificable.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Es suficiente con cambiar el nombre del archivo?</h3>
+            <p>No. Renombrar un archivo no elimina los metadatos incrustados dentro del propio JPEG o PNG. Los metadatos EXIF están dentro del archivo, no en el nombre. Necesitas una herramienta específica (como este editor) para eliminarlos.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Los PNG también tienen metadatos?</h3>
+            <p>Los PNG tienen un sistema diferente (chunks de metadatos) que puede incluir información de software, fecha de creación y comentarios, pero generalmente NO incluyen GPS. El formato JPEG es el que más datos EXIF suele contener. Los archivos RAW de cámaras profesionales tienen metadatos muy extensos.</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Eliminar EXIF me hace completamente anónimo online?</h3>
+            <p>No completamente. Eliminar metadatos EXIF es una medida importante pero no la única. Las imágenes también pueden ser identificadas por: análisis de píxeles únicos (ELA - Error Level Analysis), reconocimiento facial, marcas de agua invisibles, hash del archivo o búsqueda inversa de imágenes (Google Lens, TinEye). Para anonimato completo, también es recomendable hacer una captura de pantalla de la imagen.</p>
+          </li>
+        </ul>
+
+        {/* Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Carga tu imagen</h3>
+              <p>Arrastra y suelta la foto en el área de carga, o haz clic para seleccionarla. Funciona con JPEG, PNG y otros formatos comunes. La imagen no sale de tu dispositivo.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Revisa los metadatos detectados</h3>
+              <p>La app muestra todos los campos EXIF encontrados: GPS, fecha, dispositivo, configuración de cámara, autor... Identifica cuáles son sensibles para ti.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Verifica si hay coordenadas GPS</h3>
+              <p>Presta especial atención al campo GPS: si aparece latitud/longitud, tu foto revela dónde fue tomada. Este es el dato más sensible en términos de privacidad.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Pulsa &quot;Eliminar metadatos&quot;</h3>
+              <p>La app crea una copia limpia de la imagen sin ningún metadato. El archivo original no se modifica. Puedes comparar ambas versiones antes de descargar.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h3>Descarga la imagen limpia</h3>
+              <p>La copia sin metadatos se descarga con el mismo nombre original más el sufijo &quot;_limpio&quot; o similar. Es esta versión la que debes publicar o compartir.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepContent}>
+              <h3>Verifica el resultado</h3>
+              <p>Arrastra la imagen limpia descargada de nuevo al editor para confirmar que los metadatos han sido eliminados. Deberías ver &quot;sin metadatos&quot; o campos vacíos.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepContent}>
+              <h3>Guarda el original con metadatos si los necesitas</h3>
+              <p>Para tus archivos personales o de trabajo, conserva el original completo con EXIF. Los metadatos de configuración de cámara son útiles para aprender y mejorar tu técnica fotográfica.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <h3>📵 Desactiva el GPS de la cámara</h3>
+            <p>La solución preventiva más eficaz: en iOS ve a Ajustes → Privacidad → Localización → Cámara → Nunca. En Android varía por dispositivo, pero suele estar en la app de Cámara → Ajustes.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔁 Captura de pantalla como método alternativo</h3>
+            <p>Hacer una captura de pantalla de la imagen crea un nuevo archivo sin metadatos EXIF del original. Es el método más rápido y universal para eliminar todos los datos de una foto.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>💾 Conserva siempre el original</h3>
+            <p>Nunca sobreescribas el original con la versión limpia. Guarda ambas: el original con EXIF para tu archivo personal y la copia limpia para compartir.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔍 Revisa antes de publicar</h3>
+            <p>Haz una revisión rápida de metadatos antes de publicar cualquier foto en internet. Un solo campo GPS olvidado puede revelar información que no querías compartir.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>📋 Preserva el copyright si eres fotógrafo</h3>
+            <p>Si publicas fotos profesionales, los campos IPTC de copyright (autor, licencia, web) protegen tu propiedad intelectual. Considera eliminar GPS y datos personales, pero conservar el copyright.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🏢 Política de empresa</h3>
+            <p>Si manejas fotos de clientes o proyectos profesionales, establece una política clara: eliminar EXIF por defecto antes de enviar cualquier imagen fuera de la organización.</p>
+          </div>
+        </div>
+
+        {/* Aviso importante */}
+        <div className={styles.warningBox}>
+          <h3>⚠️ Eliminar EXIF no garantiza anonimato completo</h3>
+          <ul className={styles.warningList}>
+            <li>Las imágenes pueden ser identificadas por otros métodos: reconocimiento facial, análisis de píxeles (ELA), búsqueda inversa de imágenes (Google Lens, TinEye) o marcas de agua digitales.</li>
+            <li>En contextos legales (procesos judiciales, litigios), eliminar metadatos podría interpretarse como destrucción de evidencia. Consulta con un abogado antes de actuar.</li>
+            <li>El procesamiento ocurre completamente en tu navegador: ninguna imagen se envía a servidores de meskeIA.</li>
+            <li>Para máximo anonimato en contextos de alto riesgo, considera también hacer una captura de pantalla de la imagen recortada para eliminar posibles marcas de agua y crear un archivo completamente nuevo.</li>
+          </ul>
+        </div>
+
         <section className={styles.guideSection}>
           <h2>¿Qué datos ocultos tienen tus fotos?</h2>
           <p className={styles.introParagraph}>
