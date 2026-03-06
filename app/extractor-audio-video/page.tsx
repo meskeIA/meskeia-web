@@ -528,6 +528,189 @@ export default function ExtractorAudioVideoPage() {
         title="📚 Cómo funciona el extractor de audio"
         subtitle="Tecnología WebAssembly, formatos de audio y privacidad"
       >
+        {/* Sección 1: Tabla comparativa de formatos */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Formato</th>
+                <th>Compresión</th>
+                <th>Tamaño (1 min)</th>
+                <th>Calidad</th>
+                <th>Compatibilidad</th>
+                <th>Uso ideal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>MP3 128k</td><td>Con pérdida</td><td>~1 MB</td><td>Estándar</td><td>Universal</td><td>Podcasts, voz</td></tr>
+              <tr><td>MP3 192k</td><td>Con pérdida</td><td>~1,4 MB</td><td>Alta</td><td>Universal</td><td>Música casual</td></tr>
+              <tr><td>MP3 320k</td><td>Con pérdida</td><td>~2,4 MB</td><td>Máxima (perceptual)</td><td>Universal</td><td>Archivos finales</td></tr>
+              <tr><td>WAV 16-bit</td><td>Sin pérdida</td><td>~10 MB</td><td>Perfecta</td><td>Universal</td><td>Edición, producción</td></tr>
+              <tr><td>WAV 24-bit</td><td>Sin pérdida</td><td>~15 MB</td><td>Studio</td><td>Universal</td><td>Mastering, cine</td></tr>
+              <tr><td>OGG Vorbis</td><td>Con pérdida</td><td>~0,9 MB</td><td>Alta</td><td>Sin Apple</td><td>Web, videojuegos</td></tr>
+              <tr><td>AAC</td><td>Con pérdida</td><td>~1,1 MB</td><td>Superior a MP3</td><td>Universal</td><td>Mobile, streaming</td></tr>
+              <tr><td>FLAC</td><td>Sin pérdida</td><td>~5 MB</td><td>Perfecta</td><td>Limitada</td><td>Archivado, audiófilos</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Sección 2: Casos de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <h3>🎵 Extraer banda sonora de vídeo</h3>
+            <p>Obtén el audio de grabaciones de conciertos, películas descargadas o vídeos de YouTube (previamente descargados) en formato MP3 o WAV de alta calidad.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎙️ Preparar fragmentos para podcast</h3>
+            <p>Extrae exactamente los segundos que necesitas de una entrevista o grabación para usar como clip en tu episodio de podcast sin herramientas adicionales.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🌍 Aprendizaje de idiomas</h3>
+            <p>Aísla diálogos de películas o series para practicar pronunciación. Extrae fragmentos específicos y escúchalos fuera de contexto para mayor retención.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎬 Audio para presentaciones y vídeos</h3>
+            <p>Extrae efectos de sonido o músicas de tus grabaciones de vídeo para reutilizarlos en proyectos de edición, sin necesidad de software especializado.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎛️ Samples para producción musical</h3>
+            <p>Obtén fragmentos precisos de grabaciones para usarlos como samples o loops en tu DAW. Usa WAV para mantener la máxima calidad en la edición posterior.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>📁 Convertir colección de vídeos a audio</h3>
+            <p>Procesa grabaciones de eventos, clases o conferencias y conviértelas a audio para escucharlas después como si fueran podcasts, sin consumir espacio con el vídeo.</p>
+          </div>
+        </div>
+
+        {/* Sección 3: FAQ */}
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <h3>¿Funciona con vídeos de YouTube u otras plataformas?</h3>
+            <p>No directamente. Esta herramienta procesa archivos de tu dispositivo. Primero debes descargar el vídeo con un programa específico, luego puedes extraer el audio aquí. Respeta siempre los derechos de autor del contenido.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Por qué la primera extracción tarda ~30 segundos?</h3>
+            <p>La primera vez se descarga ffmpeg-core.wasm (~30 MB desde CDN), el motor de procesamiento. Este archivo se guarda en caché del navegador y las siguientes veces es instantáneo. Solo ocurre una vez por dispositivo.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué calidad de MP3 debo elegir?</h3>
+            <p>192k es el punto dulce: excelente calidad con tamaño razonable. Usa 128k para voz/podcasts donde el tamaño importa, y 320k solo si el vídeo original es de alta calidad y necesitas la máxima fidelidad.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Puedo extraer solo una parte del vídeo?</h3>
+            <p>Sí. Usa los sliders de inicio y fin (o los campos numéricos de precisión) para seleccionar exactamente el fragmento que quieres extraer. La herramienta procesará solo ese segmento.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué pasa si el vídeo no tiene pista de audio?</h3>
+            <p>FFmpeg detectará que no hay audio y devolverá un error. Algunos formatos como GIF o vídeos de cámara de seguridad pueden no incluir audio. Verifica que el vídeo tiene sonido antes de procesarlo.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Funciona en dispositivos móviles?</h3>
+            <p>Funciona en Chrome/Edge para Android. En iOS (Safari) puede haber limitaciones con WebAssembly para archivos grandes. Para mejores resultados, usa un ordenador de escritorio con Chrome o Firefox.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Cuánto puede pesar el vídeo?</h3>
+            <p>No hay límite artificial, pero el vídeo debe caber en la memoria RAM disponible. En ordenadores modernos con 8 GB de RAM puedes procesar vídeos de varios GB sin problemas. Vídeos de más de 10 GB pueden fallar.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿MP3 o WAV para producción musical?</h3>
+            <p>Siempre WAV si vas a editar el audio después. El MP3 pierde calidad en cada re-codificación. Si el audio extraído es el producto final (para escuchar), MP3 a 192k o 320k es perfectamente válido.</p>
+          </div>
+        </div>
+
+        {/* Sección 4: Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Sube tu archivo de vídeo</h3>
+              <p>Arrastra el archivo a la zona de carga o haz clic para buscarlo. Se aceptan AVI, MP4, MOV, MKV, WebM, WMV y MPEG.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Previsualiza el vídeo</h3>
+              <p>El reproductor incorporado te permite ver el vídeo para identificar el fragmento exacto que quieres extraer antes de procesar.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Selecciona el fragmento</h3>
+              <p>Ajusta los sliders de inicio y fin, o escribe los segundos exactos en los campos numéricos para mayor precisión (hasta décimas de segundo).</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Elige el formato de salida</h3>
+              <p>Selecciona MP3 para uso general o WAV sin pérdida para edición posterior. Para MP3, elige también la calidad (128k, 192k o 320k).</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h3>Extrae el audio</h3>
+              <p>Pulsa &quot;Extraer Audio&quot;. La primera vez cargará el motor (~30 segundos). Las siguientes extracciones son inmediatas gracias a la caché del navegador.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepContent}>
+              <h3>Descarga el resultado</h3>
+              <p>El archivo se descargará automáticamente con un nombre que incluye el fragmento temporal seleccionado (ej: video_0m30s-1m45s.mp3).</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepContent}>
+              <h3>Repite para otros fragmentos</h3>
+              <p>Pulsa &quot;Extraer de nuevo&quot; para cambiar los tiempos y extraer otro fragmento del mismo vídeo sin necesidad de volver a cargarlo.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección 5: Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <h3>🎯 192k es el punto dulce del MP3</h3>
+            <p>Para música, 192k ofrece calidad casi indistinguible del original a un tamaño razonable. Usa 320k solo si el vídeo tiene audio de estudio o necesitas la máxima fidelidad posible.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🎛️ WAV para edición posterior</h3>
+            <p>Si vas a importar el audio a un editor (Audacity, Adobe Premiere, DaVinci), usa siempre WAV. Cada re-codificación a MP3 reduce la calidad irreversiblemente.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>📻 128k suficiente para voz</h3>
+            <p>Para podcasts, entrevistas o grabaciones de voz, 128k es perfectamente válido. El oído humano no aprecia la diferencia en contenido hablado por encima de 96k.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔢 Usa los campos numéricos para precisión</h3>
+            <p>Los sliders son cómodos para aproximaciones, pero los campos de &quot;Inicio (segundos)&quot; y &quot;Fin (segundos)&quot; te dan precisión de décimas de segundo para cortes exactos.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>⚡ La caché hace las extracciones rápidas</h3>
+            <p>El motor ffmpeg.wasm (~30 MB) se descarga solo la primera vez. En sesiones siguientes ya está en caché del navegador y el procesamiento comienza inmediatamente.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔄 Extrae múltiples fragmentos sin recargar</h3>
+            <p>Usa el botón &quot;Extraer de nuevo&quot; para cambiar los tiempos y sacar otro fragmento del mismo vídeo. No necesitas volver a seleccionar el archivo cada vez.</p>
+          </div>
+        </div>
+
+        {/* Sección 6: Warning Box */}
+        <div className={styles.warningBox}>
+          <h3>⚠️ Importante antes de usar</h3>
+          <ul className={styles.warningList}>
+            <li>Esta herramienta solo procesa archivos que ya están en tu dispositivo. No descarga vídeos de internet.</li>
+            <li>Respeta los derechos de autor: extrae audio solo de contenido del que seas titular o tengas licencia para usar.</li>
+            <li>El tiempo de procesamiento depende del tamaño del vídeo y la potencia de tu dispositivo — no hay límite de tiempo, solo paciencia.</li>
+            <li>Algunos formatos de vídeo poco comunes pueden no ser compatibles con todos los navegadores aunque FFmpeg los soporte.</li>
+          </ul>
+        </div>
+
+        {/* Contenido original — preservado */}
         <section className={styles.seccionEdu}>
           <h2>¿Por qué tu vídeo no sale del navegador?</h2>
           <p>

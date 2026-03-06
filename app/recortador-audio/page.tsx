@@ -746,6 +746,188 @@ export default function RecortadorAudioPage() {
         title="📚 ¿Quieres aprender más sobre edición de audio?"
         subtitle="Descubre técnicas y formatos para optimizar tus archivos de audio"
       >
+        {/* Sección 1: Tabla comparativa de formatos */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Formato</th>
+                <th>Compresión</th>
+                <th>Tamaño (1 min)</th>
+                <th>Calidad</th>
+                <th>Compatibilidad</th>
+                <th>Ideal para</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>MP3</td><td>Con pérdida</td><td>~1-2 MB</td><td>Buena-Alta</td><td>Universal</td><td>Música, podcasts, compartir</td></tr>
+              <tr><td>WAV</td><td>Sin pérdida</td><td>~10 MB</td><td>Perfecta</td><td>Universal</td><td>Edición, producción profesional</td></tr>
+              <tr><td>OGG Vorbis</td><td>Con pérdida</td><td>~0,9 MB</td><td>Alta</td><td>Sin Apple</td><td>Web, videojuegos, streaming</td></tr>
+              <tr><td>FLAC</td><td>Sin pérdida</td><td>~5 MB</td><td>Perfecta</td><td>Limitada</td><td>Archivado, audiófilos</td></tr>
+              <tr><td>AAC</td><td>Con pérdida</td><td>~1 MB</td><td>Mejor que MP3</td><td>Universal (iOS)</td><td>Mobile, Apple, streaming</td></tr>
+              <tr><td>M4A</td><td>Con pérdida</td><td>~1 MB</td><td>Alta</td><td>Apple/Mac</td><td>iTunes, iPhone, iPad</td></tr>
+              <tr><td>AIFF</td><td>Sin pérdida</td><td>~10 MB</td><td>Perfecta</td><td>Apple</td><td>Producción en Mac, Logic Pro</td></tr>
+              <tr><td>OPUS</td><td>Con pérdida</td><td>~0,6 MB</td><td>Excelente (voz)</td><td>Web moderna</td><td>Voz, videoconferencias, Discord</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Sección 2: Casos de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <h3>📱 Crear tono de llamada personalizado</h3>
+            <p>Recorta tu canción favorita a 30-40 segundos y añade un fade out al final para un tono profesional sin cortes bruscos. La mayoría de móviles aceptan WAV directamente.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎬 Sincronizar audio con vídeo</h3>
+            <p>Prepara clips de audio con la duración exacta necesaria para tu proyecto de vídeo. Recorta con precisión de centésimas de segundo para sincronización perfecta.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎙️ Editar grabaciones de voz</h3>
+            <p>Elimina los silencios iniciales/finales de grabaciones de podcast, entrevistas o voice-overs para obtener un resultado más limpio y profesional.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🧘 Crear loop de música ambiental</h3>
+            <p>Extrae el fragmento más repetitivo de una pieza musical y añade fade in/out en ambos extremos para crear un loop perfecto para meditación o concentración.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎵 Preparar samples para producción</h3>
+            <p>Aísla el fragmento exacto que quieres samplear con precisión de centésimas de segundo. Exporta en WAV para mantener la máxima calidad al importarlo en tu DAW.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>📚 Extraer fragmentos de audiolibros</h3>
+            <p>Recorta capítulos o secciones específicas de audiolibros o conferencias largas para escucharlas de forma independiente sin tener que buscar el minuto cada vez.</p>
+          </div>
+        </div>
+
+        {/* Sección 3: FAQ ampliado */}
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <h3>¿Por qué el archivo se descarga siempre como WAV aunque elija MP3?</h3>
+            <p>Los navegadores no pueden codificar audio a MP3 de forma nativa por restricciones técnicas y de patentes. WAV es el único formato sin pérdida disponible de forma nativa. Para convertir a MP3, usa Audacity o ffmpeg localmente.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Mis archivos de audio son seguros?</h3>
+            <p>Sí, 100%. Todo el procesamiento ocurre en tu navegador usando la Web Audio API. Tus archivos nunca salen de tu dispositivo ni se envían a ningún servidor de meskeIA.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué es el fade in y fade out?</h3>
+            <p>El fade in hace que el audio comience en silencio y aumente gradualmente de volumen. El fade out hace lo contrario. Ambos duran los segundos que configures (0-5s) y evitan cortes bruscos al inicio/final del clip.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Hay límite de tamaño o duración del archivo?</h3>
+            <p>No hay límites artificiales. El límite real es la memoria RAM de tu dispositivo. Archivos de hasta 100 MB funcionan sin problemas. Para archivos mayores, el procesamiento puede ser lento.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Puedo subir el volumen más del 100%?</h3>
+            <p>Sí, el slider de volumen llega hasta 200%. Útil para grabaciones de voz que quedaron muy silenciosas. Sin embargo, superar el 100% puede introducir distorsión (clipping) si el audio original ya está cerca del máximo.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué es la Web Audio API?</h3>
+            <p>Es una API nativa del navegador para procesar y sintetizar audio directamente en JavaScript, sin plugins. Permite decodificar, manipular y reproducir audio con alta precisión temporal, todo localmente en tu dispositivo.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Por qué no puedo recortar directamente un MP3 sin convertir a WAV?</h3>
+            <p>Para recortar audio con precisión, el navegador debe decodificarlo a PCM (sin compresión) en memoria, manipularlo y re-codificarlo. La re-codificación nativa solo produce WAV; para MP3 se necesitan librerías externas como lamejs.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Cómo consigo la mayor calidad posible en el resultado?</h3>
+            <p>Usa archivos de alta calidad como entrada (WAV, FLAC o MP3 a 320k). Exporta en WAV (sin pérdida). Si el original era MP3, la calidad está limitada por la del archivo fuente; no se puede recuperar lo que ya se perdió.</p>
+          </div>
+        </div>
+
+        {/* Sección 4: Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Sube tu archivo de audio</h3>
+              <p>Arrastra el archivo a la zona de carga o haz clic para seleccionarlo. Se admiten MP3, WAV, OGG, M4A, FLAC y otros formatos de audio.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Analiza la forma de onda</h3>
+              <p>La forma de onda (waveform) muestra visualmente la intensidad del audio. Los picos altos son sonidos fuertes; las zonas planas son silencios. Úsala para identificar el fragmento.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Ajusta el punto de inicio</h3>
+              <p>Mueve el slider de inicio o escribe los segundos exactos en el campo correspondiente. La precisión es de centésimas de segundo.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Ajusta el punto de fin</h3>
+              <p>De la misma forma, define el fin del fragmento. El indicador &quot;Duración seleccionada&quot; te muestra en tiempo real cuánto durará el clip resultante.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h3>Previsualiza la selección</h3>
+              <p>Pulsa &quot;Reproducir selección&quot; para escuchar exactamente lo que vas a exportar. Ajusta los tiempos si es necesario antes de procesar.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepContent}>
+              <h3>Configura efectos (opcional)</h3>
+              <p>Añade fade in y/o fade out para transiciones suaves. Ajusta el volumen si la grabación original es demasiado silenciosa o estridente.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepContent}>
+              <h3>Procesa y descarga</h3>
+              <p>Pulsa &quot;Recortar y Procesar&quot;. El audio procesado aparecerá con un reproductor para verificar antes de descargar. El archivo tendrá el sufijo &quot;_recortado&quot;.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección 5: Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <h3>🌊 Usa la forma de onda para guiarte</h3>
+            <p>Los silencios aparecen como líneas planas en la waveform. Los picos de audio son momentos de alta intensidad. Es mucho más fácil identificar el punto exacto visualmente que a ciegas.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🌅 Fade in de 0,5s evita arranques bruscos</h3>
+            <p>Un fade in de 0,5 a 1 segundo elimina los clics y arranques abruptos sin que el oyente lo perciba. Es especialmente útil para tonos de llamada y clips de música.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔊 Sube volumen con cuidado</h3>
+            <p>Superar el 150% de volumen puede introducir distorsión (clipping). Si la grabación original es muy baja, súbelo gradualmente y escucha el resultado antes de descargar.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>📱 Para tonos: recorta a 30-40 segundos</h3>
+            <p>La mayoría de sistemas operativos limitan los tonos a 30-40 segundos. Añade un fade out en los últimos 2-3 segundos para que el tono termine de forma natural.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🎛️ WAV para seguir editando</h3>
+            <p>Si vas a importar el resultado en un editor de audio (Audacity, Logic, Premiere), usa siempre WAV. Cada conversión a formato con pérdida (MP3) degrada la calidad acumulativamente.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>⏱️ Usa los campos numéricos para precisión máxima</h3>
+            <p>Los sliders son útiles para aproximarte al fragmento, pero los campos de segundos te dan precisión de centésimas. Para cortes exactos en producción, siempre escribe el valor manualmente.</p>
+          </div>
+        </div>
+
+        {/* Sección 6: Warning Box */}
+        <div className={styles.warningBox}>
+          <h3>⚠️ Limitaciones técnicas y legales</h3>
+          <ul className={styles.warningList}>
+            <li>Los navegadores no codifican MP3/OGG de forma nativa; el archivo exportado siempre es WAV, independientemente del formato seleccionado.</li>
+            <li>La calidad del resultado está limitada por la calidad del archivo original. No se puede recuperar calidad perdida en una codificación previa.</li>
+            <li>Para archivos superiores a 100 MB, el procesamiento puede ser lento o consumir mucha memoria RAM según tu dispositivo.</li>
+            <li>Respeta los derechos de autor al recortar y reutilizar audio de terceros, incluso para uso personal.</li>
+          </ul>
+        </div>
+
         <section className={styles.guideSection}>
           <h2>¿Para qué sirve recortar audio?</h2>
           <p className={styles.introParagraph}>
