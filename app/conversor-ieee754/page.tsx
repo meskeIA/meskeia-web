@@ -587,6 +587,330 @@ export default function ConversorIEEE754Page() {
         subtitle="Conceptos fundamentales de representación en punto flotante"
         icon="📚"
       >
+        {/* 1. Tabla comparativa Half vs Single vs Double */}
+        <div className={styles.eduComparativa}>
+          <h2>📊 Comparativa: Half vs Single vs Double (IEEE 754)</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>Half (16-bit)</th>
+                  <th>Single (32-bit)</th>
+                  <th>Double (64-bit)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Bits totales</strong></td>
+                  <td>16</td>
+                  <td>32</td>
+                  <td>64</td>
+                </tr>
+                <tr>
+                  <td><strong>Bits exponente</strong></td>
+                  <td>5</td>
+                  <td>8</td>
+                  <td>11</td>
+                </tr>
+                <tr>
+                  <td><strong>Bits mantisa</strong></td>
+                  <td>10</td>
+                  <td>23</td>
+                  <td>52</td>
+                </tr>
+                <tr>
+                  <td><strong>Sesgo</strong></td>
+                  <td>15</td>
+                  <td>127</td>
+                  <td>1023</td>
+                </tr>
+                <tr>
+                  <td><strong>Rango máximo</strong></td>
+                  <td>±65.504</td>
+                  <td>±3,4×10³⁸</td>
+                  <td>±1,8×10³⁰⁸</td>
+                </tr>
+                <tr>
+                  <td><strong>Precisión decimal</strong></td>
+                  <td>~3-4 dígitos</td>
+                  <td>~7 dígitos</td>
+                  <td>~15-16 dígitos</td>
+                </tr>
+                <tr>
+                  <td><strong>Velocidad</strong></td>
+                  <td>Muy rápido (GPU)</td>
+                  <td>Rápido</td>
+                  <td>Moderado</td>
+                </tr>
+                <tr>
+                  <td><strong>Uso típico</strong></td>
+                  <td>ML/IA, shaders</td>
+                  <td>C float, gráficos</td>
+                  <td>C double, JS Number</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 2. Casos de uso prácticos */}
+        <div className={styles.eduEscenarios}>
+          <h2>🌍 Casos de Uso Prácticos</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎮</span>
+                <h3>Motores de Videojuegos</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Física y gráficos 3D usan float (32-bit). Millones de operaciones por frame.
+                Precisión suficiente para coordenadas de pantalla.
+              </p>
+              <span className={styles.escenarioTip}>Unity: Transform.position es float</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🤖</span>
+                <h3>Machine Learning / IA</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Redes neuronales usan half (16-bit/bfloat16) en GPU. Reduce VRAM a la mitad.
+                Inferencia en móvil usa float8/int8.
+              </p>
+              <span className={styles.escenarioTip}>PyTorch: model.half()</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💰</span>
+                <h3>Finanzas y Banca</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                NUNCA usar float para dinero. 0,1 + 0,2 = 0,30000000000000004.
+                0,1 € × 1.000.000 transacciones = error de 4.000 €.
+              </p>
+              <span className={styles.escenarioTip}>Usar BigDecimal o decimal</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔬</span>
+                <h3>Cálculo Científico</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Simulaciones físicas usan double (64-bit). NASA, CERN, meteorología.
+                La diferencia entre float y double puede ser la diferencia entre aterrizar en Marte o no.
+              </p>
+              <span className={styles.escenarioTip}>Siempre double en ciencia</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💻</span>
+                <h3>Sistemas Embebidos</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Microcontroladores sin FPU usan fixed-point. Arduino evita float cuando es posible.
+                STM32 con FPU usa float. Coste energético importante.
+              </p>
+              <span className={styles.escenarioTip}>Fixed-point sin FPU</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🌐</span>
+                <h3>JavaScript y Web</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Number siempre es double (64-bit). TypedArrays: Float32Array para WebGL.
+                BigInt para enteros grandes exactos.
+              </p>
+              <span className={styles.escenarioTip}>Number = IEEE 754 double</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. FAQ ampliado */}
+        <div className={styles.eduFaq}>
+          <h2>❓ Preguntas Frecuentes sobre Punto Flotante</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Por qué 0,1 + 0,2 no es 0,3 exactamente?</h4>
+              <p>
+                0,1 en binario es 0,0001100110011... (periódico infinito). Al truncarse a 23 bits de mantisa,
+                acumula error. Solución: redondear al comparar (<code>Math.abs(a-b) &lt; 1e-10</code>) o usar
+                aritmética de precisión arbitraria.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuándo usar float (32-bit) vs double (64-bit)?</h4>
+              <p>
+                Float: gráficos, física de juegos, ML donde la velocidad y memoria importan.
+                Double: finanzas, cálculo científico, por defecto en lenguajes (JS, Python).
+                Regla práctica: si dudas, usa double.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es NaN y cuándo aparece?</h4>
+              <p>
+                Not a Number: resultado de 0/0, sqrt(-1), operaciones con infinito indeterminadas.
+                NaN ≠ NaN (es la única cosa en programación que no es igual a sí misma).
+                Verificar con <code>Number.isNaN(x)</code> en JavaScript.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué son los números denormalizados?</h4>
+              <p>
+                Números muy cercanos al cero (menores que 2^-126 en float). Permiten representar
+                gradualmente el underflow en lugar de pasar directamente a cero. Más lentos en hardware
+                por emulación software. Rango: 1,4×10⁻⁴⁵ hasta 1,2×10⁻³⁸ en float.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Por qué los enteros grandes pierden precisión en float?</h4>
+              <p>
+                Float tiene 23 bits de mantisa = 2²⁴ = 16.777.217 enteros exactos. A partir de ese
+                valor, solo puede representar números pares. Por eso JS usa Number.MAX_SAFE_INTEGER = 2⁵³-1
+                (53 bits de mantisa en double).
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo afecta el orden de las operaciones a la precisión?</h4>
+              <p>
+                (a+b)+c ≠ a+(b+c) en punto flotante. Sumar números muy grandes y muy pequeños pierde
+                los dígitos pequeños. El algoritmo de Kahan compensa este error en sumas de muchos números.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué diferencia hay entre +0 y -0 en IEEE 754?</h4>
+              <p>
+                Son iguales en comparación (0 === -0 en JS), pero distintos en representación binaria
+                (bit de signo diferente). 1/+0 = +Infinity, 1/-0 = -Infinity.
+                En JavaScript: <code>Object.is(-0, 0)</code> devuelve false.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo inspeccionar los bits de un float en código?</h4>
+              <p>
+                C: <code>{'union { float f; uint32_t i; }'}</code>.
+                Python: <code>struct.pack(&apos;f&apos;, 3.14)</code>.
+                JavaScript: usar Float32Array + Uint32Array compartiendo el mismo ArrayBuffer.
+                Útil para debugging y optimización de bajo nivel.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Guía paso a paso */}
+        <div className={styles.eduGuia}>
+          <h2>📖 Guía Paso a Paso: Convertir 3,14 a IEEE 754 Single</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.eduStep}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Determinar el signo</strong>
+                <p>3,14 &gt; 0 → bit de signo = 0. Si fuera negativo, sería 1.</p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Convertir parte entera a binario</strong>
+                <p>3 en binario = 11₂ (3 = 2 + 1)</p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Convertir parte decimal a binario</strong>
+                <p>
+                  0,14 × 2 = 0,28 (0) → 0,28 × 2 = 0,56 (0) → 0,56 × 2 = 1,12 (1) → ...
+                  Resultado parcial: 0,001000111101...₂
+                </p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Normalizar en notación científica binaria</strong>
+                <p>11,001000111101...₂ = 1,1001000111101...₂ × 2¹</p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Calcular exponente sesgado</strong>
+                <p>Exponente real = 1, sesgo = 127 → 1 + 127 = 128 = 10000000₂</p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Extraer mantisa (23 bits)</strong>
+                <p>Parte fraccionaria de 1,1001000111101... = 10010001111010111000011₂</p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Combinar los tres campos</strong>
+                <p>0 | 10000000 | 10010001111010111000011 = 0x4048F5C3</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 5. Mejores prácticas */}
+        <div className={styles.eduTips}>
+          <h2>✅ Mejores Prácticas con Punto Flotante</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <strong>Usa epsilon para comparar</strong>
+              <p>Math.abs(a - b) &lt; Number.EPSILON en vez de a === b para floats</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔢</span>
+              <strong>Double por defecto</strong>
+              <p>En caso de duda, usa double (64-bit). La diferencia de rendimiento es mínima en CPUs modernas</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💶</span>
+              <strong>Nunca float para dinero</strong>
+              <p>Usa enteros de centavos o librerías especializadas (decimal.js, big.js). 0,1 + 0,2 ≠ 0,3</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🖥️</span>
+              <strong>Float en arrays para WebGL</strong>
+              <p>Float32Array consume la mitad de memoria que Float64Array en GPU. Importante para rendimiento gráfico</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⚖️</span>
+              <strong>Ordena las operaciones</strong>
+              <p>Suma primero los números de magnitud similar. Evita (grandísimo + pequeñísimo) que pierde los dígitos pequeños</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔍</span>
+              <strong>Verifica NaN explícitamente</strong>
+              <p>isNaN(x) en JS convierte a número antes. Usa Number.isNaN(x) para verificación exacta</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 6. Warning box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores que Causan Bugs Difíciles de Detectar</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Comparar floats con ==:</strong> 0,1 + 0,2 === 0,3 es false. Usa comparación con margen de tolerancia (epsilon)</li>
+            <li><strong>Usar float para dinero o contabilidad:</strong> 1,005 redondeado a 2 decimales da 1,00, no 1,01. En banca esto es un bug legal</li>
+            <li><strong>Ignorar NaN propagante:</strong> NaN + cualquier cosa = NaN. Un NaN en el pipeline de cálculo corrompe todos los resultados downstream silenciosamente</li>
+            <li><strong>Acumular errores en bucles:</strong> Sumar 0,1 mil veces en un bucle no da 100 exactamente (da 99,9999999...)</li>
+            <li><strong>Cast implícito double→float:</strong> Al pasar double a una función que espera float pierdes ~8 dígitos de precisión sin aviso del compilador (sin -Wall)</li>
+            <li><strong>Asumir que float es más rápido que double:</strong> En CPUs x86-64 modernas ambos tienen el mismo rendimiento. La ventaja de float es en memoria y ancho de banda (SIMD)</li>
+          </ul>
+        </div>
+
+        {/* Contenido educativo base */}
         <section className={styles.infoSection}>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>

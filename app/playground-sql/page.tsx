@@ -552,6 +552,345 @@ export default function PlaygroundSQLPage() {
         title="📚 ¿Quieres aprender más sobre SQL?"
         subtitle="Conceptos clave y referencia rápida"
       >
+        {/* 1. Tabla comparativa de dialectos SQL */}
+        <section className={styles.guideSection}>
+          <h2>Dialectos SQL: Comparativa de los Principales Motores</h2>
+          <p className={styles.introParagraph}>
+            SQL es un estándar, pero cada motor de base de datos tiene sus propias particularidades. Esta tabla
+            te ayuda a entender las diferencias clave para escribir código portable o adaptarte rápidamente
+            al motor que uses en cada proyecto.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>SQLite</th>
+                  <th>MySQL 8</th>
+                  <th>PostgreSQL 16</th>
+                  <th>SQL Server 2022</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Licencia</strong></td>
+                  <td>Dominio público</td>
+                  <td>GPL/Comercial</td>
+                  <td>PostgreSQL (libre)</td>
+                  <td>Propietario</td>
+                </tr>
+                <tr>
+                  <td><strong>Instalación</strong></td>
+                  <td>Sin servidor</td>
+                  <td>Servidor dedicado</td>
+                  <td>Servidor dedicado</td>
+                  <td>Servidor dedicado</td>
+                </tr>
+                <tr>
+                  <td><strong>Auto-increment</strong></td>
+                  <td>INTEGER PRIMARY KEY</td>
+                  <td>AUTO_INCREMENT</td>
+                  <td>SERIAL / GENERATED</td>
+                  <td>IDENTITY</td>
+                </tr>
+                <tr>
+                  <td><strong>Tipo booleano</strong></td>
+                  <td>INTEGER (0/1)</td>
+                  <td>TINYINT(1) / BOOL</td>
+                  <td>BOOLEAN nativo</td>
+                  <td>BIT</td>
+                </tr>
+                <tr>
+                  <td><strong>Concatenar strings</strong></td>
+                  <td>||</td>
+                  <td>CONCAT() o ||</td>
+                  <td>|| o CONCAT()</td>
+                  <td>+ o CONCAT()</td>
+                </tr>
+                <tr>
+                  <td><strong>LIMIT/OFFSET</strong></td>
+                  <td>LIMIT n OFFSET m</td>
+                  <td>LIMIT n OFFSET m</td>
+                  <td>LIMIT n OFFSET m</td>
+                  <td>TOP n / FETCH NEXT</td>
+                </tr>
+                <tr>
+                  <td><strong>JSON nativo</strong></td>
+                  <td>Sí (básico)</td>
+                  <td>Sí (JSON type)</td>
+                  <td>Sí (JSONB avanzado)</td>
+                  <td>Sí (JSON functions)</td>
+                </tr>
+                <tr>
+                  <td><strong>Ideal para</strong></td>
+                  <td>Aprendizaje, apps pequeñas</td>
+                  <td>Web, WordPress, e-commerce</td>
+                  <td>Sistemas complejos, BI</td>
+                  <td>Empresas Microsoft</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* 2. Casos de uso prácticos */}
+        <section className={styles.guideSection}>
+          <h2>Casos de Uso Prácticos por Perfil Profesional</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👨‍💻</span>
+                <strong>Desarrollador Backend</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Dominar JOINs para evitar N+1 queries. Un bucle que hace 1 query por fila = 1000 queries para 1000 filas.
+                Un JOIN bien hecho = 1 query.
+              </p>
+              <pre className={styles.codeBlock}>{`SELECT u.nombre, COUNT(p.id)
+FROM usuarios u
+LEFT JOIN pedidos p
+  ON u.id = p.usuario_id
+GROUP BY u.id`}</pre>
+              <span className={styles.escenarioTip}>Rendimiento crítico</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📊</span>
+                <strong>Analista de Datos / BI</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                GROUP BY + funciones de ventana (WINDOW FUNCTIONS) para KPIs. Reportes de cohortes, retención y LTV.
+              </p>
+              <pre className={styles.codeBlock}>{`ROW_NUMBER() OVER (
+  PARTITION BY categoria
+  ORDER BY ventas DESC
+)`}</pre>
+              <span className={styles.escenarioTip}>Ranking por categoría</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🗄️</span>
+                <strong>DBA (Database Administrator)</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Optimización con índices. EXPLAIN ANALYZE en PostgreSQL o EXPLAIN en MySQL para ver el plan de ejecución.
+                Un índice reduce de O(n×m) a O(log n).
+              </p>
+              <pre className={styles.codeBlock}>{`EXPLAIN ANALYZE
+SELECT * FROM pedidos
+WHERE cliente_id = 42;`}</pre>
+              <span className={styles.escenarioTip}>Plan de ejecución</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎓</span>
+                <strong>Estudiante de Informática</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Modelado entidad-relación. Normalización (1FN, 2FN, 3FN). Transacciones ACID. SQL es obligatorio
+                en casi todos los currículos de CS e Ingeniería Informática.
+              </p>
+              <span className={styles.escenarioTip}>Base imprescindible</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🛒</span>
+                <strong>E-commerce y aplicaciones web</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Consultas de inventario, pedidos y clientes. Calcular totales con JOINs y HAVING para filtrar resultados.
+              </p>
+              <pre className={styles.codeBlock}>{`SELECT p.nombre,
+  SUM(dp.cantidad * dp.precio) AS total
+FROM pedidos o
+JOIN detalle_pedido dp
+  ON o.id = dp.pedido_id
+GROUP BY o.id
+HAVING total > 100`}</pre>
+              <span className={styles.escenarioTip}>Pedidos y facturación</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔐</span>
+                <strong>Seguridad y auditoría</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Logs de acceso y detección de anomalías. Detectar ataques de fuerza bruta con GROUP BY + HAVING.
+              </p>
+              <pre className={styles.codeBlock}>{`SELECT usuario_id, COUNT(*)
+FROM logs_acceso
+WHERE fecha > NOW() - INTERVAL '1 hour'
+GROUP BY usuario_id
+HAVING COUNT(*) > 100`}</pre>
+              <span className={styles.escenarioTip}>Detección de ataques</span>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. FAQ ampliado */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre SQL</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cuál es la diferencia entre WHERE y HAVING?</h4>
+              <p>WHERE filtra filas ANTES de agrupar (afecta a datos originales). HAVING filtra grupos DESPUÉS de GROUP BY.
+              Ejemplo: <code>WHERE precio &gt; 10</code> filtra productos antes de contar; <code>HAVING COUNT(*) &gt; 5</code> filtra categorías que tienen más de 5 productos.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cuándo usar INNER JOIN vs LEFT JOIN?</h4>
+              <p>INNER JOIN devuelve solo filas con coincidencia en ambas tablas (descarta filas sin match). LEFT JOIN devuelve todas
+              las filas de la tabla izquierda más coincidencias (NULL donde no hay match). Regla práctica: usa LEFT JOIN cuando
+              quieras &quot;todos los X con sus Y opcionales&quot;.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué es una subconsulta y cuándo es mejor que un JOIN?</h4>
+              <p>Una subconsulta es un SELECT dentro de otro SELECT. Es mejor para: filtrar con condiciones complejas, verificar
+              existencia (EXISTS) o cuando el resultado es escalar. Un JOIN es más eficiente cuando necesitas columnas de ambas
+              tablas y el optimizador puede usar índices.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Por qué mi consulta GROUP BY da error con columnas no agrupadas?</h4>
+              <p>SQL estándar no permite SELECT de columnas que no estén en GROUP BY ni en funciones de agregación. MySQL en
+              modo permisivo lo permite (elige valor arbitrario). PostgreSQL y SQLite son estrictos. Solución: añadir la columna
+              al GROUP BY o usar <code>MAX(columna)</code>.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cómo funciona el índice y cuándo crearlo?</h4>
+              <p>El índice es como el índice de un libro: evita leer toda la tabla. Créalo en: columnas usadas en WHERE frecuentemente,
+              columnas de JOIN (claves foráneas) y columnas de ORDER BY con muchas filas. No lo crees en: tablas pequeñas,
+              columnas con pocos valores distintos (booleanos) o columnas que se actualizan constantemente.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué diferencia hay entre DELETE, TRUNCATE y DROP?</h4>
+              <p>DELETE elimina filas con WHERE, activa triggers y es más lento. TRUNCATE elimina TODAS las filas, es más rápido,
+              sin triggers y no disponible en SQLite básico. DROP elimina la tabla completa con su estructura. DELETE es reversible
+              en transacción; TRUNCATE/DROP pueden no serlo.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Para qué sirven las transacciones?</h4>
+              <p>Garantizan ACID: Atomicidad (todo o nada), Consistencia, Aislamiento y Durabilidad. Ejemplo: en una transferencia
+              bancaria, debitar cuenta A y acreditar cuenta B deben ocurrir juntos o ninguna.
+              <code>BEGIN; UPDATE ...; UPDATE ...; COMMIT;</code></p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cómo evitar la inyección SQL?</h4>
+              <p>NUNCA concatenar strings del usuario en queries. Usa prepared statements/parameterized queries:
+              <code>SELECT * FROM usuarios WHERE email = ?</code> con el valor como parámetro separado. En ORMs (Sequelize,
+              Hibernate) esto es automático. En SQL puro: siempre usa placeholders.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Guía Paso a Paso: Diseñar una Consulta SQL Compleja</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.eduStep}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <strong>Define el resultado que necesitas</strong>
+                <p>&quot;Quiero el top 5 de clientes con más gasto en el último mes&quot;. Escríbelo en palabras antes de escribir código.</p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <strong>Identifica las tablas necesarias</strong>
+                <p>Clientes, pedidos, detalle_pedido. Dibuja las relaciones o consulta el tab Esquema de este playground para visualizarlas.</p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <strong>Escribe los JOINs</strong>
+                <p>Conecta las tablas por sus claves foráneas. Empieza por la tabla principal y añade JOINs uno a uno hasta completar el grafo de relaciones.</p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <strong>Añade los filtros WHERE</strong>
+                <p>Solo las filas del último mes: <code>WHERE fecha_pedido &gt;= DATE(&apos;now&apos;, &apos;-30 days&apos;)</code></p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <strong>Agrupa y calcula</strong>
+                <p><code>GROUP BY cliente_id</code> + <code>SUM(cantidad * precio_unitario) AS total_gastado</code></p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <strong>Ordena y limita</strong>
+                <p><code>ORDER BY total_gastado DESC LIMIT 5</code></p>
+              </div>
+            </div>
+            <div className={styles.eduStep}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <strong>Verifica con datos reales</strong>
+                <p>Comprueba que el resultado tiene sentido. Prueba con LIMIT 1 primero para ver la estructura antes de expandir.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores Prácticas SQL</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <strong>Usa alias descriptivos</strong>
+              <p><code>SELECT u.nombre AS cliente, COUNT(p.id) AS num_pedidos</code> mejora la legibilidad enormemente.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <strong>Especifica columnas en SELECT</strong>
+              <p>Evita <code>SELECT *</code> en producción. Lista las columnas que necesitas, reduces datos transferidos y evitas errores si se añaden columnas nuevas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <strong>Índices en claves foráneas</strong>
+              <p>Siempre crea índice en columnas usadas en JOINs. MySQL no lo hace automático (PostgreSQL sí en PKs). <code>CREATE INDEX idx_pedidos_cliente ON pedidos(cliente_id)</code></p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <strong>Usa LIMIT al explorar</strong>
+              <p>Antes de ejecutar una query en tabla grande, añade <code>LIMIT 10</code>. Evita bloqueos y resultados interminables.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <strong>Comenta consultas complejas</strong>
+              <p><code>-- Clientes activos con más de 5 pedidos en el último trimestre</code>. Los comentarios SQL sobreviven en logs y ayudan al siguiente desarrollador.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <strong>Prueba con EXPLAIN</strong>
+              <p>En PostgreSQL: <code>EXPLAIN ANALYZE tu_query</code>. En MySQL: <code>EXPLAIN tu_query</code>. Muestra si usa índices o hace full table scan.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 6. Warning box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores SQL que Causan Problemas en Producción</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>SQL injection por concatenar strings:</strong> <code>{`"SELECT * FROM usuarios WHERE nombre = '" + input + "'"`}</code> permite destruir la base de datos. Usa prepared statements SIEMPRE.</li>
+            <li><strong>DELETE sin WHERE:</strong> <code>DELETE FROM productos</code> elimina TODOS los productos. Siempre verifica con SELECT antes de DELETE. Haz backup en producción.</li>
+            <li><strong>N+1 queries en bucles:</strong> Un bucle que ejecuta 1 query por iteración = 1000 queries para 1000 filas. Usa JOIN o consulta todo de una vez.</li>
+            <li><strong>SELECT * en producción:</strong> Transfiere columnas innecesarias, rompe el código si se renombran columnas e impide optimizaciones del motor.</li>
+            <li><strong>Olvidar índices en claves foráneas:</strong> Un JOIN sin índice = full table scan = segundos en vez de milisegundos para tablas grandes.</li>
+            <li><strong>Transacciones sin COMMIT/ROLLBACK:</strong> Una transacción abierta bloquea filas. En producción puede paralizar la aplicación entera.</li>
+          </ul>
+        </div>
+
+        {/* 7. Contenido original: Comandos SQL Básicos */}
         <section className={styles.guideSection}>
           <h2>Comandos SQL Básicos</h2>
           <p className={styles.introParagraph}>
