@@ -561,6 +561,181 @@ export default function CalculadoraCalculoPage() {
         title="📚 ¿Quieres aprender más sobre Cálculo?"
         subtitle="Derivadas, integrales, límites y sus aplicaciones"
       >
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Concepto</th>
+                <th>Definición</th>
+                <th>Método numérico</th>
+                <th>Precisión</th>
+                <th>Aplicación principal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Derivada primera</td><td>Tasa de cambio instantáneo</td><td>Diferencia central: [f(x+h)-f(x-h)]/(2h)</td><td>Alta (h=0,0001)</td><td>Velocidad, optimización, pendiente</td></tr>
+              <tr><td>Derivada segunda</td><td>Curvatura de la función</td><td>Diferencia finita de orden 2</td><td>Media</td><td>Concavidad, puntos de inflexión</td></tr>
+              <tr><td>Integral definida</td><td>Área bajo la curva en [a,b]</td><td>Suma de Riemann (punto medio)</td><td>Variable (↑ subdivisiones)</td><td>Áreas, probabilidad, trabajo</td></tr>
+              <tr><td>Límite</td><td>Valor hacia el que tiende f(x)</td><td>Aproximación sucesiva</td><td>Alta</td><td>Continuidad, derivadas, series</td></tr>
+              <tr><td>Serie aritmética</td><td>Suma con diferencia constante d</td><td>Sₙ = n/2·(2a₁ + (n-1)d)</td><td>Exacta</td><td>Pagos iguales, aritmética</td></tr>
+              <tr><td>Serie geométrica</td><td>Suma con razón constante r</td><td>Sₙ = a₁·(1-rⁿ)/(1-r)</td><td>Exacta</td><td>Capitalización, física cuántica</td></tr>
+              <tr><td>Serie geométrica ∞</td><td>Suma infinita convergente</td><td>S∞ = a₁/(1-r) si |r|&lt;1</td><td>Exacta</td><td>Probabilidad, análisis</td></tr>
+              <tr><td>Punto crítico</td><td>f&apos;(x) = 0</td><td>Evaluar derivada en el punto</td><td>Alta</td><td>Máximos, mínimos, puntos silla</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <h3>🚀 Física: velocidad instantánea</h3>
+            <p>La derivada de la posición respecto al tiempo da la velocidad instantánea. Calcula f&apos;(t) en cualquier instante para analizar el movimiento de un objeto.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>📊 Probabilidad: área bajo distribución</h3>
+            <p>Integra una función de densidad de probabilidad entre dos valores para calcular la probabilidad de que una variable aleatoria caiga en ese rango.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>💰 Finanzas: series geométricas</h3>
+            <p>Una inversión con capitalización compuesta forma una serie geométrica. Calcula la suma total acumulada tras n períodos con razón (1 + tasa de interés).</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>📐 Optimización de funciones</h3>
+            <p>Encuentra máximos y mínimos de funciones de coste o beneficio. La primera derivada cero indica un punto crítico; la segunda determina si es máximo o mínimo.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🔬 Verificar límites teóricos</h3>
+            <p>Comprueba límites clásicos como lim(x→0) sin(x)/x = 1 o lim(x→∞)(1+1/x)^x = e, observando la convergencia desde ambos lados del punto.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🎓 Preparar exámenes de cálculo</h3>
+            <p>Verifica tus cálculos manuales de derivadas, integrales y límites antes de un examen. Identifica dónde te equivocas comparando con los resultados numéricos.</p>
+          </div>
+        </div>
+
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <h3>¿Cuál es la diferencia entre derivada e integral?</h3>
+            <p>La derivada mide la tasa de cambio (velocidad, pendiente). La integral acumula valores (área, trabajo). El Teorema Fundamental del Cálculo las conecta: la integral de f&apos;(x) entre a y b es f(b) - f(a).</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Por qué se usa h muy pequeño para derivadas numéricas?</h3>
+            <p>La derivada es el límite del cociente incremental cuando h→0. Usando h=0,0001 obtenemos una aproximación muy precisa sin problemas de redondeo numérico que aparecen con h demasiado pequeño.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué significa que un límite no existe?</h3>
+            <p>Cuando el límite por la izquierda ≠ límite por la derecha, el límite no existe en ese punto. Ocurre en discontinuidades como f(x) = 1/x en x=0, donde ±∞ son diferentes.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Cuándo converge una serie geométrica infinita?</h3>
+            <p>Una serie geométrica infinita converge (tiene suma finita) únicamente cuando |r| &lt; 1. Si |r| ≥ 1, los términos no tienden a cero y la suma diverge hacia infinito.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué es el Teorema Fundamental del Cálculo?</h3>
+            <p>Establece que la derivación e integración son operaciones inversas. Si F(x) es antiderivada de f(x), entonces ∫ₐᵇ f(x)dx = F(b) - F(a). Es el puente entre cálculo diferencial e integral.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Cómo mejoro la precisión de una integral numérica?</h3>
+            <p>Aumentando el número de subdivisiones (rectángulos). Con 100 subdivisiones el error es ~1%; con 1000 es ~0,01%. Para funciones muy oscilantes o discontinuas, necesitas más subdivisiones.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué diferencia hay entre integral definida e indefinida?</h3>
+            <p>La integral definida ∫ₐᵇ f(x)dx da un número (el área entre a y b). La integral indefinida ∫f(x)dx da una familia de funciones F(x) + C, donde C es la constante de integración.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué indica la segunda derivada?</h3>
+            <p>La segunda derivada f&apos;&apos;(x) mide la concavidad. Si f&apos;&apos;(x) &gt; 0, la función es cóncava hacia arriba (forma de U). Si f&apos;&apos;(x) &lt; 0, es cóncava hacia abajo. En un punto crítico, indica si es mínimo o máximo.</p>
+          </div>
+        </div>
+
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Selecciona el tipo de cálculo</h3>
+              <p>Elige entre Derivadas, Integrales, Límites o Series según la operación matemática que necesites resolver.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Elige la función</h3>
+              <p>Selecciona una de las 8 funciones predefinidas (x², sin(x), eˣ, ln(x), etc.) o la más cercana a tu función de estudio.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Ingresa los valores requeridos</h3>
+              <p>Para derivadas: el punto x. Para integrales: los límites a y b. Para límites: el punto de tendencia. Para series: a₁, razón y número de términos.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Analiza los resultados</h3>
+              <p>Observa el resultado principal y los valores auxiliares: comportamiento creciente/decreciente, concavidad, límites laterales o suma infinita.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h3>Ajusta la precisión (integrales)</h3>
+              <p>Para integrales, incrementa las subdivisiones (100 → 1000 → 10000) si necesitas mayor exactitud. Observa cómo converge el resultado.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepContent}>
+              <h3>Contrasta con la tabla de derivadas</h3>
+              <p>Compara el resultado numérico con la tabla de &quot;Derivadas e Integrales Comunes&quot;. Verifica que coincide con la solución analítica exacta.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepContent}>
+              <h3>Interpreta el resultado</h3>
+              <p>Traduce el número a su significado físico o geométrico: una derivada positiva indica función creciente; una integral positiva indica área por encima del eje X.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <h3>🎯 Verifica con valores conocidos</h3>
+            <p>Prueba primero con funciones cuya derivada conozcas: si f(x) = x², f&apos;(2) debe dar exactamente 4. Si coincide, confía en los resultados más complejos.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>📊 Usa 1000+ subdivisiones para integrales</h3>
+            <p>Con funciones oscilantes como sin(x), usa al menos 1000 subdivisiones para obtener resultados precisos. El cálculo es rápido y la ganancia en precisión es significativa.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>↔️ Compara límites laterales</h3>
+            <p>Siempre observa si el límite por izquierda y derecha son iguales. Si difieren, el límite no existe. Es fundamental para detectar discontinuidades.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔢 Verifica convergencia en series</h3>
+            <p>Para series geométricas, comprueba |r| &lt; 1 antes de interpretar la suma infinita. Si |r| ≥ 1, la serie diverge y no tiene suma finita.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>📈 Interpreta el signo de la derivada</h3>
+            <p>f&apos;(x) &gt; 0: función creciente. f&apos;(x) &lt; 0: decreciente. f&apos;(x) = 0: punto crítico (posible máximo, mínimo o inflexión). La segunda derivada aclara el tipo.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>⚡ Combina herramientas</h3>
+            <p>Usa derivadas para encontrar puntos críticos, luego intégralas para calcular áreas. Combinar las cuatro operaciones te da una visión completa del comportamiento de la función.</p>
+          </div>
+        </div>
+
+        <div className={styles.warningBox}>
+          <h3>⚠️ Limitaciones de los métodos numéricos</h3>
+          <ul className={styles.warningList}>
+            <li>Los métodos numéricos tienen errores de redondeo y aproximación. No son exactos como el cálculo simbólico.</li>
+            <li>Para funciones con discontinuidades o singularidades, los resultados pueden ser incorrectos o inestables.</li>
+            <li>La integral numérica por punto medio puede ser imprecisa en funciones con variación muy rápida.</li>
+            <li>Para uso académico riguroso, verifica siempre con herramientas simbólicas como Wolfram Alpha o MATLAB.</li>
+          </ul>
+        </div>
+
         <section className={styles.guideSection}>
           <h2>Cálculo Diferencial e Integral</h2>
           <p className={styles.introParagraph}>

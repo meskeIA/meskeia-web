@@ -390,6 +390,188 @@ export default function CalculadoraSubredesPage() {
         subtitle="Conceptos fundamentales de networking y direccionamiento"
         icon="📚"
       >
+        {/* Sección 1: Tabla Comparativa */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Prefijo CIDR</th>
+                <th>Máscara de subred</th>
+                <th>Hosts utilizables</th>
+                <th>Uso típico</th>
+                <th>Clase IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>/8</td><td>255.0.0.0</td><td>16.777.214</td><td>Grandes corporaciones, ISPs</td><td>A</td></tr>
+              <tr><td>/16</td><td>255.255.0.0</td><td>65.534</td><td>Empresas medianas, universidades</td><td>B</td></tr>
+              <tr><td>/24</td><td>255.255.255.0</td><td>254</td><td>Redes de oficina, domésticas</td><td>C</td></tr>
+              <tr><td>/25</td><td>255.255.255.128</td><td>126</td><td>Dos departamentos en una red C</td><td>C</td></tr>
+              <tr><td>/26</td><td>255.255.255.192</td><td>62</td><td>Cuatro grupos pequeños</td><td>C</td></tr>
+              <tr><td>/27</td><td>255.255.255.224</td><td>30</td><td>VLANs pequeñas, plantas de edificio</td><td>C</td></tr>
+              <tr><td>/30</td><td>255.255.255.252</td><td>2</td><td>Enlace punto a punto entre routers</td><td>C</td></tr>
+              <tr><td>/32</td><td>255.255.255.255</td><td>1 (host)</td><td>Rutas de host único, loopback</td><td>Host</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Sección 2: Casos de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <h3>🏠 Red doméstica con router</h3>
+            <p>Un router doméstico usa típicamente 192.168.1.0/24, proporcionando 254 IPs. Calcula las IPs disponibles y verifica que tu dispositivo está en la subred correcta.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🏢 Segmentación de VLANs empresariales</h3>
+            <p>Divide una red corporativa en VLANs por departamento: Ventas /26 (62 hosts), IT /27 (30 hosts), Dirección /28 (14 hosts). Optimiza el espacio de IPs disponible.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🔧 Configuración de ACLs en Cisco</h3>
+            <p>Las ACLs de IOS usan máscara wildcard (inversa de la subred). Calcula automáticamente la wildcard mask para configurar reglas de firewall en routers Cisco.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>☁️ Planificación de VPCs en cloud</h3>
+            <p>AWS VPC, Azure VNet y GCP VPC requieren definir rangos CIDR. Usa /16 para el VPC raíz y divide en /24 por zona de disponibilidad y servicio.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>🔍 Diagnóstico de conflictos de IP</h3>
+            <p>Verifica si dos IPs están en la misma subred comparando sus direcciones de red. Si comparten red y máscara, deben comunicarse sin router.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3>📚 Preparación para CCNA / Network+</h3>
+            <p>Las certificaciones de red (CCNA, CompTIA Network+) exigen dominar el subnetting. Practica calculando máscaras y rangos hasta automatizarlo mentalmente.</p>
+          </div>
+        </div>
+
+        {/* Sección 3: FAQ */}
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <h3>¿Por qué se restan 2 hosts al calcular IPs utilizables?</h3>
+            <p>Porque la primera dirección es la dirección de red (identifica la subred) y la última es el broadcast (para enviar a todos los hosts). Ninguna de las dos se asigna a dispositivos individuales.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué significa la notación CIDR como /24?</h3>
+            <p>CIDR indica cuántos bits de la izquierda son la parte de red. /24 significa 24 bits de red y 8 bits de host. Con 8 bits de host: 2⁸ = 256 direcciones (254 utilizables).</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Cuándo usar /31 en lugar de /30 para enlaces punto a punto?</h3>
+            <p>El RFC 3021 permite usar /31 en enlaces punto a punto, eliminando la necesidad de reservar broadcast y red. Ahorra 2 IPs por enlace, lo que es significativo en redes con muchos routers.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Cuáles son los rangos de IP privadas?</h3>
+            <p>RFC 1918 define tres rangos privados: 10.0.0.0/8 (Clase A, ~16M IPs), 172.16.0.0/12 (Clase B, ~1M IPs) y 192.168.0.0/16 (Clase C, 65.534 IPs). No se enrutan en Internet.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Para qué sirve la máscara wildcard?</h3>
+            <p>Es el complemento binario de la máscara de subred. Se usa en ACLs de Cisco IOS y OSPF para indicar qué bits deben coincidir. /24 (255.255.255.0) tiene wildcard 0.0.0.255.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué es la dirección broadcast y para qué sirve?</h3>
+            <p>Es la última IP de la subred. Un paquete enviado al broadcast llega a todos los hosts de la subred simultáneamente. Útil para descubrimiento de dispositivos (ARP, DHCP Discovery).</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Qué diferencia hay entre subred y VLAN?</h3>
+            <p>Una subred es un concepto de Capa 3 (IP). Una VLAN es un concepto de Capa 2 (Ethernet) que segmenta el tráfico en un switch. Normalmente cada VLAN tiene su propia subred IP asignada.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h3>¿Por qué IPv4 e IPv6 coexisten si IPv6 es superior?</h3>
+            <p>La transición lleva décadas por la enorme infraestructura IPv4 existente. Los dispositivos actuales implementan dual-stack (IPv4 + IPv6) hasta que IPv6 sea mayoritario, lo que puede tomar años más.</p>
+          </div>
+        </div>
+
+        {/* Sección 4: Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Determina cuántos hosts necesitas</h3>
+              <p>Cuenta los dispositivos que conectarás (PCs, servidores, impresoras, teléfonos IP) y añade un margen de crecimiento del 20-30%.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Elige el prefijo CIDR mínimo</h3>
+              <p>Selecciona el prefijo que cubra tus hosts: para 50 hosts necesitas /26 (62 hosts), para 100 necesitas /25 (126 hosts).</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Introduce la IP base</h3>
+              <p>Escribe la dirección IP base (ej: 192.168.10.0). Asegúrate de que sea una IP privada de los rangos RFC 1918 para redes internas.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Ajusta el slider CIDR</h3>
+              <p>Mueve el slider hasta el prefijo seleccionado. Observa cómo cambian en tiempo real la máscara, el rango de hosts y la dirección de broadcast.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <h3>Verifica el rango de hosts</h3>
+              <p>Confirma que el primer y último host cubren todos tus dispositivos. Recuerda que la primera IP suele asignarse al gateway (router).</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>6</div>
+            <div className={styles.stepContent}>
+              <h3>Anota dirección de red y broadcast</h3>
+              <p>Copia estos valores con el botón 📋. Los necesitarás para configurar el router, el servidor DHCP y las reglas de firewall.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>7</div>
+            <div className={styles.stepContent}>
+              <h3>Documenta la configuración</h3>
+              <p>Registra la subred, máscara, gateway y rango DHCP en un documento de red. Una buena documentación evita conflictos de IP futuros.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección 5: Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <h3>📏 Deja margen de hosts</h3>
+            <p>No uses el prefijo justo. Si necesitas 50 hosts, elige /26 (62) en lugar de /27 (30). Prever crecimiento evita reconfigurar la red en el futuro.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>📄 Documenta siempre</h3>
+            <p>Registra el propósito de cada subred: &quot;192.168.10.0/24 - Planta 1 - WiFi empleados&quot;. La documentación es esencial para el mantenimiento.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔒 Usa rangos privados internamente</h3>
+            <p>Utiliza siempre rangos RFC 1918 (10.x, 172.16-31.x, 192.168.x) en redes internas. Las IPs públicas son para interfaces externas de routers.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🌐 Reserva IPs para infraestructura</h3>
+            <p>Asigna las primeras IPs de cada subred a routers, switches y servidores. Usa DHCP solo para el rango restante para facilitar la gestión.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🔗 Usa /30 para enlaces entre routers</h3>
+            <p>Los enlaces WAN entre routers solo necesitan 2 IPs. Un /30 es suficiente y no desperdicia espacio. Considera /31 (RFC 3021) para ahorrar aún más.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <h3>🚀 Planifica pensando en el futuro</h3>
+            <p>Diseña el esquema de subredes con espacio para crecer. Usa un bloque padre grande (ej: 10.0.0.0/8) y subdivídelo en subredes más pequeñas según necesidad.</p>
+          </div>
+        </div>
+
+        {/* Sección 6: Warning Box */}
+        <div className={styles.warningBox}>
+          <h3>⚠️ Importante para entornos de producción</h3>
+          <ul className={styles.warningList}>
+            <li>Esta calculadora trabaja exclusivamente con IPv4 (32 bits). IPv6 usa un esquema diferente con 128 bits.</li>
+            <li>Para entornos de producción, valida siempre la configuración de red con un administrador de sistemas.</li>
+            <li>Los cambios en subredes activas pueden interrumpir el servicio. Planifica una ventana de mantenimiento.</li>
+            <li>En redes cloud (AWS, Azure, GCP), algunos rangos están reservados por el proveedor y no son utilizables.</li>
+          </ul>
+        </div>
+
+        {/* Contenido original */}
         <section className={styles.infoSection}>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
