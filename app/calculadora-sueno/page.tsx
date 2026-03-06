@@ -276,87 +276,118 @@ export default function CalculadoraSuenoPage() {
 
       <EducationalSection
         title="¿Quieres aprender más sobre el sueño?"
-        subtitle="Descubre la ciencia del sueño, cómo mejorar tu descanso y mitos comunes"
+        subtitle="Ciencia del sueño, perfiles, consejos prácticos y errores comunes"
+        defaultOpen={false}
       >
-        <section className={styles.guideSection}>
-          <h2>Conceptos Clave</h2>
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>🌙 Arquitectura del sueño</h4>
-              <p>
-                Un ciclo de sueño dura ~90 minutos y tiene 4 fases: N1 (adormecimiento),
-                N2 (sueño ligero), N3 (sueño profundo/reparador) y REM (sueños). Cada noche
-                completamos 4-6 ciclos, con más sueño profundo al inicio y más REM al final.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>⏰ Ritmo circadiano</h4>
-              <p>
-                Nuestro reloj biológico interno regula cuándo tenemos sueño. Se sincroniza
-                con la luz solar: la luz inhibe la melatonina (hormona del sueño). Por eso
-                las pantallas por la noche (luz azul) dificultan el sueño.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>😴 Deuda de sueño</h4>
-              <p>
-                Dormir menos de lo necesario acumula "deuda de sueño". No se recupera
-                completamente durmiendo más el fin de semana. La privación crónica afecta
-                la memoria, el sistema inmune, el metabolismo y el estado de ánimo.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>📊 Horas recomendadas por edad</h4>
-              <p>
-                Adultos (18-64): 7-9 horas. Adolescentes (14-17): 8-10 horas. Niños (6-13):
-                9-11 horas. Mayores (+65): 7-8 horas. La calidad es tan importante como la
-                cantidad: 7 horas de sueño profundo superan a 9 horas de sueño fragmentado.
-              </p>
-            </div>
+        <div className={styles.eduComparativa}>
+          <h2>Las fases del sueño: qué pasa mientras duermes</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr><th>Fase</th><th>Duración por ciclo</th><th>Qué ocurre</th><th>Función principal</th><th>Si se interrumpe</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>NREM 1 (adormecimiento)</td><td>1-7 min</td><td>Transición vigilia-sueño, ralentización cardíaca</td><td>Inicio del descanso</td><td>Te despiertas sin saber que dormías</td></tr>
+                <tr><td>NREM 2 (sueño ligero)</td><td>10-25 min</td><td>Husos de sueño, consolidación de memoria</td><td>Aprendizaje procedimental</td><td>Sensación de no haber descansado</td></tr>
+                <tr><td>NREM 3 (sueño profundo)</td><td>20-40 min</td><td>Ondas delta, reparación tisular, hormonas</td><td>Recuperación física</td><td>Confusión, somnolencia diurna severa</td></tr>
+                <tr><td>REM</td><td>10-60 min (aumenta con ciclos)</td><td>Movimientos oculares, sueños vívidos, parálisis muscular</td><td>Consolidación emocional y memoria</td><td>Irritabilidad, deterioro cognitivo</td></tr>
+                <tr><td>Ciclo completo</td><td>~90 min</td><td>Secuencia NREM1→2→3→REM repetida 4-6 veces</td><td>Restauración integral</td><td>Deuda de sueño acumulada</td></tr>
+                <tr><td>Sueño recomendado adultos</td><td>7-9 horas (4-6 ciclos)</td><td>Los primeros ciclos tienen más NREM3; los últimos más REM</td><td>Equilibrio físico-mental</td><td>Mayor riesgo cardiovascular y metabólico</td></tr>
+              </tbody>
+            </table>
           </div>
-        </section>
+        </div>
 
-        <section className={styles.guideSection}>
-          <h2>Preguntas Frecuentes</h2>
-          <div className={styles.faqGrid}>
-            <details className={styles.faqItem}>
-              <summary>¿Por qué me despierto cansado aunque duermo 8 horas?</summary>
-              <p>
-                Posibles causas: despertar a mitad de un ciclo (no al final), apnea del
-                sueño no diagnosticada, consumo de alcohol (fragmenta el sueño), estrés,
-                colchón inadecuado, temperatura de la habitación (ideal: 18-21°C), o
-                condiciones médicas. Si persiste, consulta a un especialista.
-              </p>
-            </details>
-            <details className={styles.faqItem}>
-              <summary>¿Es malo dormir la siesta?</summary>
-              <p>
-                Las siestas cortas (15-20 min) mejoran la alerta y el rendimiento. Siestas
-                largas (+30 min) pueden causar inercia del sueño (despertar aturdido) y
-                dificultar el sueño nocturno. Ideal: siesta antes de las 15:00 y máximo
-                20 minutos.
-              </p>
-            </details>
-            <details className={styles.faqItem}>
-              <summary>¿Es verdad que necesito menos sueño conforme envejezco?</summary>
-              <p>
-                No exactamente. Las necesidades de sueño no disminuyen mucho con la edad,
-                pero sí cambia la arquitectura del sueño: menos sueño profundo, despertares
-                más frecuentes. Los mayores a menudo duermen menos por la noche pero
-                compensan con siestas.
-              </p>
-            </details>
-            <details className={styles.faqItem}>
-              <summary>¿El ejercicio ayuda a dormir mejor?</summary>
-              <p>
-                Sí, el ejercicio regular mejora la calidad del sueño. Pero evita ejercicio
-                intenso 2-3 horas antes de acostarte: eleva la temperatura corporal y la
-                adrenalina. El ejercicio por la mañana o tarde temprana es ideal para
-                optimizar el sueño nocturno.
-              </p>
-            </details>
+        <div className={styles.eduEscenarios}>
+          <h2>Patrones de sueño según perfil y situación</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🎓</span><h3>Estudiante en época de exámenes</h3></div>
+              <p className={styles.escenarioExample}>Estudia hasta las 2h, despertador a las 7h. Solo 5h de sueño: pierde la mayor parte del REM (última parte de la noche), clave para consolidar lo aprendido. Contraproducente.</p>
+              <span className={styles.escenarioTip}>Dormir 7h consolida mejor que estudiar 2h más</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏋️</span><h3>Deportista de alto rendimiento</h3></div>
+              <p className={styles.escenarioExample}>Necesita 8-10h. En NREM 3 se libera hormona del crecimiento, clave para reparación muscular. Muchos atletas de élite añaden siesta de 20 min para recuperación sin entrar en sueño profundo.</p>
+              <span className={styles.escenarioTip}>La siesta de 20 min mejora rendimiento un 34%</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>👶</span><h3>Padre/madre con bebé</h3></div>
+              <p className={styles.escenarioExample}>Interrupciones cada 2-3h destruyen los ciclos. La fragmentación es más dañina que pocas horas seguidas. Estrategia: dormir en fases de 90 min mínimo cuando sea posible y compartir turnos.</p>
+              <span className={styles.escenarioTip}>90 min mínimos = un ciclo completo</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>✈️</span><h3>Viajero con jet lag</h3></div>
+              <p className={styles.escenarioExample}>Cambio de zona horaria desincroniza el ritmo circadiano. Hacia el este es más difícil (adelantar el sueño). Regla: 1 día de adaptación por cada hora de diferencia. Exposición a luz natural por la mañana acelera el ajuste.</p>
+              <span className={styles.escenarioTip}>Luz solar por la mañana = reset del ritmo</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>👴</span><h3>Persona mayor de 65 años</h3></div>
+              <p className={styles.escenarioExample}>Producción de melatonina disminuye. Los ciclos se acortan y hay más despertares nocturnos. Es normal adelantar el horario de sueño 1-2h. La calidad importa más que la cantidad (necesitan menos NREM 3).</p>
+              <span className={styles.escenarioTip}>7h de calidad &gt; 9h fragmentadas</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🌙</span><h3>Trabajador nocturno o en turnos</h3></div>
+              <p className={styles.escenarioExample}>Dormir de día reduce la calidad hasta un 30%: la luz y el ruido interrumpen el sueño profundo. Persianas blackout, tapones y temperatura fresca son esenciales. Los turnos rotativos son más perjudiciales que el nocturno fijo.</p>
+              <span className={styles.escenarioTip}>Turno fijo nocturno &gt; turnos rotativos</span>
+            </div>
           </div>
-        </section>
+        </div>
+
+        <div className={styles.eduFaq}>
+          <h2>Preguntas frecuentes sobre el sueño</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}><h4>¿Cuántas horas de sueño necesito realmente?</h4><p>Los adultos necesitan entre 7 y 9 horas (National Sleep Foundation). Menos de 6h de forma crónica aumenta el riesgo de obesidad, diabetes, enfermedades cardiovasculares y deterioro cognitivo. Solo un 3% de la población tiene mutación genética que les permite funcionar bien con 6h.</p></div>
+            <div className={styles.faqItem}><h4>¿Qué es un ciclo de sueño y por qué importa?</h4><p>Un ciclo dura ~90 minutos y pasa por NREM 1, 2, 3 y REM. Despertarse a mitad de ciclo (especialmente en NREM 3) produce la inercia del sueño: atontamiento y confusión. Programar el despertador en múltiplos de 90 min minimiza este efecto.</p></div>
+            <div className={styles.faqItem}><h4>¿La siesta es buena o mala?</h4><p>Una siesta de 10-20 min ("power nap") mejora el rendimiento cognitivo un 34% y el estado de alerta un 100% según la NASA. Más de 30 min puede provocar inercia del sueño y dificultar el sueño nocturno. Lo ideal: antes de las 15h para no alterar el ritmo circadiano.</p></div>
+            <div className={styles.faqItem}><h4>¿El alcohol ayuda a dormir?</h4><p>El alcohol ayuda a conciliar el sueño pero fragmenta la segunda mitad de la noche, especialmente la fase REM. Aunque te duermes más rápido, la calidad del sueño se reduce significativamente. Incluso una copa altera la arquitectura del sueño esa noche.</p></div>
+            <div className={styles.faqItem}><h4>¿A qué hora debería acostarme?</h4><p>Depende de tu cronotipo. Los "alondras" tienen pico de rendimiento por la mañana (acostarse 22-23h); los "búhos" funcionan mejor por la noche (acostarse 0-1h). Ignorar tu cronotipo crea "jet lag social" crónico. Lo más importante es ser consistente, incluyendo fines de semana.</p></div>
+            <div className={styles.faqItem}><h4>¿Por qué me despierto siempre a la misma hora?</h4><p>El ritmo circadiano es un reloj biológico de 24h controlado por la luz y el cortisol. Despertarse a la misma hora (incluso sin alarma) es señal de que tu ritmo está bien sincronizado. Si te despiertas muy temprano con ansiedad, puede indicar estrés crónico o depresión.</p></div>
+            <div className={styles.faqItem}><h4>¿Las pantallas afectan realmente al sueño?</h4><p>Sí. La luz azul de pantallas suprime la melatonina hasta 3 horas. Además, el contenido estimulante activa el sistema nervioso. La recomendación es evitar pantallas 1h antes de dormir. Modo nocturno/naranja reduce pero no elimina el efecto.</p></div>
+            <div className={styles.faqItem}><h4>¿Puedo recuperar el sueño perdido el fin de semana?</h4><p>Parcialmente. Se puede recuperar algo de la deuda de sueño aguda, pero el sueño crónico insuficiente tiene efectos metabólicos y cognitivos que no se revierten completamente. Además, "dormir de más" el fin de semana desincroniza el ritmo circadiano para el lunes (social jet lag).</p></div>
+          </div>
+        </div>
+
+        <div className={styles.eduGuia}>
+          <h2>Cómo mejorar tu sueño en 7 pasos</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>1</div><div className={styles.stepContent}><strong>Fija un horario consistente</strong><p>Acuéstate y levántate a la misma hora cada día, incluyendo fines de semana. Es el hábito más poderoso para sincronizar el ritmo circadiano. La variación de más de 1h entre días laborables y fin de semana ya produce "jet lag social".</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>2</div><div className={styles.stepContent}><strong>Crea una rutina de relajación 30-60 min antes</strong><p>Señala a tu cerebro que es hora de dormir: luz tenue, temperatura bajando (~18-20°C), actividades relajantes (lectura física, estiramientos suaves, meditación). Evita conversaciones estresantes o decisiones importantes.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>3</div><div className={styles.stepContent}><strong>Optimiza el entorno del dormitorio</strong><p>Oscuridad total (blackout), temperatura fresca (18-20°C), silencio o ruido blanco. El dormitorio debe asociarse solo con dormir y sexo — no con trabajo o pantallas. Hasta una pequeña luz LED altera la melatonina.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>4</div><div className={styles.stepContent}><strong>Controla la cafeína y el alcohol</strong><p>La cafeína tiene una vida media de 5-7 horas: un café a las 15h todavía tiene el 50% de efecto a las 20h. Último café antes de las 14h. El alcohol puede parecer que ayuda pero fragmenta el sueño en la segunda mitad de la noche.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>5</div><div className={styles.stepContent}><strong>Gestiona la exposición a la luz</strong><p>Luz brillante por la mañana (idealmente solar) activa el cortisol y fija el reloj biológico. Luz tenue por la tarde-noche permite que suba la melatonina. Gafas de luz azul o modo nocturno desde las 20h.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>6</div><div className={styles.stepContent}><strong>Haz ejercicio, pero no demasiado tarde</strong><p>El ejercicio regular mejora significativamente la calidad del sueño profundo. Sin embargo, ejercicio intenso menos de 3h antes de dormir puede retrasar el inicio del sueño por la activación simpática y el aumento de temperatura corporal.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>7</div><div className={styles.stepContent}><strong>Si no puedes dormir, levántate</strong><p>Quedarse en la cama despierto asocia el dormitorio con la vigilia (condicionamiento negativo). Si llevas más de 20 min sin dormir, levántate, haz algo tranquilo con luz tenue y vuelve cuando tengas sueño. La restricción de sueño es la base de la Terapia Cognitivo-Conductual para el insomnio (TCC-I).</p></div></div>
+          </div>
+        </div>
+
+        <div className={styles.eduTips}>
+          <h2>Hábitos de los que duermen bien</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🌡️</span><strong>Temperatura ideal: 18-20°C</strong><p>El cuerpo necesita bajar su temperatura central para iniciar el sueño. Una habitación fresca facilita este proceso de forma natural.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>⏰</span><strong>Despertador en múltiplo de 90 min</strong><p>Calcula desde tu hora de dormirte, no de acostarte. Despertarse al final de un ciclo reduce la inercia del sueño y la sensación de atontamiento.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>📵</span><strong>Sin pantallas 1h antes</strong><p>Sustituye por lectura física, podcast relajante o meditación. El cerebro no distingue entre contenido relajante e intenso en pantalla — la luz azul siempre suprime melatonina.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🧘</span><strong>Técnica 4-7-8 para conciliar</strong><p>Inhala 4 seg, retén 7 seg, exhala 8 seg. Activa el sistema parasimpático y reduce la frecuencia cardíaca, facilitando la transición al sueño.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>☀️</span><strong>Luz solar al despertar</strong><p>10-15 min de luz natural nada más levantarte sincroniza el ritmo circadiano, mejora el estado de ánimo y facilita dormir mejor esa noche.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>📓</span><strong>Escribe tus preocupaciones antes de dormir</strong><p>El "journaling" de 5 min — listar tareas pendientes y preocupaciones — descarga la mente y reduce la activación cognitiva que impide conciliar el sueño.</p></div>
+          </div>
+        </div>
+
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores que arruinan la calidad de tu sueño</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li>Compensar la falta de sueño solo el fin de semana — crea "jet lag social" y no repara el daño cognitivo acumulado</li>
+            <li>Tomar melatonina como somnífero (dosis altas) — la melatonina es un regulador de horario, no un inductor del sueño; dosis de 0.5-1mg son suficientes</li>
+            <li>Usar el móvil en la cama "solo un momento" — el scroll activa el sistema de recompensa dopaminérgico, incompatible con el sueño</li>
+            <li>Hacer ejercicio intenso menos de 3h antes de dormir — eleva la temperatura corporal y el cortisol justo cuando deberían bajar</li>
+            <li>Beber alcohol para "relajarse" antes de dormir — fragmenta la fase REM y empeora la calidad global del sueño esa noche</li>
+            <li>Quedarse en la cama dando vueltas durante horas — refuerza la asociación cama-ansiedad; es mejor levantarse</li>
+            <li>Ignorar el ronquido crónico o las apneas — la apnea del sueño no tratada causa hipertensión, deterioro cognitivo y aumenta el riesgo cardiovascular</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-sueno')} />

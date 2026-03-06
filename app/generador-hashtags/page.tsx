@@ -291,72 +291,117 @@ export default function GeneradorHashtagsPage() {
       {/* Contenido educativo */}
       <EducationalSection
         title="📚 Guía de Hashtags para Redes Sociales"
-        subtitle="Maximiza tu alcance con la estrategia correcta de hashtags"
+        subtitle="Estrategia por plataforma, casos de uso y errores a evitar"
+        defaultOpen={false}
       >
-        <div className={styles.educationalContent}>
-          <section className={styles.eduSection}>
-            <h2>¿Cuántos hashtags usar?</h2>
-            <div className={styles.platformGuide}>
-              <div className={styles.platformCard}>
-                <h4>📸 Instagram</h4>
-                <p><strong>Máximo:</strong> 30 hashtags</p>
-                <p><strong>Recomendado:</strong> 10-15 hashtags</p>
-                <p>Mezcla populares + nicho + específicos</p>
-              </div>
-              <div className={styles.platformCard}>
-                <h4>🎵 TikTok</h4>
-                <p><strong>Máximo:</strong> Sin límite estricto</p>
-                <p><strong>Recomendado:</strong> 3-5 hashtags</p>
-                <p>Usa trending + relevantes a tu contenido</p>
-              </div>
-              <div className={styles.platformCard}>
-                <h4>🐦 Twitter/X</h4>
-                <p><strong>Máximo:</strong> Límite de 280 caracteres</p>
-                <p><strong>Recomendado:</strong> 1-3 hashtags</p>
-                <p>Menos es más, solo los esenciales</p>
-              </div>
-              <div className={styles.platformCard}>
-                <h4>💼 LinkedIn</h4>
-                <p><strong>Máximo:</strong> 30 hashtags</p>
-                <p><strong>Recomendado:</strong> 3-5 hashtags</p>
-                <p>Profesionales y relevantes al sector</p>
-              </div>
-            </div>
-          </section>
+        <div className={styles.eduComparativa}>
+          <h2>Estrategia de hashtags por plataforma</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr><th>Plataforma</th><th>Cantidad óptima</th><th>Tamaño ideal</th><th>Dónde ponerlos</th><th>Estrategia recomendada</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Instagram</td><td>5–15 (máx. 30)</td><td>Mixto: nicho + medio + popular</td><td>Caption o primer comentario</td><td>3 grandes + 5 medianos + 7 nicho</td></tr>
+                <tr><td>TikTok</td><td>3–8</td><td>Trending + nicho específico</td><td>Caption (primeras palabras)</td><td>1–2 trending + 2–3 nicho + #FYP</td></tr>
+                <tr><td>Twitter / X</td><td>1–3</td><td>Cortos y precisos</td><td>Integrados en el texto</td><td>1 trending + 1 nicho temático</td></tr>
+                <tr><td>LinkedIn</td><td>3–7</td><td>Profesionales y específicos</td><td>Al final del post</td><td>Sector + habilidad + tendencia</td></tr>
+                <tr><td>YouTube</td><td>3–5 en descripción</td><td>Descriptivos y de búsqueda</td><td>Primeras líneas de descripción</td><td>Coinciden con keywords de SEO del video</td></tr>
+                <tr><td>Pinterest</td><td>2–5</td><td>Descriptivos, basados en búsqueda</td><td>Descripción del pin</td><td>Palabras clave de búsqueda, no trending</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-          <section className={styles.eduSection}>
-            <h2>Estrategia de hashtags efectiva</h2>
-            <ul className={styles.tipsList}>
-              <li><strong>Mezcla tamaños:</strong> Combina hashtags populares (+1M), medianos (10K-1M) y de nicho (-10K)</li>
-              <li><strong>Relevancia ante todo:</strong> Usa solo hashtags relacionados con tu contenido real</li>
-              <li><strong>Investiga la competencia:</strong> Mira qué hashtags usan cuentas similares exitosas</li>
-              <li><strong>Crea el tuyo:</strong> Un hashtag de marca único ayuda a construir comunidad</li>
-              <li><strong>Rota hashtags:</strong> No uses siempre los mismos, Instagram puede penalizarte</li>
-              <li><strong>Colócalos al final:</strong> Mejor en el primer comentario (Instagram) o al final del caption</li>
-            </ul>
-          </section>
-
-          <section className={styles.eduSection}>
-            <h2>Errores comunes a evitar</h2>
-            <div className={styles.errorsGrid}>
-              <div className={styles.errorCard}>
-                <span className={styles.errorIcon}>❌</span>
-                <p>Usar hashtags baneados por la plataforma</p>
-              </div>
-              <div className={styles.errorCard}>
-                <span className={styles.errorIcon}>❌</span>
-                <p>Hashtags irrelevantes solo por ser populares</p>
-              </div>
-              <div className={styles.errorCard}>
-                <span className={styles.errorIcon}>❌</span>
-                <p>Repetir exactamente los mismos en cada post</p>
-              </div>
-              <div className={styles.errorCard}>
-                <span className={styles.errorIcon}>❌</span>
-                <p>Usar solo hashtags muy competidos (+10M)</p>
-              </div>
+        <div className={styles.eduEscenarios}>
+          <h2>Estrategias reales por tipo de cuenta</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🍕</span><h3>Restaurante local</h3></div>
+              <p className={styles.escenarioExample}>Mezcla hashtags geolocalizados (#RestaurantesMadrid, #ComidaMadrid), de nicho (#PizzaArtesanal, #CocinaItaliana) y de descubrimiento (#FoodieSpain). Evita hashtags genéricos como #food (2B+ publicaciones = invisible).</p>
+              <span className={styles.escenarioTip}>Geolocalización + nicho = audiencia local cualificada</span>
             </div>
-          </section>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>💄</span><h3>Influencer de belleza</h3></div>
+              <p className={styles.escenarioExample}>Combina: 3 hashtags de marca propia (#[TuNombre]Beauty), 5 de nicho (#MaquillajeNatural, #SkincareEspaña), 4 de tendencia (#GRWM, #MakeupTutorial) y 2 de comunidad (#BeautyBloggerES). Rota semanalmente.</p>
+              <span className={styles.escenarioTip}>Rotación semanal evita penalización por spam</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏋️</span><h3>Entrenador personal</h3></div>
+              <p className={styles.escenarioExample}>Hashtags de servicio (#EntrenadorPersonalMadrid), de contenido (#EjerciciosEnCasa, #RutinaFuerza), de comunidad (#FitnessEspaña, #VidaSaludable) y trending de fitness. LinkedIn: #Fitness #Entrenamiento #BienestarLaboral.</p>
+              <span className={styles.escenarioTip}>Servicio + ubicación + contenido = captación local</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>💻</span><h3>Freelance / Desarrollador</h3></div>
+              <p className={styles.escenarioExample}>LinkedIn es la plataforma clave: #DesarrolloWeb, #JavaScript, #ReactJS, #Freelance, #TechSpain. Twitter/X: hashtags de comunidad (#100DaysOfCode, #DevTwitter). Instagram: menos relevante para B2B tech.</p>
+              <span className={styles.escenarioTip}>LinkedIn + Twitter = las plataformas para tech</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🎨</span><h3>Artista / Ilustrador</h3></div>
+              <p className={styles.escenarioExample}>Instagram es el escaparate clave. Mezcla: #IlustraciónEspañola, #ArteDigital, #IllustrationArt (inglés para alcance global), #ArtistOnInstagram, #DrawingOfTheDay. Pinterest: keywords de búsqueda visuales (#IlustracionDigital).</p>
+              <span className={styles.escenarioTip}>Incluye hashtags en inglés para alcance global</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏠</span><h3>Agencia inmobiliaria</h3></div>
+              <p className={styles.escenarioExample}>Geolocalización es esencial: #InmobiliariaBarcelona, #PisosEnVenta[Ciudad], #AlquilerMadrid. Contenido: #TipsInmobiliarios, #ComprarPiso, #InversionInmobiliaria. LinkedIn: #MercadoInmobiliario, #PropTech.</p>
+              <span className={styles.escenarioTip}>Sin geolocalización, el inmobiliario no funciona</span>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.eduFaq}>
+          <h2>Preguntas frecuentes sobre hashtags</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}><h4>¿Cuántos hashtags debo usar en Instagram?</h4><p>La recomendación actual de Instagram (2024) es usar entre 3 y 5 hashtags muy relevantes. Estudios internos de Instagram sugieren que más hashtags no implica más alcance. Sin embargo, muchas cuentas siguen obteniendo buenos resultados con 10–15. Prueba ambas estrategias con tu audiencia.</p></div>
+            <div className={styles.faqItem}><h4>¿Los hashtags funcionan en 2025?</h4><p>Sí, pero de forma diferente. Instagram y TikTok han evolucionado hacia algoritmos de recomendación por contenido (similar a YouTube). Los hashtags ayudan a categorizar el contenido para el algoritmo, pero el alcance depende más del engagement que del volumen de hashtags. Son una señal de contexto, no un motor de alcance.</p></div>
+            <div className={styles.faqItem}><h4>¿Debo poner los hashtags en el caption o en los comentarios?</h4><p>Ambas opciones funcionan igual en términos de alcance según Instagram. En el caption son inmediatos; en el primer comentario mantienen el caption más limpio. La elección es estética. En TikTok y LinkedIn, siempre en el caption.</p></div>
+            <div className={styles.faqItem}><h4>¿Qué es un hashtag shadowbanned?</h4><p>Algunos hashtags son penalizados por Instagram por haberse usado para contenido inapropiado. Los posts con estos hashtags no aparecen en la página de exploración del hashtag. Puedes verificarlo buscando el hashtag: si el tab &quot;recientes&quot; está oculto, está shadowbanned. Evita usarlos aunque parezcan inocuos.</p></div>
+            <div className={styles.faqItem}><h4>¿Hashtags en español o en inglés?</h4><p>Depende de tu audiencia objetivo. Si tu negocio es local (España/LATAM), prioriza español. Si quieres alcance internacional o vendes digitalmente, mezcla ambos. Muchos nichos (fitness, moda, arte) tienen comunidades más grandes en inglés aunque tu audiencia sea hispanohablante.</p></div>
+            <div className={styles.faqItem}><h4>¿Debo crear un hashtag de marca propio?</h4><p>Sí, si tienes una comunidad o campaña. Un hashtag de marca (#[TuNegocio] o #[TuCampaña]) permite agrupar contenido generado por usuarios (UGC), hacer seguimiento de menciones y construir comunidad. Empieza a usarlo desde el primer post y anima a tu audiencia a adoptarlo.</p></div>
+            <div className={styles.faqItem}><h4>¿Roto o siempre los mismos hashtags?</h4><p>Rotar es mejor. Usar siempre exactamente los mismos hashtags puede ser interpretado como comportamiento spam por los algoritmos. Crea 3–5 grupos de hashtags diferentes y rótarlos. Así también puedes medir qué grupos tienen mejor rendimiento para tu cuenta.</p></div>
+            <div className={styles.faqItem}><h4>¿Cómo mido si mis hashtags funcionan?</h4><p>En Instagram: Insights del post → impresiones desde hashtags. Si los hashtags aportan menos del 5% de las impresiones, están sobredimensionados. En TikTok: Analytics de video → fuentes de tráfico. Experimenta cambiando hashtags y compara el alcance entre publicaciones similares.</p></div>
+          </div>
+        </div>
+
+        <div className={styles.eduGuia}>
+          <h2>Cómo crear tu estrategia de hashtags en 7 pasos</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>1</div><div className={styles.stepContent}><strong>Define tu nicho y audiencia objetivo</strong><p>Antes de buscar hashtags, define: ¿a quién le hablas? ¿Qué problema resuelves? Los hashtags deben conectar tu contenido con personas que buscan exactamente lo que ofreces, no con el mayor número posible de personas.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>2</div><div className={styles.stepContent}><strong>Investiga los hashtags de tu competencia</strong><p>Analiza las 5–10 cuentas más exitosas de tu nicho. ¿Qué hashtags usan en sus posts con más engagement? Ese es tu punto de partida. No copies exactamente — adapta a tu especificidad y audiencia local.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>3</div><div className={styles.stepContent}><strong>Clasifica por tamaño de audiencia</strong><p>Divide en tres grupos: grandes (&gt;1M posts) para visibilidad, medianos (100K–1M) para competencia media, pequeños/nicho (&lt;100K) donde puedes destacar más fácilmente. Una buena estrategia mezcla los tres niveles.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>4</div><div className={styles.stepContent}><strong>Crea entre 3 y 5 grupos de hashtags</strong><p>Agrupa hashtags por temática o tipo de contenido. Grupo A para contenido educativo, Grupo B para detrás de cámaras, Grupo C para productos, etc. Rota entre grupos para evitar penalización por spam.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>5</div><div className={styles.stepContent}><strong>Verifica que no estén shadowbanned</strong><p>Busca cada hashtag en la app. Si el tab &quot;recientes&quot; no aparece o muestra muy pocas publicaciones recientes, el hashtag puede estar penalizado. Elimínalo de tu lista antes de usarlo.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>6</div><div className={styles.stepContent}><strong>Publica y mide durante 30 días</strong><p>Usa los mismos grupos de forma consistente durante un mes. Registra las impresiones por hashtag en cada post. Al mes, identifica qué grupos traen más alcance y cuáles no aportan nada.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>7</div><div className={styles.stepContent}><strong>Optimiza y actualiza trimestralmente</strong><p>Los hashtags trending cambian. Lo que funcionaba hace 6 meses puede estar saturado hoy. Revisa y actualiza tu lista cada 3 meses, incorporando nuevos hashtags emergentes en tu nicho y retirando los que han perdido efectividad.</p></div></div>
+          </div>
+        </div>
+
+        <div className={styles.eduTips}>
+          <h2>Trucos para hashtags más efectivos</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🎯</span><strong>Relevancia &gt; volumen</strong><p>Un hashtag de nicho con 50K publicaciones donde puedes aparecer en &quot;recientes&quot; es más valioso que uno con 50M donde te pierdes en segundos.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>📍</span><strong>Geolocaliza siempre si eres local</strong><p>Para negocios locales (restaurantes, clínicas, tiendas), los hashtags geolocalizados (#[Servicio][Ciudad]) atraen audiencia que puede convertirse en cliente real.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🔄</span><strong>Rota tus grupos</strong><p>Guarda 3–5 grupos de hashtags en notas. Alterna entre ellos en cada publicación. Evita usar exactamente los mismos hashtags en todos los posts.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>📊</span><strong>Mide siempre</strong><p>Activa los insights de cada post a las 48h. Si los hashtags aportan menos del 10% de las impresiones, necesitas cambiar de estrategia.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🌍</span><strong>Mezcla idiomas según objetivo</strong><p>Español para audiencia local, inglés para alcance global. En nichos como tecnología, moda o arte, los hashtags en inglés tienen comunidades mucho más grandes.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🏷️</span><strong>Crea tu hashtag de marca</strong><p>Desde el primer post, usa un hashtag propio único (#MiMarca o #MiCampaña). Facilita encontrar UGC, agrupar contenido y construir comunidad propia.</p></div>
+          </div>
+        </div>
+
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores que reducen el alcance de tus hashtags</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li>Usar siempre los mismos 30 hashtags en cada post — puede interpretarse como spam y reduce el alcance orgánico</li>
+            <li>Elegir solo hashtags masivos (#love, #photo, #food) — tienen millones de publicaciones y tu contenido desaparece en segundos</li>
+            <li>No verificar si el hashtag está shadowbanned — un hashtag penalizado oculta tu post en la página de exploración</li>
+            <li>Ignorar la relevancia del hashtag para el contenido — Instagram penaliza cuando el contexto del post no coincide con los hashtags usados</li>
+            <li>No usar hashtags geolocalizados en negocios locales — es la forma más directa de llegar a clientes potenciales de tu zona</li>
+            <li>Copiar exactamente los hashtags de la competencia sin adaptar — lo que funciona para una cuenta con 100K seguidores no funciona igual para una con 1K</li>
+            <li>No medir el rendimiento de los hashtags — sin datos, es imposible saber si tu estrategia funciona o necesita ajustes</li>
+          </ul>
         </div>
       </EducationalSection>
 

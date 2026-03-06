@@ -541,57 +541,124 @@ export default function CalculadoraRentabilidadAlquilerPage() {
       {/* CONTENIDO EDUCATIVO */}
       <EducationalSection
         title="📚 Guía: Invertir en inmobiliario para alquilar"
-        subtitle="Conceptos clave antes de tomar una decisión"
+        subtitle="Métricas, ejemplos reales, errores frecuentes y pasos para evaluar una inversión"
+        defaultOpen={false}
       >
-        <section>
-          <h2>¿Qué es la rentabilidad bruta del alquiler?</h2>
-          <p>
-            La <strong>rentabilidad bruta</strong> es el cociente entre los ingresos anuales por alquiler y el precio total de compra del inmueble. Es una métrica rápida pero incompleta, ya que no considera ningún gasto.
-          </p>
-          <p>
-            <strong>Fórmula:</strong> Rentabilidad bruta = (Alquiler mensual × 12) / Precio de compra × 100
-          </p>
-          <p>
-            En España, la rentabilidad bruta media del alquiler oscila entre el <strong>4% y el 8%</strong>, dependiendo de la ciudad y zona.
-          </p>
+        {/* 1. TABLA COMPARATIVA */}
+        <div className={styles.eduComparativa}>
+          <h2>Métricas de rentabilidad en alquiler: ¿cuál usar?</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr><th>Métrica</th><th>Qué mide</th><th>Fórmula</th><th>Ventaja</th><th>Limitación</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Rentabilidad bruta</td><td>Ingresos anuales / precio compra</td><td>(Alquiler × 12) / Precio × 100</td><td>Rápida de calcular</td><td>Ignora todos los gastos</td></tr>
+                <tr><td>Rentabilidad neta</td><td>Ingresos tras gastos operativos</td><td>(Alquiler − Gastos) × 12 / Precio × 100</td><td>Más realista que la bruta</td><td>No incluye financiación</td></tr>
+                <tr><td>Rentabilidad neta-neta</td><td>Incluye vacíos e impagos</td><td>Neta × factor de ocupación real</td><td>La más conservadora y fiable</td><td>Requiere datos históricos</td></tr>
+                <tr><td>Cap Rate</td><td>Rendimiento sin apalancamiento</td><td>NOI / Valor de mercado × 100</td><td>Estándar internacional</td><td>Ignora financiación e impuestos</td></tr>
+                <tr><td>Cash-on-Cash</td><td>Retorno sobre capital propio</td><td>Flujo caja anual / Capital aportado × 100</td><td>Ideal con hipoteca</td><td>No compara propiedades distintas</td></tr>
+                <tr><td>ROE (Return on Equity)</td><td>Ganancia sobre fondos propios</td><td>(Beneficio + Plusvalía) / Equity × 100</td><td>Visión total de la inversión</td><td>Complejo de calcular con precisión</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-          <h2>¿Qué es la rentabilidad neta?</h2>
-          <p>
-            La <strong>rentabilidad neta</strong> descuenta todos los gastos anuales (IBI, comunidad, seguro, reparaciones, hipoteca) de los ingresos. Es el indicador más realista de la inversión.
-          </p>
-          <p>
-            Una rentabilidad neta del <strong>4-5%</strong> se considera razonable en el mercado español actual. Por encima del 7% es excelente.
-          </p>
+        {/* 2. ESCENARIOS */}
+        <div className={styles.eduEscenarios}>
+          <h2>Ejemplos reales por perfil de inversor</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏙️</span><h3>Piso en Madrid al contado</h3></div>
+              <p className={styles.escenarioExample}>Compra 280.000 € · Alquiler 1.200 €/mes · Gastos 250 €/mes. Rentabilidad bruta: 5,14%. Neta: 4,07%. Cap rate: 4,07%.</p>
+              <span className={styles.escenarioTip}>Zona prime = menor rentabilidad, menor riesgo</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏡</span><h3>Piso en ciudad media con hipoteca</h3></div>
+              <p className={styles.escenarioExample}>Compra 120.000 € · 30% entrada · Hipoteca 500 €/mes · Alquiler 700 €/mes. Cash-on-cash sobre 36.000 € invertidos: 6,7%.</p>
+              <span className={styles.escenarioTip}>Apalancamiento mejora el cash-on-cash</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🎓</span><h3>Piso de estudiantes por habitaciones</h3></div>
+              <p className={styles.escenarioExample}>Compra 95.000 € · 3 habitaciones a 350 €/mes. Ingresos 1.050 €/mes vs 650 € en alquiler convencional. Rentabilidad bruta: 13,3%.</p>
+              <span className={styles.escenarioTip}>Mayor rentabilidad, mayor gestión</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏖️</span><h3>Alquiler vacacional (Airbnb)</h3></div>
+              <p className={styles.escenarioExample}>Compra 200.000 € · 120 noches/año a 90 €. Ingresos 10.800 €/año. Rentabilidad bruta: 5,4% pero con alta estacionalidad y gestión intensiva.</p>
+              <span className={styles.escenarioTip}>Compara siempre con alquiler tradicional</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🔨</span><h3>Compra para reformar y alquilar</h3></div>
+              <p className={styles.escenarioExample}>Precio 80.000 € + reforma 25.000 € = coste total 105.000 €. Alquiler 750 €/mes. Rentabilidad bruta real: 8,6% (muy superior a compra sin reforma).</p>
+              <span className={styles.escenarioTip}>La reforma bien ejecutada multiplica la rentabilidad</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏢</span><h3>Local comercial en zona céntrica</h3></div>
+              <p className={styles.escenarioExample}>Compra 150.000 € · Alquiler 900 €/mes. Rentabilidad bruta: 7,2%. Mayor que residencial pero con vacíos más largos y menor protección legal.</p>
+              <span className={styles.escenarioTip}>Mayor rendimiento, mayor riesgo de vacío</span>
+            </div>
+          </div>
+        </div>
 
-          <h2>¿Qué es el cash flow en una inversión inmobiliaria?</h2>
-          <p>
-            El <strong>cash flow mensual</strong> es la diferencia entre lo que cobras de alquiler y lo que pagas en gastos (incluida la cuota de hipoteca si la tienes). Es el dinero real que entra en tu bolsillo cada mes.
-          </p>
-          <p>
-            Un cash flow negativo significa que la propiedad te cuesta dinero mes a mes. Solo tiene sentido aceptarlo si la revalorización del inmueble compensa esas pérdidas.
-          </p>
+        {/* 3. FAQ */}
+        <div className={styles.eduFaq}>
+          <h2>Preguntas frecuentes sobre rentabilidad del alquiler</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}><h4>¿Qué rentabilidad mínima es aceptable en un alquiler?</h4><p>En España, una rentabilidad bruta por encima del 5-6% se considera interesante. Neta superior al 4% ya es competitiva frente a otras inversiones de bajo riesgo. En capitales como Madrid o Barcelona, el 3-4% neto es habitual por la presión del precio.</p></div>
+            <div className={styles.faqItem}><h4>¿Debo comparar la rentabilidad con la bolsa o los depósitos?</h4><p>Sí. La referencia más usada es el bono español a 10 años (~3-3,5% en 2025). Si tu alquiler neto supera eso con menor volatilidad, la inversión tiene sentido. La bolsa históricamente ofrece un 7-8% anual medio, pero con mucha más volatilidad.</p></div>
+            <div className={styles.faqItem}><h4>¿Qué gastos debo incluir en el cálculo?</h4><p>IBI, comunidad de propietarios, seguro del hogar, seguro de impago, tasa de basuras, reparaciones estimadas (1-2% del valor anual), gestoría, periodos de vacío y posible hipoteca. Ignorar cualquiera de estos distorsiona el resultado.</p></div>
+            <div className={styles.faqItem}><h4>¿Cómo afecta la hipoteca a la rentabilidad?</h4><p>Con hipoteca, la métrica relevante es el cash-on-cash return: flujo de caja anual (alquiler − gastos − cuota hipoteca) dividido entre el capital propio aportado. Si el diferencial entre alquiler y cuota es positivo, el apalancamiento amplifica la rentabilidad sobre tu inversión real.</p></div>
+            <div className={styles.faqItem}><h4>¿Debo incluir la revalorización del piso en la rentabilidad?</h4><p>Puedes calcular la rentabilidad total (alquiler + plusvalía estimada), pero es especulativa. La rentabilidad por alquiler puro es más objetiva y útil para comparar inversiones. La plusvalía solo se materializa al vender y tributa en IRPF como ganancia patrimonial.</p></div>
+            <div className={styles.faqItem}><h4>¿Cómo tributa el alquiler en el IRPF?</h4><p>Los rendimientos del alquiler habitual se integran en la base general del IRPF. Puedes deducir todos los gastos necesarios (hipoteca, IBI, reparaciones, comunidad, seguros). El rendimiento neto reducido tiene una reducción del 50% si el inquilino usa el piso como vivienda habitual (60% en contratos anteriores a 2023).</p></div>
+            <div className={styles.faqItem}><h4>¿Qué porcentaje de vacío debo asumir?</h4><p>En una previsión conservadora, asume 1 mes de vacío al año (8,3% de vacío). En zonas con alta demanda puede ser menor; en zonas con menor demanda o alquiler vacacional, puede ser del 20-30%. El vacío es el factor que más diferencia la rentabilidad bruta de la neta real.</p></div>
+            <div className={styles.faqItem}><h4>¿Es mejor comprar para alquilar o invertir en REITs/SOCIMIs?</h4><p>Las SOCIMIs (cotizadas en bolsa) ofrecen liquidez inmediata, diversificación y gestión profesional, pero pierdes el control y el apalancamiento directo. La compra directa permite mayor personalización, apalancamiento bancario y deducciones fiscales, pero requiere gestión activa y es ilíquida. Son complementarias.</p></div>
+          </div>
+        </div>
 
-          <h2>¿Qué gastos suele tener un propietario?</h2>
-          <ul>
-            <li><strong>IBI</strong>: Impuesto sobre Bienes Inmuebles. Varía por municipio y valor catastral. Suele ser entre 200€ y 800€ al año.</li>
-            <li><strong>Comunidad de propietarios</strong>: Gastos comunes del edificio. Entre 600€ y 2.400€ al año según el edificio.</li>
-            <li><strong>Seguro de hogar</strong>: Obligatorio si hay hipoteca. Entre 200€ y 500€ al año.</li>
-            <li><strong>Reparaciones y mantenimiento</strong>: Electrodomésticos, fontanería, pintura. Estima entre el 0,5% y 1% del valor del inmueble al año.</li>
-            <li><strong>Tasa de ocupación</strong>: Los periodos sin inquilino (cambio de arrendatario, obras) reducen los ingresos efectivos. El 90-95% es razonable para zonas con alta demanda.</li>
+        {/* 4. GUÍA PASO A PASO */}
+        <div className={styles.eduGuia}>
+          <h2>Cómo evaluar una inversión en alquiler en 7 pasos</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>1</div><div className={styles.stepContent}><strong>Calcula el precio de compra total</strong><p>Suma precio escritura + ITP o IVA (según si es segunda mano o nueva) + notaría + registro + gestoría. En segunda mano, añade un 10-12% al precio de compra como coste real de adquisición.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>2</div><div className={styles.stepContent}><strong>Estima el alquiler de mercado realista</strong><p>Consulta Idealista, Fotocasa y portales locales para pisos similares en la misma zona. Usa el percentil 50 (mediana), no el máximo. Descuenta un 5% para ser conservador.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>3</div><div className={styles.stepContent}><strong>Lista todos los gastos anuales</strong><p>IBI + comunidad + seguro hogar + seguro impago (~3,5% del alquiler anual) + reparaciones estimadas (1% del valor) + vacío estimado (1 mes). Suma todo antes de calcular.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>4</div><div className={styles.stepContent}><strong>Calcula las tres rentabilidades</strong><p>Bruta = (alquiler × 12) / precio. Neta = (alquiler − gastos mensuales) × 12 / precio. Neta-neta = neta ajustada por el factor de ocupación real (ej: 11 meses/12).</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>5</div><div className={styles.stepContent}><strong>Analiza el flujo de caja mensual</strong><p>Alquiler − cuota hipoteca − gastos mensuales = flujo de caja. Si es negativo, el piso te cuesta dinero cada mes aunque haya revalorización. El flujo positivo indica independencia financiera progresiva.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>6</div><div className={styles.stepContent}><strong>Compara con alternativas de inversión</strong><p>Bono español a 10 años, depósitos bancarios, fondos indexados. Si tu rentabilidad neta no supera claramente el bono más un margen por iliquidez y gestión, reconsidera la operación.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>7</div><div className={styles.stepContent}><strong>Evalúa el riesgo y la zona</strong><p>Demanda de alquiler, evolución de precios histórica, perfil socioeconómico de la zona, proyectos urbanísticos cercanos y regulación local de alquiler. Una zona en declive demográfico puede destruir la rentabilidad en 5 años.</p></div></div>
+          </div>
+        </div>
+
+        {/* 5. TIPS */}
+        <div className={styles.eduTips}>
+          <h2>Claves para maximizar la rentabilidad</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>📍</span><strong>La zona lo es todo</strong><p>Una propiedad mediocre en zona prime siempre supera a una excelente en zona deprimida. Prioriza demanda de alquiler sobre precio bajo.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🔒</span><strong>Contrata seguro de impago</strong><p>Cuesta un 3-5% del alquiler anual y cubre 12 meses de impago + defensa jurídica. El coste vs el riesgo hace que sea casi obligatorio.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🧾</span><strong>Declara todo correctamente</strong><p>Las deducciones legales (gastos, amortización del inmueble) pueden reducir tu carga fiscal significativamente. Un gestor especializado en IRPF inmobiliario se amortiza en el primer año.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🔧</span><strong>Provisiona para reparaciones</strong><p>Reserva el 1% del valor del piso al año para mantenimiento. Un propietario que no provisiona sufre sorpresas que destrozan la rentabilidad de varios años.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>📊</span><strong>Revisa la renta cada año</strong><p>Actualiza según IPC o el índice pactado en el contrato. No actualizar durante años crea una brecha que luego es difícil de recuperar con el mismo inquilino.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🤝</span><strong>Selección de inquilino rigurosa</strong><p>Solicita 3 últimas nóminas, contrato laboral y referencias. Un buen inquilino durante 5 años vale más que una renta 10% más alta con moroso.</p></div>
+          </div>
+        </div>
+
+        {/* 6. WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores que destruyen la rentabilidad del alquiler</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li>Calcular solo la rentabilidad bruta e ignorar los gastos reales — puede multiplicar por 2 la percepción de beneficio</li>
+            <li>No incluir los gastos de compra (ITP, notaría, registro) en el precio total de inversión — infla artificialmente la rentabilidad</li>
+            <li>Asumir ocupación del 100% sin provisionar vacíos ni impagos — una sola mensualidad perdida destruye meses de margen</li>
+            <li>No actualizar la renta anualmente según IPC — en 5 años puedes cobrar un 15-20% menos que el mercado</li>
+            <li>Ignorar la fiscalidad — sin optimizar las deducciones, pagas más IRPF del necesario</li>
+            <li>Comparar solo con depósitos bancarios en lugar de con el conjunto del mercado de inversión alternativo</li>
+            <li>Comprar en zona con sobreoferta de alquiler o declive demográfico por el precio bajo — el precio bajo suele tener un motivo</li>
           </ul>
-
-          <h2>Gastos de compra en España</h2>
-          <p>
-            Al adquirir un inmueble en España hay que sumar entre el <strong>8% y el 15%</strong> del precio de compra en gastos:
-          </p>
-          <ul>
-            <li><strong>ITP (Impuesto de Transmisiones Patrimoniales)</strong>: Entre el 6% y el 10% según la comunidad autónoma (inmueble de segunda mano).</li>
-            <li><strong>IVA + AJD</strong>: 10% IVA + 1-1,5% AJD para obra nueva.</li>
-            <li><strong>Notaría</strong>: 0,1% - 0,5% del precio de escritura.</li>
-            <li><strong>Registro de la propiedad</strong>: 0,05% - 0,3%.</li>
-            <li><strong>Gestoría</strong>: 300€ - 600€ generalmente.</li>
-          </ul>
-        </section>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-rentabilidad-alquiler')} />

@@ -315,86 +315,118 @@ export default function CalculadoraHidratacionPage() {
 
       <EducationalSection
         title="¿Quieres aprender más sobre hidratación?"
-        subtitle="Descubre la ciencia detrás de la hidratación, señales de deshidratación y mitos comunes"
+        subtitle="Tablas comparativas, casos reales, preguntas frecuentes y guía paso a paso para hidratarte correctamente"
+        defaultOpen={false}
       >
-        <section className={styles.guideSection}>
-          <h2>Conceptos Clave</h2>
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>💧 ¿Por qué 35 ml/kg?</h4>
-              <p>
-                Esta fórmula está respaldada por investigaciones científicas como punto de
-                partida. La EFSA (Autoridad Europea de Seguridad Alimentaria) recomienda
-                2,5 L/día para hombres y 2 L/día para mujeres, incluyendo agua de alimentos.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>🚰 Agua de los alimentos</h4>
-              <p>
-                Aproximadamente el 20% del agua diaria proviene de alimentos. Frutas como
-                sandía (92%), melón (90%), naranja (87%) y verduras como pepino (96%),
-                lechuga (95%) y tomate (94%) contribuyen significativamente.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>⚠️ Señales de deshidratación</h4>
-              <p>
-                Orina oscura (debe ser amarillo pálido), sed intensa, dolor de cabeza,
-                fatiga, mareos, piel seca. La sed aparece cuando ya hay un 1-2% de
-                deshidratación, por lo que es mejor beber antes de sentirla.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>🏃 Hidratación durante ejercicio</h4>
-              <p>
-                Durante el ejercicio intenso se pueden perder 0,5-2 L/hora de sudor.
-                Recomendación: 150-250 ml cada 15-20 minutos. Para ejercicios de más de
-                1 hora, añadir electrolitos (sodio, potasio).
-              </p>
-            </div>
+        <div className={styles.eduComparativa}>
+          <h2>Necesidades de hidratación según actividad y condición</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr><th>Perfil</th><th>Agua base (L/día)</th><th>Extra actividad</th><th>Extra calor/humedad</th><th>Señal de alerta</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Adulto sedentario</td><td>2,0–2,5 L</td><td>—</td><td>+0,5 L por cada 10°C extra</td><td>Orina oscura (amarillo intenso)</td></tr>
+                <tr><td>Deportista moderado (1h/día)</td><td>2,5–3,0 L</td><td>+0,5–0,75 L por hora</td><td>+0,5–1 L adicional</td><td>Pérdida de más del 2% peso corporal</td></tr>
+                <tr><td>Deportista de alto rendimiento</td><td>3,0–4,0 L</td><td>+1–1,5 L por hora intensa</td><td>+1–2 L adicional</td><td>Calambres, mareo, bajada de rendimiento</td></tr>
+                <tr><td>Embarazada</td><td>2,3–3,0 L</td><td>+0,3 L extra base</td><td>+0,5 L</td><td>Orina concentrada, edemas en piernas</td></tr>
+                <tr><td>Persona mayor +65</td><td>1,8–2,5 L</td><td>+0,3 L por actividad moderada</td><td>Alto riesgo: +0,5 L mínimo</td><td>Confusión, sequedad de boca intensa</td></tr>
+                <tr><td>Trabajador en calor extremo</td><td>3,0–4,0 L</td><td>+1–2 L por turno</td><td>Reposición cada 15–20 min</td><td>Golpe de calor: emergencia médica</td></tr>
+              </tbody>
+            </table>
           </div>
-        </section>
+        </div>
 
-        <section className={styles.guideSection}>
-          <h2>Preguntas Frecuentes</h2>
-          <div className={styles.faqGrid}>
-            <details className={styles.faqItem}>
-              <summary>¿Es verdad que hay que beber 8 vasos de agua al día?</summary>
-              <p>
-                El mito de los "8 vasos" no tiene base científica sólida. Las necesidades
-                varían según peso, actividad, clima y dieta. La regla de 35 ml/kg es más
-                personalizada. Una persona de 60 kg necesita ~2,1 L, mientras que una de
-                80 kg necesita ~2,8 L.
-              </p>
-            </details>
-            <details className={styles.faqItem}>
-              <summary>¿El café y té deshidratan?</summary>
-              <p>
-                Mito parcial. Aunque la cafeína tiene efecto diurético leve, el agua que
-                contienen estas bebidas compensa con creces. Cantidades moderadas (3-4
-                tazas/día) no causan deshidratación neta y cuentan para la ingesta diaria.
-              </p>
-            </details>
-            <details className={styles.faqItem}>
-              <summary>¿Puedo beber demasiada agua?</summary>
-              <p>
-                Sí, se llama hiponatremia (niveles bajos de sodio en sangre). Ocurre
-                raramente en atletas de resistencia que beben en exceso sin reponer
-                electrolitos. Para la mayoría, es difícil excederse. Síntomas: náuseas,
-                confusión, en casos graves puede ser peligroso.
-              </p>
-            </details>
-            <details className={styles.faqItem}>
-              <summary>¿Es mejor agua fría o a temperatura ambiente?</summary>
-              <p>
-                Para hidratación general, la temperatura es preferencia personal. El agua
-                fría se absorbe ligeramente más rápido y puede ser más refrescante durante
-                el ejercicio. El agua a temperatura ambiente es mejor tolerada por personas
-                con estómagos sensibles.
-              </p>
-            </details>
+        <div className={styles.eduEscenarios}>
+          <h2>Casos reales de hidratación</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏃</span><h3>Corredor de maratón</h3></div>
+              <p className={styles.escenarioExample}>En una maratón se pierden 1–2 L/hora por sudor. Beber solo agua puede provocar hiponatremia (sodio bajo). Lo correcto: bebidas isotónicas + agua, 150–200 ml cada 20 min.</p>
+              <span className={styles.escenarioTip}>Demasiada agua sin sales = hiponatremia</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>💼</span><h3>Oficinista con AC</h3></div>
+              <p className={styles.escenarioExample}>El aire acondicionado reseca el ambiente y aumenta la pérdida insensible de agua. Muchos no sienten sed porque están en ambiente frío. Resultado: deshidratación crónica leve que reduce concentración y energía.</p>
+              <span className={styles.escenarioTip}>Pon un vaso de agua en tu escritorio, visible</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>👵</span><h3>Anciano en verano</h3></div>
+              <p className={styles.escenarioExample}>La percepción de sed disminuye con la edad. Los mayores pueden estar significativamente deshidratados sin sentir sed. Con calor extremo, el riesgo de golpe de calor es muy alto. Hidratación proactiva, no reactiva.</p>
+              <span className={styles.escenarioTip}>Beber aunque no tengan sed: vital en verano</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🤒</span><h3>Persona con fiebre o diarrea</h3></div>
+              <p className={styles.escenarioExample}>Fiebre de 38°C aumenta las pérdidas en ~0,5 L/día. La diarrea puede causar deshidratación aguda en horas. Solución de rehidratación oral (agua + sal + azúcar) es más efectiva que agua sola en estos casos.</p>
+              <span className={styles.escenarioTip}>Suero oral &gt; agua sola en enfermedad</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🤰</span><h3>Embarazada en tercer trimestre</h3></div>
+              <p className={styles.escenarioExample}>El volumen sanguíneo aumenta un 50% durante el embarazo. La deshidratación puede provocar contracciones prematuras. Necesidad mínima: 2,3 L/día de todas las fuentes, más en calor o actividad física.</p>
+              <span className={styles.escenarioTip}>La deshidratación puede provocar contracciones</span>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏗️</span><h3>Trabajador en obra en verano</h3></div>
+              <p className={styles.escenarioExample}>Con 35°C y trabajo físico intenso, las pérdidas pueden superar 2 L/hora. El protocolo de prevención: 250 ml cada 15–20 min, no esperar a tener sed, reponer electrolitos, pausas en la sombra.</p>
+              <span className={styles.escenarioTip}>250 ml cada 20 min en calor extremo</span>
+            </div>
           </div>
-        </section>
+        </div>
+
+        <div className={styles.eduFaq}>
+          <h2>Preguntas frecuentes sobre hidratación</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}><h4>¿El café y el té deshidratan?</h4><p>Mito desmentido. Aunque la cafeína tiene efecto diurético leve, el agua que contienen el café y el té compensa con creces. Contribuyen positivamente a la hidratación diaria. Solo dosis muy altas de cafeína (&gt;500 mg/día) tienen efecto neto deshidratante.</p></div>
+            <div className={styles.faqItem}><h4>¿Cuánta agua debo beber exactamente?</h4><p>La recomendación de "8 vasos al día" es un mito simplificado. Las necesidades varían según peso corporal, actividad, clima y dieta. Una guía práctica: 35 ml/kg de peso corporal. Además, el 20–30% de la hidratación proviene de los alimentos.</p></div>
+            <div className={styles.faqItem}><h4>¿Cómo sé si estoy bien hidratado?</h4><p>El mejor indicador gratuito es el color de la orina: amarillo pálido (paja) = bien hidratado. Amarillo oscuro o ámbar = bebe más agua. Incolora = posible sobrehidratación. También: no sentir sed intensa, orina 4–6 veces al día.</p></div>
+            <div className={styles.faqItem}><h4>¿Es posible beber demasiada agua?</h4><p>Sí. La hiponatremia (exceso de agua que diluye el sodio) puede ser peligrosa o mortal. Ocurre principalmente en deportistas de resistencia que beben solo agua sin reponer sales. En personas sanas con actividad normal, los riñones regulan el exceso eficientemente.</p></div>
+            <div className={styles.faqItem}><h4>¿Las bebidas isotónicas son necesarias?</h4><p>Solo en ejercicio intenso de más de 60–90 minutos o en condiciones de calor extremo. Para actividad moderada o hidratación diaria, el agua es suficiente. Las bebidas isotónicas contienen azúcares y calorías que en ejercicio ligero son innecesarias.</p></div>
+            <div className={styles.faqItem}><h4>¿Contar el agua de los alimentos?</h4><p>Sí. La fruta y verdura aportan mucha agua: sandía (92% agua), pepino (97%), tomate (95%), lechuga (96%). Una dieta rica en frutas y verduras puede aportar 0,5–1 L de agua al día. Por eso la recomendación de "2 L de agua pura" ya incluye este aporte en algunas guías.</p></div>
+            <div className={styles.faqItem}><h4>¿La hidratación afecta al rendimiento cognitivo?</h4><p>Sí, significativamente. Una deshidratación del 1–2% del peso corporal ya deteriora la atención, la memoria a corto plazo y el tiempo de reacción. En oficinas con AC, donde no se siente calor ni sed, la deshidratación leve crónica es muy común y reduce la productividad.</p></div>
+            <div className={styles.faqItem}><h4>¿Necesito más agua si tomo medicamentos?</h4><p>Depende del medicamento. Diuréticos, antihistamínicos, laxantes y algunos antidepresivos aumentan las necesidades de agua. Consulta con tu médico o farmacéutico. En general, si tomas medicación crónica, err por el lado de beber un poco más.</p></div>
+          </div>
+        </div>
+
+        <div className={styles.eduGuia}>
+          <h2>Cómo hidratarte correctamente en 7 pasos</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>1</div><div className={styles.stepContent}><strong>Calcula tu necesidad base</strong><p>Multiplica tu peso en kg × 35 ml. Ejemplo: 70 kg × 35 ml = 2.450 ml/día como base. Ajusta según actividad, clima y condición de salud usando esta calculadora.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>2</div><div className={styles.stepContent}><strong>Empieza el día con agua</strong><p>Un vaso de 250–300 ml al despertar rehidrata tras 7–8 horas sin beber, activa el metabolismo y mejora la concentración matutina. Hazlo antes del café.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>3</div><div className={styles.stepContent}><strong>Distribuye la ingesta a lo largo del día</strong><p>No bebas todo de golpe. Lo ideal es beber regularmente cada 1–2 horas. Un truco: lleva una botella de 500 ml y complétala 4 veces al día. El cuerpo absorbe mejor agua distribuida que en grandes cantidades.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>4</div><div className={styles.stepContent}><strong>Ajusta según el ejercicio</strong><p>Bebe 500 ml en las 2h previas al ejercicio, 150–200 ml cada 15–20 min durante, y rehidrata después: 1,5 L por cada kg de peso perdido durante el ejercicio (pésate antes y después si haces ejercicio intenso).</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>5</div><div className={styles.stepContent}><strong>Monitoriza el color de tu orina</strong><p>Establece el hábito de comprobar el color una vez al día. Amarillo pálido = bien. Amarillo oscuro = bebe más. Adapta tu ingesta diaria según esta señal natural del cuerpo.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>6</div><div className={styles.stepContent}><strong>Incluye alimentos ricos en agua</strong><p>Frutas (sandía, melón, naranja, fresa) y verduras (pepino, lechuga, tomate, calabacín) contribuyen 500–1.000 ml/día. Una dieta mediterránea rica en estos alimentos facilita enormemente cumplir los objetivos de hidratación.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>7</div><div className={styles.stepContent}><strong>Ajusta en situaciones especiales</strong><p>Fiebre (+0,5 L por grado sobre 37°C), diarrea/vómitos (reposición urgente con suero oral), vuelos de larga distancia (+0,5–1 L por cada 4h de vuelo), calor extremo (protocolo 250 ml/20 min en exterior).</p></div></div>
+          </div>
+        </div>
+
+        <div className={styles.eduTips}>
+          <h2>Trucos para beber más agua sin esfuerzo</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🍋</span><strong>Aromatiza tu agua</strong><p>Añade rodajas de limón, pepino, menta o jengibre. El sabor suave hace que bebas más sin añadir azúcar ni calorías. Infusiones frías también cuentan.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>📱</span><strong>Apps de recordatorio</strong><p>Usa WaterMinder, Hydro Coach o simplemente alarmas en el móvil cada 1–2 horas. Los primeros 21 días necesitas el recordatorio; luego se convierte en hábito.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🫙</span><strong>Botella visible en tu mesa</strong><p>El principio de "lo que ves, lo haces". Una botella de 1L en tu escritorio que vacíes dos veces al día es más efectiva que cualquier app.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🍽️</span><strong>Agua antes de cada comida</strong><p>Un vaso de agua 15–20 min antes de comer mejora la hidratación y reduce ligeramente el apetito. Crea un ritual automático ligado a algo que ya haces.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🫧</span><strong>Agua con gas si no te gusta la natural</strong><p>El agua carbonatada hidrata igual que el agua plana. Si el agua natural te parece aburrida, el agua con gas (sin azúcar) es una alternativa perfectamente válida.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>🌿</span><strong>Sopa e infusiones en invierno</strong><p>En invierno la sed disminuye pero las necesidades no. Sopas, caldos e infusiones calientes son una forma excelente de mantener la hidratación cuando el agua fría no apetece.</p></div>
+          </div>
+        </div>
+
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Señales de deshidratación y errores frecuentes</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li>Esperar a tener sed para beber — la sed es ya un signo de deshidratación leve (1–2% del peso corporal perdido)</li>
+            <li>Beber solo refrescos o zumos como fuente principal de líquidos — el azúcar aumenta la carga renal y no hidrata tan eficientemente como el agua</li>
+            <li>Ignorar la hidratación en invierno o en ambientes fríos — la pérdida insensible de agua por respiración continúa aunque no sudes</li>
+            <li>Compensar toda la hidratación del día en una sola vez — el riñón elimina el exceso y no lo "guarda" para más tarde</li>
+            <li>No reponer electrolitos tras ejercicio intenso prolongado — el agua sola sin sales puede provocar hiponatremia en deportes de resistencia</li>
+            <li>Confundir hambre con sed — el centro de la saciedad y la sed están muy próximos en el hipotálamo; bebe agua antes de picar</li>
+            <li>No aumentar la ingesta durante enfermedad con fiebre, vómitos o diarrea — estas situaciones pueden provocar deshidratación aguda en pocas horas</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-hidratacion')} />
