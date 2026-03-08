@@ -2,9 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './GeneradorAnagramas.module.css';
-import MeskeiaLogo from '@/components/MeskeiaLogo';
-import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Diccionario español básico (palabras comunes de 2-8 letras)
@@ -240,35 +238,223 @@ export default function GeneradorAnagramasPage() {
         )}
       </div>
 
-      <div className={styles.tipsSection}>
-        <h2>Consejos para Wordle y Scrabble</h2>
-        <div className={styles.tipsGrid}>
-          <div className={styles.tipCard}>
-            <h3>Para Wordle</h3>
-            <ul>
-              <li>Usa palabras de 5 letras</li>
-              <li>Filtra por letra obligatoria (las verdes)</li>
-              <li>Prueba con las vocales más comunes: A, E, O</li>
-            </ul>
+      <EducationalSection
+        title="Aprende sobre Anagramas y Lingüística"
+        subtitle="Historia, matemáticas combinatorias y estrategias avanzadas para juegos de palabras"
+        icon="🔤"
+      >
+        <section>
+          <h3>🏛️ Historia y Tipos de Reorganización de Letras</h3>
+          <p>Los anagramas forman parte de una familia más amplia de transformaciones lingüísticas con historia milenaria:</p>
+          <div className={styles.eduTableWrapper}>
+            <table className={styles.eduTable}>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Definición</th>
+                  <th>Ejemplo</th>
+                  <th>Uso histórico</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Anagrama</strong></td>
+                  <td>Reorganiza todas las letras formando otra palabra</td>
+                  <td>AMOR → ROMA</td>
+                  <td>Seudónimos literarios, criptografía</td>
+                </tr>
+                <tr>
+                  <td><strong>Palíndromo</strong></td>
+                  <td>Se lee igual al derecho y al revés</td>
+                  <td>RECONOCER, ANA</td>
+                  <td>Textos latinos clásicos (Sator)</td>
+                </tr>
+                <tr>
+                  <td><strong>Transposición</strong></td>
+                  <td>Subconjunto de letras reordenadas</td>
+                  <td>AMOR → MAR, ORA</td>
+                  <td>Juegos de palabras, Scrabble</td>
+                </tr>
+                <tr>
+                  <td><strong>Acrónimo inverso</strong></td>
+                  <td>Iniciales que forman otra palabra</td>
+                  <td>NATO → OTAN</td>
+                  <td>Denominaciones de organismos</td>
+                </tr>
+                <tr>
+                  <td><strong>Heterograma</strong></td>
+                  <td>Palabra sin letras repetidas</td>
+                  <td>MURCIÉLAGO (12 letras únicas)</td>
+                  <td>Tipografía, diseño de teclados</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div className={styles.tipCard}>
-            <h3>Para Scrabble</h3>
-            <ul>
-              <li>Busca palabras largas para más puntos</li>
-              <li>Las letras Q, X, Z valen más puntos</li>
-              <li>Memoriza palabras de 2-3 letras</li>
-            </ul>
+        </section>
+
+        <section>
+          <h3>🎯 Casos de Uso y Aplicaciones</h3>
+          <div className={styles.eduEscenariosGrid}>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🎮</span>
+              <h4>Wordle y Wordle en Español</h4>
+              <p>Introduce las letras que ya conoces (verdes y amarillas) y usa el filtro &quot;debe contener&quot; para encontrar palabras válidas de 5 letras que maximicen información en cada intento.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🃏</span>
+              <h4>Scrabble y Palabras Cruzadas</h4>
+              <p>Busca las palabras más largas posibles con las letras de tu atril. Las palabras de 7+ letras dan bingo (+50 puntos). Filtra por longitud mínima para encontrar jugadas de alto valor.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>📚</span>
+              <h4>Aprendizaje de Vocabulario</h4>
+              <p>Descubrir que AMOR y ROMA comparten letras, o que SALA y ALAS son anagramas, ayuda a fijar palabras en la memoria. Técnica usada en métodos de enseñanza de idiomas.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>✍️</span>
+              <h4>Seudónimos y Creatividad</h4>
+              <p>Muchos escritores usaron anagramas como seudónimos: Voltaire es anagrama de AROVET LI (latinización de su apellido). En criptografía renacentista se usaban para ocultar autoría.</p>
+            </div>
           </div>
-          <div className={styles.tipCard}>
-            <h3>Diccionario</h3>
-            <ul>
-              <li>+5.000 palabras en español</li>
-              <li>Incluye palabras comunes</li>
-              <li>Vocales acentuadas soportadas</li>
-            </ul>
+        </section>
+
+        <section>
+          <h3>❓ Preguntas Frecuentes sobre Anagramas</h3>
+          <div className={styles.eduFaqList}>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuántas palabras se pueden formar con N letras?</summary>
+              <p className={styles.eduFaqAnswer}>El número máximo teórico de combinaciones con N letras distintas es N! (factorial). Con 5 letras distintas hay 120 combinaciones posibles, con 7 hay 5.040 y con 10 hay 3.628.800. En la práctica, solo una pequeña fracción forma palabras reales del diccionario. Con letras repetidas, el número se reduce: con &quot;AAAB&quot; hay 4!/3! = 4 permutaciones.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué es un anagrama perfecto?</summary>
+              <p className={styles.eduFaqAnswer}>Un <strong>anagrama perfecto</strong> usa exactamente todas las letras de la palabra original para formar otra palabra o frase con significado propio. Ejemplos famosos en español: ROMA/AMOR/MORA/RAMO/OMAR, SALTA/ATLAS/TALAS, PIEDRA/PARDIE. Los anagramas de frases completas son especialmente valorados: &quot;SALVADOR DALÍ&quot; → &quot;AVIDA DOLLARS&quot; (hecho por él mismo).</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué letras son más valiosas en Scrabble español?</summary>
+              <p className={styles.eduFaqAnswer}>En Scrabble español, las letras de mayor valor son: <strong>CH (5 pts), LL (8 pts), RR (8 pts), Ñ (8 pts)</strong> como fichas especiales, y entre las individuales: <strong>Q (8), X (8), Y (4), Z (10), J (8), K (8)</strong>. Las vocales solo valen 1 punto. La estrategia consiste en usar letras de alto valor en casillas premium (doble/triple letra o palabra).</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cómo funciona el algoritmo de búsqueda de anagramas?</summary>
+              <p className={styles.eduFaqAnswer}>El algoritmo más eficiente usa <strong>conteo de frecuencias de letras</strong>: para cada letra del diccionario, verifica si su frecuencia en la palabra candidata no supera la frecuencia disponible. Con un diccionario de 50.000 palabras y letras de entrada de longitud N, la complejidad es O(D×N) donde D es el tamaño del diccionario. La variante con firma (ordenar letras y comparar hashes) es O(D×N×log N) pero permite precalcular índices.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Por qué no aparecen todas las palabras que conozco?</summary>
+              <p className={styles.eduFaqAnswer}>Esta herramienta usa un diccionario de ~5.000 palabras comunes en español. Un diccionario completo de la RAE contiene más de 93.000 entradas. Las palabras técnicas, términos regionales, plurales irregulares o conjugaciones verbales poco comunes pueden no estar incluidas. Para uso competitivo en Scrabble, se recomienda consultar el diccionario oficial de la FISE (Federación Internacional de Scrabble en Español).</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Las tildes cuentan como letras diferentes?</summary>
+              <p className={styles.eduFaqAnswer}>En español, las letras acentuadas (á, é, í, ó, ú, ü) son variantes ortográficas de las vocales base. En Scrabble oficial, <strong>sí cuentan como fichas distintas</strong>. En esta herramienta, puedes introducir vocales con y sin tilde y el sistema las trata correctamente. La Ñ es una letra completamente independiente del abecedario español con su propia ficha en Scrabble.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué es el &quot;bingo&quot; en Scrabble?</summary>
+              <p className={styles.eduFaqAnswer}>El <strong>bingo</strong> (o &quot;scrabble&quot; en versión americana) consiste en usar las 7 fichas del atril en una sola jugada. Se obtiene un bonus de <strong>+50 puntos</strong> además del valor de la palabra. Los jugadores competitivos memorizan palabras de 7 letras que contienen letras frecuentes (S, R, N, T, A, E, I) para maximizar las posibilidades de bingo.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuál es la mejor estrategia inicial en Wordle?</summary>
+              <p className={styles.eduFaqAnswer}>Los análisis matemáticos (teoría de la información, entropía de Shannon) señalan palabras como <strong>CRANE, SLATE, AUDIO</strong> (en inglés) o <strong>RATIO, CRANE</strong> como primeras palabras óptimas por cubrir las letras más frecuentes. En español, palabras como <strong>ORATE, AIREL, MARES</strong> cubren bien el espacio de letras frecuentes (A, E, R, S, T, O, N). El objetivo es maximizar la información obtenida en cada intento.</p>
+            </details>
           </div>
-        </div>
-      </div>
+        </section>
+
+        <section>
+          <h3>📋 Cómo Sacar el Máximo Partido al Generador</h3>
+          <ol className={styles.eduStepsList}>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>1</span>
+              <div>
+                <strong>Para Wordle: introduce letras conocidas</strong>
+                <p>Después de un intento en Wordle, introduce todas las letras que aparecen en amarillo o verde. Usa el filtro &quot;debe contener&quot; para la letra verde de posición conocida. Filtra por longitud = 5 letras.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>2</span>
+              <div>
+                <strong>Para Scrabble: busca primero las más largas</strong>
+                <p>Los resultados aparecen ordenados de mayor a menor longitud. Las palabras más largas dan más puntos base. Examina primero las de 7+ letras (potencial bingo) antes de conformarte con una corta.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>3</span>
+              <div>
+                <strong>Ajusta los filtros de longitud</strong>
+                <p>Si obtienes demasiados resultados, sube la longitud mínima. Si no encuentras nada, baja la longitud mínima a 2 o 3 letras para ver qué palabras cortas son posibles con tus letras disponibles.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>4</span>
+              <div>
+                <strong>Usa el filtro &quot;debe contener&quot; estratégicamente</strong>
+                <p>Este filtro es útil para encontrar palabras que incluyan una letra específica que necesitas colocar en el tablero, o para encontrar palabras que usen una letra de alto valor (X, Q, Z) que tengas en el atril.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>5</span>
+              <div>
+                <strong>Prueba los ejemplos para familiarizarte</strong>
+                <p>Los botones de ejemplo (amor, mesa, palabra, corazon) muestran cómo funciona la herramienta. &quot;corazon&quot; con 7 letras genera docenas de palabras — es un buen punto de partida para explorar.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>6</span>
+              <div>
+                <strong>Amplía con más letras si los resultados son escasos</strong>
+                <p>Si con 4 letras obtienes pocos resultados, añade una o dos letras más comunes (A, E, R, S). Cuantas más letras disponibles, más combinaciones posibles y más palabras encontrarás en el diccionario.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>💡 Consejos de Estrategia para Juegos de Palabras</h3>
+          <div className={styles.eduTipsGrid}>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>📊</span>
+              <h4>Frecuencia de letras en español</h4>
+              <p>Las letras más frecuentes en español son: E (13,7%), A (12,5%), O (8,7%), S (7,9%), R (6,9%), N (6,7%), I (6,2%), D (5,9%). Prioriza palabras que usen estas letras.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🎯</span>
+              <h4>Memoriza palabras de 2-3 letras</h4>
+              <p>En Scrabble, las palabras cortas son cruciales para crear jugadas paralelas. Válidas: AX, XI, QI (si se aceptan anglicismos), OI, ID, ET. Verificar siempre en el diccionario oficial.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🔄</span>
+              <h4>Piensa en sufijos y prefijos</h4>
+              <p>Si ves letras como -CIÓN, -MENTE, -ANDO, -ANDO en tu atril, busca raíces que las complementen. Los sufijos son predecibles y permiten planificar jugadas de alto valor.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🧠</span>
+              <h4>Entrena la visualización mental</h4>
+              <p>Los mejores jugadores de Scrabble practican reorganizar letras mentalmente sin ayuda. Dedica 5 minutos al día a intentar encontrar palabras antes de usar el generador como verificación.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>📖</span>
+              <h4>Amplía tu vocabulario pasivo</h4>
+              <p>No necesitas saber el significado exacto de una palabra para usarla en Scrabble — solo necesitas saber que existe y es válida. Lista de palabras raras válidas: OHM, JOT, ZAG, QAT (si aceptadas).</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>⚡</span>
+              <h4>Velocidad en Wordle competitivo</h4>
+              <p>En Wordle competitivo contra el reloj, la segunda palabra debe eliminar el máximo de letras restantes. Si la primera palabra reveló A y R, elige una segunda que no las repita y cubra otras letras frecuentes.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className={styles.eduWarningBox}>
+            <span className={styles.eduWarningIcon}>⚠️</span>
+            <div>
+              <strong>Limitaciones importantes del generador</strong>
+              <ul>
+                <li><strong>Diccionario limitado</strong>: Esta herramienta usa ~5.000 palabras comunes. El diccionario oficial de la RAE contiene 93.000+ entradas. Palabras válidas en Scrabble pueden no aparecer aquí.</li>
+                <li><strong>Sin conjugaciones completas</strong>: No están incluidas todas las formas verbales conjugadas. Por ejemplo, puede aparecer &quot;comer&quot; pero no &quot;comiéramos&quot;.</li>
+                <li><strong>No es árbitro oficial</strong>: Para partidas competitivas de Scrabble, usa siempre el diccionario oficial de la FISE. Este generador es una herramienta de práctica y aprendizaje.</li>
+                <li><strong>Sensibilidad a tildes</strong>: El sistema distingue entre letras con y sin tilde. Si no encuentras una palabra, prueba con y sin acentos en las vocales.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-anagramas')} />
 

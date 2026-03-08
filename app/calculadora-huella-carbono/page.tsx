@@ -890,6 +890,238 @@ export default function CalculadoraHuellaCarbono() {
             </div>
           </div>
         </section>
+
+        <section>
+          <h3>🌍 Huella de Carbono por País: Comparativa Mundial</h3>
+          <p>Perspectiva global de emisiones per cápita para contextualizar tu resultado:</p>
+          <div className={styles.eduTableWrapper}>
+            <table className={styles.eduTable}>
+              <thead>
+                <tr>
+                  <th>País / Región</th>
+                  <th>t CO₂/persona/año</th>
+                  <th>Vs. objetivo 2°C</th>
+                  <th>Principal fuente</th>
+                  <th>Tendencia</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>🇶🇦 Qatar</strong></td>
+                  <td>35,6 t</td>
+                  <td>18× el límite</td>
+                  <td>Industria petrolífera</td>
+                  <td>↑ Creciendo</td>
+                </tr>
+                <tr>
+                  <td><strong>🇺🇸 EE.UU.</strong></td>
+                  <td>14,4 t</td>
+                  <td>7× el límite</td>
+                  <td>Transporte + industria</td>
+                  <td>↓ Bajando lento</td>
+                </tr>
+                <tr>
+                  <td><strong>🇪🇺 Unión Europea</strong></td>
+                  <td>6,4 t</td>
+                  <td>3,2× el límite</td>
+                  <td>Transporte + calefacción</td>
+                  <td>↓ Bajando</td>
+                </tr>
+                <tr>
+                  <td><strong>🇪🇸 España</strong></td>
+                  <td>7,5 t</td>
+                  <td>3,75× el límite</td>
+                  <td>Transporte + turismo</td>
+                  <td>↓ Bajando</td>
+                </tr>
+                <tr>
+                  <td><strong>🇨🇳 China</strong></td>
+                  <td>8,2 t</td>
+                  <td>4,1× el límite</td>
+                  <td>Carbón + industria</td>
+                  <td>→ Estable/alto</td>
+                </tr>
+                <tr>
+                  <td><strong>🌍 Media mundial</strong></td>
+                  <td>4,7 t</td>
+                  <td>2,35× el límite</td>
+                  <td>Varía por región</td>
+                  <td>→ Muy lento descenso</td>
+                </tr>
+                <tr>
+                  <td><strong>🎯 Objetivo 2°C</strong></td>
+                  <td>2,0 t</td>
+                  <td>✓ Sostenible</td>
+                  <td>—</td>
+                  <td>Objetivo 2050</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h3>🎯 ¿Quién Usa las Calculadoras de Huella de Carbono?</h3>
+          <div className={styles.eduEscenariosGrid}>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>👤</span>
+              <h4>Ciudadanos y Familias</h4>
+              <p>Identificar qué hábitos tienen más impacto para priorizar cambios. Muchas personas descubren que un vuelo transatlántico equivale a meses de uso del coche, o que cambiar la dieta tiene más impacto que el reciclaje.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🏢</span>
+              <h4>Empresas y Pymes</h4>
+              <p>Regulación europea de reporte de emisiones (CSRD) obliga a empresas a medir y publicar su huella desde 2025. Las calculadoras de Scope 1, 2 y 3 son el punto de partida para planes de descarbonización.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🎓</span>
+              <h4>Educación Ambiental</h4>
+              <p>Profesores de secundaria y universidad usan calculadoras para que los estudiantes visualicen el impacto concreto de sus hábitos. Es más efectivo que hablar de &quot;millones de toneladas globales&quot; en abstracto.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🌿</span>
+              <h4>Compensación y Offsets</h4>
+              <p>Servicios como Atmosfair, Gold Standard o ClimateTrade usan calculadoras para determinar cuánto CO₂ compensar. Primero: medir. Segundo: reducir. Tercero: compensar el resto inevitable con proyectos verificados.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>❓ Preguntas Frecuentes sobre Huella de Carbono</h3>
+          <div className={styles.eduFaqList}>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué es el CO₂ equivalente (CO₂e)?</summary>
+              <p className={styles.eduFaqAnswer}>El <strong>CO₂ equivalente</strong> es una unidad que permite comparar el impacto climático de distintos gases de efecto invernadero usando el dióxido de carbono como referencia. El metano (CH₄) tiene un potencial de calentamiento 28 veces mayor que el CO₂ en 100 años (GWP100). El óxido nitroso (N₂O), 265 veces. Así, 1 kg de metano = 28 kg CO₂e. Esto permite sumar todos los GEI en una sola cifra comparable.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿La compensación de carbono (carbon offsets) realmente funciona?</summary>
+              <p className={styles.eduFaqAnswer}>Depende mucho del proyecto. Los offsets de <strong>calidad certificada</strong> (Gold Standard, VCS, Plan Vivo) que financian reforestación con comunidades locales, energías renovables en países en desarrollo o captura de metano tienen impacto real. Los offsets de baja calidad (reforestación de monocultivos, proyectos que habrían ocurrido igualmente) son criticados como &quot;greenwashing&quot;. La regla: primero reducir, luego compensar solo lo que no se puede reducir.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué son los Scopes 1, 2 y 3 de emisiones?</summary>
+              <p className={styles.eduFaqAnswer}>Es el estándar GHG Protocol para empresas: <strong>Scope 1</strong> = emisiones directas propias (combustión en instalaciones, flota de vehículos propia). <strong>Scope 2</strong> = emisiones indirectas de energía comprada (electricidad, calor, vapor). <strong>Scope 3</strong> = todas las demás emisiones de la cadena de valor (proveedores, transporte de empleados, uso del producto, fin de vida). El Scope 3 suele ser el 70-80% de la huella total de una empresa.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué impacto tiene realmente un vuelo?</summary>
+              <p className={styles.eduFaqAnswer}>Un vuelo Madrid-Nueva York (ida y vuelta, ~11.000 km) emite aproximadamente <strong>1,8 toneladas de CO₂e por pasajero</strong>, incluyendo el efecto radiativo del vapor de agua en altura (que multiplica el impacto climático ×2-3 vs. emisiones en suelo). Esto equivale a conducir un coche de gasolina durante ~9.000 km o a la huella anual de alimentación de una persona vegana. Un vuelo largo puede representar el 30-50% de la huella anual de un español medio.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuánto CO₂ absorbe un árbol al año?</summary>
+              <p className={styles.eduFaqAnswer}>Un árbol adulto en crecimiento activo absorbe entre <strong>10 y 40 kg de CO₂ al año</strong>, dependiendo de la especie, clima y condiciones de crecimiento. Un pino adulto en España absorbe ~20 kg/año. Para compensar 7,5 toneladas (huella media española) harían falta ~375 árboles absorbiendo durante 1 año. La reforestación es necesaria pero insuficiente por sí sola: no puede absorber el ritmo actual de emisiones globales.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Es el reciclaje realmente efectivo para reducir la huella?</summary>
+              <p className={styles.eduFaqAnswer}>El reciclaje tiene impacto real pero <strong>menor de lo que mucha gente cree</strong>. Reciclar aluminio ahorra el 95% de la energía vs. aluminio virgen. Reciclar papel ahorra ~40%. Sin embargo, en el contexto de la huella personal total, el reciclaje suele representar solo un 1-5% del impacto. Los cambios más efectivos son: reducir vuelos, cambiar a coche eléctrico/transporte público y reducir consumo de carne roja — estos pueden reducir la huella un 20-50%.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué es la &quot;huella embebida&quot; de los productos?</summary>
+              <p className={styles.eduFaqAnswer}>La <strong>huella embebida</strong> (o huella del ciclo de vida) incluye todas las emisiones necesarias para fabricar un producto: extracción de materias primas, manufactura, transporte, distribución y fin de vida. Un smartphone tiene una huella embebida de ~70 kg CO₂e. Un coche eléctrico, ~8-12 toneladas en fabricación (que luego compensa en uso vs. gasolina). Esta calculadora solo cubre la huella operacional directa, no la huella embebida de todos los productos que consumimos.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuándo alcanzaremos la neutralidad climática en España?</summary>
+              <p className={styles.eduFaqAnswer}>La <strong>Ley de Cambio Climático española (2021)</strong> establece neutralidad climática para 2050 y reducción del 23% de emisiones para 2030 vs. 1990. La UE apunta a -55% para 2030. A ritmo actual, España redujo ~20% sus emisiones entre 2005 y 2022, pero el ritmo necesario para 2030 requiere acelerarse significativamente. Los sectores con mayor reto: transporte (electrificación), agricultura (metano del ganado) y procesos industriales (acero, cemento).</p>
+            </details>
+          </div>
+        </section>
+
+        <section>
+          <h3>📋 Plan de Acción para Reducir tu Huella de Carbono</h3>
+          <ol className={styles.eduStepsList}>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>1</span>
+              <div>
+                <strong>Identifica tu mayor fuente de emisiones</strong>
+                <p>Usa los gráficos de resultados para ver qué categoría pesa más en tu huella personal. Para la mayoría de españoles, el transporte (especialmente vuelos y coche) o la alimentación suelen ser las categorías dominantes.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>2</span>
+              <div>
+                <strong>Establece un objetivo realista a 12 meses</strong>
+                <p>No intentes reducir todo a la vez. Elige 1-2 cambios de alto impacto: ¿puedes sustituir un vuelo por tren? ¿Reducir consumo de carne roja a 1 vez/semana? ¿Cambiar a tarifa de energía 100% renovable? Cada uno puede reducir tu huella un 10-20%.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>3</span>
+              <div>
+                <strong>Optimiza el transporte (mayor impacto)</strong>
+                <p>Orden de impacto descendente: eliminar vuelos de ocio &gt; cambiar coche gasolina/diesel por eléctrico &gt; usar más transporte público &gt; teletrabajar &gt; compartir coche. Un vuelo transatlántico puede equivaler a 6 meses de conducción diaria.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>4</span>
+              <div>
+                <strong>Reduce la huella del hogar</strong>
+                <p>Cambia a tarifa eléctrica de origen renovable (misma red, distinto contrato). Mejora el aislamiento térmico (subvenciones del PREE disponibles). Sustituye calderas de gas por bomba de calor aerotérmica (COP 3-4: por cada kWh eléctrico produce 3-4 kWh de calor).</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>5</span>
+              <div>
+                <strong>Ajusta la dieta de forma progresiva</strong>
+                <p>No hace falta volverse vegano para tener impacto significativo. Pasar de dieta &quot;alta en carne&quot; a &quot;omnívora equilibrada&quot; (carne 3-4 veces/semana en vez de diaria) reduce la huella alimentaria un 24%. Sustituir carne roja por pollo o pescado también ayuda (vacuno emite 20× más que pollo por proteína).</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>6</span>
+              <div>
+                <strong>Compensa lo que no puedas reducir</strong>
+                <p>Para emisiones inevitables (vuelo por trabajo, calefacción en invierno extremo), busca proyectos de compensación certificados con estándares Gold Standard o VCS. El precio justo de compensación es de 10-30€/tonelada CO₂. Para 7,5 t/año = 75-225€/año en offsets de calidad.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>💡 Hábitos de Alto Impacto para Reducir Emisiones</h3>
+          <div className={styles.eduTipsGrid}>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>✈️</span>
+              <h4>El tren vs. avión</h4>
+              <p>Madrid-Barcelona en AVE emite ~6 kg CO₂/pasajero. En avión, ~90 kg. El tren es 15 veces menos contaminante en este trayecto y tarda solo 30 minutos más puerta a puerta.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🥩</span>
+              <h4>La dieta importa más que el reciclaje</h4>
+              <p>Eliminar la carne de vacuno de tu dieta reduce más emisiones que dejar de conducir durante 6 meses. 1 kg de carne de vacuno emite ~27 kg CO₂e vs. 2 kg CO₂e de lentejas.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>⚡</span>
+              <h4>Energía renovable en casa</h4>
+              <p>Cambiar a tarifa de electricidad 100% renovable tiene coste similar a convencional y reduce la huella del hogar hasta un 90% en la parte eléctrica. Busca comercializadoras con certificado de garantía de origen.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🚗</span>
+              <h4>Coche eléctrico en España</h4>
+              <p>Con el mix eléctrico español (2024), un coche eléctrico emite ~5 g CO₂/km vs. ~120 g de un gasolina compacto. A medida que la red se descarboniza, el eléctrico mejora automáticamente sin cambiar el vehículo.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🌡️</span>
+              <h4>Ajusta el termostato</h4>
+              <p>Bajar 1°C el termostato en invierno reduce el consumo de calefacción un 7%. De 22°C a 20°C = -14% de consumo. Subir 1°C el aire acondicionado en verano tiene el mismo efecto.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>📱</span>
+              <h4>Vida útil de dispositivos</h4>
+              <p>Extender la vida de un smartphone 1 año más reduce su huella total un 25%. Comprar de segunda mano evita la huella embebida de fabricación (~70 kg CO₂e para un móvil, ~300 kg para un portátil).</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className={styles.eduWarningBox}>
+            <span className={styles.eduWarningIcon}>⚠️</span>
+            <div>
+              <strong>Limitaciones de esta calculadora y errores comunes</strong>
+              <ul>
+                <li><strong>Es una estimación orientativa</strong>: Los factores de emisión reales varían según tu proveedor eléctrico, ruta específica de vuelo, eficiencia de tu vehículo y origen de los alimentos. La precisión real es de ±20-30%.</li>
+                <li><strong>No incluye huella embebida</strong>: No se contabiliza el CO₂ necesario para fabricar tu ropa, muebles, electrodomésticos o infraestructura. La huella real de consumo es mayor que lo calculado.</li>
+                <li><strong>Confundir CO₂ con CO₂e</strong>: Los vuelos tienen un impacto climático real 2-3 veces mayor que sus emisiones de CO₂ puro, por el efecto de contrails y vapor de agua en altitud. Esta calculadora usa factores que intentan aproximar CO₂e.</li>
+                <li><strong>El greenwashing existe</strong>: No todos los productos &quot;neutros en carbono&quot; o &quot;compensados&quot; tienen el mismo rigor. Exige certificaciones de terceros (Gold Standard, VCS, Plan Vivo) antes de pagar por offsets.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-huella-carbono')} />
