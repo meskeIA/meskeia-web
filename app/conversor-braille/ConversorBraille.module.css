@@ -417,3 +417,323 @@
     font-size: 1.2rem;
   }
 }
+
+/* ===== SECCIONES EDUCATIVAS PROFESIONALES ===== */
+
+.eduComparativaSection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.eduComparativaSection h3 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduTablaWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.eduTablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.eduTablaComparativa thead th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .container .eduTablaComparativa thead th {
+  background: #1a5c7a;
+}
+
+.eduTablaComparativa tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.eduTablaComparativa tbody tr:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.eduTablaComparativa td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.eduTablaComparativa tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Escenarios */
+.eduEscenariosSection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.eduEscenariosSection h3 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduEscenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.eduEscenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.eduEscenarioCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.12);
+}
+
+.eduEscenarioIcon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+  display: block;
+}
+
+.eduEscenarioCard h4 {
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1rem;
+}
+
+.eduEscenarioCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* FAQ */
+.eduFaqSection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.eduFaqSection h3 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduFaqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.eduFaqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--spacing-lg);
+}
+
+.eduFaqItem h4 {
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1rem;
+}
+
+.eduFaqItem p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* Steps */
+.eduStepSection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.eduStepSection h3 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduStepList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.eduStepItem {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+}
+
+.eduStepNumber {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.eduStepContent h4 {
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+.eduStepContent p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* Tips */
+.eduTipsSection {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border);
+}
+
+.eduTipsSection h3 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduTipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.eduTipCard {
+  background: rgba(46, 134, 171, 0.05);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .container .eduTipCard {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.eduTipIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.eduTipCard h4 {
+  color: var(--primary);
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+.eduTipCard p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* Warning Box */
+.eduWarningBox {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: rgba(245, 158, 11, 0.08);
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius);
+}
+
+[data-theme='dark'] .container .eduWarningBox {
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.eduWarningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.eduWarningIcon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.eduWarningHeader h3 {
+  color: #D97706;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+[data-theme='dark'] .container .eduWarningHeader h3 {
+  color: #FCD34D;
+}
+
+.eduWarningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.eduWarningList li {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  padding-left: var(--spacing-md);
+  border-left: 3px solid #F59E0B;
+}
+
+/* Responsive educativo */
+@media (max-width: 900px) {
+  .eduTipsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .eduTipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .eduEscenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eduEscenarioCard {
+    transition: none;
+  }
+}
