@@ -331,6 +331,224 @@ export default function ConstelacionesDelCieloPage() {
             <li><strong>Magnitud 6:</strong> Límite de visión a simple vista</li>
           </ul>
         </section>
+
+        <section>
+          <h3>🏛️ Tradiciones Astronómicas del Mundo</h3>
+          <p>Las constelaciones modernas proceden de la astronomía griega, pero otras civilizaciones desarrollaron sus propios sistemas celestes:</p>
+          <div className={styles.eduTableWrapper}>
+            <table className={styles.eduTable}>
+              <thead>
+                <tr>
+                  <th>Civilización</th>
+                  <th>Época</th>
+                  <th>Nº Constelaciones</th>
+                  <th>Uso Principal</th>
+                  <th>Legado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Mesopotamia</strong></td>
+                  <td>~3000 a.C.</td>
+                  <td>~18 (zodiaco)</td>
+                  <td>Astrología y calendario</td>
+                  <td>Origen del zodiaco occidental</td>
+                </tr>
+                <tr>
+                  <td><strong>Grecia clásica</strong></td>
+                  <td>~600 a.C.</td>
+                  <td>48 (Ptolomeo)</td>
+                  <td>Navegación y mitología</td>
+                  <td>Base de las 88 actuales (IAU)</td>
+                </tr>
+                <tr>
+                  <td><strong>China imperial</strong></td>
+                  <td>~500 a.C.</td>
+                  <td>283 mansiones</td>
+                  <td>Calendario agrícola</td>
+                  <td>Registro histórico de supernovas</td>
+                </tr>
+                <tr>
+                  <td><strong>Mundo árabe</strong></td>
+                  <td>800–1200 d.C.</td>
+                  <td>Catálogos estelares</td>
+                  <td>Navegación y ciencia</td>
+                  <td>Nombres de estrellas (Aldebarán, Rigel...)</td>
+                </tr>
+                <tr>
+                  <td><strong>Polinesia</strong></td>
+                  <td>~1000 d.C.</td>
+                  <td>Variable</td>
+                  <td>Navegación oceánica</td>
+                  <td>Técnicas wayfinding sin instrumentos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h3>🎯 ¿Para Qué Sirven las Constelaciones Hoy?</h3>
+          <div className={styles.eduEscenariosGrid}>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🧭</span>
+              <h4>Navegación Histórica</h4>
+              <p>Durante siglos, marineros y exploradores usaron constelaciones como la Cruz del Sur y la Estrella Polar para determinar su posición en el mar con precisión de grados.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🌾</span>
+              <h4>Calendario Agrícola</h4>
+              <p>En la antigüedad, la aparición de ciertas constelaciones marcaba las estaciones de siembra y cosecha. Las Pléyades en Orión indicaban el inicio de la primavera en Grecia.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🔭</span>
+              <h4>Astronomía Moderna (IAU)</h4>
+              <p>Las 88 constelaciones oficiales dividen el cielo como un sistema de coordenadas. Los astrónomos las usan para indicar la posición de objetos celestes, nebulosas y galaxias.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🎓</span>
+              <h4>Educación y Divulgación</h4>
+              <p>Las constelaciones son la puerta de entrada a la astronomía: son reconocibles a simple vista, tienen historias memorables y permiten aprender mitología griega al mismo tiempo.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>❓ Preguntas Frecuentes sobre Constelaciones</h3>
+          <div className={styles.eduFaqList}>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuál es la diferencia entre una constelación y un asterismo?</summary>
+              <p className={styles.eduFaqAnswer}>Una <strong>constelación</strong> es una de las 88 regiones oficiales del cielo definidas por la IAU. Un <strong>asterismo</strong> es un patrón de estrellas reconocible pero no oficial, como el Cinturón de Orión o el Carro (parte de la Osa Mayor). Todo asterismo está dentro de una constelación, pero no toda constelación tiene un asterismo famoso.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Por qué exactamente 88 constelaciones?</summary>
+              <p className={styles.eduFaqAnswer}>En 1922, la Unión Astronómica Internacional estandarizó las 48 constelaciones de Ptolomeo y añadió 40 más descritas por astrónomos europeos de los siglos XV-XVIII para cubrir el cielo austral (invisible desde el Mediterráneo). El número 88 no tiene significado especial; simplemente fue la consolidación del trabajo histórico acumulado.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Las 12 constelaciones del zodiaco son los signos astrológicos?</summary>
+              <p className={styles.eduFaqAnswer}>No exactamente. Los 12 signos astrológicos se fijaron hace ~2000 años, pero debido a la <strong>precesión de los equinoccios</strong>, el Sol ahora pasa por 13 constelaciones (incluyendo Ofiuco) y lo hace en fechas distintas a las de la astrología. La astronomía y la astrología son disciplinas completamente separadas.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>Si las estrellas se mueven, ¿las constelaciones cambian con el tiempo?</summary>
+              <p className={styles.eduFaqAnswer}>Sí, aunque muy lentamente. Las estrellas tienen <strong>movimiento propio</strong> y dentro de ~100.000 años, la Osa Mayor tendrá una forma completamente diferente. En la escala humana (siglos), los cambios son imperceptibles, pero los astrónomos los miden con precisión de microsegundos de arco.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué es la precesión de los equinoccios?</summary>
+              <p className={styles.eduFaqAnswer}>La Tierra no gira perfectamente recta: su eje traza un cono completo cada ~26.000 años (como un trompo). Esto hace que el polo norte celeste «cambie» de estrella: ahora apunta a Polaris, pero hace 5.000 años apuntaba a Thuban. También desplaza los puntos equinocciales a lo largo del zodiaco, causando el desfase entre los signos astrológicos y las constelaciones reales.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Las estrellas de una constelación están cerca entre sí en el espacio?</summary>
+              <p className={styles.eduFaqAnswer}>No. Es una proyección visual desde la Tierra. En Orión, Betelgeuse está a ~700 años luz y Rigel a ~860 años luz — están separadas enormemente en el espacio 3D. Solo parecen «juntas» porque las vemos desde nuestra perspectiva bidimensional en el cielo nocturno.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cómo se nombran las estrellas dentro de una constelación?</summary>
+              <p className={styles.eduFaqAnswer}>El sistema más usado es la <strong>Designación de Bayer</strong> (1603): letras griegas (α, β, γ...) seguidas del nombre latino de la constelación en genitivo. α Orionis = Betelgeuse (la más brillante de Orión). También existe la Designación de Flamsteed (números), catálogos modernos (HD, HIP) y nombres propios aprobados por la IAU para las más importantes.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuál es la constelación más grande y la más pequeña?</summary>
+              <p className={styles.eduFaqAnswer}><strong>Más grande</strong>: Hydra (La Hidra) con 1.303 grados cuadrados — ocupa el 3,16% del cielo total. <strong>Más pequeña</strong>: Crux (La Cruz del Sur) con solo 68 grados cuadrados, aunque es una de las más reconocibles del hemisferio sur y figura en 4 banderas nacionales.</p>
+            </details>
+          </div>
+        </section>
+
+        <section>
+          <h3>📋 Cómo Localizar Constelaciones: Guía Práctica</h3>
+          <ol className={styles.eduStepsList}>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>1</span>
+              <div>
+                <strong>Oriéntate con la Estrella Polar</strong>
+                <p>En el hemisferio norte, localiza las dos estrellas del «cucharón» de la Osa Mayor (Dubhe y Merak) y traza una línea recta 5 veces su distancia: llegas a Polaris, que siempre indica el norte.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>2</span>
+              <div>
+                <strong>Identifica patrones reconocibles primero</strong>
+                <p>Empieza por formas simples: el cuadrado de Pegaso, el «W» de Casiopea, el trapecio de Orión con su cinturón de 3 estrellas. Una vez reconocidos, úsalos como ancla para encontrar constelaciones vecinas.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>3</span>
+              <div>
+                <strong>Adapta tus ojos a la oscuridad</strong>
+                <p>Necesitas 20-30 minutos sin luz blanca para que tus pupilas se dilaten al máximo. Usa linterna roja si necesitas iluminación — la luz roja no arruina la adaptación a la oscuridad.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>4</span>
+              <div>
+                <strong>Elige la época correcta</strong>
+                <p>Cada constelación tiene su «mejor mes» cuando está más alta en el cielo a medianoche. Orión es invernal (dic-feb), Escorpio estival (jun-ago). Fuera de temporada puedes verlas, pero más bajas y menos horas.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>5</span>
+              <div>
+                <strong>Usa una app de realidad aumentada</strong>
+                <p>Stellarium Mobile, SkySafari o Star Walk permiten apuntar el teléfono al cielo y ver las constelaciones superpuestas en tiempo real. Ideal para principiantes. Activa el modo noche (pantalla roja) para preservar la visión.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>6</span>
+              <div>
+                <strong>El telescopio no es imprescindible</strong>
+                <p>Las constelaciones se observan a simple vista — el telescopio magnifica tanto que solo ves una pequeña parte del cielo. Los prismáticos 7×50 o 10×50 son la herramienta ideal: revelan cúmulos estelares y nebulosas dentro de las constelaciones sin perder el contexto visual.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>💡 Consejos para Observadores de Constelaciones</h3>
+          <div className={styles.eduTipsGrid}>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🌑</span>
+              <h4>Luna nueva = mejor noche</h4>
+              <p>La Luna llena ilumina el cielo tanto que oculta las estrellas débiles. Planifica tus sesiones de observación en los días cercanos a luna nueva.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🗺️</span>
+              <h4>Usa mapas estelares estacionales</h4>
+              <p>Descarga o imprime el mapa estelar del mes actual. Girandolo para que el sur esté arriba si observas hacia el sur del hemisferio norte.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>📍</span>
+              <h4>Anota tus coordenadas</h4>
+              <p>La visibilidad de constelaciones depende de tu latitud. Desde España (40°N) ves bien el hemisferio norte y parte del sur; desde Argentina (35°S) ves la Cruz del Sur perfectamente.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🌬️</span>
+              <h4>Condiciones atmosféricas importan</h4>
+              <p>El «seeing» (estabilidad del aire) afecta la nitidez. Las noches frías y despejadas tras un frente frío son ideales. La humedad y el calor crean turbulencias que difuminan las estrellas.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>📚</span>
+              <h4>Aprende la mitología</h4>
+              <p>Asociar cada constelación con su historia mitológica hace que sea imposible olvidarla. Orión el cazador, Perseus rescatando a Andrómeda, Escorpio matando a Orión — son mnemotecnias perfectas.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>👥</span>
+              <h4>Únete a clubes de astronomía</h4>
+              <p>Las sociedades astronómicas locales organizan noches de observación con telescopios profesionales. En España: Agrupación Astronómica de Madrid (AAM), Grup d&apos;Estudis Astronòmics (GEA) en Cataluña.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className={styles.eduWarningBox}>
+            <span className={styles.eduWarningIcon}>⚠️</span>
+            <div>
+              <strong>Errores comunes a evitar</strong>
+              <ul>
+                <li><strong>Confundir asterismo con constelación</strong>: El «Carro» no es una constelación oficial — es un asterismo dentro de la Osa Mayor. La Cruz del Sur (Crux) sí es una constelación oficial.</li>
+                <li><strong>Creer que las estrellas de una constelación están juntas</strong>: Solo son vecinas en la proyección 2D del cielo. En el espacio 3D pueden estar a cientos de años luz de distancia entre sí.</li>
+                <li><strong>Mezclar astrología con astronomía</strong>: La astronomía es una ciencia empírica; la astrología es un sistema de creencias. Las fechas de los signos astrológicos no coinciden con las constelaciones reales debido a la precesión.</li>
+                <li><strong>Ignorar la contaminación lumínica</strong>: Desde una ciudad, solo verás unas pocas decenas de estrellas. En un cielo rural oscuro puedes ver 3.000–5.000 estrellas a simple vista. La diferencia es enorme.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('constelaciones-del-cielo')} />

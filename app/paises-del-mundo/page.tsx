@@ -369,6 +369,230 @@ export default function PaisesDelMundoPage() {
             <li><strong>Pasaportes más poderosos (2025)</strong>: Los de Singapur, Japón y Francia permiten entrar sin visa a más de 190 destinos. El más restrictivo, Afganistán, da acceso libre a menos de 30.</li>
           </ul>
         </section>
+
+        <section>
+          <h3>📊 Los 5 Continentes: Comparativa Completa</h3>
+          <p>Datos actualizados de los 5 grandes continentes habitados del planeta:</p>
+          <div className={styles.eduTableWrapper}>
+            <table className={styles.eduTable}>
+              <thead>
+                <tr>
+                  <th>Continente</th>
+                  <th>Países</th>
+                  <th>Población (2024)</th>
+                  <th>Superficie</th>
+                  <th>Densidad</th>
+                  <th>País más poblado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>🌍 África</strong></td>
+                  <td>54</td>
+                  <td>1.460 millones</td>
+                  <td>30,4 M km²</td>
+                  <td>~48 hab/km²</td>
+                  <td>Nigeria (223 M)</td>
+                </tr>
+                <tr>
+                  <td><strong>🌏 Asia</strong></td>
+                  <td>49</td>
+                  <td>4.750 millones</td>
+                  <td>44,6 M km²</td>
+                  <td>~107 hab/km²</td>
+                  <td>India (1.428 M)</td>
+                </tr>
+                <tr>
+                  <td><strong>🌎 América</strong></td>
+                  <td>35</td>
+                  <td>1.040 millones</td>
+                  <td>42,5 M km²</td>
+                  <td>~24 hab/km²</td>
+                  <td>EE.UU. (340 M)</td>
+                </tr>
+                <tr>
+                  <td><strong>🌍 Europa</strong></td>
+                  <td>44</td>
+                  <td>745 millones</td>
+                  <td>10,5 M km²</td>
+                  <td>~71 hab/km²</td>
+                  <td>Rusia (144 M)</td>
+                </tr>
+                <tr>
+                  <td><strong>🌏 Oceanía</strong></td>
+                  <td>14</td>
+                  <td>46 millones</td>
+                  <td>8,5 M km²</td>
+                  <td>~5 hab/km²</td>
+                  <td>Australia (26 M)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h3>🎯 ¿Para Qué Necesitas Conocer los Países del Mundo?</h3>
+          <div className={styles.eduEscenariosGrid}>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🎓</span>
+              <h4>Estudios de Geografía</h4>
+              <p>Preparar exámenes, proyectos escolares y concursos de cultura general. Conocer capitales, banderas, idiomas y datos clave de cada país del mundo.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>✈️</span>
+              <h4>Viajes Internacionales</h4>
+              <p>Antes de viajar: prefijo telefónico, moneda local, zona horaria, idioma oficial, dominio de internet (.es, .fr...) y ubicación en el mapa para planificar tu ruta.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🌐</span>
+              <h4>Geopolítica y Negocios</h4>
+              <p>Identificar mercados emergentes, entender relaciones entre países vecinos, analizar bloques económicos (UE, ASEAN, Mercosur) y evaluar riesgos geopolíticos.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>📚</span>
+              <h4>Educación Escolar</h4>
+              <p>Herramienta ideal para docentes y estudiantes de primaria a bachillerato. Busca cualquier país y obtén sus datos básicos de forma rápida y fiable para trabajos y presentaciones.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>❓ Preguntas Frecuentes sobre los Países del Mundo</h3>
+          <div className={styles.eduFaqList}>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Por qué hay exactamente 195 países y no otra cifra?</summary>
+              <p className={styles.eduFaqAnswer}>Los <strong>193 miembros de pleno derecho de la ONU</strong> más los 2 estados observadores permanentes (Ciudad del Vaticano y Palestina) suman 195. El número cambia históricamente: en 1945 había 51 miembros fundadores. Cada descolonización o independencia reconocida añade un nuevo estado. El último en unirse fue Sudán del Sur (2011).</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué pasó cuando se disolvió la URSS?</summary>
+              <p className={styles.eduFaqAnswer}>La disolución de la URSS en 1991 creó <strong>15 nuevos países independientes</strong>: Rusia, Ucrania, Bielorrusia, las 3 repúblicas bálticas (Estonia, Letonia, Lituania), las 5 repúblicas de Asia Central (Kazajistán, Uzbekistán, Turkmenistán, Kirguistán, Tayikistán) y las 3 del Cáucaso (Georgia, Armenia, Azerbaiyán), más Moldavia. Fue el mayor cambio político del mapa mundial del siglo XX.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué son los territorios de ultramar y por qué no son países?</summary>
+              <p className={styles.eduFaqAnswer}>Son territorios bajo soberanía de otro Estado pero no integrados en él. Francia tiene 13 colectividades de ultramar (Guadalupe, Martinica, Guayana Francesa, Reunión, Polinesia Francesa...). El Reino Unido tiene 14 territorios (Gibraltar, Islas Malvinas, Bermudas...). No son países independientes porque no tienen soberanía plena ni son miembros de la ONU por derecho propio.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuál es el país más joven del mundo?</summary>
+              <p className={styles.eduFaqAnswer}><strong>Sudán del Sur</strong>, independizado de Sudán el 9 de julio de 2011 tras un referéndum. Se convirtió en el 193.º miembro de la ONU semanas después. Antes de él, el más joven era Kosovo (2008), aunque Kosovo no es miembro de la ONU por el veto de Rusia y China en el Consejo de Seguridad.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuál es la diferencia entre país, nación y estado?</summary>
+              <p className={styles.eduFaqAnswer}><strong>Estado</strong>: entidad política con territorio, población y gobierno reconocido internacionalmente (concepto jurídico). <strong>País</strong>: término geográfico y cotidiano, prácticamente sinónimo de estado. <strong>Nación</strong>: grupo humano con identidad cultural, histórica o lingüística común, que puede o no tener su propio estado. Los kurdos son una nación sin estado propio; España es un estado multinacional (catalanes, vascos, gallegos...).</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué es la Zona Económica Exclusiva (ZEE) y por qué importa?</summary>
+              <p className={styles.eduFaqAnswer}>La ZEE es el área marina de <strong>200 millas náuticas</strong> (~370 km) desde la costa donde un país tiene derechos exclusivos sobre recursos naturales (pesca, petróleo, gas, minerales). Algunos pequeños estados insulares del Pacífico tienen ZEEs enormes: Kiribati (3,4 M km² de ZEE) con solo 800 km² de tierra. Francia tiene la segunda mayor ZEE del mundo gracias a sus territorios de ultramar.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Por qué algunos países tienen dos capitales?</summary>
+              <p className={styles.eduFaqAnswer}>Varios países dividen funciones entre ciudades: <strong>Sudáfrica</strong> tiene 3 (Pretoria ejecutiva, Ciudad del Cabo legislativa, Bloemfontein judicial). <strong>Bolivia</strong> tiene 2 (Sucre constitucional, La Paz gubernamental). <strong>Países Bajos</strong> tiene La Haya como sede de gobierno y Ámsterdam como capital constitucional. Generalmente responde a acuerdos históricos, federalismo o compromisos políticos entre regiones.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué es un estado fallido?</summary>
+              <p className={styles.eduFaqAnswer}>Un <strong>estado fallido</strong> (o estado frágil) es aquel que ha perdido el control efectivo sobre su territorio o no puede proveer servicios básicos a su población. Indicadores: incapacidad de recaudar impuestos, pérdida del monopolio de la violencia, colapso institucional. El Fragile States Index (FSI) clasifica anualmente a los países. Somalia, Yemen y Sudán del Sur han encabezado esta lista en años recientes. El término es debatido académicamente por sus implicaciones políticas.</p>
+            </details>
+          </div>
+        </section>
+
+        <section>
+          <h3>📋 Cómo Entender la Geopolítica de un País Desconocido</h3>
+          <ol className={styles.eduStepsList}>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>1</span>
+              <div>
+                <strong>Ubica el país en su contexto regional</strong>
+                <p>¿En qué continente está? ¿Qué países son sus vecinos? Las relaciones con los países fronterizos son clave: compartir fronteras con potencias regionales o con estados en conflicto define mucho del destino de un país.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>2</span>
+              <div>
+                <strong>Analiza su historia reciente (últimos 100 años)</strong>
+                <p>¿Fue colonia? ¿De quién? ¿Cuándo se independizó? ¿Ha tenido guerras civiles o conflictos recientes? La historia explica fronteras artificiales, tensiones étnicas, idiomas oficiales y alianzas internacionales actuales.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>3</span>
+              <div>
+                <strong>Identifica sus recursos naturales clave</strong>
+                <p>El petróleo (Golfo Pérsico, Venezuela), los minerales críticos (cobalto en RDC, litio en el «triángulo del litio» Bolivia-Argentina-Chile) o el agua (Nilo) explican muchos conflictos geopolíticos y alianzas económicas.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>4</span>
+              <div>
+                <strong>Examina su sistema político</strong>
+                <p>¿República o monarquía? ¿Democracia, autocracia, teocracia? ¿Federal o unitario? El tipo de gobierno determina cómo se toman las decisiones, cómo se distribuye el poder territorialmente y qué alianzas internacionales son posibles.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>5</span>
+              <div>
+                <strong>Consulta índices internacionales clave</strong>
+                <p>PIB per cápita (riqueza), IDH (desarrollo humano del PNUD), Índice de Percepción de Corrupción (Transparencia Internacional), Fragile States Index. Estos índices dan una visión multidimensional más precisa que cualquier dato aislado.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>6</span>
+              <div>
+                <strong>Entiende sus alianzas y organizaciones internacionales</strong>
+                <p>¿Es miembro de la UE, OTAN, ASEAN, Mercosur, UA, Liga Árabe? ¿Tiene acuerdos de libre comercio? Las membresías explican políticas económicas, compromisos de defensa y posicionamiento diplomático en conflictos globales.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>💡 Claves para Estudiar Geografía Política</h3>
+          <div className={styles.eduTipsGrid}>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🗺️</span>
+              <h4>Usa mapas físicos y políticos</h4>
+              <p>Los mapas físicos (relieve, ríos, costas) explican por qué las fronteras están donde están. Las cordilleras y los ríos son las fronteras naturales más antiguas del mundo.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>📰</span>
+              <h4>Sigue noticias internacionales</h4>
+              <p>La geografía cobra vida con la actualidad. El conflicto en Ucrania, las tensiones en el Mar de China o las elecciones en África son geografía política en tiempo real.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🔢</span>
+              <h4>Aprende las capitales por regiones</h4>
+              <p>Es más fácil memorizar capitales agrupando por región: los países del Golfo Pérsico, los bálticos, los andinos. Los patrones regionales facilitan la memorización.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🏳️</span>
+              <h4>Las banderas cuentan historias</h4>
+              <p>Los colores panafricanos (rojo-amarillo-verde), los símbolos islámicos (media luna), las cruces nórdicas o las estrellas del Pacífico revelan la historia e identidad de cada nación.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>📊</span>
+              <h4>Compara datos entre países similares</h4>
+              <p>Comparar Portugal con España, Argentina con Brasil, o Corea del Norte con Corea del Sur es más revelador que estudiar un país aislado. El contraste ilumina factores clave.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🌍</span>
+              <h4>Distingue idiomas de lenguas francas</h4>
+              <p>El inglés es lengua oficial en 67 países, el francés en 29, el árabe en 26, el español en 21. Un idioma «oficial» no siempre es el más hablado en casa por la población.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className={styles.eduWarningBox}>
+            <span className={styles.eduWarningIcon}>⚠️</span>
+            <div>
+              <strong>Errores comunes al estudiar geografía política</strong>
+              <ul>
+                <li><strong>Confundir capital con ciudad más grande</strong>: La capital no siempre es la ciudad más poblada. En Australia, la capital es Canberra (no Sídney ni Melbourne). En EE.UU., Washington D.C. (no Nueva York). En Brasil, Brasilia (no São Paulo ni Río).</li>
+                <li><strong>Creer que todos los países tienen fronteras definidas</strong>: Varios países tienen disputas territoriales activas: India-Pakistán (Cachemira), Israel-Palestina, China-India (Aksai Chin), Marruecos-España (Ceuta y Melilla). Las fronteras «oficiales» dependen de qué mapa uses.</li>
+                <li><strong>Mezclar reconocimiento de iure con de facto</strong>: Kosovo es reconocido por más de 100 países pero no por la ONU. Taiwán funciona como estado independiente pero solo es reconocido formalmente por 12 países. El reconocimiento diplomático y la realidad práctica pueden ser muy diferentes.</li>
+                <li><strong>Asumir que el idioma oficial es el más hablado</strong>: En Suiza hay 4 idiomas oficiales. En Bolivia, 37. En Paraguay, el guaraní lo habla más gente que el español pese a ser ambos co-oficiales. El multilingüismo es la norma global, no la excepción.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('paises-del-mundo')} />
