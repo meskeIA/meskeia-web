@@ -1155,6 +1155,223 @@ export default function EstadisticaAvanzadaPage() {
               </tbody>
             </table>
           </div>
+          {/* Tabla comparativa de tests estadísticos */}
+          <div className={styles.eduComparativaSection}>
+            <h3>⚖️ ¿Qué Test Estadístico Usar? Comparativa Completa</h3>
+            <p className={styles.eduComparativaSubtitle}>Guía rápida para elegir el análisis correcto según tus datos</p>
+            <div className={styles.eduTablaWrapper}>
+              <table className={styles.eduTablaComparativa}>
+                <thead>
+                  <tr>
+                    <th>Test / Análisis</th>
+                    <th>¿Cuándo usar?</th>
+                    <th>Tipo de datos</th>
+                    <th>Hipótesis nula</th>
+                    <th>Resultado clave</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>t-test una muestra</strong></td><td>Comparar media de muestra con valor teórico</td><td>Continuo, normal</td><td>μ = μ₀</td><td>t-estadístico, p-valor</td></tr>
+                  <tr><td><strong>t-test dos muestras</strong></td><td>Comparar medias de dos grupos</td><td>Continuo, normal</td><td>μ₁ = μ₂</td><td>t-estadístico, p-valor</td></tr>
+                  <tr><td><strong>Correlación de Pearson</strong></td><td>Relación lineal entre dos variables continuas</td><td>Continuo, bivariado</td><td>ρ = 0</td><td>r, p-valor</td></tr>
+                  <tr><td><strong>Regresión lineal</strong></td><td>Predecir Y a partir de X, cuantificar efecto</td><td>Continuo</td><td>β = 0</td><td>R², β, p-valor</td></tr>
+                  <tr><td><strong>Chi-cuadrado</strong></td><td>Asociación entre variables categóricas</td><td>Categórico</td><td>Variables independientes</td><td>χ², p-valor</td></tr>
+                  <tr><td><strong>Intervalo de confianza</strong></td><td>Estimar parámetro poblacional con incertidumbre</td><td>Cualquiera</td><td>No aplica</td><td>IC [lower, upper]</td></tr>
+                  <tr><td><strong>Test de normalidad</strong></td><td>Verificar asunción de normalidad antes de otros tests</td><td>Continuo</td><td>Distribución normal</td><td>Decisión sí/no</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Casos de uso por perfil profesional */}
+          <div className={styles.eduEscenariosSection}>
+            <h3>💼 Casos de Uso por Perfil Profesional</h3>
+            <p className={styles.eduEscenariosSubtitle}>Cómo usar estadística avanzada en tu contexto específico</p>
+            <div className={styles.eduEscenariosGrid}>
+              <div className={styles.eduEscenarioCard}>
+                <div className={styles.eduEscenarioHeader}>
+                  <span className={styles.eduEscenarioIcon}>🔬</span>
+                  <h4>Investigador Académico</h4>
+                </div>
+                <p className={styles.eduEscenarioExample}><strong>Flujo típico:</strong> Test de normalidad → si falla, Mann-Whitney. Si pasa, t-test o ANOVA. Calcula tamaño del efecto (Cohen&apos;s d). Reporta IC 95% además del p-valor.</p>
+                <p className={styles.eduEscenarioTip}><strong>Consejo clave:</strong> Nunca reportes solo el p-valor. El tamaño del efecto y el IC son obligatorios para revistas científicas de impacto desde 2016.</p>
+              </div>
+              <div className={styles.eduEscenarioCard}>
+                <div className={styles.eduEscenarioHeader}>
+                  <span className={styles.eduEscenarioIcon}>📊</span>
+                  <h4>Analista de Datos Empresarial</h4>
+                </div>
+                <p className={styles.eduEscenarioExample}><strong>Flujo típico:</strong> A/B test → t-test de dos muestras. Correlación entre variables de negocio → Pearson + regresión para cuantificar impacto económico.</p>
+                <p className={styles.eduEscenarioTip}><strong>Consejo clave:</strong> En negocio, el p-valor &lt; 0,05 no basta. Calcula el impacto económico del tamaño del efecto: ¿0,3% de mejora en conversión vale el costo del cambio?</p>
+              </div>
+              <div className={styles.eduEscenarioCard}>
+                <div className={styles.eduEscenarioHeader}>
+                  <span className={styles.eduEscenarioIcon}>🎓</span>
+                  <h4>Estudiante de Estadística</h4>
+                </div>
+                <p className={styles.eduEscenarioExample}><strong>Práctica recomendada:</strong> Para cada dataset, aplica: (1) estadísticos descriptivos, (2) visualización, (3) test de normalidad, (4) test apropiado, (5) interpretación en contexto del problema.</p>
+                <p className={styles.eduEscenarioTip}><strong>Consejo clave:</strong> Aprende los supuestos antes que las fórmulas. Un t-test mal aplicado a datos no normales con n&lt;30 es peor que no hacer nada.</p>
+              </div>
+              <div className={styles.eduEscenarioCard}>
+                <div className={styles.eduEscenarioHeader}>
+                  <span className={styles.eduEscenarioIcon}>🏥</span>
+                  <h4>Profesional de Ciencias de la Salud</h4>
+                </div>
+                <p className={styles.eduEscenarioExample}><strong>Flujo típico:</strong> Comparar grupos de tratamiento → t-test (n&gt;30, normal) o Mann-Whitney. Factores de riesgo → correlación + regresión logística. Siempre reportar NNT (Número Necesario a Tratar).</p>
+                <p className={styles.eduEscenarioTip}><strong>Consejo clave:</strong> En salud, la significancia clínica supera a la estadística. Una diferencia de presión arterial de 2 mmHg puede ser estadísticamente significativa con n=10.000 pero clínicamente irrelevante.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* FAQ ampliado */}
+          <div className={styles.eduFaqSection}>
+            <h3>❓ Preguntas Frecuentes sobre Estadística Avanzada</h3>
+            <p className={styles.eduFaqSubtitle}>Respuestas detalladas a las dudas más comunes en análisis estadístico</p>
+            <div className={styles.eduFaqList}>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Qué significa exactamente el p-valor?</h4>
+                <p>El p-valor es la probabilidad de obtener un resultado tan extremo o más extremo que el observado, <strong>asumiendo que la hipótesis nula es cierta</strong>. p = 0,03 NO significa &quot;hay 3% de probabilidad de que H₀ sea verdadera&quot;. Significa que si H₀ fuera cierta, veríamos estos datos (o más extremos) el 3% de las veces. Es la frecuencia del error de tipo I bajo H₀.</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Por qué α = 0,05 es el umbral estándar?</h4>
+                <p>Ronald Fisher lo propuso en 1925 como convención práctica, no como verdad matemática. Significa aceptar un 5% de probabilidad de rechazar H₀ siendo cierta (error tipo I). En algunos campos es diferente: partículas subatómicas usan 5-sigma (p &lt; 0,000003), ensayos clínicos fases tardías usan α = 0,025 para mayor seguridad.</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Cuál es la diferencia entre significancia estadística y relevancia práctica?</h4>
+                <p>Con muestras grandes (n &gt; 10.000), casi cualquier diferencia será estadísticamente significativa aunque sea prácticamente inútil. Ejemplo: un fármaco que reduce la presión arterial 0,5 mmHg puede dar p &lt; 0,001 con n = 50.000, pero clínicamente es irrelevante (el umbral de relevancia es &gt; 5 mmHg). Solución: reportar siempre el tamaño del efecto (Cohen&apos;s d, r², η²).</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Cuándo usar t-test en lugar de Mann-Whitney?</h4>
+                <p>Usa <strong>t-test</strong> cuando: datos aproximadamente normales (verifica con Shapiro-Wilk), n &gt; 30 (por TCL), sin outliers extremos. Usa <strong>Mann-Whitney</strong> (no paramétrico) cuando: datos sesgados o no normales, outliers significativos, datos ordinales, n pequeño (&lt; 30). Mann-Whitney no asume normalidad pero asume misma forma de distribución en ambos grupos.</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Qué es la potencia estadística y por qué importa?</h4>
+                <p>La potencia (1-β) es la probabilidad de detectar un efecto real cuando existe. Potencia = 0,8 significa 80% de probabilidad de rechazar H₀ si el efecto es real. Estudios con baja potencia (&lt; 0,6) producen resultados &quot;no significativos&quot; que en realidad son falsos negativos. Calcula el tamaño de muestra necesario ANTES del estudio para garantizar potencia ≥ 0,8 (convención estándar).</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Qué mide R² en regresión lineal?</h4>
+                <p>R² (coeficiente de determinación) es la proporción de varianza de Y explicada por X. R² = 0,65 significa que X explica el 65% de la variabilidad de Y. Interpretación por campo: en ciencias naturales R² &gt; 0,9 es esperable; en ciencias sociales R² &gt; 0,5 es bueno; en finanzas R² &gt; 0,3 puede ser excelente. R² no mide si el modelo es correcto, solo si hay relación lineal.</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Cuál es el problema del p-hacking y cómo evitarlo?</h4>
+                <p>El p-hacking es manipular el análisis para obtener p &lt; 0,05: probar múltiples variables hasta encontrar una significativa, parar cuando aparece significancia, eliminar outliers selectivamente. Con 20 tests independientes, esperamos 1 falso positivo por azar. Solución: <strong>pré-registro del estudio</strong> (especificar hipótesis y análisis antes de recoger datos), corrección de Bonferroni para múltiples comparaciones (α/n tests).</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Cómo interpretar el coeficiente de correlación de Pearson?</h4>
+                <p>r mide la fuerza y dirección de la relación LINEAL. Interpretación de Cohen: r = 0,1 débil, r = 0,3 moderado, r = 0,5 fuerte. Importante: r = 0,7 implica R² = 0,49, o sea que X explica solo el 49% de Y. <strong>Correlación no implica causalidad</strong>: el PIB per cápita correlaciona con el número de cines (ambos suben con la riqueza). Verifica siempre con un scatterplot antes de reportar correlación.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Guía paso a paso */}
+          <div className={styles.eduStepSection}>
+            <h3>📋 Proceso Correcto de Análisis Estadístico: 7 Pasos</h3>
+            <p className={styles.eduComparativaSubtitle}>Desde los datos crudos hasta conclusiones válidas</p>
+            <div className={styles.eduStepGuide}>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>1</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Define la hipótesis ANTES de ver los datos</h4>
+                  <p>Formula H₀ y H₁ de forma precisa y medible. &quot;El grupo A tiene mayor media que B&quot; es mejor que &quot;A es diferente de B&quot;. Especifica también α (típicamente 0,05), el test a usar, y el tamaño del efecto mínimo relevante. Si defines la hipótesis DESPUÉS de ver los datos, el análisis es exploratorio, no confirmatorio.</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>2</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Calcula el tamaño de muestra necesario</h4>
+                  <p>Usa análisis de potencia (a priori) para determinar n. Necesitas: efecto mínimo relevante, α, potencia deseada (típico: 0,8). Sin esto, el estudio puede ser inconclusivo incluso si el efecto existe. Herramientas: G*Power (gratuito), pwr en R, statsmodels en Python.</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>3</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Explora y limpia los datos (EDA)</h4>
+                  <p>Calcula estadísticos descriptivos: media, mediana, desviación estándar, mínimo, máximo, percentiles. Visualiza con histogramas, boxplots, scatterplots. Identifica outliers (IQR × 1,5), valores faltantes, errores de entrada. La exploración revela si los supuestos del test son razonables.</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>4</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Verifica los supuestos del test</h4>
+                  <p>Para t-test: normalidad (Shapiro-Wilk si n&lt;50, Kolmogorov-Smirnov si n≥50), homocedasticidad (Levene). Para chi-cuadrado: frecuencias esperadas ≥ 5 en cada celda. Para regresión: residuos normales, homocedasticidad, independencia. Si los supuestos fallan, usa alternativas no paramétricas o transformaciones.</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>5</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Aplica el test estadístico apropiado</h4>
+                  <p>Ejecuta el test con los datos completos. Calcula: estadístico del test (t, F, χ², r), p-valor bilateral o unilateral según la hipótesis, grados de libertad, tamaño del efecto (Cohen&apos;s d, r², η², w de Cramer). No redondees el p-valor a &quot;p&lt;0,05&quot;; reporta el valor exacto (ej: p = 0,027).</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>6</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Calcula el intervalo de confianza</h4>
+                  <p>El IC 95% da el rango plausible del parámetro poblacional. Complementa al p-valor con información sobre la magnitud. Interpretación correcta: &quot;si repitiéramos el estudio muchas veces, el 95% de los ICs calculados incluirían el verdadero parámetro&quot;. Si el IC de la diferencia incluye el 0, la diferencia no es significativa (equivalente a p &gt; 0,05).</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>7</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Interpreta en contexto y comunica correctamente</h4>
+                  <p>Reporta: estadístico(gl) = valor, p = valor exacto, IC 95% [a, b], tamaño del efecto con su clasificación. Evita: &quot;el estudio prueba que...&quot;, &quot;hay diferencias significativas&quot; sin especificar la magnitud. Di: &quot;Se encontró una diferencia estadísticamente significativa de 3,2 puntos (t(58) = 2,41, p = 0,019, d = 0,62, IC 95% [0,5, 5,9]), lo que representa un tamaño del efecto moderado&quot;.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tips - mejores prácticas */}
+          <div className={styles.eduTipsSection}>
+            <h3>✅ Mejores Prácticas en Análisis Estadístico</h3>
+            <div className={styles.eduTipsGrid}>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>📈</span>
+                <h4>Siempre visualiza antes de calcular</h4>
+                <p>Un scatterplot revela outliers, relaciones no lineales y agrupaciones que el estadístico resumen oculta. El cuarteto de Anscombe (mismo r, distribuciones totalmente distintas) lo ilustra perfectamente.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>🎯</span>
+                <h4>Reporta tamaño del efecto siempre</h4>
+                <p>Cohen&apos;s d para diferencias de medias, r² para regresión, η² para ANOVA. Un efecto puede ser estadísticamente significativo pero prácticamente irrelevante (o viceversa con muestras pequeñas).</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>🔢</span>
+                <h4>Usa IC 95% además del p-valor</h4>
+                <p>El intervalo de confianza comunica la precisión de la estimación y su relevancia práctica. Un IC [0,01, 0,02] indica precisión pero efecto minúsculo. Un IC [-5, 50] indica alta incertidumbre.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>⚠️</span>
+                <h4>Corrige para comparaciones múltiples</h4>
+                <p>Con 20 tests independientes a α=0,05, esperas 1 falso positivo. Aplica Bonferroni (α/n) para análisis exploratorios o FDR (Benjamini-Hochberg) para datos genómicos o de neuroimagen.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>🔬</span>
+                <h4>Verifica supuestos del test</h4>
+                <p>Shapiro-Wilk para normalidad (antes del t-test), Levene para homocedasticidad, Durbin-Watson para autocorrelación (en series temporales). Un test aplicado con supuestos violados puede dar resultados falsos.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>📝</span>
+                <h4>Pre-registra tus hipótesis</h4>
+                <p>Especifica hipótesis, diseño, tamaño de muestra y análisis ANTES de recoger datos. Usa OSF (Open Science Framework) para pre-registro público. Esto elimina el sesgo de confirmación y el p-hacking.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Warning box - errores comunes */}
+          <div className={styles.eduWarningBox}>
+            <div className={styles.eduWarningHeader}>
+              <span className={styles.eduWarningIcon}>⚠️</span>
+              <h3>Errores Estadísticos que Invalidan tus Conclusiones</h3>
+            </div>
+            <ul className={styles.eduWarningList}>
+              <li><strong>❌ Interpretar p &gt; 0,05 como &quot;no hay efecto&quot;:</strong> Solo significa &quot;insuficiente evidencia para rechazar H₀&quot;. Puede ser por muestra pequeña (baja potencia) o porque el efecto es pequeño. Un IC que incluye valores clínicamente relevantes es más informativo.</li>
+              <li><strong>❌ Hacer múltiples tests sin corrección:</strong> Probar 20 hipótesis independientes garantiza ~1 falso positivo por azar. Sin corrección (Bonferroni, FDR), los resultados son no reproducibles. Este es el origen principal de la &quot;crisis de replicación&quot; en ciencias.</li>
+              <li><strong>❌ Asumir normalidad sin verificar:</strong> El t-test es robusto a deviaciones leves de normalidad con n &gt; 30, pero no con outliers extremos o distribuciones altamente sesgadas (ej: ingresos, tiempos de respuesta). Shapiro-Wilk + histograma, siempre.</li>
+              <li><strong>❌ Confundir correlación con causalidad:</strong> r = 0,95 entre A y B no implica que A cause B. Puede ser relación espuria (ambos correlacionan con C), causalidad inversa (B causa A), o coincidencia. La causalidad requiere diseño experimental o métodos específicos (regresión instrumental, DAGs).</li>
+              <li><strong>❌ Aplicar test paramétrico a datos ordinales:</strong> Escala Likert (1-5) NO es continua: la distancia entre &quot;De acuerdo&quot; y &quot;Muy de acuerdo&quot; no es igual a entre &quot;Neutro&quot; y &quot;De acuerdo&quot;. Usa Mann-Whitney, Kruskal-Wallis o modelos de regresión ordinal.</li>
+              <li><strong>❌ Olvidar el tamaño del efecto con muestras grandes:</strong> Con n = 50.000, una diferencia de 0,001 mm puede ser p &lt; 0,001 pero completamente irrelevante. Cohen&apos;s d &lt; 0,2 es &quot;pequeño&quot; independientemente del p-valor. Siempre pregunta: ¿esta diferencia importa en la práctica?</li>
+            </ul>
+          </div>
         </section>
       </EducationalSection>
 

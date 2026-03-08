@@ -825,6 +825,219 @@ export default function CalculadoraDistribucionesPage() {
               </p>
             </div>
           </div>
+
+          {/* Tabla Comparativa */}
+          <div className={styles.eduComparativaSection}>
+            <h3>⚖️ Tabla Comparativa: ¿Cuándo Usar Cada Distribución?</h3>
+            <p className={styles.eduComparativaSubtitle}>Selección rápida basada en el tipo de fenómeno a modelar</p>
+            <div className={styles.eduTablaWrapper}>
+              <table className={styles.eduTablaComparativa}>
+                <thead>
+                  <tr>
+                    <th>Distribución</th>
+                    <th>Tipo</th>
+                    <th>Dominio</th>
+                    <th>Parámetros clave</th>
+                    <th>Uso principal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>Normal (Gaussian)</strong></td><td>Continua</td><td>(-∞, +∞)</td><td>μ (media), σ (desv. std.)</td><td>Alturas, pesos, errores medición, sumas por TCL</td></tr>
+                  <tr><td><strong>Poisson</strong></td><td>Discreta</td><td>[0, ∞)</td><td>λ (tasa media)</td><td>Llamadas/hora, defectos/m², accidentes/día</td></tr>
+                  <tr><td><strong>Exponencial</strong></td><td>Continua</td><td>[0, +∞)</td><td>λ (tasa de eventos)</td><td>Tiempo entre eventos, vida útil componentes, tiempos de espera</td></tr>
+                  <tr><td><strong>Uniforme</strong></td><td>Continua</td><td>[a, b]</td><td>a (mín), b (máx)</td><td>Números aleatorios, prior no informativo, rondeo</td></tr>
+                  <tr><td><strong>Gamma</strong></td><td>Continua</td><td>(0, +∞)</td><td>α (forma), β (escala)</td><td>Tiempo hasta k eventos, precipitaciones, modelos de fiabilidad</td></tr>
+                  <tr><td><strong>Beta</strong></td><td>Continua</td><td>(0, 1)</td><td>α, β (forma)</td><td>Probabilidades, proporciones, prior bayesiano conjugado</td></tr>
+                  <tr><td><strong>Binomial</strong></td><td>Discreta</td><td>[0, n]</td><td>n (ensayos), p (prob. éxito)</td><td>Control calidad, encuestas, conversiones e-commerce</td></tr>
+                  <tr><td><strong>t de Student</strong></td><td>Continua</td><td>(-∞, +∞)</td><td>ν (grados libertad)</td><td>Estimación media con σ desconocida, muestras pequeñas</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Casos de Uso Prácticos */}
+          <div className={styles.eduEscenariosSection}>
+            <h3>💼 Casos de Uso Reales por Sector</h3>
+            <p className={styles.eduEscenariosSubtitle}>Cómo aplican las distribuciones de probabilidad en contextos profesionales</p>
+            <div className={styles.eduEscenariosGrid}>
+              <div className={styles.eduEscenarioCard}>
+                <div className={styles.eduEscenarioHeader}>
+                  <span className={styles.eduEscenarioIcon}>🏭</span>
+                  <h4>Control de Calidad Industrial</h4>
+                </div>
+                <p className={styles.eduEscenarioExample}><strong>Distribuciones usadas:</strong> Normal (medidas de piezas), Binomial (defectos por lote), Poisson (defectos por unidad de superficie). Un proceso &quot;six sigma&quot; implica que las medidas caen a &lt; 6σ de la media (P(defecto) &lt; 3,4 por millón).</p>
+                <p className={styles.eduEscenarioTip}><strong>Aplicación:</strong> Límites de control estadístico de proceso (SPC) usan Normal. Si el proceso no es normal, usa distribuciones no paramétricas o transforma los datos.</p>
+              </div>
+              <div className={styles.eduEscenarioCard}>
+                <div className={styles.eduEscenarioHeader}>
+                  <span className={styles.eduEscenarioIcon}>📡</span>
+                  <h4>Ingeniería de Fiabilidad y Telecomunicaciones</h4>
+                </div>
+                <p className={styles.eduEscenarioExample}><strong>Distribuciones usadas:</strong> Exponencial (tiempo hasta fallo de componentes electrónicos), Weibull (variante de Gamma para degradación), Poisson (paquetes de datos por segundo en redes).</p>
+                <p className={styles.eduEscenarioTip}><strong>Aplicación:</strong> MTBF (Mean Time Between Failures) sigue distribución Exponencial. Si λ = 0,001 fallos/hora, MTBF = 1/λ = 1.000 horas. La probabilidad de operar 500 horas sin fallo = e^(-0,5) ≈ 60,7%.</p>
+              </div>
+              <div className={styles.eduEscenarioCard}>
+                <div className={styles.eduEscenarioHeader}>
+                  <span className={styles.eduEscenarioIcon}>📊</span>
+                  <h4>Finanzas y Actuaría</h4>
+                </div>
+                <p className={styles.eduEscenarioExample}><strong>Distribuciones usadas:</strong> Normal (retornos de activos en Black-Scholes), t-Student (retornos reales con colas pesadas), Beta (probabilidades de default en ratings crediticios).</p>
+                <p className={styles.eduEscenarioTip}><strong>Aplicación:</strong> VaR (Value at Risk) al 95%: ¿cuál es la pérdida máxima esperada? Con retornos Normal(μ, σ), VaR = μ - 1,645σ. La crisis de 2008 demostró que las colas reales son más pesadas que la Normal.</p>
+              </div>
+              <div className={styles.eduEscenarioCard}>
+                <div className={styles.eduEscenarioHeader}>
+                  <span className={styles.eduEscenarioIcon}>🔬</span>
+                  <h4>Ciencia de Datos y Machine Learning</h4>
+                </div>
+                <p className={styles.eduEscenarioExample}><strong>Distribuciones usadas:</strong> Beta (prior para tasas de conversión en bayesiano), Binomial (clasificación binaria y métricas de evaluación), Normal (distribución de pesos en redes neuronales).</p>
+                <p className={styles.eduEscenarioTip}><strong>Aplicación:</strong> A/B testing bayesiano: modela la tasa de conversión de cada variante con Beta(α, β). Actualiza con observaciones (éxitos y fracasos). El área donde Beta_B &gt; Beta_A da la probabilidad de que B sea mejor.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* FAQ Ampliado */}
+          <div className={styles.eduFaqSection}>
+            <h3>❓ Preguntas Frecuentes sobre Distribuciones de Probabilidad</h3>
+            <p className={styles.eduFaqSubtitle}>Respuestas detalladas a las dudas más comunes</p>
+            <div className={styles.eduFaqList}>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Por qué la distribución Normal es tan común en la naturaleza?</h4>
+                <p>Por el <strong>Teorema Central del Límite</strong> (TCL): la suma de muchas variables aleatorias independientes e idénticamente distribuidas tiende a una distribución Normal, independientemente de la distribución original. Esto explica por qué las alturas (suma de muchos factores genéticos y ambientales), los errores de medición, y los precios de acciones a largo plazo siguen distribuciones aproximadamente normales.</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Cuándo uso Poisson en lugar de Binomial?</h4>
+                <p>La distribución de Poisson es una aproximación a la Binomial cuando n es muy grande y p es muy pequeño (np = λ constante). Regla práctica: usa Poisson cuando n &gt; 100 y p &lt; 0,01. Ejemplo: defectos en 1 km de cable con p = 0,001 defecto/metro → Poisson(λ = 1). La Binomial exacta sería Bin(1000, 0,001) que es computacionalmente equivalente.</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Qué significa la propiedad &quot;sin memoria&quot; de la Exponencial?</h4>
+                <p>P(T &gt; t+s | T &gt; t) = P(T &gt; s). Es decir: si un componente lleva funcionando t horas, la probabilidad de que dure s horas más es la misma que si fuera nuevo. Esto tiene implicaciones importantes: no es realista para componentes que se degradan. La distribución de Weibull (generalización) permite modelar fatiga y desgaste incremental.</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Cuál es la diferencia entre PDF y PMF?</h4>
+                <p><strong>PDF</strong> (Probability Density Function): para distribuciones continuas. f(x) NO es probabilidad; es densidad. Para obtener probabilidad, debes integrar: P(a ≤ X ≤ b) = ∫f(x)dx. <strong>PMF</strong> (Probability Mass Function): para distribuciones discretas. P(X=k) SÍ es probabilidad directamente. La CDF (Función de Distribución Acumulada) funciona igual para ambas: P(X ≤ x) = área bajo la curva hasta x.</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Para qué se usa la distribución Beta en inferencia bayesiana?</h4>
+                <p>Beta es el <strong>prior conjugado</strong> para la distribución Binomial. Si el prior es Beta(α, β) y observas k éxitos en n ensayos, el posterior es Beta(α+k, β+n-k). Aplicación práctica: si tienes prior Beta(2,2) para la tasa de conversión web (neutro) y observas 30 conversiones en 100 visitas, el posterior es Beta(32,72) con media 32/104 ≈ 30,8%. Es la base del A/B testing bayesiano.</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Cuándo usar t-Student en lugar de Normal estándar?</h4>
+                <p>Usa t-Student cuando estimas la media poblacional pero <strong>no conoces σ</strong> (lo normal en práctica). Con grados de libertad ν = n-1, la t-Student tiene colas más pesadas que la Normal, reflejando la incertidumbre adicional de estimar σ. Regla práctica: con ν &gt; 30, t-Student ≈ Normal estándar. El cuantil 95% de t(5) = 2,015 vs 1,645 de la Normal, evidenciando la diferencia para muestras pequeñas.</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Cómo elijo entre Gamma y Exponencial?</h4>
+                <p>La <strong>Exponencial</strong> es un caso especial de Gamma con α=1: modela el tiempo hasta el primer evento. La <strong>Gamma(α, β)</strong> modela el tiempo hasta que ocurren α eventos. Si tienes un sistema que falla solo después de que fallen k componentes en serie, usa Gamma(k, 1/λ). La Gamma también es más flexible: puede modelar distribuciones simétricas (α grande) o sesgadas (α pequeño).</p>
+              </div>
+              <div className={styles.eduFaqItem}>
+                <h4>❓ ¿Qué es el percentil 95 y cómo se calcula?</h4>
+                <p>El percentil 95 (cuantil 0,95) es el valor x tal que P(X ≤ x) = 0,95. En la práctica: el 95% de los datos caen por debajo de este valor. Para Normal(0,1): percentil 95 = 1,645 (valor crítico en tests unilaterales). Para calcular cuantiles en distribuciones no estándar: usa la función de cuantil (inversa de la CDF). Esta calculadora calcula cuantiles exactos para las 8 distribuciones disponibles.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Guía Paso a Paso */}
+          <div className={styles.eduStepSection}>
+            <h3>📋 Cómo Elegir la Distribución Correcta: 6 Pasos</h3>
+            <p className={styles.eduComparativaSubtitle}>Proceso sistemático para seleccionar el modelo probabilístico adecuado</p>
+            <div className={styles.eduStepGuide}>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>1</div>
+                <div className={styles.eduStepContent}>
+                  <h4>¿Continua o discreta?</h4>
+                  <p>Si la variable puede tomar cualquier valor real en un rango (longitud, tiempo, temperatura) → continua (Normal, Exponencial, Gamma, Beta, Uniforme). Si solo toma valores enteros (conteos, número de éxitos) → discreta (Binomial, Poisson). Este primer filtro elimina la mitad de opciones.</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>2</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Identifica el soporte (dominio) de la variable</h4>
+                  <p>¿La variable puede ser negativa? → Normal o t-Student. ¿Solo valores positivos? → Exponencial, Gamma, LogNormal. ¿Solo entre 0 y 1? → Beta. ¿Solo enteros no negativos sin límite? → Poisson. ¿Enteros entre 0 y n? → Binomial. El dominio físico de la variable restringe las opciones válidas.</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>3</div>
+                <div className={styles.eduStepContent}>
+                  <h4>¿Cuál es el mecanismo generador?</h4>
+                  <p>¿Es una suma de muchos efectos independientes? → Normal (TCL). ¿Es un conteo de eventos raros por unidad? → Poisson. ¿Es el número de éxitos en n ensayos Bernoulli? → Binomial. ¿Es el tiempo entre eventos de Poisson? → Exponencial. ¿Es una proporción o probabilidad? → Beta. El mecanismo subyacente es la guía más confiable.</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>4</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Examina la asimetría (skewness) de los datos</h4>
+                  <p>Datos simétricos alrededor de la media → Normal. Datos sesgados a la derecha (cola larga hacia valores grandes) → Exponencial, Gamma, LogNormal. Si los datos tienen sesgo moderado, la Gamma permite ajustar la asimetría con el parámetro α. Con α grande, la Gamma se vuelve casi simétrica. Histograma + Q-Q plot son las herramientas visuales clave.</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>5</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Ajusta los parámetros con los datos</h4>
+                  <p>Estimación por Máxima Verosimilitud (MLE): para Normal, μ̂ = media muestral, σ̂ = desv. estándar. Para Poisson, λ̂ = media muestral. Para Exponencial, λ̂ = 1/media. Para Gamma y Beta, usa métodos numéricos (scipy.stats.fit en Python, fitdistr en R). Verifica el ajuste con el test de Kolmogorov-Smirnov o Chi-cuadrado de bondad de ajuste.</p>
+                </div>
+              </div>
+              <div className={styles.eduStepItem}>
+                <div className={styles.eduStepNumber}>6</div>
+                <div className={styles.eduStepContent}>
+                  <h4>Valida el ajuste visualmente y estadísticamente</h4>
+                  <p>Herramientas visuales: Q-Q plot (los puntos deben seguir la línea diagonal), histograma vs curva teórica. Estadísticos de bondad de ajuste: Kolmogorov-Smirnov (p &gt; 0,05 indica buen ajuste), AIC/BIC para comparar modelos alternativos (menor = mejor). Si ninguna distribución teórica ajusta bien, considera distribuciones no paramétricas o mezclas.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tips - Mejores Prácticas */}
+          <div className={styles.eduTipsSection}>
+            <h3>✅ Mejores Prácticas al Trabajar con Distribuciones</h3>
+            <div className={styles.eduTipsGrid}>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>📊</span>
+                <h4>Visualiza siempre primero</h4>
+                <p>Antes de asumir una distribución, haz un histograma y un Q-Q plot. Los datos reales raras veces siguen distribuciones teóricas perfectamente.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>🔢</span>
+                <h4>Entiende los parámetros</h4>
+                <p>Parametrización importa: la Exponencial puede expresarse con λ (tasa) o con 1/λ (escala). Python scipy.stats usa escala; esta calculadora usa λ. Verifica siempre.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>🎯</span>
+                <h4>Verifica la independencia</h4>
+                <p>Binomial y Poisson asumen observaciones independientes. Si hay correlación (series temporales, datos espaciales), las distribuciones estándar subestiman la varianza real.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>⚠️</span>
+                <h4>Las colas importan mucho</h4>
+                <p>La distribución Normal subestima eventos extremos. En finanzas y seguros, las distribuciones de cola pesada (t-Student, Pareto) son más realistas para modelar pérdidas catastróficas.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>🔬</span>
+                <h4>Usa MLE para estimar parámetros</h4>
+                <p>La Estimación por Máxima Verosimilitud (MLE) da los mejores estimadores insesgados para muestras grandes. Para muestras pequeñas, los estimadores bayesianos (MAP) pueden ser superiores.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>📈</span>
+                <h4>Compara modelos con AIC/BIC</h4>
+                <p>Si dudas entre Gamma y LogNormal, ajusta ambas y compara el AIC (Akaike Information Criterion): el menor indica mejor ajuste penalizado por complejidad. La diferencia ΔAIC &gt; 4 es significativa.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Warning Box - Errores Comunes */}
+          <div className={styles.eduWarningBox}>
+            <div className={styles.eduWarningHeader}>
+              <span className={styles.eduWarningIcon}>⚠️</span>
+              <h3>Errores Comunes al Usar Distribuciones de Probabilidad</h3>
+            </div>
+            <ul className={styles.eduWarningList}>
+              <li><strong>❌ Asumir normalidad sin verificar:</strong> El TCL garantiza normalidad de la media muestral con n grande, no de los datos individuales. Ingresos, tiempos de respuesta y precios de activos rara vez son normales. Shapiro-Wilk + histograma siempre antes.</li>
+              <li><strong>❌ Confundir densidad con probabilidad en distribuciones continuas:</strong> f(x) puede ser mayor que 1 (Normal(0, 0.1) tiene densidad ≈ 3,99 en x=0). La probabilidad real requiere integración: P(X ∈ [a,b]) = CDF(b) - CDF(a). Nunca digas &quot;la probabilidad es f(x)&quot;.</li>
+              <li><strong>❌ Usar Poisson cuando los eventos no son independientes:</strong> Poisson asume que la ocurrencia de un evento no afecta la probabilidad de los siguientes. En epidemias (contagios), accidentes de tráfico en cadena, o tweets virales, los eventos se autopromueven. Usa modelos Hawkes o distribuciones de cola pesada.</li>
+              <li><strong>❌ Ignorar la sobredispersión en datos de conteo:</strong> Poisson asume varianza = media. Si varianza &gt;&gt; media (sobredispersión), usa Binomial Negativa. Ejemplo: número de visitas al médico por persona tiene alta varianza entre personas (algunos van 0 veces, otros 20+).</li>
+              <li><strong>❌ Extrapolar más allá del rango de datos observados:</strong> Una distribución ajustada a datos históricos no predice confiablemente eventos fuera del rango observado. El VaR basado en Normal subestimó drásticamente las pérdidas en 2008. Para colas, usa Teoría de Valores Extremos (GEV, GPD).</li>
+              <li><strong>❌ Mezclar distribuciones de distintas poblaciones sin modelarlo:</strong> Si tus datos provienen de 2 grupos (ej: tiempos de respuesta de servidores lentos y rápidos), la distribución combinada puede parecer bimodal. Un solo modelo Normal fallará. Usa modelos de mezcla (GMM) para datos con múltiples modos.</li>
+            </ul>
+          </div>
+
         </section>
       </EducationalSection>
 
