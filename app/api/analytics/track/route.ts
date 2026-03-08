@@ -51,6 +51,17 @@ function truncar(val: unknown, max: number): string | null {
 
 export async function POST(request: NextRequest) {
   try {
+    // Filtrar bots y rastreadores conocidos (Googlebot, Bingbot, etc.)
+    const userAgent = request.headers.get('user-agent') || '';
+    const botsPattern = /Googlebot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Applebot|Screaming Frog|AhrefsBot|SemrushBot|MJ12bot|DotBot|PetalBot|GPTBot|ClaudeBot|anthropic-ai/i;
+
+    if (botsPattern.test(userAgent)) {
+      return NextResponse.json(
+        { status: 'ignored', message: 'Tráfico de bot ignorado' },
+        { status: 200, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
+      );
+    }
+
     // Inicializar DB si es necesario
     await initializeDatabase();
 
