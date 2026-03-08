@@ -28,6 +28,17 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       }
     }
 
+    // Filtrar bots en el cliente (Googlebot usa Chrome headless: navigator.webdriver=true)
+    if (navigator.webdriver) {
+      console.log('[Analytics] Bot detectado (webdriver), ignorando.');
+      return;
+    }
+    const uaBot = /bot|crawler|spider|Googlebot|bingbot|Headless/i.test(navigator.userAgent);
+    if (uaBot) {
+      console.log('[Analytics] Bot detectado (userAgent), ignorando.');
+      return;
+    }
+
     // URL base para API (relativa, funciona en cualquier dominio)
     const API_BASE = '/api/analytics';
 
