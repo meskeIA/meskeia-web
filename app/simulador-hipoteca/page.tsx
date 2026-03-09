@@ -8,7 +8,7 @@ import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
-type TipoInteres = 'fijo' | 'variable';
+type TipoInteres = 'fijo' | 'variable' | 'mixta';
 type VistaTabla = 'mensual' | 'anual';
 
 interface CuotaAmortizacion {
@@ -28,6 +28,7 @@ export default function SimuladorHipotecaPage() {
   const [interesAnual, setInteresAnual] = useState(3.5);
   const [euribor, setEuribor] = useState(3.0);
   const [diferencial, setDiferencial] = useState(0.8);
+  const [plazoFijoMixta, setPlazoFijoMixta] = useState(5);
 
   // Ingresos para ratio
   const [ingresosMensuales, setIngresosMensuales] = useState('3000');
@@ -48,69 +49,140 @@ export default function SimuladorHipotecaPage() {
 
     if (capital <= 0 || plazo <= 0) return null;
 
-    // Tipo de interés efectivo
-    const tipoEfectivo = tipoInteres === 'fijo'
-      ? interesAnual
-      : euribor + diferencial;
-
-    const interesMensual = tipoEfectivo / 100 / 12;
     const numCuotas = plazo * 12;
-
-    // Fórmula francesa: C = P * [i(1+i)^n] / [(1+i)^n - 1]
-    const cuotaMensual = capital *
-      (interesMensual * Math.pow(1 + interesMensual, numCuotas)) /
-      (Math.pow(1 + interesMensual, numCuotas) - 1);
-
-    // Generar tabla de amortización
     const tablaMensual: CuotaAmortizacion[] = [];
+
+    // Fórmula francesa
+    const calcCuota = (cap: number, tasa: number, meses: number) => {
+      if (meses <= 0) return 0;
+      if (tasa === 0) return cap / meses;
+      const r = tasa / 100 / 12;
+      return cap * (r * Math.pow(1 + r, meses)) / (Math.pow(1 + r, meses) - 1);
+    };
+
+    if (tipoInteres === 'mixta') {
+      const n1 = Math.min(plazoFijoMixta * 12, numCuotas - 1);
+      const n2 = numCuotas - n1;
+      const tipoVar = euribor + diferencial;
+      const r1 = interesAnual / 100 / 12;
+      const r2 = tipoVar / 100 / 12;
+
+      // Fase 1: cuota calculada sobre el plazo total (práctica bancaria habitual)
+      const cuota1 = calcCuota(capital, interesAnual, numCuotas);
+      let pendiente = capital;
+
+      for (let i = 1; i <= n1; i++) {
+        const interesMes = pendiente * r1;
+        const capitalMes = cuota1 - interesMes;
+        pendiente = Math.max(0, pendiente - capitalMes);
+        tablaMensual.push({ periodo: i, cuota: cuota1, interes: interesMes, capital: capitalMes, pendiente });
+      }
+
+      // Fase 2: nueva cuota sobre capital pendiente
+      const cuota2 = n2 > 0 && pendiente > 0 ? calcCuota(pendiente, tipoVar, n2) : 0;
+      for (let i = n1 + 1; i <= numCuotas; i++) {
+        const interesMes = pendiente * r2;
+        const capitalMes = cuota2 - interesMes;
+        pendiente = Math.max(0, pendiente - capitalMes);
+        tablaMensual.push({ periodo: i, cuota: cuota2, interes: interesMes, capital: capitalMes, pendiente });
+      }
+
+      const tablaAnual: CuotaAmortizacion[] = [];
+      for (let ano = 1; ano <= plazo; ano++) {
+        const cuotasAno = tablaMensual.slice((ano - 1) * 12, ano * 12);
+        tablaAnual.push({
+          periodo: ano,
+          cuota: cuotasAno.reduce((s, c) => s + c.cuota, 0),
+          interes: cuotasAno.reduce((s, c) => s + c.interes, 0),
+          capital: cuotasAno.reduce((s, c) => s + c.capital, 0),
+          pendiente: cuotasAno[cuotasAno.length - 1]?.pendiente || 0,
+        });
+      }
+
+      const totalPagado = tablaMensual.reduce((s, c) => s + c.cuota, 0);
+      return {
+        capital, cuotaMensual: cuota1, cuotaMixta2: cuota2,
+        tipoEfectivo: interesAnual, totalPagado, totalIntereses: totalPagado - capital,
+        tablaMensual, tablaAnual,
+      };
+    }
+
+    // Hipoteca fija o variable
+    const tipoEfectivo = tipoInteres === 'fijo' ? interesAnual : euribor + diferencial;
+    const cuotaMensual = calcCuota(capital, tipoEfectivo, numCuotas);
     let pendiente = capital;
 
     for (let i = 1; i <= numCuotas; i++) {
-      const interesMes = pendiente * interesMensual;
+      const r = tipoEfectivo / 100 / 12;
+      const interesMes = pendiente * r;
       const capitalMes = cuotaMensual - interesMes;
-      pendiente = pendiente - capitalMes;
-
-      tablaMensual.push({
-        periodo: i,
-        cuota: cuotaMensual,
-        interes: interesMes,
-        capital: capitalMes,
-        pendiente: Math.max(0, pendiente),
-      });
+      pendiente = Math.max(0, pendiente - capitalMes);
+      tablaMensual.push({ periodo: i, cuota: cuotaMensual, interes: interesMes, capital: capitalMes, pendiente });
     }
 
-    // Agrupar por años
     const tablaAnual: CuotaAmortizacion[] = [];
     for (let ano = 1; ano <= plazo; ano++) {
       const cuotasAno = tablaMensual.slice((ano - 1) * 12, ano * 12);
-      const totalCuota = cuotasAno.reduce((s, c) => s + c.cuota, 0);
-      const totalInteres = cuotasAno.reduce((s, c) => s + c.interes, 0);
-      const totalCapital = cuotasAno.reduce((s, c) => s + c.capital, 0);
-      const pendienteAno = cuotasAno[cuotasAno.length - 1]?.pendiente || 0;
-
       tablaAnual.push({
         periodo: ano,
-        cuota: totalCuota,
-        interes: totalInteres,
-        capital: totalCapital,
-        pendiente: pendienteAno,
+        cuota: cuotasAno.reduce((s, c) => s + c.cuota, 0),
+        interes: cuotasAno.reduce((s, c) => s + c.interes, 0),
+        capital: cuotasAno.reduce((s, c) => s + c.capital, 0),
+        pendiente: cuotasAno[cuotasAno.length - 1]?.pendiente || 0,
       });
     }
 
-    // Totales
     const totalPagado = cuotaMensual * numCuotas;
-    const totalIntereses = totalPagado - capital;
+    return {
+      capital, cuotaMensual, cuotaMixta2: 0, tipoEfectivo,
+      totalPagado, totalIntereses: totalPagado - capital, tablaMensual, tablaAnual,
+    };
+  }, [precioVivienda, entrada, plazo, tipoInteres, interesAnual, euribor, diferencial, plazoFijoMixta]);
+
+  // Comparación simultánea de los 3 tipos
+  const comparacion = useMemo(() => {
+    const precio = parseSpanishNumber(precioVivienda) || 0;
+    const entradaNum = parseSpanishNumber(entrada) || 0;
+    const capital = precio - entradaNum;
+    if (capital <= 0 || plazo <= 0) return null;
+
+    const n = plazo * 12;
+    const tipoVar = euribor + diferencial;
+
+    const calcCuota = (cap: number, tasa: number, meses: number) => {
+      if (meses <= 0 || cap <= 0) return 0;
+      if (tasa === 0) return cap / meses;
+      const r = tasa / 100 / 12;
+      return cap * (r * Math.pow(1 + r, meses)) / (Math.pow(1 + r, meses) - 1);
+    };
+
+    // Fija
+    const cuotaFija = calcCuota(capital, interesAnual, n);
+    const totalFija = cuotaFija * n;
+
+    // Variable
+    const cuotaVariable = calcCuota(capital, tipoVar, n);
+    const totalVariable = cuotaVariable * n;
+
+    // Mixta: n1 meses fijo, n2 meses variable
+    const n1 = Math.min(plazoFijoMixta * 12, n - 1);
+    const n2 = n - n1;
+    const cuota1 = calcCuota(capital, interesAnual, n);
+    let pendienteMixta = capital;
+    const r1 = interesAnual / 100 / 12;
+    for (let i = 0; i < n1; i++) {
+      const interes = pendienteMixta * r1;
+      pendienteMixta = Math.max(0, pendienteMixta - (cuota1 - interes));
+    }
+    const cuota2 = n2 > 0 ? calcCuota(pendienteMixta, tipoVar, n2) : 0;
+    const totalMixta = cuota1 * n1 + cuota2 * n2;
 
     return {
-      capital,
-      cuotaMensual,
-      tipoEfectivo,
-      totalPagado,
-      totalIntereses,
-      tablaMensual,
-      tablaAnual,
+      fija: { cuota: cuotaFija, total: totalFija, intereses: totalFija - capital },
+      variable: { cuota: cuotaVariable, total: totalVariable, intereses: totalVariable - capital },
+      mixta: { cuota1, cuota2, total: totalMixta, intereses: totalMixta - capital },
     };
-  }, [precioVivienda, entrada, plazo, tipoInteres, interesAnual, euribor, diferencial]);
+  }, [precioVivienda, entrada, plazo, interesAnual, euribor, diferencial, plazoFijoMixta]);
 
   // Ratio de endeudamiento
   const ratioEndeudamiento = useMemo(() => {
@@ -300,20 +372,29 @@ export default function SimuladorHipotecaPage() {
 
           <div className={styles.tipoToggle}>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${tipoInteres === 'fijo' ? styles.activo : ''}`}
               onClick={() => setTipoInteres('fijo')}
             >
-              Fijo
+              🔒 Fijo
             </button>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${tipoInteres === 'variable' ? styles.activo : ''}`}
               onClick={() => setTipoInteres('variable')}
             >
-              Variable
+              📊 Variable
+            </button>
+            <button
+              type="button"
+              className={`${styles.tipoBtn} ${tipoInteres === 'mixta' ? styles.activo : ''}`}
+              onClick={() => setTipoInteres('mixta')}
+            >
+              🔄 Mixta
             </button>
           </div>
 
-          {tipoInteres === 'fijo' ? (
+          {tipoInteres === 'fijo' && (
             <div className={styles.sliderGroup}>
               <div className={styles.sliderHeader}>
                 <label className={styles.label}>Interés fijo anual (TIN)</label>
@@ -329,7 +410,9 @@ export default function SimuladorHipotecaPage() {
                 onChange={(e) => setInteresAnual(parseFloat(e.target.value))}
               />
             </div>
-          ) : (
+          )}
+
+          {tipoInteres === 'variable' && (
             <>
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
@@ -349,6 +432,71 @@ export default function SimuladorHipotecaPage() {
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
                   <label className={styles.label}>Diferencial</label>
+                  <span className={styles.sliderValue}>+{diferencial.toFixed(2)}%</span>
+                </div>
+                <input
+                  type="range"
+                  className={styles.slider}
+                  min="0.3"
+                  max="2"
+                  step="0.1"
+                  value={diferencial}
+                  onChange={(e) => setDiferencial(parseFloat(e.target.value))}
+                />
+              </div>
+            </>
+          )}
+
+          {tipoInteres === 'mixta' && (
+            <>
+              <div className={styles.sliderGroup}>
+                <div className={styles.sliderHeader}>
+                  <label className={styles.label}>Tramo fijo inicial</label>
+                  <span className={styles.sliderValue}>{plazoFijoMixta} años</span>
+                </div>
+                <input
+                  type="range"
+                  className={styles.slider}
+                  min="1"
+                  max={Math.min(15, plazo - 1) || 1}
+                  value={plazoFijoMixta}
+                  onChange={(e) => setPlazoFijoMixta(parseInt(e.target.value))}
+                />
+                <span className={styles.helpText}>Años con tipo fijo antes de pasar a variable</span>
+              </div>
+              <div className={styles.sliderGroup}>
+                <div className={styles.sliderHeader}>
+                  <label className={styles.label}>Tipo fijo inicial (TIN)</label>
+                  <span className={styles.sliderValue}>{interesAnual.toFixed(2)}%</span>
+                </div>
+                <input
+                  type="range"
+                  className={styles.slider}
+                  min="1"
+                  max="6"
+                  step="0.1"
+                  value={interesAnual}
+                  onChange={(e) => setInteresAnual(parseFloat(e.target.value))}
+                />
+              </div>
+              <div className={styles.sliderGroup}>
+                <div className={styles.sliderHeader}>
+                  <label className={styles.label}>Euríbor (tramo variable)</label>
+                  <span className={styles.sliderValue}>{euribor.toFixed(2)}%</span>
+                </div>
+                <input
+                  type="range"
+                  className={styles.slider}
+                  min="-0.5"
+                  max="5"
+                  step="0.1"
+                  value={euribor}
+                  onChange={(e) => setEuribor(parseFloat(e.target.value))}
+                />
+              </div>
+              <div className={styles.sliderGroup}>
+                <div className={styles.sliderHeader}>
+                  <label className={styles.label}>Diferencial (tramo variable)</label>
                   <span className={styles.sliderValue}>+{diferencial.toFixed(2)}%</span>
                 </div>
                 <input
@@ -390,14 +538,22 @@ export default function SimuladorHipotecaPage() {
             <>
               {/* Cuota Principal */}
               <div className={styles.resultadoPrincipal}>
-                <span className={styles.resultadoLabel}>Tu cuota mensual</span>
+                <span className={styles.resultadoLabel}>
+                  {tipoInteres === 'mixta' ? `Cuota fase fija (${plazoFijoMixta} años)` : 'Tu cuota mensual'}
+                </span>
                 <span className={styles.resultadoValor}>
                   {formatCurrency(resultado.cuotaMensual)}
                 </span>
                 <span className={styles.resultadoSubtexto}>
-                  Tipo de interés: {formatNumber(resultado.tipoEfectivo, 2)}%
-                  {tipoInteres === 'variable' && ' (Euríbor + diferencial)'}
+                  {tipoInteres === 'fijo' && `Tipo fijo: ${formatNumber(resultado.tipoEfectivo, 2)}%`}
+                  {tipoInteres === 'variable' && `TIN: ${formatNumber(resultado.tipoEfectivo, 2)}% (Euríbor + diferencial)`}
+                  {tipoInteres === 'mixta' && `${formatNumber(interesAnual, 2)}% fijo · Luego Euríbor ${formatNumber(euribor, 2)}% + ${formatNumber(diferencial, 2)}%`}
                 </span>
+                {tipoInteres === 'mixta' && resultado.cuotaMixta2 > 0 && (
+                  <span className={styles.resultadoCuota2}>
+                    Cuota fase variable (años {plazoFijoMixta + 1}–{plazo}): {formatCurrency(resultado.cuotaMixta2)}/mes
+                  </span>
+                )}
               </div>
 
               {/* Resumen */}
@@ -539,74 +695,159 @@ export default function SimuladorHipotecaPage() {
         </div>
       )}
 
+      {/* Comparador simultáneo Fija vs Variable vs Mixta */}
+      {comparacion && (
+        <div className={styles.comparadorSection}>
+          <h2 className={styles.comparadorTitle}>⚖️ Compara los 3 tipos en tiempo real</h2>
+          <p className={styles.comparadorSubtitle}>
+            Misma hipoteca ({formatCurrency(comparacion.fija.cuota > 0 ? (parseSpanishNumber(precioVivienda) || 0) - (parseSpanishNumber(entrada) || 0) : 0)} de capital · {plazo} años), tres escenarios distintos
+          </p>
+          <div className={styles.comparadorGrid}>
+
+            {/* Fija */}
+            <div className={`${styles.comparadorCard} ${tipoInteres === 'fijo' ? styles.comparadorActivo : ''}`}>
+              <div className={styles.comparadorCardHeader}>🔒 Hipoteca Fija</div>
+              <div className={styles.comparadorCuota}>{formatCurrency(comparacion.fija.cuota)}<span className={styles.comparadorMes}>/mes</span></div>
+              <div className={styles.comparadorRows}>
+                <div className={styles.comparadorRow}>
+                  <span>TIN</span>
+                  <strong>{formatNumber(interesAnual, 2)}% fijo siempre</strong>
+                </div>
+                <div className={styles.comparadorRow}>
+                  <span>Total pagado</span>
+                  <strong>{formatCurrency(comparacion.fija.total)}</strong>
+                </div>
+                <div className={`${styles.comparadorRow} ${styles.comparadorRowIntereses}`}>
+                  <span>Coste en intereses</span>
+                  <strong>{formatCurrency(comparacion.fija.intereses)}</strong>
+                </div>
+              </div>
+              <div className={styles.comparadorTag}>✅ Máxima estabilidad</div>
+            </div>
+
+            {/* Variable */}
+            <div className={`${styles.comparadorCard} ${tipoInteres === 'variable' ? styles.comparadorActivo : ''}`}>
+              <div className={styles.comparadorCardHeader}>📊 Hipoteca Variable</div>
+              <div className={styles.comparadorCuota}>{formatCurrency(comparacion.variable.cuota)}<span className={styles.comparadorMes}>/mes</span></div>
+              <div className={styles.comparadorRows}>
+                <div className={styles.comparadorRow}>
+                  <span>TIN actual</span>
+                  <strong>Euríbor {formatNumber(euribor, 2)}% + {formatNumber(diferencial, 2)}%</strong>
+                </div>
+                <div className={styles.comparadorRow}>
+                  <span>Total pagado</span>
+                  <strong>{formatCurrency(comparacion.variable.total)}</strong>
+                </div>
+                <div className={`${styles.comparadorRow} ${styles.comparadorRowIntereses}`}>
+                  <span>Coste en intereses</span>
+                  <strong>{formatCurrency(comparacion.variable.intereses)}</strong>
+                </div>
+              </div>
+              <div className={styles.comparadorTag}>⚡ Potencial de ahorro</div>
+            </div>
+
+            {/* Mixta */}
+            <div className={`${styles.comparadorCard} ${tipoInteres === 'mixta' ? styles.comparadorActivo : ''}`}>
+              <div className={styles.comparadorCardHeader}>🔄 Hipoteca Mixta</div>
+              <div className={styles.comparadorCuota}>{formatCurrency(comparacion.mixta.cuota1)}<span className={styles.comparadorMes}>/mes*</span></div>
+              <div className={styles.comparadorRows}>
+                <div className={styles.comparadorRow}>
+                  <span>Fase fija ({plazoFijoMixta}a)</span>
+                  <strong>{formatNumber(interesAnual, 2)}% TIN</strong>
+                </div>
+                <div className={styles.comparadorRow}>
+                  <span>Fase variable</span>
+                  <strong>{formatCurrency(comparacion.mixta.cuota2)}/mes*</strong>
+                </div>
+                <div className={`${styles.comparadorRow} ${styles.comparadorRowIntereses}`}>
+                  <span>Coste en intereses</span>
+                  <strong>{formatCurrency(comparacion.mixta.intereses)}</strong>
+                </div>
+              </div>
+              <div className={styles.comparadorTag}>🎯 Equilibrio riesgo-ahorro</div>
+              <p className={styles.comparadorNota}>*Con Euríbor actual. Puede variar.</p>
+            </div>
+
+          </div>
+          <p className={styles.comparadorAviso}>
+            💡 Usa los controles de arriba para ajustar Euríbor y diferencial y ver cómo cambia la comparativa en tiempo real.
+          </p>
+        </div>
+      )}
+
       {/* Contenido Educativo */}
       <EducationalSection
         title="📚 Guía completa sobre hipotecas"
         subtitle="Aprende sobre tipos de interés, amortización, negociación y preguntas frecuentes"
       >
-        {/* Tabla comparativa Fija vs Variable */}
+        {/* Tabla comparativa Fija vs Variable vs Mixta */}
         <div className={styles.comparativaSection}>
-          <h2>⚖️ Hipoteca Fija vs Variable: ¿Cuál te conviene?</h2>
+          <h2>⚖️ Hipoteca Fija vs Variable vs Mixta: ¿Cuál te conviene?</h2>
         <p className={styles.comparativaSubtitle}>
           Entiende las diferencias clave para tomar la mejor decisión según tu perfil
         </p>
 
-        <div className={styles.comparativaTable}>
-          <div className={styles.comparativaRow}>
-            <div className={styles.comparativaAspecto}>
-              <strong>Aspecto</strong>
-            </div>
-            <div className={styles.comparativaFija}>
-              <strong>🔒 Hipoteca Fija</strong>
-            </div>
-            <div className={styles.comparativaVariable}>
-              <strong>📊 Hipoteca Variable</strong>
-            </div>
+        <div className={styles.comparativaTable} style={{ '--cols': '4' } as React.CSSProperties}>
+          <div className={styles.comparativaRow4}>
+            <div className={styles.comparativaAspecto}><strong>Aspecto</strong></div>
+            <div className={styles.comparativaFija}><strong>🔒 Fija</strong></div>
+            <div className={styles.comparativaVariable}><strong>📊 Variable</strong></div>
+            <div className={styles.comparativaMixta}><strong>🔄 Mixta</strong></div>
           </div>
 
-          <div className={styles.comparativaRow}>
+          <div className={styles.comparativaRow4}>
             <div className={styles.comparativaAspecto}>Cuota mensual</div>
             <div className={styles.comparativaFija}>Siempre la misma</div>
             <div className={styles.comparativaVariable}>Cambia según Euríbor</div>
+            <div className={styles.comparativaMixta}>Fija X años, luego variable</div>
           </div>
 
-          <div className={styles.comparativaRow}>
+          <div className={styles.comparativaRow4}>
             <div className={styles.comparativaAspecto}>TIN inicial</div>
             <div className={styles.comparativaFija}>Mayor (3-4%)</div>
             <div className={styles.comparativaVariable}>Menor (Euríbor + 0.6-1.2%)</div>
+            <div className={styles.comparativaMixta}>Medio (inferior al fijo puro)</div>
           </div>
 
-          <div className={styles.comparativaRow}>
+          <div className={styles.comparativaRow4}>
             <div className={styles.comparativaAspecto}>Riesgo</div>
-            <div className={styles.comparativaFija}>✅ Nulo (previsibilidad total)</div>
-            <div className={styles.comparativaVariable}>⚠️ Alto (si suben los tipos)</div>
+            <div className={styles.comparativaFija}>✅ Nulo</div>
+            <div className={styles.comparativaVariable}>⚠️ Alto</div>
+            <div className={styles.comparativaMixta}>🟡 Medio (solo fase variable)</div>
           </div>
 
-          <div className={styles.comparativaRow}>
+          <div className={styles.comparativaRow4}>
             <div className={styles.comparativaAspecto}>Ideal para...</div>
             <div className={styles.comparativaFija}>
-              • Buscas estabilidad<br />
+              • Máxima estabilidad<br />
               • Ingresos justos<br />
               • Plazo largo (25-30 años)
             </div>
             <div className={styles.comparativaVariable}>
-              • Puedes asumir riesgo<br />
+              • Asumir riesgo<br />
               • Ingresos holgados<br />
               • Plazo corto (10-15 años)
             </div>
+            <div className={styles.comparativaMixta}>
+              • Amortización anticipada planificada<br />
+              • Ingresos estables y crecientes<br />
+              • Herencia o bonus esperados
+            </div>
           </div>
 
-          <div className={styles.comparativaRow}>
+          <div className={styles.comparativaRow4}>
             <div className={styles.comparativaAspecto}>Ahorro potencial</div>
             <div className={styles.comparativaFija}>Menor (pagas "seguro")</div>
-            <div className={styles.comparativaVariable}>Mayor (si Euríbor baja o se mantiene)</div>
+            <div className={styles.comparativaVariable}>Mayor (si Euríbor baja)</div>
+            <div className={styles.comparativaMixta}>Medio (mejor que fija si Euríbor baja en fase variable)</div>
           </div>
         </div>
 
           <div className={styles.comparativaConsejo}>
             <strong>💡 Recomendación meskeIA:</strong> Si tu ratio de endeudamiento supera el 35%,
             prioriza la hipoteca fija para evitar sorpresas. Si está por debajo del 25% y tienes
-            colchón de ahorro, la variable puede ahorrarte dinero.
+            colchón de ahorro, la variable puede ahorrarte dinero. La mixta es óptima si planeas
+            amortizar anticipadamente en los primeros años.
           </div>
         </div>
 

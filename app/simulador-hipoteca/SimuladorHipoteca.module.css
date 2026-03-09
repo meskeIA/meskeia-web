@@ -973,13 +973,35 @@
   color: white;
 }
 
+.comparativaRow4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: var(--spacing-md);
+  background: var(--hover);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+}
+
+.comparativaRow4:first-child {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+}
+
+.comparativaRow4:first-child .comparativaAspecto,
+.comparativaRow4:first-child .comparativaFija,
+.comparativaRow4:first-child .comparativaVariable,
+.comparativaRow4:first-child .comparativaMixta {
+  color: white;
+}
+
 .comparativaAspecto {
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .comparativaFija,
-.comparativaVariable {
+.comparativaVariable,
+.comparativaMixta {
   font-size: 0.9rem;
   color: var(--text-secondary);
   line-height: 1.6;
@@ -1296,6 +1318,163 @@
   font-weight: 600;
 }
 
+/* Cuota fase 2 (mixta) */
+.resultadoCuota2 {
+  display: block;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-top: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+/* Comparador simultáneo Fija vs Variable vs Mixta */
+.comparadorSection {
+  margin-bottom: var(--spacing-xl);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 2px solid transparent;
+  background-image: linear-gradient(var(--bg-card), var(--bg-card)),
+    linear-gradient(135deg, var(--primary), var(--secondary));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.comparadorTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  text-align: center;
+}
+
+.comparadorSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.comparadorGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.comparadorCard {
+  background: var(--hover);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.comparadorCard:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.comparadorActivo {
+  border-color: var(--primary) !important;
+  background: rgba(46, 134, 171, 0.06);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.15);
+}
+
+.comparadorCardHeader {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+.comparadorCuota {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  line-height: 1;
+  margin: var(--spacing-sm) 0;
+}
+
+.comparadorMes {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.comparadorRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+}
+
+.comparadorRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: var(--spacing-xs) 0;
+  border-bottom: 1px solid var(--border);
+  gap: var(--spacing-sm);
+}
+
+.comparadorRow span {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.comparadorRow strong {
+  color: var(--text-primary);
+  text-align: right;
+  font-size: 0.82rem;
+}
+
+.comparadorRowIntereses strong {
+  color: var(--danger);
+}
+
+.comparadorTag {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(46, 134, 171, 0.1);
+  border-radius: 20px;
+  margin-top: var(--spacing-xs);
+}
+
+.comparadorNota {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+  font-style: italic;
+}
+
+.comparadorAviso {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: var(--radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+
 /* Responsive para nuevas secciones */
 @media (max-width: 1024px) {
   .contextGrid {
@@ -1315,10 +1494,20 @@
     gap: var(--spacing-sm);
   }
 
+  .comparativaRow4 {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+  }
+
   .comparativaAspecto {
+    grid-column: 1 / -1;
     font-weight: 700;
     padding-bottom: var(--spacing-xs);
     border-bottom: 1px solid var(--border);
+  }
+
+  .comparadorGrid {
+    grid-template-columns: 1fr;
   }
 }
 

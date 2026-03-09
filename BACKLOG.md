@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-03-01
-> **Apps totales**: 250 | **Suites**: 12
+> **Última actualización**: 2026-03-09
+> **Apps totales**: 251 | **Suites**: 12
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -38,7 +38,9 @@
     - ✅ `@types/node` 20→22 **completado** (build 459 páginas OK, commit b527402). Alineado con Node.js v22 local + Vercel. No actualizar a v25 (no es LTS).
     - ⏸️ `eslint` 9→10 **suspendido indefinidamente** hasta que `eslint-config-next` soporte oficialmente ESLint 10. No revisar en audits hasta que haya confirmación oficial de compatibilidad. Riesgo: lint se rompe completamente si se actualiza antes.
     - ✅ Next.js/React al día.
-    - 🟢 `@trpc/*` 11.10.0 → 11.11.0 patch disponible (4 paquetes). Bajo riesgo, actualizable en cualquier momento. *(detectado: 2026-03-01)*
+    - 🟢 `@trpc/*` 11.10.0 → 11.12.0 minor disponible (4 paquetes). Bajo riesgo, actualizable en cualquier momento. *(detectado: 2026-03-01, actualizado: 2026-03-09)*
+    - 🟢 `sql.js` 1.14.0 → 1.14.1 patch disponible. Bajo riesgo. *(detectado: 2026-03-09)*
+    - 🟢 `@types/node` 22.19.13 → 22.19.15 patch disponible. Muy bajo riesgo. *(detectado: 2026-03-09)*
 
 - [x] **ai-index.json: texto desactualizado** — Corregido a 250 apps, suites actualizadas, fecha 2026-03-01. *(resuelto: 2026-03-01)*
 
@@ -119,20 +121,20 @@
 - [x] **calculadora-combustible** — Tabla comparativa gasolina/diésel/GLP/eléctrico, 4 casos de uso, FAQ 6 preguntas, guía 6 pasos, 6 tips eficiencia, warning 6 errores. *(2026-03-01)*
 - [x] **calculadora-porcentajes** — Tabla comparativa 5 modos de cálculo, 4 casos de uso (IVA/descuentos/inflación/notas), FAQ 6 preguntas, guía 5 pasos, 6 trucos mentales, warning 5 errores. *(2026-03-01)*
 - [x] **calculadora-roommates** — Tabla comparativa 4 métodos de división, 4 casos de uso (estudiantes/viaje/oficina/pareja), FAQ 6 preguntas, guía 5 pasos, 6 consejos convivencia, warning 6 errores. *(2026-03-01)*
-- [ ] **contador-palabras** — SEO/escritura: longitud óptima por tipo de contenido (artículo/tweet/CV/TFG), tabla comparativa plataformas, tips de legibilidad.
-- [ ] **generador-firma-email** — Freelance/marketing: qué incluir, errores comunes, tabla comparativa estilos (mínimo/completo/creativo). DisclaimerCard RGPD.
-- [ ] **lista-equipaje** — Viajes: reglas equipaje de mano por aerolínea, packing tips, table comparativa destinos (playa/montaña/ciudad/negocios).
+- [x] **contador-palabras** — Tabla comparativa 6 tipos de contenido, 4 casos de uso (SEO/email/discurso/RRSS), FAQ 6 preguntas, guía 5 pasos, 6 consejos de escritura, warning 4 errores. *(2026-03-01)*
+- [x] **generador-firma-email** — Tabla comparativa 4 plantillas, 4 casos de uso (freelance/empresa/marketing/creativo), FAQ 6 preguntas, guía 5 pasos, 6 buenas prácticas, warning 4 errores. *(2026-03-01)*
+- [x] **lista-equipaje** — Tabla comparativa 5 aerolíneas (Vueling/Ryanair/Iberia/EasyJet/WizzAir), 4 casos de uso, FAQ 6 preguntas, guía 5 pasos, 6 trucos de packing, warning 4 errores. *(2026-03-01)*
 
 **Media prioridad** (potencial educativo sólido):
-- [ ] **calculadora-descuentos** — Educación financiera: trampas del marketing en descuentos, precio psicológico, cómo calcular precio real.
-- [ ] **calculadora-pintura** — Hogar: tipos de pintura, cómo calcular correctamente (manos + superficie), consejos de aplicación.
-- [ ] **calculadora-porciones** — Nutrición: porciones recomendadas por alimento, diferencia ración vs porción, casos de uso (dieta/evento/bebé).
+- [x] **calculadora-descuentos** — EducationalSection añadida: tipos de descuento, trampas marketing, FAQ, guía 5 pasos, 6 tips, warning. *(2026-03-01)*
+- [x] **calculadora-pintura** — EducationalSection añadida: tipos de pintura, casos por estancia, FAQ, guía 5 pasos, 6 tips, warning. *(2026-03-01)*
+- [x] **calculadora-porciones** — EducationalSection añadida: métodos medición, situaciones vitales, FAQ ración vs porción, guía 5 pasos, 6 hábitos, warning. *(2026-03-01)*
 - [ ] **generador-carruseles** — Marketing/RRSS: anatomía del carrusel perfecto, tabla comparativa formatos por plataforma.
 - [ ] **planificador-mudanzas** — Hogar: fases de una mudanza, checklist por semanas, tabla comparativa contratar empresa vs mudanza propia.
 - [ ] **calculadora-percentiles** — Estadística/salud: qué es un percentil, uso en pediatría/estadística, tabla interpretación.
 
 **Potencial educativo específico**:
-- [ ] **conversor-binario** — Técnica educativa: por qué los ordenadores usan binario, hexadecimal, tabla comparativa sistemas numéricos.
+- [x] **conversor-binario** — Tabla comparativa sistemas numéricos, EducationalSection añadida. *(2026-03-09 — verificado commit 336e1be)*
 - [ ] **calculadora-sistemas-numericos** — Similar a anterior; ver si se pueden fusionar o son suficientemente distintas.
 - [ ] **conversor-morse** — Cultura: historia del código Morse, uso real hoy, tabla comparativa alfabeto/código.
 - [ ] **calculadora-edad-mascotas** — Salud mascotas: mito "1 año = 7 perro", diferencia por razas, tabla etapas vitales.
@@ -171,7 +173,7 @@
 
 - [ ] **calculadora-jubilacion**: Revisar si los cálculos reflejan la reforma del sistema de pensiones 2024. Añadir DisclaimerCard `financial` si no la tiene.
 
-- [ ] **simulador-hipoteca**: Comparativa fija vs variable vs mixta en un mismo visualizador. Actualmente solo simula un tipo.
+- [x] **simulador-hipoteca**: Comparativa fija vs variable vs mixta en un mismo visualizador. Añadido tipo 'mixta' al simulador (2 fases) + panel comparador en tiempo real con los 3 tipos simultáneos + tabla educativa actualizada a 4 columnas. *(2026-03-09)*
 
 - [ ] **DisclaimerCard medical (Grupo B)**: Revisar las 8 apps con children custom de baja prioridad (`test-habitos-saludables`, `curso-nutrisalud`, `calculadora-porciones`, `calculadora-edad-mascotas`, `calculadora-tamano-adulto-perro`, `planificador-mascota`, `guia-cuidado-mascota`, `guia/vivir-sano`) para añadir cláusula de exoneración si se considera necesario.
 
