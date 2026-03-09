@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
   try {
     // Filtrar bots y rastreadores conocidos (Googlebot, Bingbot, etc.)
     const userAgent = request.headers.get('user-agent') || '';
-    const botsPattern = /Googlebot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Applebot|Screaming Frog|AhrefsBot|SemrushBot|MJ12bot|DotBot|PetalBot|GPTBot|ClaudeBot|anthropic-ai/i;
+    const botsPattern = /Googlebot|Google-InspectionTool|AdsBot-Google|APIs-Google|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Applebot|Screaming Frog|AhrefsBot|SemrushBot|MJ12bot|DotBot|PetalBot|GPTBot|ClaudeBot|anthropic-ai/i;
 
     if (botsPattern.test(userAgent)) {
       return NextResponse.json(
