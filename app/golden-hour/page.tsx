@@ -821,6 +821,266 @@ export default function GoldenHourPage() {
             </div>
           </div>
         </section>
+
+        {/* ===== SECCIÓN 1: TABLA COMPARATIVA ===== */}
+        <section className={styles.eduComparativaSection}>
+          <h3>🎨 Comparativa de Períodos de Luz</h3>
+          <p className={styles.eduComparativaSubtitle}>Elige el mejor momento según el tipo de fotografía que buscas</p>
+          <div className={styles.eduTablaWrapper}>
+            <table className={styles.eduTablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Período</th>
+                  <th>Temperatura Color</th>
+                  <th>Duración típica</th>
+                  <th>Calidad luz</th>
+                  <th>Ideal para</th>
+                  <th>Dificultad técnica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Golden Hour mañana</td>
+                  <td>2.500–4.000K</td>
+                  <td>20–45 min</td>
+                  <td>Cálida, suave, sombras largas</td>
+                  <td>Retratos, bodas, paisajes</td>
+                  <td>Media</td>
+                </tr>
+                <tr>
+                  <td>Golden Hour tarde</td>
+                  <td>2.000–3.500K</td>
+                  <td>20–45 min</td>
+                  <td>Dorada intensa, dramática</td>
+                  <td>Arquitectura, atardeceres, moda</td>
+                  <td>Media</td>
+                </tr>
+                <tr>
+                  <td>Blue Hour mañana</td>
+                  <td>9.000–12.000K</td>
+                  <td>20–30 min</td>
+                  <td>Azul profundo, equilibrada</td>
+                  <td>Urbana, monumentos, larga exp.</td>
+                  <td>Alta (trípode necesario)</td>
+                </tr>
+                <tr>
+                  <td>Blue Hour tarde</td>
+                  <td>9.000–12.000K</td>
+                  <td>20–30 min</td>
+                  <td>Azul intenso + luces artificiales</td>
+                  <td>Skylines, puentes, edificios iluminados</td>
+                  <td>Alta (trípode necesario)</td>
+                </tr>
+                <tr>
+                  <td>Mediodía solar</td>
+                  <td>5.500–6.500K</td>
+                  <td>Variable</td>
+                  <td>Dura, contrastes fuertes</td>
+                  <td>Producto, moda indoor, arquitectura</td>
+                  <td>Baja (sin sombras largas)</td>
+                </tr>
+                <tr>
+                  <td>Crepúsculo astronómico</td>
+                  <td>3.000–8.000K+</td>
+                  <td>30–60 min</td>
+                  <td>Colores cielo espectaculares</td>
+                  <td>Astrofotografía, Vía Láctea</td>
+                  <td>Muy alta</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ===== SECCIÓN 2: CASOS DE USO PRÁCTICOS ===== */}
+        <section className={styles.eduEscenariosSection}>
+          <h3>📸 Casos de Uso por Tipo de Fotografía</h3>
+          <p className={styles.eduEscenariosSubtitle}>Cómo aprovechar la Golden Hour según tu especialidad</p>
+          <div className={styles.eduEscenariosGrid}>
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🏔️</span>
+                <h4>Fotografía de Paisaje</h4>
+              </div>
+              <p className={styles.eduEscenarioExample}>Madrid, verano: Golden Hour tarde = 20:15–21:00. Llega 30 min antes. Busca primer plano en sombra + horizonte iluminado.</p>
+              <p className={styles.eduEscenarioTip}>Por qué funciona: La luz rasante crea texturas en montañas, campos y playas que son imposibles a mediodía.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">👰</span>
+                <h4>Bodas y Retratos al Aire Libre</h4>
+              </div>
+              <p className={styles.eduEscenarioExample}>Sesión preboda a las 19:30 en octubre. Luz suave de Golden Hour elimina necesidad de difusores. ISO bajo, piel perfecta.</p>
+              <p className={styles.eduEscenarioTip}>Por qué funciona: La temperatura de color 2.500–3.500K realza tonos de piel de forma natural, sin filtros.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🏙️</span>
+                <h4>Fotografía Urbana y Arquitectura</h4>
+              </div>
+              <p className={styles.eduEscenarioExample}>Blue Hour en ciudad: 20 min después del atardecer. Trípode + ISO 400 + f/8 + 4s. Las ventanas iluminadas equilibran el cielo azul.</p>
+              <p className={styles.eduEscenarioTip}>Por qué funciona: La Blue Hour equaliza la exposición entre luces artificiales y el cielo, eliminando el negro puro.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <div className={styles.eduEscenarioHeader}>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🌌</span>
+                <h4>Astrofotografía y Vía Láctea</h4>
+              </div>
+              <p className={styles.eduEscenarioExample}>Esperar hasta crepúsculo astronómico (sol a -18°). Mínimo 30 min tras puesta. ISO 3200, f/2.8, 20–25s. Sin luna llena.</p>
+              <p className={styles.eduEscenarioTip}>Por qué funciona: El crepúsculo astronómico garantiza cielo suficientemente oscuro para capturar la Vía Láctea sin contaminación lumínica solar.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== SECCIÓN 3: FAQ AMPLIADO ===== */}
+        <section className={styles.eduFaqSection}>
+          <h3>❓ Preguntas Frecuentes sobre Golden Hour</h3>
+          <p className={styles.eduFaqSubtitle}>Todo lo que necesitas saber para planificar tus sesiones</p>
+          <div className={styles.eduFaqList}>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cuánto dura exactamente la Golden Hour?</h4>
+              <p>La Golden Hour dura entre 20 y 60 minutos dependiendo de la latitud y la época del año. En invierno, en latitudes altas como Madrid (40°N), puede durar apenas 15–20 minutos. En verano en zonas ecuatoriales puede extenderse a 45–60 minutos. La clave: cuanto más baja la latitud y más cercano al solsticio de verano, más larga es. Esta calculadora te da los horarios exactos para cualquier lugar y fecha. 💡 Consejo: Planifica llegar 15 minutos antes del inicio.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cuál es mejor: Golden Hour de mañana o de tarde?</h4>
+              <p>Depende del objetivo. La Golden Hour de mañana tiene luz más fría (3.000–4.000K) y el ambiente suele estar más tranquilo, ideal para paisajes sin gente. La de tarde es más cálida (2.000–3.000K) y dramática, perfecta para retratos y arquitectura. Además, las nubes al atardecer tienden a coger más color que al amanecer. 💡 Consejo: Si fotografías personas, preferirás la tarde. Para naturaleza y paisajes solitarios, la mañana.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cómo varía la Golden Hour según la estación?</h4>
+              <p>En Madrid en diciembre, la Golden Hour dura ~20 min y el sol sale a las 8:30. En junio, la Golden Hour dura ~40 min y el sol sale a las 6:45. La diferencia es de hasta 2 horas en el horario y el doble de duración. En latitudes extremas (&gt;60°N), en verano puede durar varias horas o incluso todo el día. 💡 Consejo: En invierno llega antes. El sol cae rápido y el tiempo dorado es muy corto.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Hace falta trípode en Golden Hour?</h4>
+              <p>En Golden Hour (sol entre 0° y 6°) generalmente no es necesario trípode: hay luz suficiente para velocidades &gt;1/100s con ISO 400–800. Sin embargo, en Blue Hour (sol entre 0° y -6°) el trípode es imprescindible: necesitarás exposiciones de 1–10 segundos para capturar el cielo azul con luces artificiales equilibradas. 💡 Consejo: Lleva siempre el trípode aunque sea Golden Hour. Si el cielo se llena de nubes, la luz cae drásticamente.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cómo afecta la nubosidad a la Golden Hour?</h4>
+              <p>Las nubes son aliadas en Golden Hour: pueden multiplicar los colores naranjas/rojos y crear cielos espectaculares. Las mejores fotos de Golden Hour suelen tener nubes dispersas (cirros o cúmulos). El cielo completamente despejado produce colores menos intensos. Las nubes densas bloquean la luz dorada pero crean luz difusa perfecta para retratos. 💡 Consejo: Sigue el parte meteorológico. Nubes dispersas + horizonte despejado = foto épica garantizada.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Qué ajustes de cámara usar en Golden Hour?</h4>
+              <p>Puntos de partida: f/8 (paisajes), f/2.8 (retratos), ISO 100–400, velocidad según luz disponible. Balance de blancos: &quot;Soleado&quot; (5500K) mantiene los tonos cálidos; &quot;Auto&quot; puede enfriar la imagen. En Blue Hour: f/8, ISO 400–800, velocidad 1–10 segundos. 💡 Consejo: Desactiva el auto-ISO en Golden Hour. El ISO base más bajo de tu cámara da el máximo detalle en las sombras largas características de este período.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿La Golden Hour sirve para fotografía de interior?</h4>
+              <p>Indirectamente sí. Si la habitación tiene ventanas orientadas al este (mañana) u oeste (tarde), la luz dorada entrará creando haces de luz dramáticos y sombras largas. Para maximizarlo: abre persianas justo en Golden Hour, usa la luz como backlight o sidelight. 💡 Consejo: Los fotógrafos de inmuebles suelen programar sus sesiones en Golden Hour precisamente por la calidad de la luz natural que entra por las ventanas.</p>
+            </div>
+            <div className={styles.eduFaqItem}>
+              <h4>¿Cómo uso las coordenadas GPS para planificar?</h4>
+              <p>Las coordenadas determinan con precisión la hora de salida/puesta del sol y la duración del crepúsculo. Una diferencia de 1° de latitud cambia la hora de amanecer en ~4 minutos. Esta herramienta calcula los horarios exactos con coordenadas precisas. Para planificación avanzada: usa Google Maps para identificar la dirección del amanecer/atardecer y elegir el encuadre antes de llegar. 💡 Consejo: El azimut solar (dirección del sol) es tan importante como la hora. El sol sale exactamente por el este solo en los equinoccios.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== SECCIÓN 4: GUÍA PASO A PASO ===== */}
+        <section className={styles.eduStepSection}>
+          <h3>📋 Guía: Planifica tu Sesión de Golden Hour</h3>
+          <p className={styles.eduStepSubtitle}>7 pasos para no desperdiciar ni un minuto de luz dorada</p>
+          <div className={styles.eduStepGuide}>
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber} aria-hidden="true">1</div>
+              <div className={styles.eduStepContent}>
+                <h4>Introduce la ubicación exacta</h4>
+                <p>Usa GPS o busca la ciudad en el buscador. Para mayor precisión en exteriores, activa &apos;Usar mi ubicación&apos;. La diferencia entre el centro de Madrid y la Sierra a 60 km puede ser de 3–5 minutos en el amanecer.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber} aria-hidden="true">2</div>
+              <div className={styles.eduStepContent}>
+                <h4>Selecciona la fecha de la sesión</h4>
+                <p>Consulta los horarios para el día exacto. Recuerda: en España peninsular el amanecer varía desde las 6:30 (junio, Canarias) hasta las 9:00 (diciembre, Galicia). Planifica con 2–3 semanas de antelación para confirmar disponibilidad del cliente.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber} aria-hidden="true">3</div>
+              <div className={styles.eduStepContent}>
+                <h4>Elige el período que necesitas</h4>
+                <p>Golden Hour mañana para paisajes tranquilos y luz fría. Golden Hour tarde para retratos cálidos y atardeceres dramáticos. Blue Hour para fotografía urbana y arquitectónica con luces artificiales.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber} aria-hidden="true">4</div>
+              <div className={styles.eduStepContent}>
+                <h4>Planifica el desplazamiento y acceso</h4>
+                <p>Llega 30 minutos antes del inicio del período. La Golden Hour dura entre 20–45 minutos y no espera. Para localizaciones remotas (montaña, costa), planifica 1 hora extra por imprevistos. Comprueba el horario de apertura si es un recinto cerrado.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber} aria-hidden="true">5</div>
+              <div className={styles.eduStepContent}>
+                <h4>Prepara el equipo con antelación</h4>
+                <p>Carga baterías la noche anterior (el frío las descarga más rápido). Formatea tarjetas de memoria. En Blue Hour: trípode, disparador remoto o temporizador. Lleva linternas si el acceso es en oscuridad.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber} aria-hidden="true">6</div>
+              <div className={styles.eduStepContent}>
+                <h4>Ajusta la cámara antes de llegar</h4>
+                <p>Configura el perfil de color para la luz cálida: balance de blancos &apos;Soleado&apos; (5500K) o &apos;Nublado&apos; (6500K) para intensificar los tonos dorados. Desactiva el auto-ISO. Prepara la horquilla de exposición si planeas hacer HDR.</p>
+              </div>
+            </div>
+            <div className={styles.eduStepItem}>
+              <div className={styles.eduStepNumber} aria-hidden="true">7</div>
+              <div className={styles.eduStepContent}>
+                <h4>Trabaja rápido y adapta en tiempo real</h4>
+                <p>Los primeros 10 minutos son los más dramáticos. Captura primero el encuadre principal. Luego experimenta. El período de transición entre Golden Hour y Blue Hour (minutos después del atardecer) es frecuentemente el momento más mágico e ignorado.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== SECCIÓN 5: MEJORES PRÁCTICAS ===== */}
+        <section className={styles.eduTipsSection}>
+          <h3>✅ 6 Prácticas Esenciales del Fotógrafo</h3>
+          <div className={styles.eduTipsGrid}>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon} aria-hidden="true">⏰</span>
+              <h4>El timing lo es todo</h4>
+              <p>Configura alarmas para 30 min antes del inicio. Una vez comienza la Golden Hour, no hay tiempo para preparar equipo.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon} aria-hidden="true">🧭</span>
+              <h4>Conoce la dirección solar</h4>
+              <p>El sol no sale siempre por el mismo punto. En verano sale más al norte, en invierno más al sur. Usa brújula o Google Maps para anticipar el encuadre.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon} aria-hidden="true">☁️</span>
+              <h4>Las nubes son tus aliadas</h4>
+              <p>Nubes dispersas en el horizonte + cielo abierto sobre ti = puesta de sol espectacular. Los cielos completamente despejados suelen ser menos fotogénicos.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon} aria-hidden="true">🔍</span>
+              <h4>Explora en días normales</h4>
+              <p>Visita las localizaciones en horario normal antes de la sesión. Identificar obstáculos, accesos y encuadres sin presión de tiempo es fundamental.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon} aria-hidden="true">📱</span>
+              <h4>Sincroniza herramientas digitales</h4>
+              <p>Combina esta calculadora con apps como PhotoPills o The Photographer&apos;s Ephemeris para visualizar la trayectoria solar sobre el mapa.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon} aria-hidden="true">🌧️</span>
+              <h4>Plan B siempre listo</h4>
+              <p>Guarda una localización alternativa cubierta (galerías, pasos porticados) para días de lluvia. El día después de la lluvia suele dar luz excepcional.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== SECCIÓN 6: WARNING BOX — ERRORES COMUNES ===== */}
+        <div className={styles.eduWarningBox} role="alert">
+          <div className={styles.eduWarningHeader}>
+            <span className={styles.eduWarningIcon} aria-hidden="true">⚠️</span>
+            <h3>Errores que Arruinan Sesiones de Golden Hour</h3>
+          </div>
+          <ul className={styles.eduWarningList}>
+            <li><strong>Llegar en el momento exacto del amanecer/atardecer:</strong> La Golden Hour empieza con la salida del sol, no antes. Si llegas en ese momento, te pierdes los primeros y más dramáticos minutos. Llega 30 minutos antes.</li>
+            <li><strong>Ignorar la Blue Hour por enfocarse solo en Golden:</strong> Los 20 minutos después del atardecer (Blue Hour) suelen dar las imágenes más equilibradas y únicas del día, especialmente en entornos urbanos. No te vayas en cuanto el sol toque el horizonte.</li>
+            <li><strong>Fotografiar directamente hacia el sol sin control:</strong> Mirar o enfocar directo al sol puede dañar el sensor y quemar píxeles. Usa el sol como fuente de contraluz lateral (45–90°) para obtener flares controlados y siluetas dramáticas.</li>
+            <li><strong>No revisar el pronóstico meteorológico:</strong> Nubes densas tapando el horizonte bloquean por completo la Golden Hour. Comprueba el parte las 24h anteriores. AccuWeather y Meteociel ofrecen predicciones de nubosidad por horas.</li>
+            <li><strong>Confiar solo en la hora de atardecer estándar:</strong> La hora de atardecer del móvil (calendario del SO) puede diferir hasta 10 minutos de la hora solar real en tu ubicación exacta. Usa siempre las coordenadas GPS precisas de la herramienta.</li>
+            <li><strong>Olvidar el horario de verano al planificar con antelación:</strong> Si planificas sesiones con semanas de antelación y hay cambio horario (último domingo de marzo o octubre en España), los horarios de amanecer/atardecer cambian 1 hora. Introduce la fecha exacta en la calculadora.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('golden-hour')} />
