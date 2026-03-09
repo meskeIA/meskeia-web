@@ -38,9 +38,11 @@
     - ✅ `@types/node` 20→22 **completado** (build 459 páginas OK, commit b527402). Alineado con Node.js v22 local + Vercel. No actualizar a v25 (no es LTS).
     - ⏸️ `eslint` 9→10 **suspendido indefinidamente** hasta que `eslint-config-next` soporte oficialmente ESLint 10. No revisar en audits hasta que haya confirmación oficial de compatibilidad. Riesgo: lint se rompe completamente si se actualiza antes.
     - ✅ Next.js/React al día.
-    - 🟢 `@trpc/*` 11.10.0 → 11.12.0 minor disponible (4 paquetes). Bajo riesgo, actualizable en cualquier momento. *(detectado: 2026-03-01, actualizado: 2026-03-09)*
-    - 🟢 `sql.js` 1.14.0 → 1.14.1 patch disponible. Bajo riesgo. *(detectado: 2026-03-09)*
-    - 🟢 `@types/node` 22.19.13 → 22.19.15 patch disponible. Muy bajo riesgo. *(detectado: 2026-03-09)*
+    - ✅ `@trpc/*` 11.10.0 → 11.12.0 **completado** (2026-03-09). Build OK.
+    - ✅ `sql.js` 1.14.0 → 1.14.1 **completado** (2026-03-09).
+    - ✅ `@types/node` 22.19.13 → 22.19.15 **completado** (2026-03-09). No subir a v25 (no LTS).
+    - 🟡 `dompurify` CVE moderado (XSS, GHSA-v2wj-7wpq-c8vv): afecta `jspdf` y `html2pdf.js`. `npm audit fix` añadiría 61 paquetes nuevos (riesgo breaking change). Requiere sesión dedicada para revisar si jspdf tiene nueva versión compatible. *(detectado: 2026-03-09)*
+    - 🟢 `minimatch` CVE alto (ReDoS): solo en dependencias de `eslint` (dev-only, sin impacto en producción). Pendiente `npm audit fix` en sesión dedicada junto con dompurify. *(detectado: 2026-03-09)*
 
 - [x] **ai-index.json: texto desactualizado** — Corregido a 250 apps, suites actualizadas, fecha 2026-03-01. *(resuelto: 2026-03-01)*
 
