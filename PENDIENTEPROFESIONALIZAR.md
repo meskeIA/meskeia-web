@@ -24,11 +24,11 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 
 ### Finanzas e Inversión
 
-- [ ] `/amortizacion-hipoteca/` — Amortización anticipada: reducir cuota vs plazo
-- [ ] `/calculadora-inversiones/` — Calculadora de inversiones
-- [ ] `/simulador-cartera-inversion/` — Monte Carlo, Sharpe, volatilidad
-- [ ] `/calculadora-fire/` — Independencia financiera, retiro anticipado
-- [ ] `/calculadora-alquiler-vs-compra/` — Análisis alquiler vs compra vivienda
+- [x] `/amortizacion-hipoteca/` — Amortización anticipada: reducir cuota vs plazo ✅ lote 19
+- [x] `/calculadora-inversiones/` — Calculadora de inversiones ✅ lote 19 (ya profesionalizada)
+- [x] `/simulador-cartera-inversion/` — Monte Carlo, Sharpe, volatilidad ✅ lote 19 (ya profesionalizada)
+- [x] `/calculadora-fire/` — Independencia financiera, retiro anticipado ✅ lote 19
+- [x] `/calculadora-alquiler-vs-compra/` — Análisis alquiler vs compra vivienda ✅ lote 19
 - [ ] `/simulador-compraventa-inmueble/` — Gastos: ITP/IVA, notaría, registro, plusvalía
 - [ ] `/calculadora-coste-vivienda/` — Coste real mensual de mantener vivienda
 - [ ] `/comparador-tipos-seguros/` — Guía: tipos de seguros vida, auto, hogar, salud
