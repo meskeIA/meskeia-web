@@ -664,51 +664,307 @@ export default function SimuladorPuertasLogicasPage() {
 
       {/* Educational Section */}
       <EducationalSection
-        title="¿Quieres aprender más sobre puertas lógicas?"
-        subtitle="Descubre los fundamentos de la electrónica digital"
+        title="Fundamentos de Lógica Digital"
+        subtitle="Todo lo que necesitas saber sobre puertas lógicas, álgebra de Boole y circuitos digitales"
+        icon="🔌"
       >
-        <section className={styles.guideSection}>
-          <h2>Fundamentos de Lógica Digital</h2>
-          <p className={styles.introParagraph}>
-            Las puertas lógicas son los bloques fundamentales de todos los circuitos digitales.
-            Desde microprocesadores hasta memorias, todo se construye combinando estas operaciones básicas.
-          </p>
+        {/* Sección 1: Tabla Comparativa */}
+        <section>
+          <h3>Comparativa de las 7 Puertas Lógicas</h3>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Puerta</th>
+                  <th>Símbolo</th>
+                  <th>Entradas</th>
+                  <th>Expresión</th>
+                  <th>Salida HIGH cuando...</th>
+                  <th>Universal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>AND</strong></td>
+                  <td>∧</td>
+                  <td>2</td>
+                  <td><code>Y = A·B</code></td>
+                  <td>Todas las entradas son 1</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td><strong>OR</strong></td>
+                  <td>∨</td>
+                  <td>2</td>
+                  <td><code>Y = A+B</code></td>
+                  <td>Al menos una entrada es 1</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td><strong>NOT</strong></td>
+                  <td>¬</td>
+                  <td>1</td>
+                  <td><code>Y = Ā</code></td>
+                  <td>La entrada es 0</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td><strong>NAND</strong></td>
+                  <td>⊼</td>
+                  <td>2</td>
+                  <td><code>Y = (A·B)̄</code></td>
+                  <td>No todas las entradas son 1</td>
+                  <td><strong>Sí</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>NOR</strong></td>
+                  <td>⊽</td>
+                  <td>2</td>
+                  <td><code>Y = (A+B)̄</code></td>
+                  <td>Todas las entradas son 0</td>
+                  <td><strong>Sí</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>XOR</strong></td>
+                  <td>⊕</td>
+                  <td>2</td>
+                  <td><code>Y = A⊕B</code></td>
+                  <td>Las entradas son diferentes</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td><strong>XNOR</strong></td>
+                  <td>⊙</td>
+                  <td>2</td>
+                  <td><code>Y = A⊙B</code></td>
+                  <td>Las entradas son iguales</td>
+                  <td>No</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>Puertas Básicas</h4>
-              <p>
-                <strong>AND</strong>: Salida 1 solo si TODAS las entradas son 1. Como una serie de interruptores.
-                <br /><strong>OR</strong>: Salida 1 si AL MENOS UNA entrada es 1. Como interruptores en paralelo.
-                <br /><strong>NOT</strong>: Invierte la señal. El inversor más básico.
+        {/* Sección 2: Casos de Uso */}
+        <section>
+          <h3>Casos de Uso por Perfil</h3>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎓</span>
+                <strong>Estudiante de bachillerato</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Examen PAU: &quot;Simplifica A·(A+B)&quot;. Usando el teorema de absorción: A·(A+B) = A·A + A·B = A + A·B = <strong>A</strong>. Resultado: una conexión directa sin puertas.
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 Memoriza las leyes De Morgan: NOT(A·B) = NOT(A)+NOT(B). Son las más preguntadas en selectividad.
               </p>
             </div>
 
-            <div className={styles.contentCard}>
-              <h4>Puertas Universales</h4>
-              <p>
-                <strong>NAND</strong> y <strong>NOR</strong> son puertas universales: cualquier circuito digital
-                puede construirse usando solo una de ellas. Por eso son tan importantes en el diseño de chips.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔬</span>
+                <strong>Estudiante de ingeniería</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Diseñar un semisumador de 1 bit: puerta XOR para la suma (S = A⊕B) + puerta AND para el acarreo (C = A·B). <strong>Solo 2 puertas para sumar bits binarios.</strong>
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 Practica implementando cualquier función con solo puertas NAND. Es ejercicio estándar en arquitectura de computadores.
               </p>
             </div>
 
-            <div className={styles.contentCard}>
-              <h4>XOR y Paridad</h4>
-              <p>
-                La puerta <strong>XOR</strong> detecta si las entradas son diferentes. Es esencial para
-                sumadores binarios, detectores de paridad y circuitos de cifrado.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔧</span>
+                <strong>Técnico en electrónica</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Detector de paridad para comunicaciones serie: <strong>3 puertas XOR en cascada</strong> detectan si el número de unos en 4 bits es par o impar. Usado en UART para verificar integridad de datos.
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 En diseño real, NAND y NOR son más eficientes en silicio. Los fabricantes de chips los usan como bloques constructivos básicos.
               </p>
             </div>
 
-            <div className={styles.contentCard}>
-              <h4>Álgebra de Boole</h4>
-              <p>
-                Las leyes de De Morgan permiten simplificar expresiones:
-                <code>NOT(A AND B) = (NOT A) OR (NOT B)</code>. Fundamental para optimizar circuitos.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💻</span>
+                <strong>Diseñador de sistemas digitales</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Multiplexor 4:1 para seleccionar entre 4 fuentes de datos: 3 puertas AND (con señales de selección) + 1 puerta OR. <strong>Base de los buses de datos en microprocesadores.</strong>
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 Entender la lógica subyacente permite optimizar el uso de LUTs en FPGAs y celdas estándar en ASICs.
               </p>
             </div>
           </div>
         </section>
+
+        {/* Sección 3: FAQ */}
+        <section>
+          <h3>Preguntas Frecuentes</h3>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el Álgebra de Boole y para qué sirve?</h4>
+              <p>El Álgebra de Boole (1854) es el sistema matemático que describe los circuitos digitales. Trabaja con solo dos valores (0 y 1) y tres operaciones básicas (AND, OR, NOT). Permite simplificar expresiones lógicas para reducir el número de puertas y ahorrar coste, energía y espacio en silicio.</p>
+              <p className={styles.faqTip}>💡 Las leyes fundamentales son conmutativa (A·B = B·A), asociativa y distributiva (A·(B+C) = A·B + A·C).</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Por qué NAND y NOR se llaman puertas universales?</h4>
+              <p>Porque cualquier función lógica puede implementarse usando <strong>únicamente puertas NAND</strong> (o únicamente NOR). NOT(A) = A NAND A; AND(A,B) = NOT(A NAND B); OR(A,B) = (NOT A) NAND (NOT B). Los fabricantes de chips simplifican la producción usando una sola celda estándar.</p>
+              <p className={styles.faqTip}>💡 En FPGAs modernas, los &quot;Look-Up Tables&quot; (LUT) son la generalización de este concepto: una tabla de memoria que implementa cualquier función booleana.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué es una tabla de verdad y cómo se construye?</h4>
+              <p>Una tabla de verdad lista todas las combinaciones posibles de entradas (2<sup>n</sup> filas para n entradas) y la salida correspondiente. Para 2 entradas: 4 filas (00, 01, 10, 11). Para 3 entradas: 8 filas. Para 10 entradas: 1.024 filas.</p>
+              <p className={styles.faqTip}>💡 Construye siempre las entradas en orden binario natural (de 0 a 2^n-1) para no omitir ninguna combinación.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué diferencia hay entre XOR y XNOR?</h4>
+              <p>XOR da salida 1 cuando las entradas son <strong>DIFERENTES</strong>. XNOR da 1 cuando son <strong>IGUALES</strong>. Son complementarias: si A XOR B = Y, entonces A XNOR B = NOT(Y). XOR se usa en sumadores y detectores de paridad; XNOR en comparadores de igualdad.</p>
+              <p className={styles.faqTip}>💡 XOR detecta si el número de unos en la entrada es impar. Concatenando XORs se construyen generadores/verificadores de paridad.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cómo se aplican las Leyes de De Morgan?</h4>
+              <p>Primera ley: <strong>NOT(A AND B) = NOT(A) OR NOT(B)</strong>. Segunda ley: <strong>NOT(A OR B) = NOT(A) AND NOT(B)</strong>. Permiten convertir NAND en OR con entradas negadas y NOR en AND con entradas negadas. Son esenciales para simplificar circuitos.</p>
+              <p className={styles.faqTip}>💡 Para aplicar De Morgan: 1) Niega toda la expresión, 2) Cambia AND por OR (o viceversa), 3) Niega cada variable individual.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué es una expresión en Forma Normal Canónica?</h4>
+              <p>Existen dos formas: <strong>Suma de Minterms (SOP)</strong> y Producto de Maxterms (POS). SOP: para cada fila con salida 1, escribe el AND de variables y únelos con OR. Cualquier tabla de verdad puede expresarse en forma canónica.</p>
+              <p className={styles.faqTip}>💡 SOP es más intuitiva: lee las filas con salida 1, escribe el mintérmino para cada una y únelos con OR.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Para qué sirven los Mapas de Karnaugh?</h4>
+              <p>Los K-Maps son un método <strong>gráfico</strong> para simplificar expresiones booleanas. Organizan la tabla de verdad en cuadrícula donde celdas adyacentes difieren en una variable (código Gray). Agrupando celdas con valor 1 en potencias de 2, se obtiene la expresión mínima.</p>
+              <p className={styles.faqTip}>💡 Son muy eficientes para hasta 4-5 variables. Para más, se usan algoritmos como Quine-McCluskey o herramientas EDA.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cómo se implementan las puertas en hardware real?</h4>
+              <p>Las puertas lógicas se implementan con <strong>transistores CMOS</strong>. Una puerta NAND básica usa 4 transistores (2 NMOS en serie + 2 PMOS en paralelo). Los microprocesadores modernos tienen miles de millones de transistores operando a frecuencias de GHz.</p>
+              <p className={styles.faqTip}>💡 La tecnología CMOS domina porque solo consume energía durante las transiciones. Una puerta CMOS en reposo consume esencialmente cero potencia.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 4: Guía Paso a Paso */}
+        <section>
+          <h3>Cómo resolver un problema de lógica digital paso a paso</h3>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <strong>Lee el enunciado e identifica entradas y salidas</strong>
+                <p>Define claramente cuántas variables de entrada tienes (A, B, C...) y qué debe representar la salida. Ejemplo: &quot;alarma que se activa cuando A=1 AND (B=1 OR C=1)&quot;.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <strong>Construye la tabla de verdad</strong>
+                <p>Lista todas las 2<sup>n</sup> combinaciones de entradas. Para 2 variables: 4 filas; para 3: 8 filas. Rellena la columna de salida según el enunciado para cada combinación.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <strong>Obtén la expresión booleana (SOP)</strong>
+                <p>Para cada fila con salida 1, escribe el AND de las variables (directas si son 1, negadas si son 0). Une todos los términos con OR. Resultado: la expresión en Suma de Minterms.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <strong>Simplifica con Álgebra de Boole o K-Map</strong>
+                <p>Aplica las leyes de Boole para reducir términos. Para 3-4 variables, usa un Mapa de Karnaugh para encontrar la expresión mínima visualmente agrupando unos adyacentes.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <strong>Dibuja el diagrama de circuito</strong>
+                <p>Traduce la expresión simplificada a puertas: cada AND → puerta AND, cada OR → puerta OR, cada negación → NOT. Usa el modo &quot;Tablas de Verdad&quot; de este simulador para verificar cada puerta.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <strong>Verifica con el simulador</strong>
+                <p>Usa el modo &quot;Expresiones&quot; para introducir tu expresión booleana y genera la tabla automáticamente. Comprueba que coincide exactamente con tu tabla del paso 2.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <strong>Optimiza si es necesario</strong>
+                <p>¿Puedes implementar con solo puertas NAND? ¿Con menos puertas totales? Aplica De Morgan para transformar las puertas y reducir la variedad de componentes necesarios en la implementación física.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 5: Mejores Prácticas */}
+        <section>
+          <h3>6 Mejores Prácticas en Lógica Digital</h3>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <strong>Empieza por la tabla de verdad</strong>
+              <p>Antes de pensar en puertas, define la tabla. Es el contrato de tu circuito: especifica el comportamiento exacto para cada combinación. Sin tabla, sin diseño correcto.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <strong>Aplica De Morgan para simplificar</strong>
+              <p>Cuando veas NOT(AND) o NOT(OR), aplica De Morgan. Reduce el número de puertas y hace las expresiones más manejables. Es la herramienta más poderosa de simplificación.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⚡</span>
+              <strong>Usa NAND/NOR en hardware real</strong>
+              <p>Son más eficientes en silicio. En FPGAs y ASICs, el compilador las prefiere. Si diseñas hardware, piensa en términos de NAND/NOR desde el principio.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧩</span>
+              <strong>Construye de abajo arriba</strong>
+              <p>Domina las 7 puertas básicas, luego semisumadores y comparadores, luego la UAL. Cada nivel de abstracción se construye sobre el anterior.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <strong>Verifica con múltiples métodos</strong>
+              <p>Si obtienes una expresión, compruébala construyendo la tabla de verdad y simulándola. Los errores de precedencia son muy comunes. Este simulador facilita la verificación.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📝</span>
+              <strong>Documenta las simplificaciones</strong>
+              <p>En exámenes y proyectos, muestra cada paso: &quot;A·1 = A&quot; o &quot;A+A&apos; = 1&quot; deben estar justificados. Los profesores valoran el proceso, no solo el resultado.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 6: Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>6 errores conceptuales frecuentes en lógica digital</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Confundir XOR con OR</strong> — OR da 1 cuando ambas entradas son 1. XOR da 0 en ese caso. Para entradas (1,1): OR=1, XOR=0. Error muy común en exámenes.</li>
+            <li><strong>NAND y NOR no son asociativos</strong> — (A NAND B) NAND C ≠ A NAND (B NAND C). A diferencia de AND y OR, siempre usa paréntesis para especificar el orden.</li>
+            <li><strong>Aplicar mal las Leyes de De Morgan</strong> — NOT(A+B) ≠ NOT(A)+NOT(B). La ley correcta: NOT(A+B) = NOT(A)·NOT(B). Distribuir la negación sin cambiar el operador es el error más frecuente.</li>
+            <li><strong>Confundir &apos;0&apos; lógico con señal flotante</strong> — El &apos;0&apos; lógico es una tensión baja definida (~0 V). Un pin flotante (no conectado) NO es &apos;0&apos;; su comportamiento es indefinido y puede causar fallos aleatorios.</li>
+            <li><strong>Ignorar los tiempos de propagación</strong> — Las puertas tienen retardos (1-10 ns). En circuitos rápidos, &quot;glitches&quot; ocurren cuando diferentes caminos tienen retardos distintos. Crítico en diseño de alta frecuencia.</li>
+            <li><strong>Diseñar sin simplificar</strong> — Implementar la SOP directamente puede requerir 3× más puertas. Una expresión con 8 minterms podría simplificarse a 2 términos. Siempre simplifica antes de implementar.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('simulador-puertas-logicas')} />
