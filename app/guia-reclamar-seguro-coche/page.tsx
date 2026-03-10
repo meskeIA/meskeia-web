@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './GuiaReclamarSeguroCoche.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de situaciones
@@ -446,6 +446,287 @@ export default function GuiaReclamarSeguroCochePage() {
       />
 
       
+
+      {/* Contenido educativo */}
+      <EducationalSection
+        title="¿Quieres entender mejor cómo funciona tu seguro de coche?"
+        subtitle="Aprende qué coberturas tienes, cuándo reclamar y cómo hacerlo correctamente"
+        icon="📚"
+      >
+        {/* Tabla comparativa */}
+        <section className={styles.eduSection}>
+          <h2>Comparativa de coberturas del seguro de coche</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Cobertura</th>
+                  <th>Terceros básico</th>
+                  <th>Terceros ampliado</th>
+                  <th>Todo riesgo con franquicia</th>
+                  <th>Todo riesgo sin franquicia</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Daños a terceros</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Defensa jurídica</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Asistencia en carretera</td>
+                  <td>❌</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Robo del vehículo</td>
+                  <td>❌</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Daños propios (accidente)</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>✅ (franquicia)</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Fenómenos meteorológicos</td>
+                  <td>❌</td>
+                  <td>Depende</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Rotura de lunas</td>
+                  <td>❌</td>
+                  <td>Depende</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.eduSection}>
+          <h2>Casos reales: cuándo reclamar y cuándo no</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🅿️</span>
+                <span className={styles.casoTag}>Golpe en aparcamiento</span>
+              </div>
+              <p>Alguien te roza el coche en un parking y no deja nota. Daño estimado: 400 €. Con todo riesgo
+              y franquicia de 300 €, solo ahorras 100 € pero pueden subir tu prima el año siguiente.
+              Valora pagar de tu bolsillo si el coche es antiguo.</p>
+              <div className={styles.casoResultado}>Recomendación: calcular coste total antes de abrir parte</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🌪️</span>
+                <span className={styles.casoTag}>Granizo o tormenta</span>
+              </div>
+              <p>Una granizada destruye el capó y el techo del coche. Daño: 2.500 €. Este tipo de siniestro
+              meteorológico generalmente NO penaliza en la prima, ya que no es imputable al conductor.
+              Reclamar es claramente la mejor opción.</p>
+              <div className={styles.casoResultado}>Reclamar siempre: no penaliza y el daño supera ampliamente la franquicia</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🚧</span>
+                <span className={styles.casoTag}>Accidente con otro vehículo</span>
+              </div>
+              <p>Colisión en intersección con otro conductor que se da a la fuga. Sin testigos ni cámara.
+              Si tienes todo riesgo, reclama a tu aseguradora. Con solo terceros, deberás reclamar al
+              Consorcio de Compensación de Seguros si el culpable no está localizado.</p>
+              <div className={styles.casoResultado}>Consorcio de Seguros cubre accidentes con vehículo sin identificar</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🦌</span>
+                <span className={styles.casoTag}>Atropello de animal</span>
+              </div>
+              <p>Colisión con un jabalí en carretera de noche. Daño: 3.000 €. Requiere denuncia a la Guardia
+              Civil de Tráfico para documentar el siniestro. Este tipo de accidente generalmente no penaliza
+              en la prima ya que es un caso fortuito.</p>
+              <div className={styles.casoResultado}>Imprescindible: atestado de Guardia Civil de Tráfico</div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.eduSection}>
+          <h2>Preguntas frecuentes sobre reclamaciones al seguro</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Abrir parte siempre sube la prima del seguro?</h4>
+              <p>Depende del tipo de siniestro y la aseguradora. Los siniestros en los que eres culpable (colisión
+              por tu maniobra, golpe en parking) suelen penalizar. Los siniestros no culpables (granizo, robo,
+              atropello de animales) generalmente no afectan o afectan menos a la prima.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el parte amistoso y cuándo debo usarlo?</h4>
+              <p>El parte amistoso (ADCA) es un documento que ambos conductores rellenan y firman en el lugar del
+              accidente para documentar los hechos. Se usa cuando hay daños materiales entre dos vehículos y
+              acuerdo sobre lo ocurrido. Si hay heridos, llama al 112 y espera a la policía o guardia civil.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuánto tiempo tengo para comunicar un siniestro?</h4>
+              <p>La Ley del Contrato de Seguro establece 7 días para comunicar el siniestro a la aseguradora.
+              Algunas pólizas establecen plazos más breves. Notifica siempre lo antes posible, aunque no hayas
+              decidido si reclamar, para preservar tu derecho.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué hago si no estoy de acuerdo con la valoración del perito?</h4>
+              <p>Tienes derecho a solicitar un segundo peritaje a cargo de tu propio perito. Si las valoraciones
+              difieren más de un 20%, se nombra un tercer perito dirimente. También puedes acudir a la Dirección
+              General de Seguros (DGSFP) o al defensor del asegurado de la compañía.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué cubre el Consorcio de Compensación de Seguros?</h4>
+              <p>El Consorcio cubre daños causados por: vehículos no identificados (daños personales), vehículos
+              sin seguro, y fenómenos extraordinarios (inundaciones, terremotos, terrorismo). Es un organismo
+              público que actúa cuando el seguro privado no puede hacerse cargo.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Puedo reclamar si el accidente fue en el extranjero?</h4>
+              <p>Sí. La mayoría de seguros incluyen cobertura en la UE y países del Convenio Multilateral.
+              Solicita un informe del accidente a las autoridades locales, guarda todos los documentos,
+              y contacta a tu aseguradora desde el extranjero (el número suele estar en el dorso del carné de seguro).</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo reclamar al seguro de coche: paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Asegura la seguridad en el lugar del siniestro</strong>
+                <p>Enciende las luces de emergencia, ponte el chaleco reflectante ANTES de salir del coche y
+                coloca los triángulos. Si hay heridos, llama al 112 antes de cualquier gestión con el seguro.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Documenta el siniestro con fotos y datos</strong>
+                <p>Fotografía los daños, la posición de los vehículos, la señalización del entorno y las matrículas.
+                Anota datos del otro conductor, testigos y número de seguro del otro vehículo.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Rellena el parte amistoso si procede</strong>
+                <p>Si hay acuerdo entre los conductores y no hay heridos, rellena y firma el parte amistoso.
+                Cada conductor se queda con una copia. No firmes si no estás de acuerdo con lo que figura.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Comunica el siniestro a tu aseguradora</strong>
+                <p>Llama a tu compañía en las primeras horas. Proporciona todos los datos recogidos. La aseguradora
+                te indicará si debes llevar el vehículo a un taller concertado o si puede venir un perito.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Espera la valoración del perito y revísala</strong>
+                <p>El perito de la aseguradora valorará los daños. Revisa detalladamente el informe. Si hay daños
+                no recogidos o la valoración parece baja, tienes derecho a solicitar tu propio perito.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Decide: acepta la oferta o reclama formalmente</strong>
+                <p>Si la oferta es razonable, acepta y cierra el siniestro. Si no, presenta reclamación formal
+                al Servicio de Atención al Cliente, luego a la DGSFP, y como último recurso, vía judicial
+                o arbitraje de consumo.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.eduSection}>
+          <h2>Consejos para gestionar mejor tu seguro de coche</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📱</span>
+              <strong>Guarda el teléfono de siniestros</strong>
+              <p>Ten el número de emergencias de tu aseguradora guardado en el móvil. En un accidente nocturno
+              o en el extranjero, perder tiempo buscando el número es muy estresante.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📸</span>
+              <strong>Fotografía siempre antes de mover</strong>
+              <p>Nunca muevas el vehículo (salvo riesgo) sin documentar la posición. Una foto vale más que
+              cualquier declaración verbal posterior en caso de disputa.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧮</span>
+              <strong>Calcula si compensa reclamar</strong>
+              <p>Antes de abrir parte, estima el coste del siniestro, la franquicia y el posible aumento de prima
+              el año siguiente. A veces es más barato pagar de bolsillo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📋</span>
+              <strong>Guarda el parte amistoso relleno</strong>
+              <p>Saca una foto al parte amistoso antes de separarte del otro conductor. Si hay disputa posterior,
+              la foto del documento original puede ser determinante.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <strong>Notifica aunque no vayas a reclamar</strong>
+              <p>Comunica siempre el siniestro en el plazo de 7 días aunque no decidas reclamar de inmediato.
+              Preservas tu derecho a hacerlo posteriormente si los daños son mayores de lo esperado.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔍</span>
+              <strong>Revisa tu póliza antes del siniestro</strong>
+              <p>Conoce tu franquicia, tus coberturas y los talleres concertados antes de necesitarlos.
+              Sorprenderse en el momento del accidente es la peor situación para tomar buenas decisiones.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores frecuentes al reclamar al seguro de coche</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Mover el vehículo sin documentar:</strong> Si mueves el coche antes de fotografiar la posición de los vehículos, pierdes pruebas cruciales en caso de disputa sobre la culpabilidad.</li>
+            <li><strong>Firmar el parte amistoso sin leerlo:</strong> Nunca firmes un parte amistoso si no estás de acuerdo con la descripción de los hechos. Una firma equivale a aceptar lo que figura en él.</li>
+            <li><strong>No notificar en el plazo de 7 días:</strong> Aunque no decidas reclamar, notifica el siniestro a tu aseguradora dentro del plazo legal. Pasado ese plazo, puedes perder el derecho a reclamar.</li>
+            <li><strong>Aceptar la primera oferta sin revisarla:</strong> La valoración inicial del perito de la aseguradora puede estar incompleta. Revísala detalladamente antes de aceptar y comparar con presupuestos de talleres.</li>
+            <li><strong>Confundir tipos de cobertura:</strong> Un seguro de terceros no cubre daños propios, aunque el accidente sea culpa tuya. Verifica exactamente qué cubre tu póliza antes de reclamar para evitar sorpresas.</li>
+            <li><strong>No pedir el atestado en accidentes con animales o fenómenos meteorológicos:</strong> Para estos siniestros, el documento de Guardia Civil de Tráfico o certificado de AEMET es indispensable para la reclamación.</li>
+          </ul>
+        </div>
+      </EducationalSection>
 
       {/* Apps relacionadas */}
       <RelatedApps apps={getRelatedApps('guia-reclamar-seguro-coche')} />

@@ -34,14 +34,14 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 - [x] `/comparador-tipos-seguros/` — Guía: tipos de seguros vida, auto, hogar, salud ✅ lote 20
 - [x] `/checklist-coberturas-seguros/` — Qué seguros necesitas según tu perfil ✅ lote 20
 - [x] `/calculadora-infraseguro/` — Regla proporcional: cuánto cobras si tienes infraseguro ✅ lote 20
-- [ ] `/guia-reclamar-seguro-coche/` — Cuándo reclamar al seguro del coche
-- [ ] `/asistente-reclamaciones/` — Derechos del consumidor: plazos, OMIC
+- [x] `/guia-reclamar-seguro-coche/` — Cuándo reclamar al seguro del coche ✅ lote 21
+- [x] `/asistente-reclamaciones/` — Derechos del consumidor: plazos, OMIC ✅ lote 21
 
 ### Salud y Bienestar
 
-- [ ] `/calculadora-macros/` — Macronutrientes: proteínas, carbos, grasas según objetivo
-- [ ] `/planificador-embarazo/` — FPP, checklist, compras, vacunas
-- [ ] `/planificador-mascota/` — Cachorro/gatito, checklist, compras, vacunas
+- [x] `/calculadora-macros/` — Macronutrientes: proteínas, carbos, grasas según objetivo ✅ lote 21
+- [x] `/planificador-embarazo/` — FPP, checklist, compras, vacunas ✅ lote 21
+- [x] `/planificador-mascota/` — Cachorro/gatito, checklist, compras, vacunas ✅ lote 21
 - [ ] `/calculadora-alimentacion-mascotas/` — Raciones, tóxicos, transición pienso
 - [ ] `/calculadora-medicamentos-mascotas/` — Antiparasitarios, frecuencia, síntomas
 - [ ] `/seguimiento-ciclo-menstrual/` — Ventana fértil, ovulación (nueva 2026-02-19)

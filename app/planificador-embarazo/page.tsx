@@ -967,6 +967,167 @@ export default function CalculadoraFechaPartoPage() {
             </details>
           </div>
         </section>
+
+        {/* Tabla comparativa de trimestres */}
+        <section className={styles.guideSection}>
+          <h2>Resumen por trimestres del embarazo</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Trimestre</th>
+                  <th>Semanas</th>
+                  <th>Revisiones clave</th>
+                  <th>Síntomas habituales</th>
+                  <th>Suplementos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1.er trimestre</td>
+                  <td>1 – 12</td>
+                  <td>Confirmación embarazo, eco semana 11-14, analítica completa</td>
+                  <td>Náuseas, fatiga, sensibilidad en pechos</td>
+                  <td>Ácido fólico (400-800 mcg/día), yodo</td>
+                </tr>
+                <tr>
+                  <td>2.º trimestre</td>
+                  <td>13 – 27</td>
+                  <td>Eco morfológica (sem. 18-22), cribado Down, glucosa (sem. 24-28)</td>
+                  <td>Energía recuperada, primeros movimientos</td>
+                  <td>Hierro (si anemia), vitamina D, ácido fólico</td>
+                </tr>
+                <tr>
+                  <td>3.er trimestre</td>
+                  <td>28 – 40</td>
+                  <td>Eco final (sem. 32-36), estreptococo B (sem. 35-37), monitorización</td>
+                  <td>Pesadez, dificultad al dormir, contracciones Braxton-Hicks</td>
+                  <td>Continuar pauta previa, DHA (omega-3)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Preparación para el parto y el postparto: paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Elige tu maternidad y tu equipo médico (semana 8-12)</strong>
+                <p>Decide si prefieres parto en hospital público, privado o con partera. Informa al médico de
+                familia o ginecólogo. El seguimiento del embarazo puede hacerse en el sistema público o privado,
+                y puedes combinarlo según tus preferencias.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Inscríbete en la preparación al parto (semana 25-30)</strong>
+                <p>Los cursos de preparación al parto (presenciales u online) enseñan técnicas de respiración,
+                posiciones para el parto, lactancia y cuidados del recién nacido. La mayoría de centros de salud
+                los ofrecen gratuitamente a partir de la semana 26-28.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Prepara el plan de parto (semana 32-34)</strong>
+                <p>El plan de parto es un documento en el que expresas tus preferencias (epidural, acompañante,
+                posiciones, contacto piel con piel). Aunque no es vinculante, el equipo médico lo consultará
+                y respetará en la medida de lo posible.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Prepara la bolsa del hospital (semana 35-36)</strong>
+                <p>Prepara la bolsa con tiempo: documentación, ropa cómoda, artículos de higiene, ropa para el bebé,
+                silla de coche y otros elementos. Revisa la lista completa del checklist para no olvidar nada
+                importante en el momento de salir hacia el hospital.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Gestiona la baja maternal y los trámites antes del parto</strong>
+                <p>Solicita la baja maternal a la Seguridad Social (16 semanas). Informa a tu empresa con
+                antelación. Solicita el alta en el padrón municipal para el bebé si vivís en otro municipio.
+                Revisa los permisos de paternidad (también 16 semanas desde 2021).</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Planifica el postparto y la lactancia</strong>
+                <p>El postparto puede ser duro. Organiza ayuda para las primeras semanas (pareja, familia).
+                Contacta con grupos de lactancia si planeas dar el pecho. Conoce los signos de depresión
+                postparto para actuar rápidamente si aparece.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Consejos para un embarazo tranquilo</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💊</span>
+              <strong>Toma ácido fólico desde antes</strong>
+              <p>Lo ideal es empezar a tomar ácido fólico (400-800 mcg) al menos 1 mes antes de la concepción
+              y continuar hasta la semana 12. Previene defectos del tubo neural.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🚭</span>
+              <strong>Cero tabaco, alcohol y drogas</strong>
+              <p>No existe una cantidad segura de alcohol durante el embarazo. El tabaco aumenta el riesgo de
+              aborto, parto prematuro y bajo peso al nacer. Abandona estos hábitos antes de concebir.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🐱</span>
+              <strong>Cuidado con la toxoplasmosis</strong>
+              <p>Evita la caja de arena del gato (o usa guantes) y consume carne bien cocida. La toxoplasmosis
+              en el primer trimestre puede causar daños graves al feto si no existe inmunidad previa.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>😴</span>
+              <strong>Duerme sobre el lado izquierdo</strong>
+              <p>A partir del segundo trimestre, la posición de lado izquierdo mejora la circulación al bebé
+              y reduce la presión en la vena cava. Usa una almohada entre las rodillas para mayor comodidad.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📸</span>
+              <strong>Fotografía la evolución</strong>
+              <p>Una foto mensual del perfil con la misma ropa y fondo crea un recuerdo muy valioso.
+              Muchas mujeres lamentan no haberlo hecho desde el principio del embarazo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧘</span>
+              <strong>Yoga prenatal y suelo pélvico</strong>
+              <p>Los ejercicios de suelo pélvico (Kegel) son esenciales desde el primer trimestre y especialmente
+              importantes en el postparto. El yoga prenatal reduce el estrés y mejora la postura.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Señales de alarma: cuándo ir urgencias durante el embarazo</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Sangrado vaginal abundante:</strong> Cualquier sangrado significativo en el segundo o tercer trimestre requiere atención inmediata. Un pequeño sangrado en el primer trimestre puede ser de implantación, pero siempre consulta.</li>
+            <li><strong>Rotura de aguas:</strong> Si notas un líquido claro y continuo que no puedes controlar (diferente al flujo), ve al hospital aunque no tengas contracciones. Puede ser una rotura prematura de membranas.</li>
+            <li><strong>Contracciones regulares antes de la semana 37:</strong> Contracciones cada 5-10 minutos con regularidad antes del término pueden indicar parto prematuro. Acude a urgencias sin esperar.</li>
+            <li><strong>Disminución notable de los movimientos fetales:</strong> A partir de la semana 28, deberías notar movimientos regulares del bebé. Si en 2 horas no sientes ninguno, acude al hospital para una monitorización.</li>
+            <li><strong>Dolor abdominal intenso o presión pélvica fuerte:</strong> Puede indicar placenta previa, desprendimiento de placenta u otras complicaciones. No esperes: ve a urgencias o llama al 112.</li>
+            <li><strong>Fiebre alta (más de 38,5°C):</strong> Durante el embarazo, la fiebre alta puede afectar al bebé. Consulta siempre con tu médico o ve a urgencias si va acompañada de escalofríos, dolor de orina o malestar general.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('planificador-embarazo')} />

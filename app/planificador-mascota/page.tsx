@@ -1026,6 +1026,180 @@ export default function PlanificadorMascotaPage() {
             </details>
           </div>
         </section>
+
+        {/* Tabla comparativa cachorro vs adulto */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de cuidados: cachorro vs adulto vs senior</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Aspecto</th>
+                  <th>Cachorro (0-12 meses)</th>
+                  <th>Adulto (1-7 años)</th>
+                  <th>Senior (7+ años)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Comidas al día</td>
+                  <td>3-4 tomas</td>
+                  <td>2 tomas</td>
+                  <td>2 tomas (porciones menores)</td>
+                </tr>
+                <tr>
+                  <td>Vacunaciones</td>
+                  <td>Primovacunación completa</td>
+                  <td>Revacunaciones anuales</td>
+                  <td>Revacunaciones según estado de salud</td>
+                </tr>
+                <tr>
+                  <td>Desparasitación interna</td>
+                  <td>Mensual hasta 6 meses</td>
+                  <td>Cada 3 meses</td>
+                  <td>Cada 3 meses</td>
+                </tr>
+                <tr>
+                  <td>Visitas al veterinario</td>
+                  <td>Cada 3-4 semanas (primer año)</td>
+                  <td>1 revisión anual</td>
+                  <td>2 revisiones anuales</td>
+                </tr>
+                <tr>
+                  <td>Ejercicio diario (perro)</td>
+                  <td>Corto y frecuente (5 min × mes de edad)</td>
+                  <td>30-120 min según raza</td>
+                  <td>30-60 min suave</td>
+                </tr>
+                <tr>
+                  <td>Coste veterinario estimado</td>
+                  <td>400-800 € (primer año)</td>
+                  <td>150-300 €/año</td>
+                  <td>300-600 €/año</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Primeras semanas con tu nueva mascota: paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Prepara el hogar antes de su llegada</strong>
+                <p>Retira objetos pequeños que pueda tragar, esconde cables eléctricos y asegura balcones.
+                Ten lista la cama, comedero, bebedero y juguetes. Para gatos, instala el arenero en un lugar
+                tranquilo y lejos de la comida.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Primera visita al veterinario en los primeros 3-5 días</strong>
+                <p>El veterinario revisará el estado de salud general, te informará sobre el calendario de
+                vacunaciones y desparasitaciones pendientes, y te resolverá las primeras dudas. Lleva
+                el carnet de vacunación si el animal viene de una protectora o criador.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Inscripción en el registro de animales (primeras 3 semanas)</strong>
+                <p>El microchip es obligatorio para perros en toda España y para gatos en muchas comunidades.
+                Registra a tu mascota en el Registro de Animales de Compañía de tu comunidad autónoma
+                y en el ayuntamiento (a menudo lo gestiona la clínica veterinaria).</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Establece rutinas desde el primer día</strong>
+                <p>Los horarios de comida, paseo y sueño son cruciales para el bienestar y el adiestramiento.
+                Los animales se adaptan mejor cuando las rutinas son predecibles y consistentes desde el principio.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Socialización controlada (primeros 3 meses)</strong>
+                <p>El período de socialización es crítico (especialmente 3-12 semanas). Expón gradualmente
+                a tu mascota a distintas personas, sonidos, superficies y animales. Una mala socialización
+                puede generar miedos y agresividad permanente.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Planifica la esterilización (4-12 meses según especie y raza)</strong>
+                <p>La esterilización reduce el riesgo de ciertos cánceres, elimina comportamientos no deseados
+                y evita camadas no planificadas. Consulta con tu veterinario el momento óptimo según la raza
+                y el tamaño del animal.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Consejos esenciales para el cuidado de tu mascota</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🦷</span>
+              <strong>Higiene dental desde pequeño</strong>
+              <p>La enfermedad dental es la más frecuente en perros y gatos. Empieza a limpiar los dientes
+              desde cachorro para que se acostumbre. Hay premios dentales como complemento, no como sustituto.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💉</span>
+              <strong>Cumple el calendario vacunal</strong>
+              <p>Las vacunas protegen contra enfermedades potencialmente mortales. No te saltes las revacunaciones
+              anuales aunque la mascota parezca perfectamente sana.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🐛</span>
+              <strong>Desparasitación regular</strong>
+              <p>Tanto la desparasitación interna (parásitos intestinales) como la externa (pulgas, garrapatas)
+              son esenciales. Usa productos específicos para cada especie: los de perros pueden ser tóxicos para gatos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🛡️</span>
+              <strong>Seguro de mascotas para imprevistos</strong>
+              <p>Una operación de urgencias puede costar 2.000-5.000 €. Un seguro básico de 15-30 €/mes
+              puede cubrir la mayoría de imprevistos veterinarios significativos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎾</span>
+              <strong>Enriquecimiento ambiental</strong>
+              <p>Los animales necesitan estimulación mental además de física. Juguetes de inteligencia, esconder
+              comida, nuevos olores y actividades variadas previenen el aburrimiento y los problemas de conducta.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🩺</span>
+              <strong>Revisiones preventivas anuales</strong>
+              <p>Aunque tu mascota parezca sana, la revisión anual permite detectar enfermedades en fases
+              tempranas. En animales senior (7+ años), se recomiendan 2 visitas al año.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Señales de alarma: cuándo ir al veterinario de urgencias</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Dificultad respiratoria:</strong> Respiración agitada, jadeos en reposo o coloración azulada de las encías indican emergencia. Lleva al veterinario inmediatamente sin esperar.</li>
+            <li><strong>Ingestión de sustancia tóxica:</strong> Chocolate, uvas, xilitol (edulcorante), cebolla, medicamentos humanos... Si sospechas que ha ingerido algo tóxico, llama al veterinario o al Centro de Información Toxicológica (91 562 04 20) sin esperar síntomas.</li>
+            <li><strong>Abdomen hinchado y duro (especialmente en razas grandes):</strong> Puede indicar dilatación-vólvulo gástrico, una emergencia mortal en perros de razas grandes. Requiere cirugía inmediata.</li>
+            <li><strong>Convulsiones:</strong> Un episodio convulsivo de más de 5 minutos o varios episodios seguidos (status epilepticus) es una emergencia neurológica. Mantén la calma, no metas las manos en la boca y ve al veterinario.</li>
+            <li><strong>Traumatismo por atropello o caída:</strong> Aunque el animal parezca estar bien tras un golpe fuerte, puede tener lesiones internas. Siempre debe ser evaluado por un veterinario en las primeras horas.</li>
+            <li><strong>Obstrucción por cuerpo extraño:</strong> Si el animal intenta vomitar sin éxito, babea en exceso o tiene dificultad para tragar o defecar, puede haber una obstrucción. No intentes extraer el objeto: ve al veterinario urgentemente.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps

@@ -460,6 +460,108 @@ export default function CalculadoraMacrosPage() {
         title="¿Quieres aprender más sobre macronutrientes?"
         subtitle="Descubre cómo optimizar tu alimentación según tus objetivos fitness"
       >
+        {/* Tabla comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de macros por objetivo</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Objetivo</th>
+                  <th>Calorías</th>
+                  <th>Proteína</th>
+                  <th>Carbohidratos</th>
+                  <th>Grasas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🔥 Definición (déficit)</td>
+                  <td>TDEE − 300/500 kcal</td>
+                  <td>2,0 – 2,2 g/kg</td>
+                  <td>Moderados</td>
+                  <td>Mínimo 0,6 g/kg</td>
+                </tr>
+                <tr>
+                  <td>💪 Volumen (superávit)</td>
+                  <td>TDEE + 300/500 kcal</td>
+                  <td>1,6 – 2,0 g/kg</td>
+                  <td>Altos</td>
+                  <td>0,8 – 1,0 g/kg</td>
+                </tr>
+                <tr>
+                  <td>⚖️ Mantenimiento</td>
+                  <td>= TDEE</td>
+                  <td>1,6 – 1,8 g/kg</td>
+                  <td>Equilibrados</td>
+                  <td>0,8 – 1,0 g/kg</td>
+                </tr>
+                <tr>
+                  <td>🏃 Rendimiento deportivo</td>
+                  <td>TDEE + 200/300 kcal</td>
+                  <td>1,6 – 2,0 g/kg</td>
+                  <td>Muy altos (5-8 g/kg)</td>
+                  <td>20-25% kcal totales</td>
+                </tr>
+                <tr>
+                  <td>🧘 Sedentario/salud general</td>
+                  <td>= TDEE o − 200 kcal</td>
+                  <td>0,8 – 1,2 g/kg</td>
+                  <td>Moderados</td>
+                  <td>25-35% kcal totales</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.guideSection}>
+          <h2>Casos de uso reales</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🏋️</span>
+                <span className={styles.casoTag}>Definición muscular</span>
+              </div>
+              <p>Carlos, 80 kg, entrena 4 días/semana. TDEE estimado: 2.800 kcal. En fase de definición aplica
+              déficit de 400 kcal (2.400 kcal/día). Proteína: 2,0 g/kg = 160 g/día. Los carbohidratos se
+              calculan con las calorías restantes priorizando la proteína.</p>
+              <div className={styles.casoResultado}>Objetivo: preservar músculo y reducir grasa en 8-12 semanas</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🌱</span>
+                <span className={styles.casoTag}>Dieta vegana y fitness</span>
+              </div>
+              <p>María, 60 kg, vegana activa. Le preocupa cubrir proteínas sin carne ni lácteos. Con legumbres,
+              tofu, tempeh, seitán y proteína de guisante puede alcanzar los 1,8-2,0 g/kg sin problema.
+              La clave es combinar fuentes para obtener todos los aminoácidos esenciales.</p>
+              <div className={styles.casoResultado}>Proteína vegana completa combinando legumbres + cereales</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🏃‍♀️</span>
+                <span className={styles.casoTag}>Corredora de fondo</span>
+              </div>
+              <p>Laura, 55 kg, corre 60 km/semana preparando un maratón. Sus necesidades de carbohidratos
+              son muy altas (6-8 g/kg = 330-440 g/día). La grasa no debe bajar del 20% de las calorías
+              totales para mantener el correcto funcionamiento hormonal.</p>
+              <div className={styles.casoResultado}>Prioridad: carbohidratos suficientes para el rendimiento en carrera</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>👨‍💼</span>
+                <span className={styles.casoTag}>Persona sedentaria con sobrepeso</span>
+              </div>
+              <p>Tomás, 90 kg, trabajo de oficina, sin deporte. TDEE: ~2.200 kcal. Con un déficit moderado de
+              300 kcal (1.900 kcal/día) y aumentando proteína a 1,2 g/kg (108 g/día) puede perder grasa
+              sin perder masa muscular y sin hambre excesiva.</p>
+              <div className={styles.casoResultado}>Déficit moderado + proteína alta = pérdida sostenible sin rebote</div>
+            </div>
+          </div>
+        </section>
+
         <section className={styles.guideSection}>
           <h2>Conceptos Clave</h2>
           <div className={styles.contentGrid}>
@@ -559,6 +661,121 @@ export default function CalculadoraMacrosPage() {
             </details>
           </div>
         </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo calcular y ajustar tus macros: paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula tu metabolismo basal (TMB)</strong>
+                <p>Usa la fórmula de Mifflin-St Jeor: para hombres (10 × peso) + (6,25 × altura) − (5 × edad) + 5;
+                para mujeres, el mismo cálculo menos 161. Este es el mínimo calórico si estuvieras en reposo total.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Multiplica por tu factor de actividad (TDEE)</strong>
+                <p>Sedentario: TMB × 1,2. Ligero (1-3 días/semana): × 1,375. Moderado (3-5 días): × 1,55.
+                Muy activo (6-7 días intensos): × 1,725. Este es tu gasto total diario de energía.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Define tu objetivo y ajusta las calorías</strong>
+                <p>Definición: TDEE − 300/500 kcal. Volumen: TDEE + 300/500 kcal. Mantenimiento: = TDEE.
+                Deficits mayores de 500 kcal/día aceleran la pérdida de músculo. Superávits mayores de 500 kcal
+                aumentan más la grasa que el músculo.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Establece la proteína primero</strong>
+                <p>La proteína es el macro más importante. Fija entre 1,6 y 2,2 g/kg según tu objetivo e intensidad
+                de entrenamiento. Cada gramo de proteína aporta 4 kcal. Calcula las calorías de proteína y descuéntalas del total.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Fija la grasa mínima (no bajar del 20% del total calórico)</strong>
+                <p>Las grasas son esenciales para las hormonas y la absorción de vitaminas. Nunca bajes de 0,5-0,6 g/kg.
+                Cada gramo de grasa aporta 9 kcal. En definición suelen representar el 20-25% de las calorías totales.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Asigna el resto a carbohidratos y revisa cada 4-6 semanas</strong>
+                <p>Los carbohidratos cubren las calorías restantes. Cada gramo aporta 4 kcal. Recalcula los macros
+                cada 4-6 semanas o cuando tu peso cambie más de 3-5 kg, ya que el TDEE evoluciona con el cuerpo.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Consejos para seguir tus macros con éxito</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📱</span>
+              <strong>Usa una app de seguimiento</strong>
+              <p>MyFitnessPal, Cronometer o Yazio permiten registrar alimentos con detalle. La constancia
+              en el registro (incluso parcial) es más efectiva que el perfeccionismo esporádico.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🥣</span>
+              <strong>Prepara comidas con antelación (meal prep)</strong>
+              <p>Cocinar en lotes el domingo reduce la improvisación y facilita controlar los macros.
+              Las comidas preparadas eliminan las decisiones difíciles cuando tienes hambre.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⚖️</span>
+              <strong>Usa báscula de cocina al principio</strong>
+              <p>Pesar los alimentos durante las primeras semanas educa tu percepción de las porciones.
+              Después podrás estimar visualmente con mucha más precisión.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💧</span>
+              <strong>Hidratación como cuarto macro</strong>
+              <p>El agua no tiene calorías pero afecta al rendimiento y al apetito. Bebe al menos 2 litros
+              al día. Confundir sed con hambre es muy común durante las primeras semanas de dieta.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <strong>Revisa y ajusta regularmente</strong>
+              <p>Si no ves progreso en 2-3 semanas sin haber cambiado el entrenamiento, ajusta las calorías
+              en ±100-200 kcal. Los ajustes pequeños son más sostenibles que los cambios drásticos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🍽️</span>
+              <strong>Flexibilidad: el 80/20 funciona</strong>
+              <p>Seguir los macros el 80-90% del tiempo produce excelentes resultados. La rigidez total
+              lleva al abandono. Un 10-20% de comidas más libres no arruina el progreso a largo plazo.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores comunes al calcular y seguir los macros</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Usar el peso como única métrica:</strong> El peso fluctúa diariamente por el agua, el glucógeno y la digestión. Mide también perímetros (cintura, cadera) y fotos mensuales para evaluar el progreso real.</li>
+            <li><strong>Subestimar las calorías de las grasas:</strong> La grasa tiene 9 kcal/g, más del doble que proteínas y carbohidratos (4 kcal/g). Pequeñas cantidades de aceite, mantequilla o frutos secos suman muchas calorías.</li>
+            <li><strong>Priorizar los carbohidratos sobre la proteína:</strong> En definición, reducir proteína para comer más carbohidratos es un error frecuente. La proteína debe establecerse primero, especialmente cuando se pierde peso.</li>
+            <li><strong>Bajar demasiado las grasas:</strong> Bajar las grasas por debajo del 20% del total calórico puede afectar a las hormonas, la absorción de vitaminas liposolubles (A, D, E, K) y el sistema inmune.</li>
+            <li><strong>No recalcular tras perder o ganar peso:</strong> El TDEE disminuye al perder peso. Si no ajustas las calorías, el déficit se vuelve insuficiente y el progreso se estanca. Recalcula cada 4-6 semanas.</li>
+            <li><strong>Seguir macros de otra persona:</strong> Los macros son individuales. No uses los de un influencer o amigo como punto de partida sin calcular los tuyos propios según tu peso, altura, edad y nivel de actividad.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-macros')} />

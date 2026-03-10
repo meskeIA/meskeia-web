@@ -343,6 +343,115 @@ export default function AsistenteReclamacionesPage() {
         subtitle="Conceptos clave, legislación y preguntas frecuentes"
         icon="📚"
       >
+        {/* Tabla comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de vías de reclamación</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Vía</th>
+                  <th>Coste</th>
+                  <th>Plazo resolución</th>
+                  <th>Vinculante</th>
+                  <th>Cuándo usar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Servicio atención al cliente</td>
+                  <td>Gratuito</td>
+                  <td>30 días</td>
+                  <td>No siempre</td>
+                  <td>Primer paso obligatorio</td>
+                </tr>
+                <tr>
+                  <td>OMIC (Oficina Municipal)</td>
+                  <td>Gratuito</td>
+                  <td>1-3 meses</td>
+                  <td>No</td>
+                  <td>Mediación local, comercio minorista</td>
+                </tr>
+                <tr>
+                  <td>Consumo autonómico</td>
+                  <td>Gratuito</td>
+                  <td>2-4 meses</td>
+                  <td>Depende</td>
+                  <td>Si OMIC no resuelve</td>
+                </tr>
+                <tr>
+                  <td>Arbitraje de consumo</td>
+                  <td>Gratuito</td>
+                  <td>90 días</td>
+                  <td>Sí (ambas partes)</td>
+                  <td>Empresa adherida al sistema</td>
+                </tr>
+                <tr>
+                  <td>Plataforma ODR (online)</td>
+                  <td>Gratuito</td>
+                  <td>90 días</td>
+                  <td>Depende</td>
+                  <td>Compras en UE online</td>
+                </tr>
+                <tr>
+                  <td>Vía judicial (juicio verbal)</td>
+                  <td>Bajo coste (&lt;2.000 €)</td>
+                  <td>6-18 meses</td>
+                  <td>Sí</td>
+                  <td>Último recurso, daños significativos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.guideSection}>
+          <h2>Casos reales de reclamación</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>📦</span>
+                <span className={styles.casoTag}>Producto defectuoso en garantía</span>
+              </div>
+              <p>Un televisor comprado hace 2 años deja de funcionar sin causa aparente. El vendedor quiere
+              cobrar la reparación. La garantía legal de 3 años (desde 2022) obliga al vendedor a reparar,
+              sustituir o devolver el dinero de forma gratuita.</p>
+              <div className={styles.casoResultado}>Derecho: reparación/sustitución gratuita. Reclamar al vendedor, no al fabricante</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🛒</span>
+                <span className={styles.casoTag}>Devolución compra online</span>
+              </div>
+              <p>Ropa comprada por internet no corresponde a las fotos. Se quiere devolver a los 10 días.
+              El derecho de desistimiento (14 días naturales) permite devolver sin dar explicaciones.
+              La tienda debe reembolsar incluso los gastos de envío originales.</p>
+              <div className={styles.casoResultado}>14 días de desistimiento desde la recepción, sin justificación</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>✈️</span>
+                <span className={styles.casoTag}>Vuelo cancelado</span>
+              </div>
+              <p>Una aerolínea cancela un vuelo con menos de 14 días de antelación. El Reglamento UE 261/2004
+              establece compensaciones de 250 a 600 € según la distancia, además del reembolso del billete
+              o vuelo alternativo. Reclamar directamente a la aerolínea o a AESA.</p>
+              <div className={styles.casoResultado}>Compensación automática: 250-600 € + reembolso según caso</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>📱</span>
+                <span className={styles.casoTag}>Cobro indebido en factura</span>
+              </div>
+              <p>Una operadora cobra un servicio que nunca se contrató. Llamar al servicio al cliente exigiendo
+              la devolución y documentando la conversación. Si no responden en 30 días, acudir a la Secretaría
+              de Estado de Telecomunicaciones (SETSI) o la OMIC.</p>
+              <div className={styles.casoResultado}>Plazo de respuesta: 30 días. Siguiente paso: SETSI o OMIC</div>
+            </div>
+          </div>
+        </section>
+
         <section className={styles.guideSection}>
           <h2>Conceptos clave de consumo</h2>
 
@@ -449,6 +558,125 @@ export default function AsistenteReclamacionesPage() {
             </details>
           </div>
         </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo reclamar como consumidor: paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Documenta el problema desde el principio</strong>
+                <p>Guarda tickets, facturas, correos, capturas de pantalla y cualquier prueba del problema.
+                Sin documentación, es mucho más difícil demostrar tu reclamación. Empieza a recopilar evidencias
+                desde el primer momento.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Contacta al servicio de atención al cliente</strong>
+                <p>Es el primer paso obligatorio. Comunica el problema por escrito (correo electrónico o formulario)
+                para tener constancia. Guarda el número de referencia o ticket que te asignen. Tienen 30 días para responder.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Pide la hoja de reclamaciones si es presencial</strong>
+                <p>Si se trata de un establecimiento físico y no resuelven el problema, solicita la hoja de
+                reclamaciones oficial. Están obligados a dártela. Una copia va a la administración de consumo
+                de tu comunidad autónoma.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Acude a la OMIC si no hay respuesta</strong>
+                <p>Si la empresa no responde o rechaza tu reclamación en 30 días, acude a la Oficina Municipal
+                de Información al Consumidor (OMIC) de tu ayuntamiento. Es gratuita y puede mediar entre
+                tú y la empresa.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Solicita arbitraje de consumo si la empresa está adherida</strong>
+                <p>El arbitraje es gratuito, rápido (90 días) y vinculante. Comprueba si la empresa está en el
+                registro de empresas adheridas al Sistema Arbitral de Consumo. Si lo está, es la vía más eficaz
+                sin necesidad de abogado.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Vía judicial como último recurso</strong>
+                <p>Para reclamaciones de hasta 2.000 €, el juicio verbal no requiere abogado ni procurador.
+                Para importes mayores, valora si el coste del proceso (abogado, procurador, tiempo) compensa
+                el importe a recuperar. En muchos casos, la amenaza de demanda ya resuelve el conflicto.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Consejos para reclamar con éxito</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✍️</span>
+              <strong>Siempre por escrito</strong>
+              <p>Reclama siempre por correo electrónico o formulario web, nunca solo por teléfono.
+              Necesitas prueba de que reclamaste y en qué fecha.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <strong>Controla los plazos legales</strong>
+              <p>Garantía: 3 años desde la entrega. Desistimiento online: 14 días. Vuelo cancelado: 5 años
+              para reclamar. No esperes demasiado.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📁</span>
+              <strong>Guarda toda la documentación</strong>
+              <p>Ticket, factura, correos, fotos del defecto, capturas de conversaciones de chat.
+              Cuanta más evidencia, más fuerte es tu posición.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <strong>Sé concreto en tu reclamación</strong>
+              <p>Indica claramente: qué pasó, cuándo, qué producto/servicio, qué solución pides
+              (reparación, sustitución, devolución) y en qué plazo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⚖️</span>
+              <strong>Conoce la legislación básica</strong>
+              <p>TRLGDCU (garantías y devoluciones), Ley 50/1980 (seguros), Reglamento EU 261 (vuelos).
+              Citar la normativa en tu reclamación aumenta la efectividad.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🌐</span>
+              <strong>Usa la plataforma ODR para compras UE</strong>
+              <p>Para conflictos con empresas de otros países de la UE, la Plataforma Online de Resolución
+              de Disputas (ec.europa.eu/odr) es la vía más efectiva y gratuita.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores que debilitan o invalidan tu reclamación</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Reclamar solo por teléfono:</strong> Una conversación telefónica no deja constancia legal. Si la empresa lo niega, no tienes prueba de que reclamaste. Siempre usa canales escritos y guarda los comprobantes.</li>
+            <li><strong>No guardar el ticket o factura:</strong> Sin justificante de compra, es prácticamente imposible reclamar la garantía. Guarda los tickets en formato digital (foto) para que no se borren con el tiempo.</li>
+            <li><strong>Dejar pasar el plazo de desistimiento:</strong> El derecho de desistimiento en compras online caduca a los 14 días naturales desde la recepción. Pasado ese plazo, ya no puedes devolver sin causa de defecto.</li>
+            <li><strong>Confundir garantía legal con garantía comercial:</strong> La garantía legal (3 años) es un derecho irrenunciable frente al vendedor. La garantía del fabricante es adicional, no la sustituye. Reclama siempre al vendedor primero.</li>
+            <li><strong>Aceptar una solución peor de la que te corresponde:</strong> En garantía, tienes derecho a elegir entre reparación, sustitución o devolución del precio. La empresa no puede imponerte la opción que le resulte más barata.</li>
+            <li><strong>No usar el número de referencia de la reclamación:</strong> Cuando la empresa te asigna un número de ticket o referencia, úsalo en todos los seguimientos. Sin él, cada contacto puede empezar de cero.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('asistente-reclamaciones')} />
