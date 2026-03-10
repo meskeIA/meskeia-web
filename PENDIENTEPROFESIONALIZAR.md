@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Total profesionalizadas**: 90 | **Pendientes**: ~131
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-10 | **Total profesionalizadas**: ~103 | **Pendientes**: ~118
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 
 ---
@@ -256,8 +256,8 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Categoría | Profesionalizadas | Pendientes |
 |-----------|:-----------------:|:----------:|
-| Finanzas e Inversión | 19 | 12 |
-| Salud y Bienestar | 9 | 11 |
+| Finanzas e Inversión | 24 | 0 (ALTA completada) |
+| Salud y Bienestar | 12 | 8 |
 | Matemáticas y Estadística | 1 | 13 |
 | Productividad / Sensores | 14 | 15 |
 | Texto y Documentos | 2 | 14 |
@@ -273,20 +273,21 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 | Herramientas Web / Tecnología | 5 | 5 |
 | Calculadoras y Utilidades | 7 | 10 |
 | Biomedicina | 1 | 1 |
-| **TOTAL** | **~85** | **~136** |
-
-> _Las ~5 apps "VERIFICAR" se contabilizan en Pendientes hasta confirmar._
+| **TOTAL** | **~100** | **~121** |
 
 ---
 
 ## 🔄 Historial de Lotes
 
-| Fecha | Apps profesionalizadas | Commit |
-|-------|------------------------|--------|
-| 2026-03-10 | `calculadora-suscripciones`, `simulador-puertas-logicas` | `5d23136` |
-| 2026-03-10 | Verificadas y completadas: `golden-hour`, `matriz-eisenhower`, `conversor-horarios`, `codificador-base64`, `seguimiento-habitos` | `508b873` |
-| 2026-03-05 (aprox) | `golden-hour`, `matriz-eisenhower`, `conversor-horarios` (parcial) | `3e42761` |
-| 2026-03-05 (aprox) | `seguimiento-habitos` (parcial) | `870b870` |
-| 2026-03-05 (aprox) | `codificador-base64` (parcial) | `3810e54` |
+| Lote | Fecha | Apps profesionalizadas | Commit |
+|------|-------|------------------------|--------|
+| Lote 21 | 2026-03-10 | `guia-reclamar-seguro-coche`, `asistente-reclamaciones`, `calculadora-macros`, `planificador-embarazo`, `planificador-mascota` | `3a8c210` |
+| Lote 20 | 2026-03-10 | `simulador-compraventa-inmueble`, `calculadora-coste-vivienda`(verificada), `comparador-tipos-seguros`, `checklist-coberturas-seguros`, `calculadora-infraseguro` | `258faf4` |
+| Lote 19 | 2026-03-10 | `amortizacion-hipoteca`, `calculadora-inversiones`(verif.), `simulador-cartera-inversion`(verif.), `calculadora-fire`, `calculadora-alquiler-vs-compra` | `1ea0146` |
+| — | 2026-03-10 | `calculadora-suscripciones`, `simulador-puertas-logicas` | `5d23136` |
+| — | 2026-03-10 | Verificadas: `golden-hour`, `matriz-eisenhower`, `conversor-horarios`, `codificador-base64`, `seguimiento-habitos` | `508b873` |
+| — | 2026-03-05 | `golden-hour`, `matriz-eisenhower`, `conversor-horarios` (parcial) | `3e42761` |
+| — | 2026-03-05 | `seguimiento-habitos` (parcial) | `870b870` |
+| — | 2026-03-05 | `codificador-base64` (parcial) | `3810e54` |
 
 _Al completar un lote: marcar con `[x]` y añadir fila en esta tabla._
