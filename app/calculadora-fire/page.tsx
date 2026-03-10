@@ -429,7 +429,146 @@ export default function CalculadoraFIREPage() {
                 es 600.000 €. Usa esta calculadora para personalizar según tu situación real.
               </dd>
             </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Puedo incluir la pensión pública en el cálculo FIRE?</dt>
+              <dd className={styles.faqRespuesta}>
+                Sí, pero con cautela. Si alcanzas FIRE antes de los 67 años, tendrás un periodo sin pensión.
+                Puedes incluirla como un ingreso pasivo futuro que reduce los gastos que debe cubrir tu cartera
+                a partir de esa edad. Usa el campo de &quot;rentas adicionales&quot; para modelarlo.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿El Coast FIRE me permite dejar de ahorrar?</dt>
+              <dd className={styles.faqRespuesta}>
+                Exactamente. Coast FIRE es el punto en el que, aunque dejes de hacer aportaciones,
+                el interés compuesto de tu patrimonio actual llegará solo al número FIRE en tu edad de retiro prevista.
+                Por ejemplo: 100.000 € a los 35 años, al 7%, se convierten en ~760.000 € a los 65 sin añadir nada más.
+              </dd>
+            </div>
           </dl>
+        </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Tu plan FIRE en 7 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula tu gasto anual real</strong>
+                <p>Revisa extractos de los últimos 12 meses. Clasifica en gastos fijos, variables y discrecionales. Esta cifra es la base de tu número FIRE.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Define tu número FIRE</strong>
+                <p>Gasto anual × 25 (regla del 4%) o × 30-33 si quieres más margen. Ajusta si anticipas cambios de estilo de vida o gastos extraordinarios en el retiro.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Maximiza la tasa de ahorro</strong>
+                <p>La tasa de ahorro es el factor más impactante. Cada 10 puntos más de ahorro puede reducir el plazo entre 3 y 8 años. Busca aumentar ingresos y reducir gastos en paralelo.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Construye y automatiza tu cartera inversora</strong>
+                <p>Fondos indexados globales de bajo coste (TER &lt; 0,2%) a través de brokers como MyInvestor, Indexa Capital o Trade Republic. Automatiza las aportaciones mensuales.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Planifica la fiscalidad del retiro</strong>
+                <p>En España, las plusvalías tributan al 19-28%. Estructura las retiradas para no superar los primeros tramos. Considera usar un plan de pensiones con diferimiento fiscal.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Define una estrategia de retirada</strong>
+                <p>La regla del 4% implica retirar 40.000 € al año de una cartera de 1 M €. Establece un orden de retirada: primero liquidez, luego dividendos, luego venta de activos.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Revisa y ajusta anualmente</strong>
+                <p>Comprueba tu progreso cada año: patrimonio actual vs. objetivo, tasa de ahorro real, desviaciones. Un mal año en bolsa no invalida el plan; mantén la estrategia.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>6 claves para acelerar tu FIRE</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⬆️</span>
+              <strong>Aumenta ingresos, no solo recortes</strong>
+              <p>La tasa de ahorro puede crecer más rápido aumentando ingresos (ascenso, freelance, negocio) que reduciendo gastos. Ambas palancas son necesarias.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧮</span>
+              <strong>Usa la rentabilidad real, no la nominal</strong>
+              <p>Resta la inflación (2-3%) a la rentabilidad esperada. Un 7% nominal con 3% de inflación da un 4% real. Tu calculadora debe usar el dato real para ser precisa.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🛡️</span>
+              <strong>Mantén un colchón extra en el retiro</strong>
+              <p>Añade un 15-20% al número FIRE calculado como margen de seguridad ante crisis de mercado en los primeros años del retiro (riesgo de secuencia de rendimientos).</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💼</span>
+              <strong>Considera el Barista FIRE</strong>
+              <p>Trabajar a tiempo parcial en el retiro cubriendo solo gastos básicos (1.000 €/mes) reduce el capital necesario a la mitad. El semi-retiro es una etapa intermedia muy válida.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <strong>Diversifica en múltiples activos</strong>
+              <p>No solo acciones. Renta fija, REITs e incluso bienes raíces físicos como fuente de alquiler pueden reducir la volatilidad de la cartera y añadir ingresos pasivos diversificados.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧘</span>
+              <strong>Define el &quot;por qué&quot; antes del número</strong>
+              <p>FIRE no es solo dejar de trabajar. Define qué harás con tu tiempo. Tener un propósito claro reduce el riesgo de &quot;one more year syndrome&quot; (posponer el retiro indefinidamente).</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h2>Errores frecuentes en la planificación FIRE</h2>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Usar rentabilidad nominal en vez de real.</strong> Calcular con 7% sin descontar la inflación (3%) sobreestima el patrimonio final. Usa siempre la rentabilidad real (4-5%) para proyecciones conservadoras.
+              </li>
+              <li>
+                <strong>No considerar los impuestos sobre retiradas.</strong> En España, las plusvalías tributan al 19-28%. Si tu número FIRE es 600.000 €, necesitarás retirar más del 4% anual bruto para cubrir impuestos.
+              </li>
+              <li>
+                <strong>Ignorar el riesgo de secuencia de rendimientos.</strong> Una caída del 40% en los primeros años del retiro puede agotar la cartera aunque la rentabilidad media a 30 años sea buena. Mantén 1-2 años en liquidez al entrar en el retiro.
+              </li>
+              <li>
+                <strong>Calcular con gastos actuales sin ajustar por el retiro.</strong> En el retiro pueden aumentar gastos sanitarios, de ocio y viaje. Añade un 10-15% a tus gastos actuales para planificar con margen.
+              </li>
+              <li>
+                <strong>Alcanzar el número y no tener plan de retirada.</strong> Llegar al número FIRE sin una estrategia clara de cómo y en qué orden retirar el dinero puede llevar a decisiones fiscalmente ineficientes.
+              </li>
+              <li>
+                <strong>Rendirse tras una mala racha en bolsa.</strong> Un año con -20% no invalida el plan FIRE. Las caídas son parte del proceso. Reducir temporalmente gastos en años malos (estrategia de guarda) alarga significativamente la duración de la cartera.
+              </li>
+            </ul>
+          </div>
         </section>
 
         <section className={styles.guideSection}>

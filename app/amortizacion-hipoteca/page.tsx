@@ -1005,7 +1005,139 @@ export default function AmortizacionHipotecaPage() {
                 simulador usa el sistema francés para todos sus cálculos.
               </dd>
             </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Compensa amortizar en el primer tercio de la hipoteca?</dt>
+              <dd className={styles.faqRespuesta}>
+                Sí, especialmente en los primeros años, donde la mayor parte de la cuota son intereses.
+                Cada euro que amortizas en el primer año puede ahorrarte hasta 0,80-0,90 € en intereses.
+                En los últimos años, el efecto es menor porque ya queda poco capital.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Qué pasa si tengo hipoteca variable y sube el Euríbor?</dt>
+              <dd className={styles.faqRespuesta}>
+                En hipotecas variables, amortizar capital reduce el importe sobre el que se aplica el tipo
+                de interés, protegiéndote parcialmente de subidas del Euríbor. Si reduces cuota, el efecto
+                es inmediato; si reduces plazo, la protección es mayor a largo plazo.
+              </dd>
+            </div>
           </dl>
+        </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo realizar una amortización anticipada: paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Revisa tu contrato hipotecario</strong>
+                <p>Localiza la cláusula de amortización anticipada. Verifica el tipo de hipoteca (variable/fija) y la comisión máxima aplicable según la Ley 5/2019.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Simula el ahorro con esta calculadora</strong>
+                <p>Introduce tus datos reales: importe inicial, plazo, tipo de interés y fecha actual. Compara la opción de reducir cuota vs. reducir plazo para tu caso concreto.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Compara con alternativas de inversión</strong>
+                <p>Si tu hipoteca está al 2-3%, calcula si invertir ese dinero en fondos indexados (rentabilidad media histórica 6-8% anual) puede ser más rentable a largo plazo.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Contacta con tu banco y solicita el importe exacto</strong>
+                <p>Pide el &quot;certificado de deuda&quot; o &quot;saldo pendiente&quot; actualizado al día que quieres amortizar. El banco tiene obligación de dártelo.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Confirma la opción elegida (cuota o plazo)</strong>
+                <p>Comunica al banco tu decisión por escrito. La mayoría de bancos permiten hacerlo por banca online, aunque algunos exigen ir en persona o por teléfono.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Verifica la nueva situación en tu próxima cuota</strong>
+                <p>Comprueba que el banco ha aplicado correctamente la amortización. Si elegiste reducir cuota, verifica el nuevo importe en el recibo del mes siguiente.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>6 consejos para amortizar de forma inteligente</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <strong>Amortiza a principios de año</strong>
+              <p>Cada mes que adelantas la amortización reduce el tiempo durante el que pagas intereses. La diferencia entre enero y diciembre puede ser de cientos de euros.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏦</span>
+              <strong>Negocia la eliminación de comisiones</strong>
+              <p>Muchos bancos las eliminan si llevas productos vinculados (seguro de hogar, nómina domiciliada). Pide que conste en el contrato o en una adenda firmada.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💡</span>
+              <strong>Prioriza reducir plazo vs. cuota</strong>
+              <p>A igualdad de ahorro total, reducir plazo siempre genera un mayor ahorro en intereses. Solo elige reducir cuota si necesitas liquidez mensual urgentemente.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🛡️</span>
+              <strong>Mantén fondo de emergencia primero</strong>
+              <p>Antes de amortizar, asegúrate de tener 3-6 meses de gastos en liquidez. La hipoteca está garantizada por el inmueble; no lo priorices sobre tu seguridad financiera.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <strong>Considera el impacto fiscal</strong>
+              <p>Si tu hipoteca es anterior a 2013, verificar si la amortización anticipa reduce tu base de deducción por vivienda habitual puede cambiar la decisión óptima.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <strong>Plan de amortizaciones anuales</strong>
+              <p>Aportar 3.000-5.000 € extras cada año puede reducir el plazo en 4-6 años y ahorrarte más de 15.000 € en intereses en una hipoteca de 200.000 € al 3%.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box - Errores comunes */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h2>Errores frecuentes al amortizar hipoteca</h2>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Amortizar sin consultar la comisión exacta.</strong> La ley fija los máximos, pero tu banco puede cobrar menos. Pide siempre el importe exacto antes de decidir.
+              </li>
+              <li>
+                <strong>Amortizar y quedarse sin liquidez.</strong> Si surge un imprevisto (paro, enfermedad) y no tienes ahorros, puedes tener problemas para pagar la cuota ordinaria. La hipoteca es un préstamo a muy largo plazo.
+              </li>
+              <li>
+                <strong>Olvidar comparar con la rentabilidad de invertir.</strong> Con tipos hipotecarios bajos (2-3%), históricamente ha sido más rentable invertir en índices bursátiles. Esta calculadora no sustituye ese análisis.
+              </li>
+              <li>
+                <strong>No pedir confirmación escrita al banco.</strong> Siempre solicita un documento o justificante de la amortización realizada con el nuevo cuadro de amortización actualizado.
+              </li>
+              <li>
+                <strong>Elegir reducir cuota por defecto.</strong> El banco suele proponer reducir cuota por comodidad operativa. Analiza qué te conviene según tus circunstancias, no aceptes sin comparar.
+              </li>
+              <li>
+                <strong>Amortizar en la segunda mitad del préstamo.</strong> Si ya llevas el 60-70% del plazo, la mayor parte de los intereses ya están pagados. El ahorro es limitado; puede ser mejor destinar ese dinero a inversión o a otros objetivos.
+              </li>
+            </ul>
+          </div>
         </section>
       </EducationalSection>
 

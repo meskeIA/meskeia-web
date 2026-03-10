@@ -554,54 +554,265 @@ export default function CalculadoraAlquilerVsCompraPage() {
         subtitle="Entiende el coste de oportunidad, los gastos ocultos y cuándo conviene cada opción según tu situación"
         icon="🏠"
       >
-        <section>
-          <h4>¿Qué calcula esta herramienta?</h4>
-          <p>La calculadora compara el <strong>patrimonio neto</strong> que acumulas en cada escenario a lo largo del tiempo, no solo los pagos mensuales.</p>
-          <ul>
-            <li><strong>🏠 Compra</strong>: Cuota hipotecaria (fórmula francesa), IBI, comunidad de propietarios, seguro de hogar y mantenimiento (~1% del valor anual).</li>
-            <li><strong>🏢 Alquiler</strong>: Renta mensual con incremento anual estimado según evolución del mercado.</li>
-            <li><strong>📈 Coste de oportunidad</strong>: Si alquilas, la entrada (más gastos de compra) y el ahorro mensual frente a la hipoteca se invierten a la rentabilidad que indiques. Tu patrimonio crece por otra vía.</li>
-          </ul>
+        {/* Tabla comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa: alquilar vs. comprar</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Factor</th>
+                  <th>🏢 Alquilar</th>
+                  <th>🏠 Comprar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Entrada inicial</strong></td>
+                  <td>1-2 meses fianza</td>
+                  <td>20-30% del valor + ~10% gastos</td>
+                </tr>
+                <tr>
+                  <td><strong>Coste mensual total</strong></td>
+                  <td>Solo renta</td>
+                  <td>Cuota + IBI + comunidad + seguro + mantenimiento</td>
+                </tr>
+                <tr>
+                  <td><strong>Flexibilidad</strong></td>
+                  <td>Alta (preaviso 1-2 meses)</td>
+                  <td>Baja (venta compleja y costosa)</td>
+                </tr>
+                <tr>
+                  <td><strong>Construcción de patrimonio</strong></td>
+                  <td>Vía inversión del capital libre</td>
+                  <td>Vía amortización del préstamo</td>
+                </tr>
+                <tr>
+                  <td><strong>Riesgo inflación</strong></td>
+                  <td>Alto (alquiler sube con IPC)</td>
+                  <td>Bajo con hipoteca fija</td>
+                </tr>
+                <tr>
+                  <td><strong>PER razonable</strong></td>
+                  <td>Conveniente si PER &gt; 20</td>
+                  <td>Conveniente si PER &lt; 15</td>
+                </tr>
+                <tr>
+                  <td><strong>Horizonte recomendado</strong></td>
+                  <td>&lt; 7 años</td>
+                  <td>&gt; 10-15 años</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
 
-        <section>
-          <h4>El error más común: comparar cuota con alquiler</h4>
-          <p>Muchas personas comparan directamente la cuota hipotecaria con el alquiler mensual. Esto es incorrecto por tres razones:</p>
-          <ul>
-            <li><strong>Gastos adicionales del propietario</strong>: IBI, comunidad, seguro y mantenimiento añaden entre 100-300 €/mes al coste real de ser propietario.</li>
-            <li><strong>La entrada inmoviliza capital</strong>: 50.000 € en una hipoteca podrían invertirse en un índice bursátil con rentabilidades históricas del 6-8% anual.</li>
-            <li><strong>Los gastos de compra (~10%)</strong>: Impuesto de Transmisiones Patrimoniales (ITP), notaría, registro e IVA (obra nueva) suponen 20.000-30.000 € en una vivienda media que nunca se recuperan a corto plazo.</li>
-          </ul>
+        {/* Casos de uso */}
+        <section className={styles.guideSection}>
+          <h2>¿Cuándo conviene cada opción?</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>🚀</span>
+                <span className={styles.casoNivel}>Joven móvil (20-32 años)</span>
+              </div>
+              <p className={styles.casoTip}>
+                Con incertidumbre laboral y vital, el alquiler da flexibilidad. Si ahorras e inviertes la diferencia (entrada + diferencial de cuota), puedes superar el patrimonio del comprador en 10 años.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>👨‍👩‍👧</span>
+                <span className={styles.casoNivel}>Familia estable (35-50 años)</span>
+              </div>
+              <p className={styles.casoTip}>
+                Con estabilidad laboral y horizonte de 15+ años, comprar suele generar más patrimonio. La cuota fija protege de subidas del alquiler y la hipoteca se amortiza con el tiempo.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>📊</span>
+                <span className={styles.casoNivel}>Mercado con PER alto (&gt;25)</span>
+              </div>
+              <p className={styles.casoTip}>
+                En ciudades como Madrid o Barcelona donde el PER supera 25-30, alquilar e invertir el capital libre históricamente ha superado la rentabilidad de comprar en los últimos 15 años.
+              </p>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoIcon}>🧳</span>
+                <span className={styles.casoNivel}>Trabajador remoto / nómada</span>
+              </div>
+              <p className={styles.casoTip}>
+                Si puedes trabajar desde cualquier lugar, alquilar permite optimizar coste de vida (ciudades más baratas) y mantener capital invertido en activos líquidos. La vivienda propia ancla a una localización.
+              </p>
+            </div>
+          </div>
         </section>
 
-        <section>
-          <h4>¿Cuándo suele convenir más comprar?</h4>
-          <ul>
-            <li>Horizonte temporal largo (+10-15 años): los gastos de compra se diluyen y la hipoteca se amortiza.</li>
-            <li>Estabilidad laboral y geográfica garantizada: cambios de ciudad o trabajo fuerzan una venta anticipada con pérdidas.</li>
-            <li>Mercado de alquiler tensionado: si el alquiler sube mucho más que la inflación, la hipoteca fija se vuelve más competitiva.</li>
-            <li>Revalorización del inmueble superior a la inversión alternativa: zonas con alta demanda estructural.</li>
-          </ul>
+        {/* FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes</h2>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Es verdad que alquilar es tirar el dinero?</dt>
+              <dd className={styles.faqRespuesta}>
+                No necesariamente. El coste real de comprar incluye intereses hipotecarios, gastos de compra (~10%), IBI, comunidad y mantenimiento. En los primeros 5-7 años, el total pagado suele superar lo que costaría alquilar. La diferencia es la flexibilidad y la construcción de patrimonio, no la cuota en sí.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Cuánto ahorrar antes de comprar?</dt>
+              <dd className={styles.faqRespuesta}>
+                El banco financia hasta el 80% del valor (90% en algunos casos para jóvenes). Necesitas un 20% de entrada + ~10% en gastos de compra (ITP/IVA, notaría, registro, gestoría). Para una vivienda de 200.000 €, prepara unos 60.000 €. Además, mantén un fondo de emergencia de 6 meses después de la compra.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Qué es el PER inmobiliario y cómo lo uso?</dt>
+              <dd className={styles.faqRespuesta}>
+                El PER es el precio de la vivienda dividido entre la renta anual de alquiler. Un PER de 20 significa que pagas 20 años de alquiler para comprar el piso. PER &lt; 15: zona favorable a comprar. PER 15-20: zona de equilibrio. PER &gt; 25: zona favorable a alquilar (como Madrid o Barcelona donde supera 30).
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Hipoteca fija o variable en 2025-2026?</dt>
+              <dd className={styles.faqRespuesta}>
+                Con el Euríbor bajando desde máximos de 2023-2024, las hipotecas variables vuelven a ganar atractivo, aunque las fijas ofrecen certeza. Si puedes asumir volatilidad a corto plazo y tu horizonte es largo (&gt;15 años), una variable con revisión anual puede ser más barata en el ciclo completo. Simula ambas antes de decidir.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿La vivienda siempre sube?</dt>
+              <dd className={styles.faqRespuesta}>
+                No. Entre 2008 y 2014, los precios cayeron un 30-45% en España. La rentabilidad real de la vivienda española desde 1985 está entre el 3-4% anual incluyendo alquiler, inferior a índices bursátiles globales. La vivienda es un activo de valor, pero no garantiza revalorización en todos los mercados ni plazos.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Qué rentabilidad alternativa debo usar en la calculadora?</dt>
+              <dd className={styles.faqRespuesta}>
+                Usa la rentabilidad real de la alternativa en la que invertirías el capital liberado. Para fondos indexados globales: 5-7% real histórico (descontando inflación). Para depósitos o bonos: 1-3% real. Para ser conservador, usa 4-5%. Cambiar este parámetro tiene gran impacto en el resultado.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt className={styles.faqPregunta}>¿Cómo afecta la Ley de Vivienda 2023 al alquiler?</dt>
+              <dd className={styles.faqRespuesta}>
+                La Ley de Vivienda (mayo 2023) limita las actualizaciones del alquiler al IPC en zonas tensionadas y endurece las condiciones de desahucio. Para el inquilino, mayor protección pero menos oferta. Para el propietario, más incertidumbre. Esto puede encarecer el alquiler en zonas no tensionadas y reducir la oferta total.
+              </dd>
+            </div>
+          </dl>
         </section>
 
-        <section>
-          <h4>¿Cuándo suele convenir más alquilar?</h4>
-          <ul>
-            <li>Horizonte corto o incertidumbre vital: los gastos de compra-venta destruyen rentabilidad en plazos inferiores a 5-7 años.</li>
-            <li>Flexibilidad laboral o personal: movilidad frecuente, posibilidad de trabajo remoto desde otro país o ciudad.</li>
-            <li>Alta rentabilidad de la inversión alternativa: si el mercado bursátil supera la revalorización inmobiliaria, el alquiler puede ser más rentable.</li>
-            <li>Precios muy altos en relación al alquiler (PER elevado): si el PER &gt; 25 (precio = 25 veces la renta anual), alquilar suele ser más eficiente.</li>
-          </ul>
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Proceso de decisión: alquilar vs. comprar en 6 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Define tu horizonte temporal real</strong>
+                <p>¿Cuántos años planeas vivir en esa ciudad? Si es menos de 7 años, los gastos de compra-venta hacen que alquilar sea casi siempre más eficiente financieramente.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula el PER de tu zona</strong>
+                <p>Divide el precio de compra entre la renta anual de alquiler equivalente. PER &lt; 15: comprar. PER 15-20: equilibrio, usa la calculadora. PER &gt; 25: alquilar casi siempre mejor.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula el coste real mensual de la compra</strong>
+                <p>Cuota hipotecaria + IBI (÷12) + comunidad + seguro + mantenimiento (1% del valor al año ÷12). Suma todos estos conceptos para obtener el coste real de ser propietario.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Estima el coste de oportunidad de la entrada</strong>
+                <p>El 20-30% de entrada + gastos de compra inmoviliza capital que podría invertirse. Calcula cuánto crecería ese capital al 5-6% anual durante el mismo horizonte temporal.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Simula ambos escenarios con esta calculadora</strong>
+                <p>Introduce los datos reales de una vivienda concreta. Ajusta la revalorización inmobiliaria esperada y la rentabilidad alternativa. Observa en qué año se cruzan los patrimonios.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Pondera factores no financieros</strong>
+                <p>La seguridad de no depender de un propietario, personalizar el hogar o saber dónde vivirás en 20 años tienen valor real. La calculadora da el análisis financiero; la decisión final incluye factores personales.</p>
+              </div>
+            </li>
+          </ol>
         </section>
 
-        <section>
-          <h4>Glosario de términos</h4>
-          <ul>
-            <li><strong>Cuota francesa</strong>: Sistema de amortización donde la cuota es constante pero la proporción de intereses/capital varía. Al principio se pagan más intereses.</li>
-            <li><strong>IBI</strong>: Impuesto sobre Bienes Inmuebles. Lo paga el propietario anualmente al ayuntamiento. Entre 0,4% y 1,1% del valor catastral.</li>
-            <li><strong>Punto de equilibrio</strong>: Año en que el patrimonio del comprador supera al del inquilino-inversor. Antes de ese punto, alquilar e invertir puede ser más rentable.</li>
-            <li><strong>PER inmobiliario</strong>: Price-to-Earnings Ratio. Precio de la vivienda dividido entre la renta anual. Un PER de 20 significa que pagarías 20 años de alquiler para comprar el piso.</li>
-          </ul>
+        {/* Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>6 factores clave que suelen olvidarse</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔧</span>
+              <strong>Mantenimiento real ~1% anual</strong>
+              <p>Una vivienda de 250.000 € requiere unos 2.500 € al año en mantenimiento medio. Fontanería, electricidad, pintura, electrodomésticos... es un gasto real que muchos calculan en cero.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📋</span>
+              <strong>Gastos de compraventa ~10%</strong>
+              <p>ITP (4-10% según CCAA), notaría, registro y gestoría suman entre el 8-12% del precio. En una vivienda de 200.000 €, son 16.000-24.000 € que nunca se recuperan si vendes pronto.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📈</span>
+              <strong>La revalorización no está garantizada</strong>
+              <p>Usar un 3% anual de revalorización es razonable para grandes ciudades, pero en municipios pequeños o zonas con despoblación puede ser negativa. Ajusta según la zona concreta.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💸</span>
+              <strong>El alquiler sube con la inflación</strong>
+              <p>Con inflación al 3-4%, una renta de 1.000 €/mes en 2025 puede ser 1.350 €/mes en 2035. Una hipoteca fija protege de este riesgo, aunque el alquiler empieza siendo más bajo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏦</span>
+              <strong>El ratio cuota/ingresos no debe superar el 35%</strong>
+              <p>El banco exige que la cuota no supere el 30-35% de tus ingresos netos. Pero para tu estabilidad financiera personal, lo ideal es no superar el 25-28%.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⚖️</span>
+              <strong>Comprar no siempre genera más riqueza</strong>
+              <p>En ciudades con PER &gt; 25 y mercados bursátiles con retornos del 7%, alquilar e invertir el capital libre genera en muchos casos más patrimonio a 20 años que comprar.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h2>Errores frecuentes al tomar esta decisión</h2>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Comparar cuota hipotecaria con alquiler sin incluir todos los gastos.</strong> La cuota representa solo una parte del coste real de ser propietario. IBI, comunidad, seguro y mantenimiento añaden entre 150-400 €/mes al coste total.
+              </li>
+              <li>
+                <strong>Ignorar el coste de oportunidad de la entrada.</strong> 50.000 € inmovilizados durante 20 años al 6% se convierten en 160.000 €. Ese capital libre tiene un valor que debe entrar en el cálculo.
+              </li>
+              <li>
+                <strong>Asumir que la vivienda siempre revaloriza.</strong> En periodos de 5-10 años puede haber caídas del 20-40% en España. Calcular con revalorización positiva fija puede llevar a tomar una decisión errónea.
+              </li>
+              <li>
+                <strong>Decidir bajo presión social o emocional.</strong> &quot;Tirar el dinero en el alquiler&quot; es un mito en muchos mercados. La decisión debe basarse en números, horizonte real y circunstancias vitales concretas.
+              </li>
+              <li>
+                <strong>No tener en cuenta los gastos de venta.</strong> Vender una vivienda cuesta entre un 5-10% del precio (comisión inmobiliaria, plusvalía municipal, IRPF sobre ganancia). Si vendes en 5-7 años, estas pérdidas son enormes.
+              </li>
+              <li>
+                <strong>Comprar sin fondo de emergencia post-compra.</strong> Muchas familias agotan todos sus ahorros en la entrada y quedan sin colchón. Un imprevisto laboral o familiar puede llevar a la imposibilidad de pagar la hipoteca.
+              </li>
+            </ul>
+          </div>
         </section>
       </EducationalSection>
 
