@@ -674,6 +674,394 @@ export default function CalculadoraGastoEnergeticoPage() {
             </div>
           </div>
         </section>
+
+        {/* Sección 4: Tabla Comparativa de Tarifas */}
+        <section className={styles.guideSection}>
+          <h2>⚖️ Comparativa de Tarifas Eléctricas</h2>
+          <p className={styles.introParagraph}>
+            Elegir la tarifa correcta puede suponerte un ahorro de 100-300 € al año. Aquí tienes
+            los factores clave para decidir cuál se adapta mejor a tu perfil de consumo.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>PVPC (Regulada)</th>
+                  <th>Mercado Libre</th>
+                  <th>Solar / Autoconsumo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Variabilidad del precio</td>
+                  <td>Alta (varía cada hora)</td>
+                  <td>Baja (precio fijo acordado)</td>
+                  <td>Muy baja (producción propia)</td>
+                </tr>
+                <tr>
+                  <td>Precio medio estimado</td>
+                  <td>~0,13 €/kWh</td>
+                  <td>~0,14–0,18 €/kWh</td>
+                  <td>~0,04–0,06 €/kWh (excedente)</td>
+                </tr>
+                <tr>
+                  <td>Penalización horas punta</td>
+                  <td>Sí (hasta 0,18 €/kWh)</td>
+                  <td>No (precio único)</td>
+                  <td>Irrelevante si hay batería</td>
+                </tr>
+                <tr>
+                  <td>Ideal para</td>
+                  <td>Consumidores flexibles con horario nocturno</td>
+                  <td>Hogares con consumo constante de día</td>
+                  <td>+400 kWh/mes con tejado disponible</td>
+                </tr>
+                <tr>
+                  <td>Riesgo de precio</td>
+                  <td>Medio (sube en crisis energéticas)</td>
+                  <td>Bajo (precio pactado)</td>
+                  <td>Muy bajo a largo plazo</td>
+                </tr>
+                <tr>
+                  <td>Requiere instalación adicional</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>Sí (paneles + inversor, ~5.000–8.000 €)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Sección 5: Casos de Uso Prácticos */}
+        <section className={styles.guideSection}>
+          <h2>💼 Casos de Uso Prácticos</h2>
+          <p className={styles.introParagraph}>
+            Descubre cuánto consume y paga cada tipo de hogar en España y qué puedes hacer para
+            reducir tu factura según tu situación concreta.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏠</span>
+                <h4>Piso pequeño (2 personas)</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Consumo típico: ~250 kWh/mes · Factura media: ~65 €/mes
+              </p>
+              <p className={styles.escenarioTip}>
+                La nevera y la iluminación son los principales consumidores. Cambiar a LED y ajustar
+                la temperatura del frigorífico a 4°C puede ahorrar hasta 15 €/mes.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+                <h4>Casa familiar (4 personas)</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Consumo típico: ~450 kWh/mes · Factura media: ~110 €/mes
+              </p>
+              <p className={styles.escenarioTip}>
+                Lavadora y lavavajillas en horas valle (0h–8h) y revisar la potencia contratada
+                pueden suponer un ahorro de 20–30 €/mes sin cambiar hábitos de consumo.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>❄️</span>
+                <h4>Hogar con climatización</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                El A/C puede representar el 40% de la factura en verano
+              </p>
+              <p className={styles.escenarioTip}>
+                Cada grado más en verano (de 22°C a 25°C) ahorra un 21% en climatización.
+                Un A/C de 1.500 W usado 6 h/día durante 90 días añade ~85 € a tu factura.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🌙</span>
+                <h4>Aprovechamiento hora valle</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Ahorro potencial: 15–25 €/mes moviendo electrodomésticos a las 0h–8h
+              </p>
+              <p className={styles.escenarioTip}>
+                En PVPC, el precio valle (~0,08 €/kWh) es la mitad que el precio punta (~0,18 €/kWh).
+                Programar lavadora y lavavajillas de noche ahorra el 55% del coste de esos ciclos.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 6: FAQ Ampliado */}
+        <section className={styles.guideSection}>
+          <h2>❓ Preguntas Frecuentes sobre la Factura Eléctrica</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el PVPC y cuándo conviene?</h4>
+              <p>
+                El PVPC (Precio Voluntario al Pequeño Consumidor) es la tarifa regulada por el Gobierno.
+                El precio varía cada hora según el mercado mayorista. Conviene si puedes mover tus
+                consumos a horas valle (0h–8h) o si tu consumo es principalmente nocturno o de fin de semana.
+              </p>
+              <span className={styles.faqTip}>Ideal para: consumidores flexibles, teletrabajadores nocturnos, propietarios de VE.</span>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo puedo reducir el término de potencia?</h4>
+              <p>
+                El término de potencia es un cargo fijo mensual. Puedes solicitar a tu comercializadora
+                una reducción de potencia si nunca saltan tus fusibles. De 4,6 kW a 3,45 kW ahorras
+                ~10 €/mes (~120 €/año). El trámite es gratuito y tarda 1–2 semanas.
+              </p>
+              <span className={styles.faqTip}>Comprueba en tu cuadro eléctrico cuántos kW tienes activos simultáneamente.</span>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué electrodoméstico consume más en mi hogar?</h4>
+              <p>
+                En la mayoría de hogares españoles el orden es: climatización (40%), agua caliente
+                sanitaria (20%), frigorífico (15%), lavadora+secadora (10%) e iluminación (5%).
+                Usa esta calculadora para identificar el tuyo con datos reales.
+              </p>
+              <span className={styles.faqTip}>Añade tus aparatos con horas reales de uso para ver el ranking personalizado.</span>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuánto ahorro cambiando todas las bombillas a LED?</h4>
+              <p>
+                Una bombilla incandescente de 60 W equivale a una LED de 8 W con la misma luminosidad.
+                Con 20 bombillas encendidas 5 h/día y precio de 0,15 €/kWh: incandescentes cuestan
+                ~32 €/mes, LED ~4 €/mes. Ahorro: ~28 €/mes, ROI en menos de 6 meses.
+              </p>
+              <span className={styles.faqTip}>El ahorro en iluminación suele amortizarse en 4–8 meses.</span>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el impuesto eléctrico del 5,113%?</h4>
+              <p>
+                Es un impuesto especial sobre la electricidad que se aplica sobre la suma del término
+                de energía y el término de potencia (antes del IVA). Su tipo nominal es del 5,11269632%,
+                redondeado habitualmente a 5,113%. No existe manera legal de evitarlo.
+              </p>
+              <span className={styles.faqTip}>Representa entre 2 y 6 € en una factura media de hogar.</span>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Merece la pena instalar paneles solares?</h4>
+              <p>
+                Si consumes más de 400 kWh/mes y tienes tejado disponible con orientación sur,
+                la instalación suele amortizarse en 6–10 años. En 2025, una instalación de 3 kWp
+                cuesta ~5.000–7.000 € y puede cubrir el 60–80% del consumo anual de un hogar medio.
+              </p>
+              <span className={styles.faqTip}>Solicita al menos 3 presupuestos y comprueba las ayudas del IDAE.</span>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo funciona la discriminación horaria?</h4>
+              <p>
+                En PVPC existen tres periodos: punta (10h–14h y 18h–22h), llano (8h–10h, 14h–18h
+                y 22h–24h) y valle (0h–8h y festivos todo el día). El precio en valle puede ser
+                hasta un 55% más barato que en punta.
+              </p>
+              <span className={styles.faqTip}>Los sábados y domingos completos son considerados hora valle en PVPC.</span>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿En qué horas es más barata la luz en España?</h4>
+              <p>
+                Con PVPC: de 0h a 8h todos los días + sábados, domingos y festivos nacionales
+                completos. En Mercado Libre el precio es fijo durante todo el día. La diferencia
+                punta/valle en PVPC puede ser de 0,10 €/kWh o más en días de alta demanda.
+              </p>
+              <span className={styles.faqTip}>Activa las alarmas del móvil a las 23:50h para programar tus electrodomésticos.</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 7: Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>📋 Guía Paso a Paso: Optimiza tu Factura de Luz</h2>
+          <p className={styles.introParagraph}>
+            Sigue estos 7 pasos en orden para reducir tu factura de manera sistemática y
+            sin inversiones innecesarias.
+          </p>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <h4>Identifica tus mayores consumidores</h4>
+                <p>
+                  Usa esta calculadora añadiendo todos tus electrodomésticos con sus horas reales de uso.
+                  El 80% del ahorro suele venir del 20% de los aparatos. Identifica cuál es ese 20%.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <h4>Revisa tu potencia contratada</h4>
+                <p>
+                  Consulta tu última factura. Si nunca se van los plomos y tienes más de 4,6 kW,
+                  prueba a reducirla. El ahorro puede ser de 10–20 €/mes sin ningún cambio de hábitos.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <h4>Elige la tarifa adecuada</h4>
+                <p>
+                  Compara PVPC vs Mercado Libre con tu consumo real. Si puedes usar electrodomésticos
+                  de noche (0h–8h), el PVPC con discriminación horaria suele ser más barato.
+                  Usa comparadores como CNMC o OCU.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <h4>Cambia toda la iluminación a LED</h4>
+                <p>
+                  El ROI es de 6–12 meses y el ahorro es permanente. Una bombilla LED de 8 W
+                  equivale a una incandescente de 60 W. Si tienes 15 bombillas, ahorras ~25 €/mes
+                  desde el primer día.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <h4>Programa electrodomésticos en hora valle</h4>
+                <p>
+                  Configura el temporizador de la lavadora y el lavavajillas para que terminen
+                  sus ciclos antes de las 8h. Con PVPC ahorras hasta el 55% del coste de cada ciclo.
+                  En un hogar de 4 personas, esto supone ~15 €/mes.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <h4>Elimina el consumo en standby</h4>
+                <p>
+                  TV, ordenadores, cargadores y aparatos con piloto rojo consumen aunque estén
+                  apagados. Instala regletas con interruptor en los centros de entretenimiento y
+                  despacho. Ahorro típico: 8–12 €/mes.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <h4>Evalúa el autoconsumo solar</h4>
+                <p>
+                  Si tu consumo supera los 400 kWh/mes y tienes tejado disponible con orientación
+                  sur, calcula el retorno de la inversión. Con las ayudas actuales y el precio de
+                  la luz, la amortización puede ser de 6–8 años con vida útil de 25+ años.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 8: Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>✅ Mejores Prácticas de Ahorro Energético</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>❄️</span>
+              <h4>Climatización inteligente</h4>
+              <p>
+                Cada grado menos de A/C en verano (o más de calefacción en invierno) ahorra un 7%
+                en esa partida. De 22°C a 25°C en verano supone un 21% menos de consumo en climatización.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧊</span>
+              <h4>Frigorífico optimizado</h4>
+              <p>
+                La nevera representa el 15% de la factura y funciona las 24 horas. Mantén la
+                temperatura a 4°C en la nevera y -18°C en el congelador. Nunca introduzcas
+                alimentos calientes ni cubras los orificios de ventilación.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧺</span>
+              <h4>Lavadora en 30°C</h4>
+              <p>
+                El 90% de la energía de la lavadora se usa para calentar el agua. Lavar a 30°C
+                en lugar de 60°C ahorra un 40% de energía por ciclo. La ropa queda igual de limpia
+                con detergentes modernos.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔴</span>
+              <h4>Standby: el ladrón silencioso</h4>
+              <p>
+                Los aparatos en modo standby (piloto rojo encendido) pueden suponer el 10% de tu
+                factura anual, entre 80–130 € según el hogar. Usa regletas con interruptor para
+                eliminarlos completamente.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <h4>Compara ofertas cada 12 meses</h4>
+              <p>
+                El mercado libre cambia constantemente. Comparar ofertas anualmente usando
+                el comparador de la CNMC puede suponer un ahorro de 50–150 € al año sin
+                cambiar ningún hábito de consumo.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🤝</span>
+              <h4>Bono Social Eléctrico</h4>
+              <p>
+                Si cumples los requisitos (pensionista, familia numerosa, desempleado, discapacidad
+                o víctima de violencia de género), puedes acceder al Bono Social con descuentos
+                del 25% al 65% en tu factura. Solicítalo a tu comercializadora de referencia.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 9: Warning Box */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>6 Errores que Disparan tu Factura de Luz</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>No revisar la potencia contratada:</strong> Pagar el término fijo de 9,2 kW
+                cuando con 4,6 kW es suficiente supone 40 €/mes de más, o 480 €/año tirados.
+              </li>
+              <li>
+                <strong>Comparar solo el precio del kWh en ofertas:</strong> El término de potencia
+                puede ser más caro en el Mercado Libre que en PVPC. Compara la factura total estimada,
+                no solo el precio por kWh.
+              </li>
+              <li>
+                <strong>Usar el horno para cantidades pequeñas:</strong> Calentar un plato en horno
+                eléctrico (2.000 W durante 20 min) consume 0,67 kWh. El microondas hace lo mismo
+                en 3 min con 0,05 kWh. Un 70% menos de energía por cada uso.
+              </li>
+              <li>
+                <strong>Dejar el A/C encendido con ventanas abiertas:</strong> Una ventana abierta
+                con A/C funcionando puede multiplicar por 3 el consumo del aparato. Ventila siempre
+                antes de encender el aire acondicionado.
+              </li>
+              <li>
+                <strong>Frigorífico mal configurado o mal ubicado:</strong> Un frigorífico a 1°C
+                menos de lo necesario incrementa su consumo un 5%. Si está cerca del horno o recibe
+                sol directo, trabaja un 30% más para mantener la temperatura.
+              </li>
+              <li>
+                <strong>No aprovechar la tarifa nocturna con vehículo eléctrico o piscina:</strong>
+                Cargar un VE (60 kWh de batería) en hora punta cuesta ~11 €. En hora valle cuesta ~5 €.
+                El ahorro es de 6 € por cada carga completa, o más de 200 €/año con carga semanal.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-gasto-energetico')} />
