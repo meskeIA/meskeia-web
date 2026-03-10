@@ -660,7 +660,157 @@ Si quieres profesionalizar más apps:
   20. Calculadora ROI Marketing (app/calculadora-roi-marketing/) - 6 secciones profesionales con CSS prefijado 'edu' para evitar conflictos con tablaWrapper/tablaComparativa existentes (Tabla Comparativa 6 canales × 7 criterios ROI/ROAS/CPL/horizonte, Casos de Uso 4 perfiles ecommerce/SaaS B2B/local/infoproductos, FAQ 8 preguntas atribución/CAC/CLV/gestión, Guía 7 pasos optimizar mix, Tips 6 reglas marketing rentable, Warning 6 errores que destruyen ROI)
   21. Calculadora Coste Vivienda (app/calculadora-coste-vivienda/) - 6 secciones profesionales + eliminado disclaimer duplicado (Tabla Comparativa 5 tipos vivienda × 7 criterios, Casos de Uso 4 perfiles joven/familia/segunda residencia/inversor, FAQ 8 preguntas adquisición/regla 30%/alquilar vs comprar/derramas, Guía 7 pasos auditar y reducir costes, Tips 6 hábitos propietario inteligente, Warning 6 errores que disparan el coste)
 
-**Última actualización**: 2026-02-20 (Sesión: calculadora-roi-marketing + calculadora-coste-vivienda → 21 apps v2.0, 25 total)
+**Última actualización**: 2026-03-10 (Sesión: inventario PENDIENTEPROFESIONALIZAR.md + 5 apps verificadas → 90 apps v2.0)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
 **Versión**: 2.0
-**Apps implementadas**: 25 (3 v1.0 FULL, 2 v1.0 cleanup, 21 v2.0 migradas)
+**Apps implementadas**: 90 (85 con .warningBox en CSS + 5 verificadas con clases edu-xxx)
+
+---
+
+## 🔄 Procedimiento de Profesionalización por Lotes (v2026-03-10)
+
+Este procedimiento describe el flujo estándar para profesionalizar apps en lotes de forma sistemática y homogénea.
+
+---
+
+### 📂 Archivos del Sistema
+
+| Archivo | Propósito |
+|---------|-----------|
+| `PENDIENTEPROFESIONALIZAR.md` | Inventario de pendientes con prioridad y estado |
+| `PROFESIONALIZACION.md` | Documentación técnica del patrón v2.0 (este archivo) |
+| `templates/app-base/` | Plantillas de referencia |
+
+---
+
+### 🔍 Indicador Automático de Detección
+
+Una app está **profesionalizada v2.0** si su CSS module contiene la clase `.warningBox`.
+
+```bash
+# Detectar apps profesionalizadas (devuelve rutas de CSS con warningBox)
+grep -rl "\.warningBox" app/*/  --include="*.module.css"
+
+# Contar total profesionalizadas
+grep -rl "\.warningBox" app/*/ --include="*.module.css" | wc -l
+```
+
+**Nota**: Algunas apps usan clases CSS con prefijo `edu-` en lugar del CSS module estándar. Son igualmente válidas, pero el marcador `.warningBox {}` debe añadirse al CSS module para que el indicador funcione.
+
+---
+
+### 📋 Flujo de Trabajo por Lote
+
+#### FASE 1: Selección de Apps
+
+1. Abrir `PENDIENTEPROFESIONALIZAR.md`
+2. Seleccionar **2-4 apps** de la misma prioridad (preferiblemente de la misma categoría para contexto similar)
+3. Criterio de selección por sesión:
+   - **Sesión normal**: 2-3 apps de ALTA o MEDIA prioridad
+   - **Sesión rápida**: 1 app compleja o 4 apps simples
+   - **Evitar mezclar** ALTA + BAJA en el mismo lote (el agente pierde contexto)
+
+#### FASE 2: Verificación Previa
+
+Antes de lanzar agentes, leer los `page.tsx` de las apps seleccionadas para confirmar:
+- Estado actual de la `<EducationalSection>`
+- Si ya tienen algunas secciones (no reemplazar lo que existe, añadir lo que falta)
+- Tamaño aproximado del archivo (apps >500 líneas requieren más contexto en el agente)
+
+#### FASE 3: Lanzamiento de Agentes
+
+```
+Lanzar 1 agente general-purpose por app, en paralelo.
+Máximo recomendado: 3-4 agentes simultáneos.
+```
+
+**Prompt estándar para el agente** (adaptar por app):
+
+```
+Profesionaliza la EducationalSection de la app [nombre-app] en:
+app/[nombre-app]/page.tsx
+app/[nombre-app]/[NombreApp].module.css
+
+Patrón v2.0 — 6 secciones DENTRO de <EducationalSection>:
+1. Tabla Comparativa (4-6 columnas relevantes para esta app)
+2. Casos de Uso (4 perfiles de usuario con ejemplos concretos)
+3. FAQ (8 preguntas frecuentes con respuestas detalladas)
+4. Guía Paso a Paso (7 pasos del proceso completo)
+5. Mejores Prácticas (6 tips accionables en grid 3 columnas)
+6. Warning Box (6 errores comunes con consecuencias y soluciones)
+
+CSS: Usar clases estándar del patrón v2.0:
+.tableWrapper, .comparativaTable, .escenariosGrid, .escenarioCard,
+.escenarioHeader, .escenarioIcon, .escenarioExample, .escenarioTip,
+.faqList, .faqItem, .faqTip, .stepGuide, .step, .stepNumber,
+.stepContent, .tipsGrid, .tipCard, .tipIcon,
+.warningBox, .warningHeader, .warningIcon, .warningList
+
+Incluir dark mode [data-theme='dark'] y responsive @media (max-width: 768px)
+para TODAS las clases nuevas.
+
+Contenido: Específico, no genérico. Datos concretos, ejemplos reales.
+Ver PROFESIONALIZACION.md para guía completa de tono y estilo.
+```
+
+#### FASE 4: Verificación Post-Agentes
+
+```bash
+# Confirmar que .warningBox existe en los CSS modificados
+grep -l "\.warningBox" app/[nombre-app-1]/*.module.css
+grep -l "\.warningBox" app/[nombre-app-2]/*.module.css
+```
+
+#### FASE 5: Build
+
+```bash
+npm run build
+# Esperar exit code 0 y 0 errores TypeScript
+# Si hay lock: rm -f .next/lock && npm run build
+```
+
+#### FASE 6: Commit y Push
+
+```bash
+git add app/[app1]/page.tsx app/[app1]/[App1].module.css \
+        app/[app2]/page.tsx app/[app2]/[App2].module.css
+
+git commit -m "feat: profesionalizar [app1], [app2] con patrón v2.0
+
+- [app1]: Tabla Comparativa X, 4 perfiles, 8 FAQ, 7 pasos, 6 tips, 6 errores
+- [app2]: Tabla Comparativa Y, 4 perfiles, 8 FAQ, 7 pasos, 6 tips, 6 errores
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+
+git push origin main
+```
+
+#### FASE 7: Actualizar Inventario
+
+En `PENDIENTEPROFESIONALIZAR.md`:
+1. Marcar cada app completada: `[ ]` → `[x]`
+2. Actualizar el contador del header: `Total profesionalizadas: N → N+X`
+3. Actualizar `Pendientes: ~Y → ~Y-X`
+4. Añadir fila en la tabla "Historial de Lotes" con fecha, apps y hash del commit
+
+---
+
+### ⚡ Tamaño Óptimo de Lote
+
+| Tipo de app | Apps por sesión | Tiempo estimado |
+|-------------|:---------------:|-----------------|
+| Apps financieras complejas | 2 | 90-120 min |
+| Apps de salud / ciencia | 2-3 | 60-90 min |
+| Herramientas técnicas | 2-3 | 60 min |
+| Texto / conversores / juegos | 3-4 | 45-60 min |
+
+---
+
+### 🚫 Errores Comunes en el Proceso de Lotes
+
+- **No verificar el estado previo**: Puede duplicar contenido ya existente
+- **Lanzar >4 agentes en paralelo**: Degrada la calidad del contenido generado
+- **Olvidar actualizar el inventario**: El documento pierde utilidad como fuente de verdad
+- **No hacer build antes del push**: Puede deployar errores TypeScript a producción
+- **Mezclar apps de categorías muy distintas**: El agente pierde contexto y genera contenido menos específico
+- **Usar `edu-xxx` en lugar de `styles.warningBox`**: El indicador grep no detectará la app como profesionalizada
