@@ -564,6 +564,22 @@ export default function ChecklistCoberturasSeguroPage() {
           </div>
         </section>
 
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores graves al gestionar tus coberturas de seguros</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>No revisar las exclusiones de la póliza:</strong> Las exclusiones definen para qué no sirve el seguro. Contratar sin leerlas puede llevar a reclamaciones denegadas en el peor momento.</li>
+            <li><strong>Infrasegurar el contenido del hogar:</strong> Si aseguras el contenido por 20.000 € pero tienes bienes por 50.000 €, en un siniestro total solo cobras la fracción proporcional. El seguro debe reflejar el valor real.</li>
+            <li><strong>Cancelar el seguro antiguo antes de tener el nuevo activo:</strong> Un solo día sin cobertura puede ser muy costoso. Espera siempre a que la nueva póliza esté en vigor antes de cancelar la anterior.</li>
+            <li><strong>No actualizar beneficiarios del seguro de vida:</strong> Tras un divorcio, nueva pareja o nacimiento de hijos, los beneficiarios pueden ser incorrectos. Si falleces, el dinero puede ir a quien ya no es tu voluntad.</li>
+            <li><strong>Ignorar los períodos de carencia en seguros de salud:</strong> Muchos seguros de salud excluyen cirugías, maternidad o enfermedades preexistentes durante los primeros 6-12 meses. Contratar justo cuando lo necesitas puede ser demasiado tarde.</li>
+            <li><strong>No comunicar cambios de situación a la aseguradora:</strong> Reformas importantes, uso del inmueble como oficina, nueva mascota de raza considerada peligrosa... No declarar cambios puede anular la cobertura en el siniestro.</li>
+          </ul>
+        </div>
+
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('checklist-coberturas-seguros')} />

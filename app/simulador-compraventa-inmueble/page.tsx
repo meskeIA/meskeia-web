@@ -820,6 +820,278 @@ export default function SimuladorCompraventaPage() {
             <li><strong>Gestoría:</strong> Opcional, entre 200€ y 400€ (tramitación de documentos)</li>
           </ul>
         </section>
+
+        {/* Tabla comparativa */}
+        <section className={styles.eduSection}>
+          <h2>Comparativa de impuestos en compraventa</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Concepto</th>
+                  <th>Vivienda nueva</th>
+                  <th>Vivienda segunda mano</th>
+                  <th>¿Quién paga?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>IVA</td>
+                  <td>10% (21% locales/terrenos)</td>
+                  <td>No aplica</td>
+                  <td>Comprador</td>
+                </tr>
+                <tr>
+                  <td>ITP</td>
+                  <td>No aplica</td>
+                  <td>4% – 11% (según CC.AA.)</td>
+                  <td>Comprador</td>
+                </tr>
+                <tr>
+                  <td>AJD</td>
+                  <td>0,5% – 1,5%</td>
+                  <td>0,5% – 1,5% (con hipoteca)</td>
+                  <td>Comprador</td>
+                </tr>
+                <tr>
+                  <td>Plusvalía municipal</td>
+                  <td>Sí</td>
+                  <td>Sí</td>
+                  <td>Vendedor</td>
+                </tr>
+                <tr>
+                  <td>IRPF ganancia patrimonial</td>
+                  <td>19% – 28%</td>
+                  <td>19% – 28%</td>
+                  <td>Vendedor</td>
+                </tr>
+                <tr>
+                  <td>Notaría</td>
+                  <td>600 € – 1.500 €</td>
+                  <td>600 € – 1.500 €</td>
+                  <td>Comprador</td>
+                </tr>
+                <tr>
+                  <td>Registro de la propiedad</td>
+                  <td>200 € – 600 €</td>
+                  <td>200 € – 600 €</td>
+                  <td>Comprador</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.eduSection}>
+          <h2>Casos de uso reales</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🏠</span>
+                <span className={styles.casoTag}>Comprador primera vivienda</span>
+              </div>
+              <p>Marta, 29 años, compra su primera vivienda de segunda mano en Madrid por 200.000 €.
+              Al ser menor de 36 años en la Comunidad de Madrid, se aplica un ITP reducido del 6%.
+              El simulador le calcula 12.000 € de ITP más unos 1.800 € en notaría, registro y gestoría.</p>
+              <div className={styles.casoResultado}>Ahorra ~4.000 € frente al tipo general del 8%</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🏗️</span>
+                <span className={styles.casoTag}>Comprador obra nueva</span>
+              </div>
+              <p>Carlos compra un piso nuevo en Valencia por 180.000 €. Paga el 10% de IVA (18.000 €)
+              más el 1,5% de AJD (2.700 €) al ser la primera transmisión del promotor.
+              El total de impuestos asciende a 20.700 €.</p>
+              <div className={styles.casoResultado}>IVA + AJD frente a ITP en segunda mano</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>💸</span>
+                <span className={styles.casoTag}>Vendedor con ganancia</span>
+              </div>
+              <p>Ana vende su piso por 250.000 €. Lo compró hace 8 años por 180.000 €. La ganancia
+              patrimonial de 70.000 € tributa al 19% los primeros 6.000 €, al 21% el siguiente tramo
+              y al 23% el resto. Además paga la plusvalía municipal por el método más favorable.</p>
+              <div className={styles.casoResultado}>Ganancia patrimonial sujeta a IRPF del ahorro</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>👴</span>
+                <span className={styles.casoTag}>Vendedor mayor de 65 años</span>
+              </div>
+              <p>Pedro, 67 años, vende su vivienda habitual por 300.000 €. Al ser mayor de 65 años
+              y tratarse de la residencia habitual, está exento de tributar la ganancia patrimonial
+              en IRPF. Solo debe abonar la plusvalía municipal.</p>
+              <div className={styles.casoResultado}>Exención total de IRPF por edad y vivienda habitual</div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ ampliado */}
+        <section className={styles.eduSection}>
+          <h2>Preguntas frecuentes sobre gastos de compraventa</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Qué diferencia hay entre ITP e IVA en la compra de una vivienda?</h4>
+              <p>El ITP se aplica a viviendas de segunda mano (transmisiones entre particulares), mientras que
+              el IVA al 10% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir
+              en la misma operación: o se paga uno u otro, nunca ambos.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Puedo negociar quién paga cada gasto?</h4>
+              <p>En principio, salvo los gastos del vendedor (plusvalía municipal, IRPF), el resto son del comprador
+              por ley. Sin embargo, es posible pactar condiciones distintas en el contrato privado. Lo que no puede
+              modificarse es la obligación tributaria frente a Hacienda.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el valor de referencia catastral y cómo afecta al ITP?</h4>
+              <p>Desde 2022, la base imponible del ITP es el mayor valor entre el precio escriturado y el valor
+              de referencia catastral (publicado por el Catastro). Si el valor de referencia supera el precio
+              de compra, deberás pagar ITP sobre ese valor mayor, aunque hayas comprado más barato.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuándo se está exento de pagar plusvalía municipal?</h4>
+              <p>Desde la sentencia del Tribunal Constitucional de 2021, si no existe ganancia real en el valor
+              del terreno (vendes por menos de lo que compraste), puedes acreditar la pérdida y quedar exento.
+              El vendedor puede elegir el método de cálculo más favorable: objetivo o real.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué gastos puede deducir el comprador en la declaración de la renta?</h4>
+              <p>Si compras con hipoteca, los gastos financieros no son deducibles en IRPF desde 2013
+              (solo para contratos anteriores). Sin embargo, los gastos de compraventa (notaría, registro, ITP)
+              incrementan el valor de adquisición, reduciendo la ganancia patrimonial futura al vender.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?</h4>
+              <p>Muchas comunidades aplican tipos reducidos para jóvenes (menores de 35-36 años), familias numerosas,
+              personas con discapacidad (≥33%), VPO o municipios en riesgo de despoblación. Los requisitos
+              (edad, ingresos, valor máximo del inmueble) varían por comunidad. Consulta la normativa de tu CC.AA.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿La gestoría es obligatoria en la compraventa?</h4>
+              <p>No es obligatoria por ley, pero los bancos suelen exigirla cuando hay hipoteca para asegurarse
+              de que la documentación se tramita correctamente. Su coste oscila entre 200 € y 400 €.
+              Sin hipoteca, puedes presentar los impuestos directamente o contratar una gestoría por comodidad.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo gestionar los gastos de una compraventa: paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula el presupuesto total antes de firmar</strong>
+                <p>Suma al precio del inmueble entre un 10% y 15% adicional para gastos e impuestos.
+                Usa el simulador para obtener una estimación personalizada según tu comunidad y perfil.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Comprueba si tienes derecho a tipos reducidos de ITP</strong>
+                <p>Verifica los requisitos de tu comunidad autónoma: edad, ingresos, discapacidad, familia numerosa.
+                Un tipo reducido puede suponerte miles de euros de ahorro en el impuesto principal.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Firma el contrato de arras con condiciones claras</strong>
+                <p>En el contrato de arras, especifica quién asume cada gasto. Aunque los impuestos del comprador
+                no son negociables frente a Hacienda, sí puedes acordar que el vendedor asuma ciertos gastos notariales.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Firma ante notario y recibe la escritura</strong>
+                <p>En el momento de la firma, el notario calcula sus honorarios según los aranceles oficiales.
+                La gestoría (o tú mismo) se encargará de tramitar los impuestos en los plazos legales.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Liquida los impuestos en el plazo establecido</strong>
+                <p>El ITP o IVA+AJD debe liquidarse en un plazo de 30 días hábiles desde la firma.
+                El incumplimiento genera recargos del 5% al 20% e intereses de demora.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Inscribe la propiedad en el Registro</strong>
+                <p>Una vez pagados los impuestos, presenta la escritura en el Registro de la Propiedad.
+                Guarda todos los justificantes de pago para futuras ventas, ya que incrementan el valor
+                de adquisición y reducen la posible ganancia patrimonial tributable.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.eduSection}>
+          <h2>Consejos para reducir los gastos de compraventa</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <strong>Verifica el valor de referencia catastral</strong>
+              <p>Consulta el valor catastral antes de negociar el precio. Si supera el precio de mercado,
+              prepara documentación para impugnar la base imponible del ITP.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📋</span>
+              <strong>Solicita varios presupuestos de notaría</strong>
+              <p>Aunque los aranceles notariales están regulados, los complementos y servicios adicionales
+              pueden variar. Compara y elige la notaría con mejor relación calidad-precio.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <strong>Planifica los plazos fiscales</strong>
+              <p>Liquida los impuestos en los 30 días hábiles legales. Un retraso, aunque sea breve,
+              genera recargos automáticos. Tenlo agendado desde el día de la firma.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏦</span>
+              <strong>Negocia quién asume la gestoría</strong>
+              <p>En operaciones con hipoteca bancaria, el banco a veces incluye la gestoría en sus servicios.
+              Verifica si puedes elegir tu propia gestoría para reducir costes.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📁</span>
+              <strong>Guarda todos los justificantes</strong>
+              <p>Conserva las facturas de notaría, registro, impuestos y reformas. Cuando vendas en el futuro,
+              estos gastos incrementan el valor de adquisición y reducen la ganancia patrimonial tributable.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>👨‍💼</span>
+              <strong>Consulta a un asesor fiscal</strong>
+              <p>Para operaciones complejas (herencias, divorcios, no residentes, reinversión en vivienda habitual),
+              un asesor fiscal puede identificar exenciones y deducciones que el simulador no contempla.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores comunes al calcular los gastos de compraventa</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>No incluir el IVA de notaría y registro:</strong> Los honorarios de notaría y registro llevan IVA al 21%, que a menudo se olvida en el presupuesto inicial.</li>
+            <li><strong>Ignorar el valor de referencia catastral:</strong> Si supera el precio escriturado, Hacienda aplicará ITP sobre ese valor mayor y podrás recibir una comprobación de valores.</li>
+            <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican.</li>
+            <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final.</li>
+            <li><strong>No comprobar bonificaciones autonómicas:</strong> Cada comunidad tiene tipos reducidos para ciertos colectivos. Ignorarlos puede costar miles de euros en impuestos innecesarios.</li>
+            <li><strong>Liquidar fuera de plazo:</strong> El ITP o IVA+AJD debe pagarse en 30 días hábiles desde la escritura. Pasado ese plazo, se generan recargos automáticos del 5% al 20%.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('simulador-compraventa-inmueble')} />

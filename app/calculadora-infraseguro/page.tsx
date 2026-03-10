@@ -345,6 +345,232 @@ export default function CalculadoraInfraseguroPage() {
             </div>
           </div>
         </section>
+
+        {/* Tabla comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa: cobertura adecuada vs infraseguro</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Situación</th>
+                  <th>Valor real del bien</th>
+                  <th>Capital asegurado</th>
+                  <th>% cobertura</th>
+                  <th>Siniestro de 30.000 €</th>
+                  <th>Diferencia que pagas tú</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cobertura perfecta</td>
+                  <td>200.000 €</td>
+                  <td>200.000 €</td>
+                  <td>100%</td>
+                  <td>30.000 €</td>
+                  <td>0 €</td>
+                </tr>
+                <tr>
+                  <td>Infraseguro leve</td>
+                  <td>200.000 €</td>
+                  <td>160.000 €</td>
+                  <td>80%</td>
+                  <td>24.000 €</td>
+                  <td>6.000 €</td>
+                </tr>
+                <tr>
+                  <td>Infraseguro moderado</td>
+                  <td>200.000 €</td>
+                  <td>120.000 €</td>
+                  <td>60%</td>
+                  <td>18.000 €</td>
+                  <td>12.000 €</td>
+                </tr>
+                <tr>
+                  <td>Infraseguro grave</td>
+                  <td>200.000 €</td>
+                  <td>80.000 €</td>
+                  <td>40%</td>
+                  <td>12.000 €</td>
+                  <td>18.000 €</td>
+                </tr>
+                <tr>
+                  <td>Infraseguro crítico</td>
+                  <td>200.000 €</td>
+                  <td>40.000 €</td>
+                  <td>20%</td>
+                  <td>6.000 €</td>
+                  <td>24.000 €</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.guideSection}>
+          <h2>Casos reales de infraseguro</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🔥</span>
+                <span className={styles.casoTag}>Incendio en cocina reformada</span>
+              </div>
+              <p>María reformó su cocina por 18.000 € hace 3 años pero no actualizó la póliza. Cuando un incendio
+              la destruyó completamente, solo recuperó el 65% del coste de reconstrucción. Tuvo que poner
+              6.300 € de su bolsillo por no haber comunicado la reforma.</p>
+              <div className={styles.casoResultado}>Lección: comunicar reformas inmediatamente a la aseguradora</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>💧</span>
+                <span className={styles.casoTag}>Rotura de tubería en piso alquilado</span>
+              </div>
+              <p>Carlos aseguró el contenido de su piso de alquiler por 15.000 € cuando lo compró en 2015.
+              En 2024, una rotura de tubería causó daños de 8.000 €. La perito calculó que el contenido real
+              valía 35.000 €, aplicando la regla proporcional: solo cobró 3.428 €.</p>
+              <div className={styles.casoResultado}>Lección: actualizar el capital asegurado con la inflación</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🏢</span>
+                <span className={styles.casoTag}>Local comercial sin actualización</span>
+              </div>
+              <p>Un negocio de hostelería contrató el seguro en 2018 con 80.000 € de cobertura. Para 2023,
+              entre el mobiliario nuevo, la maquinaria y las obras, el valor real era 180.000 €.
+              Un robo con daños de 40.000 € solo generó una indemnización de 17.778 €.</p>
+              <div className={styles.casoResultado}>Lección: revisar el capital asegurado tras nuevas inversiones</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>✅</span>
+                <span className={styles.casoTag}>Cobertura correctamente actualizada</span>
+              </div>
+              <p>Laura revisó su póliza cada año y actualizó el capital tras comprar electrodomésticos nuevos
+              y hacer una reforma de baño. Cuando un escape de agua causó 15.000 € en daños, cobró íntegramente
+              porque su cobertura reflejaba el valor real del inmueble.</p>
+              <div className={styles.casoResultado}>Resultado: indemnización completa sin sorpresas</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo calcular y corregir el infraseguro: paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula el valor real del continente</strong>
+                <p>El continente es la estructura: paredes, suelos, techos, instalaciones fijas. Usa el coste
+                de reconstrucción (no el valor de mercado) por metro cuadrado según los precios actuales de construcción
+                en tu zona. No es lo mismo que el precio de compra.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Haz un inventario del contenido</strong>
+                <p>Recorre habitación por habitación y anota muebles, electrodomésticos, ropa, joyas, electrónica y
+                objetos de valor. Fotografíalos y guarda las facturas. El total de reposición suele superar ampliamente
+                la estimación inicial.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Compara con el capital asegurado actual</strong>
+                <p>Usa esta calculadora para ver si existe infraseguro y cuánto porcentaje de los siniestros
+                quedaría sin cubrir. El objetivo es que el capital asegurado iguale o supere el valor real calculado.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Contacta a tu aseguradora para actualizar</strong>
+                <p>Solicita la modificación de la póliza indicando el nuevo capital asegurado. La variación en la prima
+                suele ser pequeña comparada con la mejora de cobertura. Guarda el suplemento de póliza actualizado.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Comunica reformas y nuevas adquisiciones relevantes</strong>
+                <p>Cada vez que hagas una reforma significativa o compres bienes de valor, notifica a la aseguradora.
+                No es necesario para pequeñas compras, pero una reforma de cocina o baño puede suponer 10.000-30.000 €
+                que quedan desprotegidos.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Revisa anualmente en cada renovación</strong>
+                <p>La inflación erosiona la cobertura cada año. Si la póliza no tiene cláusula de actualización automática
+                por IPC, aumenta el capital manualmente cada 1-2 años. Una revisión de 15 minutos al año puede evitar
+                miles de euros de pérdidas.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Buenas prácticas para evitar el infraseguro</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📸</span>
+              <strong>Inventario fotográfico del contenido</strong>
+              <p>Fotografía habitación por habitación y guarda las fotos en la nube. Facilita la valoración del contenido
+              y la reclamación de siniestros.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🗂️</span>
+              <strong>Guarda facturas de bienes valiosos</strong>
+              <p>Electrodomésticos, muebles, joyas y electrónica. Sin factura, la aseguradora puede aplicar
+              depreciación agresiva en la valoración del siniestro.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <strong>Revisión anual en la renovación</strong>
+              <p>Aprovecha la renovación para revisar el capital asegurado. Añade el coste de adquisiciones del año
+              y un 3-5% por inflación general.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏗️</span>
+              <strong>Comunica reformas antes de iniciarlas</strong>
+              <p>Avisa a la aseguradora antes de empezar obras. Algunas pólizas excluyen daños ocurridos durante
+              las reformas si no se ha notificado previamente.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <strong>Solicita cláusula de actualización automática</strong>
+              <p>Muchas aseguradoras ofrecen actualización anual por IPC. Actívala para que el capital se ajuste
+              automáticamente sin gestiones manuales.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>👨‍💼</span>
+              <strong>Pide una valoración profesional</strong>
+              <p>Para inmuebles de valor o contenido muy específico (joyas, obras de arte, instrumentos), solicita
+              un peritaje profesional que justifique el capital asegurado.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores comunes que generan infraseguro sin saberlo</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Usar el precio de compra como capital asegurado:</strong> El precio de compra incluye el valor del terreno (no asegurable) y puede estar desactualizado. Usa siempre el coste de reconstrucción actualizado.</li>
+            <li><strong>No actualizar tras reformas importantes:</strong> Una reforma de cocina o baño puede añadir 15.000-30.000 € al valor real. No comunicarla deja ese importe sin cobertura.</li>
+            <li><strong>Infravalorar el contenido:</strong> Muchas personas estiman el contenido en 10.000-20.000 € cuando la realidad supera los 40.000-60.000 €. Haz el inventario real antes de estimar.</li>
+            <li><strong>Ignorar la inflación acumulada:</strong> Con una inflación del 3% anual, en 10 años el valor real crece un 34%. Una póliza sin actualización pierde cobertura progresivamente cada año.</li>
+            <li><strong>Confundir valor de mercado con valor de reposición:</strong> Tu televisión de 2018 puede valer 80 € de segunda mano, pero reponerla por una equivalente actual cuesta 500 €. La cobertura debe ser por el coste de sustitución.</li>
+            <li><strong>No asegurar objetos de especial valor por separado:</strong> Joyas, colecciones, instrumentos musicales o arte suelen tener límites por objeto en las pólizas estándar. Si superan ese límite, deben asegurarse en un anexo específico.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-infraseguro')} />

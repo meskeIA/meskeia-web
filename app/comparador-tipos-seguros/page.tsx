@@ -554,6 +554,119 @@ export default function ComparadorTiposSegurosPage() {
         title="Guía para elegir y contratar seguros"
         subtitle="Cómo decidir qué seguro necesitas, qué revisar antes de firmar y preguntas frecuentes"
       >
+        {/* Tabla comparativa */}
+        <section className={styles.guiaSection}>
+          <h2>Comparativa de seguros principales</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Tipo de seguro</th>
+                  <th>¿Obligatorio?</th>
+                  <th>Coste orientativo/año</th>
+                  <th>Qué cubre</th>
+                  <th>Para quién</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🚗 Auto (terceros)</td>
+                  <td>Sí (legal)</td>
+                  <td>200 – 500 €</td>
+                  <td>Daños a terceros</td>
+                  <td>Todo conductor</td>
+                </tr>
+                <tr>
+                  <td>🚗 Auto (todo riesgo)</td>
+                  <td>No</td>
+                  <td>600 – 1.500 €</td>
+                  <td>Daños propios + terceros</td>
+                  <td>Vehículo nuevo/financiado</td>
+                </tr>
+                <tr>
+                  <td>🏠 Hogar</td>
+                  <td>Con hipoteca sí</td>
+                  <td>150 – 400 €</td>
+                  <td>Continente + contenido</td>
+                  <td>Propietarios e inquilinos</td>
+                </tr>
+                <tr>
+                  <td>❤️ Vida</td>
+                  <td>Con hipoteca recomendado</td>
+                  <td>200 – 800 €</td>
+                  <td>Capital a beneficiarios</td>
+                  <td>Con cargas/dependientes</td>
+                </tr>
+                <tr>
+                  <td>🏥 Salud</td>
+                  <td>No</td>
+                  <td>500 – 1.500 €</td>
+                  <td>Médico especialista, cirugías</td>
+                  <td>Quienes valoran rapidez</td>
+                </tr>
+                <tr>
+                  <td>⚖️ Defensa jurídica</td>
+                  <td>No</td>
+                  <td>80 – 250 €</td>
+                  <td>Gastos abogado y procurador</td>
+                  <td>Autónomos, propietarios</td>
+                </tr>
+                <tr>
+                  <td>🦷 Dental</td>
+                  <td>No</td>
+                  <td>100 – 300 €</td>
+                  <td>Revisiones, empastes, ortodoncia</td>
+                  <td>Familias con hijos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.guiaSection}>
+          <h2>Casos de uso: qué seguro necesita cada perfil</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🎓</span>
+                <span className={styles.casoTag}>Joven independiente (25-30 años)</span>
+              </div>
+              <p>Sin hipoteca ni cargas familiares. Solo es obligatorio el seguro de auto si tiene coche.
+              Un seguro de salud privado puede complementar bien la sanidad pública para consultas rápidas.</p>
+              <div className={styles.casoResultado}>Prioridad: auto obligatorio + salud opcional</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>👨‍👩‍👧</span>
+                <span className={styles.casoTag}>Familia con hipoteca</span>
+              </div>
+              <p>Necesita seguro de vida (capital que cubra la hipoteca + años de ingresos), seguro de hogar
+              (obligatorio con hipoteca) y auto. El seguro de defensa jurídica suele ser una buena opción para conflictos vecinales.</p>
+              <div className={styles.casoResultado}>Prioridad: vida + hogar + auto. Presupuesto: 1.200-2.000 €/año</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>💼</span>
+                <span className={styles.casoTag}>Autónomo o freelance</span>
+              </div>
+              <p>Además del auto y hogar habituales, el autónomo necesita valorar un seguro de salud
+              (bajas largas sin prestación), de responsabilidad civil profesional y de defensa jurídica
+              para litigios con clientes o proveedores.</p>
+              <div className={styles.casoResultado}>Prioridad: RC profesional + salud + defensa jurídica</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🏡</span>
+                <span className={styles.casoTag}>Propietario con inmueble en alquiler</span>
+              </div>
+              <p>Necesita un seguro de hogar específico para propietario-arrendador que cubra el impago
+              del inquilino y daños causados por este. El seguro estándar puede no cubrir estos riesgos.</p>
+              <div className={styles.casoResultado}>Prioridad: seguro de alquiler (impago + daños)</div>
+            </div>
+          </div>
+        </section>
+
         <section className={styles.guiaSection}>
           <h2>Guía paso a paso: cómo elegir el seguro correcto</h2>
           <ol className={styles.pasosList}>
@@ -631,6 +744,59 @@ export default function ComparadorTiposSegurosPage() {
             </div>
           </div>
         </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.guiaSection}>
+          <h2>Consejos para optimizar tus seguros</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔍</span>
+              <strong>Compara cada año en la renovación</strong>
+              <p>Los precios varían entre aseguradoras. Revisa en comparadores 30 días antes del vencimiento para negociar o cambiar con antelación suficiente.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📋</span>
+              <strong>Lee siempre las exclusiones</strong>
+              <p>Las exclusiones definen realmente para qué sirve el seguro. Un seguro barato con muchas exclusiones puede dejar sin cobertura el siniestro que más te preocupa.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <strong>Ajusta el capital asegurado</strong>
+              <p>Ni de más ni de menos. Sobresegurar desperdicia dinero. Infrasegurar puede dejar el siniestro sin cubrir totalmente. Revisa el capital real necesario cada 3-5 años.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💰</span>
+              <strong>Valora las franquicias</strong>
+              <p>Aumentar la franquicia puede reducir la prima un 20-40%. Si tienes capacidad de asumir pequeños siniestros, las franquicias altas pueden ser muy rentables.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📦</span>
+              <strong>Agrupa seguros con la misma aseguradora</strong>
+              <p>Muchas aseguradoras ofrecen descuentos del 10-20% por tener varios seguros contratados (auto + hogar + vida). Negocia un descuento multiproducto.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⚖️</span>
+              <strong>Usa el defensor del asegurado</strong>
+              <p>Si la aseguradora rechaza un siniestro injustamente, acude al Servicio de Atención al Cliente y luego a la DGSFP. El proceso es gratuito y suele resolver en tu favor.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores frecuentes al contratar y gestionar seguros</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>No comunicar cambios relevantes a la aseguradora:</strong> Si cambias de trabajo, te mudas o modificas el uso del vehículo, debes notificarlo. Ocultarlo puede anular la cobertura en un siniestro.</li>
+            <li><strong>Contratar el seguro del banco sin comparar:</strong> El seguro vinculado a tu hipoteca puede ser 30-60% más caro que el mercado libre. La Ley 5/2019 te permite cambiarlo sin penalización.</li>
+            <li><strong>Infravalorar el capital del seguro de vida:</strong> El capital debe cubrir la hipoteca + gastos familiares de varios años, no solo la deuda pendiente. Un capital insuficiente deja a la familia desprotegida.</li>
+            <li><strong>No revisar las carencias en seguros de salud:</strong> Muchos seguros de salud tienen 6-12 meses de carencia para cirugías, maternidad o enfermedades preexistentes. Contratar justo cuando lo necesitas puede ser demasiado tarde.</li>
+            <li><strong>Ignorar el período de oposición al autorrenovarse:</strong> Los seguros se renuevan automáticamente. Si no quieres renovar, debes comunicarlo con al menos 1 mes de antelación. Pasada la fecha, estás obligado otro año.</li>
+            <li><strong>No guardar la póliza ni los recibos:</strong> En caso de siniestro, necesitarás el número de póliza, el teléfono de siniestros y las coberturas contratadas. Guarda una copia digital accesible y comunica la ubicación a tus beneficiarios.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('comparador-tipos-seguros')} />
