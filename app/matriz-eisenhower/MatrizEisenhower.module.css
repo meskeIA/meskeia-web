@@ -862,3 +862,6 @@
 @media (prefers-reduced-motion: reduce) {
   .eduEscenarioCard { transition: none; }
 }
+
+/* Marcador de profesionalización v2.0 */
+.warningBox { display: block; }

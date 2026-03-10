@@ -522,6 +522,8 @@ export default function CodificadorBase64Page() {
             <li><strong>No uses Base64 para contraseñas</strong>: Es un error de seguridad muy común. Las contraseñas deben hashearse con bcrypt, Argon2 o PBKDF2. Nunca codificarse.</li>
             <li><strong>Doble encoding silencioso</strong>: Codificar datos ya codificados (ej: URL encoding de Base64 que contiene +) genera errores difíciles de depurar. Verifica siempre el estado de los datos antes de codificar.</li>
             <li><strong>Texto Unicode y btoa()</strong>: La función btoa() del navegador falla con caracteres fuera de Latin-1 (tildes, emojis, caracteres CJK). Esta herramienta usa encodeURIComponent() internamente para manejarlos correctamente.</li>
+            <li><strong>El padding &quot;=&quot; no es opcional</strong>: Aunque muchos sistemas toleran Base64 sin padding, el estándar RFC 4648 lo exige. Si recibes un error de &quot;invalid padding&quot;, prueba añadir uno o dos &quot;=&quot; al final antes de asumir que los datos están corruptos.</li>
+            <li><strong>No incrustes imágenes grandes en Base64</strong>: Codificar imágenes en Base64 para CSS o HTML aumenta el peso un 33% y elimina el paralelismo del navegador. Solo es eficiente para iconos o imágenes muy pequeñas (&lt;2 KB).</li>
           </ul>
         </div>
       </EducationalSection>

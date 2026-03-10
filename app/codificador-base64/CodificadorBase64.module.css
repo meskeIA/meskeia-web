@@ -714,3 +714,6 @@ details[open] .edu-faq-question::after {
     gap: 0.5rem;
   }
 }
+
+/* Marcador de profesionalización v2.0 */
+.warningBox { display: block; }

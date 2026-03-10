@@ -1084,6 +1084,13 @@ export default function SeguimientoHabitosPage() {
                 <span>Un día perdido es humano. Dos seguidos es el comienzo del abandono. Si fallas, el siguiente día es prioritario sin excepciones. Revisa en estadísticas tu tasa de cumplimiento para detectar patrones de fallo.</span>
               </div>
             </li>
+            <li className="edu-step-item">
+              <div className="edu-step-number">7</div>
+              <div className="edu-step-content">
+                <strong>Revisión mensual y evolución del sistema</strong>
+                <span>Cada mes revisa tus hábitos: celebra los consolidados, ajusta la dificultad de los que se están quedando atrás y valora si añadir uno nuevo. Los sistemas de hábitos que no evolucionan pierden efectividad. Un hábito consolidado puede aumentarse gradualmente en intensidad o duración.</span>
+              </div>
+            </li>
           </ol>
         </div>
 
