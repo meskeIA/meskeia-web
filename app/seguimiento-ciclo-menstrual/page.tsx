@@ -321,54 +321,224 @@ export default function SeguimientoCicloMenstrualPage() {
 
       {/* CONTENIDO EDUCATIVO */}
       <EducationalSection
-        title="📚 Cómo funciona el ciclo menstrual"
-        subtitle="Guía completa de las 4 fases"
+        title="📚 Guía completa del ciclo menstrual"
+        subtitle="Todo lo que necesitas saber sobre las fases, fertilidad y seguimiento"
       >
-        <section>
-          <h2>Las 4 fases del ciclo menstrual</h2>
+        {/* Tabla comparativa: fases del ciclo */}
+        <h2>Las 4 fases del ciclo menstrual</h2>
+        <div className={styles.tableWrapper}>
+          <table className={styles.tablaComparativa}>
+            <thead>
+              <tr>
+                <th>Fase</th>
+                <th>Días (ciclo 28d)</th>
+                <th>Hormonas dominantes</th>
+                <th>Cómo te sientes</th>
+                <th>Fertilidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>🔴 Menstrual</td>
+                <td>1-5</td>
+                <td>Estrógeno y progesterona bajos</td>
+                <td>Cansancio, calambres, introspección</td>
+                <td>Muy baja</td>
+              </tr>
+              <tr>
+                <td>🌱 Folicular</td>
+                <td>1-13</td>
+                <td>Estrógeno en ascenso (FSH)</td>
+                <td>Energía y optimismo crecientes</td>
+                <td>Baja → moderada</td>
+              </tr>
+              <tr>
+                <td>✨ Ovulatoria</td>
+                <td>14 (±2)</td>
+                <td>Pico de LH, estrógeno máximo</td>
+                <td>Vitalidad, sociabilidad, libido alta</td>
+                <td>Alta (ventana fértil)</td>
+              </tr>
+              <tr>
+                <td>🌙 Lútea</td>
+                <td>15-28</td>
+                <td>Progesterona dominante</td>
+                <td>Calma, posible SPM en últimos días</td>
+                <td>Baja</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <h3>🔴 Fase menstrual (días 1-5 aprox.)</h3>
-          <p>
-            Es el inicio del ciclo. El revestimiento uterino (endometrio) se desprende y es expulsado en forma de flujo menstrual. Dura entre 2 y 8 días. Los niveles de estrógeno y progesterona están en su punto más bajo.
-          </p>
+        {/* Casos de uso */}
+        <h2>Casos reales de uso del seguimiento</h2>
+        <div className={styles.casosGrid}>
+          <div className={styles.casoCard}>
+            <div className={styles.casoHeader}>
+              <span className={styles.casoEmoji}>👶</span>
+              <h3>Buscar embarazo</h3>
+              <span className={styles.casoTag}>Fertilidad</span>
+            </div>
+            <p>Ana, 30 años, lleva 3 meses intentando concebir. Con el seguimiento identifica su ventana fértil real (días 11-16 de su ciclo de 30 días) y ajusta el momento de relaciones.</p>
+            <p className={styles.casoResultado}>✅ Identifica los días óptimos con precisión</p>
+          </div>
+          <div className={styles.casoCard}>
+            <div className={styles.casoHeader}>
+              <span className={styles.casoEmoji}>🏋️</span>
+              <h3>Optimizar entrenamiento</h3>
+              <span className={styles.casoTag}>Deporte</span>
+            </div>
+            <p>Laura, deportista amateur, adapta su entrenamiento al ciclo: entrenamientos de fuerza en fase folicular, HIIT en ovulación y yoga/recuperación en fase lútea tardía.</p>
+            <p className={styles.casoResultado}>✅ Mejor rendimiento sin sobreentrenamiento</p>
+          </div>
+          <div className={styles.casoCard}>
+            <div className={styles.casoHeader}>
+              <span className={styles.casoEmoji}>📅</span>
+              <h3>Planificar eventos importantes</h3>
+              <span className={styles.casoTag}>Productividad</span>
+            </div>
+            <p>Marta programa presentaciones laborales y entrevistas en su fase folicular/ovulatoria, cuando se siente más segura y comunicativa, evitando los días de mayor fatiga.</p>
+            <p className={styles.casoResultado}>✅ Mayor rendimiento en momentos clave</p>
+          </div>
+          <div className={styles.casoCard}>
+            <div className={styles.casoHeader}>
+              <span className={styles.casoEmoji}>⚠️</span>
+              <h3>Detectar irregularidades</h3>
+              <span className={styles.casoTag}>Salud</span>
+            </div>
+            <p>Sofía nota que sus ciclos varían entre 22 y 40 días. El seguimiento durante 3 meses le permite mostrar datos objetivos a su ginecóloga, que diagnostica SOP.</p>
+            <p className={styles.casoResultado}>✅ Diagnóstico más rápido con datos reales</p>
+          </div>
+        </div>
 
-          <h3>🌱 Fase folicular (días 1-13 aprox.)</h3>
-          <p>
-            Comienza el primer día de la menstruación y termina con la ovulación. La hipófisis libera FSH (hormona folículo estimulante), que estimula el desarrollo de folículos en los ovarios. El estrógeno aumenta, haciendo que el endometrio se engrose. Es la fase en que muchas mujeres se sienten con más energía.
-          </p>
+        {/* FAQ */}
+        <h2>Preguntas frecuentes</h2>
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <h4>¿Cada cuánto debo tener el período para considerarlo normal?</h4>
+            <p>Un ciclo normal oscila entre 21 y 35 días. Lo más importante no es que sea exactamente de 28 días, sino que sea regular para ti. Variaciones de ±3 días de un mes a otro son habituales.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Puedo quedarme embarazada durante la menstruación?</h4>
+            <p>Es poco probable pero no imposible. Si tienes ciclos cortos (21-23 días), puedes ovular muy pronto tras el período. Los espermatozoides pueden vivir hasta 5 días, por lo que las relaciones durante la menstruación podrían coincidir con la ovulación.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Por qué la ovulación no siempre ocurre el día 14?</h4>
+            <p>El día 14 es la media de un ciclo de 28 días. La ovulación ocurre aproximadamente 14 días ANTES del siguiente período, independientemente de la duración del ciclo. En un ciclo de 35 días, ovularías alrededor del día 21.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Es fiable este método para evitar embarazos?</h4>
+            <p>No. El método del calendario tiene una tasa de fallo del 9-25% con uso típico. Los ciclos pueden variar por estrés, enfermedad o cambios de peso. Para anticoncepción, consulta a tu médico sobre métodos con mayor eficacia.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Qué síntomas del SPM son normales y cuáles no?</h4>
+            <p>Molestias leves (sensibilidad mamaria, cambios de humor, retención de líquidos) en los días previos al período son normales. Si los síntomas interfieren gravemente con tu vida diaria, consulta: podría ser TDPM (trastorno disfórico premenstrual).</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Cuántos ciclos debo registrar para tener datos fiables?</h4>
+            <p>Mínimo 3-6 ciclos para identificar tu patrón personal. Con más datos la predicción mejora. Si buscas embarazo o tienes irregularidades, registra al menos 6 meses antes de sacar conclusiones.</p>
+          </div>
+        </div>
 
-          <h3>✨ Ovulación (alrededor del día 14 en un ciclo de 28 días)</h3>
-          <p>
-            El folículo maduro libera un óvulo que viaja por la trompa de Falopio. El óvulo puede ser fecundado durante las siguientes <strong>12-24 horas</strong>. Sin embargo, la <strong>ventana fértil</strong> real es de unos 6 días (5 días antes de la ovulación + el día del ovulo), porque los espermatozoides pueden vivir hasta 5 días en el aparato reproductor femenino.
-          </p>
-          <p>
-            La ovulación no ocurre siempre en el día 14. En ciclos más largos o cortos, se ajusta: ocurre aproximadamente <strong>14 días antes del próximo período</strong>.
-          </p>
-
-          <h3>🌙 Fase lútea (días 15-28 aprox.)</h3>
-          <p>
-            El folículo vacío se convierte en el cuerpo lúteo y produce progesterona. Si el óvulo no es fecundado, el cuerpo lúteo se degenera, la progesterona cae y comienza la menstruación. En esta fase pueden aparecer síntomas del síndrome premenstrual (SPM): sensibilidad en el pecho, cambios de humor, retención de líquidos.
-          </p>
-
-          <h2>¿Qué es un ciclo "normal"?</h2>
-          <p>
-            Un ciclo menstrual normal dura entre <strong>21 y 35 días</strong>. La duración del período varía entre <strong>2 y 8 días</strong>. Pequeñas variaciones de un mes a otro son completamente normales: el estrés, el ejercicio intenso, los cambios de peso o la enfermedad pueden alterar el ciclo.
-          </p>
-
-          <h2>Factores que pueden alterar el ciclo</h2>
-          <ul>
-            <li><strong>Estrés</strong>: el cortisol puede retrasar o suprimir la ovulación</li>
-            <li><strong>Cambios de peso bruscos</strong>: la pérdida o ganancia rápida de peso afecta las hormonas</li>
-            <li><strong>Ejercicio excesivo</strong>: el entrenamiento muy intenso puede causar amenorrea</li>
-            <li><strong>Enfermedad o medicamentos</strong>: los antibióticos, por ejemplo, pueden interferir con la píldora</li>
-            <li><strong>Síndrome de ovario poliquístico (SOP)</strong>: causa ciclos irregulares y períodos largos</li>
-          </ul>
-
-          <h2>Métodos anticonceptivos y fertilidad</h2>
-          <p>
-            <strong>Importante:</strong> esta calculadora usa el método del calendario, que NO es un método anticonceptivo fiable. Los ciclos pueden variar mes a mes. Para contracepción, consulta con tu ginecólogo o médico de cabecera.
-          </p>
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo hacer un seguimiento efectivo de tu ciclo</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Marca el primer día de tu período</strong>
+                <p>El día 1 es el primer día de sangrado activo (no el manchado previo). Anota la fecha cada mes de forma consistente.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Registra la duración del sangrado</strong>
+                <p>Apunta cuántos días dura y la intensidad (leve, moderada, intensa). Esto ayuda a detectar cambios con el tiempo.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Anota síntomas asociados</strong>
+                <p>Dolor, cambios de humor, energía, libido, migrañas. Usa un sistema simple: emojis o escala 1-5 para cada síntoma.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula tu ciclo promedio</strong>
+                <p>Suma la duración de tus últimos 3-6 ciclos y divídela entre el número de ciclos. Usa ese promedio para las predicciones.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Identifica señales de ovulación</strong>
+                <p>Moco cervical elástico (tipo clara de huevo), ligero dolor en un lado del abdomen (mittelschmerz) o aumento leve de temperatura basal.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Lleva los datos a tu ginecóloga</strong>
+                <p>Con 3-6 meses de registros podrás mostrar patrones claros que facilitan el diagnóstico de irregularidades o planificación familiar.</p>
+              </div>
+            </li>
+          </ol>
         </section>
+
+        {/* Mejores prácticas */}
+        <h2>Consejos para cada fase del ciclo</h2>
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>🔴</div>
+            <h4>Fase menstrual</h4>
+            <p>Descansa más, aplica calor en el abdomen, evita el exceso de sal y cafeína, hidrátate bien.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>🌱</div>
+            <h4>Fase folicular</h4>
+            <p>Aprovecha la energía creciente para proyectos nuevos y entrenamientos de mayor intensidad.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>✨</div>
+            <h4>Ovulación</h4>
+            <p>Tu pico de vitalidad y comunicación: ideal para presentaciones, reuniones importantes y socializar.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>🌙</div>
+            <h4>Fase lútea</h4>
+            <p>Prioriza el descanso, reduce azúcar y alcohol, practica yoga o meditación para gestionar el SPM.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>📱</div>
+            <h4>Registro consistente</h4>
+            <p>Usa siempre el mismo criterio para el día 1 y registra en las primeras 24 horas para mayor precisión.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>🩺</div>
+            <h4>Revisión anual</h4>
+            <p>Comparte tu historial con tu ginecóloga en la revisión anual. Los datos longitudinales son muy valiosos.</p>
+          </div>
+        </div>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Señales que requieren consulta médica urgente</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li>Ausencia de período por más de 3 meses sin embarazo (amenorrea)</li>
+            <li>Sangrado muy abundante (empapas una compresa/tampón por hora durante varias horas)</li>
+            <li>Dolor menstrual tan intenso que impide las actividades diarias</li>
+            <li>Sangrado entre períodos o tras relaciones sexuales</li>
+            <li>Ciclos que se vuelven muy irregulares de forma repentina</li>
+            <li>Menstruaciones con coágulos grandes (mayores que una moneda de 50 céntimos)</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('seguimiento-ciclo-menstrual')} />

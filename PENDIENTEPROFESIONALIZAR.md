@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-10 | **Total profesionalizadas**: ~103 | **Pendientes**: ~118
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-10 | **Total profesionalizadas**: ~107 | **Pendientes**: ~114
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 
 ---
@@ -42,14 +42,14 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 - [x] `/calculadora-macros/` — Macronutrientes: proteínas, carbos, grasas según objetivo ✅ lote 21
 - [x] `/planificador-embarazo/` — FPP, checklist, compras, vacunas ✅ lote 21
 - [x] `/planificador-mascota/` — Cachorro/gatito, checklist, compras, vacunas ✅ lote 21
-- [ ] `/calculadora-alimentacion-mascotas/` — Raciones, tóxicos, transición pienso
-- [ ] `/calculadora-medicamentos-mascotas/` — Antiparasitarios, frecuencia, síntomas
-- [ ] `/seguimiento-ciclo-menstrual/` — Ventana fértil, ovulación (nueva 2026-02-19)
-- [ ] `/planificador-chequeos-medicos/` — Chequeos preventivos por edad/sexo (nueva 2026-02-23)
+- [x] `/calculadora-alimentacion-mascotas/` — Raciones, tóxicos, transición pienso ✅ lote 22
+- [x] `/calculadora-medicamentos-mascotas/` — Antiparasitarios, frecuencia, síntomas ✅ lote 22
+- [x] `/seguimiento-ciclo-menstrual/` — Ventana fértil, ovulación (nueva 2026-02-19) ✅ lote 22
+- [x] `/planificador-chequeos-medicos/` — Chequeos preventivos por edad/sexo (nueva 2026-02-23) ✅ lote 22
 
 ### Matemáticas Avanzadas
 
-- [ ] `/estadistica-avanzada/` — Estadística avanzada
+- [x] `/estadistica-avanzada/` — Estadística avanzada ✅ lote 22 (ya profesionalizada, clases edu-)
 - [ ] `/calculadora-distribuciones/` — Normal, Poisson, Exponencial, etc.
 - [ ] `/inferencia-bayesiana/` — Teorema de Bayes, tests diagnósticos
 - [ ] `/calculadora-algebra-abstracta/` — Álgebra abstracta
@@ -257,8 +257,8 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 | Categoría | Profesionalizadas | Pendientes |
 |-----------|:-----------------:|:----------:|
 | Finanzas e Inversión | 24 | 0 (ALTA completada) |
-| Salud y Bienestar | 12 | 8 |
-| Matemáticas y Estadística | 1 | 13 |
+| Salud y Bienestar | 16 | 4 |
+| Matemáticas y Estadística | 2 | 12 |
 | Productividad / Sensores | 14 | 15 |
 | Texto y Documentos | 2 | 14 |
 | Criptografía y Seguridad | 1 | 6 |
@@ -273,7 +273,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 | Herramientas Web / Tecnología | 5 | 5 |
 | Calculadoras y Utilidades | 7 | 10 |
 | Biomedicina | 1 | 1 |
-| **TOTAL** | **~100** | **~121** |
+| **TOTAL** | **~107** | **~114** |
 
 ---
 
@@ -281,6 +281,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote 22 | 2026-03-10 | `calculadora-alimentacion-mascotas`, `calculadora-medicamentos-mascotas`, `seguimiento-ciclo-menstrual`, `planificador-chequeos-medicos`, `estadistica-avanzada`(verif.) | pendiente |
 | Lote 21 | 2026-03-10 | `guia-reclamar-seguro-coche`, `asistente-reclamaciones`, `calculadora-macros`, `planificador-embarazo`, `planificador-mascota` | `3a8c210` |
 | Lote 20 | 2026-03-10 | `simulador-compraventa-inmueble`, `calculadora-coste-vivienda`(verificada), `comparador-tipos-seguros`, `checklist-coberturas-seguros`, `calculadora-infraseguro` | `258faf4` |
 | Lote 19 | 2026-03-10 | `amortizacion-hipoteca`, `calculadora-inversiones`(verif.), `simulador-cartera-inversion`(verif.), `calculadora-fire`, `calculadora-alquiler-vs-compra` | `1ea0146` |

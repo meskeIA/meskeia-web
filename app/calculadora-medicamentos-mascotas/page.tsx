@@ -513,6 +513,108 @@ export default function CalculadoraMedicamentosMascotasPage() {
         title="📚 ¿Quieres aprender más sobre parásitos en mascotas?"
         subtitle="Información sobre prevención, tratamiento y cuidados"
       >
+        {/* Tabla comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de antiparasitarios más usados</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Parásitos que cubre</th>
+                  <th>Frecuencia</th>
+                  <th>Especie</th>
+                  <th>Observaciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>💊 Pastilla antiparasitaria interna</td>
+                  <td>Áscaris, tenias, ancilostomas</td>
+                  <td>Cada 3 meses (adultos)</td>
+                  <td>Perros y gatos</td>
+                  <td>Mensual en cachorros hasta 6 meses</td>
+                </tr>
+                <tr>
+                  <td>💧 Pipeta antiparasitaria externa</td>
+                  <td>Pulgas, garrapatas, mosquitos (según producto)</td>
+                  <td>Mensual o cada 3 meses</td>
+                  <td>Perros y gatos</td>
+                  <td>No bañar 48h antes/después</td>
+                </tr>
+                <tr>
+                  <td>🔵 Collar antiparasitario</td>
+                  <td>Pulgas, garrapatas, mosquitos</td>
+                  <td>Cada 4-8 meses (según marca)</td>
+                  <td>Perros (algunos gatos)</td>
+                  <td>No combinar con pipeta del mismo principio activo</td>
+                </tr>
+                <tr>
+                  <td>💊 Comprimido antipulgas/garrapatas</td>
+                  <td>Pulgas y garrapatas sistémico</td>
+                  <td>Mensual o cada 3 meses</td>
+                  <td>Solo perros (Bravecto, NexGard...)</td>
+                  <td>Muy efectivo. Consultar en razas MDR1</td>
+                </tr>
+                <tr>
+                  <td>💉 Vacuna leishmaniasis</td>
+                  <td>Leishmania (transmitida por flebotomos)</td>
+                  <td>Anual</td>
+                  <td>Perros</td>
+                  <td>Zonas endémicas mediterráneas especialmente</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.guideSection}>
+          <h2>Situaciones frecuentes de desparasitación</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🐕</span>
+                <span className={styles.casoTag}>Cachorro recién adoptado</span>
+              </div>
+              <p>Bruno, 8 semanas, llega de una protectora. Aunque la protectora le haya desparasitado,
+              el veterinario recomienda repetir a las 2 semanas. La pauta: antiparasitario interno mensual
+              hasta los 6 meses, luego cada 3 meses. Externa: pipeta o collar desde las 8 semanas.</p>
+              <div className={styles.casoResultado}>Interno: mensual primeros 6 meses. Externo: desde semana 8</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🌊</span>
+                <span className={styles.casoTag}>Perro que va mucho al campo</span>
+              </div>
+              <p>Toro sale al campo todos los fines de semana. El riesgo de garrapatas y leishmania es alto.
+              El veterinario recomienda collar antiparasitario de larga duración más pipeta específica para
+              mosquitos, y revisión de cuerpo completo tras cada salida al campo.</p>
+              <div className={styles.casoResultado}>Collar + pipeta reforzada + revisión post-campo</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🐈</span>
+                <span className={styles.casoTag}>Gato de interior sin contacto exterior</span>
+              </div>
+              <p>Misty vive en un piso y nunca sale. El riesgo es bajo pero no nulo: las pulgas pueden
+              llegar en ropa o calzado del propietario. Se recomienda pipeta cada 3 meses como mínimo
+              y antiparasitario interno dos veces al año.</p>
+              <div className={styles.casoResultado}>Desparasitación mínima incluso en gatos de interior</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span className={styles.casoEmoji}>🦠</span>
+                <span className={styles.casoTag}>Infestación activa de pulgas en casa</span>
+              </div>
+              <p>Solo el 5% de las pulgas viven en el animal; el 95% están en el entorno (alfombras, sofás,
+              camas). Tratar solo al animal sin desinfectar el hogar es ineficaz. Se necesita: pipeta de
+              acción rápida en la mascota + spray ambiental con IGR (regulador de crecimiento de insectos).</p>
+              <div className={styles.casoResultado}>Tratar mascota + entorno simultáneamente</div>
+            </div>
+          </div>
+        </section>
+
         <section className={styles.guideSection}>
           <h2>🦟 Parásitos Externos Comunes</h2>
           <div className={styles.parasitosGrid}>
@@ -548,6 +650,126 @@ export default function CalculadoraMedicamentosMascotasPage() {
             </div>
           </div>
         </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo establecer un protocolo de desparasitación: paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Consulta con el veterinario el protocolo personalizado</strong>
+                <p>No existe un protocolo único. El veterinario valorará: zona geográfica (riesgo de leishmaniasis,
+                filariosis), estilo de vida (campo, ciudad, viajes), presencia de niños en casa y estado de salud
+                del animal para diseñar el calendario más adecuado.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Elige productos específicos para la especie</strong>
+                <p>NUNCA uses productos de perro en gatos. Muchos antiparasitarios de perro (especialmente los
+                que contienen permetrina) son letales para los gatos. Lee siempre la etiqueta y confirma con
+                el veterinario antes de aplicar cualquier producto.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Aplica los antiparasitarios en las fechas correctas</strong>
+                <p>Usa este calculador para saber cuándo corresponde la siguiente aplicación. Los antiparasitarios
+                externos deben aplicarse en la nuca (zona entre escápulas), donde el animal no puede lamerse.
+                Los internos deben darse con el estómago vacío si lo indica el prospecto.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>No combines productos sin supervisión veterinaria</strong>
+                <p>Usar collar + pipeta + comprimido simultáneamente puede causar sobredosis de principio activo.
+                El veterinario decidirá qué combinaciones son seguras y cuáles son complementarias sin riesgo
+                de toxicidad.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Mantén un registro de aplicaciones</strong>
+                <p>Anota en el carnet de salud o en una app de mascotas cada aplicación: producto, fecha y lote.
+                Esto evita duplicaciones accidentales, ayuda al veterinario en caso de reacción adversa y
+                es útil en viajes internacionales.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Revisa periódicamente la efectividad</strong>
+                <p>Examina la piel del animal regularmente buscando pulgas, garrapatas o signos de rascado.
+                Si ves parásitos a pesar del tratamiento, el producto puede haber caducado, haberse aplicado mal
+                o el parásito puede tener resistencia. Consulta al veterinario.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Tips */}
+        <section className={styles.guideSection}>
+          <h2>Consejos de prevención antiparasitaria</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🚫</span>
+              <strong>Nunca productos de perro en gatos</strong>
+              <p>La permetrina, presente en muchos antiparasitarios caninos, es extremadamente tóxica para
+              los gatos. Puede causar convulsiones y la muerte. Siempre verifica la especie en la etiqueta.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🌡️</span>
+              <strong>Protección en meses cálidos</strong>
+              <p>Las pulgas y garrapatas son más activas de primavera a otoño, pero en climas templados
+              pueden estar presentes todo el año. No abandones la protección en invierno en zonas costeras.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏠</span>
+              <strong>Trata el entorno en infestaciones</strong>
+              <p>El 95% de las pulgas viven en el hogar. Si hay infestación activa, lava ropa de cama,
+              aspira a fondo y usa un spray ambiental con IGR (inhibidor de crecimiento de insectos).</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔍</span>
+              <strong>Revisión completa tras salidas al campo</strong>
+              <p>Tras cada paseo por zonas de hierba alta, revisa todo el cuerpo del animal: entre los dedos,
+              orejas, axilas, ingles y zona del cuello. Extrae las garrapatas con un quitagarrapatas, no con las manos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💉</span>
+              <strong>Vacuna antiparasitaria en zonas endémicas</strong>
+              <p>En zonas mediterráneas, la vacuna contra la leishmaniasis es muy recomendable. Consulta con
+              el veterinario si tu zona tiene riesgo de filariosis cardiaca (gusano del corazón).</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🐱</span>
+              <strong>Los gatos de interior también necesitan protección</strong>
+              <p>Las pulgas pueden entrar en casa en ropa, calzado o mascotas visitantes. Incluso los gatos
+              de interior deben tener un mínimo de protección durante los meses de mayor riesgo.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores peligrosos en la desparasitación de mascotas</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Usar productos de perro en gatos:</strong> La permetrina y otros insecticidas presentes en antiparasitarios caninos son letales para los gatos. Este es uno de los errores más frecuentes y más graves. Siempre comprueba la especie en el envase.</li>
+            <li><strong>Aplicar el antiparasitario externo donde el animal puede lamerse:</strong> La pipeta debe aplicarse en la nuca o entre las escápulas, donde el animal no alcanza. Si se lame el producto puede intoxicarse con síntomas neurológicos.</li>
+            <li><strong>Combinar productos sin consultar:</strong> Collar + pipeta + comprimido con el mismo principio activo puede causar sobredosis. No combines productos sin aprobación veterinaria explícita.</li>
+            <li><strong>Tratar solo al animal en una infestación de pulgas:</strong> El 95% de la población de pulgas está en el entorno (alfombras, sofás, camas). Sin tratar el hogar, la reinfestación es inmediata y continua.</li>
+            <li><strong>Usar dosis de adulto en cachorros:</strong> Muchos antiparasitarios tienen restricciones de edad y peso mínimo. Usar productos de adulto en cachorros muy jóvenes o de razas pequeñas puede ser tóxico.</li>
+            <li><strong>Abandonar la desparasitación en invierno:</strong> En climas templados y zonas costeras, las pulgas y garrapatas pueden estar activas durante todo el año. La "protección estacional" puede dejar al animal desprotegido.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <ShareCard appName="calculadora-medicamentos-mascotas" />

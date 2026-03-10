@@ -481,46 +481,226 @@ export default function PlanificadorChequeosMedicos() {
       </div>
 
       <EducationalSection
-        title="¿Qué es la medicina preventiva?"
-        subtitle="Por qué los chequeos regulares son importantes aunque te encuentres bien"
+        title="📚 Guía completa de medicina preventiva"
+        subtitle="Chequeos recomendados por edad, cribados del SNS y cómo organizarte"
         icon="🏥"
       >
-        <h3>Prevención primaria y secundaria</h3>
-        <p>
-          La medicina preventiva actúa antes de que aparezca la enfermedad (<strong>prevención primaria</strong>,
-          como las vacunas) o detecta enfermedades en fases muy tempranas cuando son más tratables
-          (<strong>prevención secundaria</strong>, como los cribados de cáncer).
-        </p>
+        {/* Tabla comparativa: chequeos por franja de edad */}
+        <h2>Chequeos clave por franja de edad</h2>
+        <div className={styles.tableWrapper}>
+          <table className={styles.tablaComparativa}>
+            <thead>
+              <tr>
+                <th>Franja de edad</th>
+                <th>Chequeos prioritarios</th>
+                <th>Cribados SNS</th>
+                <th>Frecuencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>18-39 años</td>
+                <td>Tensión arterial, IMC, colesterol, salud sexual</td>
+                <td>Citología/VPH (mujeres 25+)</td>
+                <td>Cada 1-3 años</td>
+              </tr>
+              <tr>
+                <td>40-49 años</td>
+                <td>Glucemia en ayunas, ECG, visión/audición</td>
+                <td>Mamografía (mujeres 45+), citología</td>
+                <td>Cada 1-2 años</td>
+              </tr>
+              <tr>
+                <td>50-64 años</td>
+                <td>Densitometría ósea, colonoscopia/SOH, PSA (hombres)</td>
+                <td>Cáncer colorrectal (50-74), mama (50-69)</td>
+                <td>Anual o según riesgo</td>
+              </tr>
+              <tr>
+                <td>65-74 años</td>
+                <td>Deterioro cognitivo, caídas, audición, función renal</td>
+                <td>Colorrectal hasta 74, mamografía hasta 70</td>
+                <td>Anual</td>
+              </tr>
+              <tr>
+                <td>75+ años</td>
+                <td>Valoración geriátrica integral, polifarmacia, visión</td>
+                <td>Individualizado por médico</td>
+                <td>Según estado de salud</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-        <h3>¿Por qué seguir las guías clínicas?</h3>
-        <p>
-          Las recomendaciones de revisiones están respaldadas por evidencia científica y priorizan
-          las pruebas con mejor relación beneficio-riesgo. No todas las pruebas son útiles en todos
-          los grupos de edad: por eso las guías establecen a partir de qué edad y con qué frecuencia
-          deben realizarse.
-        </p>
+        {/* Casos de uso */}
+        <h2>Casos reales de prevención efectiva</h2>
+        <div className={styles.casosGrid}>
+          <div className={styles.casoCard}>
+            <div className={styles.casoHeader}>
+              <span className={styles.casoEmoji}>👨‍💼</span>
+              <h3>Hombre 45 años, sedentario</h3>
+              <span className={styles.casoTag}>Cardiovascular</span>
+            </div>
+            <p>Carlos, ejecutivo con estrés laboral, nunca había hecho analíticas. Un chequeo rutinario detecta colesterol 280 mg/dL y glucemia 118 mg/dL (prediabetes). Cambia dieta y hace ejercicio.</p>
+            <p className={styles.casoResultado}>✅ Evita evento cardiovascular en 5-10 años</p>
+          </div>
+          <div className={styles.casoCard}>
+            <div className={styles.casoHeader}>
+              <span className={styles.casoEmoji}>👩</span>
+              <h3>Mujer 52 años, menopausia</h3>
+              <span className={styles.casoTag}>Cribado SNS</span>
+            </div>
+            <p>Marta recibe carta del programa de cribado de mama. En la mamografía encuentran una lesión de 8 mm en estadio I. Tratamiento conservador con alta probabilidad de curación.</p>
+            <p className={styles.casoResultado}>✅ Detección precoz = mejor pronóstico</p>
+          </div>
+          <div className={styles.casoCard}>
+            <div className={styles.casoHeader}>
+              <span className={styles.casoEmoji}>👴</span>
+              <h3>Hombre 68 años, fumador ex</h3>
+              <span className={styles.casoTag}>Respiratorio</span>
+            </div>
+            <p>Antonio, exfumador de 40 paquetes-año, se apunta al cribado de cáncer de pulmón por TC de baja dosis disponible en su comunidad. Espirometría revela EPOC moderada no diagnosticada.</p>
+            <p className={styles.casoResultado}>✅ Tratamiento precoz frena el deterioro</p>
+          </div>
+          <div className={styles.casoCard}>
+            <div className={styles.casoHeader}>
+              <span className={styles.casoEmoji}>👧</span>
+              <h3>Mujer 28 años, antecedentes familiares</h3>
+              <span className={styles.casoTag}>Genética</span>
+            </div>
+            <p>Sara tiene madre y abuela con cáncer de mama. Su médico la deriva a la Unidad de Consejo Genético que estudia mutación BRCA. Con resultado positivo inicia seguimiento intensificado.</p>
+            <p className={styles.casoResultado}>✅ Vigilancia precoz individualizada</p>
+          </div>
+        </div>
 
-        <h3>El papel del médico de cabecera</h3>
-        <p>
-          Tu médico de cabecera es quien mejor conoce tu historial y puede ajustar estas recomendaciones
-          a tu situación particular: antecedentes familiares, hábitos, medicación o enfermedades crónicas.
-          Esta guía es un punto de partida, no un sustituto de esa relación.
-        </p>
+        {/* FAQ */}
+        <h2>Preguntas frecuentes sobre chequeos médicos</h2>
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <h4>¿Necesito pagar un chequeo privado si tengo tarjeta sanitaria?</h4>
+            <p>No para los cribados del SNS (mama, colon, cuello uterino): son gratuitos y el sistema te avisará cuando corresponda. Para pruebas adicionales no incluidas en la cartera pública (como revisiones de empresa), sí puede requerirse privada o mutua laboral.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Con qué frecuencia debo hacerme analíticas de sangre?</h4>
+            <p>Para adultos sanos sin factores de riesgo, cada 2-3 años hasta los 40, luego anual. Con hipertensión, diabetes, dislipemia o antecedentes, el médico establecerá la frecuencia según tu caso particular.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Debo ir a urgencias si tengo una duda sobre un resultado?</h4>
+            <p>No, las urgencias son para situaciones que no pueden esperar. Para interpretar resultados de analíticas o revisiones, pide cita con tu médico de cabecera, que conoce tu historial completo y puede contextualizar los valores.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Tiene sentido hacerse pruebas genéticas de salud en Internet?</h4>
+            <p>Las pruebas genéticas de consumo directo tienen limitaciones importantes y pueden generar ansiedad sin base clínica. Si tienes antecedentes familiares relevantes, lo correcto es solicitar derivación a la Unidad de Consejo Genético de tu hospital de referencia.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿Los chequeos de empresa son suficientes?</h4>
+            <p>Los reconocimientos médicos laborales evalúan la aptitud para el puesto de trabajo específico, no son un chequeo integral de salud. Son un complemento, no un sustituto de la revisión con tu médico de cabecera.</p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>¿A qué edad debo empezar con el chequeo cardiovascular?</h4>
+            <p>La tensión arterial se mide desde la infancia/adolescencia. El perfil lipídico (colesterol) se recomienda por primera vez a los 20 años, o antes si hay antecedentes familiares de enfermedad cardiovascular precoz.</p>
+          </div>
+        </div>
 
-        <h3>Cribados del Sistema Nacional de Salud (SNS)</h3>
-        <ul>
-          <li><strong>Cáncer colorrectal</strong>: sangre oculta en heces cada 2 años entre 50 y 74 años.</li>
-          <li><strong>Cáncer de mama</strong>: mamografía cada 2 años entre 45/50 y 69/70 años (varía por comunidad).</li>
-          <li><strong>Cáncer de cuello de útero</strong>: citología/test VPH cada 3-5 años entre 25 y 65 años.</li>
-          <li>Estos programas son <strong>gratuitos y accesibles</strong> a través de la sanidad pública española.</li>
-        </ul>
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo organizarte para no saltarte ningún chequeo</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Haz una lista de tus antecedentes personales y familiares</strong>
+                <p>Hipertensión, diabetes, enfermedades cardiovasculares, cánceres hereditarios. Esto define qué pruebas son prioritarias para ti.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Revisa qué chequeos tienes pendientes según tu edad</strong>
+                <p>Usa este planificador como referencia. Marca los que ya tienes al día y los que necesitas solicitar próximamente.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Pide cita con tu médico de cabecera</strong>
+                <p>Lleva tu lista de chequeos pendientes. El médico decidirá cuáles son prioritarios y solicitará las pruebas pertinentes desde el SNS.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Atiende las cartas de cribado del SNS</strong>
+                <p>Los programas de cribado de mama y colorrectal envían citaciones periódicas. No las ignores: son pruebas con evidencia sólida de reducción de mortalidad.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Registra las fechas de tus últimas pruebas</strong>
+                <p>Guarda los informes en un lugar accesible (carpeta física o digital). Facilita mucho la comunicación con cualquier médico especialista.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Programa recordatorios para las revisiones anuales</strong>
+                <p>Pon una alarma recurrente en el calendario para tu cumpleaños o inicio de año: es el mejor momento para revisar qué chequeos te corresponden ese año.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
 
-        <h3>Las marcas «al día» son orientativas</h3>
-        <p>
-          Los checks en esta herramienta son solo un recordatorio visual de sesión. No se guardan ni
-          se procesan. Su único propósito es ayudarte a identificar qué revisiones tienes pendientes
-          durante la consulta de esta guía.
-        </p>
+        {/* Mejores prácticas */}
+        <h2>Hábitos que potencian la eficacia de tus chequeos</h2>
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>📋</div>
+            <h4>Lleva un historial propio</h4>
+            <p>Guarda todos tus informes médicos. Tener acceso rápido a resultados anteriores permite comparar evolución.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>🩸</div>
+            <h4>Ayuno correcto para analíticas</h4>
+            <p>8-12 horas de ayuno para glucemia y triglicéridos fiables. Puedes beber agua, pero no café ni zumos.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>💊</div>
+            <h4>Comunica tu medicación</h4>
+            <p>Informa siempre de todos los medicamentos, suplementos y vitaminas que tomas. Algunos alteran resultados.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>🏃</div>
+            <h4>Prevención activa</h4>
+            <p>No fumar, 150 min/semana de ejercicio moderado, dieta mediterránea y peso saludable reducen el 80% de las enfermedades crónicas.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>🦷</div>
+            <h4>No olvides la salud bucodental</h4>
+            <p>Revisión dental anual: la enfermedad periodontal se asocia a mayor riesgo cardiovascular y de diabetes.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <div className={styles.tipIcon}>🧠</div>
+            <h4>Salud mental también es salud</h4>
+            <p>El cribado de depresión está recomendado en atención primaria. No dudes en comentar a tu médico cómo te sientes emocionalmente.</p>
+          </div>
+        </div>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Síntomas que no deben esperar a la próxima revisión</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li>Dolor torácico, dificultad para respirar o palpitaciones irregulares → urgencias</li>
+            <li>Pérdida de peso involuntaria mayor al 5% en 6 meses sin causa conocida</li>
+            <li>Sangrado rectal, urinario o vaginal no esperado</li>
+            <li>Bulto o nódulo nuevo en mama, testículo, cuello o axila</li>
+            <li>Cambio en lunares (tamaño, color, bordes irregulares) → dermatología</li>
+            <li>Tos persistente más de 3 semanas, especialmente con sangre o en fumadores</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('planificador-chequeos-medicos')} />
