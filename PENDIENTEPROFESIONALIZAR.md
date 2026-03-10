@@ -281,7 +281,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
-| Lote 22 | 2026-03-10 | `calculadora-alimentacion-mascotas`, `calculadora-medicamentos-mascotas`, `seguimiento-ciclo-menstrual`, `planificador-chequeos-medicos`, `estadistica-avanzada`(verif.) | pendiente |
+| Lote 22 | 2026-03-10 | `calculadora-alimentacion-mascotas`, `calculadora-medicamentos-mascotas`, `seguimiento-ciclo-menstrual`, `planificador-chequeos-medicos`, `estadistica-avanzada`(verif.) | `dacaccd` |
 | Lote 21 | 2026-03-10 | `guia-reclamar-seguro-coche`, `asistente-reclamaciones`, `calculadora-macros`, `planificador-embarazo`, `planificador-mascota` | `3a8c210` |
 | Lote 20 | 2026-03-10 | `simulador-compraventa-inmueble`, `calculadora-coste-vivienda`(verificada), `comparador-tipos-seguros`, `checklist-coberturas-seguros`, `calculadora-infraseguro` | `258faf4` |
 | Lote 19 | 2026-03-10 | `amortizacion-hipoteca`, `calculadora-inversiones`(verif.), `simulador-cartera-inversion`(verif.), `calculadora-fire`, `calculadora-alquiler-vs-compra` | `1ea0146` |
