@@ -554,7 +554,316 @@
   font-size: 0.9rem;
 }
 
-/* Dark Mode */
+/* =========================================
+   EDUCATIONAL SECTION v2.0
+   ========================================= */
+
+/* Bloque educativo genérico */
+.eduBlock {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.eduBlockTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--primary);
+}
+
+/* Tabla comparativa */
+.tableResponsive {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.eduTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.eduTable th {
+  background: var(--primary);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.eduTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.eduTable tr:last-child td {
+  border-bottom: none;
+}
+
+.eduTable tr:nth-child(even) td {
+  background: var(--hover);
+}
+
+.eduTable td code {
+  font-family: 'Monaco', 'Consolas', monospace;
+  background: var(--hover);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+
+/* Escenarios */
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.scenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.scenarioCard:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+.scenarioIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.scenarioTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.scenarioDesc {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.scenarioTip {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.scenarioTip strong {
+  color: var(--primary);
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.faqItem {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.faqItem[open] {
+  border-color: var(--primary);
+}
+
+.faqQuestion {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--bg-card);
+  transition: background 0.2s ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.faqQuestion::-webkit-details-marker {
+  display: none;
+}
+
+.faqQuestion::before {
+  content: '▶';
+  font-size: 0.7rem;
+  color: var(--primary);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.faqItem[open] .faqQuestion::before {
+  transform: rotate(90deg);
+}
+
+.faqQuestion:hover {
+  background: var(--hover);
+}
+
+.faqAnswer {
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  border-top: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+/* Guía Paso a Paso */
+.stepsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.stepItem {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease;
+}
+
+.stepItem:hover {
+  border-color: var(--primary);
+}
+
+.stepNumber {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+}
+
+.stepContent p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Mejores Prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.tipCard:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.1);
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.tipTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tipDesc {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Warning Box */
+.warningBox {
+  background: rgba(231, 76, 60, 0.06);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-left: 4px solid #e74c3c;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.warningTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #c0392b;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.warningList li {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.warningList li strong {
+  color: #c0392b;
+}
+
+/* Dark Mode - Educational Section */
 [data-theme='dark'] .configSection,
 [data-theme='dark'] .truthTableSection,
 [data-theme='dark'] .karnaughSection,

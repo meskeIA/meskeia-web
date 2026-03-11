@@ -1111,378 +1111,404 @@ export default function CalculadoraElectricidadPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="⚡ Aprende Electricidad: Conceptos, Preguntas y Guías"
-        subtitle="Desde la Ley de Ohm hasta circuitos RC/RL — todo lo que necesitas saber"
+        title="⚡ Aprende Electricidad: Leyes, Cálculos y Aplicaciones Prácticas"
+        subtitle="Desde la Ley de Ohm hasta instalaciones reales — todo lo que necesitas saber"
       >
-        {/* Tabla Comparativa */}
+        {/* Sección 1: Tabla Comparativa */}
         <section className={styles.guideSection}>
-          <h2>Corriente Continua (CC) vs Corriente Alterna (CA)</h2>
+          <h2>Leyes y Fórmulas Eléctricas Fundamentales</h2>
           <p className={styles.introParagraph}>
-            La primera gran pregunta en electricidad: ¿CC o CA? Una pila es CC, el enchufe de casa es CA.
-            Entender la diferencia es fundamental antes de trabajar con cualquier circuito.
+            Las siete leyes y conceptos que resuelven el 95% de los problemas eléctricos reales,
+            con fórmulas, unidades y un ejemplo concreto de cada una.
           </p>
           <div className={styles.tableWrapper}>
-            <table className={styles.tablaComparativa}>
+            <table className={styles.tablaComparativaV2}>
               <thead>
                 <tr>
-                  <th>Característica</th>
-                  <th>Corriente Continua (CC / DC)</th>
-                  <th>Corriente Alterna (CA / AC)</th>
+                  <th>Ley / Concepto</th>
+                  <th>Fórmula</th>
+                  <th>Variables</th>
+                  <th>Unidades</th>
+                  <th>Ejemplo real</th>
+                  <th>Aplicación práctica</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Dirección del flujo</td>
-                  <td>Un único sentido, constante</td>
-                  <td>Cambia de sentido 50 veces/s (50 Hz)</td>
+                  <td>Ley de Ohm</td>
+                  <td>V = I × R</td>
+                  <td>V voltaje, I corriente, R resistencia</td>
+                  <td>V, A, Ω</td>
+                  <td>12 V / 6 Ω = 2 A en un circuito de coche</td>
+                  <td>Base de cualquier cálculo eléctrico</td>
                 </tr>
                 <tr>
-                  <td>Voltaje típico</td>
-                  <td>1,5 V (pila) – 48 V (solar/baterías)</td>
-                  <td>230 V (monofásico) – 400 V (trifásico)</td>
+                  <td>Potencia eléctrica</td>
+                  <td>P = V × I</td>
+                  <td>P potencia, V voltaje, I corriente</td>
+                  <td>W (vatios)</td>
+                  <td>230 V × 4,35 A = 1.000 W (secador)</td>
+                  <td>Dimensionar cables e interruptores</td>
                 </tr>
                 <tr>
-                  <td>Generación</td>
-                  <td>Pilas, baterías, paneles solares</td>
-                  <td>Alternadores, centrales eléctricas</td>
+                  <td>Ley de Watt</td>
+                  <td>P = I² × R</td>
+                  <td>P potencia, I corriente, R resistencia</td>
+                  <td>W, A, Ω</td>
+                  <td>2 A² × 6 Ω = 24 W disipados en resistencia</td>
+                  <td>Calcular calor generado en conductores</td>
                 </tr>
                 <tr>
-                  <td>Transporte</td>
-                  <td>Pérdidas elevadas en distancias largas</td>
-                  <td>Eficiente con transformadores (alta tensión)</td>
+                  <td>Energía eléctrica</td>
+                  <td>E = P × t</td>
+                  <td>E energía, P potencia, t tiempo</td>
+                  <td>Wh o kWh</td>
+                  <td>1.000 W × 5 h = 5 kWh (factura)</td>
+                  <td>Calcular coste de electrodomésticos</td>
                 </tr>
                 <tr>
-                  <td>Uso doméstico</td>
-                  <td>Electrónica, LED, carga de dispositivos</td>
-                  <td>Electrodomésticos, motores, iluminación</td>
+                  <td>Ley de Joule</td>
+                  <td>Q = I² × R × t</td>
+                  <td>Q calor, I corriente, R resistencia, t tiempo</td>
+                  <td>J (julios)</td>
+                  <td>2² × 6 × 10 s = 240 J de calor</td>
+                  <td>Diseño de fusibles y protecciones térmicas</td>
                 </tr>
                 <tr>
-                  <td>Conversión</td>
-                  <td>CC → CA: inversor / ondulador</td>
-                  <td>CA → CC: rectificador / fuente de alimentación</td>
+                  <td>Circuito serie</td>
+                  <td>Req = R₁ + R₂ + ...</td>
+                  <td>Req resistencia equivalente, R₁ R₂ resistencias</td>
+                  <td>Ω</td>
+                  <td>10 Ω + 20 Ω + 30 Ω = 60 Ω total</td>
+                  <td>Cadenas de LEDs, resistencias limitadoras</td>
+                </tr>
+                <tr>
+                  <td>Circuito paralelo</td>
+                  <td>1/Req = 1/R₁ + 1/R₂ + ...</td>
+                  <td>Req resistencia equivalente, R₁ R₂ resistencias</td>
+                  <td>Ω</td>
+                  <td>1/(1/20 + 1/30) = 12 Ω equivalente</td>
+                  <td>Enchufes domésticos, circuitos independientes</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </section>
 
-        {/* Casos de Uso */}
+        {/* Sección 2: Escenarios */}
         <section className={styles.guideSection}>
-          <h2>¿Para quién es esta calculadora?</h2>
+          <h2>Escenarios Reales: ¿Cómo lo resuelves?</h2>
           <p className={styles.introParagraph}>
-            Cuatro perfiles reales que usan esta herramienta y cómo saca partido de ella cada uno.
+            Cuatro situaciones reales con cálculo detallado y el tip profesional que marca la diferencia.
           </p>
-          <div className={styles.casosUsoGrid}>
-            <div className={styles.casoCard}>
-              <div className={styles.casoIcon}>🎓</div>
-              <div className={styles.casoTitle}>Estudiante FP Electricidad</div>
-              <div className={styles.casoSubtitle}>Preparando el examen de circuitos</div>
-              <p className={styles.casoDesc}>
-                Usa Ley de Ohm y Serie/Paralelo para verificar ejercicios del libro antes del examen.
-                Entiende por qué la resistencia equivalente en paralelo siempre es menor que la más pequeña
-                del grupo.
+          <div className={styles.escenarioGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioTitulo}>Propietario de vivienda</span>
+              </div>
+              <p className={styles.escenarioProblema}>
+                ¿Puedo conectar el horno (2.200 W) y la vitrocerámica (3.500 W) al mismo circuito de 20 A a 230 V?
+                P_total = 5.700 W, I = 5.700/230 = 24,8 A &gt; 20 A.
+                <strong> No, necesita circuito dedicado.</strong>
               </p>
+              <div className={styles.escenarioTip}>
+                <span className={styles.escenarioTipLabel}>Tip profesional</span>
+                Calcula siempre la corriente total antes de conectar varios electrodomésticos en el mismo circuito.
+              </div>
             </div>
-            <div className={styles.casoCard}>
-              <div className={styles.casoIcon}>🔧</div>
-              <div className={styles.casoTitle}>Electricista Junior en Obra</div>
-              <div className={styles.casoSubtitle}>Cálculos rápidos en campo</div>
-              <p className={styles.casoDesc}>
-                Calcula la corriente que circulará por un circuito antes de elegir la sección del cable.
-                Usa Potencia para verificar que el interruptor automático es el adecuado y Consumo
-                para dar presupuesto al cliente.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>⚡</span>
+                <span className={styles.escenarioTitulo}>Técnico electricista</span>
+              </div>
+              <p className={styles.escenarioProblema}>
+                Dimensionar el cable de una instalación: bomba de 1.500 W a 230 V, 15 m de distancia,
+                caída de tensión máx. 3%. I = 6,52 A → cable de 1,5 mm² es suficiente para potencia,
+                pero la caída de tensión exige <strong>2,5 mm²</strong>.
               </p>
+              <div className={styles.escenarioTip}>
+                <span className={styles.escenarioTipLabel}>Tip profesional</span>
+                La caída de tensión en cables largos es tan crítica como la sección por corriente.
+              </div>
             </div>
-            <div className={styles.casoCard}>
-              <div className={styles.casoIcon}>🛠️</div>
-              <div className={styles.casoTitle}>Técnico de Mantenimiento</div>
-              <div className={styles.casoSubtitle}>Diagnóstico de averías</div>
-              <p className={styles.casoDesc}>
-                Mide con multímetro y compara con los valores teóricos de la calculadora.
-                Un motor que consume más amperios de los calculados señala un devanado en mal estado
-                o un problema mecánico.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🌞</span>
+                <span className={styles.escenarioTitulo}>Instalador solar</span>
+              </div>
+              <p className={styles.escenarioProblema}>
+                Sistema solar aislado: 4 paneles de 300 W (1.200 W pico), batería 200 Ah a 24 V
+                (4.800 Wh), inversor 1.500 W. ¿Autonomía? 4.800 Wh / 600 Wh consumo diario =
+                <strong> 8 días sin sol.</strong>
               </p>
+              <div className={styles.escenarioTip}>
+                <span className={styles.escenarioTipLabel}>Tip profesional</span>
+                Energía almacenada (Wh) = Capacidad (Ah) × Tensión (V). Siempre calcular en Wh, no en Ah.
+              </div>
             </div>
-            <div className={styles.casoCard}>
-              <div className={styles.casoIcon}>🤖</div>
-              <div className={styles.casoTitle}>Aficionado DIY / Maker</div>
-              <div className={styles.casoSubtitle}>Proyectos Arduino, ESP32, Raspberry</div>
-              <p className={styles.casoDesc}>
-                Calcula la resistencia limitadora de corriente para un LED, diseña un divisor de tensión
-                para adaptar señales de 5 V a 3,3 V, o elige el condensador de filtrado adecuado
-                para su fuente de alimentación casera.
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏭</span>
+                <span className={styles.escenarioTitulo}>Ingeniero industrial</span>
+              </div>
+              <p className={styles.escenarioProblema}>
+                Motor trifásico 15 kW, cos φ = 0,85, η = 92%. Potencia aparente: S = 15/(0,85 × 0,92) = 19,2 kVA.
+                Corriente de línea a 400 V: I = 19.200/(√3 × 400) = 27,7 A →
+                <strong> magnetotérmico de 32 A.</strong>
               </p>
+              <div className={styles.escenarioTip}>
+                <span className={styles.escenarioTipLabel}>Tip profesional</span>
+                En trifásico, P = √3 × V_línea × I × cos φ. El factor de potencia y rendimiento siempre reducen la eficiencia real.
+              </div>
             </div>
           </div>
         </section>
 
-        {/* FAQ */}
+        {/* Sección 3: FAQ */}
         <section className={styles.guideSection}>
           <h2>Preguntas Frecuentes sobre Electricidad</h2>
           <p className={styles.introParagraph}>
-            Las 8 dudas que aparecen una y otra vez en clase, en obra y en foros de electrónica.
+            Las dudas más habituales de propietarios, instaladores y aficionados a la electrónica.
           </p>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Por qué en España usamos 230 V y en USA 120 V?</p>
+              <p className={styles.faqPregunta}>¿Cuánto cuesta al año tener un frigorífico encendido?</p>
               <p className={styles.faqRespuesta}>
-                Es una decisión histórica. Europa adoptó 220-240 V porque permite transportar la misma
-                potencia con cables más finos (menos corriente a mayor voltaje, P = V × I). EE.UU. se
-                quedó en 110-120 V por inercia de las primeras instalaciones de Edison (finales del s. XIX).
-                A mayor voltaje, mayor eficiencia en transporte pero mayor peligro en caso de contacto accidental.
+                Frigorífico clase A++ 150 W medio: 150 W × 8.760 h/año = 1.314 kWh/año.
+                A 0,18 €/kWh = 236,52 €/año. Pero la mayoría son &lt;200 kWh/año por el ciclo compresor.
+                Mira la etiqueta energética: indica kWh/año real.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Cuándo usar circuito en serie y cuándo en paralelo?</p>
+              <p className={styles.faqPregunta}>¿Qué diferencia hay entre vatios y vatios-hora?</p>
               <p className={styles.faqRespuesta}>
-                Serie cuando quieres que los componentes compartan la misma corriente (cadenas de LEDs,
-                resistencias limitadoras). Paralelo cuando quieres que cada componente tenga el voltaje
-                completo y funcione de forma independiente (enchufes de casa, bombillas). Si una bombilla
-                del paralelo se funde, las demás siguen encendidas; en serie, todas se apagan.
+                Vatio (W) es potencia: velocidad a la que se consume energía. Vatio-hora (Wh) es energía:
+                cantidad total consumida. Un calefactor de 1.000 W encendido 5 horas consume 5.000 Wh = 5 kWh.
+                La factura te cobra kWh.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Por qué se queman los fusibles y los plomos?</p>
+              <p className={styles.faqPregunta}>¿Por qué el circuito del horno debe ser independiente?</p>
               <p className={styles.faqRespuesta}>
-                El fusible es un sacrificio calculado: un hilo metálico dimensionado para fundirse antes
-                de que el calor dañe el cableado o provoque un incendio. Se quema cuando la corriente
-                supera su calibre (ej: 16 A). Un cortocircuito o demasiados aparatos conectados generan
-                ese exceso. El PIA (interruptor automático) moderno hace lo mismo pero sin consumibles:
-                detecta la sobrecorriente y abre el circuito magnéticamente.
+                El horno necesita 2.200 W → 2.200/230 = 9,6 A. El ICP del circuito general es 16-20 A.
+                Con otros electrodomésticos activos, se supera fácilmente. El Reglamento Eléctrico exige
+                circuito independiente para cocina.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Qué diferencia hay entre Vatios (W) y Voltamperios (VA)?</p>
+              <p className={styles.faqPregunta}>¿Qué es el factor de potencia y por qué importa en casa?</p>
               <p className={styles.faqRespuesta}>
-                En CC son iguales. En CA con cargas inductivas (motores, transformadores) o capacitivas
-                hay diferencia: los VA miden la potencia aparente (lo que la red suministra) y los W
-                la potencia activa (la que realmente se convierte en trabajo útil). El cos(φ) o factor
-                de potencia indica la relación: W = VA × cos(φ). Un motor con cos(φ) = 0,8 necesita
-                1,25 kVA de la red para entregar 1 kW de trabajo.
+                En corriente alterna, los aparatos con bobinas (motores, transformadores) consumen potencia
+                reactiva que no hace trabajo útil. Las distribuidoras penalizan factor de potencia &lt;0,95
+                en industria. En viviendas, afecta menos pero puede disparar el ICP.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Por qué se calientan los cables cuando pasa mucha corriente?</p>
+              <p className={styles.faqPregunta}>¿Cómo calculo si puedo poner un cargador de coche eléctrico en casa?</p>
               <p className={styles.faqRespuesta}>
-                Por el efecto Joule: todo conductor tiene una resistencia interna y cuando pasa corriente,
-                parte de la energía se disipa como calor (P = I² × R). A mayor corriente, el calor aumenta
-                al cuadrado — doblar la corriente cuadruplica el calor generado. Por eso los cables tienen
-                una sección mínima según la corriente: a mayor sección, menor resistencia y menos calentamiento.
+                Wallbox 7,4 kW: I = 7.400/230 = 32 A. Necesitas contrato ≥10 kW (unos 44 A). Comprueba
+                que el ICP, el cable desde el contador y el diferencial soporten 32 A. Muchas casas antiguas
+                necesitan refuerzo de instalación.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Qué es la constante de tiempo τ (tau) y para qué sirve?</p>
+              <p className={styles.faqPregunta}>¿Qué sección de cable necesito para mi instalación?</p>
               <p className={styles.faqRespuesta}>
-                τ es el tiempo que tarda un circuito RC o RL en cargarse al 63,2% de su valor final.
-                Después de 5τ está al 99% y se considera completamente cargado. Es fundamental para
-                diseñar temporizadores (555, monoestables), filtros de audio paso alto/bajo, circuitos
-                de debounce para botones y etapas de acoplamiento AC en amplificadores.
+                Regla práctica: 1,5 mm² hasta 16 A (bombillas, enchufes pequeños), 2,5 mm² hasta 20 A
+                (enchufes uso general), 4 mm² hasta 25 A (cocina, lavadora), 6 mm² hasta 32 A (horno,
+                cargador VE). Siempre calcular caída de tensión en tramos largos.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Cómo afecta la temperatura a la resistencia de un conductor?</p>
+              <p className={styles.faqPregunta}>¿Cuánto ahorro con LED vs halógenas?</p>
               <p className={styles.faqRespuesta}>
-                En la mayoría de los metales (cobre, aluminio), la resistencia aumenta con la temperatura:
-                al calentarse, los átomos vibran más y dificultan el paso de electrones. Se calcula con
-                R(T) = R₀ × [1 + α × (T - T₀)], donde α es el coeficiente de temperatura del material
-                (para cobre: 0,00393 / °C). Por eso un motor en arranque consume más corriente que en
-                régimen: la resistencia de los devanados es menor cuando están fríos.
+                Bombilla halógena 60 W vs LED 8 W equivalente. Ahorro: 52 W × 1.000 h/año = 52 kWh ×
+                0,18 € = 9,36 €/año por bombilla. Con 20 bombillas: 187 €/año. El LED se amortiza en 3-6 meses.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Cuántos aparatos puedo conectar a un enchufe de 16 A?</p>
+              <p className={styles.faqPregunta}>¿Qué es la tarifa de discriminación horaria?</p>
               <p className={styles.faqRespuesta}>
-                Un circuito de 16 A a 230 V puede suministrar hasta 3.680 W (P = V × I). En la práctica
-                se recomienda no superar el 80% (≈ 2.944 W) para evitar calentamiento prolongado. Suma
-                las potencias de todos los aparatos conectados: microondas (1.000 W) + tostadora (900 W)
-                + hervidor (1.500 W) = 3.400 W, ya cerca del límite. Si saltan los plomos, es la señal
-                de que has superado la capacidad del circuito.
+                En España (PVPC y tarifas reguladas): valle (0-8 h, fines de semana) a ~0,08 €/kWh,
+                punta (10-14 h y 18-22 h) a ~0,28 €/kWh. Usar lavadora, lavavajillas y cargador EV
+                en horas valle puede ahorrar 30-40% en la factura eléctrica.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Guía paso a paso */}
+        {/* Sección 4: Guía paso a paso */}
         <section className={styles.guideSection}>
-          <h2>Cómo analizar un circuito desconocido: 6 pasos</h2>
+          <h2>Cómo calcular el consumo mensual de tu hogar: 7 pasos</h2>
           <p className={styles.introParagraph}>
-            Metodología sistemática para resolver cualquier circuito resistivo, tanto en examen
-            como en el trabajo real.
+            Metodología práctica para conocer cuánto consumes y dónde están los mayores gastos antes
+            de actuar sobre la factura.
           </p>
           <div className={styles.pasosList}>
             <div className={styles.paso}>
               <div className={styles.pasoNum}>1</div>
               <div className={styles.pasoContent}>
-                <p className={styles.pasoTitle}>Identificar la fuente de alimentación</p>
+                <p className={styles.pasoTitle}>Inventariar aparatos</p>
                 <p className={styles.pasoDesc}>
-                  Anota el voltaje (V) y si es CC o CA. En CC, identifica el polo positivo y negativo.
-                  En CA, anota la frecuencia (50 Hz en España) si es relevante para el circuito.
+                  Lista todos los electrodomésticos con su potencia (W) en la placa técnica o manual.
+                  Agrupa: iluminación, climatización, electrodomésticos de cocina, standby.
                 </p>
               </div>
             </div>
             <div className={styles.paso}>
               <div className={styles.pasoNum}>2</div>
               <div className={styles.pasoContent}>
-                <p className={styles.pasoTitle}>Localizar y anotar todos los componentes</p>
+                <p className={styles.pasoTitle}>Estimar horas de uso</p>
                 <p className={styles.pasoDesc}>
-                  Lista todas las resistencias con sus valores en ohmios (Ω). Si hay condensadores
-                  o inductores, anótalos también. Lee correctamente el código de colores o el valor marcado.
+                  Frigorífico: 24 h (ciclo 30%). TV: 4 h/día. Calefacción eléctrica: 6 h/día en invierno.
+                  Iluminación: 3 h/día promedio.
                 </p>
               </div>
             </div>
             <div className={styles.paso}>
               <div className={styles.pasoNum}>3</div>
               <div className={styles.pasoContent}>
-                <p className={styles.pasoTitle}>Determinar la topología de conexión</p>
+                <p className={styles.pasoTitle}>Calcular consumo diario</p>
                 <p className={styles.pasoDesc}>
-                  ¿Están en serie (misma línea), en paralelo (mismos nodos) o en combinación mixta?
-                  Redibuja el circuito simplificado si es necesario. Un circuito mixto siempre
-                  se resuelve de dentro hacia fuera.
+                  Energía (Wh) = Potencia (W) × Horas. Frigorífico 150 W × 24 h × 0,30 = 1.080 Wh = 1,08 kWh.
+                  TV 100 W × 4 h = 400 Wh. Suma todos.
                 </p>
               </div>
             </div>
             <div className={styles.paso}>
               <div className={styles.pasoNum}>4</div>
               <div className={styles.pasoContent}>
-                <p className={styles.pasoTitle}>Calcular la resistencia equivalente total</p>
+                <p className={styles.pasoTitle}>Convertir a mensual</p>
                 <p className={styles.pasoDesc}>
-                  Serie: Req = R₁ + R₂ + ... | Paralelo: 1/Req = 1/R₁ + 1/R₂ + ...
-                  En circuitos mixtos, resuelve primero los grupos internos y sustitúyelos por su equivalente.
-                  Usa la calculadora de Mixtos para verificar el resultado.
+                  kWh diario × 30 días. Ejemplo: 10 kWh/día × 30 = 300 kWh/mes.
                 </p>
               </div>
             </div>
             <div className={styles.paso}>
               <div className={styles.pasoNum}>5</div>
               <div className={styles.pasoContent}>
-                <p className={styles.pasoTitle}>Calcular la corriente total con Ley de Ohm</p>
+                <p className={styles.pasoTitle}>Calcular coste energético</p>
                 <p className={styles.pasoDesc}>
-                  I_total = V_fuente / Req. En serie, esta corriente es igual en todos los elementos.
-                  En paralelo, se reparte entre las ramas inversamente proporcional a su resistencia.
+                  300 kWh × precio/kWh (aprox. 0,15-0,25 € según tarifa y período) = 45-75 € solo en
+                  energía, sin término de potencia ni impuestos.
                 </p>
               </div>
             </div>
             <div className={styles.paso}>
               <div className={styles.pasoNum}>6</div>
               <div className={styles.pasoContent}>
-                <p className={styles.pasoTitle}>Verificar con Leyes de Kirchhoff</p>
+                <p className={styles.pasoTitle}>Añadir términos fijos</p>
                 <p className={styles.pasoDesc}>
-                  Calcula V en cada elemento (V = I × R). Verifica: la suma de tensiones en un lazo
-                  cerrado es 0 (LKT), y la suma de corrientes en un nodo es 0 (LKC). Si cuadra,
-                  el análisis es correcto.
+                  Término de potencia (~3,5 €/kW contratado × kW/mes) + IVA 21% + impuesto eléctrico
+                  5,1% + alquiler equipo medida (~3 €/mes).
+                </p>
+              </div>
+            </div>
+            <div className={styles.paso}>
+              <div className={styles.pasoNum}>7</div>
+              <div className={styles.pasoContent}>
+                <p className={styles.pasoTitle}>Identificar mayores consumidores</p>
+                <p className={styles.pasoDesc}>
+                  Normalmente: climatización (40%), calentador ACS (20%), frigorífico (15%), iluminación
+                  (10%). Actúa sobre los mayores consumidores primero.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Tips y Errores */}
+        {/* Sección 5: Mejores prácticas */}
         <section className={styles.guideSection}>
-          <h2>Tips Profesionales y Errores Típicos</h2>
-          <div className={styles.tipsErrorsSection}>
-            <div className={styles.tipsColumn}>
-              <h3 className={styles.tipsHeader}>✅ Tips que marcan la diferencia</h3>
-              <div className={styles.tipItem}>Apunta siempre las unidades (Ω, V, A, W, kW). Un número sin unidad no significa nada en electricidad.</div>
-              <div className={styles.tipItem}>En serie la corriente es idéntica en todo el circuito. En paralelo el voltaje es idéntico en todas las ramas. Grábatelo a fuego.</div>
-              <div className={styles.tipItem}>Para calcular consumo, divide los vatios entre 1.000: 1.500 W = 1,5 kW. Luego multiplica por las horas de uso diario.</div>
-              <div className={styles.tipItem}>En circuitos RC/RL, usa 5τ como tiempo de estabilización completa para el diseño práctico de temporizadores y filtros.</div>
-              <div className={styles.tipItem}>Un divisor de tensión solo funciona bien sin carga o con carga de impedancia mucho mayor que R2. Con carga baja, el voltaje de salida cae.</div>
-              <div className={styles.tipItem}>Antes de medir con multímetro, comprueba el modo: voltios para tensión (en paralelo), amperios para corriente (en serie).</div>
+          <h2>Mejores Prácticas para Ahorrar y Dimensionar Bien</h2>
+          <p className={styles.introParagraph}>
+            Seis consejos aplicables inmediatamente, tanto si eres propietario como instalador.
+          </p>
+          <div className={styles.mejoresPracticasGrid}>
+            <div className={styles.mejorPracticaCard}>
+              <div className={styles.mejorPracticaIcono}>🔌</div>
+              <div className={styles.mejorPracticaTitulo}>Mide antes de estimar</div>
+              <p className={styles.mejorPracticaDesc}>
+                Un medidor de consumo enchufable (&lt;15 €) te da el consumo real de cada aparato.
+                Sorpresa habitual: el set-top box en standby consume más que el LED encendido.
+              </p>
             </div>
-            <div className={styles.tipsColumn}>
-              <h3 className={styles.errorsHeader}>❌ Errores que comete casi todo el mundo</h3>
-              <div className={styles.errorItem}>Confundir CC (pilas, USB, solar) con CA (enchufe de pared). Son circuitos incompatibles — conectar un aparato DC a 230 V CA lo destruye.</div>
-              <div className={styles.errorItem}>Sumar resistencias en paralelo directamente. Error clásico: dos resistencias de 100 Ω en paralelo NO son 200 Ω, son 50 Ω.</div>
-              <div className={styles.errorItem}>Olvidar convertir W a kW al calcular consumo. Un aparato de 2.000 W consume 2 kWh por hora, no 2.000 kWh.</div>
-              <div className={styles.errorItem}>Medir amperios poniendo el multímetro en paralelo. Es un cortocircuito instantáneo: el fusible interno del multímetro salta o el aparato se daña.</div>
-              <div className={styles.errorItem}>Ignorar el cos(φ) en motores y transformadores. Un motor de 1 kW puede necesitar 1,25 kVA de la red si su factor de potencia es 0,8.</div>
-              <div className={styles.errorItem}>Creer que el fusible protege el aparato. El fusible protege el cable. Para proteger aparatos existen varistores y protectores de sobretensión.</div>
+            <div className={styles.mejorPracticaCard}>
+              <div className={styles.mejorPracticaIcono}>⏰</div>
+              <div className={styles.mejorPracticaTitulo}>Programar consumos en valle</div>
+              <p className={styles.mejorPracticaDesc}>
+                Lavar, secar y cargar el coche en horas valle (0-8 h) puede ahorrar 30-40% en esas
+                cargas con tarifa discriminación horaria.
+              </p>
+            </div>
+            <div className={styles.mejorPracticaCard}>
+              <div className={styles.mejorPracticaIcono}>🌡️</div>
+              <div className={styles.mejorPracticaTitulo}>1°C menos = 7% ahorro calefacción</div>
+              <p className={styles.mejorPracticaDesc}>
+                Bajar el termostato de 22°C a 21°C ahorra ~7% en calefacción. De 22°C a 19°C: 21%
+                de ahorro, sin sacrificar confort.
+              </p>
+            </div>
+            <div className={styles.mejorPracticaCard}>
+              <div className={styles.mejorPracticaIcono}>💡</div>
+              <div className={styles.mejorPracticaTitulo}>LED para iluminación siempre</div>
+              <p className={styles.mejorPracticaDesc}>
+                El LED tiene 15.000-25.000 h de vida vs 1.000 h del incandescente. Con precio actual,
+                la amortización es &lt;6 meses incluso en lámparas de uso esporádico.
+              </p>
+            </div>
+            <div className={styles.mejorPracticaCard}>
+              <div className={styles.mejorPracticaIcono}>🔋</div>
+              <div className={styles.mejorPracticaTitulo}>Dimensiona bien la instalación solar</div>
+              <p className={styles.mejorPracticaDesc}>
+                Sobredimensionar paneles es barato (paneles son baratos). Sobredimensionar baterías es caro.
+                Calcula primero tu consumo real antes de dimensionar.
+              </p>
+            </div>
+            <div className={styles.mejorPracticaCard}>
+              <div className={styles.mejorPracticaIcono}>📊</div>
+              <div className={styles.mejorPracticaTitulo}>Contrata la potencia justa</div>
+              <p className={styles.mejorPracticaDesc}>
+                En España, bajar de 5,75 kW a 4,6 kW ahorra ~15 €/mes en término de potencia.
+                Si no tienes climatización eléctrica, 3,45 kW puede ser suficiente.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* Conceptos Básicos - contenido existente */}
+        {/* Sección 6: Warning Box */}
         <section className={styles.guideSection}>
-          <h2>Conceptos Básicos de Electricidad</h2>
-          <p className={styles.introParagraph}>
-            La electricidad es el flujo de electrones a través de un conductor. Los tres conceptos
-            fundamentales son el voltaje (presión eléctrica), la corriente (flujo de electrones)
-            y la resistencia (oposición al flujo).
-          </p>
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>Ley de Ohm</h4>
-              <p>V = I × R relaciona voltaje, corriente y resistencia. Es la base de todos los cálculos eléctricos. 1 Voltio = 1 Amperio × 1 Ohmio.</p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Potencia Eléctrica</h4>
-              <p>P = V × I mide la energía consumida por unidad de tiempo. Se mide en Vatios (W). 1 kW = 1000 W. También: P = I²R = V²/R.</p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Circuitos Serie</h4>
-              <p>Resistencias conectadas una tras otra. La corriente es igual en todos los puntos. Req = R₁ + R₂ + R₃...</p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Circuitos Paralelo</h4>
-              <p>Resistencias conectadas entre los mismos puntos. El voltaje es igual en todas las ramas. 1/Req = 1/R₁ + 1/R₂ + 1/R₃...</p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Divisor de Tensión</h4>
-              <p>Vout = Vin × R₂ / (R₁ + R₂). Permite obtener un voltaje menor que la fuente. Muy usado en electrónica para adaptar niveles de señal.</p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Divisor de Corriente</h4>
-              <p>La corriente se divide inversamente proporcional a las resistencias. I₁ = Iin × R₂ / (R₁ + R₂). Útil en circuitos paralelo.</p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Circuitos RC</h4>
-              <p>Resistencia + Capacitor. τ = R × C. Usados en filtros, temporizadores, acoplamiento AC. El capacitor almacena energía en campo eléctrico.</p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Circuitos RL</h4>
-              <p>Resistencia + Inductor. τ = L / R. Usados en filtros, fuentes conmutadas, motores. El inductor almacena energía en campo magnético.</p>
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.guideSection}>
-          <h2>Respuesta Transitoria RC/RL</h2>
-          <p className={styles.introParagraph}>
-            Cuando se aplica o retira voltaje en un circuito RC o RL, la respuesta no es instantánea.
-            El capacitor o inductor se carga/descarga exponencialmente con constante de tiempo τ (tau).
-          </p>
-          <div className={styles.tableWrapper}>
-            <table className={styles.factoresTable}>
-              <thead>
-                <tr>
-                  <th>Tiempo</th>
-                  <th>% Carga/Descarga</th>
-                  <th>Aplicación</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1τ</td>
-                  <td>63,2%</td>
-                  <td>Tiempo característico del sistema</td>
-                </tr>
-                <tr>
-                  <td>2τ</td>
-                  <td>86,5%</td>
-                  <td>Respuesta prácticamente establecida</td>
-                </tr>
-                <tr>
-                  <td>3τ</td>
-                  <td>95,0%</td>
-                  <td>Considerado &quot;casi completo&quot; en ingeniería</td>
-                </tr>
-                <tr>
-                  <td>5τ</td>
-                  <td>99,3%</td>
-                  <td>Respuesta completamente establecida</td>
-                </tr>
-              </tbody>
-            </table>
+          <div className={styles.warningBox}>
+            <h3 className={styles.warningTitle}>⚠️ Errores eléctricos con consecuencias graves</h3>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Sobrecargar un circuito:</strong> Superar la corriente nominal del cable causa
+                calentamiento → incendio. El magnetotérmico protege, pero si está mal dimensionado
+                no saltará a tiempo.
+              </li>
+              <li>
+                <strong>Usar cable de sección insuficiente en instalaciones solares 12 V:</strong> A 12 V,
+                la corriente es el doble que a 24 V para la misma potencia. El 80% de incendios en
+                instalaciones solares son por cables mal dimensionados.
+              </li>
+              <li>
+                <strong>Confundir kW con kWh en baterías:</strong> Una batería de 200 Ah a 12 V = 2.400 Wh
+                = 2,4 kWh, NO 200 kWh. Error frecuente que lleva a subdimensionar.
+              </li>
+              <li>
+                <strong>No considerar la caída de tensión en DC:</strong> En corriente continua (solar,
+                12/24 V), tramos largos de cable pueden perder 10-20% de tensión si la sección es insuficiente.
+              </li>
+              <li>
+                <strong>Instalar sin diferencial o con uno averiado:</strong> El diferencial salva vidas
+                (corriente de fuga &gt;30 mA). Verifica mensualmente pulsando el botón de test.
+              </li>
+              <li>
+                <strong>Mezclar circuitos de distinta tensión sin separación galvánica:</strong> 230 V AC
+                y 12 V DC en el mismo cuadro sin separación puede causar electrocución en la parte de
+                baja tensión.
+              </li>
+            </ul>
           </div>
         </section>
       </EducationalSection>

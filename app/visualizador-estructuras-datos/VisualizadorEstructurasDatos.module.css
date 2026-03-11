@@ -605,6 +605,329 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* ===== EDUCATIONAL SECTION v2.0 ===== */
+
+/* Secciones internas */
+.eduSection {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.eduSection:last-child {
+  margin-bottom: 0;
+}
+
+.eduSectionTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--primary);
+}
+
+/* Tabla comparativa */
+.eduTableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.eduTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.eduTable th {
+  background: var(--primary);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.eduTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: center;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+}
+
+.eduTable td:first-child {
+  text-align: left;
+}
+
+.eduTable tr:nth-child(even) td {
+  background: var(--hover);
+}
+
+.eduTable tr:last-child td {
+  border-bottom: none;
+}
+
+.eduTableNote {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: var(--spacing-sm);
+  font-style: italic;
+}
+
+/* Escenarios reales */
+.scenarioGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.scenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border-left: 4px solid var(--primary);
+}
+
+.scenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.scenarioIcon {
+  font-size: 1.4rem;
+}
+
+.scenarioCard h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.scenarioCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.scenarioTip {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: var(--hover);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--secondary);
+}
+
+.scenarioTip strong {
+  color: var(--secondary);
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.faqQuestion {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.faqAnswer {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Pasos */
+.stepsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.stepItem {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.stepContent h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.stepContent p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Tips / Mejores Prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+}
+
+.tipCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tipCard p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Warning Box */
+.warningBox {
+  background: #fff8e1;
+  border: 2px solid #f59e0b;
+  border-radius: var(--radius);
+  padding: var(--spacing-xl);
+}
+
+.warningTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  color: #78350f;
+  line-height: 1.6;
+  padding-left: var(--spacing-lg);
+  position: relative;
+}
+
+.warningList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.warningList li strong {
+  color: #92400e;
+}
+
+/* Dark mode - secciones educativas */
+[data-theme='dark'] .scenarioCard {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .scenarioTip {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .faqItem {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .stepItem {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .eduTable td {
+  background: transparent;
+}
+
+[data-theme='dark'] .eduTable tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .eduTableWrapper {
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: #f59e0b;
+}
+
+[data-theme='dark'] .warningTitle {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fde68a;
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: #fcd34d;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .container {
@@ -670,5 +993,23 @@
 
   .input {
     width: 100%;
+  }
+
+  .scenarioGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stepItem {
+    gap: var(--spacing-md);
+  }
+
+  .eduTable th,
+  .eduTable td {
+    font-size: 0.78rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
 }

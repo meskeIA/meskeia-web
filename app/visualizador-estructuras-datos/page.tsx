@@ -611,63 +611,286 @@ export default function VisualizadorEstructurasDatosPage() {
         subtitle="Conceptos fundamentales para programadores"
         icon="📚"
       >
-        <section className={styles.infoSection}>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoCard}>
-              <h3>📊 Array (Arreglo)</h3>
-              <p>
-                Colección ordenada de elementos del mismo tipo almacenados en
-                posiciones contiguas de memoria. Acceso directo por índice en O(1).
-              </p>
-              <code>arr[0] = 5; // Acceso directo</code>
+        {/* Sección 1: Tabla Comparativa */}
+        <section className={styles.eduSection}>
+          <h3 className={styles.eduSectionTitle}>Tabla Comparativa de Estructuras de Datos</h3>
+          <div className={styles.eduTableWrapper}>
+            <table className={styles.eduTable}>
+              <thead>
+                <tr>
+                  <th>Estructura</th>
+                  <th>Acceso</th>
+                  <th>Búsqueda</th>
+                  <th>Inserción</th>
+                  <th>Eliminación</th>
+                  <th>Memoria</th>
+                  <th>Uso típico</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Array</strong></td>
+                  <td>O(1)</td>
+                  <td>O(n)</td>
+                  <td>O(n)</td>
+                  <td>O(n)</td>
+                  <td>O(n) continua</td>
+                  <td>Acceso por índice, cache-friendly</td>
+                </tr>
+                <tr>
+                  <td><strong>Lista Enlazada</strong></td>
+                  <td>O(n)</td>
+                  <td>O(n)</td>
+                  <td>O(1)*</td>
+                  <td>O(1)*</td>
+                  <td>O(n) + punteros</td>
+                  <td>Inserciones/eliminaciones frecuentes</td>
+                </tr>
+                <tr>
+                  <td><strong>Pila (Stack)</strong></td>
+                  <td>O(n)</td>
+                  <td>O(n)</td>
+                  <td>O(1)</td>
+                  <td>O(1)</td>
+                  <td>O(n)</td>
+                  <td>Deshacer, recursión, expresiones</td>
+                </tr>
+                <tr>
+                  <td><strong>Cola (Queue)</strong></td>
+                  <td>O(n)</td>
+                  <td>O(n)</td>
+                  <td>O(1)</td>
+                  <td>O(1)</td>
+                  <td>O(n)</td>
+                  <td>BFS, procesamiento en orden</td>
+                </tr>
+                <tr>
+                  <td><strong>Árbol BST</strong></td>
+                  <td>O(log n)</td>
+                  <td>O(log n)</td>
+                  <td>O(log n)</td>
+                  <td>O(log n)</td>
+                  <td>O(n)</td>
+                  <td>Búsqueda ordenada, rangos</td>
+                </tr>
+                <tr>
+                  <td><strong>Hash Table</strong></td>
+                  <td>O(1) amort.</td>
+                  <td>O(1) amort.</td>
+                  <td>O(1) amort.</td>
+                  <td>O(1) amort.</td>
+                  <td>O(n) dispersa</td>
+                  <td>Diccionarios, cachés, índices</td>
+                </tr>
+                <tr>
+                  <td><strong>Grafo</strong></td>
+                  <td>O(1)</td>
+                  <td>O(V+E)</td>
+                  <td>O(1)</td>
+                  <td>O(V+E)</td>
+                  <td>O(V+E)</td>
+                  <td>Redes, rutas, relaciones</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className={styles.eduTableNote}>* O(1) si se tiene referencia directa al nodo. BST casos promedio; puede degradar a O(n) sin balanceo.</p>
+        </section>
+
+        {/* Sección 2: Escenarios reales */}
+        <section className={styles.eduSection}>
+          <h3 className={styles.eduSectionTitle}>Escenarios Reales</h3>
+          <div className={styles.scenarioGrid}>
+            <div className={styles.scenarioCard}>
+              <div className={styles.scenarioHeader}>
+                <span className={styles.scenarioIcon}>🌐</span>
+                <h4>Navegador web</h4>
+              </div>
+              <p>El historial usa una Pila (Stack): cada página visitada se apila, el botón atrás hace pop. Las pestañas abiertas usan una lista doblemente enlazada.</p>
+              <div className={styles.scenarioTip}>
+                <strong>Tip:</strong> Stack para historial, Queue para operaciones pendientes (descarga de imágenes).
+              </div>
             </div>
 
-            <div className={styles.infoCard}>
-              <h3>📚 Stack (Pila)</h3>
-              <p>
-                Estructura LIFO (Last In, First Out). El último elemento en
-                entrar es el primero en salir. Piensa en una pila de platos.
-              </p>
-              <code>push(x), pop(), peek()</code>
+            <div className={styles.scenarioCard}>
+              <div className={styles.scenarioHeader}>
+                <span className={styles.scenarioIcon}>🔍</span>
+                <h4>Motor de búsqueda</h4>
+              </div>
+              <p>Google usa tablas hash invertidas: palabra → lista de URLs. Con 50.000M páginas, la búsqueda es O(1) en lugar de O(n).</p>
+              <div className={styles.scenarioTip}>
+                <strong>Tip:</strong> Hash Table cuando necesitas búsqueda O(1) y tienes una clave única.
+              </div>
             </div>
 
-            <div className={styles.infoCard}>
-              <h3>🚶 Queue (Cola)</h3>
-              <p>
-                Estructura FIFO (First In, First Out). El primer elemento en
-                entrar es el primero en salir. Como una cola de personas.
-              </p>
-              <code>enqueue(x), dequeue(), front()</code>
+            <div className={styles.scenarioCard}>
+              <div className={styles.scenarioHeader}>
+                <span className={styles.scenarioIcon}>🎮</span>
+                <h4>Pathfinding en videojuegos</h4>
+              </div>
+              <p>A* usa una Cola de Prioridad (heap). En un mapa 1000×1000 con obstáculos, encuentra el camino óptimo en &lt;10ms.</p>
+              <div className={styles.scenarioTip}>
+                <strong>Tip:</strong> Cola de prioridad para problemas donde siempre procesas el elemento más prioritario.
+              </div>
             </div>
 
-            <div className={styles.infoCard}>
-              <h3>🔗 Lista Enlazada</h3>
-              <p>
-                Secuencia de nodos donde cada nodo contiene datos y un puntero
-                al siguiente. Inserción/eliminación eficiente en cualquier punto.
-              </p>
-              <code>node.next = newNode;</code>
+            <div className={styles.scenarioCard}>
+              <div className={styles.scenarioHeader}>
+                <span className={styles.scenarioIcon}>🗺️</span>
+                <h4>GPS y redes sociales</h4>
+              </div>
+              <p>Dijkstra sobre un grafo de 300M nodos (red de carreteras de Europa) encuentra la ruta óptima. LinkedIn representa conexiones como grafo no dirigido ponderado.</p>
+              <div className={styles.scenarioTip}>
+                <strong>Tip:</strong> Grafo para relaciones complejas muchos-a-muchos con pesos.
+              </div>
             </div>
+          </div>
+        </section>
 
-            <div className={styles.infoCard}>
-              <h3>🌳 Árbol BST</h3>
-              <p>
-                Árbol binario donde los valores menores van a la izquierda y
-                los mayores a la derecha. Búsqueda eficiente en O(log n).
-              </p>
-              <code>if (x &lt; node) goLeft();</code>
+        {/* Sección 3: FAQ */}
+        <section className={styles.eduSection}>
+          <h3 className={styles.eduSectionTitle}>Preguntas Frecuentes</h3>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4 className={styles.faqQuestion}>¿Cuándo usar Array vs Lista Enlazada?</h4>
+              <p className={styles.faqAnswer}>Array cuando: acceso por índice frecuente (cache-friendly), tamaño conocido, pocas inserciones en medio. Lista cuando: inserciones/eliminaciones frecuentes en cualquier posición, tamaño desconocido. En la práctica, los arrays casi siempre ganan por localidad de caché.</p>
             </div>
+            <div className={styles.faqItem}>
+              <h4 className={styles.faqQuestion}>¿Por qué los Hash Tables tienen O(1) amortizado, no garantizado?</h4>
+              <p className={styles.faqAnswer}>Con mala función hash, muchas claves colisionan en el mismo bucket → lista enlazada → O(n) en peor caso. Solución: rehashing cuando el factor de carga supera 0,75.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4 className={styles.faqQuestion}>¿Qué es un árbol balanceado y por qué importa?</h4>
+              <p className={styles.faqAnswer}>Un BST degenerado (insertar 1,2,3,4,5 en orden) se convierte en lista enlazada: O(n) búsqueda. AVL y Red-Black Trees garantizan O(log n) mediante rotaciones automáticas.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4 className={styles.faqQuestion}>¿Diferencia entre Stack y Queue?</h4>
+              <p className={styles.faqAnswer}>Stack: LIFO (Last In, First Out) — como una pila de platos. Queue: FIFO (First In, First Out) — como una cola del supermercado. Stack para llamadas de función, deshacer. Queue para procesamiento en orden, BFS.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4 className={styles.faqQuestion}>¿Cuándo usar un Heap vs un BST?</h4>
+              <p className={styles.faqAnswer}>Heap: cuando solo necesitas el máximo/mínimo rápidamente (O(1) peek, O(log n) insert/delete). BST: cuando necesitas búsqueda por valor arbitrario O(log n). Priority Queue implementa Heap.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4 className={styles.faqQuestion}>¿Qué es la complejidad espacial y por qué importa?</h4>
+              <p className={styles.faqAnswer}>El espacio de memoria que usa la estructura. Lista enlazada necesita O(n) nodos + punteros (overhead ×2 vs array). En sistemas embebidos o con millones de objetos, este overhead puede ser crítico.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4 className={styles.faqQuestion}>¿BFS vs DFS en grafos?</h4>
+              <p className={styles.faqAnswer}>BFS (Cola): encuentra el camino más corto en grafos no ponderados. Usa O(n) memoria (guarda nivel completo). DFS (Stack/Recursión): explora profundidad, usa menos memoria O(h) donde h es la altura. DFS para detectar ciclos, componentes conexos.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4 className={styles.faqQuestion}>¿Qué es una tabla hash perfecta?</h4>
+              <p className={styles.faqAnswer}>Una función hash sin colisiones para un conjunto conocido de claves. Posible cuando las claves son fijas (ej: palabras clave de un lenguaje de programación). gperf genera tablas hash perfectas mínimas.</p>
+            </div>
+          </div>
+        </section>
 
-            <div className={styles.infoCard}>
-              <h3>⚡ ¿Cuál usar?</h3>
-              <p>
-                <strong>Array:</strong> Acceso por índice frecuente<br />
-                <strong>Stack:</strong> Deshacer, recursión<br />
-                <strong>Queue:</strong> Tareas en orden, BFS<br />
-                <strong>Lista:</strong> Inserciones/eliminaciones frecuentes<br />
-                <strong>BST:</strong> Búsqueda ordenada rápida
-              </p>
+        {/* Sección 4: Guía Paso a Paso */}
+        <section className={styles.eduSection}>
+          <h3 className={styles.eduSectionTitle}>Guía Paso a Paso: Cómo Elegir una Estructura</h3>
+          <div className={styles.stepsList}>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>¿Cómo accedes a los datos?</h4>
+                <p>Por índice → Array. Por clave → Hash Table. Secuencialmente → Lista. Jerárquicamente → Árbol.</p>
+              </div>
             </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>¿Qué operación es más frecuente?</h4>
+                <p>Búsqueda O(1) → Hash Table. Búsqueda ordenada → BST. Inserción/eliminación → Lista. Min/max → Heap.</p>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>¿Los datos tienen relaciones?</h4>
+                <p>Jerárquicas (padre-hijo) → Árbol. Muchos-a-muchos → Grafo. Secuenciales → Array/Lista.</p>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>¿Cuánta memoria tienes?</h4>
+                <p>Limitada → Array (sin overhead de punteros). Sin límite → Lista, Árbol.</p>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>¿Necesitas orden?</h4>
+                <p>Sí, total → BST o Array ordenado. Sí, parcial (min/max) → Heap. No → Hash Table.</p>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>¿Los datos cambian mucho?</h4>
+                <p>Inserciones frecuentes en medio → Lista. Pocas inserciones, muchas lecturas → Array. Dinámico con búsqueda → BST balanceado.</p>
+              </div>
+            </div>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Usa la librería del lenguaje</h4>
+                <p>Python: list (array dinámico), dict (hash table), heapq (heap). Java: ArrayList, HashMap, TreeMap. C++: vector, unordered_map, priority_queue.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 5: Mejores Prácticas */}
+        <section className={styles.eduSection}>
+          <h3 className={styles.eduSectionTitle}>Mejores Prácticas</h3>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧠</span>
+              <h4>Localidad de caché</h4>
+              <p>Arrays son 5-10x más rápidos que listas enlazadas para iteración secuencial por localidad de caché. Prefiere arrays salvo que las inserciones en medio sean críticas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <h4>Factor de carga</h4>
+              <p>Mantén el factor de carga de Hash Tables entre 0,6-0,75. Sobre 0,8, las colisiones degradan el rendimiento a O(n).</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🌳</span>
+              <h4>Árboles siempre balanceados</h4>
+              <p>Nunca implementes BST sin balanceo en producción. Usa TreeMap (Java), SortedDict (Python sortedcontainers) o equivalente.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔗</span>
+              <h4>Listas doblemente enlazadas</h4>
+              <p>Para eliminación O(1) cuando tienes el nodo (LRU Cache usa HashMap + Lista doblemente enlazada). Sola, la lista enlazada rara vez es óptima.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💡</span>
+              <h4>Estructura compuesta</h4>
+              <p>Los problemas reales usan combinaciones: HashMap&lt;String, BST&gt; para búsqueda de rango por clave, o Array of Linked Lists para hash table con chaining.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📏</span>
+              <h4>Mide con tus datos reales</h4>
+              <p>La complejidad teórica asume distribución uniforme. Mide con tus datos reales: un HashMap puede ser más lento que un Array pequeño por el overhead de hashing.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 6: Warning Box */}
+        <section className={styles.eduSection}>
+          <div className={styles.warningBox}>
+            <h3 className={styles.warningTitle}>⚠️ Errores comunes con estructuras de datos</h3>
+            <ul className={styles.warningList}>
+              <li><strong>ArrayList con inserción frecuente en medio:</strong> O(n) por desplazamiento. Con 1M elementos y 1000 inserciones/s, usa LinkedList o deque.</li>
+              <li><strong>HashMap sin hashCode() correcto:</strong> En Java/Python, si dos objetos iguales tienen distinto hashCode, tendrás duplicados y comportamiento indefinido.</li>
+              <li><strong>BST sin balanceo con datos ordenados:</strong> Insertar 1..N en BST sin balancear → lista enlazada → O(n) búsqueda.</li>
+              <li><strong>Stack overflow por DFS recursivo:</strong> En grafos con 100K+ nodos, la recursión puede exceder el stack. Convierte a DFS iterativo con stack explícito.</li>
+              <li><strong>Hash Table con claves mutables:</strong> En Python, usar listas como claves de dict lanza TypeError. Los objetos mutables no pueden ser claves hash.</li>
+              <li><strong>Ignorar el overhead de memoria:</strong> Lista enlazada con 1M nodos int: 8 bytes dato + 8 bytes puntero siguiente = 2x más memoria que array.</li>
+            </ul>
           </div>
         </section>
       </EducationalSection>

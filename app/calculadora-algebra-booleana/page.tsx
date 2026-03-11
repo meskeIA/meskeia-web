@@ -712,40 +712,310 @@ export default function CalculadoraAlgebraBooleanaPage() {
         title="¿Quieres aprender más sobre Álgebra Booleana?"
         subtitle="Descubre los fundamentos de la lógica digital y simplificación de circuitos"
       >
-        <div className={styles.guideSection}>
-          <h2>¿Qué es el Álgebra Booleana?</h2>
-          <p>
-            El álgebra booleana es un sistema matemático que trabaja con valores binarios
-            (verdadero/falso, 1/0). Fue desarrollada por George Boole en 1854 y es
-            fundamental en el diseño de circuitos digitales y programación.
-          </p>
+        {/* Sección 1: Tabla Comparativa */}
+        <div className={styles.eduBlock}>
+          <h3 className={styles.eduBlockTitle}>Puertas Lógicas y Leyes del Álgebra Booleana</h3>
+          <div className={styles.tableResponsive}>
+            <table className={styles.eduTable}>
+              <thead>
+                <tr>
+                  <th>Puerta</th>
+                  <th>Símbolo</th>
+                  <th>Tabla verdad</th>
+                  <th>Expresión</th>
+                  <th>Equivalencia NAND</th>
+                  <th>Uso en circuitos reales</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>AND</strong></td>
+                  <td><code>&amp;</code></td>
+                  <td>0,0→0 · 0,1→0 · 1,0→0 · 1,1→1</td>
+                  <td><code>A · B</code></td>
+                  <td><code>NAND(NAND(A,B), NAND(A,B))</code></td>
+                  <td>Habilitar señales, máscaras de bits</td>
+                </tr>
+                <tr>
+                  <td><strong>OR</strong></td>
+                  <td><code>|</code></td>
+                  <td>0,0→0 · 0,1→1 · 1,0→1 · 1,1→1</td>
+                  <td><code>A + B</code></td>
+                  <td><code>NAND(NAND(A,A), NAND(B,B))</code></td>
+                  <td>Combinar señales, detección de eventos</td>
+                </tr>
+                <tr>
+                  <td><strong>NOT</strong></td>
+                  <td><code>¬</code></td>
+                  <td>0→1 · 1→0</td>
+                  <td><code>A&apos;</code></td>
+                  <td><code>NAND(A, A)</code></td>
+                  <td>Inversión de señal, lógica activa-baja</td>
+                </tr>
+                <tr>
+                  <td><strong>NAND</strong></td>
+                  <td><code>↑</code></td>
+                  <td>0,0→1 · 0,1→1 · 1,0→1 · 1,1→0</td>
+                  <td><code>(A · B)&apos;</code></td>
+                  <td>Puerta base (universal)</td>
+                  <td>Lógica TTL, CMOS, diseño FPGA</td>
+                </tr>
+                <tr>
+                  <td><strong>NOR</strong></td>
+                  <td><code>↓</code></td>
+                  <td>0,0→1 · 0,1→0 · 1,0→0 · 1,1→0</td>
+                  <td><code>(A + B)&apos;</code></td>
+                  <td><code>NAND(NAND(NAND(A,A), NAND(B,B)), ...)</code></td>
+                  <td>Circuitos RTL, lógica de control</td>
+                </tr>
+                <tr>
+                  <td><strong>XOR</strong></td>
+                  <td><code>⊕</code></td>
+                  <td>0,0→0 · 0,1→1 · 1,0→1 · 1,1→0</td>
+                  <td><code>A ⊕ B</code></td>
+                  <td>4 puertas NAND</td>
+                  <td>Sumadores, paridad, cifrado</td>
+                </tr>
+                <tr>
+                  <td><strong>XNOR</strong></td>
+                  <td><code>⊙</code></td>
+                  <td>0,0→1 · 0,1→0 · 1,0→0 · 1,1→1</td>
+                  <td><code>(A ⊕ B)&apos;</code></td>
+                  <td>5 puertas NAND</td>
+                  <td>Comparadores, detectores de igualdad</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-          <h3>Mapas de Karnaugh</h3>
-          <p>
-            Los mapas de Karnaugh (K-maps) son una herramienta gráfica para simplificar
-            funciones booleanas. Fueron introducidos por Maurice Karnaugh en 1953 como
-            una alternativa visual al método algebraico y al algoritmo Quine-McCluskey.
-          </p>
-
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>Código Gray</h4>
-              <p>
-                Las filas y columnas del mapa usan código Gray (solo un bit cambia entre
-                celdas adyacentes). Esto permite que las celdas vecinas difieran en solo
-                una variable, facilitando la agrupación.
+        {/* Sección 2: Escenarios */}
+        <div className={styles.eduBlock}>
+          <h3 className={styles.eduBlockTitle}>Casos de Uso Reales</h3>
+          <div className={styles.scenariosGrid}>
+            <div className={styles.scenarioCard}>
+              <div className={styles.scenarioIcon}>💻</div>
+              <h4 className={styles.scenarioTitle}>Diseñador de circuitos digitales</h4>
+              <p className={styles.scenarioDesc}>
+                Minimizar un circuito de 6 variables con Mapa de Karnaugh: de 12 compuertas AND/OR a 4 compuertas NAND. Ahorro del 67% en área de silicio y consumo.
               </p>
+              <div className={styles.scenarioTip}>
+                <strong>Tip:</strong> Mapas de Karnaugh para n≤6 variables; para n&gt;6 usa algoritmo Quine-McCluskey o Espresso.
+              </div>
             </div>
 
-            <div className={styles.contentCard}>
-              <h4>Aplicaciones</h4>
-              <p>
-                Simplificación de circuitos digitales, diseño de PLDs (Programmable Logic
-                Devices), optimización de código en compiladores, y diseño de máquinas de
-                estados finitos.
+            <div className={styles.scenarioCard}>
+              <div className={styles.scenarioIcon}>🔒</div>
+              <h4 className={styles.scenarioTitle}>Sistemas de acceso</h4>
+              <p className={styles.scenarioDesc}>
+                Control de acceso: ENTRAR = (TarjetaVálida AND HorarioLaboral) OR (TarjetaAdmin AND NOT Bloqueado). Implementado con 3 compuertas NAND universales.
               </p>
+              <div className={styles.scenarioTip}>
+                <strong>Tip:</strong> NAND y NOR son puertas universales: cualquier función booleana se implementa solo con ellas.
+              </div>
+            </div>
+
+            <div className={styles.scenarioCard}>
+              <div className={styles.scenarioIcon}>🖥️</div>
+              <h4 className={styles.scenarioTitle}>Arquitectura de CPU</h4>
+              <p className={styles.scenarioDesc}>
+                La ALU de un procesador ARM Cortex-M0 usa álgebra booleana para operaciones bit a bit: AND, OR, XOR entre registros. XOR para detectar cambios de bit (flip-flops, paridad).
+              </p>
+              <div className={styles.scenarioTip}>
+                <strong>Tip:</strong> XOR es la puerta de la suma binaria sin acarreo: 1⊕1=0, 1⊕0=1.
+              </div>
+            </div>
+
+            <div className={styles.scenarioCard}>
+              <div className={styles.scenarioIcon}>🔍</div>
+              <h4 className={styles.scenarioTitle}>Motor de búsqueda</h4>
+              <p className={styles.scenarioDesc}>
+                Google usa álgebra booleana en búsquedas: &apos;python AND (tutorial OR curso) NOT básico&apos;. El índice invertido evalúa esta expresión booleana sobre millones de documentos.
+              </p>
+              <div className={styles.scenarioTip}>
+                <strong>Tip:</strong> Las expresiones booleanas en SQL (WHERE A AND B OR NOT C) siguen exactamente las mismas leyes.
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Sección 3: FAQ */}
+        <div className={styles.eduBlock}>
+          <h3 className={styles.eduBlockTitle}>Preguntas Frecuentes</h3>
+          <div className={styles.faqList}>
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>¿Por qué NAND es una puerta universal?</summary>
+              <div className={styles.faqAnswer}>
+                Cualquier función booleana (AND, OR, NOT, XOR...) puede construirse solo con puertas NAND. NOT(A) = NAND(A,A). AND(A,B) = NAND(NAND(A,B), NAND(A,B)). En la práctica, los chips usan solo NAND para minimizar tipos de componentes.
+              </div>
+            </details>
+
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>¿Qué es la forma canónica SOP?</summary>
+              <div className={styles.faqAnswer}>
+                Sum of Products: suma (OR) de productos (AND) de literales. Ej: f = A&apos;B + AB&apos; + AB. Cada término es un minterm donde f=1. Siempre existe y es única para una función dada.
+              </div>
+            </details>
+
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>¿Cuándo usar Mapa de Karnaugh vs Quine-McCluskey?</summary>
+              <div className={styles.faqAnswer}>
+                Karnaugh: visual, manual, hasta 6 variables. Quine-McCluskey: algorítmico, cualquier número de variables, implementable en software. Para n&gt;6, las herramientas EDA (Vivado, Quartus) usan variantes de Quine-McCluskey.
+              </div>
+            </details>
+
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>¿Qué son los don&apos;t cares en un mapa de Karnaugh?</summary>
+              <div className={styles.faqAnswer}>
+                Combinaciones de entrada que nunca ocurrirán en la práctica. Se pueden agrupar como 0 o 1 según convenga para minimizar. Ejemplo: un circuito para dígitos BCD nunca tendrá entradas 1010-1111.
+              </div>
+            </details>
+
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>¿Diferencia entre XOR y XNOR?</summary>
+              <div className={styles.faqAnswer}>
+                XOR (⊕): salida 1 cuando las entradas son DISTINTAS. XNOR: salida 1 cuando las entradas son IGUALES. XOR detecta diferencias, XNOR detecta igualdad. Usados en comparadores, generadores de paridad, cifrado.
+              </div>
+            </details>
+
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>¿Qué es el hazard en circuitos combinacionales?</summary>
+              <div className={styles.faqAnswer}>
+                Glitch temporal cuando múltiples señales cambian y llegan con distinto retardo a una puerta. Causa pulsos espurios en la salida. Se elimina añadiendo términos de consenso en el diseño booleano.
+              </div>
+            </details>
+
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>¿Cómo se relaciona álgebra booleana con SQL?</summary>
+              <div className={styles.faqAnswer}>
+                WHERE A AND B OR NOT C sigue las leyes de De Morgan y distributividad. Los optimizadores de SQL reescriben las condiciones usando álgebra booleana para elegir el plan de ejecución más eficiente.
+              </div>
+            </details>
+
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>¿Qué es el teorema de De Morgan?</summary>
+              <div className={styles.faqAnswer}>
+                NOT(A AND B) = NOT(A) OR NOT(B). NOT(A OR B) = NOT(A) AND NOT(B). Permite convertir NAND a NOT-OR y NOR a NOT-AND. Fundamental para simplificar expresiones y cambiar entre formas SOP y POS.
+              </div>
+            </details>
+          </div>
+        </div>
+
+        {/* Sección 4: Guía Paso a Paso */}
+        <div className={styles.eduBlock}>
+          <h3 className={styles.eduBlockTitle}>Cómo Minimizar con Mapa de Karnaugh (7 pasos)</h3>
+          <div className={styles.stepsList}>
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <strong>Definir la función</strong>
+                <p>Construye la tabla de verdad completa. Para n variables, hay 2^n filas. Identifica los minterms donde f=1.</p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <strong>Dibujar el mapa</strong>
+                <p>Para 2 vars: 2×2, para 3: 2×4, para 4: 4×4. El orden de columnas es código Gray (00,01,11,10) para que celdas adyacentes difieran en 1 bit.</p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <strong>Rellenar el mapa</strong>
+                <p>Escribe 1 en cada celda que corresponda a un minterm donde f=1. Los don&apos;t cares se marcan con X.</p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <strong>Identificar grupos</strong>
+                <p>Agrupa celdas adyacentes con 1s (y X si ayuda): grupos de 1, 2, 4, 8, 16 celdas. Los grupos deben ser lo más grandes posible. Las esquinas son adyacentes (el mapa es toroidal).</p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <strong>Extraer términos</strong>
+                <p>Cada grupo produce un término: las variables que son iguales en todo el grupo se conservan (complementadas o no), las que varían desaparecen.</p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <strong>Escribir la expresión SOP</strong>
+                <p>Haz OR de todos los términos. Verifica con la tabla de verdad.</p>
+              </div>
+            </div>
+
+            <div className={styles.stepItem}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <strong>Implementar con NAND universales</strong>
+                <p>Aplica De Morgan: la expresión SOP se convierte directamente a NAND-NAND. Dos niveles de NAND equivalen a SOP.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección 5: Mejores Prácticas */}
+        <div className={styles.eduBlock}>
+          <h3 className={styles.eduBlockTitle}>Mejores Prácticas de Diseño Booleano</h3>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>🗺️</div>
+              <h4 className={styles.tipTitle}>Grupos máximos en Karnaugh</h4>
+              <p className={styles.tipDesc}>Siempre busca el grupo más grande posible, aunque ya hayas cubierto esa celda. Grupos más grandes = menos literales = circuito más simple.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>🔄</div>
+              <h4 className={styles.tipTitle}>Usa NOR/NAND universales</h4>
+              <p className={styles.tipDesc}>En FPGA y ASIC, implementa con NAND para minimizar celdas lógicas. NAND-NAND = SOP en 2 niveles.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>✅</div>
+              <h4 className={styles.tipTitle}>Verifica con tabla de verdad</h4>
+              <p className={styles.tipDesc}>Siempre comprueba la expresión minimizada evaluando todos los casos. Un error en el mapa invalida el circuito.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>🔢</div>
+              <h4 className={styles.tipTitle}>Don&apos;t cares bien definidos</h4>
+              <p className={styles.tipDesc}>Solo usa don&apos;t care cuando la combinación es físicamente imposible o no importa. Un don&apos;t care mal colocado puede causar comportamiento erróneo en entradas no previstas.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>📐</div>
+              <h4 className={styles.tipTitle}>POS cuando hay más 0s que 1s</h4>
+              <p className={styles.tipDesc}>Si hay pocos 0s en la tabla, minimiza en POS (Product of Sums) agrupando los 0s. Más eficiente cuando f=0 es el caso común.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>🏭</div>
+              <h4 className={styles.tipTitle}>Herramientas EDA para diseño real</h4>
+              <p className={styles.tipDesc}>Para circuitos con &gt;6 variables, usa Vivado (Xilinx), Quartus (Intel/Altera) o Yosys. Implementan Espresso y síntesis lógica automática.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección 6: Warning Box */}
+        <div className={styles.warningBox}>
+          <h4 className={styles.warningTitle}>⚠️ Errores que invalidan el diseño booleano</h4>
+          <ul className={styles.warningList}>
+            <li><strong>Orden incorrecto en el mapa de Karnaugh</strong>: Las columnas deben ir en código Gray (00,01,11,10), NO en orden binario (00,01,10,11). Con orden incorrecto, los grupos adyacentes son incorrectos.</li>
+            <li><strong>Grupos que no son potencias de 2</strong>: Solo son válidos grupos de 1, 2, 4, 8, 16 celdas. Un grupo de 3 o 5 celdas es incorrecto.</li>
+            <li><strong>Olvidar la torodalidad del mapa</strong>: Las esquinas y bordes son adyacentes. La columna izquierda es adyacente a la derecha, la fila superior a la inferior.</li>
+            <li><strong>Confundir NAND y NOR universales</strong>: Ambas son universales pero las conversiones son distintas. NOT(A) = NAND(A,A) pero NOT(A) = NOR(A,A).</li>
+            <li><strong>Ignorar los hazards</strong>: Un diseño minimizado puede tener glitches. Añade términos de consenso para eliminarlos en circuitos síncronos sensibles.</li>
+            <li><strong>Don&apos;t care en entradas posibles</strong>: Marcar como X una combinación que puede ocurrir → comportamiento impredecible. Solo usa X en combinaciones garantizadas como imposibles.</li>
+          </ul>
         </div>
       </EducationalSection>
 

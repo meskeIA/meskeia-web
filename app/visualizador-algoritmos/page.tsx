@@ -624,6 +624,301 @@ export default function VisualizadorAlgoritmosPage() {
             </div>
           </section>
 
+          {/* ===== SECCIÓN 1: TABLA COMPARATIVA v2.0 ===== */}
+          <section className={styles.guideSection}>
+            <h2>📊 Tabla Comparativa Completa</h2>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Algoritmo</th>
+                    <th>Mejor caso</th>
+                    <th>Caso medio</th>
+                    <th>Peor caso</th>
+                    <th>Espacio</th>
+                    <th>Estable</th>
+                    <th>Cuándo usarlo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Bubble Sort</strong></td>
+                    <td>O(n)</td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td>O(1)</td>
+                    <td>Sí</td>
+                    <td>Solo para enseñar conceptos o detectar arrays ya ordenados</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Selection Sort</strong></td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td>O(1)</td>
+                    <td>No</td>
+                    <td>Cuando minimizar escrituras en memoria es crítico (EEPROM)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Insertion Sort</strong></td>
+                    <td>O(n)</td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td>O(1)</td>
+                    <td>Sí</td>
+                    <td>Arrays pequeños (&lt;50) o casi ordenados</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Merge Sort</strong></td>
+                    <td>O(n log n)</td>
+                    <td>O(n log n)</td>
+                    <td>O(n log n)</td>
+                    <td>O(n)</td>
+                    <td>Sí</td>
+                    <td>Cuando necesitas garantías de peor caso o estabilidad</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Quick Sort</strong></td>
+                    <td>O(n log n)</td>
+                    <td>O(n log n)</td>
+                    <td>O(n²)</td>
+                    <td>O(log n)</td>
+                    <td>No</td>
+                    <td>Uso general en memoria, datos aleatorios con pivote aleatorio</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Heap Sort</strong></td>
+                    <td>O(n log n)</td>
+                    <td>O(n log n)</td>
+                    <td>O(n log n)</td>
+                    <td>O(1)</td>
+                    <td>No</td>
+                    <td>Cuando necesitas O(1) espacio extra con peor caso garantizado</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Counting Sort</strong></td>
+                    <td>O(n+k)</td>
+                    <td>O(n+k)</td>
+                    <td>O(n+k)</td>
+                    <td>O(k)</td>
+                    <td>Sí</td>
+                    <td>Enteros en rango pequeño y conocido (k &lt;&lt; n)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* ===== SECCIÓN 2: ESCENARIOS v2.0 ===== */}
+          <section className={styles.guideSection}>
+            <h2>🎯 Escenarios Reales de Uso</h2>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">👨‍💻</span>
+                  <h4>Entrevista técnica</h4>
+                </div>
+                <p className={styles.escenarioExample}>
+                  &ldquo;FAANG pregunta &#39;ordena este array en O(n log n)&#39;. Merge Sort garantiza el peor caso.
+                  Quick Sort es más rápido en la práctica pero tiene peor caso O(n²).&rdquo;
+                </p>
+                <p className={styles.escenarioTip}>
+                  <strong>Tip:</strong> Mergesort para garantías, Quicksort para rendimiento medio.
+                </p>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎮</span>
+                  <h4>Motor de juego</h4>
+                </div>
+                <p className={styles.escenarioExample}>
+                  &ldquo;Ordenar 10.000 entidades por distancia al jugador cada frame (60fps). Insertion sort
+                  para arrays casi ordenados (movimiento incremental) es 10x más rápido que Quicksort.&rdquo;
+                </p>
+                <p className={styles.escenarioTip}>
+                  <strong>Tip:</strong> Analiza si los datos están casi ordenados antes de elegir algoritmo.
+                </p>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
+                  <h4>Base de datos</h4>
+                </div>
+                <p className={styles.escenarioExample}>
+                  &ldquo;PostgreSQL usa introsort (híbrido QuickSort + HeapSort + InsertionSort) para ORDER BY.
+                  Cambia a algoritmo estable cuando necesita preservar orden relativo.&rdquo;
+                </p>
+                <p className={styles.escenarioTip}>
+                  <strong>Tip:</strong> Las BDs usan algoritmos híbridos adaptativos, no puros.
+                </p>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🔬</span>
+                  <h4>Análisis científico</h4>
+                </div>
+                <p className={styles.escenarioExample}>
+                  &ldquo;Ordenar 10⁹ mediciones de sensor en disco (externo): Merge Sort externo en bloques
+                  de 64MB, 1,2TB procesados en 4 horas.&rdquo;
+                </p>
+                <p className={styles.escenarioTip}>
+                  <strong>Tip:</strong> Para datos que no caben en RAM, solo Merge Sort externo es viable.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* ===== SECCIÓN 3: FAQ v2.0 ===== */}
+          <section className={styles.guideSection}>
+            <h2>❓ Preguntas Frecuentes (versión avanzada)</h2>
+            <div className={styles.faqListV2}>
+              <div className={styles.faqItemV2}>
+                <strong>¿Por qué Quicksort es más rápido que Mergesort si tienen la misma complejidad O(n log n)?</strong>
+                <p>La constante importa: Quicksort tiene mejor localidad de caché (acceso secuencial), menos operaciones de copia y overhead de recursión. En la práctica es 2-3x más rápido que Mergesort para datos en memoria.</p>
+              </div>
+              <div className={styles.faqItemV2}>
+                <strong>¿Cuándo usar Bubble Sort?</strong>
+                <p>Casi nunca en producción. Solo es útil para enseñar conceptos o detectar si un array ya está ordenado (termina en O(n) con la variante optimizada). Con n&gt;100 elementos, cualquier otro algoritmo lo supera.</p>
+              </div>
+              <div className={styles.faqItemV2}>
+                <strong>¿Qué significa que un algoritmo sea estable?</strong>
+                <p>Que elementos con igual clave mantienen su orden relativo original. Crucial cuando ordenas por múltiples criterios: primero por apellido, luego por nombre. Mergesort y Insertion Sort son estables; Quicksort y Heapsort no.</p>
+              </div>
+              <div className={styles.faqItemV2}>
+                <strong>¿Qué es el algoritmo Timsort?</strong>
+                <p>El algoritmo usado por Python y Java (Arrays.sort). Híbrido de Mergesort + InsertionSort que detecta subsecuencias ya ordenadas (runs) y las combina. Rendimiento real O(n) en datos casi ordenados, O(n log n) en peor caso.</p>
+              </div>
+              <div className={styles.faqItemV2}>
+                <strong>¿Por qué el peor caso de Quicksort es O(n²)?</strong>
+                <p>Ocurre cuando el pivote elegido siempre es el mínimo o máximo: array ya ordenado con pivote en posición 0. Solución: elegir pivote aleatoriamente o usar &lsquo;mediana de tres&rsquo;.</p>
+              </div>
+              <div className={styles.faqItemV2}>
+                <strong>¿Qué es la ordenación externa?</strong>
+                <p>Cuando los datos no caben en RAM. Se divide en bloques que sí caben, se ordena cada bloque, se guardan en disco y se fusionan (Merge Sort externo). Usado en bases de datos, Hadoop MapReduce.</p>
+              </div>
+              <div className={styles.faqItemV2}>
+                <strong>¿Qué es Counting Sort y cuándo es más rápido que O(n log n)?</strong>
+                <p>Cuando el rango de valores es pequeño y conocido. Crea un array de contadores. Ordena n=1.000.000 enteros de 0-255 en O(n+k) ≈ O(n). Imposible para números flotantes o strings arbitrarios.</p>
+              </div>
+              <div className={styles.faqItemV2}>
+                <strong>¿Cuál es el límite teórico de la ordenación por comparación?</strong>
+                <p>Ω(n log n) — demostrado por el argumento del árbol de decisión. Ningún algoritmo basado en comparaciones puede ser más rápido en el caso general. Radix Sort y Counting Sort lo superan porque no comparan.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* ===== SECCIÓN 4: GUÍA PASO A PASO v2.0 ===== */}
+          <section className={styles.guideSection}>
+            <h2>🗺️ Cómo elegir el algoritmo correcto: 7 pasos</h2>
+            <div className={styles.stepGuide}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <strong>¿Los datos caben en RAM?</strong>
+                  <p>No → Merge Sort externo. Sí → continúa.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <strong>¿Cuántos elementos?</strong>
+                  <p>n&lt;50 → Insertion Sort (constante pequeña). n&gt;50 → continúa.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <strong>¿Los datos están casi ordenados?</strong>
+                  <p>Sí → Insertion Sort o Timsort. No → continúa.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepContent}>
+                  <strong>¿El rango de valores es pequeño y entero?</strong>
+                  <p>Sí → Counting Sort o Radix Sort (O(n)). No → continúa.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>5</div>
+                <div className={styles.stepContent}>
+                  <strong>¿Necesitas orden estable?</strong>
+                  <p>Sí → Mergesort. No → continúa.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>6</div>
+                <div className={styles.stepContent}>
+                  <strong>¿Tienes restricciones de espacio (O(1) extra)?</strong>
+                  <p>Sí → Heapsort. No → Quicksort con pivote aleatorio.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>7</div>
+                <div className={styles.stepContent}>
+                  <strong>En producción: usa la librería del lenguaje</strong>
+                  <p>Python sort(), Java Arrays.sort(), C++ std::sort() — son híbridos optimizados que superan cualquier implementación manual.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ===== SECCIÓN 5: MEJORES PRÁCTICAS v2.0 ===== */}
+          <section className={styles.guideSection}>
+            <h2>💡 Mejores Prácticas</h2>
+            <div className={styles.tipsGridV2}>
+              <div className={styles.tipsGridCard}>
+                <span className={styles.tipIconV2} aria-hidden="true">🏎️</span>
+                <strong>Confía en la librería</strong>
+                <p>Python sort()/sorted(), Java Arrays.sort(), C++ std::sort() son Timsort/Introsort optimizados. Más rápidos que cualquier implementación propia.</p>
+              </div>
+              <div className={styles.tipsGridCard}>
+                <span className={styles.tipIconV2} aria-hidden="true">📏</span>
+                <strong>Mide antes de optimizar</strong>
+                <p>Para n&lt;10.000 la diferencia entre O(n²) y O(n log n) es &lt;1ms. Optimiza solo cuando el profiler lo confirma.</p>
+              </div>
+              <div className={styles.tipsGridCard}>
+                <span className={styles.tipIconV2} aria-hidden="true">🧮</span>
+                <strong>Analiza tus datos</strong>
+                <p>¿Ya casi ordenados? ¿Rango pequeño? ¿Muchos duplicados? La respuesta cambia el algoritmo óptimo.</p>
+              </div>
+              <div className={styles.tipsGridCard}>
+                <span className={styles.tipIconV2} aria-hidden="true">🎯</span>
+                <strong>Pivote en Quicksort</strong>
+                <p>Nunca uses siempre el primer elemento como pivote. Mediana de tres o pivote aleatorio evita el caso O(n²).</p>
+              </div>
+              <div className={styles.tipsGridCard}>
+                <span className={styles.tipIconV2} aria-hidden="true">💾</span>
+                <strong>Localidad de caché</strong>
+                <p>En arrays grandes, algoritmos con acceso secuencial (Mergesort, Heapsort) aprovechan mejor la caché L1/L2 que los de acceso aleatorio.</p>
+              </div>
+              <div className={styles.tipsGridCard}>
+                <span className={styles.tipIconV2} aria-hidden="true">🔗</span>
+                <strong>Considera la estructura</strong>
+                <p>Si ordenas objetos por un campo, extrae el campo a un array auxiliar, ordena índices y reordena — evita mover objetos grandes.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* ===== SECCIÓN 6: WARNING BOX v2.0 ===== */}
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>Errores clásicos al elegir algoritmo de ordenación</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li><strong>Usar Bubble Sort en producción:</strong> O(n²) con constante grande. Con n=100.000 elementos, es 10.000x más lento que Mergesort.</li>
+              <li><strong>No verificar estabilidad:</strong> Si ordenas por múltiples criterios, un algoritmo inestable puede corromper el orden previo.</li>
+              <li><strong>Quicksort con pivote fijo en datos ordenados:</strong> El caso más común de degradación a O(n²). Usa pivote aleatorio o mediana de tres.</li>
+              <li><strong>Reimplementar sort() en lugar de usarlo:</strong> Las implementaciones del lenguaje tienen optimizaciones que tardan años en desarrollar.</li>
+              <li><strong>Ignorar el espacio auxiliar:</strong> Mergesort necesita O(n) espacio extra. En sistemas embebidos con RAM limitada puede ser un bloqueante.</li>
+              <li><strong>Comparar por floating point sin epsilon:</strong> sorted() con comparación directa de floats puede ser inconsistente por errores de precisión.</li>
+            </ul>
+          </div>
+
         </div>
       </EducationalSection>
 
