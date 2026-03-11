@@ -469,12 +469,12 @@ export default function ConversorMorsePage() {
           </div>
 
           {/* SECCIÓN 6: Warning Box */}
-          <div className={styles.eduWarningBox}>
-            <div className={styles.eduWarningHeader}>
-              <span className={styles.eduWarningIcon}>⚠️</span>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
               <h3>Errores Comunes al Aprender y Usar Código Morse</h3>
             </div>
-            <ul className={styles.eduWarningList}>
+            <ul className={styles.warningList}>
               <li><strong>❌ Memorizar puntos y rayas visualmente:</strong> Si aprendes que la K es &quot;-.-&quot; mirando una tabla, tu cerebro decodificará símbolo por símbolo y nunca superarás los 5 WPM. El Morse se aprende como idioma oral: por sonido, por ritmo, por asociación directa con la letra.</li>
               <li><strong>❌ Empezar a velocidad demasiado lenta (bajo 15 WPM):</strong> Si entrenas a 5 WPM, tu cerebro aprende a decodificar a 5 WPM y luego no puede acelerar. El método Farnsworth recomienda enviar a velocidad final (20 WPM) con pausas largas entre letras, reduciendo gradualmente las pausas hasta alcanzar la velocidad objetivo real.</li>
               <li><strong>❌ Confundir Morse Internacional con Morse Americano:</strong> Los caracteres C, F, L, O, R, Y difieren entre ambos sistemas. Si aprendes caracteres del Morse americano creyendo que es el estándar ITU, tus mensajes serán incomprensibles en comunicaciones internacionales de radioafición.</li>

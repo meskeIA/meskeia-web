@@ -101,14 +101,14 @@ Apps de uso frecuente con buen potencial educativo.
 - [ ] `/conjugador-verbos/` — Conjugador de verbos español con irregulares
 - [ ] `/tablas-multiplicar/` — Entrenador de tablas gamificado
 - [ ] `/contador-silabas/` — Separar y contar sílabas en español
-- [ ] `/conversor-texto/` — Conversor de texto
+- [x] `/conversor-texto/` — Conversor de texto ✅ lote 26
 - [ ] `/comparador-textos/` — Comparador de textos
 - [ ] `/conversor-markdown-html/` — Markdown a HTML
-- [ ] `/conversor-morse/` — Código morse
-- [ ] `/conversor-numeros-romanos/` — Números romanos
+- [x] `/conversor-morse/` — Código morse ✅ lote 26
+- [x] `/conversor-numeros-romanos/` — Números romanos ✅ lote 26
 - [ ] `/detector-idioma/` — Detector de idioma automático
-- [ ] `/conversor-binario/` — Conversión binaria
-- [ ] `/conversor-braille/` — Sistema Braille
+- [x] `/conversor-binario/` — Conversión binaria ✅ lote 26
+- [x] `/conversor-braille/` — Sistema Braille ✅ lote 26
 - [ ] `/generador-anagramas/` — Generador de anagramas
 - [ ] `/generador-lorem-ipsum/` — Texto de prueba lorem ipsum
 - [ ] `/limpiador-texto/` — Limpieza y normalización de texto
@@ -281,6 +281,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote 26 | 2026-03-11 | `conversor-morse`, `conversor-braille`, `conversor-binario`, `conversor-texto`, `conversor-numeros-romanos` | pendiente |
 | Lote 25 | 2026-03-11 | `cifrado-clasico`, `cifrado-vigenere`, `cifrado-transposicion`, `cifrado-playfair`, `generador-hashes` | `6661636` |
 | Lote 24 | 2026-03-11 | `visualizador-algoritmos`, `visualizador-estructuras-datos`, `calculadora-algebra-booleana`, `calculadora-electricidad`, `tabla-periodica` | `29456c6` |
 | Lote 23 | 2026-03-11 | `calculadora-distribuciones`, `inferencia-bayesiana`, `calculadora-algebra-abstracta`, `calculadora-teoria-colas`, `calculadora-estadistica-medica` | `d5bf6a4` |

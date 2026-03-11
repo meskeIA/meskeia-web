@@ -225,44 +225,183 @@ export default function ConversorTextoPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="¿Quieres aprender más sobre conversión de texto?"
-        subtitle="Descubre las diferentes transformaciones y cuándo usarlas"
+        title="Aprende sobre Transformaciones de Texto"
+        subtitle="Casos de uso reales, convenciones profesionales y cómo aplicarlas correctamente"
       >
-        <section className={styles.infoSection}>
-          <h2>Tipos de conversión</h2>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoCard}>
-              <h3>🔠 Mayúsculas y minúsculas</h3>
-              <p>
-                <strong>MAYÚSCULAS:</strong> Todo el texto en mayúsculas. Útil para títulos o énfasis.<br />
-                <strong>minúsculas:</strong> Todo el texto en minúsculas. Ideal para normalizar texto.
-              </p>
-            </div>
-            <div className={styles.infoCard}>
-              <h3>📝 Formatos de título</h3>
-              <p>
-                <strong>Capitalizar:</strong> Primera letra de cada palabra en mayúscula.<br />
-                <strong>Formato Título:</strong> Similar pero respeta artículos y preposiciones.<br />
-                <strong>Formato oración:</strong> Solo la primera letra de cada oración.
-              </p>
-            </div>
-            <div className={styles.infoCard}>
-              <h3>🔄 Transformaciones</h3>
-              <p>
-                <strong>Alternar:</strong> Alterna mayúsculas y minúsculas (aLtErNaDo).<br />
-                <strong>Invertir:</strong> Invierte el orden de los caracteres.<br />
-                <strong>Sin acentos:</strong> Elimina tildes y diacríticos.
-              </p>
-            </div>
-            <div className={styles.infoCard}>
-              <h3>💡 Consejos de uso</h3>
-              <p>
-                • Usa &quot;Formato Título&quot; para títulos de artículos en español<br />
-                • &quot;Sin acentos&quot; es útil para URLs amigables<br />
-                • &quot;Limpiar espacios&quot; elimina espacios duplicados
-              </p>
+        <section>
+
+          {/* SECCIÓN 1: Comparativa de conversiones */}
+          <div className={styles.comparativaSection}>
+            <h3>📊 Guía de Conversiones: Cuándo Usar Cada Una</h3>
+            <div className={styles.infoGrid}>
+              <div className={styles.infoCard}>
+                <h4>🔠 Mayúsculas / minúsculas</h4>
+                <p><strong>MAYÚSCULAS</strong> → énfasis, siglas, código de error<br />
+                <strong>minúsculas</strong> → normalizar antes de comparar, slugs, emails<br />
+                <strong>Invertir mayús</strong> → efecto visual, tipografía creativa</p>
+              </div>
+              <div className={styles.infoCard}>
+                <h4>📝 Formatos de título</h4>
+                <p><strong>Capitalizar</strong> → nombres propios, encabezados de tabla<br />
+                <strong>Formato Título</strong> → títulos en español (respeta artículos)<br />
+                <strong>Formato oración</strong> → inicio de párrafos, redes sociales</p>
+              </div>
+              <div className={styles.infoCard}>
+                <h4>🔄 Transformaciones especiales</h4>
+                <p><strong>Alternar (aLtErNaR)</strong> → memes, humor en redes<br />
+                <strong>Invertir caracteres</strong> → efecto espejo, steganografía simple<br />
+                <strong>Invertir palabras</strong> → ejercicios de comprensión lectora</p>
+              </div>
+              <div className={styles.infoCard}>
+                <h4>🧹 Limpieza de texto</h4>
+                <p><strong>Sin acentos</strong> → URLs, IDs de base de datos, nombres de archivo<br />
+                <strong>Limpiar espacios</strong> → texto copiado de PDF o Word<br />
+                <strong>Combinar ambas</strong> → generar slugs para URLs amigables SEO</p>
+              </div>
             </div>
           </div>
+
+          {/* SECCIÓN 2: Uso en programación */}
+          <div className={styles.programacionSection}>
+            <h3>💻 Convenciones de Texto en Programación</h3>
+            <p className={styles.programacionIntro}>
+              En desarrollo de software, el formato del texto no es solo estética — es convención técnica.
+              Cada lenguaje y ecosistema tiene sus estándares.
+            </p>
+            <div className={styles.convencionesList}>
+              <div className={styles.convencionItem}>
+                <span className={styles.convencionBadge}>camelCase</span>
+                <div>
+                  <strong>nombreDeVariable, calcularImpuesto()</strong>
+                  <p>JavaScript, Java, C#. Variables y funciones. Primera palabra en minúscula, siguientes capitalizadas.</p>
+                </div>
+              </div>
+              <div className={styles.convencionItem}>
+                <span className={styles.convencionBadge}>PascalCase</span>
+                <div>
+                  <strong>NombreDeClase, CalculadoraFire</strong>
+                  <p>Clases y componentes React. Igual que camelCase pero con la primera letra en mayúscula.</p>
+                </div>
+              </div>
+              <div className={styles.convencionItem}>
+                <span className={styles.convencionBadge}>snake_case</span>
+                <div>
+                  <strong>nombre_de_variable, calcular_impuesto</strong>
+                  <p>Python, Ruby, SQL. Todas las letras en minúscula separadas por guion bajo.</p>
+                </div>
+              </div>
+              <div className={styles.convencionItem}>
+                <span className={styles.convencionBadge}>kebab-case</span>
+                <div>
+                  <strong>nombre-de-clase, mi-componente</strong>
+                  <p>CSS, URLs, nombres de archivos HTML. Palabras en minúscula separadas por guion.</p>
+                </div>
+              </div>
+              <div className={styles.convencionItem}>
+                <span className={styles.convencionBadge}>SCREAMING_SNAKE</span>
+                <div>
+                  <strong>MAX_INTENTOS, API_BASE_URL</strong>
+                  <p>Constantes en casi todos los lenguajes. Todo en mayúsculas con guiones bajos.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SECCIÓN 3: FAQ */}
+          <div className={styles.faqSection}>
+            <h3>❓ Preguntas Frecuentes sobre Transformación de Texto</h3>
+            <div className={styles.faqList}>
+              <details className={styles.faqItem}>
+                <summary className={styles.faqQuestion}>¿Por qué &quot;Sin acentos&quot; no elimina la ñ?</summary>
+                <p className={styles.faqAnswer}>La función <code>normalize(&apos;NFD&apos;)</code> descompone caracteres con diacríticos (tildes) en su carácter base + modificador, y luego elimina los modificadores. La &quot;ñ&quot; en español es un carácter propio del Unicode (U+00F1), no una &quot;n&quot; con tilde, por lo que no se descompone con NFD estándar. Para eliminar la ñ habría que hacer una sustitución explícita (ñ→n), lo que cambiaría el significado de palabras como &quot;año&quot; (→ &quot;ano&quot;).</p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary className={styles.faqQuestion}>¿Cuál es la diferencia entre &quot;Capitalizar&quot; y &quot;Formato Título&quot;?</summary>
+                <p className={styles.faqAnswer}>Ambos ponen en mayúscula la primera letra de cada palabra, pero &quot;Formato Título&quot; respeta las reglas tipográficas del español: no capitaliza artículos (el, la, los, las), preposiciones (de, en, con, por, para) ni conjunciones (y, a) cuando están en posición intermedia. Ejemplo: &quot;El perro de la vecina&quot; → &quot;El Perro de la Vecina&quot; (Formato Título) vs &quot;El Perro De La Vecina&quot; (Capitalizar).</p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary className={styles.faqQuestion}>¿Para qué sirve &quot;Invertir palabras&quot;?</summary>
+                <p className={styles.faqAnswer}>&quot;Invertir palabras&quot; invierte el orden de las palabras (última primera, primera última) manteniendo cada palabra intacta. Se usa en ejercicios de comprensión lectora para aumentar la dificultad, en lingüística computacional para pruebas de modelos de lenguaje, y en algunos sistemas de indexación inversa para optimización de búsquedas. También se usa en juegos de palabras creativos.</p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary className={styles.faqQuestion}>¿Por qué &quot;Limpiar espacios&quot; no elimina los saltos de línea?</summary>
+                <p className={styles.faqAnswer}>La función usa <code>/\s+/g</code> que coincide con uno o más caracteres de espacio en blanco, incluyendo espacios, tabulaciones Y saltos de línea. Si el texto tiene saltos de línea entre párrafos, la función los reemplaza por un único espacio, dejando el texto en una sola línea. Si necesitas preservar los saltos de línea, la operación correcta es <code>/[ \t]+/g</code> (solo espacios y tabulaciones, no saltos de línea).</p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary className={styles.faqQuestion}>¿El texto procesado se envía a algún servidor?</summary>
+                <p className={styles.faqAnswer}>No. Todas las transformaciones ocurren completamente en tu navegador usando JavaScript del lado del cliente. Tu texto nunca sale de tu dispositivo ni se transmite por internet. Puedes usar esta herramienta con textos confidenciales (contratos, datos personales, código propietario) sin preocuparte por la privacidad.</p>
+              </details>
+            </div>
+          </div>
+
+          {/* SECCIÓN 4: Casos de uso reales */}
+          <div className={styles.casosSection}>
+            <h3>🎯 Casos de Uso Reales</h3>
+            <div className={styles.casosGrid}>
+              <div className={styles.casoCard}>
+                <span className={styles.casoIcon}>🔗</span>
+                <h4>Generar slugs para URLs</h4>
+                <p>Proceso: <strong>minúsculas → sin acentos → limpiar espacios</strong> y reemplazar espacios por guiones. Resultado: &quot;Cómo Calcular el IVA&quot; → &quot;como-calcular-el-iva&quot;.</p>
+              </div>
+              <div className={styles.casoCard}>
+                <span className={styles.casoIcon}>📧</span>
+                <h4>Normalizar emails en bases de datos</h4>
+                <p>Convertir siempre a <strong>minúsculas</strong> antes de guardar o comparar emails. &quot;Usuario@Gmail.COM&quot; y &quot;usuario@gmail.com&quot; son el mismo email pero JavaScript los trata como strings diferentes.</p>
+              </div>
+              <div className={styles.casoCard}>
+                <span className={styles.casoIcon}>📄</span>
+                <h4>Limpiar texto de PDFs</h4>
+                <p>Los PDFs copiados suelen tener espacios dobles, triples y tabulaciones intercaladas. <strong>Limpiar espacios</strong> normaliza todo de una vez, ahorrando la edición manual.</p>
+              </div>
+              <div className={styles.casoCard}>
+                <span className={styles.casoIcon}>📱</span>
+                <h4>Formatear publicaciones en redes</h4>
+                <p><strong>Formato oración</strong> es ideal para posts donde copiamos texto en minúsculas. <strong>Alternar mayúsculas</strong> para memes o humor. El inversor de caracteres da un efecto visual llamativo.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* SECCIÓN 5: Tips */}
+          <div className={styles.tipsSection}>
+            <h3>💡 Flujos de Trabajo Eficientes</h3>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>⚡</span>
+                <h4>Encadenar transformaciones</h4>
+                <p>Usa el botón &quot;↕ Usar resultado como entrada&quot; para aplicar múltiples conversiones secuencialmente. Por ejemplo: minúsculas → sin acentos → (manualmente reemplaza espacios por guiones) = slug perfecto.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📋</span>
+                <h4>Copiar al portapapeles</h4>
+                <p>El botón &quot;📋 Copiar&quot; copia el resultado directamente al portapapeles del sistema. No necesitas seleccionar el texto manualmente. Funciona en todos los navegadores modernos sobre HTTPS.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🔤</span>
+                <h4>Contar sin copiar</h4>
+                <p>Los contadores de caracteres y palabras bajo los textareas se actualizan en tiempo real. Úsalos para verificar límites (Twitter: 280 chars, meta description: 155-160 chars, título SEO: 50-60 chars).</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🔁</span>
+                <h4>Probar múltiples variantes</h4>
+                <p>Escribe tu texto base, aplica una conversión, cópiala, y luego prueba otra. El campo de entrada no cambia al aplicar conversiones, así que puedes probar todas las variantes sin volver a escribir.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* SECCIÓN 6: Warning Box */}
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Limitaciones y Comportamientos a Tener en Cuenta</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li><strong>❌ El &quot;Formato Título&quot; no es perfecto para todos los idiomas:</strong> La lista de excepciones (artículos, preposiciones) está calibrada para el español. Textos en inglés siguen convenciones distintas (Title Case en inglés no excluye las mismas palabras). Para inglés, &quot;Capitalizar Palabras&quot; da resultados más predecibles.</li>
+              <li><strong>❌ &quot;Sin acentos&quot; puede crear ambigüedades en español:</strong> Eliminar tildes cambia el significado en pares como &quot;sé/se&quot;, &quot;él/el&quot;, &quot;más/mas&quot;, &quot;sí/si&quot;, &quot;cómo/como&quot;. Usa esta función solo cuando el contexto técnico lo requiera (URLs, IDs), nunca en textos que se publicarán para lectura humana.</li>
+              <li><strong>❌ La función &quot;Invertir&quot; trabaja sobre caracteres Unicode, no grafemas:</strong> Algunos emojis compuestos (como las banderas 🇪🇸) están formados por secuencias de puntos de código Unicode. Invertirlos puede romperlos visualmente porque los puntos de código quedan en orden incorrecto.</li>
+              <li><strong>❌ El contador de palabras usa espacios como separador:</strong> El recuento usa <code>split(/\s+/).filter(Boolean)</code>, que divide por cualquier espacio en blanco. Signos de puntuación pegados a palabras se cuentan como parte de la palabra. &quot;hola, mundo!&quot; = 2 palabras, no 4 tokens.</li>
+            </ul>
+          </div>
+
         </section>
       </EducationalSection>
 

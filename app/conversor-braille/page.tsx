@@ -579,12 +579,12 @@ export default function ConversorBraillePage() {
           </div>
 
           {/* SECCIÓN 6: Warning Box */}
-          <div className={styles.eduWarningBox}>
-            <div className={styles.eduWarningHeader}>
-              <span className={styles.eduWarningIcon}>⚠️</span>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
               <h3>Limitaciones y Errores Comunes al Usar Braille Digital</h3>
             </div>
-            <ul className={styles.eduWarningList}>
+            <ul className={styles.warningList}>
               <li><strong>❌ Este conversor es visual/educativo, no táctil:</strong> Los caracteres Braille Unicode en pantalla sirven para aprender y entender el sistema, pero no son equivalentes al Braille real en papel. Para producir Braille físico funcional (que una persona ciega pueda leer con los dedos) se necesita una embosadora Braille, no copiar y pegar caracteres Unicode.</li>
               <li><strong>❌ Solo implementa Grado 1 (sin contracciones):</strong> El uso diario real del Braille utiliza el Grado 2, que incluye contracciones para palabras y sílabas frecuentes. La transcripción literal letra a letra del Grado 1 ocupa un 25-30% más de espacio. Para materiales de lectura real, un software de transcripción profesional (Duxbury DBT, Braille2000) con tablas de Grado 2 es imprescindible.</li>
               <li><strong>❌ Las reglas de puntuación Braille varían por país y normativa:</strong> El Código Braille Español (ONCE, 2009) puede diferir en detalles del sistema usado en México, Argentina u otros países hispanohablantes. La puntuación, indicadores y algunos caracteres especiales no son completamente universales entre las normas nacionales.</li>

@@ -220,6 +220,311 @@
   margin: 0;
 }
 
+/* ===== SECCIÓN EDUCATIVA ===== */
+
+/* Comparativa */
+.comparativaSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.comparativaSection h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.infoCard h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+/* Programación / Convenciones */
+.programacionSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.programacionSection h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.programacionIntro {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.convencionesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.convencionItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: var(--spacing-md);
+}
+
+[data-theme='dark'] .container .convencionItem {
+  background: var(--bg-primary);
+}
+
+.convencionBadge {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.convencionItem div strong {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.convencionItem div p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* FAQ */
+.faqSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.faqSection h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .container .faqItem {
+  background: var(--bg-primary);
+}
+
+.faqQuestion {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  list-style: none;
+}
+
+.faqQuestion::-webkit-details-marker { display: none; }
+
+.faqQuestion::before {
+  content: '▶ ';
+  font-size: 0.7rem;
+  color: var(--primary);
+}
+
+.faqItem[open] .faqQuestion::before {
+  content: '▼ ';
+}
+
+.faqAnswer {
+  padding: 0 var(--spacing-lg) var(--spacing-md);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.faqAnswer code {
+  background: rgba(46, 134, 171, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--primary);
+}
+
+/* Casos de uso */
+.casosSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.casosSection h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.casosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.casoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .container .casoCard {
+  background: var(--bg-primary);
+}
+
+.casoIcon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.casoCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.casoCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Tips */
+.tipsSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.tipsSection h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05) 0%, rgba(72, 169, 166, 0.05) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .container .tipCard {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.tipCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.tipCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Warning Box */
+.warningBox {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: rgba(245, 158, 11, 0.08);
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius);
+}
+
+[data-theme='dark'] .container .warningBox {
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.warningIcon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.warningHeader h3 {
+  color: #D97706;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+[data-theme='dark'] .container .warningHeader h3 {
+  color: #FCD34D;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.warningList li {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  padding-left: var(--spacing-md);
+  border-left: 3px solid #F59E0B;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .container {

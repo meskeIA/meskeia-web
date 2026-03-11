@@ -440,13 +440,17 @@ export default function ConversorBinarioPage() {
         </div>
 
         {/* Warning Box */}
-        <div className="edu-warning-box">
-          <h4 className="edu-warning-title">⚠️ Limitaciones de esta herramienta</h4>
-          <ul className="edu-warning-list">
-            <li><strong>ASCII de 8 bits solamente</strong>: Esta herramienta convierte cada carácter a su valor ASCII estándar (0–255). No soporta Unicode completo.</li>
-            <li><strong>Caracteres especiales</strong>: Las tildes (á, é, í...) y la ñ tienen códigos superiores a 127 y pueden variar según la codificación del sistema.</li>
-            <li><strong>No confundir base 16 con base 2</strong>: El hexadecimal mostrado es equivalente al binario pero más compacto; no son sistemas diferentes de datos.</li>
-            <li><strong>Sin soporte de negativos</strong>: Los números negativos (complemento a dos) no están implementados en esta versión del conversor.</li>
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Limitaciones y Errores Comunes al Usar este Conversor</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>❌ ASCII de 8 bits solamente:</strong> Esta herramienta convierte cada carácter a su valor ASCII estándar (0–255). No soporta Unicode completo (emojis, caracteres chinos, árabes, etc.) que requieren UTF-8 con múltiples bytes por carácter.</li>
+            <li><strong>❌ Caracteres especiales con codificación variable:</strong> Las tildes (á, é, í...) y la ñ tienen códigos superiores a 127 y pueden variar según la codificación del sistema (Latin-1 vs UTF-8). Un mismo binario puede representar letras diferentes según la tabla de codificación usada.</li>
+            <li><strong>❌ No confundir base 16 con base 2:</strong> El hexadecimal mostrado es equivalente numérico al binario, pero más compacto. No son sistemas diferentes de datos: 0b1010 y 0xA representan exactamente el mismo número (10 en decimal).</li>
+            <li><strong>❌ Sin soporte de números negativos (complemento a dos):</strong> Los enteros con signo en programación usan el complemento a dos. El número -1 en un entero de 8 bits es 11111111, no -00000001. Esta herramienta no implementa esa representación.</li>
+            <li><strong>❌ Confundir bits con bytes:</strong> 1 byte = 8 bits. La letra &apos;A&apos; ocupa 1 byte (01000001). Un entero de 32 bits ocupa 4 bytes. La confusión entre ambas unidades es origen frecuente de errores en cálculos de memoria y almacenamiento.</li>
           </ul>
         </div>
       </EducationalSection>
