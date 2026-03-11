@@ -755,6 +755,19 @@
   color: #e0a800;
 }
 
+/* Disclaimer List */
+.disclaimerList {
+  margin: var(--spacing-sm) 0 0 var(--spacing-md);
+  padding: 0;
+  font-size: 0.9rem;
+  color: #856404;
+  line-height: 1.7;
+}
+
+[data-theme='dark'] .disclaimerList {
+  color: #e0a800;
+}
+
 /* Educational Content */
 .guideSection {
   margin-bottom: var(--spacing-xl);
@@ -1100,6 +1113,15 @@
   font-size: 0.85rem;
   color: var(--text-secondary);
   line-height: 1.6;
+}
+
+.faqTip {
+  display: block;
+  margin-top: var(--spacing-xs);
+  font-size: 0.8rem;
+  color: var(--secondary);
+  font-weight: 500;
+  font-style: italic;
 }
 
 /* Guía Paso a Paso */

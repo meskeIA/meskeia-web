@@ -962,28 +962,51 @@ export default function InferenciaBayesianaPage() {
             </div>
           </div>
 
-          {/* Tabla Comparativa */}
+          {/* Tabla Comparativa: Frecuentista vs Bayesiano vs ML */}
           <div className={styles.eduComparativaSection}>
-            <h3>⚖️ Comparativa de Métodos de Inferencia Bayesiana</h3>
-            <p className={styles.eduComparativaSubtitle}>¿Cuándo usar cada modo de esta calculadora?</p>
+            <h3>⚖️ Frecuentista vs Bayesiano vs Machine Learning</h3>
+            <p className={styles.eduComparativaSubtitle}>Tres paradigmas estadísticos: diferencias clave, cuándo usarlos y ejemplos reales</p>
             <div className={styles.eduTablaWrapper}>
               <table className={styles.eduTablaComparativa}>
                 <thead>
                   <tr>
-                    <th>Criterio</th>
-                    <th>🎯 Bayes Simple</th>
-                    <th>📊 Hipótesis Múltiples</th>
-                    <th>🔄 Secuencial</th>
-                    <th>🏥 Diagnóstico</th>
+                    <th>Enfoque</th>
+                    <th>Probabilidad</th>
+                    <th>Requiere priors</th>
+                    <th>Interpretación</th>
+                    <th>Actualización con datos</th>
+                    <th>Uso típico</th>
+                    <th>Ejemplo</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td><strong>Nº hipótesis</strong></td><td>1 (A o ¬A)</td><td>2-6 mutuamente excluyentes</td><td>1 (actualización iterativa)</td><td>1 (enfermedad sí/no)</td></tr>
-                  <tr><td><strong>Tipo de evidencia</strong></td><td>Un único evento B</td><td>Un único evento E</td><td>Secuencia de observaciones</td><td>Resultado de test médico</td></tr>
-                  <tr><td><strong>Salida principal</strong></td><td>Posterior P(A|B) + LR</td><td>Ranking de hipótesis</td><td>Evolución del posterior</td><td>VPP + VPN + Matriz</td></tr>
-                  <tr><td><strong>Caso de uso típico</strong></td><td>¿Está enferma esta persona?</td><td>¿Qué diagnóstico es más probable?</td><td>¿Cambia mi creencia con los datos?</td><td>¿Cuánto vale un positivo?</td></tr>
-                  <tr><td><strong>Complejidad</strong></td><td>⭐ Baja</td><td>⭐⭐ Media</td><td>⭐⭐ Media</td><td>⭐⭐⭐ Alta</td></tr>
-                  <tr><td><strong>Ideal para</strong></td><td>Aprender Bayes, casos simples</td><td>Diagnóstico diferencial</td><td>Investigación, ML</td><td>Medicina, screening</td></tr>
+                  <tr>
+                    <td><strong>🔬 Frecuentista</strong></td>
+                    <td>Frecuencia límite de experimentos repetidos</td>
+                    <td>No (rechazado filosóficamente)</td>
+                    <td>P-value: P(datos|H₀). Intervalo de confianza: 95% de experimentos contendrían el parámetro</td>
+                    <td>Test de hipótesis una vez por dataset; no hay actualización incremental</td>
+                    <td>Ensayos clínicos, control de calidad, A/B testing clásico</td>
+                    <td>t-test, ANOVA, chi-cuadrado, regresión logística con p-values</td>
+                  </tr>
+                  <tr>
+                    <td><strong>🧠 Bayesiano</strong></td>
+                    <td>Grado de creencia, actualizable con evidencia</td>
+                    <td>Sí (prior obligatorio; puede ser no informativo)</td>
+                    <td>Posterior: probabilidad directa de la hipótesis dado los datos</td>
+                    <td>Continua: cada dato actualiza el posterior que se convierte en nuevo prior</td>
+                    <td>Diagnóstico médico, pronósticos con incertidumbre, sistemas de recomendación</td>
+                    <td>Teorema de Bayes, redes bayesianas, MCMC, Stan/PyMC</td>
+                  </tr>
+                  <tr>
+                    <td><strong>🤖 Machine Learning</strong></td>
+                    <td>Función de pérdida optimizada; no necesariamente probabilista</td>
+                    <td>Implícitamente (arquitectura, hiperparámetros, regularización)</td>
+                    <td>Predicción: output numeral o probabilístico sin interpretación causal directa</td>
+                    <td>Reentrenamiento con nuevos datos; no actualización bayesiana pura</td>
+                    <td>Clasificación masiva, reconocimiento de imágenes, NLP, series temporales</td>
+                    <td>Random Forest, XGBoost, redes neuronales, Naive Bayes como caso especial</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -991,40 +1014,40 @@ export default function InferenciaBayesianaPage() {
 
           {/* Casos de Uso */}
           <div className={styles.eduEscenariosSection}>
-            <h3>💼 Casos de Uso Reales</h3>
-            <p className={styles.eduEscenariosSubtitle}>Aplicaciones concretas del Teorema de Bayes en distintos campos</p>
+            <h3>💼 Casos de Uso por Perfil Profesional</h3>
+            <p className={styles.eduEscenariosSubtitle}>Cómo aplica el teorema de Bayes en 4 disciplinas con ejemplos numéricos concretos</p>
             <div className={styles.eduEscenariosGrid}>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioHeader}>
                   <span className={styles.eduEscenarioIcon}>🏥</span>
-                  <h4>Diagnóstico Médico y Screening</h4>
+                  <h4>Médico — Diagnóstico Clínico</h4>
                 </div>
-                <p className={styles.eduEscenarioExample}><strong>Ejemplo:</strong> Test de cáncer con sensibilidad 99%, especificidad 99%, prevalencia 0,1%. Positivo → solo 9% probabilidad real de tener cáncer.</p>
-                <p className={styles.eduEscenarioTip}><strong>Por qué importa:</strong> Evita la &quot;falacia del fiscal&quot; y el sobretratamiento. Comprenderlo salva vidas y recursos sanitarios.</p>
+                <p className={styles.eduEscenarioExample}><strong>Caso real:</strong> Test COVID con sensibilidad 95% y especificidad 90% en una población con prevalencia 1%. Un paciente da positivo. P(COVID|+) = (0,95 × 0,01) / (0,95×0,01 + 0,10×0,99) = 0,0095 / 0,1085 ≈ <strong>8,8%</strong>. Solo 1 de cada 11 positivos tiene COVID realmente.</p>
+                <p className={styles.eduEscenarioTip}><strong>Clave clínica:</strong> La sensibilidad/especificidad del test NO es el valor predictivo. La prevalencia de la enfermedad en la consulta (no en la población general) es el prior correcto para el diagnóstico individual.</p>
               </div>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioHeader}>
                   <span className={styles.eduEscenarioIcon}>🤖</span>
-                  <h4>Machine Learning y Clasificación</h4>
+                  <h4>Científico de Datos — Clasificación y Detección de Fraude</h4>
                 </div>
-                <p className={styles.eduEscenarioExample}><strong>Ejemplo:</strong> Filtro de spam: P(spam|&quot;ganaste&quot;) = P(&quot;ganaste&quot;|spam) × P(spam) / P(&quot;ganaste&quot;). Trained con millones de emails.</p>
-                <p className={styles.eduEscenarioTip}><strong>Por qué importa:</strong> Naive Bayes es el algoritmo base para clasificación de texto, detección de fraude y sistemas de recomendación.</p>
+                <p className={styles.eduEscenarioExample}><strong>Caso real:</strong> Filtro de spam Naive Bayes. P(spam|&quot;dinero&quot;,&quot;gratis&quot;,&quot;urgente&quot;) = P(&quot;dinero&quot;|spam) × P(&quot;gratis&quot;|spam) × P(&quot;urgente&quot;|spam) × P(spam) / P(evidencia). Con P(spam)=0,3 y LRs de 8×, 12× y 5×, el posterior supera 99,9%. En detección de fraude bancario: transacción en país inusual (LR+15) + importe atípico (LR+8) + hora nocturna (LR+3) → posterior 85% de fraude aunque la tasa base sea 0,1%.</p>
+                <p className={styles.eduEscenarioTip}><strong>Clave técnica:</strong> Naive Bayes asume independencia condicional entre features, lo que raramente se cumple pero simplifica el cálculo enormemente. Para modelos más precisos con dependencias: redes bayesianas o modelos gráficos probabilísticos.</p>
+              </div>
+              <div className={styles.eduEscenarioCard}>
+                <div className={styles.eduEscenarioHeader}>
+                  <span className={styles.eduEscenarioIcon}>📊</span>
+                  <h4>Economista — Pronósticos con Incertidumbre</h4>
+                </div>
+                <p className={styles.eduEscenarioExample}><strong>Caso real:</strong> Pronóstico de recesión. Prior basado en ciclo económico histórico: P(recesión en 12 meses) = 15%. Aparece dato nuevo: curva de rendimientos invertida (LR = 4,2 históricamente). Posterior = (4,2 × 0,15) / (4,2×0,15 + 1×0,85) = 0,63 / 1,48 ≈ <strong>42,6%</strong>. Nuevo dato: PMI manufacturero cae a 47 (LR = 2,8). Posterior actualizado → <strong>68%</strong>.</p>
+                <p className={styles.eduEscenarioTip}><strong>Clave económica:</strong> Los pronósticos bayesianos cuantifican la incertidumbre explícitamente, algo que los modelos VAR clásicos no hacen. Permite comunicar &quot;68% de probabilidad de recesión&quot; en lugar de &quot;probablemente habrá recesión&quot;.</p>
               </div>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioHeader}>
                   <span className={styles.eduEscenarioIcon}>🔬</span>
-                  <h4>Investigación Científica</h4>
+                  <h4>Investigador Científico — Meta-análisis y Experimentos</h4>
                 </div>
-                <p className={styles.eduEscenarioExample}><strong>Ejemplo:</strong> Experimento de física: prior = 50%, cada medición actualiza el posterior. Tras 10 obs. positivas → 98,4% de confianza.</p>
-                <p className={styles.eduEscenarioTip}><strong>Por qué importa:</strong> La estadística bayesiana permite incorporar conocimiento previo de forma rigurosa, crucial en estudios con muestras pequeñas.</p>
-              </div>
-              <div className={styles.eduEscenarioCard}>
-                <div className={styles.eduEscenarioHeader}>
-                  <span className={styles.eduEscenarioIcon}>📈</span>
-                  <h4>Decisiones Empresariales y A/B Testing</h4>
-                </div>
-                <p className={styles.eduEscenarioExample}><strong>Ejemplo:</strong> Test A/B web: prior 50%, variante B tiene CR 4,2% vs 3,8% de A. Tras 1.000 visitas → 85% probabilidad de que B sea mejor.</p>
-                <p className={styles.eduEscenarioTip}><strong>Por qué importa:</strong> A diferencia del enfoque frecuentista, el bayesiano da probabilidades directas de superioridad, más interpretables para decisiones de negocio.</p>
+                <p className={styles.eduEscenarioExample}><strong>Caso real:</strong> Meta-análisis bayesiano de eficacia de un fármaco. Prior de 3 estudios previos: P(eficaz) = 60%. Nuevo ECA con n=500 muestra OR=1,8 (p=0,03). Posterior bayesiano: 84%. Tercer estudio con n=200, OR=1,4 (p=0,12): posterior 79%. Comparar con meta-análisis frecuentista: solo reporta I²=34% y OR combinado=1,65 sin cuantificar la probabilidad de eficacia.</p>
+                <p className={styles.eduEscenarioTip}><strong>Clave científica:</strong> El intervalo creíble bayesiano (ej: &quot;95% de probabilidad de que el OR esté entre 1,2 y 2,4&quot;) es directamente interpretable, a diferencia del intervalo de confianza frecuentista. En estudios con muestras pequeñas, el prior bien especificado mejora la estimación.</p>
               </div>
             </div>
           </div>
@@ -1032,95 +1055,102 @@ export default function InferenciaBayesianaPage() {
           {/* FAQ */}
           <div className={styles.eduFaqSection}>
             <h3>❓ Preguntas Frecuentes sobre Inferencia Bayesiana</h3>
-            <p className={styles.eduFaqSubtitle}>Respuestas detalladas a las dudas más comunes</p>
+            <p className={styles.eduFaqSubtitle}>8 preguntas clave con respuestas detalladas y ejemplos numéricos</p>
             <div className={styles.eduFaqList}>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Qué diferencia hay entre frecuentista y bayesiano?</h4>
-                <p>El enfoque <strong>frecuentista</strong> trata la probabilidad como la frecuencia límite de un experimento repetido: P-values, intervalos de confianza, hipótesis nula. El <strong>bayesiano</strong> trata la probabilidad como grado de creencia: actualiza creencias previas con datos. En la práctica: bayesiano permite decir &quot;hay 87% de probabilidad de que H sea cierta&quot;; frecuentista solo permite &quot;si H fuera falsa, veríamos estos datos con probabilidad p&quot;.</p>
+                <h4>❓ ¿Qué es la probabilidad a priori (prior)?</h4>
+                <p>El <strong>prior P(H)</strong> es tu creencia inicial sobre la hipótesis H <em>antes</em> de observar ningún dato. Puede basarse en: (1) estadísticas poblacionales (ej: prevalencia de una enfermedad = 1% → prior = 0,01), (2) datos históricos (ej: 30% de proyectos similares fallaron → prior de fracaso = 0,30), o (3) ser &quot;no informativo&quot; (P(H) = 0,5 si no tienes ninguna información). El prior NO es arbitrario cuando existen datos: usar P(H) = 0,5 para una enfermedad con prevalencia del 0,001% es un error grave que inflará artificialmente el VPP.</p>
+                <p className={styles.faqTip}>Regla práctica: busca siempre la tasa base (base rate) del fenómeno que estudias antes de aplicar Bayes.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Qué es el &quot;error del fiscal&quot; y por qué es tan grave?</h4>
-                <p>El <strong>error del fiscal</strong> (Prosecutor&apos;s Fallacy) confunde P(evidencia|inocente) con P(inocente|evidencia). Ejemplo real: ADN coincide en 1 de 1 millón → fiscal dice &quot;hay 1 en 1 millón de probabilidad de inocencia&quot;. Error: si la ciudad tiene 10 millones, hay ~10 personas con ese ADN. La probabilidad real de inocencia depende de la prevalencia del delito y otras pruebas. Ha llevado a condenas injustas.</p>
+                <h4>❓ ¿Cuál es la diferencia entre el enfoque bayesiano y el frecuentista?</h4>
+                <p>La diferencia es filosófica y práctica. <strong>Frecuentista:</strong> la probabilidad es la frecuencia límite en experimentos repetidos. Solo acepta que H es verdadera o falsa (no probabilística). Produce P-values: &quot;si H₀ fuera cierta, la probabilidad de observar estos datos o más extremos es 3%&quot;. <strong>Bayesiano:</strong> la probabilidad es grado de creencia, actualizable. Produce directamente P(H|datos): &quot;dado lo observado, hay 87% de probabilidad de que H sea cierta&quot;. Diferencia práctica: un bayesiano puede decir &quot;hay 92% de probabilidad de que el fármaco funcione&quot;; un frecuentista solo puede decir &quot;rechazamos H₀ con p=0,04&quot;. El intervalo creíble bayesiano es directamente interpretable; el intervalo de confianza frecuentista, no.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Cómo elijo un prior cuando no tengo información previa?</h4>
-                <p>Tres opciones: (1) <strong>Prior no informativo</strong>: P(H) = 0,5 (máxima incertidumbre), bueno para comenzar. (2) <strong>Prior basado en prevalencia</strong>: usa estadísticas poblacionales (ej: prevalencia de la enfermedad en la región). (3) <strong>Prior de Jeffreys</strong>: matemáticamente neutro respecto a la escala. Con suficiente evidencia, el impacto del prior disminuye y los resultados convergen.</p>
+                <h4>❓ ¿Cómo se elige el prior y cuándo importa su elección?</h4>
+                <p>El prior importa <strong>mucho</strong> con pocos datos y <strong>poco</strong> con muchos datos. Criterios de elección: (1) <strong>Prior informativo:</strong> basado en literatura científica o datos históricos (ej: efectividad de vacunas similares). (2) <strong>Prior conjugado:</strong> elige la familia distribucional que hace el cálculo analítico (Beta para proporciones, Gamma para tasas). (3) <strong>Prior de Jeffreys:</strong> invariante ante transformaciones de escala, matemáticamente neutro. (4) <strong>Prior uniforme:</strong> P(H)=0,5, válido solo si genuinamente no sabes nada. Con n &gt; 100 observaciones, priors razonablemente distintos convergen al mismo posterior si los datos son informativos.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Por qué el Likelihood Ratio (LR) es tan importante?</h4>
-                <p>El LR es la &quot;fuerza de la evidencia&quot; independiente del prior. LR = P(E|H) / P(E|¬H). Interpretación: LR = 10 → la evidencia es 10 veces más probable bajo H que bajo ¬H. Regla práctica: LR &gt; 10 = fuerte, LR &gt; 100 = muy fuerte. Ventaja: en medicina se usa para combinar múltiples tests independientes multiplicando sus LRs.</p>
+                <h4>❓ ¿Qué es el teorema de Bayes aplicado al diagnóstico médico?</h4>
+                <p>En diagnóstico: P(enfermedad|test+) = P(test+|enfermedad) × P(enfermedad) / P(test+). Donde P(test+|enfermedad) = sensibilidad, P(enfermedad) = prevalencia, P(test+) = P(test+|enf)×P(enf) + P(test+|sano)×P(sano). Ejemplo numérico: test COVID, sensibilidad=95%, especificidad=90%, prevalencia=1%. P(COVID|+) = (0,95×0,01) / (0,95×0,01 + 0,10×0,99) = 0,0095/0,1085 = <strong>8,8%</strong>. Conclusión: en población de baja prevalencia, un positivo es mayoritariamente un falso positivo. Comparar: con prevalencia=50% → VPP=90,5%. El mismo test, completamente diferente utilidad clínica.</p>
+                <p className={styles.faqTip}>La paradoja del test: un test excelente en laboratorio puede ser clínicamente inútil en screening masivo de enfermedades raras.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Cuándo el VPP (Valor Predictivo Positivo) puede ser engañoso?</h4>
-                <p>Cuando la prevalencia es muy baja. Un test con 99% sensibilidad y 99% especificidad tiene VPP = 50% si la prevalencia es 1% (por cada verdadero positivo, hay un falso positivo). Consecuencia: los programas de screening masivo para enfermedades raras generan muchos falsos positivos. Solución: hacer pruebas confirmatorias en positivos, no tratar directamente.</p>
+                <h4>❓ ¿Qué es la verosimilitud (likelihood) y en qué se diferencia del posterior?</h4>
+                <p><strong>Verosimilitud P(E|H):</strong> mide cuán compatible es la evidencia E con la hipótesis H. Es una función de H dados los datos, no una probabilidad de H. No suma 1 al variar H. <strong>Posterior P(H|E):</strong> probabilidad de H dados los datos, sí suma 1 al variar H. La confusión entre ambos es el &quot;error del fiscal&quot;: confundir P(match_ADN|inocente) = 0,000001 con P(inocente|match_ADN) = 0,000001. Son distintas porque ignora la prevalencia de culpables con ese perfil ADN en la población. El <strong>Likelihood Ratio</strong> LR = P(E|H)/P(E|¬H) es la medida de fuerza de evidencia: LR=10 significa que E es 10× más probable si H es cierta que si no lo es.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Qué es la actualización secuencial y para qué sirve?</h4>
-                <p>Es aplicar Bayes múltiples veces: el posterior de hoy se convierte en el prior de mañana. Sirve para: sistemas de navegación (GPS acumula mediciones para localización precisa), predicción meteorológica (actualización hora a hora), aprendizaje automático online (actualización con cada dato nuevo). La belleza: el orden de las observaciones no importa, el resultado final es el mismo.</p>
+                <h4>❓ ¿Cuándo usar inferencia bayesiana en lugar de tests estadísticos clásicos?</h4>
+                <p>Usa inferencia <strong>bayesiana</strong> cuando: (1) tienes conocimiento previo relevante que sería un desperdicio ignorar, (2) necesitas probabilidades directas (&quot;87% de que el efecto sea positivo&quot;), (3) el tamaño muestral es pequeño y el prior mejora la estimación, (4) necesitas actualización continua (sistemas en tiempo real, A/B testing continuo), (5) quieres cuantificar evidencia a favor de H₀ (algo imposible con p-values). Usa tests <strong>frecuentistas</strong> cuando: (1) el campo exige p-values (reguladores farmacéuticos, publicaciones con estándares CONSORT), (2) no tienes justificación para priors informativos, (3) el n es grande y el prior tendrá poco impacto, (4) prefieres la objetividad percibida del procedimiento sin priors.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Pueden dos personas con el mismo prior llegar a conclusiones diferentes?</h4>
-                <p>Con los mismos datos, eventualmente no: con suficiente evidencia, cualquier prior razonable converge al mismo posterior. Pero con pocos datos, sí: si una persona cree P(H) = 0,01 y otra P(H) = 0,5, observar el mismo resultado puede llevarlas a posteriors muy distintos. Esto ilustra por qué en ciencia se publica evidencia acumulada, no estudios aislados.</p>
+                <h4>❓ ¿Qué son los intervalos creíbles y en qué se diferencian de los intervalos de confianza?</h4>
+                <p><strong>Intervalo creíble bayesiano al 95%:</strong> &quot;dado los datos observados, hay un 95% de probabilidad de que el parámetro esté en [a, b]&quot;. Interpretación directa y natural. <strong>Intervalo de confianza frecuentista al 95%:</strong> &quot;si repitiéramos el experimento infinitas veces, el 95% de los intervalos calculados contendría el verdadero parámetro&quot;. NO significa que el parámetro esté en ese intervalo con probabilidad 95%. Ejemplo: estimación de conversión de una campaña. IC frecuentista 95% = [2,3% ; 5,7%]. IC creíble bayesiano 95% = [2,1% ; 5,4%]. Numéricamente similares, pero el bayesiano tiene la interpretación que los profesionales quieren usar (y que a menudo usan erróneamente para el frecuentista).</p>
+                <p className={styles.faqTip}>El 95% del IC frecuentista es sobre el procedimiento, no sobre el parámetro. El 95% del IC creíble es sobre el parámetro.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Qué herramientas se usan para la inferencia bayesiana avanzada?</h4>
-                <p>Para modelos simples: esta calculadora, Excel, Python (scipy.stats). Para modelos complejos: <strong>MCMC</strong> (Markov Chain Monte Carlo) con herramientas como PyMC, Stan, JAGS. Para ML bayesiano: scikit-learn (GaussianNB), TensorFlow Probability. Para investigación: R con paquetes BayesFactor, rstanarm. El costo computacional escala con la complejidad del modelo.</p>
+                <h4>❓ ¿Cómo afecta el tamaño muestral al posterior?</h4>
+                <p>Con <strong>n pequeño</strong>: el posterior está dominado por el prior; dos investigadores con priors distintos obtienen posteriors muy diferentes con los mismos datos. Con <strong>n grande</strong>: los datos dominan y el prior se &quot;lava&quot;; priors razonablemente distintos convergen al mismo posterior (fenómeno de &quot;consistencia bayesiana&quot;). Ejemplo numérico: prior P(moneda justa) = 0,5. Tras 10 lanzamientos con 7 caras → posterior = 65%. Tras 100 lanzamientos con 70 caras → posterior = 96,4%. Tras 1.000 lanzamientos con 700 caras → posterior &gt; 99,99%, independientemente del prior inicial (siempre que no fuera 0 o 1). Regla práctica: necesitas al menos n~10/P(H) observaciones para que los datos dominen sobre un prior informativo.</p>
               </div>
             </div>
           </div>
 
           {/* Guía Paso a Paso */}
           <div className={styles.eduStepSection}>
-            <h3>📋 Cómo Aplicar el Teorema de Bayes: Guía Paso a Paso</h3>
-            <p className={styles.eduComparativaSubtitle}>7 pasos para resolver cualquier problema bayesiano</p>
+            <h3>📋 Test COVID con 95% Sensibilidad en Población con 1% de Prevalencia: Guía Paso a Paso</h3>
+            <p className={styles.eduComparativaSubtitle}>7 pasos para aplicar el teorema de Bayes a un problema diagnóstico real</p>
             <div className={styles.eduStepGuide}>
               <div className={styles.eduStepItem}>
                 <div className={styles.eduStepNumber}>1</div>
                 <div className={styles.eduStepContent}>
-                  <h4>Define claramente la hipótesis H</h4>
-                  <p>Enuncia explícitamente qué es H y qué es ¬H. Ejemplo: H = &quot;el paciente tiene tuberculosis&quot;, ¬H = &quot;no tiene tuberculosis&quot;. Evitar ambigüedades: &quot;tiene infección&quot; es demasiado vago. La precisión aquí determina la calidad de todo el análisis.</p>
+                  <h4>Define la hipótesis y la evidencia</h4>
+                  <p><strong>H</strong> = &quot;el paciente tiene COVID-19&quot;. <strong>¬H</strong> = &quot;no tiene COVID-19&quot;. <strong>E</strong> = &quot;el test PCR da positivo&quot;. Pregunta que responde Bayes: P(COVID|test+), es decir, ¿qué probabilidad hay de tener COVID dado un positivo? Esta no es la sensibilidad del test, que responde a P(test+|COVID).</p>
                 </div>
               </div>
               <div className={styles.eduStepItem}>
                 <div className={styles.eduStepNumber}>2</div>
                 <div className={styles.eduStepContent}>
-                  <h4>Establece el prior P(H)</h4>
-                  <p>Busca datos de prevalencia o base rate. Fuentes: estadísticas nacionales de salud (para enfermedades), datos históricos de proyectos (para predicciones empresariales), frecuencias de eventos pasados. Si no hay datos, usa P(H) = 0,5 y documenta la incertidumbre.</p>
+                  <h4>Establece el prior P(H) a partir de la prevalencia</h4>
+                  <p><strong>P(COVID) = 1% = 0,01</strong>. Fuente: datos epidemiológicos de la región en ese momento. Este es el prior: de cada 100 personas que se hacen el test en esa situación epidemiológica, aproximadamente 1 tiene COVID. Por tanto P(¬COVID) = 0,99.</p>
                 </div>
               </div>
               <div className={styles.eduStepItem}>
                 <div className={styles.eduStepNumber}>3</div>
                 <div className={styles.eduStepContent}>
-                  <h4>Determina P(E|H) - Verosimilitud</h4>
-                  <p>¿Con qué probabilidad observarías esta evidencia E si H fuera cierta? En medicina: sensibilidad del test. En clasificación: P(palabra|spam). Esta probabilidad debe obtenerse de estudios de validación, no estimarse subjetivamente cuando sea posible.</p>
+                  <h4>Determina P(test+|COVID) — Sensibilidad</h4>
+                  <p><strong>P(test+|COVID) = 95% = 0,95</strong>. Significado: si el paciente tiene COVID, el test detecta correctamente el 95% de los casos. El 5% restante son falsos negativos (test negativo en paciente enfermo). Este dato proviene de estudios de validación clínica del test PCR.</p>
                 </div>
               </div>
               <div className={styles.eduStepItem}>
                 <div className={styles.eduStepNumber}>4</div>
                 <div className={styles.eduStepContent}>
-                  <h4>Determina P(E|¬H) - Falsos positivos</h4>
-                  <p>¿Con qué probabilidad observarías E si H fuera falsa? En medicina: 1 - especificidad. Este valor es crítico: un falso positivo alto destruye el valor del test incluso con alta sensibilidad. Ejemplo: síntoma de fiebre → P(fiebre|no gripe) = 0,4 porque muchas enfermedades causan fiebre.</p>
+                  <h4>Determina P(test+|¬COVID) — Tasa de falsos positivos</h4>
+                  <p><strong>P(test+|¬COVID) = 1 − especificidad</strong>. Si especificidad = 90%, entonces P(test+|¬COVID) = <strong>10% = 0,10</strong>. Significado: 1 de cada 10 personas sanas da positivo igualmente. Este 10% de falsos positivos en una población mayoritariamente sana tendrá un gran impacto en el resultado final.</p>
                 </div>
               </div>
               <div className={styles.eduStepItem}>
                 <div className={styles.eduStepNumber}>5</div>
                 <div className={styles.eduStepContent}>
-                  <h4>Calcula P(E) - Probabilidad total</h4>
-                  <p>P(E) = P(E|H)×P(H) + P(E|¬H)×P(¬H). Este es el &quot;denominador normalizador&quot; que hace que el posterior sea una probabilidad válida. Se puede calcular como suma ponderada si hay múltiples hipótesis: P(E) = Σ P(E|Hᵢ)×P(Hᵢ).</p>
+                  <h4>Calcula P(test+) — Probabilidad total de obtener un positivo</h4>
+                  <p>P(test+) = P(test+|COVID) × P(COVID) + P(test+|¬COVID) × P(¬COVID)</p>
+                  <p>= 0,95 × 0,01 + 0,10 × 0,99 = <strong>0,0095 + 0,099 = 0,1085</strong></p>
+                  <p>Interpretación: el 10,85% de los tests dan positivo. De cada 10.000 personas, 1.085 tienen test positivo.</p>
                 </div>
               </div>
               <div className={styles.eduStepItem}>
                 <div className={styles.eduStepNumber}>6</div>
                 <div className={styles.eduStepContent}>
-                  <h4>Aplica la fórmula y calcula el posterior</h4>
-                  <p>P(H|E) = P(E|H) × P(H) / P(E). Verifica que P(H|E) + P(¬H|E) = 1. Si tienes múltiples hipótesis, verifica que todos los posteriors sumen 1. Calcula también el Likelihood Ratio = P(E|H)/P(E|¬H) para comunicar la fuerza de la evidencia independientemente del prior.</p>
+                  <h4>Aplica el Teorema de Bayes para obtener el posterior</h4>
+                  <p>P(COVID|test+) = P(test+|COVID) × P(COVID) / P(test+)</p>
+                  <p>= 0,95 × 0,01 / 0,1085 = 0,0095 / 0,1085 ≈ <strong>8,76%</strong></p>
+                  <p>Visualización: de los 1.085 positivos por 10.000 personas, solo 95 son verdaderos positivos (enfermos) y 990 son falsos positivos (sanos con test erróneo). VPP = 95 / 1.085 = 8,76%.</p>
                 </div>
               </div>
               <div className={styles.eduStepItem}>
                 <div className={styles.eduStepNumber}>7</div>
                 <div className={styles.eduStepContent}>
-                  <h4>Interpreta y comunica el resultado correctamente</h4>
-                  <p>Comunica siempre: el posterior con su incertidumbre, el prior usado y su fuente, y las limitaciones. Di &quot;dado este test positivo, la probabilidad de tener la enfermedad es 15%&quot;, NO &quot;el test dice que tienes la enfermedad&quot;. Con priors inciertos, muestra el rango de posteriors posibles (análisis de sensibilidad).</p>
+                  <h4>Interpreta y decide con el resultado</h4>
+                  <p>Un test positivo, con esta prevalencia, solo implica <strong>8,76% de probabilidad real de tener COVID</strong>. Decisión clínica: no aislar definitivamente por un solo positivo, sino hacer test confirmatorio o esperar síntomas. Si la prevalencia sube al 10% (epidemia activa), el mismo test da VPP = 51,4%. Si la prevalencia es 30%, VPP = 80,3%. Comunicación al paciente: &quot;El test es positivo pero en la situación actual hay un 8,76% de probabilidad de que tengas COVID. Recomendamos confirmación.&quot;</p>
                 </div>
               </div>
             </div>
