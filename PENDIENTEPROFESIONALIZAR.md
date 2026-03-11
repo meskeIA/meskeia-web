@@ -281,7 +281,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
-| Lote 27 | 2026-03-11 | `generador-anagramas`, `generador-lorem-ipsum`, `conjugador-verbos`, `tablas-multiplicar`, `limpiador-texto` | pendiente |
+| Lote 27 | 2026-03-11 | `generador-anagramas`, `generador-lorem-ipsum`, `conjugador-verbos`, `tablas-multiplicar`, `limpiador-texto` | `4e1d5b3` |
 | Lote 26 | 2026-03-11 | `conversor-morse`, `conversor-braille`, `conversor-binario`, `conversor-texto`, `conversor-numeros-romanos` | `0da882a` |
 | Lote 25 | 2026-03-11 | `cifrado-clasico`, `cifrado-vigenere`, `cifrado-transposicion`, `cifrado-playfair`, `generador-hashes` | `6661636` |
 | Lote 24 | 2026-03-11 | `visualizador-algoritmos`, `visualizador-estructuras-datos`, `calculadora-algebra-booleana`, `calculadora-electricidad`, `tabla-periodica` | `29456c6` |
