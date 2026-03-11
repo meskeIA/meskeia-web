@@ -704,10 +704,10 @@ grep -rl "\.warningBox" app/*/ --include="*.module.css" | wc -l
 #### FASE 1: Selección de Apps
 
 1. Abrir `PENDIENTEPROFESIONALIZAR.md`
-2. Seleccionar **2-4 apps** de la misma prioridad (preferiblemente de la misma categoría para contexto similar)
+2. Seleccionar **5 apps** de la misma prioridad (preferiblemente de la misma categoría para contexto similar)
 3. Criterio de selección por sesión:
-   - **Sesión normal**: 2-3 apps de ALTA o MEDIA prioridad
-   - **Sesión rápida**: 1 app compleja o 4 apps simples
+   - **Lote estándar**: 5 apps, procesadas secuencialmente (una tras otra)
+   - **Apps complejas** (>1000 líneas page.tsx): reducir a 3-4 por lote
    - **Evitar mezclar** ALTA + BAJA en el mismo lote (el agente pierde contexto)
 
 #### FASE 2: Verificación Previa
@@ -720,9 +720,14 @@ Antes de lanzar agentes, leer los `page.tsx` de las apps seleccionadas para conf
 #### FASE 3: Lanzamiento de Agentes
 
 ```
-Lanzar 1 agente general-purpose por app, en paralelo.
-Máximo recomendado: 3-4 agentes simultáneos.
+Lanzar 1 agente general-purpose por app, de forma SECUENCIAL.
+Lote recomendado: 5 apps por sesión, una tras otra.
 ```
+
+> **⚠️ IMPORTANTE — Rate Limit**: Lanzar agentes en paralelo consume tokens a 5× la velocidad normal
+> y agota el límite por ventana temporal antes de completar el lote, cortando el trabajo a mitad.
+> El enfoque SECUENCIAL consume los mismos tokens totales pero repartidos en el tiempo,
+> permitiendo completar más apps por sesión. Velocidad de reloj mayor ≠ más apps completadas.
 
 **Prompt estándar para el agente** (adaptar por app):
 
@@ -797,19 +802,24 @@ En `PENDIENTEPROFESIONALIZAR.md`:
 
 ### ⚡ Tamaño Óptimo de Lote
 
-| Tipo de app | Apps por sesión | Tiempo estimado |
-|-------------|:---------------:|-----------------|
-| Apps financieras complejas | 2 | 90-120 min |
-| Apps de salud / ciencia | 2-3 | 60-90 min |
-| Herramientas técnicas | 2-3 | 60 min |
-| Texto / conversores / juegos | 3-4 | 45-60 min |
+**Regla general**: 5 apps por lote, procesadas secuencialmente (una tras otra, no en paralelo).
+
+| Tipo de app | Apps por lote | Tiempo por app | Tiempo total lote |
+|-------------|:-------------:|:--------------:|:-----------------:|
+| Apps financieras complejas | 3-4 | 15-20 min | ~60-80 min |
+| Apps de salud / ciencia | 5 | 10-15 min | ~60 min |
+| Herramientas técnicas | 5 | 8-12 min | ~50 min |
+| Texto / conversores | 5 | 6-10 min | ~40 min |
+
+> **Ventaja del secuencial**: el rate limit se va "recargando" entre agentes,
+> permitiendo completar lotes completos sin interrupciones.
 
 ---
 
 ### 🚫 Errores Comunes en el Proceso de Lotes
 
 - **No verificar el estado previo**: Puede duplicar contenido ya existente
-- **Lanzar >4 agentes en paralelo**: Degrada la calidad del contenido generado
+- **Lanzar agentes en paralelo**: Agota el rate limit a 5× la velocidad — menos apps completadas por sesión
 - **Olvidar actualizar el inventario**: El documento pierde utilidad como fuente de verdad
 - **No hacer build antes del push**: Puede deployar errores TypeScript a producción
 - **Mezclar apps de categorías muy distintas**: El agente pierde contexto y genera contenido menos específico
