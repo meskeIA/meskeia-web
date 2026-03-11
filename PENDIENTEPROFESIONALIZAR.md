@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-10 | **Total profesionalizadas**: ~107 | **Pendientes**: ~114
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-11 | **Total profesionalizadas**: ~117 | **Pendientes**: ~104
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 
 ---
@@ -50,27 +50,27 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 ### Matemáticas Avanzadas
 
 - [x] `/estadistica-avanzada/` — Estadística avanzada ✅ lote 22 (ya profesionalizada, clases edu-)
-- [ ] `/calculadora-distribuciones/` — Normal, Poisson, Exponencial, etc.
-- [ ] `/inferencia-bayesiana/` — Teorema de Bayes, tests diagnósticos
-- [ ] `/calculadora-algebra-abstracta/` — Álgebra abstracta
-- [ ] `/calculadora-teoria-colas/` — Teoría de colas
+- [x] `/calculadora-distribuciones/` — Normal, Poisson, Exponencial, etc. ✅ lote 23
+- [x] `/inferencia-bayesiana/` — Teorema de Bayes, tests diagnósticos ✅ lote 23
+- [x] `/calculadora-algebra-abstracta/` — Álgebra abstracta ✅ lote 23
+- [x] `/calculadora-teoria-colas/` — Teoría de colas ✅ lote 23
 
 ### Informática y Programación
 
-- [ ] `/visualizador-algoritmos/` — Algoritmos de ordenación paso a paso
-- [ ] `/visualizador-estructuras-datos/` — Arrays, pilas, colas, listas, árboles BST
-- [ ] `/calculadora-algebra-booleana/` — Mapas de Karnaugh, SOP/POS, tablas de verdad
+- [x] `/visualizador-algoritmos/` — Algoritmos de ordenación paso a paso ✅ lote 24
+- [x] `/visualizador-estructuras-datos/` — Arrays, pilas, colas, listas, árboles BST ✅ lote 24
+- [x] `/calculadora-algebra-booleana/` — Mapas de Karnaugh, SOP/POS, tablas de verdad ✅ lote 24
 
 ### Física y Química
 
-- [ ] `/calculadora-electricidad/` — Calculadora de electricidad
-- [ ] `/tabla-periodica/` — Tabla periódica interactiva
+- [x] `/calculadora-electricidad/` — Calculadora de electricidad ✅ lote 24
+- [x] `/tabla-periodica/` — Tabla periódica interactiva ✅ lote 24
 - [ ] `/glosario-fisica-quimica/` — Glosario física y química
 - [ ] `/conversor-unidades-rf/` — dBm, Watts, VSWR, longitud de onda
 
 ### Biomedicina
 
-- [ ] `/calculadora-estadistica-medica/` — Sensibilidad, especificidad, VPP, VPN, OR, RR, NNT
+- [x] `/calculadora-estadistica-medica/` — Sensibilidad, especificidad, VPP, VPN, OR, RR, NNT ✅ lote 23
 
 ---
 
@@ -281,6 +281,8 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote 24 | 2026-03-11 | `visualizador-algoritmos`, `visualizador-estructuras-datos`, `calculadora-algebra-booleana`, `calculadora-electricidad`, `tabla-periodica` | `29456c6` |
+| Lote 23 | 2026-03-11 | `calculadora-distribuciones`, `inferencia-bayesiana`, `calculadora-algebra-abstracta`, `calculadora-teoria-colas`, `calculadora-estadistica-medica` | `d5bf6a4` |
 | Lote 22 | 2026-03-10 | `calculadora-alimentacion-mascotas`, `calculadora-medicamentos-mascotas`, `seguimiento-ciclo-menstrual`, `planificador-chequeos-medicos`, `estadistica-avanzada`(verif.) | `dacaccd` |
 | Lote 21 | 2026-03-10 | `guia-reclamar-seguro-coche`, `asistente-reclamaciones`, `calculadora-macros`, `planificador-embarazo`, `planificador-mascota` | `3a8c210` |
 | Lote 20 | 2026-03-10 | `simulador-compraventa-inmueble`, `calculadora-coste-vivienda`(verificada), `comparador-tipos-seguros`, `checklist-coberturas-seguros`, `calculadora-infraseguro` | `258faf4` |
