@@ -115,12 +115,12 @@ Apps de uso frecuente con buen potencial educativo.
 
 ### Criptografía y Seguridad
 
-- [ ] `/cifrado-clasico/` — César, ROT13, Atbash
-- [ ] `/cifrado-vigenere/` — Cifrado polialfabético con clave
-- [ ] `/cifrado-transposicion/` — Columnas, Rail Fence, Escítala
-- [ ] `/cifrado-playfair/` — Matriz 5x5, digramas
+- [x] `/cifrado-clasico/` — César, ROT13, Atbash ✅ lote 25
+- [x] `/cifrado-vigenere/` — Cifrado polialfabético con clave ✅ lote 25
+- [x] `/cifrado-transposicion/` — Columnas, Rail Fence, Escítala ✅ lote 25
+- [x] `/cifrado-playfair/` — Matriz 5x5, digramas ✅ lote 25
 - [ ] `/cifrado-aes/` — AES-256 GCM/CBC moderno
-- [ ] `/generador-hashes/` — MD5, SHA-256, SHA-512
+- [x] `/generador-hashes/` — MD5, SHA-256, SHA-512 ✅ lote 25
 
 ### SEO y Marketing
 
@@ -281,6 +281,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote 25 | 2026-03-11 | `cifrado-clasico`, `cifrado-vigenere`, `cifrado-transposicion`, `cifrado-playfair`, `generador-hashes` | pendiente |
 | Lote 24 | 2026-03-11 | `visualizador-algoritmos`, `visualizador-estructuras-datos`, `calculadora-algebra-booleana`, `calculadora-electricidad`, `tabla-periodica` | `29456c6` |
 | Lote 23 | 2026-03-11 | `calculadora-distribuciones`, `inferencia-bayesiana`, `calculadora-algebra-abstracta`, `calculadora-teoria-colas`, `calculadora-estadistica-medica` | `d5bf6a4` |
 | Lote 22 | 2026-03-10 | `calculadora-alimentacion-mascotas`, `calculadora-medicamentos-mascotas`, `seguimiento-ciclo-menstrual`, `planificador-chequeos-medicos`, `estadistica-avanzada`(verif.) | `dacaccd` |

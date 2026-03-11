@@ -120,6 +120,12 @@ export default function GeneradorHashesPage() {
   const [hashComparar, setHashComparar] = useState('');
   const [resultadoComparacion, setResultadoComparacion] = useState<boolean | null>(null);
   const [procesando, setProcesando] = useState(false);
+  const [copiado, setCopiado] = useState('');
+
+  // Estados para HTML code generation
+  const [htmlCode, setHtmlCode] = useState('');
+  const [htmlExpanded, setHtmlExpanded] = useState(false);
+  const [htmlCopiado, setHtmlCopiado] = useState(false);
 
   // Generar hash usando Web Crypto API (o MD5 puro para ese algoritmo)
   const generarHash = useCallback(async (data: ArrayBuffer, algo: AlgoritmoType): Promise<string> => {
@@ -143,6 +149,7 @@ export default function GeneradorHashesPage() {
       const resultado = await generarHash(data.buffer, algoritmo);
       setHash(resultado);
       setResultadoComparacion(null);
+      generarCodigoHTML(resultado, algoritmo, texto.slice(0, 40) + (texto.length > 40 ? '...' : ''));
     } catch (error) {
       console.error('Error generando hash:', error);
     }
@@ -162,6 +169,7 @@ export default function GeneradorHashesPage() {
       const resultado = await generarHash(arrayBuffer, algoritmo);
       setHashArchivo(resultado);
       setResultadoComparacion(null);
+      generarCodigoHTML(resultado, algoritmo, file.name);
     } catch (error) {
       console.error('Error procesando archivo:', error);
     }
@@ -177,9 +185,46 @@ export default function GeneradorHashesPage() {
     setResultadoComparacion(hashActual === hashNormalizado);
   };
 
-  const copiarHash = async (hashToCopy: string) => {
+  // Generar código HTML exportable
+  const generarCodigoHTML = useCallback((hashVal: string, algo: AlgoritmoType, fuente: string) => {
+    if (!hashVal) { setHtmlCode(''); return; }
+
+    let codigo = `<!-- Hash ${algo} - generado con meskeIA -->\n\n`;
+    codigo += `<div class="hash-verificacion">\n`;
+    codigo += `  <p class="etiqueta">Hash ${algo} de: <em>${fuente}</em></p>\n`;
+    codigo += `  <code class="hash-valor">${hashVal}</code>\n`;
+    codigo += `  <p class="hash-meta">${hashVal.length} caracteres · ${algo}</p>\n`;
+    codigo += `</div>\n\n`;
+    codigo += `<!-- CSS recomendado -->\n`;
+    codigo += `<style>\n`;
+    codigo += `  .hash-verificacion {\n`;
+    codigo += `    font-family: 'Courier New', monospace;\n`;
+    codigo += `    background: #f0f4f8;\n`;
+    codigo += `    border-left: 4px solid #2E86AB;\n`;
+    codigo += `    padding: 1rem 1.5rem;\n`;
+    codigo += `    border-radius: 8px;\n`;
+    codigo += `  }\n`;
+    codigo += `  .etiqueta { color: #666; font-size: 0.85rem; margin: 0 0 0.5rem; font-family: sans-serif; }\n`;
+    codigo += `  .hash-valor { display: block; color: #1A1A1A; font-size: 0.9rem; word-break: break-all; margin: 0 0 0.5rem; }\n`;
+    codigo += `  .hash-meta { color: #666; font-size: 0.75rem; margin: 0; font-family: sans-serif; }\n`;
+    codigo += `</style>\n`;
+
+    setHtmlCode(codigo);
+  }, []);
+
+  const copiarHash = async (hashToCopy: string, id: string = 'default') => {
     if (hashToCopy) {
       await navigator.clipboard.writeText(hashToCopy);
+      setCopiado(id);
+      setTimeout(() => setCopiado(''), 2000);
+    }
+  };
+
+  const copiarCodigoHTML = async () => {
+    if (htmlCode) {
+      await navigator.clipboard.writeText(htmlCode);
+      setHtmlCopiado(true);
+      setTimeout(() => setHtmlCopiado(false), 2000);
     }
   };
 
@@ -190,6 +235,8 @@ export default function GeneradorHashesPage() {
     setNombreArchivo('');
     setHashComparar('');
     setResultadoComparacion(null);
+    setHtmlCode('');
+    setHtmlExpanded(false);
   };
 
   const hashActual = modo === 'texto' ? hash : hashArchivo;
@@ -368,10 +415,10 @@ export default function GeneradorHashesPage() {
               </label>
               <button
                 type="button"
-                onClick={() => copiarHash(hashActual)}
+                onClick={() => copiarHash(hashActual, 'hash')}
                 className={styles.btnCopy}
               >
-                📋 Copiar
+                {copiado === 'hash' ? '✅ Copiado' : '📋 Copiar'}
               </button>
             </div>
             <div className={styles.resultBox}>
@@ -383,69 +430,306 @@ export default function GeneradorHashesPage() {
             </div>
           </div>
         )}
+
+        {/* ========== HTML CODE GENERATION ========== */}
+        {htmlCode && (
+          <div className={styles.htmlCodeSection}>
+            <button
+              type="button"
+              className={styles.htmlToggleBtn}
+              onClick={() => setHtmlExpanded(!htmlExpanded)}
+            >
+              <span>{htmlExpanded ? '▲' : '▼'} Exportar hash como código HTML</span>
+              <span className={styles.htmlBadge}>Nuevo</span>
+            </button>
+
+            {htmlExpanded && (
+              <div className={styles.htmlCodeContent}>
+                <p className={styles.htmlDescription}>
+                  Copia este código para publicar el hash de verificación en tu web o documentación:
+                </p>
+                <pre className={styles.htmlPre}>{htmlCode}</pre>
+                <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyHtml}>
+                  {htmlCopiado ? '✅ ¡Copiado!' : '📋 Copiar código HTML'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Sección educativa colapsable */}
+      {/* ========== SECCIÓN EDUCATIVA ========== */}
       <EducationalSection
         title="¿Quieres aprender más sobre funciones hash?"
-        subtitle="Qué son, para qué sirven y cómo protegen la integridad de tus datos"
+        subtitle="Qué son, para qué sirven, historia y cómo protegen la integridad de tus datos"
       >
+        {/* ========== SECCIÓN 1: TABLA COMPARATIVA ========== */}
+        <section className={styles.comparativaSection}>
+          <h2>📊 Comparativa de algoritmos de hash</h2>
+          <p className={styles.comparativaSubtitle}>
+            MD5, SHA-1, SHA-256, SHA-384 y SHA-512: bits, longitud, velocidad y estado de seguridad actual
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Algoritmo</th>
+                  <th>Bits</th>
+                  <th>Longitud (hex)</th>
+                  <th>Año</th>
+                  <th>Estado actual</th>
+                  <th>Uso recomendado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>MD5</td>
+                  <td>128</td>
+                  <td>32 chars</td>
+                  <td>1992</td>
+                  <td className={styles.tdNegative}>Roto (2004)</td>
+                  <td>Solo checksums no críticos</td>
+                </tr>
+                <tr>
+                  <td>SHA-1</td>
+                  <td>160</td>
+                  <td>40 chars</td>
+                  <td>1995</td>
+                  <td className={styles.tdNegative}>Obsoleto (2017)</td>
+                  <td>No recomendado</td>
+                </tr>
+                <tr>
+                  <td>SHA-256</td>
+                  <td>256</td>
+                  <td>64 chars</td>
+                  <td>2001</td>
+                  <td className={styles.tdPositive}>Seguro ✅</td>
+                  <td>Uso general, contraseñas, TLS</td>
+                </tr>
+                <tr>
+                  <td>SHA-384</td>
+                  <td>384</td>
+                  <td>96 chars</td>
+                  <td>2001</td>
+                  <td className={styles.tdPositive}>Muy seguro ✅</td>
+                  <td>Seguridad alta, certificados</td>
+                </tr>
+                <tr>
+                  <td>SHA-512</td>
+                  <td>512</td>
+                  <td>128 chars</td>
+                  <td>2001</td>
+                  <td className={styles.tdPositive}>Máxima seguridad ✅</td>
+                  <td>Datos críticos, firmas digitales</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ========== SECCIÓN 2: QUÉ ES UN HASH ========== */}
         <section className={styles.infoSection}>
-          <h2>¿Qué es un Hash?</h2>
+          <h2>🔐 ¿Qué son las funciones hash criptográficas?</h2>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>🔐 Definición</h3>
+              <h3>📖 Definición</h3>
               <p>
-                Un hash es una &quot;huella digital&quot; única de cualquier dato. Es una
-                función matemática que convierte cualquier cantidad de datos en una
-                cadena de longitud fija. El mismo input siempre produce el mismo hash.
+                Una función hash convierte cualquier cantidad de datos (texto, archivo, imagen)
+                en una cadena de longitud fija llamada «digest» o «hash». El mismo input
+                siempre produce exactamente el mismo hash. Funcionan como una
+                <strong> huella digital única</strong> de los datos.
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🎯 Propiedades</h3>
+              <h3>🎯 Tres propiedades fundamentales</h3>
               <p>
-                <strong>Determinista:</strong> mismo input = mismo output<br />
-                <strong>Unidireccional:</strong> no se puede revertir<br />
-                <strong>Resistente a colisiones:</strong> casi imposible encontrar dos inputs con el mismo hash
+                <strong>Determinista:</strong> mismo input → mismo output siempre<br />
+                <strong>Unidireccional:</strong> imposible calcular el input desde el hash<br />
+                <strong>Resistente a colisiones:</strong> prácticamente imposible que dos inputs distintos produzcan el mismo hash
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>💡 Usos comunes</h3>
+              <h3>💡 Usos en el mundo real</h3>
               <p>
-                • Verificar descargas (checksums)<br />
-                • Almacenar contraseñas de forma segura<br />
-                • Firmas digitales<br />
-                • Blockchain y criptomonedas<br />
-                • Detectar cambios en archivos
+                • Verificar descargas con checksums<br />
+                • Almacenar contraseñas (con salt)<br />
+                • Firmas digitales y certificados SSL<br />
+                • Blockchain y criptomonedas (Bitcoin usa SHA-256)<br />
+                • Control de versiones (Git usa SHA-1 y SHA-256)<br />
+                • Detección de malware por hash de archivos
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>⚠️ MD5 y SHA-1 vs SHA-2</h3>
+              <h3>📅 Historia del SHA</h3>
               <p>
-                <strong>MD5</strong> (128 bits) está roto - solo usar para checksums no críticos.<br />
-                <strong>SHA-1</strong> (160 bits) está obsoleto desde 2017.<br />
-                <strong>SHA-256/512</strong> son seguros para uso actual.
+                SHA (Secure Hash Algorithm) fue diseñado por la NSA y estandarizado
+                por el NIST. SHA-1 (1995) → SHA-2 (2001, incluye SHA-256/512) →
+                SHA-3 (2015, basado en Keccak). SHA-256 y SHA-512 siguen siendo los
+                estándares de facto para seguridad en 2024.
               </p>
             </div>
           </div>
         </section>
 
-        <section className={styles.ejemplosSection}>
-          <h2>Ejemplo Práctico</h2>
-          <div className={styles.ejemplo}>
-            <p>Si hasheas &quot;Hola&quot; con SHA-256:</p>
-            <code className={styles.ejemploHash}>
-              d9014c4624844aa5bac314773d6b689ad467fa4e1d1a50a1b8a99d5a95f72ff5
-            </code>
-            <p>Si cambias una sola letra a &quot;hola&quot; (minúscula):</p>
-            <code className={styles.ejemploHash}>
-              b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79
-            </code>
-            <p className={styles.ejemploNota}>
-              ¡El hash cambia completamente! Esto se llama &quot;efecto avalancha&quot;.
-            </p>
+        {/* ========== SECCIÓN 3: FAQ ========== */}
+        <section className={styles.faqSection}>
+          <h2>❓ Preguntas frecuentes sobre hashes</h2>
+          <div className={styles.faqList}>
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>
+                ¿Por qué MD5 está &quot;roto&quot; si sigue generando hashes?
+              </summary>
+              <p className={styles.faqAnswer}>
+                MD5 funciona perfectamente para generar hashes, pero ha sido demostrado
+                que es posible crear colisiones intencionadas (dos archivos diferentes con
+                el mismo hash MD5) en minutos con equipos actuales. Esto lo hace
+                inaceptable para seguridad, pero válido para checksums donde no hay
+                un atacante intentando manipular los datos.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>
+                ¿Se pueden almacenar contraseñas directamente con SHA-256?
+              </summary>
+              <p className={styles.faqAnswer}>
+                No directamente. SHA-256 es demasiado rápido: un atacante puede probar
+                billones de contraseñas por segundo con GPU. Para contraseñas se usan
+                funciones específicamente lentas como <strong>bcrypt</strong>, <strong>Argon2</strong>
+                o <strong>PBKDF2</strong>, que añaden un «salt» y son deliberadamente costosas computacionalmente.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>
+                ¿Qué es el «efecto avalancha»?
+              </summary>
+              <p className={styles.faqAnswer}>
+                Es una propiedad donde cambiar un solo bit del input cambia
+                aproximadamente el 50% de los bits del hash de salida. Por ejemplo,
+                hashear «Hola» vs «hola» (solo cambia mayúscula/minúscula) produce
+                hashes SHA-256 completamente diferentes. Esta propiedad es fundamental
+                para que los hashes sean seguros.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>
+                ¿Qué es un hash con salt?
+              </summary>
+              <p className={styles.faqAnswer}>
+                Un salt es un valor aleatorio único que se añade al input antes de
+                hashear. Sirve para prevenir ataques con «rainbow tables» (bases de datos
+                pre-calculadas de hashes de contraseñas comunes). Con salt, dos usuarios
+                con la misma contraseña tendrán hashes diferentes.
+              </p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>
+                ¿Cómo verifica Bitcoin la integridad de las transacciones?
+              </summary>
+              <p className={styles.faqAnswer}>
+                Bitcoin usa SHA-256 de forma doble (SHA-256 aplicado dos veces al resultado).
+                Cada bloque contiene el hash del bloque anterior, formando una cadena.
+                Modificar cualquier transacción pasada cambiaría su hash, que cambiaría
+                el hash del siguiente bloque, y así sucesivamente — requiriendo recalcular
+                toda la cadena, lo que es computacionalmente inviable.
+              </p>
+            </details>
           </div>
         </section>
+
+        {/* ========== SECCIÓN 4: EFECTO AVALANCHA ========== */}
+        <section className={styles.ejemplosSection}>
+          <h2>⚡ El efecto avalancha en acción</h2>
+          <div className={styles.ejemploGrid}>
+            <div className={styles.ejemploCard}>
+              <p className={styles.ejemploLabel}>Input: <code>&quot;Hola&quot;</code></p>
+              <code className={styles.ejemploHash}>
+                d9014c4624844aa5bac314773d6b689ad467fa4e1d1a50a1b8a99d5a95f72ff5
+              </code>
+              <p className={styles.ejemploAlgo}>SHA-256</p>
+            </div>
+            <div className={styles.ejemploCard}>
+              <p className={styles.ejemploLabel}>Input: <code>&quot;hola&quot;</code> (solo minúscula)</p>
+              <code className={styles.ejemploHash}>
+                b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79
+              </code>
+              <p className={styles.ejemploAlgo}>SHA-256</p>
+            </div>
+          </div>
+          <p className={styles.ejemploNota}>
+            Solo cambió una letra (H→h) pero el hash es completamente diferente.
+            Eso es el <strong>efecto avalancha</strong>: un cambio mínimo en el input genera un hash totalmente distinto.
+          </p>
+        </section>
+
+        {/* ========== SECCIÓN 5: USOS PRÁCTICOS ========== */}
+        <section className={styles.tipsSection}>
+          <h2>💡 Cuándo usar cada algoritmo</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📦</span>
+              <div>
+                <strong>SHA-256 para verificación de descargas</strong>
+                <p>Cuando descargas software, compara el SHA-256 publicado en la web oficial con el hash del archivo descargado. Si coinciden, el archivo no ha sido modificado.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔒</span>
+              <div>
+                <strong>SHA-512 para datos muy sensibles</strong>
+                <p>Documentos legales, datos médicos o claves criptográficas merecen el mayor nivel de seguridad disponible. SHA-512 ofrece 512 bits de resistencia a colisiones.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📝</span>
+              <div>
+                <strong>MD5 solo para checksums rápidos</strong>
+                <p>Si simplemente necesitas detectar corrupción accidental de archivos (no ataques intencionados), MD5 sigue siendo útil por su velocidad y amplia compatibilidad.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔏</span>
+              <div>
+                <strong>Git usa SHA-1 (migra a SHA-256)</strong>
+                <p>Los repositorios Git identifican cada commit por su SHA-1. GitHub y Git 2.29+ ya soportan SHA-256. Si trabajas en proyectos de seguridad, considera migrar a SHA-256.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ========== SECCIÓN 6: WARNING BOX ========== */}
+        <div className={styles.warningBox}>
+          <h2>⚠️ Errores frecuentes con funciones hash</h2>
+          <ul className={styles.warningList}>
+            <li className={styles.warningItem}>
+              <span className={styles.warningIcon}>🚫</span>
+              <div>
+                <strong>Hashear contraseñas directamente con SHA-256</strong>
+                <p>SHA-256 es demasiado rápido para proteger contraseñas. Un atacante con GPU puede probar 10.000 millones de hashes por segundo. Usa siempre bcrypt, Argon2 o PBKDF2 para contraseñas.</p>
+              </div>
+            </li>
+            <li className={styles.warningItem}>
+              <span className={styles.warningIcon}>🚫</span>
+              <div>
+                <strong>Usar MD5 o SHA-1 para seguridad real</strong>
+                <p>MD5 tiene colisiones documentadas desde 2004. SHA-1 fue retirado en 2017 cuando Google demostró una colisión (ataque SHAttered). Para cualquier uso de seguridad, usa SHA-256 como mínimo.</p>
+              </div>
+            </li>
+            <li className={styles.warningItem}>
+              <span className={styles.warningIcon}>🚫</span>
+              <div>
+                <strong>Creer que un hash es cifrado</strong>
+                <p>Los hashes son unidireccionales: no se pueden revertir al input original. No son cifrado — no tienen clave y no pueden descifrarse. Son herramientas de verificación de integridad, no de confidencialidad.</p>
+              </div>
+            </li>
+            <li className={styles.warningItem}>
+              <span className={styles.warningIcon}>✅</span>
+              <div>
+                <strong>Uso correcto: verificación e integridad</strong>
+                <p>Los hashes brillan para verificar integridad de archivos, detectar cambios, crear identificadores únicos de contenido, firmas digitales (combinados con cifrado asimétrico) y como componente de otros sistemas de seguridad.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-hashes')} />
