@@ -362,3 +362,320 @@
     text-align: center;
   }
 }
+
+/* ===== SECCIÓN EDUCATIVA ===== */
+
+.eduComparativaSection {
+  margin-bottom: 2rem;
+}
+
+.eduComparativaSection h3,
+.eduCasosSection h3,
+.eduFaqSection h3,
+.eduPasadasSection h3,
+.eduTipsSection h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 1rem;
+}
+
+[data-theme='dark'] .container .eduComparativaSection h3,
+[data-theme='dark'] .container .eduCasosSection h3,
+[data-theme='dark'] .container .eduFaqSection h3,
+[data-theme='dark'] .container .eduPasadasSection h3,
+[data-theme='dark'] .container .eduTipsSection h3 {
+  color: var(--text-primary, #E5E5E5);
+}
+
+.eduInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.eduInfoCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+[data-theme='dark'] .container .eduInfoCard {
+  background: #2A2A2A;
+}
+
+.eduInfoCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin-bottom: 8px;
+}
+
+.eduInfoCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Casos */
+.eduCasosSection {
+  margin-bottom: 2rem;
+}
+
+.eduCasosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.eduCasoCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+[data-theme='dark'] .container .eduCasoCard {
+  background: #2A2A2A;
+}
+
+.eduCasoIcon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.eduCasoCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 8px;
+}
+
+.eduCasoCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* FAQ */
+.eduFaqSection {
+  margin-bottom: 2rem;
+}
+
+.eduFaqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.eduFaqItem {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .container .eduFaqItem {
+  background: #2A2A2A;
+}
+
+.eduFaqQuestion {
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary, #1A1A1A);
+  cursor: pointer;
+  list-style: none;
+}
+
+.eduFaqQuestion::-webkit-details-marker { display: none; }
+
+.eduFaqQuestion::before {
+  content: '▶ ';
+  font-size: 0.7rem;
+  color: #2E86AB;
+}
+
+.eduFaqItem[open] .eduFaqQuestion::before {
+  content: '▼ ';
+}
+
+.eduFaqAnswer {
+  padding: 0 1.25rem 1rem;
+  color: var(--text-secondary, #666666);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.eduFaqAnswer code {
+  background: rgba(46, 134, 171, 0.1);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #2E86AB;
+}
+
+/* Múltiples pasadas */
+.eduPasadasSection {
+  margin-bottom: 2rem;
+}
+
+.eduPasadasIntro {
+  color: var(--text-secondary, #666666);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.eduPasadasSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.eduPasadaStep {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: rgba(46, 134, 171, 0.05);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.eduPasadaNum {
+  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.eduPasadaStep div strong {
+  display: block;
+  color: var(--text-primary, #1A1A1A);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.eduPasadaStep div p {
+  color: var(--text-secondary, #666666);
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Tips */
+.eduTipsSection {
+  margin-bottom: 2rem;
+}
+
+.eduTipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.eduTipCard {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05) 0%, rgba(72, 169, 166, 0.05) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+[data-theme='dark'] .container .eduTipCard {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+.eduTipIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.eduTipCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin-bottom: 8px;
+}
+
+.eduTipCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Warning Box */
+.warningBox {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(245, 158, 11, 0.08);
+  border: 2px solid #F59E0B;
+  border-radius: 12px;
+}
+
+[data-theme='dark'] .container .warningBox {
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.warningIcon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.warningHeader h3 {
+  color: #D97706;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+[data-theme='dark'] .container .warningHeader h3 {
+  color: #FCD34D;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningList li {
+  color: var(--text-secondary, #666666);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  padding-left: 1rem;
+  border-left: 3px solid #F59E0B;
+}
+
+@media (max-width: 768px) {
+  .eduInfoGrid,
+  .eduCasosGrid,
+  .eduTipsGrid {
+    grid-template-columns: 1fr;
+  }
+}

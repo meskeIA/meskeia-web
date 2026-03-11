@@ -505,6 +505,20 @@ export default function TablasMultiplicarPage() {
             <li><strong>Tablas del 3, 6, 7 y 8:</strong> Las más difíciles, practicar con repetición</li>
           </ul>
         </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Errores Comunes al Aprender las Tablas de Multiplicar</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>❌ Aprender de memoria sin entender el concepto:</strong> Memorizar 7×8=56 sin entender que es &quot;7 grupos de 8&quot; crea conocimiento frágil. Cuando el niño olvida la respuesta, no puede reconstruirla. La comprensión conceptual (multiplicar = sumar repetidamente) es la base que permite recuperar una respuesta olvidada.</li>
+            <li><strong>❌ Estudiar todas las tablas a la vez:</strong> Intentar aprender las tablas del 1 al 10 simultáneamente satura la memoria de trabajo. El método efectivo es dominar completamente una tabla antes de pasar a la siguiente, siguiendo el orden recomendado (1, 2, 5, 10, 4, 9, 3, 6, 7, 8).</li>
+            <li><strong>❌ No aprovechar la propiedad conmutativa:</strong> Si sabes 6×7=42, ya sabes 7×6=42. Esto reduce el número real de combinaciones a memorizar de 100 a 55. Muchos estudiantes ignoran esta simplificación y memorizan las 100 combinaciones por separado.</li>
+            <li><strong>❌ Practicar solo en orden secuencial:</strong> Recitar &quot;7×1=7, 7×2=14, 7×3=21...&quot; en orden es mucho más fácil que responder preguntas aleatorias. El objetivo final es la recuperación rápida en cualquier orden. Este entrenador aleatoriza las preguntas precisamente para desarrollar esa habilidad.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('tablas-multiplicar')} />

@@ -637,6 +637,20 @@ export default function ConjugadorVerbosPage() {
             <li><strong>Decir y venir:</strong> Irregulares en presente, futuro (diré, vendré) y pretérito</li>
           </ul>
         </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Limitaciones del Conjugador y Errores Comunes</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>❌ Diccionario limitado (~600 verbos):</strong> Este conjugador incluye los verbos más frecuentes del español, pero el diccionario de la RAE recoge más de 10.000 verbos. Si no encuentras un verbo muy específico o técnico, prueba a buscar su forma base en el diccionario oficial.</li>
+            <li><strong>❌ No incluye variantes dialectales:</strong> El español tiene variantes regionales significativas: el voseo (vos tenés, vos sos) de Argentina, Uruguay y zonas de Centroamérica no está representado. Las conjugaciones corresponden al español estándar peninsular.</li>
+            <li><strong>❌ Los tiempos verbales tienen usos contextuales complejos:</strong> Saber conjugar un verbo no equivale a saber cuándo usarlo. El pretérito indefinido vs. el pretérito imperfecto, o el presente de subjuntivo, requieren comprensión del contexto. La conjugación es la forma; la sintaxis dicta cuándo.</li>
+            <li><strong>❌ El imperativo negativo usa subjuntivo:</strong> Un error frecuente es usar el imperativo positivo para negar. &quot;No habla&quot; (incorrecto) vs &quot;No hables&quot; (correcto). El imperativo negativo en español siempre usa la forma de subjuntivo presente.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('conjugador-verbos')} />

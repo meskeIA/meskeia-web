@@ -98,8 +98,8 @@ Apps de uso frecuente con buen potencial educativo.
 
 ### Texto y Documentos
 
-- [ ] `/conjugador-verbos/` — Conjugador de verbos español con irregulares
-- [ ] `/tablas-multiplicar/` — Entrenador de tablas gamificado
+- [x] `/conjugador-verbos/` — Conjugador de verbos español con irregulares ✅ lote 27
+- [x] `/tablas-multiplicar/` — Entrenador de tablas gamificado ✅ lote 27
 - [ ] `/contador-silabas/` — Separar y contar sílabas en español
 - [x] `/conversor-texto/` — Conversor de texto ✅ lote 26
 - [ ] `/comparador-textos/` — Comparador de textos
@@ -109,9 +109,9 @@ Apps de uso frecuente con buen potencial educativo.
 - [ ] `/detector-idioma/` — Detector de idioma automático
 - [x] `/conversor-binario/` — Conversión binaria ✅ lote 26
 - [x] `/conversor-braille/` — Sistema Braille ✅ lote 26
-- [ ] `/generador-anagramas/` — Generador de anagramas
-- [ ] `/generador-lorem-ipsum/` — Texto de prueba lorem ipsum
-- [ ] `/limpiador-texto/` — Limpieza y normalización de texto
+- [x] `/generador-anagramas/` — Generador de anagramas ✅ lote 27
+- [x] `/generador-lorem-ipsum/` — Texto de prueba lorem ipsum ✅ lote 27
+- [x] `/limpiador-texto/` — Limpieza y normalización de texto ✅ lote 27
 
 ### Criptografía y Seguridad
 
@@ -281,6 +281,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote 27 | 2026-03-11 | `generador-anagramas`, `generador-lorem-ipsum`, `conjugador-verbos`, `tablas-multiplicar`, `limpiador-texto` | pendiente |
 | Lote 26 | 2026-03-11 | `conversor-morse`, `conversor-braille`, `conversor-binario`, `conversor-texto`, `conversor-numeros-romanos` | `0da882a` |
 | Lote 25 | 2026-03-11 | `cifrado-clasico`, `cifrado-vigenere`, `cifrado-transposicion`, `cifrado-playfair`, `generador-hashes` | `6661636` |
 | Lote 24 | 2026-03-11 | `visualizador-algoritmos`, `visualizador-estructuras-datos`, `calculadora-algebra-booleana`, `calculadora-electricidad`, `tabla-periodica` | `29456c6` |

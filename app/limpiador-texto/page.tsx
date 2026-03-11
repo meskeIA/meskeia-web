@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './LimpiadorTexto.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -171,10 +171,10 @@ export default function LimpiadorTextoPage() {
           <div className={styles.opcionesHeader}>
             <h2 className={styles.sectionTitle}>Opciones de limpieza</h2>
             <div className={styles.opcionesAcciones}>
-              <button onClick={seleccionarTodas} className={styles.btnMini}>
+              <button type="button" onClick={seleccionarTodas} className={styles.btnMini}>
                 Todas
               </button>
-              <button onClick={seleccionarNinguna} className={styles.btnMini}>
+              <button type="button" onClick={seleccionarNinguna} className={styles.btnMini}>
                 Ninguna
               </button>
             </div>
@@ -203,7 +203,7 @@ export default function LimpiadorTextoPage() {
           <section className={styles.textoPanel}>
             <div className={styles.panelHeader}>
               <h2 className={styles.sectionTitle}>Texto original</h2>
-              <button onClick={limpiarTodo} className={styles.btnSecundario}>
+              <button type="button" onClick={limpiarTodo} className={styles.btnSecundario}>
                 Limpiar
               </button>
             </div>
@@ -233,7 +233,7 @@ export default function LimpiadorTextoPage() {
                   {formatNumber(estadisticas.diferencia, 0)} ({formatNumber(estadisticas.porcentaje, 1)}%)
                 </span>
               </div>
-              <button onClick={usarResultado} className={styles.btnUsar} title="Usar resultado como entrada">
+              <button type="button" onClick={usarResultado} className={styles.btnUsar} title="Usar resultado como entrada">
                 ↓ Aplicar
               </button>
             </div>
@@ -244,6 +244,7 @@ export default function LimpiadorTextoPage() {
             <div className={styles.panelHeader}>
               <h2 className={styles.sectionTitle}>Texto limpio</h2>
               <button
+                type="button"
                 onClick={copiarResultado}
                 className={styles.btnSecundario}
                 disabled={!textoLimpio}
@@ -289,6 +290,174 @@ export default function LimpiadorTextoPage() {
           </div>
         </div>
       </section>
+
+      <EducationalSection
+        title="Aprende sobre Limpieza y Normalización de Texto"
+        subtitle="Casos de uso reales, técnicas avanzadas y cuándo aplicar cada opción"
+        defaultOpen={false}
+      >
+        <section>
+
+          {/* SECCIÓN 1: Guía de opciones */}
+          <div className={styles.eduComparativaSection}>
+            <h3>📊 Guía de Opciones: Cuándo Usar Cada Una</h3>
+            <div className={styles.eduInfoGrid}>
+              <div className={styles.eduInfoCard}>
+                <h4>🧹 Espacios y formato</h4>
+                <p><strong>Espacios extra</strong> → texto copiado de Word/PDF con dobles espacios<br />
+                <strong>Espacios inicio/fin</strong> → limpiar líneas antes de procesar en código<br />
+                <strong>Tabulaciones</strong> → texto exportado de Excel/tablas</p>
+              </div>
+              <div className={styles.eduInfoCard}>
+                <h4>📄 Estructura de líneas</h4>
+                <p><strong>Líneas vacías</strong> → compactar texto para conteo de palabras real<br />
+                <strong>Líneas duplicadas</strong> → listas de emails, CSV con registros repetidos<br />
+                <strong>Saltos de línea</strong> → convertir párrafos a una sola línea para SQL/JSON</p>
+              </div>
+              <div className={styles.eduInfoCard}>
+                <h4>🔣 Caracteres especiales</h4>
+                <p><strong>HTML tags</strong> → extraer texto plano de código HTML<br />
+                <strong>URLs</strong> → limpiar posts de redes con muchos enlaces<br />
+                <strong>Emails</strong> → anonimizar texto antes de compartir</p>
+              </div>
+              <div className={styles.eduInfoCard}>
+                <h4>✂️ Contenido selectivo</h4>
+                <p><strong>Números</strong> → extraer solo texto de documentos mixtos<br />
+                <strong>Puntuación</strong> → preparar texto para análisis lingüístico/NLP<br />
+                <strong>Emojis</strong> → limpiar comentarios de redes para análisis de sentimiento</p>
+              </div>
+            </div>
+          </div>
+
+          {/* SECCIÓN 2: Casos de uso reales */}
+          <div className={styles.eduCasosSection}>
+            <h3>🎯 Casos de Uso Reales por Tipo de Usuario</h3>
+            <div className={styles.eduCasosGrid}>
+              <div className={styles.eduCasoCard}>
+                <span className={styles.eduCasoIcon}>👨‍💻</span>
+                <h4>Desarrolladores</h4>
+                <p>Limpiar datos de entrada antes de guardar en base de datos. Eliminar HTML de texto scrapeado. Normalizar CSV exportados de Excel (espacios extra, BOM characters).</p>
+              </div>
+              <div className={styles.eduCasoCard}>
+                <span className={styles.eduCasoIcon}>📊</span>
+                <h4>Analistas de datos</h4>
+                <p>Preparar corpus de texto para análisis NLP (eliminar puntuación, URLs, emojis). Deduplicar listas de emails o registros. Limpiar respuestas de encuestas abiertas.</p>
+              </div>
+              <div className={styles.eduCasoCard}>
+                <span className={styles.eduCasoIcon}>✍️</span>
+                <h4>Escritores y editores</h4>
+                <p>Limpiar texto copiado de PDFs con saltos de línea erráticos. Eliminar espacios dobles de borradores. Compactar texto para verificar conteo de palabras real.</p>
+              </div>
+              <div className={styles.eduCasoCard}>
+                <span className={styles.eduCasoIcon}>📱</span>
+                <h4>Community managers</h4>
+                <p>Limpiar comentarios de redes antes de exportar a Excel. Eliminar emojis de textos para procesamiento. Anonimizar correos en capturas para publicar.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* SECCIÓN 3: FAQ */}
+          <div className={styles.eduFaqSection}>
+            <h3>❓ Preguntas Frecuentes sobre Limpieza de Texto</h3>
+            <div className={styles.eduFaqList}>
+              <details className={styles.eduFaqItem}>
+                <summary className={styles.eduFaqQuestion}>¿En qué orden se aplican las operaciones?</summary>
+                <p className={styles.eduFaqAnswer}>Las operaciones se aplican en el orden en que aparecen en la lista de opciones: primero espacios extra, luego espacios inicio/fin, líneas vacías, líneas duplicadas, saltos de línea, tabulaciones, caracteres especiales, números, puntuación, emojis, HTML, URLs y finalmente emails. El orden importa: por ejemplo, eliminar saltos de línea antes que espacios extra puede dejar espacios que luego se limpian correctamente.</p>
+              </details>
+              <details className={styles.eduFaqItem}>
+                <summary className={styles.eduFaqQuestion}>¿Por qué &quot;Caracteres especiales&quot; mantiene tildes y ñ?</summary>
+                <p className={styles.eduFaqAnswer}>La expresión regular usada (<code>[^\w\sáéíóúüñÁÉÍÓÚÜÑ.,;:!?¿¡&apos;&quot;()-]</code>) excluye explícitamente las letras con tilde y la ñ porque son caracteres válidos en español. Si se eliminaran, el texto español perdería significado. La opción elimina símbolos menos comunes (@, #, $, ^, ~, etc.) pero preserva el español correcto.</p>
+              </details>
+              <details className={styles.eduFaqItem}>
+                <summary className={styles.eduFaqQuestion}>¿Qué hace exactamente &quot;Líneas duplicadas&quot;?</summary>
+                <p className={styles.eduFaqAnswer}>Compara cada línea con las anteriores (normalizada a minúsculas y sin espacios al inicio/fin). Si una línea ya apareció antes, se elimina. El orden del texto se preserva: se mantiene la primera aparición de cada línea. Es útil para listas de emails, usernames o cualquier dato con entradas repetidas.</p>
+              </details>
+              <details className={styles.eduFaqItem}>
+                <summary className={styles.eduFaqQuestion}>¿El texto se guarda o envía a algún servidor?</summary>
+                <p className={styles.eduFaqAnswer}>No. Toda la limpieza ocurre localmente en tu navegador con JavaScript puro. El texto nunca sale de tu dispositivo. Puedes usarlo con información confidencial (contratos, datos personales, código fuente propietario) sin riesgo de exposición.</p>
+              </details>
+              <details className={styles.eduFaqItem}>
+                <summary className={styles.eduFaqQuestion}>¿Cómo limpiar texto de un PDF copiado?</summary>
+                <p className={styles.eduFaqAnswer}>El texto copiado de PDFs suele tener: (1) guiones de partición de palabras al final de línea (-), (2) saltos de línea dentro de párrafos, (3) espacios dobles. La combinación más efectiva es activar: <strong>Espacios extra + Espacios inicio/fin</strong>. Si los párrafos están partidos en múltiples líneas, añade también <strong>Saltos de línea</strong>, aunque esto fusionará todos los párrafos en uno.</p>
+              </details>
+            </div>
+          </div>
+
+          {/* SECCIÓN 4: Flujo de múltiples pasadas */}
+          <div className={styles.eduPasadasSection}>
+            <h3>🔄 Técnica de Múltiples Pasadas</h3>
+            <p className={styles.eduPasadasIntro}>
+              El botón <strong>&quot;↓ Aplicar&quot;</strong> convierte el texto limpio en entrada para una nueva pasada.
+              Esto permite encadenar limpiezas complejas:
+            </p>
+            <div className={styles.eduPasadasSteps}>
+              <div className={styles.eduPasadaStep}>
+                <span className={styles.eduPasadaNum}>1</span>
+                <div>
+                  <strong>Pasada 1: Estructura</strong>
+                  <p>Activa: Espacios extra + Espacios inicio/fin + Tabulaciones → &quot;↓ Aplicar&quot;</p>
+                </div>
+              </div>
+              <div className={styles.eduPasadaStep}>
+                <span className={styles.eduPasadaNum}>2</span>
+                <div>
+                  <strong>Pasada 2: Contenido</strong>
+                  <p>Activa: Líneas vacías + Líneas duplicadas → &quot;↓ Aplicar&quot;</p>
+                </div>
+              </div>
+              <div className={styles.eduPasadaStep}>
+                <span className={styles.eduPasadaNum}>3</span>
+                <div>
+                  <strong>Pasada 3: Datos sensibles</strong>
+                  <p>Activa: URLs + Emails → Copiar resultado final</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SECCIÓN 5: Tips */}
+          <div className={styles.eduTipsSection}>
+            <h3>💡 Tips para Limpiezas Profesionales</h3>
+            <div className={styles.eduTipsGrid}>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>💾</span>
+                <h4>Guarda el original siempre</h4>
+                <p>Antes de limpiar texto importante, guarda siempre una copia del original. Las operaciones de limpieza no tienen deshacer y pueden eliminar contenido que necesitarás recuperar.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>🔍</span>
+                <h4>Revisa las estadísticas</h4>
+                <p>El porcentaje de caracteres eliminados te da una señal de si la limpieza fue razonable. Una reducción de más del 30% suele indicar que se eliminó contenido que quizás no debías.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>⚡</span>
+                <h4>Empieza conservador</h4>
+                <p>Activa primero solo &quot;Espacios extra + Espacios inicio/fin&quot;. Son las operaciones más seguras. Añade opciones más agresivas (caracteres especiales, puntuación) solo si el resultado previo es insuficiente.</p>
+              </div>
+              <div className={styles.eduTipCard}>
+                <span className={styles.eduTipIcon}>🌐</span>
+                <h4>Para NLP y análisis de texto</h4>
+                <p>Si preparas texto para modelos de lenguaje o análisis estadístico, la secuencia estándar es: minúsculas (en Conversor de Texto) → sin puntuación → sin números → sin URLs → sin emojis.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* SECCIÓN 6: Warning Box */}
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Limitaciones y Riesgos de la Limpieza de Texto</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li><strong>❌ &quot;Caracteres especiales&quot; puede eliminar datos importantes:</strong> Símbolos como @, #, $, &amp; tienen significado funcional en muchos contextos (menciones de Twitter, hashtags, divisas, operadores lógicos). Esta opción elimina todo símbolo no estándar, lo que puede corromper datos estructurados como JSON, XML o código de programación.</li>
+              <li><strong>❌ &quot;Líneas duplicadas&quot; no distingue contexto:</strong> Si tu texto tiene dos párrafos que comienzan igual (por ejemplo, en legalese repetitivo), el segundo se elimina aunque sea diferente. La deduplicación es estricta: cualquier línea normalizada idéntica a una anterior se descarta.</li>
+              <li><strong>❌ &quot;Saltos de línea&quot; fusiona párrafos:</strong> Convertir a una sola línea elimina la estructura de párrafos. Si después necesitas distinguir dónde empezaba cada párrafo, habrás perdido esa información. Úsalo solo cuando el texto destino es un campo de texto plano sin estructura (como un campo de búsqueda o una variable de código).</li>
+              <li><strong>❌ La detección de emails y URLs es aproximada:</strong> Las expresiones regulares usadas capturan la mayoría de formatos, pero pueden dar falsos positivos (eliminar texto que parece email pero no lo es) o falsos negativos (no detectar URLs con formatos inusuales). Para procesamiento de producción, usa librerías especializadas.</li>
+            </ul>
+          </div>
+
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('limpiador-texto')} />
 

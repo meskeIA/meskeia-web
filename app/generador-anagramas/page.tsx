@@ -441,8 +441,8 @@ export default function GeneradorAnagramasPage() {
         </section>
 
         <section>
-          <div className={styles.eduWarningBox}>
-            <span className={styles.eduWarningIcon}>⚠️</span>
+          <div className={styles.warningBox}>
+            <span className={styles.warningIcon}>⚠️</span>
             <div>
               <strong>Limitaciones importantes del generador</strong>
               <ul>
