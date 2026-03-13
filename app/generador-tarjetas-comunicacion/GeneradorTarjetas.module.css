@@ -1,0 +1,927 @@
+/* ============================================
+   Generador de Tarjetas de Comunicación
+   meskeIA - Paleta oficial
+   ============================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --border: #E0E0E0;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.13);
+
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.title {
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 0.65rem;
+  line-height: 1.15;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  opacity: 0.92;
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ============================================
+   PESTAÑAS DE VISTA
+   ============================================ */
+.vistaTabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 0;
+}
+
+.vistaTab {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  min-height: 52px;
+}
+
+.vistaTab:hover {
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.vistaTabActiva {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: rgba(46, 134, 171, 0.07);
+}
+
+.vistaTab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   EDITOR - LAYOUT
+   ============================================ */
+.editorPanel {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  border: 2px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  min-height: 520px;
+  box-shadow: var(--shadow);
+}
+
+/* Sidebar de mazos */
+.mazosSidebar {
+  background: rgba(46, 134, 171, 0.04);
+  border-right: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.mazosHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0.85rem 0.5rem;
+}
+
+.mazosTitulo {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.btnNuevoMazo {
+  width: 28px;
+  height: 28px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.btnNuevoMazo:hover {
+  background: #256a8a;
+  transform: scale(1.1);
+}
+
+.btnNuevoMazo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.mazosList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.4rem 0.5rem;
+  overflow-y: auto;
+}
+
+.mazoItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  background: transparent;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  gap: 0.4rem;
+  min-height: 40px;
+}
+
+.mazoItem:hover {
+  background: rgba(46, 134, 171, 0.07);
+}
+
+.mazoItemActivo {
+  background: rgba(46, 134, 171, 0.12) !important;
+  border-color: var(--primary) !important;
+}
+
+.mazoItemNombre {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mazoItemCount {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--border);
+  border-radius: 999px;
+  padding: 0.1rem 0.4rem;
+  flex-shrink: 0;
+}
+
+/* Panel principal del editor */
+.editorMain {
+  background: var(--bg-card);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow-y: auto;
+}
+
+/* Cabecera del mazo */
+.mazoHeader {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+}
+
+.mazoTituloRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mazoNombreH2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+.btnEditarNombre,
+.btnEliminarMazo {
+  font-size: 1rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0.25rem 0.45rem;
+  min-height: 32px;
+  transition: all 0.15s;
+}
+
+.btnEditarNombre:hover {
+  border-color: var(--primary);
+}
+
+.btnEliminarMazo:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+.mazoRenombrar {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.inputMazoNombre {
+  flex: 1;
+  padding: 0.45rem 0.7rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.inputMazoNombre:focus {
+  outline: none;
+}
+
+.btnGuardarNombre {
+  min-height: 36px;
+  min-width: 36px;
+  background: #16A34A;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.btnCancelarNombre {
+  min-height: 36px;
+  min-width: 36px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Formulario nueva tarjeta */
+.nuevaTarjetaForm {
+  background: rgba(46, 134, 171, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.formTitulo {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Selector de categoría */
+.categoriaSelector {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.categoriaBtnColor {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.categoriaBtnColor:hover {
+  transform: scale(1.1);
+  border-color: rgba(0,0,0,0.15);
+}
+
+.categoriaActiva {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.categoriaBtnColor:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Fila emoji + texto + botón */
+.formRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.emojiCol {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.btnEmojiGrande {
+  width: 56px;
+  height: 56px;
+  font-size: 1.8rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.btnEmojiGrande:hover,
+.btnEmojiGrande:focus-visible {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.emojiDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  width: 240px;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: var(--shadow-md);
+}
+
+.emojiOpt {
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emojiOpt:hover {
+  background: rgba(46, 134, 171, 0.08);
+  transform: scale(1.15);
+}
+
+.emojiOptActivo {
+  border-color: var(--primary) !important;
+  background: rgba(46, 134, 171, 0.1) !important;
+}
+
+.textoCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.inputLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.inputTexto {
+  padding: 0.6rem 0.85rem;
+  font-size: 0.95rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: border-color 0.2s;
+  height: 56px;
+  box-sizing: border-box;
+}
+
+.inputTexto:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.btnAgregarTarjeta {
+  width: 56px;
+  height: 56px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnAgregarTarjeta:hover:not(:disabled) {
+  background: #256a8a;
+  transform: scale(1.05);
+}
+
+.btnAgregarTarjeta:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnAgregarTarjeta:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Sin tarjetas */
+.sinTarjetas {
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+/* Grid de tarjetas en editor */
+.tarjetasEditorGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.tarjetaEditorItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 80px;
+  padding: 0.6rem 0.5rem;
+  border-radius: 10px;
+  border: 2px solid rgba(0,0,0,0.08);
+}
+
+.tarjetaEditorEmoji {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.tarjetaEditorTexto {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: center;
+  color: #1A1A1A;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.btnEliminarT {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  font-size: 0.65rem;
+  background: #EF4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+  font-weight: 700;
+}
+
+.tarjetaEditorItem:hover .btnEliminarT {
+  opacity: 1;
+}
+
+.btnEliminarT:focus-visible {
+  opacity: 1;
+  outline: 2px solid #EF4444;
+  outline-offset: 1px;
+}
+
+/* ============================================
+   PANEL IMPRIMIR
+   ============================================ */
+.imprimirPanel {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.imprimirControles {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.controlGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.controlLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.controlSelect {
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  min-width: 220px;
+  transition: border-color 0.2s;
+}
+
+.controlSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.tamanoOpciones {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.tamanoBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.5rem 0.85rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 52px;
+}
+
+.tamanoBtn:hover {
+  border-color: var(--primary);
+}
+
+.tamanoBtnActivo {
+  border-color: var(--primary) !important;
+  background: rgba(46, 134, 171, 0.08) !important;
+  color: var(--primary);
+}
+
+.tamanoLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.tamanoSub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.btnImprimir {
+  min-height: 52px;
+  padding: 0 2rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.18s;
+  box-shadow: 0 4px 14px rgba(46, 134, 171, 0.4);
+}
+
+.btnImprimir:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnImprimir:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.imprimirInfo {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ============================================
+   ÁREA DE IMPRESIÓN
+   ============================================ */
+.printArea {
+  padding: 1rem 0;
+}
+
+.printAreaHidden {
+  display: none;
+}
+
+.printHeader {
+  display: none; /* Solo en impresión */
+}
+
+/* Grids según tamaño */
+.tarjetasGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.grid-pequena .tarjetaImpresion { width: 90px;  height: 90px; }
+.grid-mediana .tarjetaImpresion { width: 120px; height: 120px; }
+.grid-grande  .tarjetaImpresion { width: 160px; height: 160px; }
+
+.tarjetaImpresion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 12px;
+  border: 2px solid rgba(0,0,0,0.10);
+  padding: 8px 4px;
+  box-sizing: border-box;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Emoji y texto por tamaño */
+.tarjeta-pequena .tarjetaImpEmoji { font-size: 2rem; }
+.tarjeta-mediana .tarjetaImpEmoji { font-size: 2.8rem; }
+.tarjeta-grande  .tarjetaImpEmoji { font-size: 4rem; }
+
+.tarjetaImpEmoji {
+  line-height: 1;
+  display: block;
+}
+
+.tarjeta-pequena .tarjetaImpTexto { font-size: 0.62rem; }
+.tarjeta-mediana .tarjetaImpTexto { font-size: 0.75rem; }
+.tarjeta-grande  .tarjetaImpTexto { font-size: 0.9rem; }
+
+.tarjetaImpTexto {
+  font-weight: 800;
+  text-align: center;
+  color: #1A1A1A;
+  line-height: 1.2;
+  word-break: break-word;
+  padding: 0 2px;
+}
+
+/* ============================================
+   CONTENIDO EDUCATIVO
+   ============================================ */
+.guiaSeccion h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.4rem 0 0.5rem;
+}
+
+.guiaSeccion h2:first-child {
+  margin-top: 0;
+}
+
+.guiaSeccion p {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion ul {
+  padding-left: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion li {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin-bottom: 0.45rem;
+}
+
+.guiaSeccion strong {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 700px) {
+  .hero {
+    margin-top: 70px;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .editorPanel {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .mazosSidebar {
+    border-right: none;
+    border-bottom: 2px solid var(--border);
+    max-height: 140px;
+  }
+
+  .mazosList {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.4rem;
+  }
+
+  .mazoItem {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .imprimirControles {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controlSelect {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .tamanoOpciones {
+    justify-content: space-between;
+  }
+
+  .btnImprimir {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   IMPRESIÓN CSS
+   ============================================ */
+@media print {
+  /* Ocultar toda la UI */
+  :global(.noPrint),
+  :global(nav),
+  :global(footer) {
+    display: none !important;
+  }
+
+  /* Mostrar solo el área de impresión */
+  .container {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .printArea {
+    display: block !important;
+    padding: 0;
+  }
+
+  .printAreaHidden {
+    display: block !important;
+  }
+
+  .printHeader {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    color: #333;
+  }
+
+  .soloImpresion {
+    display: block !important;
+  }
+
+  /* Grid para impresión */
+  .tarjetasGrid {
+    gap: 8px;
+  }
+
+  .tarjetaImpresion {
+    border: 2px solid rgba(0,0,0,0.15) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Tamaños en cm para impresión */
+  .grid-pequena .tarjetaImpresion { width: 5cm;  height: 5cm; }
+  .grid-mediana .tarjetaImpresion { width: 7cm;  height: 7cm; }
+  .grid-grande  .tarjetaImpresion { width: 10cm; height: 10cm; }
+
+  .tarjeta-pequena .tarjetaImpEmoji { font-size: 2.5cm; }
+  .tarjeta-mediana .tarjetaImpEmoji { font-size: 3.5cm; }
+  .tarjeta-grande  .tarjetaImpEmoji { font-size: 5.5cm; }
+
+  .tarjeta-pequena .tarjetaImpTexto { font-size: 10pt; }
+  .tarjeta-mediana .tarjetaImpTexto { font-size: 13pt; }
+  .tarjeta-grande  .tarjetaImpTexto { font-size: 18pt; }
+}
+
+/* ============================================
+   ANIMACIONES RESPETUOSAS
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  :global(*),
+  :global(*::before),
+  :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

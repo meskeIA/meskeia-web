@@ -896,8 +896,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'planificador-rutinas': [
     { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer con círculo de colores' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC para comunicar' },
-    { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Relajación entre tareas' },
+    { url: '/generador-tarjetas-comunicacion/', icon: '🃏', name: 'Generador de Tarjetas', description: 'Crea e imprime tarjetas AAC' },
     { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Textos más fáciles de leer' },
+  ],
+  'generador-tarjetas-comunicacion': [
+    { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC en pantalla con voz' },
+    { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Agenda visual con pictogramas' },
+    { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Textos más fáciles de leer' },
+    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto', description: 'Lee textos en voz alta' },
   ],
 };
 

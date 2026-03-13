@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 250+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 251+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 250,
+  "total_tools": 251,
   "last_updated": "2026-03-13",
   "features": {
     "all_free": true,
@@ -84,14 +84,14 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 46
+      "tool_count": 47
     },
     {
       "id": "salud",
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 35
+      "tool_count": 36
     },
     {
       "id": "viajes",
@@ -107,21 +107,21 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 96
+      "tool_count": 97
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 89
+      "tool_count": 90
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 86
+      "tool_count": 87
     },
     {
       "id": "dinero",
@@ -6221,6 +6221,32 @@
         "horario visual"
       ],
       "icon": "📅"
+    },
+    {
+      "slug": "generador-tarjetas-comunicacion",
+      "name": "Generador de Tarjetas de Comunicación",
+      "url": "https://meskeia.com/generador-tarjetas-comunicacion/",
+      "description": "Crea e imprime tarjetas de comunicación pictográficas personalizadas. Organiza por colores y categorías (necesidades, emociones, comida, acciones, personas, lugares). Para AAC, logopedia y autismo.",
+      "suites": [
+        "salud",
+        "productividad"
+      ],
+      "contexts": [
+        "casa",
+        "trabajo",
+        "estudio"
+      ],
+      "keywords": [
+        "tarjetas comunicacion",
+        "pictogramas imprimir",
+        "tarjetas AAC",
+        "comunicacion aumentativa",
+        "tarjetas autismo",
+        "pictogramas personalizados",
+        "PECS tarjetas",
+        "logopedia materiales"
+      ],
+      "icon": "🃏"
     }
   ],
   "llm_instructions": {

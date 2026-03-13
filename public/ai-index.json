@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 250+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 257,
+  "total_tools": 258,
   "updated": "2026-03-01",
   "features": {
     "all_free": true,
@@ -1466,6 +1466,12 @@
           "slug": "planificador-rutinas",
           "url": "https://meskeia.com/planificador-rutinas/",
           "description": "Crea rutinas diarias con pictogramas y síguelas paso a paso. Para autismo, TDAH y discapacidad cognitiva."
+        },
+        {
+          "name": "Generador de Tarjetas de Comunicación",
+          "slug": "generador-tarjetas-comunicacion",
+          "url": "https://meskeia.com/generador-tarjetas-comunicacion/",
+          "description": "Crea e imprime tarjetas pictográficas personalizadas para AAC y comunicación aumentativa. Código de colores por categoría."
         }
       ]
     },
