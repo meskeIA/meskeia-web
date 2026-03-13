@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 248+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 249+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 248,
+  "total_tools": 249,
   "last_updated": "2026-03-13",
   "features": {
     "all_free": true,
@@ -91,7 +91,7 @@
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 33
+      "tool_count": 34
     },
     {
       "id": "viajes",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 84
+      "tool_count": 85
     },
     {
       "id": "dinero",
@@ -142,7 +142,7 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 28
+      "tool_count": 29
     },
     {
       "id": "curiosidad",
@@ -6169,6 +6169,32 @@
         "simbolos comunicacion"
       ],
       "icon": "💬"
+    },
+    {
+      "slug": "ejercicios-vocalizacion",
+      "name": "Ejercicios de Vocalización para Parkinson",
+      "url": "https://meskeia.com/ejercicios-vocalizacion/",
+      "description": "Ejercicios guiados de vocalización para personas con Parkinson. Vocales sostenidas y lectura en voz alta con medidor visual de volumen en tiempo real. Registro de sesiones. Privacidad total: el audio nunca sale del dispositivo.",
+      "suites": [
+        "salud"
+      ],
+      "contexts": [
+        "casa",
+        "relax"
+      ],
+      "keywords": [
+        "ejercicios vocalizacion parkinson",
+        "logopedia parkinson",
+        "voz parkinson",
+        "LSVT",
+        "hipofonia",
+        "rehabilitacion voz",
+        "ejercicios habla",
+        "terapia voz",
+        "voz debil",
+        "parkinson habla"
+      ],
+      "icon": "🎙️"
     }
   ],
   "llm_instructions": {

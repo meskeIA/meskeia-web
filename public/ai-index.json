@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 250+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 250,
+  "total_tools": 256,
   "updated": "2026-03-01",
   "features": {
     "all_free": true,
@@ -1424,6 +1424,42 @@
           "slug": "luxometro",
           "url": "https://meskeia.com/luxometro/",
           "description": "Mide la intensidad de luz en lux con tu dispositivo. Ideal para fotógrafos con recomendaciones de ISO y apertura."
+        },
+        {
+          "name": "Adaptador de Lectura para Dislexia",
+          "slug": "adaptador-dislexia",
+          "url": "https://meskeia.com/adaptador-dislexia/",
+          "description": "Herramienta para adaptar textos para personas con dislexia. Ajusta fuente (Lexend), tamaño, espaciado, interlineado y color de fondo."
+        },
+        {
+          "name": "Temporizador Visual",
+          "slug": "temporizador-visual",
+          "url": "https://meskeia.com/temporizador-visual/",
+          "description": "Temporizador con círculo que cambia de color verde a rojo. Para personas con autismo, TDAH o discapacidad cognitiva."
+        },
+        {
+          "name": "Guía de Respiración Consciente",
+          "slug": "guia-respiracion",
+          "url": "https://meskeia.com/guia-respiracion/",
+          "description": "Guía interactiva de técnicas de respiración con círculo animado. Diafragmática, cuadrada, 4-7-8 y coherente."
+        },
+        {
+          "name": "Lector de Texto en Voz Alta",
+          "slug": "lector-texto-voz",
+          "url": "https://meskeia.com/lector-texto-voz/",
+          "description": "Lector TTS con resaltado de palabras en tiempo real. Para discapacidad visual, dislexia y TDAH."
+        },
+        {
+          "name": "Tablero de Comunicación AAC",
+          "slug": "tablero-comunicacion",
+          "url": "https://meskeia.com/tablero-comunicacion/",
+          "description": "Tablero AAC con 72 símbolos visuales para comunicación aumentativa. Para personas no verbales, autismo y afasia."
+        },
+        {
+          "name": "Ejercicios de Vocalización para Parkinson",
+          "slug": "ejercicios-vocalizacion",
+          "url": "https://meskeia.com/ejercicios-vocalizacion/",
+          "description": "Ejercicios de vocalización con medidor de voz en tiempo real. Vocales sostenidas y lectura guiada para rehabilitación vocal en Parkinson."
         }
       ]
     },

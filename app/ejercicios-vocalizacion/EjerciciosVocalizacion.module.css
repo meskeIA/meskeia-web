@@ -1,0 +1,778 @@
+/* ============================================
+   Ejercicios de Vocalización para Parkinson
+   meskeIA - Paleta oficial
+   ============================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --border: #E0E0E0;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.13);
+
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.title {
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 0.65rem;
+  line-height: 1.15;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  opacity: 0.92;
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ============================================
+   SECCIÓN MICRÓFONO
+   ============================================ */
+.seccionMic {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.micInactivo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.micIcono {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.micTexto {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 480px;
+}
+
+.errorMic {
+  background: #FEF2F2;
+  border: 2px solid #EF4444;
+  border-radius: var(--radius);
+  padding: 0.85rem 1.1rem;
+  font-size: 0.9rem;
+  color: #991B1B;
+  text-align: left;
+  max-width: 480px;
+  width: 100%;
+}
+
+[data-theme='dark'] .errorMic {
+  background: rgba(239, 68, 68, 0.12);
+  color: #FCA5A5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.btnActivarMic {
+  min-height: 60px;
+  min-width: 200px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 0 2rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.4);
+}
+
+.btnActivarMic:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnActivarMic:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* Micrófono activo */
+.micActivo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.medidorWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.medidorLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.medidorBarra {
+  position: relative;
+  height: 36px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.medidorRelleno {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.1s ease, background-color 0.3s ease;
+  min-width: 4px;
+}
+
+.medidorUmbral {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 0;
+}
+
+[data-theme='dark'] .medidorUmbral {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.medidorEstado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.silencio {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.vozDetectada {
+  color: #16A34A;
+  font-weight: 700;
+}
+
+.medidorNumero {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.btnDesactivarMic {
+  align-self: flex-start;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  min-height: 40px;
+  transition: all 0.18s ease;
+}
+
+.btnDesactivarMic:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+.btnDesactivarMic:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   NAVEGACIÓN DE MODOS
+   ============================================ */
+.modosNav {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 0;
+}
+
+.modoBtn {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  min-height: 52px;
+}
+
+.modoBtn:hover {
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.modoBtnActivo {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: rgba(46, 134, 171, 0.07);
+}
+
+.modoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   PANEL EJERCICIO
+   ============================================ */
+.panel {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 1.75rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.panelTitulo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.panelDesc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1.5rem;
+}
+
+/* ============================================
+   VOCALES
+   ============================================ */
+.vocalesGrid {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.vocalBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: 90px;
+  height: 90px;
+  background: var(--bg-card);
+  border: 3px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.vocalBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+  transform: translateY(-2px);
+}
+
+.vocalBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.vocalBtnActivo {
+  border-color: var(--primary) !important;
+  background: rgba(46, 134, 171, 0.1) !important;
+}
+
+.vocalBtn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.vocalLetra {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.vocalSeg {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ============================================
+   EJERCICIO ACTIVO
+   ============================================ */
+.ejercicioActivo {
+  background: rgba(46, 134, 171, 0.05);
+  border: 2px solid rgba(46, 134, 171, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.ejercicioInstruccion {
+  text-align: center;
+}
+
+.ejercicioInstruccion strong {
+  font-size: 1.15rem;
+  color: var(--text-primary);
+}
+
+.ejercicioInstruccion p {
+  margin: 0.3rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.vocalDestacada {
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+/* Progreso circular */
+.progresoWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.progresoCirculo {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.progresoTexto {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progresoSegs {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.progresoTotal {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Progreso lineal (frases) */
+.progresoLineal {
+  width: 100%;
+  max-width: 400px;
+  height: 14px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progresoLinealRelleno {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.9s ease, background-color 0.3s ease;
+}
+
+.progresoLinealTexto {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Indicador de voz */
+.indicadorVoz {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.vozOk {
+  color: #16A34A;
+}
+
+.vozBaja {
+  color: #D97706;
+}
+
+.exito {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #16A34A;
+  background: rgba(22, 163, 74, 0.08);
+  border: 2px solid rgba(22, 163, 74, 0.25);
+  border-radius: var(--radius);
+  padding: 0.75rem 1.5rem;
+}
+
+/* Botones de acción */
+.btnDetener {
+  min-height: 52px;
+  min-width: 200px;
+  font-size: 1rem;
+  font-weight: 700;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 0 1.5rem;
+  transition: all 0.18s ease;
+}
+
+.btnDetener:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+.btnDetener:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnNuevo {
+  min-height: 52px;
+  min-width: 200px;
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 0 1.5rem;
+  transition: all 0.18s ease;
+  box-shadow: 0 3px 10px rgba(46, 134, 171, 0.35);
+}
+
+.btnNuevo:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnNuevo:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   FRASES
+   ============================================ */
+.frasesLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.fraseBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+}
+
+.fraseBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.fraseBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.fraseBtnActiva {
+  border-color: var(--primary) !important;
+  background: rgba(46, 134, 171, 0.07) !important;
+}
+
+.fraseBtn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.fraseTexto {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.fraseDesc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.fraseActiva {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  line-height: 1.5;
+  padding: 0 1rem;
+}
+
+/* ============================================
+   HISTORIAL
+   ============================================ */
+.historialSeccion {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.historialToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  min-height: 52px;
+  transition: background 0.18s ease;
+}
+
+.historialToggle:hover {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.historialToggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.toggleFlecha {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.historialLista {
+  border-top: 1px solid var(--border);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.historialItem {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.82rem;
+  align-items: center;
+}
+
+.historialExito {
+  background: rgba(22, 163, 74, 0.07);
+}
+
+.historialParcial {
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.historialFecha {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.historialEjercicio {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.historialDuracion {
+  color: var(--text-secondary);
+  white-space: nowrap;
+  text-align: right;
+}
+
+.btnLimpiarHistorial {
+  margin-top: 0.5rem;
+  align-self: flex-start;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 0.35rem 0.75rem;
+  min-height: 34px;
+  transition: all 0.18s ease;
+}
+
+.btnLimpiarHistorial:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+/* ============================================
+   CONTENIDO EDUCATIVO
+   ============================================ */
+.guiaSeccion h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.4rem 0 0.5rem;
+}
+
+.guiaSeccion h2:first-child {
+  margin-top: 0;
+}
+
+.guiaSeccion p {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion ul {
+  padding-left: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion li {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin-bottom: 0.45rem;
+}
+
+.guiaSeccion strong {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 700px) {
+  .hero {
+    margin-top: 70px;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .vocalesGrid {
+    justify-content: center;
+  }
+
+  .vocalBtn {
+    width: 80px;
+    height: 80px;
+  }
+
+  .vocalLetra {
+    font-size: 2rem;
+  }
+
+  .historialItem {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+
+  .historialDuracion {
+    text-align: left;
+  }
+
+  .modoBtn {
+    font-size: 0.82rem;
+    padding: 0.65rem 0.9rem;
+  }
+}
+
+/* ============================================
+   ANIMACIONES RESPETUOSAS
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  :global(*),
+  :global(*::before),
+  :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
