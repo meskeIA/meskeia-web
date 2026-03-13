@@ -306,6 +306,7 @@ export const implementedAppsUrls = [
   "/temporizador-visual/",              // Temporizador con círculo de colores para autismo/discapacidad cognitiva
   "/guia-respiracion/",                 // Técnicas de respiración consciente con guía visual animada
   "/lector-texto-voz/",                 // Lector TTS con resaltado de palabras en tiempo real
+  "/tablero-comunicacion/",             // Tablero AAC con símbolos visuales y voz para personas no verbales
 ];
 
 /**

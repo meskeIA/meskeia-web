@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 247+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 248+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 247,
+  "total_tools": 248,
   "last_updated": "2026-03-13",
   "features": {
     "all_free": true,
@@ -84,14 +84,14 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 44
+      "tool_count": 45
     },
     {
       "id": "salud",
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 32
+      "tool_count": 33
     },
     {
       "id": "viajes",
@@ -107,21 +107,21 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 94
+      "tool_count": 95
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 87
+      "tool_count": 88
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 83
+      "tool_count": 84
     },
     {
       "id": "dinero",
@@ -6141,6 +6141,34 @@
         "accesibilidad"
       ],
       "icon": "🔊"
+    },
+    {
+      "slug": "tablero-comunicacion",
+      "name": "Tablero de Comunicación AAC",
+      "url": "https://meskeia.com/tablero-comunicacion/",
+      "description": "Tablero de comunicación aumentativa y alternativa con 72 símbolos visuales en 6 categorías. Construye frases y léelas en voz alta. Para personas no verbales, autismo, parálisis cerebral o afasia.",
+      "suites": [
+        "salud",
+        "productividad"
+      ],
+      "contexts": [
+        "casa",
+        "trabajo",
+        "estudio"
+      ],
+      "keywords": [
+        "tablero comunicacion",
+        "AAC",
+        "comunicacion aumentativa",
+        "autismo",
+        "no verbal",
+        "paralisis cerebral",
+        "afasia",
+        "pictogramas",
+        "PECS",
+        "simbolos comunicacion"
+      ],
+      "icon": "💬"
     }
   ],
   "llm_instructions": {
