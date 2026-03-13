@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 243+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 244+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 243,
-  "last_updated": "2026-03-11",
+  "total_tools": 244,
+  "last_updated": "2026-03-13",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -35,7 +35,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 54
+      "tool_count": 55
     },
     {
       "id": "finanzas",
@@ -84,14 +84,14 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 40
+      "tool_count": 41
     },
     {
       "id": "salud",
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 28
+      "tool_count": 29
     },
     {
       "id": "viajes",
@@ -107,21 +107,21 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 91
+      "tool_count": 92
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 83
+      "tool_count": 84
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 79
+      "tool_count": 80
     },
     {
       "id": "dinero",
@@ -6027,6 +6027,37 @@
         "privado sin subir"
       ],
       "icon": "🎬"
+    },
+    {
+      "slug": "adaptador-dislexia",
+      "name": "Adaptador de Lectura para Dislexia",
+      "url": "https://meskeia.com/adaptador-dislexia/",
+      "description": "Herramienta para adaptar textos y facilitar la lectura a personas con dislexia. Ajusta fuente (Lexend), tamaño, espaciado entre letras y palabras, interlineado, ancho de columna y color de fondo. Preferencias guardadas automáticamente.",
+      "suites": [
+        "salud",
+        "productividad",
+        "estudiantes"
+      ],
+      "contexts": [
+        "casa",
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "dislexia",
+        "adaptador lectura",
+        "fuente dislexia",
+        "lexend",
+        "texto dislexia",
+        "accesibilidad",
+        "lectura facil",
+        "espaciado letras",
+        "interlineado",
+        "dificultad lectura",
+        "daltonismo",
+        "discapacidad"
+      ],
+      "icon": "📖"
     }
   ],
   "llm_instructions": {

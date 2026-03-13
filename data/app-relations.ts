@@ -855,6 +855,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-tarifa-freelance/', icon: '💰', name: 'Tarifa Freelance', description: 'Cuánto cobrar por hora' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
   ],
+
+  // ACCESIBILIDAD
+  'adaptador-dislexia': [
+    { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice de masa corporal' },
+    { url: '/planificador-chequeos-medicos/', icon: '🏥', name: 'Chequeos Médicos', description: 'Revisiones preventivas por edad' },
+    { url: '/calculadora-tension-arterial/', icon: '🩺', name: 'Tensión Arterial', description: 'Clasifica tu presión arterial' },
+    { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento de Hábitos', description: 'Construye rutinas saludables' },
+  ],
 };
 
 /**

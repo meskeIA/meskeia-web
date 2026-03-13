@@ -395,6 +395,11 @@ export const applicationsDatabase: Application[] = [
   // 16. Nuevas apps (2026-02-21)
   // ============================================
   { name: "Extractor de Audio de Vídeo", suites: ["tecnicas", "productividad"], contexts: ["trabajo", "creando", "casa"], icon: "🎬", description: "Extrae y recorta fragmentos de audio de tus vídeos (AVI, MP4, MOV, MKV) y conviértelos a MP3 o WAV. Todo se procesa en tu navegador: privacidad total garantizada, ningún archivo sale de tu dispositivo", url: "/extractor-audio-video/", keywords: ["extractor audio video", "video a mp3", "avi a mp3", "mp4 a wav", "extraer audio video", "convertir video audio", "recortar audio", "webassembly", "ffmpeg online", "privado sin subir"] },
+
+  // ============================================
+  // 17. Apps de Accesibilidad (2026-03-13)
+  // ============================================
+  { name: "Adaptador de Lectura para Dislexia", suites: ["salud", "productividad", "estudiantes"], contexts: ["casa", "estudio", "trabajo"], icon: "📖", description: "Herramienta para adaptar textos y facilitar la lectura a personas con dislexia. Ajusta fuente (Lexend), tamaño, espaciado entre letras y palabras, interlineado, ancho de columna y color de fondo. Preferencias guardadas automáticamente.", url: "/adaptador-dislexia/", keywords: ["dislexia", "adaptador lectura", "fuente dislexia", "lexend", "texto dislexia", "accesibilidad", "lectura facil", "espaciado letras", "interlineado", "dificultad lectura", "daltonismo", "discapacidad"] },
 ];
 
 // ============================================

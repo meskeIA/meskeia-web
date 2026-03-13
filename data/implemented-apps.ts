@@ -300,6 +300,9 @@ export const implementedAppsUrls = [
   "/planificador-itinerario/",           // Organiza días y actividades de viaje con horarios y notas
   "/calculadora-tension-arterial/",      // Clasificación ESH/ESC 2018: TAM, presión de pulso e historial local
   "/planificador-chequeos-medicos/",     // Chequeos preventivos por edad/sexo: referencia Ministerio Sanidad y SEMFyC
+
+  // Apps de Accesibilidad (2026-03-13)
+  "/adaptador-dislexia/",               // Adaptador visual de textos para personas con dislexia
 ];
 
 /**
