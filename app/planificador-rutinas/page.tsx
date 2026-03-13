@@ -8,6 +8,7 @@ import {
   LegalNotice,
   RelatedApps,
   EducationalSection,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -825,6 +826,7 @@ export default function PlanificadorRutinasPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('planificador-rutinas')} />
+      <ShareCard appName="planificador-rutinas" />
       <Footer appName="planificador-rutinas" />
     </div>
   );

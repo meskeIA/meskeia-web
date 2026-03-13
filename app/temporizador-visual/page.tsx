@@ -8,6 +8,7 @@ import {
   LegalNotice,
   RelatedApps,
   EducationalSection,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -335,6 +336,7 @@ export default function TemporizadorVisualPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('temporizador-visual')} />
+      <ShareCard appName="temporizador-visual" />
       <Footer appName="temporizador-visual" />
     </div>
   );

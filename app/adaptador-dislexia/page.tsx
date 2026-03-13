@@ -9,6 +9,7 @@ import {
   RelatedApps,
   DisclaimerCard,
   EducationalSection,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -641,6 +642,7 @@ export default function AdaptadorDislexiaPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('adaptador-dislexia')} />
+      <ShareCard appName="adaptador-dislexia" />
       <Footer appName="adaptador-dislexia" />
     </div>
   );

@@ -8,6 +8,7 @@ import {
   LegalNotice,
   RelatedApps,
   EducationalSection,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -724,6 +725,7 @@ export default function GeneradorTarjetasPage() {
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('generador-tarjetas-comunicacion')} />
+        <ShareCard appName="generador-tarjetas-comunicacion" />
         <Footer appName="generador-tarjetas-comunicacion" />
       </div>
     </div>

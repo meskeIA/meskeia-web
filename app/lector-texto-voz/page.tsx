@@ -8,6 +8,7 @@ import {
   LegalNotice,
   RelatedApps,
   EducationalSection,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -654,6 +655,7 @@ export default function LectorTextoVozPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('lector-texto-voz')} />
+      <ShareCard appName="lector-texto-voz" />
       <Footer appName="lector-texto-voz" />
     </div>
   );

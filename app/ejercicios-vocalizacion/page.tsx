@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   DisclaimerCard,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -834,6 +835,7 @@ export default function EjerciciosVocalizacionPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('ejercicios-vocalizacion')} />
+      <ShareCard appName="ejercicios-vocalizacion" />
       <Footer appName="ejercicios-vocalizacion" />
     </div>
   );

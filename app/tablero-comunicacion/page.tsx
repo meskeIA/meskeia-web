@@ -9,6 +9,7 @@ import {
   RelatedApps,
   DisclaimerCard,
   EducationalSection,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -569,6 +570,7 @@ export default function TableroComunicacionPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('tablero-comunicacion')} />
+      <ShareCard appName="tablero-comunicacion" />
       <Footer appName="tablero-comunicacion" />
     </div>
   );

@@ -9,6 +9,7 @@ import {
   RelatedApps,
   DisclaimerCard,
   EducationalSection,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -624,6 +625,7 @@ export default function GuiaRespiracionPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('guia-respiracion')} />
+      <ShareCard appName="guia-respiracion" />
       <Footer appName="guia-respiracion" />
     </div>
   );
