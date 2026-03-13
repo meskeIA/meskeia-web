@@ -1,0 +1,1008 @@
+/* ============================================
+   Planificador Visual de Rutinas
+   meskeIA - Paleta oficial
+   ============================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --border: #E0E0E0;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.13);
+
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.title {
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 0.65rem;
+  line-height: 1.15;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  opacity: 0.92;
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ============================================
+   LISTA DE RUTINAS
+   ============================================ */
+.rutinasSección {
+  margin-bottom: 2rem;
+}
+
+.rutinasSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+}
+
+.seccionTitulo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.btnNuevaRutina {
+  min-height: 48px;
+  padding: 0 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 10px rgba(46, 134, 171, 0.35);
+  white-space: nowrap;
+}
+
+.btnNuevaRutina:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnNuevaRutina:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sinRutinas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem;
+  background: var(--bg-card);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.sinRutinasEmoji {
+  font-size: 3rem;
+}
+
+.rutinasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.rutinaCard {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  transition: box-shadow 0.18s ease;
+}
+
+.rutinaCard:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.rutinaCardHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.rutinaCardNombre {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.rutinaCardCount {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.rutinaCardPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.previewEmoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.previewMas {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.rutinaCardAcciones {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.btnIniciarRutina {
+  flex: 1;
+  min-height: 48px;
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btnIniciarRutina:hover {
+  background: #256a8a;
+  transform: translateY(-1px);
+}
+
+.btnIniciarRutina:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnEditarRutina {
+  min-height: 48px;
+  padding: 0 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btnEditarRutina:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnEditarRutina:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnEliminarRutina {
+  min-height: 48px;
+  min-width: 48px;
+  font-size: 1.1rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btnEliminarRutina:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+.btnEliminarRutina:focus-visible {
+  outline: 2px solid #EF4444;
+  outline-offset: 2px;
+}
+
+/* ============================================
+   MODO SEGUIR RUTINA
+   ============================================ */
+.progresoTop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--border);
+  z-index: 100;
+}
+
+.progresoTopBar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.5s ease;
+}
+
+.seguirWrapper {
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding-bottom: 3rem;
+}
+
+.rutinaHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.rutinaHeaderNombre {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.rutinaHeaderProgreso {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Tarea actual — tarjeta grande */
+.tareaActualCard {
+  width: 100%;
+  background: var(--bg-card);
+  border: 3px solid var(--primary);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.tareaActualEmoji {
+  font-size: 5rem;
+  line-height: 1;
+}
+
+.tareaActualNombre {
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.tareaActualDuracion {
+  font-size: 1rem;
+  color: var(--text-muted);
+  background: rgba(46, 134, 171, 0.08);
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+}
+
+/* Próxima tarea */
+.proximaTarea {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+.proximaLabel {
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.proximaEmoji {
+  font-size: 1.4rem;
+}
+
+.proximaNombre {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Botón HECHO */
+.btnHecho {
+  width: 100%;
+  min-height: 90px;
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  font-weight: 900;
+  background: #16A34A;
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.45);
+  letter-spacing: 0.03em;
+}
+
+.btnHecho:hover {
+  background: #15803D;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(22, 163, 74, 0.55);
+}
+
+.btnHecho:active {
+  transform: scale(0.96);
+}
+
+.btnHecho:focus-visible {
+  outline: 4px solid #16A34A;
+  outline-offset: 4px;
+}
+
+/* Lista compacta de tareas */
+.listaTareasSeguir {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tareaItemSeguir {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  transition: all 0.18s ease;
+}
+
+.tareaCompletada {
+  opacity: 0.5;
+  text-decoration: line-through;
+  background: rgba(22, 163, 74, 0.05);
+}
+
+.tareaEnCurso {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+  font-weight: 700;
+}
+
+.tareaItemEmoji {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.tareaItemNombreSeguir {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.tareaCheck {
+  color: #16A34A;
+  font-weight: 900;
+  font-size: 1rem;
+}
+
+.tareaFlecha {
+  color: var(--primary);
+  font-size: 0.8rem;
+}
+
+.btnSalir {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 0.6rem 1.5rem;
+  min-height: 44px;
+  transition: all 0.18s ease;
+}
+
+.btnSalir:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+.btnSalir:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Fin de rutina */
+.finRutina {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.finEmoji {
+  font-size: 5rem;
+  line-height: 1;
+}
+
+.finTitulo {
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-weight: 900;
+  color: var(--primary);
+  margin: 0;
+}
+
+.finSubtitulo {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.finAcciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 360px;
+}
+
+.btnFinPrimario {
+  min-height: 64px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.4);
+}
+
+.btnFinPrimario:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnFinSecundario {
+  min-height: 56px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btnFinSecundario:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ============================================
+   EDITOR DE RUTINA
+   ============================================ */
+.editorWrapper {
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-bottom: 3rem;
+}
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btnVolver {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  min-height: 44px;
+  transition: all 0.18s ease;
+}
+
+.btnVolver:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnVolver:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.editorTitulo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Campo nombre */
+.campoNombre {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.campoLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.inputNombre {
+  padding: 0.75rem 1rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inputNombre:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Lista de tareas */
+.tareasList {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tareasListTitulo {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tareasVacias {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.tareaEditorItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(46, 134, 171, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.tareaEditorEmoji {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.tareaEditorInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.tareaEditorNombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tareaEditorDur {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.tareaEditorAcciones {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btnOrden {
+  min-height: 36px;
+  min-width: 36px;
+  font-size: 0.75rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btnOrden:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnOrden:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.btnEliminarTarea {
+  min-height: 36px;
+  min-width: 36px;
+  font-size: 0.85rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btnEliminarTarea:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+/* Formulario nueva tarea */
+.nuevaTareaForm {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.nuevaTareaTitulo {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Selector de emoji */
+.emojiSelector {
+  position: relative;
+}
+
+.btnEmojiActual {
+  font-size: 2rem;
+  width: 56px;
+  height: 56px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.18s;
+}
+
+.btnEmojiActual:hover,
+.btnEmojiActual:focus-visible {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.emojiPicker {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  width: 320px;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: var(--shadow-md);
+}
+
+.emojiOpcion {
+  font-size: 1.4rem;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emojiOpcion:hover {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: var(--border);
+  transform: scale(1.15);
+}
+
+.emojiOpcionActiva {
+  border-color: var(--primary) !important;
+  background: rgba(46, 134, 171, 0.1) !important;
+}
+
+.nuevaTareaInputs {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.75rem;
+}
+
+.inputGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.inputTarea {
+  padding: 0.6rem 0.85rem;
+  font-size: 0.95rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inputTarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.inputDuracion {
+  padding: 0.6rem 0.85rem;
+  font-size: 0.95rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inputDuracion:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.btnAgregarTarea {
+  min-height: 52px;
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--secondary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  align-self: flex-start;
+  padding: 0 1.5rem;
+}
+
+.btnAgregarTarea:hover:not(:disabled) {
+  background: #3d9290;
+  transform: translateY(-1px);
+}
+
+.btnAgregarTarea:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnAgregarTarea:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+/* Botón guardar */
+.btnGuardarRutina {
+  min-height: 64px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.4);
+}
+
+.btnGuardarRutina:hover:not(:disabled) {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnGuardarRutina:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnGuardarRutina:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* ============================================
+   CONTENIDO EDUCATIVO
+   ============================================ */
+.guiaSeccion h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.4rem 0 0.5rem;
+}
+
+.guiaSeccion h2:first-child {
+  margin-top: 0;
+}
+
+.guiaSeccion p {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion ul {
+  padding-left: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion li {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin-bottom: 0.45rem;
+}
+
+.guiaSeccion strong {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 700px) {
+  .hero {
+    margin-top: 70px;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .rutinasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .nuevaTareaInputs {
+    grid-template-columns: 1fr;
+  }
+
+  .emojiPicker {
+    width: 260px;
+  }
+
+  .tareaActualCard {
+    padding: 2rem 1.25rem;
+  }
+
+  .btnHecho {
+    min-height: 80px;
+    font-size: 1.3rem;
+  }
+}
+
+/* ============================================
+   ANIMACIONES RESPETUOSAS
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  :global(*),
+  :global(*::before),
+  :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

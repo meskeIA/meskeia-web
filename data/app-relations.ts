@@ -889,9 +889,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'ejercicios-vocalizacion': [
     { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Técnicas de respiración consciente' },
-    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto', description: 'Lee textos en voz alta' },
+    { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Estructura el día visualmente' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz' },
     { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer para los ejercicios' },
+  ],
+  'planificador-rutinas': [
+    { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer con círculo de colores' },
+    { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC para comunicar' },
+    { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Relajación entre tareas' },
+    { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Textos más fáciles de leer' },
   ],
 };
 

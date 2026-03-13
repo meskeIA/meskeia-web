@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 249+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 250+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 249,
+  "total_tools": 250,
   "last_updated": "2026-03-13",
   "features": {
     "all_free": true,
@@ -84,14 +84,14 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 45
+      "tool_count": 46
     },
     {
       "id": "salud",
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 34
+      "tool_count": 35
     },
     {
       "id": "viajes",
@@ -107,21 +107,21 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 95
+      "tool_count": 96
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 88
+      "tool_count": 89
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 85
+      "tool_count": 86
     },
     {
       "id": "dinero",
@@ -6195,6 +6195,32 @@
         "parkinson habla"
       ],
       "icon": "🎙️"
+    },
+    {
+      "slug": "planificador-rutinas",
+      "name": "Planificador Visual de Rutinas",
+      "url": "https://meskeia.com/planificador-rutinas/",
+      "description": "Crea rutinas diarias con pictogramas y síguelas paso a paso. Diseñado para personas con autismo, TDAH o discapacidad cognitiva. Guarda múltiples rutinas en el navegador. Funciona sin conexión.",
+      "suites": [
+        "salud",
+        "productividad"
+      ],
+      "contexts": [
+        "casa",
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "planificador rutinas visual",
+        "agenda visual autismo",
+        "rutinas autismo",
+        "pictogramas rutinas",
+        "TDAH organizacion",
+        "agenda diaria visual",
+        "rutinas discapacidad cognitiva",
+        "horario visual"
+      ],
+      "icon": "📅"
     }
   ],
   "llm_instructions": {

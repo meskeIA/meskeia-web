@@ -308,6 +308,7 @@ export const implementedAppsUrls = [
   "/lector-texto-voz/",                 // Lector TTS con resaltado de palabras en tiempo real
   "/tablero-comunicacion/",             // Tablero AAC con símbolos visuales y voz para personas no verbales
   "/ejercicios-vocalizacion/",          // Ejercicios de vocalización para Parkinson con medidor de voz en tiempo real
+  "/planificador-rutinas/",             // Planificador visual de rutinas con pictogramas para autismo y TDAH
 ];
 
 /**

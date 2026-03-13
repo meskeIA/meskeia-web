@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 250+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 256,
+  "total_tools": 257,
   "updated": "2026-03-01",
   "features": {
     "all_free": true,
@@ -1460,6 +1460,12 @@
           "slug": "ejercicios-vocalizacion",
           "url": "https://meskeia.com/ejercicios-vocalizacion/",
           "description": "Ejercicios de vocalización con medidor de voz en tiempo real. Vocales sostenidas y lectura guiada para rehabilitación vocal en Parkinson."
+        },
+        {
+          "name": "Planificador Visual de Rutinas",
+          "slug": "planificador-rutinas",
+          "url": "https://meskeia.com/planificador-rutinas/",
+          "description": "Crea rutinas diarias con pictogramas y síguelas paso a paso. Para autismo, TDAH y discapacidad cognitiva."
         }
       ]
     },
