@@ -1,0 +1,435 @@
+/* ============================================
+   Temporizador Visual
+   meskeIA - Paleta oficial
+   ============================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --border: #E0E0E0;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.13);
+
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.title {
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 0.6rem;
+  line-height: 1.1;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  opacity: 0.92;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ============================================
+   PRESETS
+   ============================================ */
+.presets {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.seccionTitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.1rem;
+  text-align: center;
+}
+
+.presetBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.presetBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border: 3px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  color: var(--text-primary);
+  gap: 0.1rem;
+}
+
+.presetBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.07);
+  transform: translateY(-2px);
+}
+
+.presetBtn.presetActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.2);
+}
+
+.presetBtn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.presetNum {
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.presetLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+/* Personalizado */
+.personalizado {
+  display: flex;
+  gap: 0.65rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.inputPersonalizado {
+  width: 140px;
+  padding: 0.65rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.inputPersonalizado:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.btnPersonalizado {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-height: 48px;
+}
+
+.btnPersonalizado:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btnPersonalizado:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   CÍRCULO TEMPORIZADOR
+   ============================================ */
+.timerSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.timerContainer {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+}
+
+.timerContainer.terminado {
+  animation: pulsoFin 0.6s ease 3;
+}
+
+@keyframes pulsoFin {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.timerSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.svgPista {
+  stroke: var(--border);
+}
+
+[data-theme='dark'] .svgPista {
+  stroke: #404040;
+}
+
+.svgTiempo {
+  font-size: 3.2rem;
+  font-weight: 800;
+  font-family: 'Courier New', monospace;
+  letter-spacing: -0.02em;
+}
+
+.svgEstado {
+  font-size: 1rem;
+  font-weight: 600;
+  fill: var(--text-muted);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+[data-theme='dark'] .svgEstado {
+  fill: #808080;
+}
+
+/* ============================================
+   CONTROLES
+   ============================================ */
+.controles {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+  flex-wrap: wrap;
+}
+
+.btnControl {
+  flex: 1;
+  min-height: 68px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  letter-spacing: 0.01em;
+  min-width: 130px;
+}
+
+.btnControl:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.btnPrincipal {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 14px rgba(46, 134, 171, 0.35);
+}
+
+.btnPrincipal:hover:not(:disabled) {
+  background: #256a8a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.45);
+}
+
+.btnPrincipal:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btnTerminado {
+  background: #22C55E;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+}
+
+.btnReset {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid var(--border);
+}
+
+.btnReset:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   TOGGLE SONIDO
+   ============================================ */
+.sonidoToggle {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  justify-content: center;
+}
+
+.btnSonido {
+  padding: 0.65rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-height: 48px;
+  border: 2px solid transparent;
+}
+
+.sonidoOn {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16A34A;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.sonidoOff {
+  background: rgba(156, 163, 175, 0.12);
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+
+.btnSonido:hover {
+  transform: scale(1.03);
+}
+
+.btnSonido:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   CONTENIDO EDUCATIVO
+   ============================================ */
+.guiaSeccion h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.4rem 0 0.5rem;
+}
+
+.guiaSeccion h2:first-child {
+  margin-top: 0;
+}
+
+.guiaSeccion p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion ul {
+  padding-left: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion li {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.guiaSeccion strong {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 600px) {
+  .hero {
+    margin-top: 70px;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .presetBtn {
+    width: 66px;
+    height: 66px;
+  }
+
+  .presetNum {
+    font-size: 1.35rem;
+  }
+
+  .controles {
+    flex-direction: column;
+  }
+
+  .btnControl {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+/* ============================================
+   ANIMACIONES RESPETUOSAS
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  :global(*),
+  :global(*::before),
+  :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .timerContainer.terminado {
+    animation: none;
+  }
+}

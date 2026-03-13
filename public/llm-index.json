@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 244+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 245+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 244,
+  "total_tools": 245,
   "last_updated": "2026-03-13",
   "features": {
     "all_free": true,
@@ -84,14 +84,14 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 41
+      "tool_count": 42
     },
     {
       "id": "salud",
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 29
+      "tool_count": 30
     },
     {
       "id": "viajes",
@@ -107,21 +107,21 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 92
+      "tool_count": 93
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 84
+      "tool_count": 85
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 80
+      "tool_count": 81
     },
     {
       "id": "dinero",
@@ -6058,6 +6058,33 @@
         "discapacidad"
       ],
       "icon": "📖"
+    },
+    {
+      "slug": "temporizador-visual",
+      "name": "Temporizador Visual",
+      "url": "https://meskeia.com/temporizador-visual/",
+      "description": "Temporizador con gran círculo que cambia de color (verde→rojo) según el tiempo restante. Botones grandes, presets de 1 a 30 minutos, sonido al terminar. Diseñado para personas con autismo, TDAH o dificultades cognitivas.",
+      "suites": [
+        "salud",
+        "productividad"
+      ],
+      "contexts": [
+        "casa",
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "temporizador visual",
+        "timer autismo",
+        "reloj cuenta atras",
+        "temporizador colores",
+        "discapacidad cognitiva",
+        "tdah",
+        "autismo",
+        "timer grande",
+        "temporizador accesible"
+      ],
+      "icon": "⏱️"
     }
   ],
   "llm_instructions": {
