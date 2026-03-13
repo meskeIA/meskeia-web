@@ -1,0 +1,504 @@
+/* ============================================
+   Lector de Texto en Voz Alta
+   meskeIA - Paleta oficial
+   ============================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --border: #E0E0E0;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.12);
+
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.title {
+  font-size: clamp(1.7rem, 4.5vw, 2.5rem);
+  font-weight: 800;
+  margin: 0 0 0.65rem;
+  line-height: 1.15;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  opacity: 0.92;
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ============================================
+   AVISO NAVEGADOR
+   ============================================ */
+.avisoNavegador {
+  background: #FEF3C7;
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: #92400E;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .avisoNavegador {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FCD34D;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+/* ============================================
+   PANEL DE CONFIGURACIÓN
+   ============================================ */
+.configPanel {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow);
+  align-items: start;
+}
+
+.configGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.configLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.configLabel strong {
+  color: var(--primary);
+}
+
+.selector {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.selector:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.selector:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(46, 134, 171, 0.4);
+  transition: transform 0.15s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: none;
+}
+
+.slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   PESTAÑAS
+   ============================================ */
+.pestanas {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0;
+  border-bottom: 2px solid var(--border);
+}
+
+.pestana {
+  padding: 0.7rem 1.25rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  min-height: 48px;
+}
+
+.pestana:hover {
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.pestana.pestanaActiva {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: rgba(46, 134, 171, 0.07);
+}
+
+.pestana:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   PANEL EDITAR
+   ============================================ */
+.panelEditar {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.textarea {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  resize: vertical;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: transparent;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  min-height: 220px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .textarea {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.contadorTexto {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: right;
+  margin: 0.5rem 0 0;
+}
+
+/* ============================================
+   PANEL ESCUCHAR
+   ============================================ */
+.panelEscuchar {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow);
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.textoResaltado {
+  font-size: 1.15rem;
+  line-height: 2;
+  color: var(--text-primary);
+}
+
+.palabra {
+  background: transparent;
+  border-radius: 4px;
+  padding: 0.05em 0.02em;
+  transition: background-color 0.15s ease;
+  display: inline;
+}
+
+.palabraLeida {
+  color: var(--text-muted);
+}
+
+.palabraActual {
+  background: #FEF08A;
+  color: #1A1A1A;
+  border-radius: 4px;
+  padding: 0.05em 0.1em;
+  box-shadow: 0 0 0 2px #EAB308;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .palabraActual {
+  background: #854D0E;
+  color: #FEF9C3;
+  box-shadow: 0 0 0 2px #CA8A04;
+}
+
+.placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ============================================
+   BARRA DE PROGRESO
+   ============================================ */
+.progreso {
+  position: relative;
+  height: 10px;
+  background: var(--border);
+  border-radius: 999px;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+
+.progresoBar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.progresoTexto {
+  position: absolute;
+  right: 0;
+  top: 14px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ============================================
+   CONTROLES PRINCIPALES
+   ============================================ */
+.controles {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btnControl {
+  min-height: 68px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0 2rem;
+  min-width: 180px;
+}
+
+.btnControl:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.btnControl:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnPlay {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.4);
+}
+
+.btnPlay:hover:not(:disabled) {
+  background: #256a8a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(46, 134, 171, 0.5);
+}
+
+.btnPausa {
+  background: #F59E0B;
+  color: white;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+}
+
+.btnPausa:hover {
+  background: #D97706;
+  transform: translateY(-2px);
+}
+
+.btnStop {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid var(--border);
+}
+
+.btnStop:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   CONTENIDO EDUCATIVO
+   ============================================ */
+.guiaSeccion h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.4rem 0 0.5rem;
+}
+
+.guiaSeccion h2:first-child {
+  margin-top: 0;
+}
+
+.guiaSeccion p {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion ul {
+  padding-left: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion li {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin-bottom: 0.45rem;
+}
+
+.guiaSeccion strong {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 700px) {
+  .hero {
+    margin-top: 70px;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .configPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .controles {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btnControl {
+    width: 100%;
+  }
+
+  .pestana {
+    font-size: 0.82rem;
+    padding: 0.6rem 0.9rem;
+  }
+}
+
+/* ============================================
+   ANIMACIONES RESPETUOSAS
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  :global(*),
+  :global(*::before),
+  :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

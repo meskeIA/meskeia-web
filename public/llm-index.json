@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 246+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 247+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 246,
+  "total_tools": 247,
   "last_updated": "2026-03-13",
   "features": {
     "all_free": true,
@@ -35,7 +35,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 55
+      "tool_count": 56
     },
     {
       "id": "finanzas",
@@ -84,14 +84,14 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 43
+      "tool_count": 44
     },
     {
       "id": "salud",
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 31
+      "tool_count": 32
     },
     {
       "id": "viajes",
@@ -107,21 +107,21 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 93
+      "tool_count": 94
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 86
+      "tool_count": 87
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 82
+      "tool_count": 83
     },
     {
       "id": "dinero",
@@ -6113,6 +6113,34 @@
         "estres"
       ],
       "icon": "🫁"
+    },
+    {
+      "slug": "lector-texto-voz",
+      "name": "Lector de Texto en Voz Alta",
+      "url": "https://meskeia.com/lector-texto-voz/",
+      "description": "Lector text-to-speech en español con resaltado de palabras en tiempo real. Ajusta voz, velocidad y tono. Ideal para discapacidad visual, dislexia, TDAH y fatiga visual. Privacidad total: funciona sin conexión.",
+      "suites": [
+        "salud",
+        "productividad",
+        "estudiantes"
+      ],
+      "contexts": [
+        "casa",
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "lector texto voz",
+        "text to speech",
+        "tts",
+        "leer en voz alta",
+        "discapacidad visual",
+        "dislexia",
+        "resaltado palabras",
+        "lectura asistida",
+        "accesibilidad"
+      ],
+      "icon": "🔊"
     }
   ],
   "llm_instructions": {

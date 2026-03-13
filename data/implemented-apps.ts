@@ -305,6 +305,7 @@ export const implementedAppsUrls = [
   "/adaptador-dislexia/",               // Adaptador visual de textos para personas con dislexia
   "/temporizador-visual/",              // Temporizador con círculo de colores para autismo/discapacidad cognitiva
   "/guia-respiracion/",                 // Técnicas de respiración consciente con guía visual animada
+  "/lector-texto-voz/",                 // Lector TTS con resaltado de palabras en tiempo real
 ];
 
 /**
