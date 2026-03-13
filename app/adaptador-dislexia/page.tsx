@@ -420,6 +420,224 @@ export default function AdaptadorDislexiaPage() {
             <li>Complementa con la función de lectura en voz alta de tu dispositivo o navegador</li>
           </ul>
         </section>
+
+        {/* TABLA COMPARATIVA */}
+        <section className={styles.guiaSeccion}>
+          <h2>Comparativa de fuentes para dislexia</h2>
+          <p>No todas las fuentes funcionan igual según el perfil lector. Esta tabla resume las diferencias clave para ayudarte a elegir:</p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>Arial / Sistema</th>
+                  <th>Lexend ⭐</th>
+                  <th>Monoespaciada</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Legibilidad general</td>
+                  <td>Buena</td>
+                  <td className={styles.celdaDestacada}>Excelente</td>
+                  <td>Media</td>
+                </tr>
+                <tr>
+                  <td>Distinción b/d/p/q</td>
+                  <td>Media</td>
+                  <td className={styles.celdaDestacada}>Alta</td>
+                  <td>Alta</td>
+                </tr>
+                <tr>
+                  <td>Fatiga visual</td>
+                  <td>Media</td>
+                  <td className={styles.celdaDestacada}>Baja</td>
+                  <td>Alta en textos largos</td>
+                </tr>
+                <tr>
+                  <td>Apta para imprimir</td>
+                  <td>Sí</td>
+                  <td className={styles.celdaDestacada}>Sí (muy buena)</td>
+                  <td>Regular</td>
+                </tr>
+                <tr>
+                  <td>Recomendada para</td>
+                  <td>Uso general</td>
+                  <td className={styles.celdaDestacada}>Dislexia, lectura prolongada</td>
+                  <td>Código, listas cortas</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* CASOS DE USO */}
+        <section className={styles.guiaSeccion}>
+          <h2>¿Para quién es este adaptador?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>🧒</span>
+              <h3>Niño escolar con dislexia</h3>
+              <p>Facilita la lectura de apuntes y enunciados de examen. El educador puede pegar el texto y configurarlo juntos, guardando los ajustes para futuras visitas desde el mismo dispositivo.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>🎓</span>
+              <h3>Adulto universitario</h3>
+              <p>Adapta artículos académicos y apuntes extensos. El fondo crema y la columna estrecha reducen la sobrecarga visual en sesiones de estudio largas.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>💼</span>
+              <h3>Profesional con fatiga visual</h3>
+              <p>Útil para leer correos largos, informes o normativas. Sin necesidad de instalar fuentes en el ordenador corporativo: funciona directamente en el navegador.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>👩‍🏫</span>
+              <h3>Educador o logopeda</h3>
+              <p>Prepara materiales de lectura adaptados para cada alumno. Permite demostrar en tiempo real el impacto de los diferentes ajustes tipográficos en una sesión.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guiaSeccion}>
+          <h2>Preguntas frecuentes</h2>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt>¿Qué diferencia hay entre Lexend y otras fuentes &quot;para dislexia&quot;?</dt>
+              <dd>Lexend fue diseñada con base en investigación sobre velocidad lectora. A diferencia de otras fuentes populares (como OpenDyslexic), no añade peso extra a la base de las letras, lo que muchos usuarios encuentran más natural y menos distractivo.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿El adaptador funciona sin conexión a internet?</dt>
+              <dd>Casi completamente. La fuente Lexend se carga desde Google Fonts la primera vez; si ya la cargaste antes y tu navegador la tiene en caché, sí funciona sin conexión. Arial y Mono están disponibles siempre.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Los ajustes se guardan para la próxima visita?</dt>
+              <dd>Sí. Los parámetros se guardan en el almacenamiento local del navegador. La próxima vez que abras la app en el mismo dispositivo y navegador, encontrarás la configuración tal como la dejaste.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Qué fondo funciona mejor para cada persona?</dt>
+              <dd>No hay una respuesta única. El fondo Crema suele ser el más cómodo para la mayoría, pero algunas personas prefieren el Azul pálido o el Verde. Lo ideal es probarlo con el propio usuario presente y dejar que decida.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Se puede imprimir el texto con los ajustes aplicados?</dt>
+              <dd>Sí. Puedes usar la función de imprimir del navegador (Ctrl+P). El texto de la vista previa se imprimirá con la fuente y el tamaño que hayas configurado, aunque el color de fondo depende de la configuración de tu impresora.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Hay diferencia entre dislexia y baja visión?</dt>
+              <dd>Sí. La dislexia es una dificultad de procesamiento lingüístico neurológico, no visual. La baja visión implica una agudeza visual reducida. Este adaptador ayuda en ambos casos, pero desde mecanismos diferentes: reduce la confusión de letras en dislexia y aumenta la comodidad visual en baja visión.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Funciona en móvil y tablet?</dt>
+              <dd>Sí. La interfaz es responsive y se adapta a cualquier tamaño de pantalla. En tablet puede resultar especialmente útil en orientación horizontal, con el panel de ajustes a la izquierda y el texto adaptado a la derecha.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Puede sustituir a una evaluación profesional?</dt>
+              <dd>No. Esta herramienta es un apoyo visual para la lectura, no un diagnóstico ni un tratamiento. Si sospechas dislexia en un niño o adulto, consulta con un psicopedagogo o logopeda para una evaluación adecuada.</dd>
+            </div>
+          </dl>
+        </section>
+
+        {/* GUÍA PASO A PASO */}
+        <section className={styles.guiaSeccion}>
+          <h2>Cómo configurar el adaptador con un alumno</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div>
+                <strong>Pega el texto a adaptar</strong>
+                <p>Copia el texto que necesita leer el alumno (apuntes, enunciado, artículo) y pégalo en el área de texto superior.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div>
+                <strong>Empieza con Lexend y fondo Crema</strong>
+                <p>Son los ajustes recomendados por defecto. En la mayoría de casos, ya habrá una mejora visible sin cambiar nada más.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div>
+                <strong>Ajusta el tamaño de letra</strong>
+                <p>Pregunta al alumno si el texto le parece grande o pequeño. Mueve el slider hasta que responda &quot;está bien&quot;. Un rango habitual: 20–26px.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div>
+                <strong>Amplía el espaciado entre letras</strong>
+                <p>Sube el slider de &quot;Espacio letras&quot; hasta el 10-15%. Observa si el alumno nota que las letras &quot;respiran mejor&quot;.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div>
+                <strong>Abre el interlineado</strong>
+                <p>Sube hasta 2.0 o 2.2. Esto separa las líneas y evita que el ojo se &quot;pierda&quot; al saltar de una línea a la siguiente.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div>
+                <strong>Reduce el ancho de columna</strong>
+                <p>Baja al 55–65%. Las líneas más cortas reducen el desplazamiento ocular y facilitan encontrar el inicio de la siguiente línea.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div>
+                <strong>Prueba los fondos de color</strong>
+                <p>Deja que el alumno elija el que le resulte más cómodo. Los ajustes se guardan automáticamente para la próxima sesión.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* MEJORES PRÁCTICAS */}
+        <section className={styles.guiaSeccion}>
+          <h2>Buenas prácticas para educadores y familias</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🎯</span>
+              <p><strong>Configura con el usuario presente.</strong> La configuración óptima varía mucho entre personas. Siempre ajusta con el alumno o familiar delante, no de antemano.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🔄</span>
+              <p><strong>Cambia un parámetro cada vez.</strong> Si cambias fuente, tamaño y espaciado a la vez, no sabrás qué fue lo que ayudó. Modifica de uno en uno.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🗣️</span>
+              <p><strong>Combina con lectura en voz alta.</strong> El adaptador visual y el lector de pantalla del navegador son complementarios. Usa ambos para reforzar la comprensión.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>📸</span>
+              <p><strong>Guarda la configuración óptima.</strong> Una vez encontrada, haz una captura de pantalla de los ajustes. Si alguien borra las cookies, tendrás la configuración de referencia.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>📅</span>
+              <p><strong>Revisa la configuración periódicamente.</strong> Las necesidades cambian con el tiempo. Una configuración perfecta a los 8 años puede necesitar ajustarse a los 12.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🤝</span>
+              <p><strong>Comparte el enlace de la app.</strong> Envía la URL al alumno para que pueda usarla en casa con sus mismos ajustes guardados (si usa el mismo navegador y dispositivo).</p>
+            </div>
+          </div>
+        </section>
+
+        {/* WARNING BOX */}
+        <section className={styles.guiaSeccion}>
+          <div className={styles.warningBox}>
+            <h3>⚠️ Errores comunes que reducen la efectividad</h3>
+            <ul>
+              <li><strong>Tamaño muy grande sin reducir el ancho de columna:</strong> con letras de 28px o más y columna al 100%, las líneas quedan demasiado largas y el efecto positivo desaparece.</li>
+              <li><strong>Usar fondo blanco puro si hay fotosensibilidad:</strong> el blanco puro (#FFFFFF) genera más contraste del necesario. El fondo crema o azul pálido suelen ser más cómodos.</li>
+              <li><strong>Asumir que lo que funciona para uno funciona para todos:</strong> la dislexia se manifiesta de formas muy distintas. No copies la configuración de otro alumno sin comprobarla.</li>
+              <li><strong>Confundir dificultad de lectura con falta de interés:</strong> si un alumno rechaza la herramienta, puede ser que los ajustes no sean los adecuados aún. Prueba diferentes combinaciones antes de concluir que no le ayuda.</li>
+              <li><strong>Usar el adaptador como único apoyo:</strong> la herramienta es un complemento, no un sustituto de intervención logopédica, ajustes pedagógicos y apoyo emocional.</li>
+              <li><strong>No guardar la configuración:</strong> si el usuario borra los datos del navegador (cookies/localStorage), los ajustes se pierden. Tomar nota o captura de la configuración ideal es una buena práctica de seguridad.</li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('adaptador-dislexia')} />

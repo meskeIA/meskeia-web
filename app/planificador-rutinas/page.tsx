@@ -605,6 +605,223 @@ export default function PlanificadorRutinasPage() {
             <li>Crea rutinas separadas para mañana, tarde y noche</li>
           </ul>
         </section>
+
+        {/* TABLA COMPARATIVA */}
+        <section className={styles.guiaSeccion}>
+          <h2>Comparativa: formatos de agenda visual</h2>
+          <p>Existen distintas formas de implementar una agenda visual. Esta tabla ayuda a elegir la más adecuada según el contexto:</p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Formato</th>
+                  <th>Sin preparación previa</th>
+                  <th>Tono de éxito</th>
+                  <th>Portátil</th>
+                  <th>Indicado para</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>📱 Esta app (meskeIA)</td>
+                  <td className={styles.celdaDestacada}>Sí</td>
+                  <td className={styles.celdaDestacada}>Sí (audio)</td>
+                  <td className={styles.celdaDestacada}>Sí</td>
+                  <td>Uso en dispositivo propio, cambios rápidos</td>
+                </tr>
+                <tr>
+                  <td>Tablero de pictogramas físico</td>
+                  <td>No (hay que imprimirlo)</td>
+                  <td>No</td>
+                  <td>Sí (portátil)</td>
+                  <td>Sin dispositivo, mayor durabilidad</td>
+                </tr>
+                <tr>
+                  <td>Pizarra blanca con imanes</td>
+                  <td>No (materiales)</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>Entorno fijo (aula, hogar)</td>
+                </tr>
+                <tr>
+                  <td>Apps especializadas (Routine)</td>
+                  <td>No (instalar)</td>
+                  <td>Sí</td>
+                  <td>Sí</td>
+                  <td>Usuarios con necesidades complejas</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* CASOS DE USO */}
+        <section className={styles.guiaSeccion}>
+          <h2>¿Para quién es este planificador?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>🧩</span>
+              <h3>Niño con TEA en casa</h3>
+              <p>La rutina visual de la mañana (levantarse, desayunar, vestirse, mochila, salir) reduce los meltdowns en transiciones. El tono de éxito al marcar cada tarea es un refuerzo positivo inmediato.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>⚡</span>
+              <h3>Adulto con TDAH</h3>
+              <p>Externalizar la secuencia de pasos de tareas complejas (preparar la reunión, hacer la compra) elimina la carga de recordar el siguiente paso y reduce la parálisis por decisión.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>🤝</span>
+              <h3>Persona con discapacidad intelectual</h3>
+              <p>Una rutina visual creada por el educador o familiar permite a la persona seguir las actividades del día de forma más autónoma, sin depender de instrucciones verbales constantes.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>👩‍🏫</span>
+              <h3>Educador o terapeuta ocupacional</h3>
+              <p>Crear rutinas personalizadas para cada alumno en el dispositivo del centro, con los emojis que ese alumno ya conoce. El modo seguimiento permite acompañar sin intervenir constantemente.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guiaSeccion}>
+          <h2>Preguntas frecuentes</h2>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt>¿Las rutinas se guardan si cierro la app?</dt>
+              <dd>Sí. Todas las rutinas y tareas se guardan en el almacenamiento local del navegador. La próxima vez que abras la app en el mismo dispositivo y navegador, encontrarás tus rutinas guardadas.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Cuántas rutinas puedo crear?</dt>
+              <dd>No hay límite técnico. Puedes crear rutinas separadas para mañana, tarde, noche, fin de semana, tareas del cole, etc. Cada una se gestiona de forma independiente.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿El tono de éxito se puede desactivar?</dt>
+              <dd>Actualmente el tono se reproduce con la API de audio del navegador y no tiene opción de silencio individual. Si necesitas silencio, puedes bajar el volumen del dispositivo antes de usar el modo seguimiento.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Puedo usar los mismos emojis que usa mi hijo en su tablero AAC?</dt>
+              <dd>Sí, siempre que los emojis de tu tablero físico o sistema AAC tengan equivalente en la selección de la app. El objetivo es la coherencia visual para que el usuario relacione ambos sistemas.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿La app funciona sin internet?</dt>
+              <dd>Sí, una vez cargada. Los emojis son del sistema operativo y no requieren descarga. Ideal para usar en entornos sin WiFi (residencias, aulas sin conexión, viajes).</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Puedo compartir una rutina entre varios dispositivos?</dt>
+              <dd>No directamente: los datos se guardan en local en cada dispositivo. Para compartir, tendrías que replicar la rutina manualmente en el otro dispositivo. Una función de exportación/importación está prevista para futuras versiones.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Cuántas tareas debo incluir en una rutina?</dt>
+              <dd>Para usuarios con TEA o DI, empieza con 4-6 tareas. Rutinas muy largas pueden resultar abrumadoras. Una vez que la rutina esté bien interiorizada (2-3 semanas), puedes añadir más pasos gradualmente.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Es adecuado para personas con demencia?</dt>
+              <dd>En demencias leves, una rutina visual sencilla (4-5 tareas básicas) puede ser útil para orientar la mañana y reducir la confusión temporal. En fases moderadas o avanzadas, la supervisión de un especialista es necesaria para determinar si las agendas visuales son adecuadas.</dd>
+            </div>
+          </dl>
+        </section>
+
+        {/* GUÍA PASO A PASO */}
+        <section className={styles.guiaSeccion}>
+          <h2>Cómo crear y usar tu primera rutina</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div>
+                <strong>Pulsa &quot;Nueva rutina&quot;</strong>
+                <p>Desde la pantalla principal, pulsa el botón + para crear una nueva rutina. Ponle un nombre descriptivo: &quot;Mañana&quot;, &quot;Tarde cole&quot;, &quot;Noche&quot;.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div>
+                <strong>Elige los emojis con el usuario presente</strong>
+                <p>Muestra la paleta de emojis y deja que el usuario elija el que asocia con cada actividad. Su participación en la creación mejora la aceptación de la rutina.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div>
+                <strong>Añade las tareas en orden</strong>
+                <p>Empieza con pocas tareas (4-6). Puedes reordenarlas con los botones ▲▼. Añade tiempos orientativos si la rutina tiene pasos con duración variable.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div>
+                <strong>Guarda la rutina</strong>
+                <p>Pulsa Guardar y vuelve a la pantalla principal. La rutina estará disponible inmediatamente.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div>
+                <strong>Activa el modo &quot;Seguir rutina&quot;</strong>
+                <p>Pulsa el botón ▶ junto a la rutina. Aparecerá la primera tarea en grande. Muestra la pantalla al usuario.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div>
+                <strong>Pulsa ✓ HECHO cuando complete cada tarea</strong>
+                <p>El tono de éxito confirma la acción y la app pasa automáticamente a la siguiente tarea. Deja que el usuario pulse el botón siempre que sea posible para fomentar su autonomía.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div>
+                <strong>Celebra al terminar</strong>
+                <p>Al completar todas las tareas, la pantalla muestra un mensaje de fin de rutina. Refuerza verbalmente el logro antes de iniciar la siguiente actividad.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* MEJORES PRÁCTICAS */}
+        <section className={styles.guiaSeccion}>
+          <h2>Buenas prácticas para una agenda visual efectiva</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>✏️</span>
+              <p><strong>Crea la rutina con el usuario, no para el usuario.</strong> Su participación en la elección de emojis y el orden de tareas aumenta significativamente la aceptación y el seguimiento.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🔄</span>
+              <p><strong>Anticipa los cambios con tiempo.</strong> Si la rutina va a ser diferente (visita al médico, salida especial), avísalo antes con la propia app: muestra las tareas del día distinto con antelación.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>📏</span>
+              <p><strong>Mantén la rutina estable al principio.</strong> Cambia el orden de las tareas solo cuando la rutina original está bien interiorizada. Los cambios frecuentes reducen la seguridad que la agenda visual proporciona.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>📲</span>
+              <p><strong>Asigna un dispositivo fijo para la app.</strong> Usar siempre el mismo tablet o móvil reduce la variable de aprender el dispositivo y permite que el usuario anticipe el ritual de consultar la agenda.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🎵</span>
+              <p><strong>El tono de éxito importa.</strong> El sonido de confirmación es un refuerzo positivo. Asegúrate de que el volumen sea audible pero no molesto. En entornos de grupo, considera bajar el volumen para no distraer a otros.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>👥</span>
+              <p><strong>Informa a todo el equipo.</strong> Que familia, profesores y terapeutas usen la misma rutina y el mismo lenguaje en torno a ella (los mismos nombres de tareas) refuerza la consistencia y acelera el aprendizaje.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* WARNING BOX */}
+        <section className={styles.guiaSeccion}>
+          <div className={styles.warningBox}>
+            <h3>⚠️ Errores comunes en la implementación de rutinas visuales</h3>
+            <ul>
+              <li><strong>Crear rutinas demasiado largas desde el inicio:</strong> más de 8-10 tareas puede resultar abrumador para usuarios con TEA o DI. Empieza siempre con pocas tareas y amplía gradualmente cuando la rutina corta esté consolidada.</li>
+              <li><strong>Cambiar los emojis sin avisar:</strong> para muchos usuarios con TEA, el emoji específico es parte de la rutina. Cambiar 🥛 por 🍼 para representar el desayuno puede generar confusión o rechazo. Si necesitas cambiar un emoji, hazlo de forma gradual y explicada.</li>
+              <li><strong>No dejar tiempo suficiente entre tareas:</strong> las personas con TEA o DI pueden necesitar más tiempo para completar cada paso. Una rutina ajustada al tiempo del adulto puede generar estrés en lugar de reducirlo.</li>
+              <li><strong>Usar la app como castigo o presión:</strong> &quot;Si no pulsas HECHO, no salimos&quot; convierte una herramienta de apoyo en una fuente de estrés. La agenda visual debe asociarse con seguridad y autonomía, nunca con control o castigo.</li>
+              <li><strong>Borrar las rutinas guardadas accidentalmente:</strong> si vas a dejar que el usuario use el dispositivo de forma autónoma, considera restringir el acceso al modo editor. Los datos se guardan localmente y si se borran, hay que volver a crearlos.</li>
+              <li><strong>Esta app no es un sistema de gestión conductual:</strong> el planificador visual apoya las rutinas, pero no reemplaza un plan de intervención conductual diseñado por un especialista (psicólogo, terapeuta ocupacional, educador especial).</li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('planificador-rutinas')} />

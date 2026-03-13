@@ -1,8 +1,24 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-11 | **Total profesionalizadas**: ~117 | **Pendientes**: ~104
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-13 | **Total profesionalizadas**: ~124 | **Pendientes**: ~97
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
+> **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
+
+---
+
+## ✅ APPS DE ACCESIBILIDAD - PROFESIONALIZADAS EN CREACIÓN (2026-03-13)
+
+7 apps nuevas de la suite de accesibilidad, profesionalizadas directamente durante su creación (nunca estuvieron en pendientes). Temporizador Visual excluido per criterio "herramientas triviales".
+
+- [x] `/adaptador-dislexia/` — Adaptador tipográfico para dislexia ✅ 6/6 secciones (lote 28)
+- [x] `/guia-respiracion/` — Guía de respiración consciente ✅ 6/6 secciones (lote 28)
+- [x] `/lector-texto-voz/` — Lector de texto en voz alta ✅ 6/6 secciones (lote 29)
+- [x] `/tablero-comunicacion/` — Tablero AAC con pictogramas ✅ 6/6 secciones (lote 29)
+- [x] `/ejercicios-vocalizacion/` — Ejercicios vocales para Parkinson ✅ 6/6 secciones (lote 30)
+- [x] `/planificador-rutinas/` — Planificador visual de rutinas ✅ 6/6 secciones (lote 30)
+- [x] `/generador-tarjetas-comunicacion/` — Generador de tarjetas AAC ✅ 6/6 secciones (lote 30)
+- [ ] `/temporizador-visual/` — **EXCLUIDO**: herramienta trivial según criterios PROFESIONALIZACION.md
 
 ---
 

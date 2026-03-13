@@ -404,6 +404,223 @@ export default function GuiaRespiracionPage() {
             <li><strong>EPOC</strong>: La respiración diafragmática mejora la eficiencia respiratoria. Siempre con supervisión médica.</li>
           </ul>
         </section>
+
+        {/* TABLA COMPARATIVA */}
+        <section className={styles.guiaSeccion}>
+          <h2>Comparativa de las 4 técnicas</h2>
+          <p>Elige la técnica según tu objetivo y nivel. Esta tabla resume los aspectos clave de cada una:</p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Técnica</th>
+                  <th>Dificultad</th>
+                  <th>Duración ciclo</th>
+                  <th>Beneficio principal</th>
+                  <th>Con retención</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🌬️ Diafragmática</td>
+                  <td className={styles.celdaDestacada}>Principiante</td>
+                  <td>10 s</td>
+                  <td>Relajación general</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td>⬜ Cuadrada</td>
+                  <td>Intermedia</td>
+                  <td>16 s</td>
+                  <td>Concentración</td>
+                  <td>Sí</td>
+                </tr>
+                <tr>
+                  <td>💤 4-7-8</td>
+                  <td>Intermedia</td>
+                  <td>19 s</td>
+                  <td>Ansiedad / sueño</td>
+                  <td>Sí (7 s)</td>
+                </tr>
+                <tr>
+                  <td>💙 Coherente</td>
+                  <td className={styles.celdaDestacada}>Fácil</td>
+                  <td>10 s</td>
+                  <td>Equilibrio emocional</td>
+                  <td>No</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* CASOS DE USO */}
+        <section className={styles.guiaSeccion}>
+          <h2>¿Para quién es esta guía de respiración?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>😰</span>
+              <h3>Persona con ansiedad situacional</h3>
+              <p>Antes de una reunión difícil, un examen o una situación social, 3-5 ciclos de 4-7-8 pueden reducir la respuesta de estrés en menos de 2 minutos.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>🫁</span>
+              <h3>Paciente en rehabilitación respiratoria</h3>
+              <p>La técnica Diafragmática refuerza el trabajo del diafragma, complementando la fisioterapia respiratoria en EPOC o recuperación postoperatoria. Siempre con supervisión médica.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>📚</span>
+              <h3>Estudiante antes de un examen</h3>
+              <p>2-3 minutos de respiración Cuadrada antes de entrar en el aula mejoran la concentración y reducen el estrés previo, sin necesidad de equipo ni espacio especial.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>🧩</span>
+              <h3>Terapeuta con pacientes autistas</h3>
+              <p>El círculo visual predecible y el ritmo constante hacen esta app ideal como herramienta de regulación sensorial. La Diafragmática sin retención es el punto de partida más seguro.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guiaSeccion}>
+          <h2>Preguntas frecuentes</h2>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt>¿Cuántos ciclos debo hacer en cada sesión?</dt>
+              <dd>Entre 3 y 10 ciclos es suficiente para la mayoría de personas. Más importante que la cantidad es la regularidad: 5 minutos al día tienen más impacto que 30 minutos una vez a la semana.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Puedo usar la app si tengo asma o EPOC?</dt>
+              <dd>La técnica Diafragmática (sin retenciones) suele ser compatible con estas condiciones, pero consulta siempre con tu médico antes de practicar ejercicios de retención de aire. La retención puede no ser adecuada para ti.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Por qué el círculo cambia de tamaño?</dt>
+              <dd>El círculo se expande durante la inhalación y se contrae durante la exhalación, imitando visualmente el movimiento del pulmón. Este biofeedback visual facilita sincronizar la respiración con la guía, especialmente útil para personas con TDAH o autismo.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Qué hace exactamente la voz guiada?</dt>
+              <dd>Usa la API de síntesis de voz del navegador para pronunciar &quot;Inhala&quot;, &quot;Retén&quot; o &quot;Exhala&quot; al inicio de cada fase. No requiere conexión a internet ni archivos de audio externos. Funciona en todos los navegadores modernos.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Es normal sentir mareo durante las retenciones?</dt>
+              <dd>Un ligero mareo puede ocurrir si es tu primera vez practicando retenciones. Si el mareo es intenso o persiste, detén el ejercicio inmediatamente. Si se repite, evita las técnicas con retención y consulta a tu médico.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Puedo usar 4-7-8 si tengo ansiedad severa?</dt>
+              <dd>Durante un ataque de pánico activo, la técnica 4-7-8 puede no ser apropiada porque la retención prolongada puede aumentar la sensación de ahogo. En ese momento, la Diafragmática simple es más segura y manejable.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Cuánto tiempo tarda en notarse el efecto?</dt>
+              <dd>La mayoría de personas notan una reducción del estrés ya en la primera sesión, incluso con solo 3 ciclos. Los beneficios a largo plazo (mejor manejo del estrés, mejor sueño) se desarrollan con práctica diaria durante 2-4 semanas.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Sirve para enseñar a niños a regularse emocionalmente?</dt>
+              <dd>Sí, especialmente desde los 6-7 años. La guía visual del círculo hace que sea intuitivo para niños. La Diafragmática es el mejor punto de partida, sin retenciones, y con sesiones cortas de 3-5 ciclos.</dd>
+            </div>
+          </dl>
+        </section>
+
+        {/* GUÍA PASO A PASO */}
+        <section className={styles.guiaSeccion}>
+          <h2>Cómo realizar tu primera sesión</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div>
+                <strong>Elige un lugar tranquilo</strong>
+                <p>Siéntate o túmbate cómodamente. No es necesario ningún equipo especial. Asegúrate de que la pantalla sea visible sin tensión en el cuello.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div>
+                <strong>Selecciona la técnica adecuada</strong>
+                <p>Para tu primera vez, elige Diafragmática o Coherente. Son las más sencillas y no incluyen retenciones.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div>
+                <strong>Activa la voz guiada si quieres apoyo auditivo</strong>
+                <p>Pulsa el botón de voz para activarla. Así podrás cerrar los ojos y seguir el ritmo solo con el audio.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div>
+                <strong>Pulsa Iniciar y sigue el círculo</strong>
+                <p>Inhala cuando el círculo crece, exhala cuando se encoge. No fuerces el ritmo; la app va a tu ritmo, no al revés.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div>
+                <strong>Respira de forma natural, no forzada</strong>
+                <p>Si no llegas al tiempo indicado, no pasa nada. Con la práctica, los tiempos se vuelven cómodos. Lo importante es mantener la calma.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div>
+                <strong>Realiza al menos 3-5 ciclos completos</strong>
+                <p>Es el mínimo para notar un efecto de relajación. Puedes continuar hasta 10 ciclos si lo deseas.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div>
+                <strong>Termina con calma</strong>
+                <p>Al pulsar Detener, haz 2 respiraciones naturales antes de levantarte. Evita ponerte de pie bruscamente, especialmente si practicaste retenciones.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* MEJORES PRÁCTICAS */}
+        <section className={styles.guiaSeccion}>
+          <h2>Buenas prácticas para aprovechar al máximo la app</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>📅</span>
+              <p><strong>Practica a la misma hora cada día.</strong> La consistencia horaria refuerza el hábito y el sistema nervioso aprende a anticipar la relajación en ese momento.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>⏰</span>
+              <p><strong>Actúa al notar los primeros síntomas.</strong> Para la ansiedad, practica 4-7-8 en cuanto notes la tensión, no cuando ya estés desbordado. La efectividad es mayor en las primeras señales.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🧩</span>
+              <p><strong>Para niños y autismo: sin retenciones al principio.</strong> Empieza siempre con Diafragmática o Coherente. Introduce retenciones solo cuando el niño esté completamente cómodo con el ritmo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🧘</span>
+              <p><strong>Combina con relajación muscular progresiva.</strong> La respiración consciente + tensión-relajación muscular multiplica los beneficios para la ansiedad y el insomnio.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>📝</span>
+              <p><strong>Lleva un registro de qué técnica te funciona mejor.</strong> Anota cuándo practicaste, qué técnica y cómo te sentiste después. Esto ayuda a identificar qué funciona para tu caso específico.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🚗</span>
+              <p><strong>Nunca practiques al conducir o manejar maquinaria.</strong> Las técnicas con retención pueden causar mareos transitorios. Reserva la práctica para cuando estés sentado o tumbado en un entorno seguro.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* WARNING BOX */}
+        <section className={styles.guiaSeccion}>
+          <div className={styles.warningBox}>
+            <h3>⚠️ Señales de alarma: cuándo parar y consultar al médico</h3>
+            <ul>
+              <li><strong>Hipertensión arterial no controlada:</strong> las técnicas con retención (Cuadrada, 4-7-8) pueden aumentar transitoriamente la presión. Consulta a tu médico antes de practicarlas.</li>
+              <li><strong>Mareo intenso, palpitaciones o malestar:</strong> detén el ejercicio inmediatamente si experimentas cualquiera de estos síntomas. Son señales de que la técnica no es adecuada para ti en ese momento.</li>
+              <li><strong>La técnica 4-7-8 en ataques de pánico activos:</strong> durante un ataque de pánico, la retención de 7 segundos puede aumentar la sensación de ahogo. Usa Diafragmática simple en su lugar.</li>
+              <li><strong>Más de 4 ciclos consecutivos de 4-7-8:</strong> el Dr. Weil, creador de esta técnica, recomienda no superar 4 repeticiones seguidas, especialmente al principio. Aumenta gradualmente con el tiempo.</li>
+              <li><strong>Asma activa o EPOC descompensada:</strong> en crisis agudas, no practiques sin indicación médica. La respiración guiada es una herramienta de bienestar, no un tratamiento de urgencia.</li>
+              <li><strong>Esta app no sustituye la fisioterapia respiratoria:</strong> si tienes una condición respiratoria diagnosticada, la guía de respiración puede complementar, pero nunca reemplazar, el plan de tratamiento de tu equipo médico.</li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('guia-respiracion')} />

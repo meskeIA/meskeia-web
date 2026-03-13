@@ -511,6 +511,216 @@ export default function GeneradorTarjetasPage() {
               <li>Adapta el tamaño: pequeño para tableros grandes, grande para usuarios con dificultades motoras</li>
             </ul>
           </section>
+
+          {/* TABLA COMPARATIVA */}
+          <section className={styles.guiaSeccion}>
+            <h2>Comparativa de tamaños de tarjeta</h2>
+            <p>El tamaño de las tarjetas debe adaptarse al usuario y al contexto de uso. Esta tabla resume las diferencias prácticas:</p>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Tamaño</th>
+                    <th>Dimensión</th>
+                    <th>Tarjetas por A4</th>
+                    <th>Motor fino necesario</th>
+                    <th>Ideal para</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Pequeño</td>
+                    <td>5 × 5 cm</td>
+                    <td>~16</td>
+                    <td>Fino</td>
+                    <td>Tableros grandes, adultos sin dificultades motoras</td>
+                  </tr>
+                  <tr>
+                    <td>Mediano</td>
+                    <td>7 × 7 cm</td>
+                    <td>~9</td>
+                    <td>Medio</td>
+                    <td>Uso general, niños en edad escolar</td>
+                  </tr>
+                  <tr>
+                    <td>Grande</td>
+                    <td className={styles.celdaDestacada}>10 × 10 cm</td>
+                    <td>~4</td>
+                    <td className={styles.celdaDestacada}>Grueso (motor reducido)</td>
+                    <td>Baja visión, parálisis cerebral, primeros usos</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* CASOS DE USO */}
+          <section className={styles.guiaSeccion}>
+            <h2>¿Para quién es este generador de tarjetas?</h2>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <span className={styles.escenarioIcono}>🏥</span>
+                <h3>Logopeda en sesión</h3>
+                <p>Genera y personaliza mazos para trabajar vocabulario funcional con cada paciente. El código de color por categoría facilita la organización temática del material impreso.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <span className={styles.escenarioIcono}>🏠</span>
+                <h3>Familia en casa</h3>
+                <p>Crea tarjetas de las cosas importantes en el hogar: comidas preferidas, rutinas, personas. Usar emojis familiares aumenta el reconocimiento y la velocidad de comunicación.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <span className={styles.escenarioIcono}>🎒</span>
+                <h3>Maestro de apoyo en el aula</h3>
+                <p>Prepara tarjetas de vocabulario del aula, normas de clase o secuencias de actividad. El tamaño grande es idóneo para usuarios con dificultades visuales o motoras en el aula.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <span className={styles.escenarioIcono}>🧑</span>
+                <h3>Adulto con afasia o ELA</h3>
+                <p>Genera un mazo personalizado con las expresiones que más usa en su vida cotidiana. Las tarjetas grandes y plastificadas son más fáciles de manejar con movilidad reducida.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className={styles.guiaSeccion}>
+            <h2>Preguntas frecuentes</h2>
+            <dl className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <dt>¿Cómo se imprimen las tarjetas?</dt>
+                <dd>Pulsa el botón &quot;Imprimir&quot; en la vista de edición. El navegador abrirá el diálogo de impresión. Asegúrate de activar &quot;Imprimir colores de fondo&quot; o &quot;Gráficos de fondo&quot; en las opciones avanzadas para que los colores de categoría se impriman correctamente.</dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Los mazos se guardan si cierro el navegador?</dt>
+                <dd>Sí. Todos los mazos y tarjetas se guardan en el almacenamiento local del navegador. La próxima vez que accedas a la app en el mismo dispositivo y navegador, encontrarás tus mazos guardados.</dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Cuántas tarjetas puede tener un mazo?</dt>
+                <dd>No hay límite técnico. Sin embargo, para uso en comunicación, los mazos de 12-24 tarjetas bien seleccionadas son más funcionales que mazos de 100 tarjetas poco relevantes. La calidad del vocabulario importa más que la cantidad.</dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Puedo usar fotos reales en lugar de emojis?</dt>
+                <dd>Esta versión usa exclusivamente emojis del sistema, que tienen la ventaja de ser reconocibles universalmente y no requieren subir archivos. Para tarjetas con fotos reales, existen herramientas como ARASAAC o Pictoapp especializadas en ello.</dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Es mejor imprimir en color o en blanco y negro?</dt>
+                <dd>En color siempre que sea posible: el código de color por categoría (rojo=necesidades, verde=comida, etc.) es una clave visual importante para la búsqueda rápida. En blanco y negro, las tarjetas funcionan pero se pierde esa distinción rápida.</dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Qué papel se recomienda para imprimir?</dt>
+                <dd>Papel normal (80 gr) funciona pero se desgasta rápido. Lo ideal es papel fotográfico o cartulina (160-200 gr) y luego plastificar. Para uso intensivo (mano, bolso), la plastificación y un refuerzo de cartón en la parte trasera mejoran mucho la durabilidad.</dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Cómo se usa el velcro con las tarjetas?</dt>
+                <dd>Plastifica las tarjetas y pega un trozo pequeño de velcro (parte suave) en la parte trasera. En el tablero, pega la parte rugosa. Así las tarjetas se colocan y se retiran fácilmente, lo que es fundamental en sistemas como PECS.</dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Las tarjetas son adecuadas para el sistema PECS?</dt>
+                <dd>Pueden usarse como punto de partida, pero PECS requiere tarjetas con vocabulario específico determinado por el evaluador, y el proceso de entrenamiento debe llevarlo un especialista. Estas tarjetas son un recurso flexible, no un protocolo PECS certificado.</dd>
+              </div>
+            </dl>
+          </section>
+
+          {/* GUÍA PASO A PASO */}
+          <section className={styles.guiaSeccion}>
+            <h2>Cómo crear e imprimir tu primer mazo</h2>
+            <ol className={styles.stepGuide}>
+              <li className={styles.step}>
+                <span className={styles.stepNumber}>1</span>
+                <div>
+                  <strong>Define el vocabulario con el logopeda</strong>
+                  <p>Antes de crear las tarjetas, identifica con el especialista qué palabras son más funcionales para el usuario en su vida cotidiana (necesidades básicas, personas del entorno, actividades preferidas).</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber}>2</span>
+                <div>
+                  <strong>Crea un nuevo mazo</strong>
+                  <p>Pulsa &quot;Nuevo mazo&quot; y dale un nombre descriptivo: &quot;Casa&quot;, &quot;Cole&quot;, &quot;Emociones&quot;. Puedes tener varios mazos temáticos.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber}>3</span>
+                <div>
+                  <strong>Añade las tarjetas</strong>
+                  <p>Selecciona la categoría de color, elige el emoji más representativo y escribe el texto. El texto debe ser corto (1-2 palabras) para que quede legible en la tarjeta impresa.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber}>4</span>
+                <div>
+                  <strong>Elige el tamaño de impresión</strong>
+                  <p>Selecciona Pequeño, Mediano o Grande según las necesidades del usuario. Puedes cambiar el tamaño antes de imprimir sin perder las tarjetas.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber}>5</span>
+                <div>
+                  <strong>Imprime con colores de fondo activados</strong>
+                  <p>En el diálogo de impresión, ve a &quot;Más opciones&quot; o &quot;Configuración&quot; y activa &quot;Imprimir colores de fondo&quot;. Sin esta opción, los fondos de color no se imprimirán.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber}>6</span>
+                <div>
+                  <strong>Recorta y plastifica</strong>
+                  <p>Recorta cada tarjeta por las líneas (hay espacio entre tarjetas para facilitar el corte). Plastifica para mayor durabilidad. Añade velcro si las vas a usar en un tablero.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber}>7</span>
+                <div>
+                  <strong>Introduce las tarjetas gradualmente</strong>
+                  <p>No presentes todas las tarjetas a la vez. Empieza con 3-5 tarjetas del vocabulario más motivador para el usuario y añade nuevas cuando las anteriores estén bien reconocidas.</p>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          {/* MEJORES PRÁCTICAS */}
+          <section className={styles.guiaSeccion}>
+            <h2>Buenas prácticas para el uso de tarjetas físicas</h2>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcono}>🎯</span>
+                <p><strong>Prioriza el vocabulario funcional.</strong> &quot;Agua&quot;, &quot;Baño&quot;, &quot;Más&quot; y &quot;No&quot; tienen más impacto en la calidad de vida que un vocabulario temático extenso. Empieza siempre por lo que el usuario necesita comunicar cada día.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcono}>📦</span>
+                <p><strong>Organiza las tarjetas en un sistema predecible.</strong> Separadores por categoría de color, carpetas con velcro o tableros etiquetados. El usuario debe poder localizar cualquier tarjeta en menos de 5 segundos.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcono}>🔄</span>
+                <p><strong>Reemplaza las tarjetas dañadas inmediatamente.</strong> Una tarjeta borrosa, rota o con el emoji deformado puede causar confusión. Imprime siempre un set de repuesto para sustituir rápidamente las que se deterioren.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcono}>👁️</span>
+                <p><strong>Comprueba que los emojis se reconocen antes de imprimir.</strong> Muestra el mazo en pantalla al usuario y verifica que reconoce el emoji antes de gastar papel y tinta. Algunos emojis pueden ser ambiguos para ciertos usuarios.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcono}>🤲</span>
+                <p><strong>Usa el modelado para enseñar el uso.</strong> Señala o usa tú las tarjetas durante la comunicación con el usuario. El modelado (ver a otros usar el sistema) acelera el aprendizaje más que la instrucción directa.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcono}>📋</span>
+                <p><strong>Documenta qué tarjetas usa y cuáles ignora.</strong> Esta información es valiosa para el logopeda en la revisión del vocabulario. Un mazo que nadie usa necesita rediseño, no más tarjetas.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* WARNING BOX */}
+          <section className={styles.guiaSeccion}>
+            <div className={styles.warningBox}>
+              <h3>⚠️ Errores frecuentes en la creación de materiales AAC</h3>
+              <ul>
+                <li><strong>Crear mazos muy grandes desde el inicio:</strong> 50 tarjetas desde el primer día es agotador para el usuario y difícil de gestionar. Empieza con 6-12 y amplía en función del uso real.</li>
+                <li><strong>Usar emojis que el usuario no reconoce:</strong> Algunos emojis son culturalmente específicos o ambiguos. Verifica siempre la comprensión antes de incluirlos. Un emoji que no se entiende es ruido, no comunicación.</li>
+                <li><strong>No activar &quot;colores de fondo&quot; al imprimir:</strong> Sin esta opción, las tarjetas saldrán en blanco y negro, perdiendo el código de color por categoría que facilita la búsqueda rápida.</li>
+                <li><strong>No laminar las tarjetas:</strong> Las tarjetas sin plastificar duran pocas semanas de uso intensivo. La humedad, el sudor y los dobleces las deterioran rápidamente. El coste de plastificar es mínimo comparado con reimprimir continuamente.</li>
+                <li><strong>Sustituir el habla en lugar de aumentarla:</strong> El objetivo de las tarjetas AAC es aumentar y apoyar la comunicación, no sustituir la voz cuando existe. Si el usuario puede hablar, usa las tarjetas como complemento, no como reemplazo.</li>
+                <li><strong>No involucrar al logopeda en el diseño del mazo:</strong> El vocabulario de un sistema AAC debe responder a las necesidades comunicativas reales del usuario, no a lo que el adulto cree que necesita. El especialista tiene las herramientas para identificar ese vocabulario.</li>
+              </ul>
+            </div>
+          </section>
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('generador-tarjetas-comunicacion')} />

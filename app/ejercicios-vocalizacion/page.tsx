@@ -614,6 +614,223 @@ export default function EjerciciosVocalizacionPage() {
             <li>Quieres acceder a un programa certificado LSVT LOUD®</li>
           </ul>
         </section>
+
+        {/* TABLA COMPARATIVA */}
+        <section className={styles.guiaSeccion}>
+          <h2>Comparativa de opciones de rehabilitación vocal en Parkinson</h2>
+          <p>Esta app es una herramienta de apoyo entre sesiones. Aquí comparamos distintos recursos disponibles:</p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Recurso</th>
+                  <th>Disponibilidad</th>
+                  <th>Feedback tiempo real</th>
+                  <th>Personalizable</th>
+                  <th>Indicado para</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🎙️ Esta app (meskeIA)</td>
+                  <td className={styles.celdaDestacada}>24/7, sin cita</td>
+                  <td className={styles.celdaDestacada}>Sí (volumen)</td>
+                  <td>Básica</td>
+                  <td>Práctica diaria entre sesiones</td>
+                </tr>
+                <tr>
+                  <td>Logopeda (LSVT LOUD®)</td>
+                  <td>Citas presenciales</td>
+                  <td>Sí (experto)</td>
+                  <td className={styles.celdaDestacada}>Muy alta</td>
+                  <td>Tratamiento principal certificado</td>
+                </tr>
+                <tr>
+                  <td>Apps LSVT LOUD (oficial)</td>
+                  <td>Con suscripción</td>
+                  <td>Sí</td>
+                  <td>Alta</td>
+                  <td>Complemento al programa LSVT</td>
+                </tr>
+                <tr>
+                  <td>Sin rehabilitación</td>
+                  <td>—</td>
+                  <td>No</td>
+                  <td>—</td>
+                  <td>No recomendado (voz se deteriora)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* CASOS DE USO */}
+        <section className={styles.guiaSeccion}>
+          <h2>¿Para quién es esta app de ejercicios?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>🧑‍⚕️</span>
+              <h3>Persona con Parkinson en fase inicial</h3>
+              <p>Mantener el volumen y la proyección vocal desde el inicio del diagnóstico ralentiza el deterioro. La app permite practicar a diario en casa sin depender de citas.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>👪</span>
+              <h3>Familiar o cuidador</h3>
+              <p>Puede guiar al familiar con Parkinson en los ejercicios usando la app como referencia visual. El medidor de volumen objetivo hace la sesión más motivadora y cuantificable.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>🏥</span>
+              <h3>Logopeda en rehabilitación</h3>
+              <p>Puede mostrar la app en consulta para demostrar el nivel de volumen objetivo, y recomendarla como práctica entre sesiones. El historial de sesiones facilita el seguimiento.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcono}>👴</span>
+              <h3>Persona mayor con voz debilitada</h3>
+              <p>Aunque no tenga Parkinson, la hipofonía por envejecimiento también mejora con ejercicios de proyección vocal. La app es útil para cualquier persona con voz débil.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guiaSeccion}>
+          <h2>Preguntas frecuentes</h2>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt>¿Cuántas veces a la semana debo practicar?</dt>
+              <dd>La evidencia del LSVT LOUD® sugiere 4 sesiones semanales para mejores resultados. Para práctica de mantenimiento, 10-15 minutos diarios son suficientes. La constancia es más importante que la duración.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿El micrófono del móvil es suficientemente bueno?</dt>
+              <dd>Sí para los objetivos de esta app. No necesitas un micrófono externo. El micrófono interno de cualquier smartphone o tableta es capaz de captar la variación de volumen que la app mide.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Puede usarla alguien que no tiene Parkinson?</dt>
+              <dd>Completamente. La app es útil para cualquier persona con voz débil por envejecimiento, disfonía funcional, fatiga vocal profesional (cantantes, docentes) o recuperación tras una afección respiratoria.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Se guardan los resultados de mis ejercicios?</dt>
+              <dd>Sí. El historial de sesiones se guarda en el almacenamiento local del navegador. Puedes ver las últimas sesiones completadas, con fecha y tipo de ejercicio. No se envía ningún dato a servidores externos.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Qué diferencia hay entre vocales sostenidas y lectura en voz alta?</dt>
+              <dd>Las vocales sostenidas entrenan la proyección pura y la capacidad de mantener el volumen. La lectura en voz alta entrena la articulación y la prosodia en contexto real de comunicación. Se complementan: combinar ambos da mejores resultados.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Puedo usar la app si estoy en tratamiento con medicación para el Parkinson?</dt>
+              <dd>Sí. Los ejercicios vocales son compatibles con cualquier medicación para el Parkinson. De hecho, muchos especialistas recomiendan practicar en el momento de mayor efecto de la medicación (ventana &quot;ON&quot;).</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿La app funciona en tablet y móvil?</dt>
+              <dd>Sí. La interfaz es responsive. En tablet la experiencia es especialmente buena por el mayor tamaño de los botones y el medidor de volumen. Asegúrate de dar permiso al navegador para acceder al micrófono.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Qué hago si el micrófono no detecta mi voz?</dt>
+              <dd>Primero comprueba que has dado permiso de micrófono al navegador (aparece un icono en la barra de dirección). Si sigue sin funcionar, prueba a acercarte más al dispositivo o sube el volumen de tu voz. Los micrófonos en funda gruesa pueden tener menor sensibilidad.</dd>
+            </div>
+          </dl>
+        </section>
+
+        {/* GUÍA PASO A PASO */}
+        <section className={styles.guiaSeccion}>
+          <h2>Cómo realizar una sesión completa</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div>
+                <strong>Prepara el entorno</strong>
+                <p>Siéntate erguido o ponte de pie. Asegúrate de estar en un lugar sin mucho ruido ambiente. Acerca el dispositivo a unos 30-40 cm de tu boca.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div>
+                <strong>Activa el micrófono</strong>
+                <p>Pulsa &quot;Activar micrófono&quot; y acepta el permiso del navegador. El medidor de volumen debe mostrar actividad cuando hablas en voz normal.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div>
+                <strong>Haz 2-3 respiraciones profundas</strong>
+                <p>Inhala expandiendo el diafragma, no el pecho. Este precalentamiento mejora la proyección vocal y reduce la fatiga.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div>
+                <strong>Empieza con vocales sostenidas</strong>
+                <p>Selecciona la vocal A y practica sostenerla durante 10 segundos. El temporizador solo avanza cuando detecta tu voz — si se detiene, proyecta más.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div>
+                <strong>Completa las 5 vocales</strong>
+                <p>Practica A, E, I, O, U en ese orden. Entre cada vocal, descansa 15-20 segundos. No fuerces si notas tensión en la garganta.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div>
+                <strong>Pasa a la lectura en voz alta</strong>
+                <p>Cambia al modo de frases y lee en voz alta manteniendo el mismo nivel de proyección que con las vocales. El objetivo es mantener ese volumen en frases completas.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div>
+                <strong>Revisa tu historial</strong>
+                <p>Al terminar, la sesión queda registrada. Si practicas regularmente, podrás ver tu progreso y compartirlo con tu logopeda.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* MEJORES PRÁCTICAS */}
+        <section className={styles.guiaSeccion}>
+          <h2>Buenas prácticas para familiares y cuidadores</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>📅</span>
+              <p><strong>Integra la práctica en la rutina diaria.</strong> Vincular los ejercicios a una actividad fija (después del desayuno, antes de ver la tele) facilita que se conviertan en hábito.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🎯</span>
+              <p><strong>Practica en el &quot;momento ON&quot; de la medicación.</strong> Los ejercicios son más efectivos cuando el efecto de la medicación está en su pico. Coordínalo con el neurólogo si es posible.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>💬</span>
+              <p><strong>Recuerda durante las conversaciones.</strong> Cuando el familiar con Parkinson hable en voz baja, recuérdale amablemente: &quot;Habla como cuando practicas.&quot; El refuerzo positivo es más efectivo que la corrección.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🔄</span>
+              <p><strong>Comparte el historial con el logopeda.</strong> El registro de sesiones es una herramienta de seguimiento. Muéstraselo en la próxima visita para que el especialista evalúe la adherencia y ajuste el plan.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>😌</span>
+              <p><strong>No fuerces si hay fatiga vocal o días malos.</strong> En días de mayor rigidez o temblor, el esfuerzo puede ser contraproducente. Descansar un día no rompe el progreso; forzar sí puede hacerlo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono}>🏆</span>
+              <p><strong>Celebra los logros, por pequeños que sean.</strong> Mantener el volumen 10 segundos hoy es un éxito. El refuerzo positivo, no la comparación con ayer, es el motor del progreso en rehabilitación.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* WARNING BOX */}
+        <section className={styles.guiaSeccion}>
+          <div className={styles.warningBox}>
+            <h3>⚠️ Señales de que debes consultar al médico o logopeda</h3>
+            <ul>
+              <li><strong>Dolor al hablar o al tragar:</strong> la disfonía con dolor no debe tratarse con ejercicios sin evaluación previa. Puede indicar una lesión en las cuerdas vocales o disfagia que requiere valoración médica.</li>
+              <li><strong>Cambio repentino en la voz:</strong> si la voz cambia significativamente en pocos días, consulta a tu neurólogo. Puede indicar un cambio en la progresión de la enfermedad que requiera ajuste de tratamiento.</li>
+              <li><strong>Fatiga vocal persistente:</strong> si la voz se cansa en pocos minutos de práctica de forma repetida, el plan de ejercicios puede ser demasiado intenso. El logopeda debe ajustarlo.</li>
+              <li><strong>Esta app no diagnostica ni trata:</strong> el feedback del medidor de volumen es orientativo, no clínico. No uses los datos de la app para evaluar la progresión de la enfermedad sin supervisión profesional.</li>
+              <li><strong>No reemplaza la evaluación logopédica:</strong> la rehabilitación vocal en Parkinson debe ser prescrita y supervisada por un logopeda. Esta app es un complemento entre sesiones, no un sustituto del tratamiento.</li>
+              <li><strong>Disfagia (dificultad para tragar):</strong> si aparecen atragantamientos frecuentes o sensación de ahogo al comer o beber, comunícalo inmediatamente al neurólogo. La disfagia en Parkinson puede tener consecuencias graves y requiere evaluación urgente.</li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('ejercicios-vocalizacion')} />

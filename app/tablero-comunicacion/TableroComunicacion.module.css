@@ -404,6 +404,279 @@
 }
 
 /* ============================================
+   PROFESIONALIZACIÓN - TABLA COMPARATIVA
+   ============================================ */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable th {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid rgba(46, 134, 171, 0.2);
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:hover td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.celdaDestacada {
+  color: var(--primary) !important;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .comparativaTable tr:hover td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+/* ============================================
+   PROFESIONALIZACIÓN - CASOS DE USO
+   ============================================ */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.escenarioCard h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.4rem 0 0.5rem;
+}
+
+.escenarioCard p {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.escenarioIcono {
+  font-size: 2rem;
+  display: block;
+}
+
+/* ============================================
+   PROFESIONALIZACIÓN - FAQ
+   ============================================ */
+.faqList {
+  margin: 0.5rem 0 0;
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqItem dt {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem dd {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================
+   PROFESIONALIZACIÓN - GUÍA PASO A PASO
+   ============================================ */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin-top: 0.1rem;
+}
+
+.step > div {
+  flex: 1;
+}
+
+.step > div strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.step > div p {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================
+   PROFESIONALIZACIÓN - MEJORES PRÁCTICAS
+   ============================================ */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.tipCard {
+  background: rgba(72, 169, 166, 0.06);
+  border: 1px solid rgba(72, 169, 166, 0.2);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tipIcono {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.tipCard p {
+  font-size: 0.88rem !important;
+  line-height: 1.65 !important;
+  color: var(--text-secondary) !important;
+  margin: 0 !important;
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(72, 169, 166, 0.08);
+  border-color: rgba(72, 169, 166, 0.15);
+}
+
+/* ============================================
+   PROFESIONALIZACIÓN - WARNING BOX
+   ============================================ */
+.warningBox {
+  background: #FFF8E7;
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+}
+
+.warningBox h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #92400E;
+  margin: 0 0 0.85rem;
+}
+
+.warningBox ul {
+  padding-left: 1.25rem;
+  margin: 0;
+}
+
+.warningBox li {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: #78350F;
+  margin-bottom: 0.5rem;
+}
+
+.warningBox li:last-child {
+  margin-bottom: 0;
+}
+
+.warningBox strong {
+  color: #92400E;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+[data-theme='dark'] .warningBox h3 {
+  color: #FCD34D;
+}
+
+[data-theme='dark'] .warningBox li {
+  color: #FDE68A;
+}
+
+[data-theme='dark'] .warningBox strong {
+  color: #FCD34D;
+}
+
+/* ============================================
+   RESPONSIVE - PROFESIONALIZACIÓN
+   ============================================ */
+@media (max-width: 640px) {
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
    ANIMACIONES RESPETUOSAS
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
