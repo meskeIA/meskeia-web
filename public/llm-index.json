@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 245+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 246+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 245,
+  "total_tools": 246,
   "last_updated": "2026-03-13",
   "features": {
     "all_free": true,
@@ -84,14 +84,14 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 42
+      "tool_count": 43
     },
     {
       "id": "salud",
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 30
+      "tool_count": 31
     },
     {
       "id": "viajes",
@@ -114,14 +114,14 @@
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 85
+      "tool_count": 86
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 81
+      "tool_count": 82
     },
     {
       "id": "dinero",
@@ -142,7 +142,7 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 27
+      "tool_count": 28
     },
     {
       "id": "curiosidad",
@@ -6085,6 +6085,34 @@
         "temporizador accesible"
       ],
       "icon": "⏱️"
+    },
+    {
+      "slug": "guia-respiracion",
+      "name": "Guía de Respiración Consciente",
+      "url": "https://meskeia.com/guia-respiracion/",
+      "description": "Guía interactiva de técnicas de respiración consciente con círculo animado. Respiración diafragmática, cuadrada, 4-7-8 y coherente. Voz guiada opcional. Ideal para ansiedad, autismo, TDAH y EPOC.",
+      "suites": [
+        "salud",
+        "productividad"
+      ],
+      "contexts": [
+        "casa",
+        "relax",
+        "estudio"
+      ],
+      "keywords": [
+        "respiracion consciente",
+        "tecnicas respiracion",
+        "respiracion 4-7-8",
+        "respiracion cuadrada",
+        "ansiedad",
+        "relajacion",
+        "mindfulness",
+        "autismo",
+        "EPOC",
+        "estres"
+      ],
+      "icon": "🫁"
     }
   ],
   "llm_instructions": {

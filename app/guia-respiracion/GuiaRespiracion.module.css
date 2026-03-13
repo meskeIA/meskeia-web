@@ -1,0 +1,437 @@
+/* ============================================
+   Guía de Respiración Consciente
+   meskeIA - Paleta oficial
+   ============================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --border: #E0E0E0;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 28px rgba(0, 0, 0, 0.12);
+
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 28px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.title {
+  font-size: clamp(1.7rem, 4.5vw, 2.5rem);
+  font-weight: 800;
+  margin: 0 0 0.65rem;
+  line-height: 1.15;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  opacity: 0.92;
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ============================================
+   SELECCIÓN DE TÉCNICA
+   ============================================ */
+.tecnicas {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.seccionTitulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.1rem;
+  text-align: center;
+}
+
+.tecnicaGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.tecnicaCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 0.5rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+  text-align: center;
+  min-height: 110px;
+}
+
+.tecnicaCard:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+  transform: translateY(-2px);
+}
+
+.tecnicaCard.tecnicaActiva {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.2);
+}
+
+.tecnicaCard:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tecnicaIcono {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.tecnicaNombre {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tecnicaDesc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.tecnicaRitmo {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  margin-top: 0.1rem;
+}
+
+.tecnicaUsos {
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.tecnicaUsos strong {
+  color: var(--primary);
+}
+
+/* ============================================
+   EJERCICIO - CÍRCULO
+   ============================================ */
+.ejercicioSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+/* Contador de ciclos */
+.ciclosInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.ciclosNum {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.ciclosLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Círculo animado */
+.circuloWrapper {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circuloExterno {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 60px rgba(46, 134, 171, 0.25);
+  transform-origin: center;
+}
+
+.circuloInterno {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme='dark'] .circuloInterno {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.cuentaNum {
+  font-size: 3.2rem;
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.iconoEspera {
+  font-size: 2.5rem;
+}
+
+/* Texto de fase */
+.faseInfo {
+  text-align: center;
+}
+
+.faseTitulo {
+  font-size: 1.9rem;
+  font-weight: 800;
+  margin: 0 0 0.3rem;
+  transition: color 0.4s ease;
+  letter-spacing: -0.01em;
+}
+
+.faseDesc {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Botones de control */
+.controles {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  max-width: 340px;
+}
+
+.btnIniciar,
+.btnDetener {
+  width: 100%;
+  min-height: 68px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+}
+
+.btnIniciar {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.4);
+}
+
+.btnIniciar:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(46, 134, 171, 0.5);
+}
+
+.btnDetener {
+  background: #EF4444;
+  color: white;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+}
+
+.btnDetener:hover {
+  background: #DC2626;
+  transform: translateY(-2px);
+}
+
+.btnIniciar:focus-visible,
+.btnDetener:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* Botón de voz */
+.btnVoz {
+  padding: 0.6rem 1.5rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-height: 48px;
+  border: 2px solid transparent;
+}
+
+.vozOn {
+  background: rgba(72, 169, 166, 0.12);
+  color: #2E9B98;
+  border-color: rgba(72, 169, 166, 0.35);
+}
+
+.vozOff {
+  background: rgba(156, 163, 175, 0.1);
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+
+.btnVoz:hover {
+  transform: scale(1.03);
+}
+
+.btnVoz:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   CONTENIDO EDUCATIVO
+   ============================================ */
+.guiaSeccion h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.4rem 0 0.5rem;
+}
+
+.guiaSeccion h2:first-child {
+  margin-top: 0;
+}
+
+.guiaSeccion p {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion ul {
+  padding-left: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion li {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.guiaSeccion strong {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 640px) {
+  .hero {
+    margin-top: 70px;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .tecnicaGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .circuloWrapper,
+  .circuloExterno {
+    width: 240px;
+    height: 240px;
+  }
+
+  .circuloInterno {
+    width: 90px;
+    height: 90px;
+  }
+
+  .cuentaNum {
+    font-size: 2.6rem;
+  }
+
+  .faseTitulo {
+    font-size: 1.55rem;
+  }
+}
+
+/* ============================================
+   ANIMACIONES RESPETUOSAS
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  :global(*),
+  :global(*::before),
+  :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .circuloExterno {
+    transition: none !important;
+  }
+}
