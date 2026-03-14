@@ -310,6 +310,13 @@ export default function GuiaVivirSanoPage() {
               <p className={styles.otherGuideDescription}>Trabaja por tu cuenta</p>
             </div>
           </Link>
+          <Link href="/guia/accesibilidad/" className={styles.otherGuideCard}>
+            <span className={styles.otherGuideIcon}>♿</span>
+            <div>
+              <h3 className={styles.otherGuideTitle}>Guía de Accesibilidad</h3>
+              <p className={styles.otherGuideDescription}>Apoyos visuales para autismo, TDAH y dislexia</p>
+            </div>
+          </Link>
         </div>
       </section>
 

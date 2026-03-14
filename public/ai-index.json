@@ -1490,6 +1490,12 @@
           "slug": "historias-sociales",
           "url": "https://meskeia.com/historias-sociales/",
           "description": "Crea y lee historias sociales visuales para preparar situaciones nuevas o difíciles. Basado en la técnica de Carol Gray. 3 ejemplos incluidos. Para autismo, TDAH, discapacidad cognitiva y educadores."
+        },
+        {
+          "name": "Guía de Accesibilidad Digital",
+          "slug": "guia/accesibilidad",
+          "url": "https://meskeia.com/guia/accesibilidad/",
+          "description": "Kit de apoyos visuales digitales para autismo, TDAH y dislexia. Journey de 6 etapas: calma, estructura, comunicación, lectura, preparación y medicación. 9 herramientas gratuitas, sin registro, funciona offline."
         }
       ]
     },
