@@ -17,6 +17,13 @@
   },
   "suites": [
     {
+      "id": "accesibilidad",
+      "name": "Accesibilidad e Inclusión",
+      "icon": "♿",
+      "description": "Herramientas para personas con autismo, TDAH, dislexia, discapacidad visual o cognitiva",
+      "tool_count": 15
+    },
+    {
       "id": "cultura",
       "name": "Cultura General",
       "icon": "📚",
@@ -745,6 +752,7 @@
       "url": "https://meskeia.com/contraste-colores/",
       "description": "Verifica accesibilidad WCAG con ratios de contraste AA/AAA y simulación de daltonismo",
       "suites": [
+        "accesibilidad",
         "diseno"
       ],
       "contexts": [
@@ -4573,6 +4581,7 @@
       "url": "https://meskeia.com/lupa-digital/",
       "description": "Lupa digital que usa la cámara trasera con zoom hasta 5x. Incluye filtros de accesibilidad (alto contraste, invertir colores), ajustes de brillo y linterna integrada",
       "suites": [
+        "accesibilidad",
         "tecnicas",
         "salud"
       ],
@@ -5118,6 +5127,7 @@
       "url": "https://meskeia.com/conversor-morse/",
       "description": "Convierte texto a código Morse y viceversa con reproducción de audio. Alfabeto completo y señales internacionales",
       "suites": [
+        "accesibilidad",
         "cultura"
       ],
       "contexts": [
@@ -5218,6 +5228,7 @@
       "url": "https://meskeia.com/conversor-braille/",
       "description": "Convierte texto a Braille español y viceversa. Sistema completo con ñ, acentos, números y visualización de celdas",
       "suites": [
+        "accesibilidad",
         "cultura"
       ],
       "contexts": [
@@ -6034,6 +6045,7 @@
       "url": "https://meskeia.com/adaptador-dislexia/",
       "description": "Herramienta para adaptar textos y facilitar la lectura a personas con dislexia. Ajusta fuente (Lexend), tamaño, espaciado entre letras y palabras, interlineado, ancho de columna y color de fondo. Preferencias guardadas automáticamente.",
       "suites": [
+        "accesibilidad",
         "salud",
         "productividad",
         "estudiantes"
@@ -6065,6 +6077,7 @@
       "url": "https://meskeia.com/temporizador-visual/",
       "description": "Temporizador con gran círculo que cambia de color (verde→rojo) según el tiempo restante. Botones grandes, presets de 1 a 30 minutos, sonido al terminar. Diseñado para personas con autismo, TDAH o dificultades cognitivas.",
       "suites": [
+        "accesibilidad",
         "salud",
         "productividad"
       ],
@@ -6092,6 +6105,7 @@
       "url": "https://meskeia.com/guia-respiracion/",
       "description": "Guía interactiva de técnicas de respiración consciente con círculo animado. Respiración diafragmática, cuadrada, 4-7-8 y coherente. Voz guiada opcional. Ideal para ansiedad, autismo, TDAH y EPOC.",
       "suites": [
+        "accesibilidad",
         "salud",
         "productividad"
       ],
@@ -6120,6 +6134,7 @@
       "url": "https://meskeia.com/lector-texto-voz/",
       "description": "Lector text-to-speech en español con resaltado de palabras en tiempo real. Ajusta voz, velocidad y tono. Ideal para discapacidad visual, dislexia, TDAH y fatiga visual. Privacidad total: funciona sin conexión.",
       "suites": [
+        "accesibilidad",
         "salud",
         "productividad",
         "estudiantes"
@@ -6148,6 +6163,7 @@
       "url": "https://meskeia.com/tablero-comunicacion/",
       "description": "Tablero de comunicación aumentativa y alternativa con 72 símbolos visuales en 6 categorías. Construye frases y léelas en voz alta. Para personas no verbales, autismo, parálisis cerebral o afasia.",
       "suites": [
+        "accesibilidad",
         "salud",
         "productividad"
       ],
@@ -6176,6 +6192,7 @@
       "url": "https://meskeia.com/ejercicios-vocalizacion/",
       "description": "Ejercicios guiados de vocalización para personas con Parkinson. Vocales sostenidas y lectura en voz alta con medidor visual de volumen en tiempo real. Registro de sesiones. Privacidad total: el audio nunca sale del dispositivo.",
       "suites": [
+        "accesibilidad",
         "salud"
       ],
       "contexts": [
@@ -6202,6 +6219,7 @@
       "url": "https://meskeia.com/planificador-rutinas/",
       "description": "Crea rutinas diarias con pictogramas y síguelas paso a paso. Diseñado para personas con autismo, TDAH o discapacidad cognitiva. Guarda múltiples rutinas en el navegador. Funciona sin conexión.",
       "suites": [
+        "accesibilidad",
         "salud",
         "productividad"
       ],
@@ -6228,6 +6246,7 @@
       "url": "https://meskeia.com/generador-tarjetas-comunicacion/",
       "description": "Crea e imprime tarjetas de comunicación pictográficas personalizadas. Organiza por colores y categorías (necesidades, emociones, comida, acciones, personas, lugares). Para AAC, logopedia y autismo.",
       "suites": [
+        "accesibilidad",
         "salud",
         "productividad"
       ],
@@ -6254,6 +6273,7 @@
       "url": "https://meskeia.com/semaforo-emocional/",
       "description": "Herramienta visual de regulación emocional con tres estados (muy activado, activado, tranquilo) y estrategias adaptadas para cada uno. Historial del día. Para autismo, TDAH, ansiedad y educación emocional.",
       "suites": [
+        "accesibilidad",
         "salud",
         "productividad",
         "estudiantes"
@@ -6283,6 +6303,7 @@
       "url": "https://meskeia.com/recordatorio-medicacion/",
       "description": "Gestiona y recuerda tus medicamentos con pictogramas, colores y horarios visuales. Marca cada toma del día como tomada. Historial local, sin registro. Para autismo, TDAH, discapacidad cognitiva y mayores con polimedicación.",
       "suites": [
+        "accesibilidad",
         "salud",
         "productividad"
       ],
@@ -6309,6 +6330,7 @@
       "url": "https://meskeia.com/historias-sociales/",
       "description": "Crea y lee historias sociales visuales para preparar situaciones nuevas o difíciles. Técnica de Carol Gray adaptada. 3 historias de ejemplo incluidas. Para autismo, TDAH, discapacidad cognitiva y educadores.",
       "suites": [
+        "accesibilidad",
         "salud",
         "productividad",
         "estudiantes"

@@ -10,6 +10,7 @@
 
 // Tipos de suites disponibles (exportado como valor para compatibilidad con Turbopack)
 export const SUITE_IDS = [
+  'accesibilidad',
   'cultura',
   'diseno',
   'estudiantes',
@@ -26,8 +27,14 @@ export const SUITE_IDS = [
 
 export type SuiteType = typeof SUITE_IDS[number];
 
-// Definición de las 11 Suites (ordenadas alfabéticamente por nombre)
+// Definición de las 13 Suites (ordenadas alfabéticamente por nombre)
 export const suites = [
+  {
+    id: 'accesibilidad' as SuiteType,
+    name: 'Accesibilidad e Inclusión',
+    icon: '♿',
+    description: 'Herramientas para personas con autismo, TDAH, dislexia, discapacidad visual o cognitiva'
+  },
   {
     id: 'cultura' as SuiteType,
     name: 'Cultura General',
