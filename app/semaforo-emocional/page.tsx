@@ -231,6 +231,12 @@ export default function SemaforoEmocionalPage() {
         </section>
       )}
 
+      {/* ---- AVISO ---- */}
+      <div className={styles.avisoBox}>
+        <h3>⚠️ Aviso importante</h3>
+        <p>Esta herramienta es un <strong>apoyo visual para la autogestión emocional</strong>. No es un diagnóstico ni sustituye la atención de un profesional de salud mental. Si las dificultades de regulación emocional son frecuentes o intensas, consulta con un psicólogo, terapeuta o médico especializado.</p>
+      </div>
+
       {/* ---- SECCIÓN EDUCATIVA ---- */}
       <EducationalSection
         title="📚 Guía para familias, educadores y terapeutas"
@@ -245,46 +251,34 @@ export default function SemaforoEmocionalPage() {
                 <tr>
                   <th>Criterio</th>
                   <th>Semáforo meskeIA</th>
-                  <th>Zonas de Regulación (Kuypers)</th>
-                  <th>Semáforo físico de aula</th>
-                  <th>Sin herramienta</th>
+                  <th>Otras opciones</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Acceso inmediato</td>
+                  <td>Acceso</td>
                   <td className={styles.celdaDestacada}>✅ Digital, siempre disponible</td>
-                  <td>Requiere material físico o app de pago</td>
-                  <td>Solo en el aula</td>
-                  <td>❌ Sin apoyo visual</td>
+                  <td>Material físico, solo en el aula, o app de pago</td>
                 </tr>
                 <tr>
-                  <td>Estrategias incluidas</td>
-                  <td className={styles.celdaDestacada}>✅ 5 por estado</td>
-                  <td>✅ Amplio banco de estrategias</td>
-                  <td>❌ Solo identifica, no propone</td>
-                  <td>❌ Depende del adulto</td>
+                  <td>Estrategias</td>
+                  <td className={styles.celdaDestacada}>✅ 5 por estado, integradas</td>
+                  <td>Dependen del adulto o requieren formación adicional</td>
                 </tr>
                 <tr>
-                  <td>Historial</td>
-                  <td className={styles.celdaDestacada}>✅ Hasta 8 entradas del día</td>
-                  <td>❌ Manual o de pago</td>
-                  <td>❌ No tiene</td>
-                  <td>❌ No tiene</td>
+                  <td>Historial del día</td>
+                  <td className={styles.celdaDestacada}>✅ Hasta 8 registros</td>
+                  <td>Manual, de pago o inexistente</td>
                 </tr>
                 <tr>
                   <td>Coste</td>
                   <td className={styles.celdaDestacada}>✅ Gratis</td>
-                  <td>Libro/formación de pago</td>
-                  <td>Bajo (material)</td>
-                  <td>Sin coste</td>
+                  <td>Libro, material o formación (coste variable)</td>
                 </tr>
                 <tr>
-                  <td>Sin internet</td>
-                  <td className={styles.celdaDestacada}>✅ Funciona offline</td>
-                  <td>✅ Físico</td>
-                  <td>✅ Físico</td>
-                  <td>✅ Sin herramienta</td>
+                  <td>Funciona offline</td>
+                  <td className={styles.celdaDestacada}>✅ Sí, sin internet</td>
+                  <td>Depende del formato (físico sí, apps varía)</td>
                 </tr>
               </tbody>
             </table>

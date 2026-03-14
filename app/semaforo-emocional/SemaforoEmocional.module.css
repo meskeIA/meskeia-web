@@ -275,6 +275,44 @@
 }
 
 /* ============================================
+   AVISO
+   ============================================ */
+.avisoBox {
+  background: #FFF7ED;
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+[data-theme='dark'] .avisoBox {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: #D97706;
+}
+
+.avisoBox h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #92400E;
+  margin: 0 0 0.4rem;
+}
+
+[data-theme='dark'] .avisoBox h3 {
+  color: #FCD34D;
+}
+
+.avisoBox p {
+  font-size: 0.85rem;
+  color: #78350F;
+  line-height: 1.55;
+  margin: 0;
+}
+
+[data-theme='dark'] .avisoBox p {
+  color: #FDE68A;
+}
+
+/* ============================================
    SECCIÓN EDUCATIVA (patrón v2.0)
    ============================================ */
 .guiaSeccion {
