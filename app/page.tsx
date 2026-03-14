@@ -80,6 +80,15 @@ const guidesData = [
     toolsCount: 7,
     available: true,
   },
+  {
+    id: 'accesibilidad',
+    name: 'Guía de Accesibilidad Digital',
+    icon: '♿',
+    description: 'Kit de apoyos visuales para autismo, TDAH y dislexia. Sin registro ni instalación',
+    url: '/guia/accesibilidad/',
+    toolsCount: 9,
+    available: true,
+  },
 ];
 
 function HomeContent() {
