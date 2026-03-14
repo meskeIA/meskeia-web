@@ -527,6 +527,381 @@
   border-left: 3px solid var(--error);
 }
 
+/* =============================================
+   PATRÓN v2.0 - SECCIONES EDUCATIVAS
+   ============================================= */
+
+/* 1. TABLA COMPARATIVA */
+.tableWrapper {
+  overflow-x: auto;
+  margin-top: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 680px;
+}
+
+.comparativaTable thead tr {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.comparativaTable th {
+  padding: 0.875rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:nth-child(odd) {
+  background: var(--bg-primary);
+}
+
+.comparativaTable tbody tr:nth-child(even) {
+  background: var(--bg-card);
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(odd) {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {
+  background: var(--bg-card);
+}
+
+/* 2. ESCENARIOS / CASOS DE USO */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.escenarioCard:hover {
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.escenarioIcon {
+  font-size: 1.75rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.escenarioHeader strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.escenarioCard > p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.escenarioExample {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-style: italic;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+.escenarioTip {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed var(--border);
+}
+
+[data-theme='dark'] .escenarioTip {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* 3. FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.25rem;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+.faqItem h4 {
+  margin: 0 0 0.625rem;
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.faqItem p {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.faqTip {
+  font-size: 0.83rem;
+  color: var(--secondary);
+  background: rgba(72, 169, 166, 0.08);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.875rem;
+  border-left: 3px solid var(--secondary);
+  font-weight: 500;
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+/* 4. GUÍA PASO A PASO */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 1rem;
+  position: relative;
+}
+
+.stepGuide::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 40px;
+  bottom: 40px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary), var(--secondary));
+  opacity: 0.3;
+}
+
+.step {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  padding: 1rem 0;
+  position: relative;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.3);
+}
+
+.stepContent {
+  flex: 1;
+  padding-top: 0.125rem;
+}
+
+.stepContent h4 {
+  margin: 0 0 0.375rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 5. TIPS / MEJORES PRÁCTICAS */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tipCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+.tipIcon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.tipCard h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 6. WARNING BOX */
+.warningBox {
+  background: rgba(245, 158, 11, 0.07);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.warningHeader h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.warningList li {
+  padding: 0.875rem 1rem;
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--warning);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .warningList li {
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+/* Responsive patrón v2.0 */
+@media (max-width: 900px) {
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .mainContent {
@@ -540,6 +915,30 @@
   .statsGrid,
   .formulasGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stepGuide::before {
+    left: 19px;
+  }
+
+  .comparativaTable {
+    font-size: 0.82rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .warningBox {
+    padding: 1.25rem;
   }
 }
 
@@ -564,5 +963,27 @@
   .scoreCard {
     flex-direction: column;
     text-align: center;
+  }
+
+  .step {
+    gap: 1rem;
+  }
+
+  .stepNumber {
+    width: 34px;
+    height: 34px;
+    font-size: 0.85rem;
+  }
+
+  .faqItem h4 {
+    font-size: 0.95rem;
+  }
+
+  .escenarioHeader {
+    flex-wrap: wrap;
+  }
+
+  .warningHeader {
+    align-items: flex-start;
   }
 }

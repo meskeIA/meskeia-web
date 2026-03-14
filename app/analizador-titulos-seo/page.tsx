@@ -421,6 +421,295 @@ export default function AnalizadorTitulosSeoPage() {
             </ul>
           </section>
         </div>
+
+        {/* 1. TABLA COMPARATIVA */}
+        <div className={styles.eduSection}>
+          <h2>Tabla comparativa: títulos SEO por tipo de página</h2>
+          <p>No todos los títulos funcionan igual. Cada tipo de página tiene sus propias reglas y prioridades SEO.</p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo de página</th>
+                  <th>Longitud recomendada</th>
+                  <th>Estructura ideal</th>
+                  <th>Incluir marca</th>
+                  <th>Keyword al inicio</th>
+                  <th>CTR esperado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Homepage</strong></td>
+                  <td>50–60 caracteres</td>
+                  <td>Marca + propuesta de valor</td>
+                  <td>Sí, al final</td>
+                  <td>Opcional</td>
+                  <td>Medio-alto (marca conocida)</td>
+                </tr>
+                <tr>
+                  <td><strong>Blog post informativo</strong></td>
+                  <td>55–60 caracteres</td>
+                  <td>Número + Keyword + Beneficio</td>
+                  <td>No obligatorio</td>
+                  <td>Sí, posición 1–3</td>
+                  <td>Alto con números (+36%)</td>
+                </tr>
+                <tr>
+                  <td><strong>Ficha de producto (e-commerce)</strong></td>
+                  <td>50–55 caracteres</td>
+                  <td>Producto + atributo + marca</td>
+                  <td>Sí, al final</td>
+                  <td>Sí, siempre</td>
+                  <td>Alto si precio competitivo</td>
+                </tr>
+                <tr>
+                  <td><strong>Categoría (e-commerce)</strong></td>
+                  <td>45–60 caracteres</td>
+                  <td>Keyword + descriptor + año</td>
+                  <td>Opcional</td>
+                  <td>Sí, posición 1</td>
+                  <td>Medio (competencia alta)</td>
+                </tr>
+                <tr>
+                  <td><strong>Página de servicio</strong></td>
+                  <td>50–60 caracteres</td>
+                  <td>Servicio + ubicación + beneficio</td>
+                  <td>Sí, al final</td>
+                  <td>Sí, posición 1–2</td>
+                  <td>Alto en búsqueda local</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 2. CASOS DE USO */}
+        <div className={styles.eduSection}>
+          <h2>Casos de uso: quién usa este analizador y cómo</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
+                <strong>Tienda online (fichas de producto)</strong>
+              </div>
+              <p>Una tienda de ropa necesita optimizar 300 fichas de producto. Usa el analizador para verificar que cada título incluya el nombre del producto, la talla o color relevante y la marca al final.</p>
+              <div className={styles.escenarioExample}>
+                Ejemplo: "Zapatillas Running Hombre Ligeras Nike Air | TuTienda"
+              </div>
+              <div className={styles.escenarioTip}>
+                Consejo: mantén la keyword al inicio y la marca al final separada con |
+              </div>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">✍️</span>
+                <strong>Blog de nicho (artículos informativos)</strong>
+              </div>
+              <p>Un blogger de finanzas personales quiere aumentar el CTR de sus artículos en Google. Prueba distintas variaciones de título con números y palabras de poder para encontrar la combinación ganadora.</p>
+              <div className={styles.escenarioExample}>
+                Ejemplo: "7 Trucos para Ahorrar 500€ al Mes sin Esfuerzo"
+              </div>
+              <div className={styles.escenarioTip}>
+                Consejo: los títulos con números concretos aumentan el CTR un 36% de media
+              </div>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📍</span>
+                <strong>Negocio local (SEO geolocalizado)</strong>
+              </div>
+              <p>Una clínica dental en Sevilla quiere aparecer en búsquedas locales. Optimiza sus títulos incluyendo la ciudad y el servicio concreto para mejorar la visibilidad en Google Maps y búsqueda orgánica.</p>
+              <div className={styles.escenarioExample}>
+                Ejemplo: "Implantes Dentales en Sevilla | Clínica Dental Nombre"
+              </div>
+              <div className={styles.escenarioTip}>
+                Consejo: ciudad + servicio + marca es la estructura más efectiva para SEO local
+              </div>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
+                <strong>Agencia SEO (múltiples clientes)</strong>
+              </div>
+              <p>Un consultor SEO necesita revisar los títulos de decenas de URLs para varios clientes. Usa el analizador como checklist rápido para detectar títulos duplicados, demasiado largos o sin keyword principal.</p>
+              <div className={styles.escenarioExample}>
+                Ejemplo de auditoría: detectar todos los títulos &gt; 60 caracteres o con puntuación &lt; 60
+              </div>
+              <div className={styles.escenarioTip}>
+                Consejo: prioriza primero las páginas con más impresiones en Google Search Console
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. FAQ */}
+        <div className={styles.eduSection}>
+          <h2>Preguntas frecuentes sobre títulos SEO</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Cuál es la longitud ideal del título SEO?</h4>
+              <p>Entre 50 y 60 caracteres, o aproximadamente 580 píxeles de ancho. Google mide el espacio en píxeles, no en caracteres, por lo que letras mayúsculas anchas (como M o W) consumen más espacio. Una buena regla práctica: no superar los 60 caracteres de texto visible.</p>
+              <div className={styles.faqTip}>Dato: Google trunca el título con "..." cuando supera ~580px, lo que puede ocultar información clave para el usuario.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Por qué Google reescribe mis títulos?</h4>
+              <p>Según estudios de Portent, Google reescribe el 61% de los títulos. Lo hace cuando el título original es demasiado largo, no refleja bien el contenido de la página, contiene keyword stuffing o cuando Google considera que otro texto de la página representa mejor el resultado para una consulta específica.</p>
+              <div className={styles.faqTip}>Clave: si Google reescribe tu título, es una señal de que el original no estaba alineado con la intención de búsqueda.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Debo poner la keyword al inicio o al final del título?</h4>
+              <p>Al inicio, siempre que sea posible. Las palabras al principio del título reciben más peso en el algoritmo de Google y captan antes la atención del usuario en los resultados de búsqueda. Sin embargo, si la keyword al inicio genera un título forzado o poco natural, es mejor sacrificar la posición por la legibilidad.</p>
+              <div className={styles.faqTip}>Excepción: en la homepage, la marca puede ir al inicio si es un nombre conocido (ej. "Zara - Moda Online Mujer y Hombre").</div>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Debo incluir la marca en todos los títulos?</h4>
+              <p>No en todos. En páginas internas (blog, producto, servicios) se recomienda incluir la marca al final separada por | o —, especialmente si la marca ya tiene reconocimiento. En páginas con títulos largos cerca del límite de 60 caracteres, omitir la marca es preferible a truncar la keyword principal.</p>
+              <div className={styles.faqTip}>Regla práctica: marca al final para páginas internas, marca al inicio solo en la homepage.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuál es la diferencia entre el title tag y el H1?</h4>
+              <p>El title tag aparece en la pestaña del navegador y en los resultados de Google (SERP). El H1 es el titular visible dentro de la página. No tienen que ser idénticos, aunque sí deben ser coherentes. El title tag está optimizado para el CTR en buscadores; el H1 está optimizado para el usuario que ya está en tu página.</p>
+              <div className={styles.faqTip}>Buena práctica: el H1 puede ser más largo y descriptivo, el title tag debe ser más conciso y con la keyword al inicio.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo afecta el CTR al posicionamiento en Google?</h4>
+              <p>El CTR (Click Through Rate) es una señal de comportamiento del usuario que Google utiliza como factor indirecto de posicionamiento. Un CTR alto indica que los usuarios encuentran relevante tu resultado para esa búsqueda. Aumentar el CTR del 2% al 4% puede mejorar significativamente tu posición, especialmente en posiciones 4-10 donde la competencia es alta.</p>
+              <div className={styles.faqTip}>Estrategia: un título bien optimizado puede subir 2-3 posiciones sin ningún cambio técnico en la página.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo escribir títulos para Featured Snippets?</h4>
+              <p>Los Featured Snippets (posición 0) responden directamente a preguntas. Para optar a ellos, el título debe formularse como una pregunta o comenzar con "Cómo", "Qué es", "Cuál es", "Por qué". La página debe responder la pregunta de forma concisa en los primeros párrafos. En España, las búsquedas con "qué es" y "cómo" tienen alta tasa de Featured Snippets.</p>
+              <div className={styles.faqTip}>Ejemplo efectivo: "¿Qué es el SEO? Guía Completa para Principiantes"</div>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo mido si mi título funciona usando Google Search Console?</h4>
+              <p>En Google Search Console (GSC), ve a Rendimiento &gt; Resultados de búsqueda y filtra por la URL de tu página. Observa las impresiones, clics y CTR. Si tienes muchas impresiones pero bajo CTR (menor del 2-3%), el título es el primer elemento a optimizar. Modifica el título, espera 2-4 semanas y compara los datos.</p>
+              <div className={styles.faqTip}>Referencia: un CTR superior al 5% para posiciones 1-3 es excelente en mercados hispanohablantes.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. GUÍA PASO A PASO */}
+        <div className={styles.eduSection}>
+          <h2>Cómo escribir un título SEO perfecto: guía en 7 pasos</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Identifica la keyword principal</h4>
+                <p>Investiga qué término busca realmente tu audiencia. Usa Google Search Console, Google Suggest o herramientas como Semrush o Ahrefs. La keyword principal debe aparecer en el título, preferiblemente en los primeros 3 palabras.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Analiza la intención de búsqueda</h4>
+                <p>Busca tu keyword en Google y observa los 10 primeros resultados. ¿Son artículos informativos, páginas de compra, comparativas? Tu título debe encajar con la intención dominante o Google no te mostrará para esa búsqueda.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Coloca la keyword al inicio</h4>
+                <p>Las primeras palabras del título tienen más peso SEO y captan antes la atención visual del usuario. Si la keyword al inicio genera una frase forzada, reescríbela de forma natural manteniendo la keyword en las primeras 4-5 palabras.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Añade un diferenciador de CTR</h4>
+                <p>Incluye un número ("7 técnicas"), un adjetivo de valor ("completo", "definitivo", "gratis"), un año ("2025") o un formato especial ("Guía", "Tutorial", "Checklist"). Estos elementos aumentan el CTR porque destacan visualmente en los resultados de búsqueda.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Controla la longitud</h4>
+                <p>Escribe el título y pégalo en este analizador. El objetivo es quedar entre 50 y 60 caracteres. Si es más largo, elimina palabras de relleno ("muy", "bastante", "también"). Si es más corto, añade contexto que aporte valor al usuario.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Añade la marca si el espacio lo permite</h4>
+                <p>Si el título tiene menos de 50 caracteres, añade tu marca al final separada por | o —. Esto refuerza el reconocimiento de marca y puede aumentar el CTR si la marca ya tiene autoridad en tu nicho. Si el título ya está al límite, omite la marca.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Mide, itera y mejora con GSC</h4>
+                <p>Publica el título, espera 2-4 semanas y revisa el CTR en Google Search Console. Si el CTR es bajo (menor del 2%), prueba una variación con diferente número, adjetivo o estructura. El SEO es iteración continua: ningún título es definitivo.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 5. MEJORES PRÁCTICAS */}
+        <div className={styles.eduSection}>
+          <h2>6 mejores prácticas para títulos SEO de alto rendimiento</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
+              <h4>55–60 caracteres es el rango dorado</h4>
+              <p>Google muestra hasta ~580px de ancho. Los títulos de 55-60 caracteres raramente se truncan y tienen espacio suficiente para incluir keyword, diferenciador y marca. Menos de 40 caracteres desaprovecha el espacio; más de 65 corre riesgo de truncarse.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
+              <h4>Keyword en posición 1–3 del título</h4>
+              <p>Las primeras palabras del título reciben más peso algorítmico en Google. Además, en los resultados de búsqueda el ojo del usuario lee de izquierda a derecha y se detiene en la keyword si coincide con su búsqueda. Moverla al inicio puede aumentar el CTR entre un 10% y 20%.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
+              <h4>Números y datos concretos aumentan el CTR un 36%</h4>
+              <p>Según estudios de Conductor, los títulos con números tienen un CTR un 36% mayor que los títulos sin números. Los números impares (7, 5, 3) funcionan especialmente bien. Evita números redondos genéricos como "10" si puedes ser más específico ("11 técnicas").</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">💡</span>
+              <h4>Palabras emocionales y de poder</h4>
+              <p>Palabras como "definitivo", "secreto", "revelado", "gratis", "fácil" o "probado" activan sesgos cognitivos que aumentan la probabilidad de clic. Úsalas con moderación: 1-2 palabras de poder por título son suficientes; más de 3 puede parecer spam y reducir la credibilidad.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
+              <h4>Evita el keyword stuffing a toda costa</h4>
+              <p>Repetir la keyword dos o más veces en el mismo título ("Zapatillas Running - Las Mejores Zapatillas Running Baratas") no mejora el posicionamiento y genera una experiencia de usuario negativa. Google puede penalizarlo y reescribir el título automáticamente.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🧪</span>
+              <h4>Test A/B con Google Search Console</h4>
+              <p>GSC permite comparar el rendimiento antes y después de cambiar un título. Modifica el título, espera mínimo 28 días (para normalizar variaciones estacionales) y compara CTR e impresiones. En mercados hispanohablantes, los títulos con "España" o la región específica suelen superar a los genéricos.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 6. WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+            <h3>6 errores que destruyen tu posicionamiento en Google</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li>
+              <strong>Títulos que se truncan en el SERP:</strong> Si tu título supera los 60 caracteres (~580px), Google lo corta con "...". El usuario no ve el final del título, lo que puede ocultar la keyword secundaria, la marca o el diferenciador de CTR que más convierte. Solución: revisa siempre la vista previa antes de publicar.
+            </li>
+            <li>
+              <strong>Títulos duplicados en todo el sitio:</strong> Tener el mismo title tag en varias páginas confunde a Google sobre qué página debe posicionar para cada keyword. Es uno de los errores más comunes en tiendas con paginación (?page=2, ?page=3) o filtros de categorías. Audita con Screaming Frog o GSC.
+            </li>
+            <li>
+              <strong>Omitir la keyword principal:</strong> El title tag sigue siendo el factor on-page más importante para indicar a Google el tema de tu página. Un título como "Bienvenido a nuestra tienda" no le dice nada ni a Google ni al usuario. La keyword debe aparecer siempre, aunque sea en variante semántica.
+            </li>
+            <li>
+              <strong>Títulos genéricos sin diferenciación:</strong> "Los mejores consejos de marketing" compite contra millones de resultados similares. Sin un elemento diferenciador (número, año, ubicación, formato específico), tu CTR será inferior al promedio del sector, especialmente en posiciones 4-10 donde la competencia visual es máxima.
+            </li>
+            <li>
+              <strong>Keyword stuffing en el título:</strong> Repetir la keyword más de una vez en el mismo título ("Recetas de Cocina Fáciles - Recetas Fáciles Rápidas") no mejora el posicionamiento. Google lo detecta y puede reescribir el título automáticamente por uno más natural, perdiendo así el control sobre lo que se muestra en las SERPs.
+            </li>
+            <li>
+              <strong>Ignorar la intención de búsqueda del usuario:</strong> Si alguien busca "cómo hacer gazpacho" quiere un tutorial, no una tienda. Si tu título de receta dice "Gazpacho Andaluz - Compra Online", Google no te posicionará porque no coincide con la intención. Alinear el título con la intención de búsqueda (informacional, transaccional, navegacional) es más importante que cualquier optimización técnica.
+            </li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('analizador-titulos-seo')} />

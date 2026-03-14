@@ -408,14 +408,475 @@
   margin: 0;
 }
 
-/* Dark mode adjustments */
+/* ============================================
+   PATRÓN v2.0 - EDUCATIONAL SECTION CLASES
+   ============================================ */
+
+/* --- Tabla Comparativa --- */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
+.comparativaTable thead {
+  background: var(--primary);
+  color: white;
+}
+
+.comparativaTable th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover {
+  background: var(--bg-primary);
+}
+
+.cellBuena {
+  color: #059669;
+  font-weight: 600;
+}
+
+.cellMedia {
+  color: #d97706;
+  font-weight: 500;
+}
+
+.cellMala {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* --- Escenarios / Casos de Uso --- */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: box-shadow 0.2s;
+}
+
+.escenarioCard:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.escenarioHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+}
+
+.escenarioTip {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 6px 6px 0;
+}
+
+/* --- FAQ --- */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+
+.faqItem h3 {
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.faqItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 8px 0;
+}
+
+.faqItem p:last-of-type {
+  margin-bottom: 0;
+}
+
+.faqItem code {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.85em;
+  font-family: 'SF Mono', Monaco, monospace;
+  color: var(--primary);
+}
+
+.faqTip {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border-radius: 6px;
+  border-left: 2px solid var(--secondary);
+}
+
+/* --- Guía Paso a Paso --- */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.stepGuide::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary), var(--secondary));
+  border-radius: 2px;
+}
+
+.step {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 16px 0;
+  position: relative;
+}
+
+.stepNumber {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 4px var(--bg-primary);
+}
+
+.stepContent {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  flex: 1;
+}
+
+.stepContent h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.stepContent p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.stepContent code {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.85em;
+  font-family: 'SF Mono', Monaco, monospace;
+  color: var(--primary);
+}
+
+/* --- Mejores Prácticas (Tips Grid) --- */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.tipCard:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.1);
+  transform: translateY(-2px);
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.tipCard h3 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- Warning Box --- */
+.warningBox {
+  background: #fff8e6;
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.warningHeader h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: #78350f;
+  line-height: 1.65;
+  padding-left: 20px;
+  position: relative;
+}
+
+.warningList li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.warningList li strong {
+  color: #7c2d12;
+}
+
+.warningList li code {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.85em;
+  font-family: 'SF Mono', Monaco, monospace;
+  color: #92400e;
+}
+
+/* ============================================
+   DARK MODE - Clases existentes
+   ============================================ */
 [data-theme='dark'] .errorBox {
   background: rgba(239, 68, 68, 0.1);
   border-color: #ef4444;
   color: #fca5a5;
 }
 
-/* Responsive */
+/* ============================================
+   DARK MODE - Patrón v2.0
+   ============================================ */
+[data-theme='dark'] .comparativaTable {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .cellBuena {
+  color: #34d399;
+}
+
+[data-theme='dark'] .cellMedia {
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .cellMala {
+  color: #f87171;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .escenarioCard:hover {
+  box-shadow: 0 4px 16px rgba(72, 169, 166, 0.15);
+}
+
+[data-theme='dark'] .escenarioTip {
+  background: rgba(255, 255, 255, 0.04);
+  border-left-color: var(--secondary);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .faqItem h3 {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .faqItem code {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .stepContent {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .stepContent code {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tipCard:hover {
+  box-shadow: 0 4px 16px rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: #d97706;
+}
+
+[data-theme='dark'] .warningHeader h2 {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fde68a;
+}
+
+[data-theme='dark'] .warningList li::before {
+  color: #f87171;
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .warningList li code {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fcd34d;
+}
+
+/* ============================================
+   RESPONSIVE - Existente
+   ============================================ */
 @media (max-width: 768px) {
   .container {
     padding: 15px;
@@ -464,6 +925,35 @@
   .resultActions {
     flex-direction: column;
   }
+
+  /* --- Responsive Patrón v2.0 --- */
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 9px 12px;
+    font-size: 0.82rem;
+  }
+
+  .stepGuide::before {
+    left: 15px;
+  }
+
+  .stepNumber {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+
+  .warningBox {
+    padding: 18px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -473,5 +963,18 @@
 
   .title {
     font-size: 1.4rem;
+  }
+
+  /* --- Responsive estrecho Patrón v2.0 --- */
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .escenarioHeader {
+    flex-wrap: wrap;
+  }
+
+  .warningHeader {
+    flex-wrap: wrap;
   }
 }

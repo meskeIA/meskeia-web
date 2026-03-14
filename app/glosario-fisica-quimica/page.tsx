@@ -290,9 +290,10 @@ export default function GlosarioFisicaQuimicaPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 ¿Cómo usar este glosario?"
-        subtitle="Consejos para aprovechar al máximo este recurso de estudio"
+        title="📚 Guía completa de Física y Química"
+        subtitle="Todo lo que necesitas saber para estudiar ciencias exactas en ESO, Bachillerato y universidad"
       >
+        {/* Contenido original mantenido */}
         <section className={styles.guideSection}>
           <h2>Guía de Uso del Glosario</h2>
           <p className={styles.introParagraph}>
@@ -336,6 +337,341 @@ export default function GlosarioFisicaQuimicaPage() {
                 químico.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 1: Tabla Comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de Ramas: Física vs Química vs Fisicoquímica</h2>
+          <p className={styles.introParagraph}>
+            Cada rama tiene su propio enfoque, nivel de abstracción matemática y salidas profesionales.
+            Conocerlas te ayuda a elegir qué estudiar en profundidad.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Rama</th>
+                  <th>Dificultad matemática</th>
+                  <th>Herramientas clave</th>
+                  <th>Aplicaciones reales</th>
+                  <th>Salidas profesionales</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Mecánica clásica</strong></td>
+                  <td>Media — derivadas e integrales básicas</td>
+                  <td>Cálculo diferencial, vectores</td>
+                  <td>Diseño de puentes, coches, maquinaria</td>
+                  <td>Ingeniería civil, mecánica, aeronáutica</td>
+                </tr>
+                <tr>
+                  <td><strong>Termodinámica</strong></td>
+                  <td>Media-alta — ciclos, entropía</td>
+                  <td>Cálculo, estadística</td>
+                  <td>Motores de combustión, frigoríficos, centrales eléctricas</td>
+                  <td>Ingeniería industrial, energética</td>
+                </tr>
+                <tr>
+                  <td><strong>Electromagnetismo</strong></td>
+                  <td>Alta — ecuaciones de Maxwell</td>
+                  <td>Cálculo vectorial, álgebra lineal</td>
+                  <td>Circuitos, antenas, resonancia magnética (MRI)</td>
+                  <td>Ingeniería eléctrica, telecomunicaciones</td>
+                </tr>
+                <tr>
+                  <td><strong>Óptica</strong></td>
+                  <td>Media — trigonometría y ondas</td>
+                  <td>Álgebra, trigonometría</td>
+                  <td>Gafas, microscopios, fibra óptica, láseres</td>
+                  <td>Óptica clínica, fotónica, medicina</td>
+                </tr>
+                <tr>
+                  <td><strong>Química orgánica</strong></td>
+                  <td>Baja-media — más memorización estructural</td>
+                  <td>Nomenclatura IUPAC, estereoquímica</td>
+                  <td>Fármacos, plásticos, combustibles, cosméticos</td>
+                  <td>Farmacia, química industrial, biotecnología</td>
+                </tr>
+                <tr>
+                  <td><strong>Química inorgánica</strong></td>
+                  <td>Media — tabla periódica, estequiometría</td>
+                  <td>Tabla periódica, cálculos molares</td>
+                  <td>Metalurgia, fertilizantes, semiconductores</td>
+                  <td>Materiales, minería, electrónica</td>
+                </tr>
+                <tr>
+                  <td><strong>Fisicoquímica</strong></td>
+                  <td>Alta — termodinámica + cinética + cuántica</td>
+                  <td>Cálculo, estadística, mecánica cuántica</td>
+                  <td>Pilas de combustible, catálisis, espectroscopía</td>
+                  <td>Investigación, química computacional, nanotecnología</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* SECCIÓN 2: Casos de Uso / Perfiles */}
+        <section className={styles.guideSection}>
+          <h2>¿Para quién es este glosario?</h2>
+          <p className={styles.introParagraph}>
+            Según tu nivel y objetivo, el glosario se usa de manera diferente. Identifica tu perfil y sácale el máximo partido.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎒</span>
+                <h4>Estudiante ESO / Bachillerato</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Tienes el examen de Física y Química en dos semanas. Necesitas afianzar conceptos como fuerza, presión, pH y enlace químico.
+              </p>
+              <p className={styles.escenarioTip}>
+                Filtra por <strong>nivel Básico</strong> y repasa los 20 términos fundamentales. Presta especial atención a las fórmulas y ejemplos cotidianos.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏛️</span>
+                <h4>Estudiante universitario de ingeniería</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Estás en primero de ingeniería y te enfrentas a electromagnetismo, termodinámica y mecánica cuántica simultáneamente.
+              </p>
+              <p className={styles.escenarioTip}>
+                Usa el filtro <strong>nivel Avanzado</strong> para conceptos como entropía, dualidad onda-partícula o principio de incertidumbre. Las fórmulas expandidas son clave.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📝</span>
+                <h4>Opositor / Docente</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Preparas oposiciones al cuerpo de docentes de secundaria o necesitas refrescar conceptos para explicarlos en clase.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consulta los tres niveles en orden. El glosario sirve para estructurar la progresión didáctica de tus unidades: de básico a avanzado, con ejemplos reales incluidos.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔬</span>
+                <h4>Profesional de investigación</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Trabajas en un laboratorio o centro de I+D y necesitas un diccionario rápido para comunicarte con colegas de otras especialidades.
+              </p>
+              <p className={styles.escenarioTip}>
+                La búsqueda por texto libre te permite localizar términos como &quot;hibridación&quot;, &quot;energía de activación&quot; o &quot;entalpía&quot; en segundos, con su definición precisa y fórmula.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 3: FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre Física y Química</h2>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt>¿Cuál es la diferencia entre física y química?</dt>
+              <dd>
+                La física estudia las propiedades de la materia y la energía sin que haya cambio en la composición de las sustancias (movimiento, fuerzas, luz). La química estudia cómo se transforma la materia: qué ocurre cuando los átomos se recombinan y forman nuevas sustancias. Por ejemplo, calentar agua es física; electrolizarla para obtener hidrógeno y oxígeno es química.
+                <span className={styles.faqTip}>Regla mnemotécnica: si hay nueva sustancia al final del proceso, es química.</span>
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Qué diferencia la física clásica de la física moderna?</dt>
+              <dd>
+                La física clásica (Newton, Maxwell) describe el mundo cotidiano: objetos macroscópicos, velocidades mucho menores que la luz (v &lt;&lt; c = 3×10⁸ m/s). La física moderna (relatividad especial, mecánica cuántica) es necesaria cuando los objetos son muy pequeños (átomos, electrones) o van a velocidades relativistas. Para el 99,99% de la ingeniería diaria, la física clásica es suficiente.
+                <span className={styles.faqTip}>La relatividad se vuelve relevante por encima del 10% de la velocidad de la luz.</span>
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Diferencia entre química orgánica e inorgánica?</dt>
+              <dd>
+                La química orgánica estudia compuestos basados en carbono (con cadenas C-C o C-H), como los hidrocarburos, los aminoácidos o los plásticos. La química inorgánica estudia el resto: sales, óxidos, metales, ácidos minerales, semiconductores. Hoy en día existe mucho solapamiento: la organometálica combina ambas.
+                <span className={styles.faqTip}>Si el compuesto tiene carbono enlazado a hidrógeno, casi siempre es orgánico.</span>
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Cuánto se necesita saber de matemáticas para física?</dt>
+              <dd>
+                Para ESO basta con proporciones y ecuaciones de primer grado. Para Bachillerato se necesita trigonometría, sistemas de ecuaciones y notación científica. Para la carrera, cálculo diferencial e integral, álgebra lineal y ecuaciones diferenciales son imprescindibles. La asignatura &quot;Matemáticas para físicos&quot; suele ocupar los dos primeros años de carrera.
+                <span className={styles.faqTip}>Dominar derivadas e integrales básicas resuelve el 80% de los problemas de primer año universitario.</span>
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Cómo se usan las derivadas e integrales en física?</dt>
+              <dd>
+                La derivada de la posición respecto al tiempo es la velocidad: v = dx/dt. La derivada de la velocidad es la aceleración: a = dv/dt. La integral de la aceleración recupera la velocidad: v = ∫a dt. En circuitos eléctricos, la intensidad es la derivada de la carga: i = dq/dt. Entender este lenguaje es fundamental para pasar de fórmulas estáticas a problemas dinámicos reales.
+                <span className={styles.faqTip}>Piensa en la derivada como &quot;tasa de cambio&quot; y en la integral como &quot;área acumulada&quot;.</span>
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Qué son las unidades del Sistema Internacional (SI)?</dt>
+              <dd>
+                El SI tiene 7 unidades base: metro (m), kilogramo (kg), segundo (s), amperio (A), kelvin (K), mol (mol) y candela (cd). Todas las demás unidades se derivan de estas. Por ejemplo, el Newton es kg·m/s², el Joule es kg·m²/s² y el Pascal es kg/(m·s²). Mantener consistencia en las unidades previene el 70% de los errores de cálculo en problemas numéricos.
+                <span className={styles.faqTip}>Convierte siempre al SI antes de sustituir en fórmulas (km/h → m/s dividiendo entre 3,6).</span>
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Qué es la notación científica y cuándo se usa?</dt>
+              <dd>
+                La notación científica expresa números muy grandes o pequeños como a × 10ⁿ, donde 1 ≤ a &lt; 10. La masa de un electrón es 9,109×10⁻³¹ kg. La distancia Tierra-Sol es 1,496×10¹¹ m. En química, el número de Avogadro es 6,022×10²³ mol⁻¹. Se usa para evitar errores al escribir muchos ceros y para operar con órdenes de magnitud.
+                <span className={styles.faqTip}>En la calculadora científica: 6,022 EXP 23 equivale a 6,022×10²³.</span>
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Cómo se aplica la física y la química en ingeniería?</dt>
+              <dd>
+                Prácticamente toda la ingeniería usa ambas: la ingeniería civil aplica mecánica de sólidos y fluidos; la electrónica, electromagnetismo y semiconductores (química del silicio); la química industrial diseña reactores basándose en cinética química y termodinámica; la biomedicina combina óptica (TAC, endoscopias) con bioquímica. Las empresas más demandantes de estos perfiles en España son Repsol, Iberdrola, SEAT e Indra.
+                <span className={styles.faqTip}>En la selectividad española (EBAU), física y química son las asignaturas que más nota media elevan para ingeniería (peso × 0,2 cada una).</span>
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        {/* SECCIÓN 4: Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo estudiar Física y Química de forma sistemática (7 pasos)</h2>
+          <p className={styles.introParagraph}>
+            Un método probado para pasar de cero al dominio de los conceptos, aplicable tanto a ESO como a primer año de carrera.
+          </p>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <h4>Domina las unidades y la notación científica</h4>
+                <p>Antes de cualquier fórmula, asegúrate de convertir correctamente entre unidades (m, kg, s, mol). Practica con 10 conversiones diarias durante la primera semana. El 60% de los errores en exámenes son de unidades, no de concepto.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <h4>Aprende los conceptos ANTES que las fórmulas</h4>
+                <p>Entiende qué es la fuerza (interacción que produce aceleración) antes de memorizar F = m × a. La comprensión conceptual te permite deducir la fórmula si la olvidas en el examen y adaptarla a contextos nuevos.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <h4>Construye un mapa de relaciones entre conceptos</h4>
+                <p>Dibuja en papel cómo se conectan: fuerza → trabajo → energía → potencia. O en química: átomo → molécula → mol → estequiometría. Ver la jerarquía evita estudiar como islas de información desconectada.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <h4>Resuelve problemas numéricos desde el día 1</h4>
+                <p>No esperes a &quot;entender todo&quot; para hacer ejercicios. Con cada concepto nuevo, resuelve al menos 3 problemas numéricos. Un coche a 72 km/h = 20 m/s. Una solución de pH 3 tiene [H⁺] = 10⁻³ mol/L. Los números anclan la teoría.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <h4>Memoriza los 20 conceptos básicos de cada rama</h4>
+                <p>En física: fuerza, energía, trabajo, potencia, velocidad, aceleración, presión, temperatura, campo eléctrico, onda. En química: átomo, mol, pH, enlace, reacción, oxidación, equilibrio, electronegatividad, entalpía, estequiometría. Con estos 20 se resuelve el 80% de los problemas de selectividad.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <h4>Practica con exámenes reales de EBAU de tu comunidad autónoma</h4>
+                <p>Descarga los 5 últimos exámenes de selectividad de tu CC.AA. (disponibles en la web de la universidad). Cronométrate: cada problema de física debería resolverse en 15-20 minutos. La repetición de patrones reduce la ansiedad y mejora la velocidad.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <h4>Revisa los errores con un enfoque diagnóstico</h4>
+                <p>Cuando fallas un problema, clasifica el error: ¿es conceptual (no entendí el fenómeno)?, ¿algebraico (me equivoqué al despejar)?, ¿de unidades?, ¿de lectura del enunciado? Llevar un registro de errores durante 4 semanas mejora la nota media un 15-20%.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* SECCIÓN 5: Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>6 claves para estudiar ciencias exactas con eficacia</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⏱️</span>
+              <h4>Bloques de 45 minutos</h4>
+              <p>El cerebro mantiene concentración óptima en física/química durante 45-50 minutos. Estudia en bloques de 45 min + 10 min de pausa activa. Estudiar 3×45 min rinde más que 3 horas continuas con rendimiento decreciente.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✍️</span>
+              <h4>Escribe las fórmulas a mano</h4>
+              <p>Escribir F = m × a o ΔS = Q/T a mano activa áreas motoras del cerebro que refuerzan la memoria. Los estudiantes que copian fórmulas a mano retienen un 30% más que los que solo las leen, según estudios de aprendizaje motor.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔗</span>
+              <h4>Conecta con la vida real</h4>
+              <p>El principio de Arquímedes explica por qué flota un barco de acero de 200.000 toneladas. La ley de Ohm está detrás del fusible de tu casa. La presión osmótica es por qué la lechuga se mustia con sal. Los ejemplos cotidianos multiplican la retención.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>👥</span>
+              <h4>Explica en voz alta</h4>
+              <p>La técnica Feynman: intenta explicar un concepto como si se lo contaras a alguien de 12 años. Si no puedes explicar la entropía sin fórmulas, todavía no la has entendido. Los estudiantes que enseñan a otros retienen el 90% del contenido frente al 10% de solo leer.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📐</span>
+              <h4>Usa análisis dimensional siempre</h4>
+              <p>Antes de calcular, comprueba que las unidades son coherentes. Si quieres obtener velocidad (m/s) y el resultado te da kg·m, hay un error. Este hábito, aplicado en todos los problemas, detecta el 40% de los errores sin resolver la ecuación completa.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🗓️</span>
+              <h4>Repaso espaciado (curva del olvido)</h4>
+              <p>Repasa cada concepto nuevo al día siguiente, a los 3 días, a los 7 días y a los 21 días. Este patrón (basado en la curva de Ebbinghaus) mantiene el 80% de la información en la memoria a largo plazo frente al 20% sin repaso. Usa el glosario para los repasos breves de 5 minutos.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 6: Warning Box — Errores comunes */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>6 errores frecuentes que debes evitar</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Confundir masa y peso.</strong> La masa es invariable (70 kg en la Tierra y en la Luna). El peso es una fuerza que depende de la gravedad: P = m × g. En la Luna, g = 1,62 m/s², así que un cuerpo de 70 kg pesa solo 113 N (frente a 686 N en la Tierra).
+              </li>
+              <li>
+                <strong>Errores de unidades al sustituir en fórmulas.</strong> Si la velocidad está en km/h y la usas directamente en Ec = ½mv², obtendrás un resultado incorrecto. Convierte siempre a unidades del SI antes de sustituir: 90 km/h = 25 m/s.
+              </li>
+              <li>
+                <strong>Memorizar fórmulas sin entender el concepto.</strong> Saber que pH = -log[H⁺] no sirve si no entiendes que el pH mide la concentración de protones en solución. Sin comprensión conceptual no puedes aplicar la fórmula en contextos nuevos ni interpretar los resultados.
+              </li>
+              <li>
+                <strong>Confundir velocidad media y velocidad instantánea.</strong> La velocidad media es el desplazamiento total dividido por el tiempo total. La instantánea es la derivada de la posición en ese instante. En un viaje de 200 km en 2 h, la velocidad media es 100 km/h, pero en ningún momento concreto tienes garantizado ir a 100 km/h.
+              </li>
+              <li>
+                <strong>No distinguir reacción exotérmica de endotérmica.</strong> En una reacción exotérmica (ΔH &lt; 0) se libera calor: la combustión de metano (ΔH = -890 kJ/mol). En una endotérmica (ΔH &gt; 0) se absorbe calor: la fotosíntesis. Confundirlas invierte el signo del balance energético en los cálculos de ingeniería química.
+              </li>
+              <li>
+                <strong>Olvidar el signo en problemas vectoriales.</strong> La velocidad, la fuerza y el campo eléctrico son vectores: tienen módulo, dirección y sentido. En un plano inclinado, no es lo mismo una fuerza de +30 N (cuesta abajo) que -30 N (cuesta arriba). Definir el sistema de referencia al inicio del problema y respetarlo evita este error.
+              </li>
+            </ul>
           </div>
         </section>
       </EducationalSection>

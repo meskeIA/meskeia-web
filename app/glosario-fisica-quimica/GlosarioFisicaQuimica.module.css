@@ -351,6 +351,362 @@
   line-height: 1.6;
 }
 
+/* ===== PATRÓN v2.0 — SECCIONES EDUCATIVAS ===== */
+
+/* Tabla Comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  margin-top: var(--spacing-md);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  background: var(--bg-card);
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:hover td {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .comparativaTable {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: var(--border);
+}
+
+/* Escenarios / Perfiles */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border-top: 3px solid var(--primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.escenarioHeader h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.escenarioIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0;
+  padding: var(--spacing-sm);
+  background: var(--hover);
+  border-radius: var(--radius);
+}
+
+.escenarioTip {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border-left: 3px solid var(--secondary);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+}
+
+.faqItem dt {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.faqItem dd {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.faqTip {
+  display: block;
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 3px solid var(--secondary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.83rem;
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+/* Guía Paso a Paso */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-md) 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 2.2rem;
+  height: 2.2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.stepContent p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Tips / Mejores Prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+}
+
+.tipCard h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+}
+
+/* Warning Box */
+.warningBox {
+  background: rgba(245, 158, 11, 0.07);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.warningHeader h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #B45309;
+  margin: 0;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #F59E0B;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding-left: var(--spacing-lg);
+  margin: 0;
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.warningList li strong {
+  color: #B45309;
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: #F59E0B;
+}
+
+/* ===== RESPONSIVE v2.0 ===== */
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable {
+    font-size: 0.8rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .step {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .stepNumber {
+    width: 1.9rem;
+    height: 1.9rem;
+    font-size: 0.85rem;
+  }
+
+  .faqItem {
+    padding: var(--spacing-md);
+  }
+
+  .warningList {
+    padding-left: var(--spacing-md);
+  }
+}
+
+/* ===== FIN PATRÓN v2.0 ===== */
+
 /* Responsive */
 @media (max-width: 1024px) {
   .mainContent {

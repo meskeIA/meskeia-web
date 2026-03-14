@@ -715,6 +715,367 @@ export default function ConversorUnidadesRFPage() {
             </table>
           </div>
         </section>
+
+        {/* SECCIÓN 1: Tabla Comparativa de Unidades RF */}
+        <section className={styles.guideSection}>
+          <h2>Tabla Comparativa: dBm vs Watts vs dBW vs dBµV</h2>
+          <p className={styles.introParagraph}>
+            Cada unidad RF tiene su contexto de uso. Entender cuándo aplicar cada una evita errores de cálculo y facilita la comunicación entre equipos de trabajo.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Unidad</th>
+                  <th>Rango típico</th>
+                  <th>Cuándo se usa</th>
+                  <th>Escala</th>
+                  <th>Facilidad de cálculo</th>
+                  <th>Estándares donde aparece</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>dBm</strong></td>
+                  <td>-174 a +60 dBm</td>
+                  <td>Potencia de señal en sistemas de comunicaciones, medición con analizadores de espectro</td>
+                  <td>Logarítmica (ref. 1 mW)</td>
+                  <td>Muy alta: suma y resta directa de ganancias/pérdidas</td>
+                  <td>IEEE 802.11, 3GPP LTE/5G, ITU-T</td>
+                </tr>
+                <tr>
+                  <td><strong>Watts (W/mW)</strong></td>
+                  <td>pW a kW</td>
+                  <td>Especificación de amplificadores, transmisores, cálculos de SAR</td>
+                  <td>Lineal</td>
+                  <td>Media: necesita multiplicaciones para cadenas RF</td>
+                  <td>IEC 60268, UNE-EN 300 422</td>
+                </tr>
+                <tr>
+                  <td><strong>dBW</strong></td>
+                  <td>-30 a +90 dBW</td>
+                  <td>Sistemas de satélite, radioenlaces, PIRE (Potencia Isótropa Radiada Equivalente)</td>
+                  <td>Logarítmica (ref. 1 W)</td>
+                  <td>Alta: igual que dBm, pero referenciada a 1 W</td>
+                  <td>ITU-R, ETSI EN 302 217</td>
+                </tr>
+                <tr>
+                  <td><strong>dBµV</strong></td>
+                  <td>0 a 120 dBµV</td>
+                  <td>Medición de señales de TV, cable, DAB+, compatibilidad electromagnética (EMC)</td>
+                  <td>Logarítmica (ref. 1 µV)</td>
+                  <td>Alta: estándar en instalaciones de antenas domésticas</td>
+                  <td>DVB-T2 (ETSI EN 302 755), UNE-EN 50083</td>
+                </tr>
+                <tr>
+                  <td><strong>dBmV</strong></td>
+                  <td>-20 a +60 dBmV</td>
+                  <td>Distribución de señal en redes de cable coaxial (CATV, DOCSIS)</td>
+                  <td>Logarítmica (ref. 1 mV)</td>
+                  <td>Alta: común en instalaciones de cable</td>
+                  <td>DOCSIS 3.1, SCTE 40</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* SECCIÓN 2: Casos de Uso por Perfil */}
+        <section className={styles.guideSection}>
+          <h2>Casos de Uso por Perfil Profesional</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📡</span>
+                <h3>Técnico en Telecomunicaciones calibrando antenas</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Instalando una antena sectorial LTE a 1800 MHz. El analizador de espectro marca -45 dBm en el punto de conexión al feeder. Necesita saber si la señal es suficiente para el modem (sensibilidad -100 dBm). Diferencia: 55 dB de margen, más que suficiente. Mide también el VSWR de la antena: 1,4:1 → Return Loss de 15,6 dB → solo el 2,8% de la potencia se refleja. Instalación correcta.
+              </p>
+              <p className={styles.escenarioTip}>
+                Herramienta clave: conversor dBm ↔ W para verificar que la potencia del transmisor (43 dBm = 20 W) no supera los límites legales de exposición de la CMT.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📻</span>
+                <h3>Radioaficionado midiendo potencia de emisora</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Operador EA4 con licencia clase A (máx. 400 W PEP en HF). Su transceptor indica 100 W en el display (50 dBm). Ajusta el ATU hasta conseguir VSWR 1,2:1 en la antena dipolo a 14 MHz (λ = 21,4 m → dipolo de 10,7 m). Con cable RG-213 de 15 m (pérdidas: ~0,7 dB/10m a 14 MHz), la pérdida en el cable es ~1 dB: entrega 79,4 W a la antena.
+              </p>
+              <p className={styles.escenarioTip}>
+                Referencia EA/URE: VSWR &lt; 1,5:1 es el objetivo habitual. Con VSWR 2:1 el Return Loss es 9,5 dB y se refleja el 11% de la potencia (11 W de 100 W).
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔬</span>
+                <h3>Ingeniero de RF diseñando amplificadores</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Diseño de un LNA (Low Noise Amplifier) para banda 5G sub-6GHz (3,5 GHz). Nivel de entrada esperado: -90 dBm (señal del aire). Ganancia del LNA: 20 dB. Salida: -70 dBm. Figura de ruido del LNA: 1,5 dB. Piso de ruido del sistema: -174 dBm/Hz + 10·log(200 kHz BW) + 1,5 dB = -119,5 dBm. Margen SNR: -70 - (-119,5) = 49,5 dB. Diseño viable.
+              </p>
+              <p className={styles.escenarioTip}>
+                En diseño RF, cada dB cuenta. Un conector mal soldado puede añadir 0,5 dB de pérdidas y degradar la figura de ruido de todo el sistema.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📺</span>
+                <h3>Técnico de instalaciones TV/satélite</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Instalación de TDT en edificio de 20 pisos. Señal de entrada en cabecera: 75 dBµV. Cable utilizado: RG-6 con pérdidas de 8 dB/10m a 800 MHz. Distribuidor de 8 salidas: 12 dB de pérdida de inserción. Derivador por planta: 1,5 dB. Con 5 plantas hasta el piso 15 y 30 m de cable: 75 - 12 (distribuidor) - 2,4 (cable) - 7,5 (derivadores) = 53,1 dBµV. Nivel mínimo DVB-T2: 45 dBµV. Sistema válido.
+              </p>
+              <p className={styles.escenarioTip}>
+                Normativa ICT (RD 346/2011): el nivel mínimo de señal en toma de usuario debe estar entre 45 y 80 dBµV para TV terrestre.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 3: FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre Unidades RF</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h3>¿Qué es el dBm y por qué se usa en telecomunicaciones?</h3>
+              <p>
+                El dBm (decibelio-milivatio) expresa potencia en escala logarítmica referenciada a 1 mW: dBm = 10 × log₁₀(P/1mW). Se usa porque las señales RF abarcan rangos enormes (desde -174 dBm del ruido térmico hasta +60 dBm de una emisora) que serían impracticables en escala lineal. Además, las ganancias y pérdidas en cascada se calculan con simples sumas y restas, no con multiplicaciones.
+              </p>
+              <p className={styles.faqTip}>Ejemplo: Transmisor 30 dBm + cable -3 dB + antena +8 dBi = PIRE 35 dBm (3,16 W).</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Cuál es la diferencia entre dBm y dBW?</h3>
+              <p>
+                Ambos miden potencia en escala logarítmica pero con distinta referencia. dBm usa 1 mW como referencia; dBW usa 1 W. La conversión es directa: <strong>dBW = dBm - 30</strong>. Por ejemplo, 30 dBm equivale exactamente a 0 dBW (ambos son 1 W). En teleco españoles, los analizadores de espectro suelen mostrar dBm; los cálculos de radioenlaces y satélite usan dBW por tratarse de potencias superiores a 1 W.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Cómo se calcula la ganancia total de un sistema RF?</h3>
+              <p>
+                En dB, la ganancia total es la suma algebraica de todas las ganancias y pérdidas de la cadena: G_total (dB) = G₁ + G₂ + ... - L₁ - L₂ - ... Un ejemplo de link budget LTE: PIRE transmisor (+43 dBm) - pérdida de propagación en espacio libre (-120 dB a 1 km, 2,1 GHz) + ganancia antena receptora (+2 dBi) - pérdidas de cable receptor (-2 dB) = nivel en receptor: -77 dBm. Si la sensibilidad del equipo es -100 dBm, el margen es de 23 dB.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Qué es el VSWR y cuáles son los valores aceptables?</h3>
+              <p>
+                El VSWR (Voltage Standing Wave Ratio) mide la adaptación de impedancias entre una línea de transmisión (generalmente 50 Ω) y la carga (antena). Un VSWR de 1:1 es perfecto (sin reflexión). Los valores aceptables según aplicación:
+              </p>
+              <ul>
+                <li><strong>VSWR &lt; 1,2:1</strong> — Excelente, para sistemas críticos (radar, satélite)</li>
+                <li><strong>VSWR &lt; 1,5:1</strong> — Muy bueno, estándar profesional (Return Loss &gt; 14 dB)</li>
+                <li><strong>VSWR &lt; 2:1</strong> — Aceptable, uso general (Return Loss &gt; 9,5 dB, reflexión 11%)</li>
+                <li><strong>VSWR &lt; 3:1</strong> — Límite para equipos 50 Ω sin daños en el PA</li>
+                <li><strong>VSWR &gt; 3:1</strong> — Problema serio, riesgo de daño al amplificador de potencia</li>
+              </ul>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Cómo se relacionan la longitud de onda y la frecuencia?</h3>
+              <p>
+                La relación es inversa: λ (m) = c / f, donde c = 299.792.458 m/s (velocidad de la luz en el vacío). En medios físicos (cable coaxial, guía de onda), hay que aplicar el factor de velocidad del medio (VF, típicamente 0,66 a 0,85 para cables coaxiales). Ejemplos prácticos en España: FM (100 MHz → λ = 3 m, antena dipolo 1,5 m), DAB+ (225 MHz → λ = 1,33 m), 4G Band 20 (800 MHz → λ = 37,5 cm), WiFi 2,4 GHz (λ = 12,5 cm), 5G mmWave 28 GHz (λ = 10,7 mm).
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Qué es el nivel de ruido en receptores y cómo afecta al rendimiento?</h3>
+              <p>
+                El piso de ruido térmico es -174 dBm/Hz a 290 K (temperatura de referencia ITU). Para un ancho de banda B: N₀ = -174 + 10·log₁₀(B) + NF, donde NF es la figura de ruido del receptor en dB. Un receptor LTE con BW de 10 MHz (70 dB·Hz) y NF = 7 dB tiene un piso de ruido de -174 + 70 + 7 = -97 dBm. La sensibilidad real requiere además un margen de SNR mínimo (típicamente 10-15 dB), resultando en una sensibilidad de -82 a -87 dBm.
+              </p>
+              <p className={styles.faqTip}>Para mejorar la sensibilidad: reducir la figura de ruido del LNA (cada dB de NF mejora directamente la sensibilidad 1 dB) o reducir el ancho de banda si la modulación lo permite.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Cuáles son las pérdidas típicas en cable coaxial?</h3>
+              <p>
+                Las pérdidas en cables coaxiales comunes (por cada 10 metros) a distintas frecuencias:
+              </p>
+              <ul>
+                <li><strong>RG-58 (3 mm):</strong> 3 dB/10m a 100 MHz, 6 dB a 400 MHz, 20 dB a 2,4 GHz</li>
+                <li><strong>RG-213 (10 mm):</strong> 1 dB/10m a 100 MHz, 2 dB a 400 MHz, 6 dB a 2,4 GHz</li>
+                <li><strong>RG-6 (coaxial TV/SAT):</strong> 0,8 dB/10m a 100 MHz, 2,5 dB a 800 MHz, 5 dB a 2,15 GHz</li>
+                <li><strong>LMR-400:</strong> 0,7 dB/10m a 450 MHz, 1,3 dB a 900 MHz, 2,1 dB a 2,4 GHz</li>
+                <li><strong>Heliax 7/8&quot;:</strong> 0,15 dB/10m a 900 MHz, 0,4 dB a 2,4 GHz</li>
+              </ul>
+              <p className={styles.faqTip}>Regla práctica: duplicar la frecuencia aumenta las pérdidas aproximadamente 1,4 veces (raíz cuadrada de la frecuencia).</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Cómo convertir potencia (dBm) a campo eléctrico (dBµV/m)?</h3>
+              <p>
+                La conversión depende de la distancia y la ganancia de antena. Para una antena isótropa en espacio libre: E (dBµV/m) = PIRE (dBm) + 20·log₁₀(f MHz) - 20·log₁₀(d m) - 77,2. Ejemplo: transmisor de 10 dBm (10 mW) con antena isótropa a 100 m y 900 MHz: E = 10 + 59,1 - 40 - 77,2 = -48,1 dBµV/m. Para mediciones de compatibilidad electromagnética (EMC/CEM), la normativa CISPR y la UNE-EN 55032 especifican límites en dBµV/m a distancias de 10 o 30 metros.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 4: Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Guía Paso a Paso: Medir y Analizar una Instalación RF</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">1</div>
+              <div className={styles.stepContent}>
+                <h3>Identificar la fuente y el tipo de señal</h3>
+                <p>
+                  Determina la frecuencia de trabajo (HF 3-30 MHz, VHF 30-300 MHz, UHF 300 MHz-3 GHz, SHF 3-30 GHz), la impedancia del sistema (50 Ω en RF profesional, 75 Ω en TV/SAT/cable) y la potencia nominal del transmisor en dBm o W. Consulta la documentación del equipo o la hoja de datos del fabricante.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">2</div>
+              <div className={styles.stepContent}>
+                <h3>Calcular el presupuesto de enlace (Link Budget)</h3>
+                <p>
+                  Suma algebraica en dB: Potencia TX (dBm) + Ganancia antena TX (dBi) - Pérdidas en cable TX (dB) - Pérdida de propagación (dB) + Ganancia antena RX (dBi) - Pérdidas cable RX (dB) = Nivel en receptor (dBm). Compara el resultado con la sensibilidad del receptor para obtener el margen del sistema. Un margen mínimo de 10-15 dB es recomendable para instalaciones fijas.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">3</div>
+              <div className={styles.stepContent}>
+                <h3>Verificar la adaptación de impedancias con el medidor de VSWR</h3>
+                <p>
+                  Con el reflectómetro o analizador de antenas (ej. NanoVNA, RigExpert AA-55 Zoom), mide el VSWR en la frecuencia de trabajo con la antena conectada. Objetivo: VSWR &lt; 1,5:1. Si el VSWR es mayor, ajusta la longitud de la antena (+/- longitud para subir/bajar la frecuencia de resonancia) o usa un ATU (Automatic Tuning Unit). Anota también el Return Loss y la resistencia e reactancia en la frecuencia de interés.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">4</div>
+              <div className={styles.stepContent}>
+                <h3>Medir las pérdidas reales del cable y conectores</h3>
+                <p>
+                  Con un analizador de redes o medidor de pérdidas de inserción, mide la atenuación del cable a la frecuencia de trabajo. Compara con los valores del fabricante; si la pérdida es mayor en más de 1-2 dB, revisa los conectores (corrosión, soldaduras frías, conectores mal crimpados). Un conector PL-259 mal instalado puede añadir hasta 2-3 dB de pérdidas extra.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">5</div>
+              <div className={styles.stepContent}>
+                <h3>Medir el nivel de señal en el punto de recepción</h3>
+                <p>
+                  Con el analizador de espectro o un medidor de campo (para instalaciones TV/SAT), mide el nivel en dBm o dBµV en el punto de conexión del receptor. Para TDT: el nivel debe estar entre 45 y 80 dBµV en la toma de usuario (normativa ICT, RD 346/2011). Para LTE/5G: el RSSI debe superar el umbral de sensibilidad del equipo terminal en al menos 10-20 dB.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">6</div>
+              <div className={styles.stepContent}>
+                <h3>Evaluar la relación señal/ruido (SNR) y la figura de ruido</h3>
+                <p>
+                  El SNR mínimo depende de la modulación utilizada: BPSK requiere ~10 dB, 16-QAM ~20 dB, 256-QAM ~30 dB, 1024-QAM ~38 dB. Para DVB-T2 con 256-QAM y code rate 3/5, el umbral de SNR es aproximadamente 20 dB. Mide el SNR real con el analizador de espectro o el propio receptor (muchos equipos profesionales muestran MER o SNR en su interfaz de diagnóstico).
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">7</div>
+              <div className={styles.stepContent}>
+                <h3>Documentar y verificar niveles en el receptor final</h3>
+                <p>
+                  Redacta un informe con: frecuencia de trabajo, potencia TX, VSWR medido, pérdidas de cable, nivel de señal en receptor (dBm o dBµV), SNR medido y margen de sistema. Verifica que todos los valores cumplen la normativa aplicable (ICT para instalaciones en edificios, RD 123/2017 para el espacio radioeléctrico, plan técnico nacional de TDT). Archiva las mediciones con fecha y equipo de medida usado (número de serie, fecha de calibración).
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 5: Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores Prácticas para Trabajo con Señales RF</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
+              <h3>Define siempre el punto de referencia</h3>
+              <p>
+                Antes de anotar cualquier medición, especifica el punto físico donde se midió (entrada del receptor, salida del transmisor, toma de usuario). Una diferencia de 3 dB entre mediciones puede deberse simplemente a que un técnico midió antes del cable y otro después. Usa etiquetas como &quot;-45 dBm en SMA de salida PA&quot;.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
+              <h3>Compensa la variación térmica en mediciones críticas</h3>
+              <p>
+                Los cables coaxiales y conectores varían su atenuación con la temperatura: aproximadamente +0,002 dB/°C por cada 10 m de RG-213. En instalaciones al aire libre en España (verano: +40°C, invierno: -5°C, rango de 45°C), un tramo de 50 m de cable puede variar hasta 0,5 dB entre estaciones. Para sistemas con margen ajustado (&lt; 5 dB), calibra en las condiciones de temperatura más desfavorables.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔌</span>
+              <h3>Termina siempre los puertos no usados con cargas de 50 Ω</h3>
+              <p>
+                Un puerto sin terminar de un divisor de potencia o un acoplador puede reflejar hasta el 100% de la señal (VSWR infinito), degradando el VSWR de todo el sistema. Usa siempre cargas terminadoras de 50 Ω (o 75 Ω en sistemas de TV) en los puertos no conectados. Una carga de buena calidad debe mantener VSWR &lt; 1,1:1 hasta la frecuencia de trabajo.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
+              <h3>Calibra el equipo de medida antes de cada sesión</h3>
+              <p>
+                Los analizadores de espectro y los reflectómetros requieren calibración previa al uso: ajuste de nivel con señal de referencia conocida (ej. -20 dBm ± 0,5 dB), corrección del factor de calibración del cable de medida y compensación de la pérdida de inserción de los adaptadores. La IEC 61169 recomienda recalibrar los equipos de medida RF al menos cada 12 meses; en campo, una verificación diaria con señal de referencia es suficiente.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
+              <h3>Respeta los límites de potencia de entrada de los instrumentos</h3>
+              <p>
+                La mayoría de analizadores de espectro portátiles tienen un límite de entrada de +30 dBm (1 W). Superar este nivel puede dañar irreversiblemente el mezclador de entrada. Antes de conectar un transmisor al analizador, siempre usa un atenuador calibrado. Para transmisores de &gt; 5 W (+37 dBm), usa como mínimo un acoplador direccional de 20-30 dB y verifica que el nivel residual esté por debajo de +20 dBm.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
+              <h3>Documenta el link budget antes de cualquier instalación</h3>
+              <p>
+                Un link budget completo incluye: potencia TX (dBm), ganancia de antena TX (dBi), pérdidas totales de cable TX (dB), modelo de propagación (Friis, Okumura-Hata, COST-231), pérdidas adicionales por edificios/vegetación (dB), ganancia de antena RX (dBi), pérdidas cable RX (dB), figura de ruido del receptor (dB), ancho de banda (MHz) y margen de desvanecimiento (dB). Para instalaciones ICT en España, el cálculo debe cumplir el Reglamento ICT aprobado por RD 346/2011.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 6: Warning Box */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox} role="alert">
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h2>Errores Comunes en el Trabajo con RF</h2>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Confundir dBm con dB (ganancia relativa):</strong> El dBm es una unidad absoluta de potencia; el dB es una ratio adimensional. Sumar 30 dBm + 30 dBm no da 60 dBm: dos señales de 30 dBm combinadas en cuadratura dan 33 dBm (el doble de potencia lineal = +3 dB). Solo se pueden sumar dBm y dB cuando el dB representa una ganancia o pérdida aplicada a esa potencia.
+              </li>
+              <li>
+                <strong>VSWR fuera de rango sin protección del amplificador:</strong> Muchos amplificadores de potencia de estado sólido (PA) tienen protección automática de VSWR, pero esta protección actúa reduciendo la potencia de salida, no eliminando la reflexión. Con VSWR &gt; 3:1, los PA sin circuito de protección pueden dañarse permanentemente por la tensión de pico reflejada. Comprueba siempre el VSWR antes de aplicar potencia, especialmente en antenas resonantes ajustadas manualmente.
+              </li>
+              <li>
+                <strong>No compensar las pérdidas del cable en el cálculo de PIRE:</strong> La Potencia Isótropa Radiada Equivalente (PIRE) se calcula en la entrada de la antena, no en la salida del transmisor. Si el transmisor da 43 dBm y el cable tiene 3 dB de pérdidas, la PIRE con una antena de +8 dBi es 43 - 3 + 8 = 48 dBm (63 W PIRE), no 51 dBm. Error frecuente en declaraciones de conformidad ante la CNAF (Cuadro Nacional de Atribución de Frecuencias).
+              </li>
+              <li>
+                <strong>Mezclar referencias dBm y dBW sin conversión:</strong> En proyectos de radioenlaces o satélite que mezclan equipos americanos (dBm) y estándares ITU (dBW), es fácil cometer errores de 30 dB en los cálculos. Establece una única unidad base en el link budget y convierte siempre explícitamente: 0 dBW = +30 dBm, 10 dBW = +40 dBm, etc. Un error de 30 dB equivale a un factor de 1000 en potencia lineal.
+              </li>
+              <li>
+                <strong>Polarización incorrecta de antena:</strong> Una antena linealmente polarizada (horizontal o vertical) conectada con 90° de error respecto al transmisor sufrirá una pérdida de polarización de hasta 20-30 dB en campo lejano (teóricamente infinita para polarizaciones ortogonales puras). En instalaciones TDT, la polarización de la antena transmisora está especificada en el Plan Técnico Nacional (generalmente horizontal en España para la banda UHF). Verifica la polarización en el BOE correspondiente a la demarcación geográfica.
+              </li>
+              <li>
+                <strong>Interferencias por armónicos del transmisor:</strong> Los transmisores no ideales generan armónicos a 2f, 3f, etc. Un transmisor de 144 MHz puede emitir energía espuria a 288 MHz (2º armónico), 432 MHz (3º armónico) y 576 MHz (4º armónico). Sin filtro paso-bajo a la salida, estos armónicos pueden interferir con servicios como TDT (470-790 MHz), 4G Band 12 (700 MHz) o el satélite NOAA (137 MHz con el 1º subarmónico). La normativa ETSI EN 300 086 exige que los armónicos estén al menos 60 dB por debajo de la portadora para equipos de radiocomunicación profesional.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('conversor-unidades-rf')} />
