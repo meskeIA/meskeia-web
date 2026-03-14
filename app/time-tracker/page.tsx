@@ -503,6 +503,7 @@ export default function TimeTrackerPage() {
         subtitle="Mejora tu productividad y facturación con estos consejos"
       >
         <div className={styles.educationalContent}>
+          {/* Secciones originales preservadas */}
           <section className={styles.eduSection}>
             <h2>¿Por qué registrar el tiempo?</h2>
             <p>
@@ -535,6 +536,399 @@ export default function TimeTrackerPage() {
               2.000€ + 800€ (impuestos) + 300€ (SS) + 200€ (gastos) = 3.300€/mes
               <br />
               3.300€ ÷ 120h = <strong>27,50€/hora mínimo</strong>
+            </div>
+          </section>
+
+          {/* 1. Tabla Comparativa de Métodos */}
+          <section className={styles.eduSection}>
+            <h2>Comparativa de métodos de registro de tiempo</h2>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Método</th>
+                    <th>Precisión</th>
+                    <th>Esfuerzo de uso</th>
+                    <th>Ideal para</th>
+                    <th>Granularidad</th>
+                    <th>Uso en facturación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Time Tracker manual</strong> (este)</td>
+                    <td>Alta (±5%)</td>
+                    <td>Bajo — un clic</td>
+                    <td>Freelancers que facturan por horas</td>
+                    <td>Por tarea/proyecto</td>
+                    <td>Directo — exportar CSV</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Seguimiento automático</strong></td>
+                    <td>Muy alta (±1%)</td>
+                    <td>Ninguno</td>
+                    <td>Desarrolladores, diseñadores</td>
+                    <td>Por aplicación/URL</td>
+                    <td>Requiere filtrado manual</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Técnica Pomodoro</strong></td>
+                    <td>Media (±15%)</td>
+                    <td>Medio</td>
+                    <td>Trabajo en bloque de concentración</td>
+                    <td>Intervalos de 25 min</td>
+                    <td>Aproximado — no recomendado</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Timeboxing</strong></td>
+                    <td>Media (±20%)</td>
+                    <td>Medio-alto</td>
+                    <td>Gestores de proyectos</td>
+                    <td>Por bloque de agenda</td>
+                    <td>Solo como referencia</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Estimación por proyecto</strong></td>
+                    <td>Baja (±40%)</td>
+                    <td>Muy bajo</td>
+                    <td>Presupuestos iniciales</td>
+                    <td>Global por proyecto</td>
+                    <td>No recomendado</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* 2. Casos de Uso */}
+          <section className={styles.eduSection}>
+            <h2>¿Para quién es útil el time tracking?</h2>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
+                  <strong>Freelancer / Autónomo</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Factura a varios clientes por horas. Necesita justificar cada hora en la factura y
+                  demostrar el trabajo realizado.
+                </p>
+                <p className={styles.escenarioTip}>
+                  <strong>Clave:</strong> Registrar tiempo facturable vs. no facturable (gestiones,
+                  formación, administración). Los freelancers subestiman tareas un 40% de media.
+                </p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
+                  <strong>Empleado en teletrabajo</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  El RD 8/2019 obliga a todas las empresas españolas a registrar la jornada diaria.
+                  En teletrabajo, este registro es responsabilidad del trabajador.
+                </p>
+                <p className={styles.escenarioTip}>
+                  <strong>Clave:</strong> Guardar el historial exportado como evidencia. La Inspección
+                  de Trabajo puede requerir registros de hasta 4 años atrás.
+                </p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
+                  <strong>Gestor de proyectos</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Controla que el equipo no supera el presupuesto de horas acordado con el cliente.
+                  Detecta desviaciones antes de que sean críticas.
+                </p>
+                <p className={styles.escenarioTip}>
+                  <strong>Clave:</strong> Comparar tiempo estimado vs. real por sprint o fase.
+                  La revisión semanal mejora la precisión de estimaciones futuras un 25%.
+                </p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🚀</span>
+                  <strong>Emprendedor</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Analiza en qué tareas gasta su tiempo y si esas tareas generan ingresos reales.
+                  Decide qué delegar o eliminar.
+                </p>
+                <p className={styles.escenarioTip}>
+                  <strong>Clave:</strong> Calcular el coste real de cada actividad (tiempo × tarifa
+                  alternativa). Si registrar facturas le cuesta 3h/semana, valorar externalizar.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* 3. FAQ */}
+          <section className={styles.eduSection}>
+            <h2>Preguntas frecuentes sobre time tracking</h2>
+            <dl className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <dt>¿Para qué sirve el time tracking?</dt>
+                <dd>
+                  El time tracking registra el tiempo real dedicado a cada tarea, proyecto o cliente.
+                  Sirve para facturar con precisión, mejorar estimaciones, identificar tareas ineficientes
+                  y justificar el trabajo ante clientes o empleadores.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Cuál es la diferencia entre tiempo estimado y tiempo real?</dt>
+                <dd>
+                  El tiempo estimado es lo que crees que tardará una tarea antes de hacerla. El tiempo
+                  real es lo que has tardado de verdad. Los estudios muestran que las personas subestiman
+                  las tareas entre un 20% y un 50% (sesgo de planificación). El time tracking es la única
+                  forma de corregir este sesgo con datos objetivos.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Cuánto mejora la productividad con time tracking?</dt>
+                <dd>
+                  Según estudios de gestión del tiempo, quienes registran su jornada identifican en
+                  promedio un 20-30% de tiempo desperdiciado que no eran conscientes de perder. Además,
+                  el simple hecho de saber que el tiempo está siendo registrado (efecto Hawthorne)
+                  puede aumentar la concentración hasta un 15%.
+                </dd>
+                <dd className={styles.faqTip}>Consejo: revisa tus registros cada viernes durante 4 semanas y verás patrones claros.</dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Cómo registro las interrupciones?</dt>
+                <dd>
+                  Detén el timer cuando hay una interrupción significativa (llamada, reunión no
+                  planificada, gestión administrativa). Para interrupciones cortas de menos de 2 minutos,
+                  no merece la pena parar. Crea una categoría específica como &ldquo;Reuniones internas&rdquo; o
+                  &ldquo;Interrupciones&rdquo; para hacer visible este coste oculto.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Obliga la ley española a registrar el tiempo de trabajo?</dt>
+                <dd>
+                  Sí. El <strong>Real Decreto-ley 8/2019</strong> modificó el Estatuto de los Trabajadores
+                  (art. 34.9) y obliga a todas las empresas a garantizar el registro diario de la jornada
+                  de trabajo. La empresa debe conservar los registros durante 4 años. El incumplimiento
+                  puede acarrear sanciones de hasta 6.250€ por infracción grave.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Cómo usar el registro de tiempo para mejorar presupuestos futuros?</dt>
+                <dd>
+                  Exporta el CSV y agrupa por tipo de tarea. Calcula el tiempo medio real de tareas
+                  similares. Cuando presupuestes un nuevo proyecto, usa esos datos históricos en lugar de
+                  estimaciones intuitivas. Con 3-6 meses de datos, tus presupuestos mejorarán un 25-40%
+                  en precisión.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Qué diferencia hay entre tiempo de trabajo y tiempo productivo?</dt>
+                <dd>
+                  El tiempo de trabajo es todo el tiempo que estás &ldquo;trabajando&rdquo; (incluyendo correos,
+                  reuniones, gestiones). El tiempo productivo es el tiempo dedicado a tareas que generan
+                  valor directo. La mayoría de profesionales tienen entre 3 y 5 horas de trabajo
+                  productivo real en una jornada de 8 horas. El resto son tareas necesarias pero no
+                  directamente productivas.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt>¿Cómo facturar por horas correctamente en España como autónomo?</dt>
+                <dd>
+                  La factura debe incluir: número de horas trabajadas, descripción del trabajo realizado,
+                  tarifa por hora acordada y el total. Al ser autónomo, debes añadir IVA (generalmente 21%)
+                  y aplicar retención de IRPF si el cliente es empresa o profesional (15%, o 7% el primer
+                  año). Guarda siempre el CSV de time tracking como documentación de soporte de la factura.
+                </dd>
+                <dd className={styles.faqTip}>Importante: el CSV exportado de esta herramienta puede servir como anexo justificativo de horas en tu factura.</dd>
+              </div>
+            </dl>
+          </section>
+
+          {/* 4. Guía Paso a Paso */}
+          <section className={styles.eduSection}>
+            <h2>Cómo implementar time tracking efectivo en 7 pasos</h2>
+            <ol className={styles.stepGuide}>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">1</span>
+                <div className={styles.stepContent}>
+                  <strong>Define tus categorías de proyecto antes de empezar</strong>
+                  <p>
+                    Crea proyectos con nombres claros y consistentes: cliente + tipo de trabajo
+                    (ej: &ldquo;ClienteABC - Desarrollo&rdquo;, &ldquo;ClienteABC - Reuniones&rdquo;). Separa siempre
+                    tiempo facturable de no facturable desde el inicio.
+                  </p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">2</span>
+                <div className={styles.stepContent}>
+                  <strong>Establece la tarifa correcta para cada proyecto</strong>
+                  <p>
+                    Introduce la tarifa acordada con el cliente en €/hora. Esto permite calcular
+                    automáticamente el valor económico de cada sesión de trabajo y el total facturado.
+                  </p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">3</span>
+                <div className={styles.stepContent}>
+                  <strong>Activa el timer al inicio de cada tarea, no al final</strong>
+                  <p>
+                    El error más común es registrar el tiempo de memoria al final del día. Esto introduce
+                    errores de hasta el 50%. Haz del clic en &ldquo;Iniciar&rdquo; un hábito automático antes de
+                    comenzar cualquier tarea.
+                  </p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">4</span>
+                <div className={styles.stepContent}>
+                  <strong>Añade una descripción breve en cada registro</strong>
+                  <p>
+                    Una descripción de 3-5 palabras (&ldquo;Maquetación página home&rdquo;, &ldquo;Revisión feedback cliente&rdquo;)
+                    es suficiente. Te permitirá entender los registros semanas después y justificar
+                    las horas ante el cliente si lo pide.
+                  </p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">5</span>
+                <div className={styles.stepContent}>
+                  <strong>Para el timer en interrupciones de más de 2 minutos</strong>
+                  <p>
+                    Llamadas, reuniones espontáneas, gestiones bancarias: detén el timer y crea
+                    una entrada nueva para esa actividad. Así tendrás datos reales sobre cuánto
+                    tiempo te roban las interrupciones.
+                  </p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">6</span>
+                <div className={styles.stepContent}>
+                  <strong>Exporta el CSV al final de cada semana</strong>
+                  <p>
+                    Descarga el CSV cada viernes y guárdalo en una carpeta por mes. Estos archivos
+                    son tu documentación de trabajo: útiles para facturar, para resolución de disputas
+                    con clientes y como respaldo ante Hacienda.
+                  </p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">7</span>
+                <div className={styles.stepContent}>
+                  <strong>Revisa y aprende de tus datos cada semana</strong>
+                  <p>
+                    Dedica 15 minutos cada lunes a revisar la semana anterior. Pregúntate: ¿qué tareas
+                    tardaron más de lo esperado? ¿Cuánto tiempo facturable vs. no facturable? Esta revisión,
+                    constante durante 4 semanas, mejora la precisión de tus estimaciones futuras un 25%.
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          {/* 5. Mejores Prácticas */}
+          <section className={styles.eduSection}>
+            <h2>6 mejores prácticas para un time tracking eficaz</h2>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">⚡</span>
+                <strong>Registra en tiempo real</strong>
+                <p>
+                  Nunca registres el tiempo de memoria al final del día. Los estudios muestran
+                  errores de hasta el 50% en el registro retroactivo. El timer en tiempo real
+                  es la única fuente fiable de datos.
+                </p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">🗂️</span>
+                <strong>Mantén categorías claras y pocas</strong>
+                <p>
+                  Entre 3 y 8 proyectos activos es el rango óptimo. Más de 10 categorías provoca
+                  parálisis de decisión y hace que el registro sea menos consistente. Agrupa
+                  clientes pequeños bajo &ldquo;Varios&rdquo; si hay poca facturación.
+                </p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">📅</span>
+                <strong>Revisión semanal obligatoria</strong>
+                <p>
+                  15 minutos cada lunes revisando la semana anterior. Compara tiempo estimado vs.
+                  real. Identifica el proyecto que más tiempo consumió vs. el que más ingresos generó.
+                  La revisión semanal mejora la precisión de estimaciones un 25%.
+                </p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
+                <strong>Regla de los 15 minutos para microgestión</strong>
+                <p>
+                  No registres tareas de menos de 15 minutos de forma individual: agrúpalas en
+                  &ldquo;Gestiones&rdquo; o &ldquo;Administración&rdquo;. Registrar cada email de 3 minutos es agotador
+                  y crea un historial demasiado granular para ser útil.
+                </p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">💶</span>
+                <strong>Separa tiempo facturable de no facturable</strong>
+                <p>
+                  Usa proyectos separados: &ldquo;ClienteABC - Trabajo&rdquo; (facturable) y &ldquo;Admin general&rdquo;
+                  (no facturable). Esto te permite ver tu ratio real de eficiencia y qué porcentaje
+                  de tu jornada se traduce en ingresos reales.
+                </p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">📊</span>
+                <strong>Exporta y analiza mensualmente</strong>
+                <p>
+                  El CSV exportado contiene todos tus datos de tiempo e importes. Ábrelo en Excel
+                  o Google Sheets para crear tablas dinámicas: ingresos por cliente, horas por
+                  categoría, tendencias mensuales. Son datos de oro para negociar tarifas.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* 6. Warning Box */}
+          <section className={styles.eduSection}>
+            <div className={styles.warningBox}>
+              <div className={styles.warningHeader}>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+                <strong>6 errores comunes que debes evitar</strong>
+              </div>
+              <ul className={styles.warningList}>
+                <li>
+                  <strong>Registrar el tiempo retroactivamente:</strong> Hacerlo de memoria al final
+                  del día introduce errores de hasta el 50%. Es el error más frecuente y el más
+                  dañino para la precisión de tu facturación.
+                </li>
+                <li>
+                  <strong>Crear demasiadas categorías:</strong> Más de 10 proyectos activos provoca
+                  parálisis de decisión cada vez que activas el timer. Resultado: dejas de registrar.
+                  Empieza con pocas categorías y amplía solo si es necesario.
+                </li>
+                <li>
+                  <strong>No revisar los datos acumulados:</strong> Registrar sin revisar es como
+                  llevar un diario que nunca relees. Sin revisión semanal, los datos no se traducen
+                  en mejoras de estimación ni en optimización de tu negocio.
+                </li>
+                <li>
+                  <strong>Confundir tiempo trabajado con tiempo productivo:</strong> 8 horas de
+                  jornada no equivalen a 8 horas facturables. Las reuniones, los correos y las
+                  gestiones son trabajo, pero no siempre son facturables. Mide ambos por separado.
+                </li>
+                <li>
+                  <strong>No registrar reuniones y correos en el registro:</strong> Las reuniones
+                  con clientes, las llamadas de seguimiento y la revisión de correos son tiempo
+                  de trabajo real. Si no los registras, estás regalando horas y distorsionando
+                  tu tarifa efectiva real.
+                </li>
+                <li>
+                  <strong>Ignorar el tiempo de administración en freelance:</strong> Emitir facturas,
+                  gestionar el alta en Hacienda, contabilidad, búsqueda de clientes... Los freelancers
+                  dedican entre 10% y 20% de su jornada a tareas administrativas no facturables.
+                  Si no las contabilizas, tu tarifa efectiva real es mucho menor de lo que crees.
+                </li>
+              </ul>
             </div>
           </section>
         </div>

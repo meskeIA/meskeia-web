@@ -589,3 +589,524 @@
     text-align: center;
   }
 }
+
+/* ============================================
+   PATRÓN v2.0 — TABLA COMPARATIVA
+   ============================================ */
+.tableWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-lg) 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 640px;
+}
+
+.comparativaTable thead {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+}
+
+.comparativaTable thead th {
+  padding: var(--spacing-md) var(--spacing-lg);
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable thead th:first-child {
+  border-radius: var(--radius) 0 0 0;
+}
+
+.comparativaTable thead th:last-child {
+  border-radius: 0 var(--radius) 0 0;
+}
+
+.comparativaTable tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s ease;
+}
+
+.comparativaTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover {
+  background: var(--hover);
+}
+
+.comparativaTable tbody td {
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--text-secondary);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.comparativaTable tbody td:first-child {
+  color: var(--text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .comparativaTable tbody td:first-child {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: var(--hover);
+}
+
+@media (max-width: 768px) {
+  .tableWrapper {
+    margin: var(--spacing-md) 0;
+  }
+
+  .comparativaTable {
+    font-size: 0.82rem;
+  }
+
+  .comparativaTable thead th,
+  .comparativaTable tbody td {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+/* ============================================
+   PATRÓN v2.0 — CASOS DE USO
+   ============================================ */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.escenarioCard:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.escenarioHeader strong {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  background: var(--bg-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: calc(var(--radius) / 2);
+  border-left: 3px solid var(--accent);
+  margin: 0;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: #1e1e1e;
+  border-left-color: var(--primary);
+}
+
+.escenarioTip {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.escenarioTip strong {
+  color: var(--primary);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   PATRÓN v2.0 — FAQ
+   ============================================ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-lg) 0;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.faqItem h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: 1.4;
+}
+
+.faqItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.faqItem p:last-child {
+  margin-bottom: 0;
+}
+
+.faqItem strong {
+  color: var(--text-primary);
+}
+
+.faqTip {
+  font-size: 0.85rem !important;
+  color: var(--text-muted) !important;
+  font-style: italic;
+  background: var(--bg-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: calc(var(--radius) / 2);
+  border-left: 3px solid var(--secondary);
+  margin-top: var(--spacing-sm) !important;
+}
+
+[data-theme='dark'] .faqTip {
+  background: #1e1e1e;
+  border-left-color: var(--secondary);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+@media (max-width: 768px) {
+  .faqItem {
+    padding: var(--spacing-md);
+  }
+
+  .faqItem h4 {
+    font-size: 0.95rem;
+  }
+}
+
+/* ============================================
+   PATRÓN v2.0 — GUÍA PASO A PASO
+   ============================================ */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-lg) 0;
+  position: relative;
+}
+
+.stepGuide::before {
+  content: '';
+  position: absolute;
+  left: 23px;
+  top: 24px;
+  bottom: 24px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary), var(--secondary));
+  border-radius: 1px;
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  position: relative;
+  z-index: 1;
+}
+
+.stepNumber {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.35);
+}
+
+.stepContent {
+  flex: 1;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.stepContent h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.stepContent p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.stepContent strong {
+  color: var(--primary);
+}
+
+.stepContent em {
+  color: var(--text-muted);
+}
+
+.stepContent code {
+  background: var(--hover);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+}
+
+[data-theme='dark'] .stepContent {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .stepContent code {
+  background: #333;
+}
+
+@media (max-width: 768px) {
+  .stepGuide::before {
+    display: none;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .stepNumber {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .stepContent {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ============================================
+   PATRÓN v2.0 — MEJORES PRÁCTICAS
+   ============================================ */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.tipCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.tipIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.tipCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.tipCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .tipCard:hover {
+  border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipCard {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ============================================
+   PATRÓN v2.0 — WARNING BOX
+   ============================================ */
+.warningBox {
+  background: linear-gradient(135deg, #fff8ed 0%, #fff3e0 100%);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  border: 2px solid #f59e0b;
+  margin: var(--spacing-lg) 0;
+}
+
+[data-theme='dark'] .warningBox {
+  background: linear-gradient(135deg, #2a2010 0%, #231c0b 100%);
+  border-color: #d97706;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.warningIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.warningHeader h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #fbbf24;
+}
+
+.warningBox > p {
+  color: #78350f;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+[data-theme='dark'] .warningBox > p {
+  color: #d4a04a;
+}
+
+.warningList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.warningList li {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: var(--radius);
+  border-left: 4px solid #f59e0b;
+  font-size: 0.9rem;
+  color: #78350f;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .warningList li {
+  background: rgba(245, 158, 11, 0.07);
+  color: #d4a04a;
+  border-left-color: #d97706;
+}
+
+.warningList li strong {
+  color: #92400e;
+  display: block;
+  margin-bottom: 2px;
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: #fbbf24;
+}
+
+@media (max-width: 768px) {
+  .warningBox {
+    padding: var(--spacing-lg);
+  }
+
+  .warningHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .warningList li {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
