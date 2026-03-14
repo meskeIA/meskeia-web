@@ -14,7 +14,8 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
-type CategoriaId = 'necesidades' | 'emociones' | 'comida' | 'acciones' | 'personas' | 'lugares';
+type CategoriaId = 'favoritos' | 'necesidades' | 'emociones' | 'comida' | 'acciones' | 'personas' | 'lugares';
+const FAVORITOS_KEY = 'meskeia-tablero-favoritos';
 
 interface Simbolo {
   id: string;
@@ -30,6 +31,14 @@ interface Categoria {
   color: string;
   colorFondo: string;
 }
+
+const FAVORITOS_CATEGORIA: Categoria = {
+  id: 'favoritos',
+  nombre: 'Favoritos',
+  icono: '⭐',
+  color: '#D97706',
+  colorFondo: '#FFFBEB',
+};
 
 // Categorías con colores diferenciados
 const CATEGORIAS: Categoria[] = [
@@ -147,18 +156,36 @@ export default function TableroComunicacionPage() {
   const [categoriaActiva, setCategoriaActiva] = useState<CategoriaId>('necesidades');
   const [frase, setFrase] = useState<Simbolo[]>([]);
   const [ultimoClick, setUltimoClick] = useState('');
+  const [favoritos, setFavoritos] = useState<string[]>([]);
 
-  // Cargar voces al montar
+  // Cargar voces y favoritos al montar
   useEffect(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.getVoices();
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
+    try {
+      const raw = localStorage.getItem(FAVORITOS_KEY);
+      if (raw) setFavoritos(JSON.parse(raw) as string[]);
+    } catch { /* ignorar */ }
     return () => { window.speechSynthesis?.cancel(); };
   }, []);
 
-  const simbolosCategoria = SIMBOLOS.filter(s => s.categoria === categoriaActiva);
-  const categoriaInfo = CATEGORIAS.find(c => c.id === categoriaActiva)!;
+  const toggleFavorito = useCallback((id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFavoritos(prev => {
+      const nuevo = prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id];
+      try { localStorage.setItem(FAVORITOS_KEY, JSON.stringify(nuevo)); } catch { /* ignorar */ }
+      return nuevo;
+    });
+  }, []);
+
+  const simbolosCategoria = categoriaActiva === 'favoritos'
+    ? SIMBOLOS.filter(s => favoritos.includes(s.id))
+    : SIMBOLOS.filter(s => s.categoria === categoriaActiva);
+  const categoriaInfo = categoriaActiva === 'favoritos'
+    ? FAVORITOS_CATEGORIA
+    : CATEGORIAS.find(c => c.id === categoriaActiva)!;
 
   const agregarSimbolo = useCallback((simbolo: Simbolo) => {
     setFrase(prev => [...prev, simbolo]);
@@ -262,6 +289,19 @@ export default function TableroComunicacionPage() {
         role="tablist"
         aria-label="Categorías de símbolos"
       >
+        {/* Tab Favoritos */}
+        <button
+          type="button"
+          className={`${styles.categoriaTab} ${styles.categoriaTabFavoritos} ${categoriaActiva === 'favoritos' ? styles.categoriaActiva : ''}`}
+          onClick={() => setCategoriaActiva('favoritos')}
+          role="tab"
+          aria-selected={categoriaActiva === 'favoritos'}
+          aria-controls={`panel-${categoriaActiva}`}
+          style={categoriaActiva === 'favoritos' ? { borderBottomColor: '#D97706', color: '#D97706' } : {}}
+        >
+          <span aria-hidden="true">⭐</span>
+          <span>Favoritos{favoritos.length > 0 ? ` (${favoritos.length})` : ''}</span>
+        </button>
         {CATEGORIAS.map(cat => (
           <button
             key={cat.id}
@@ -288,23 +328,38 @@ export default function TableroComunicacionPage() {
         aria-label={`Símbolos de ${categoriaInfo.nombre}`}
         style={{ borderColor: categoriaInfo.color }}
       >
+        {categoriaActiva === 'favoritos' && favoritos.length === 0 && (
+          <p className={styles.favoritosVacio}>
+            ⭐ Pulsa la estrella ☆ en cualquier símbolo para añadirlo aquí
+          </p>
+        )}
         <div className={styles.simbolosGrid}>
           {simbolosCategoria.map(simbolo => (
-            <button
-              key={simbolo.id}
-              className={`${styles.simboloBtn} ${ultimoClick === simbolo.id ? styles.simboloPulsado : ''}`}
-              onClick={() => agregarSimbolo(simbolo)}
-              aria-label={simbolo.texto}
-              style={{
-                borderColor: categoriaInfo.color,
-                backgroundColor: categoriaInfo.colorFondo,
-              }}
-            >
-              <span className={styles.simboloEmoji} aria-hidden="true">
-                {simbolo.emoji}
-              </span>
-              <span className={styles.simboloTexto}>{simbolo.texto}</span>
-            </button>
+            <div key={simbolo.id} className={styles.simboloWrapper}>
+              <button
+                className={`${styles.simboloBtn} ${ultimoClick === simbolo.id ? styles.simboloPulsado : ''}`}
+                onClick={() => agregarSimbolo(simbolo)}
+                aria-label={simbolo.texto}
+                type="button"
+                style={{
+                  borderColor: categoriaInfo.color,
+                  backgroundColor: categoriaInfo.colorFondo,
+                }}
+              >
+                <span className={styles.simboloEmoji} aria-hidden="true">
+                  {simbolo.emoji}
+                </span>
+                <span className={styles.simboloTexto}>{simbolo.texto}</span>
+              </button>
+              <button
+                type="button"
+                className={`${styles.btnEstrella} ${favoritos.includes(simbolo.id) ? styles.btnEstrellaActiva : ''}`}
+                onClick={(e) => toggleFavorito(simbolo.id, e)}
+                aria-label={favoritos.includes(simbolo.id) ? `Quitar ${simbolo.texto} de favoritos` : `Añadir ${simbolo.texto} a favoritos`}
+              >
+                {favoritos.includes(simbolo.id) ? '⭐' : '☆'}
+              </button>
+            </div>
           ))}
         </div>
       </section>

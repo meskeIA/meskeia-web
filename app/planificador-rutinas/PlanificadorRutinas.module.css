@@ -400,36 +400,41 @@
   outline-offset: 4px;
 }
 
-/* Lista compacta de tareas */
-.listaTareasSeguir {
+/* Puntos de progreso (reemplaza lista de tareas) */
+.progresoPuntos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: center;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+  padding: 0.25rem 0;
 }
 
-.tareaItemSeguir {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 0.85rem;
-  border-radius: var(--radius);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  font-size: 0.9rem;
-  transition: all 0.18s ease;
+.progresoPunto {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 2px solid var(--border);
+  transition: all 0.25s ease;
+  flex-shrink: 0;
 }
 
-.tareaCompletada {
-  opacity: 0.5;
-  text-decoration: line-through;
-  background: rgba(22, 163, 74, 0.05);
+.puntoCompletado {
+  background: #16A34A;
+  border-color: #16A34A;
 }
 
-.tareaEnCurso {
+.puntoActual {
+  background: var(--primary);
   border-color: var(--primary);
-  background: rgba(46, 134, 171, 0.06);
-  font-weight: 700;
+  transform: scale(1.4);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .progresoPunto {
+  background: #404040;
+  border-color: #404040;
 }
 
 .tareaItemEmoji {

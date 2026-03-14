@@ -366,6 +366,17 @@
   margin-bottom: 2rem;
   justify-content: center;
   flex-wrap: wrap;
+  position: sticky;
+  top: 0.5rem;
+  z-index: 10;
+  background: var(--bg-primary);
+  padding: 0.75rem 0;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .controles {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 .btnControl {

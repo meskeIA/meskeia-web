@@ -308,18 +308,15 @@ export default function PlanificadorRutinasPage() {
                 ✓ ¡HECHO!
               </button>
 
-              {/* Lista de tareas */}
-              <div className={styles.listaTareasSeguir}>
+              {/* Puntos de progreso — menos ruido visual para usuarios con DI/TEA */}
+              <div className={styles.progresoPuntos} role="progressbar" aria-label={`Tarea ${tareasCompletadas + 1} de ${totalTareas}`}>
                 {rutinaActiva.tareas.map((t, i) => (
                   <div
                     key={t.id}
-                    className={`${styles.tareaItemSeguir} ${t.completada ? styles.tareaCompletada : ''} ${i === tareaActualIdx ? styles.tareaEnCurso : ''}`}
-                  >
-                    <span className={styles.tareaItemEmoji}>{t.emoji}</span>
-                    <span className={styles.tareaItemNombreSeguir}>{t.nombre}</span>
-                    {t.completada && <span className={styles.tareaCheck} aria-hidden="true">✓</span>}
-                    {i === tareaActualIdx && <span className={styles.tareaFlecha} aria-hidden="true">◀</span>}
-                  </div>
+                    className={`${styles.progresoPunto} ${t.completada ? styles.puntoCompletado : ''} ${i === tareaActualIdx ? styles.puntoActual : ''}`}
+                    title={t.nombre}
+                    aria-hidden="true"
+                  />
                 ))}
               </div>
 
