@@ -923,6 +923,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Expresa emociones y necesidades con símbolos' },
     { url: '/recordatorio-medicacion/', icon: '💊', name: 'Recordatorio Medicación', description: 'Gestiona la rutina de medicación visualmente' },
   ],
+
+  // GUÍA ACCESIBILIDAD
+  'guia-accesibilidad': [
+    { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Regulación emocional visual' },
+    { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Agenda visual con pictogramas' },
+    { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer con círculo de colores' },
+    { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Textos más fáciles de leer' },
+    { url: '/historias-sociales/', icon: '📖', name: 'Historias Sociales', description: 'Prepara situaciones nuevas' },
+    { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz' },
+  ],
 };
 
 /**
