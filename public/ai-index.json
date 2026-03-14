@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 250+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 259,
+  "total_tools": 260,
   "updated": "2026-03-01",
   "features": {
     "all_free": true,
@@ -1478,6 +1478,12 @@
           "slug": "semaforo-emocional",
           "url": "https://meskeia.com/semaforo-emocional/",
           "description": "Herramienta visual de regulación emocional con tres estados (🔴 Muy Activado, 🟡 Activado, 🟢 Tranquilo) y estrategias de calma. Para personas con autismo, TDAH y dificultades de regulación emocional."
+        },
+        {
+          "name": "Recordatorio Visual de Medicación",
+          "slug": "recordatorio-medicacion",
+          "url": "https://meskeia.com/recordatorio-medicacion/",
+          "description": "Gestiona y recuerda tus medicamentos con pictogramas, colores y horarios visuales. Marca cada toma del día. Para autismo, TDAH, discapacidad cognitiva y mayores con polimedicación. Sin registro, 100% local."
         }
       ]
     },

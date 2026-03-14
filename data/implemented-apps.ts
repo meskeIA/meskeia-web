@@ -311,6 +311,7 @@ export const implementedAppsUrls = [
   "/planificador-rutinas/",             // Planificador visual de rutinas con pictogramas para autismo y TDAH
   "/generador-tarjetas-comunicacion/",  // Crea e imprime tarjetas pictográficas para AAC y comunicación aumentativa
   "/semaforo-emocional/",               // Regulación emocional visual con tres estados y estrategias adaptadas
+  "/recordatorio-medicacion/",          // Gestión visual de medicamentos con pictogramas y horarios por toma
 ];
 
 /**

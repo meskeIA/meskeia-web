@@ -911,6 +911,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Mide el tiempo de las estrategias' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Expresa lo que necesitas con símbolos' },
   ],
+  'recordatorio-medicacion': [
+    { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Organiza el día con horarios visuales' },
+    { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Cuenta atrás hasta la próxima toma' },
+    { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Gestiona el estado emocional en el día' },
+    { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Reduce la ansiedad asociada a medicación' },
+  ],
 };
 
 /**

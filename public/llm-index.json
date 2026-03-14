@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 252+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 253+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 252,
+  "total_tools": 253,
   "last_updated": "2026-03-14",
   "features": {
     "all_free": true,
@@ -84,14 +84,14 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 48
+      "tool_count": 49
     },
     {
       "id": "salud",
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 37
+      "tool_count": 38
     },
     {
       "id": "viajes",
@@ -107,7 +107,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 98
+      "tool_count": 99
     },
     {
       "id": "estudio",
@@ -121,7 +121,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 88
+      "tool_count": 89
     },
     {
       "id": "dinero",
@@ -6276,6 +6276,32 @@
         "accesibilidad emocional"
       ],
       "icon": "🚦"
+    },
+    {
+      "slug": "recordatorio-medicacion",
+      "name": "Recordatorio Visual de Medicación",
+      "url": "https://meskeia.com/recordatorio-medicacion/",
+      "description": "Gestiona y recuerda tus medicamentos con pictogramas, colores y horarios visuales. Marca cada toma del día como tomada. Historial local, sin registro. Para autismo, TDAH, discapacidad cognitiva y mayores con polimedicación.",
+      "suites": [
+        "salud",
+        "productividad"
+      ],
+      "contexts": [
+        "casa",
+        "trabajo"
+      ],
+      "keywords": [
+        "recordatorio medicacion",
+        "pastillero visual",
+        "gestion medicamentos",
+        "autismo medicacion",
+        "discapacidad cognitiva pastillas",
+        "TDAH medicacion",
+        "pictogramas medicamentos",
+        "mayores medicacion",
+        "polimedicacion"
+      ],
+      "icon": "💊"
     }
   ],
   "llm_instructions": {
