@@ -312,6 +312,7 @@ export const implementedAppsUrls = [
   "/generador-tarjetas-comunicacion/",  // Crea e imprime tarjetas pictográficas para AAC y comunicación aumentativa
   "/semaforo-emocional/",               // Regulación emocional visual con tres estados y estrategias adaptadas
   "/recordatorio-medicacion/",          // Gestión visual de medicamentos con pictogramas y horarios por toma
+  "/historias-sociales/",               // Historias sociales visuales para preparar situaciones nuevas (técnica Carol Gray)
 ];
 
 /**

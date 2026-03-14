@@ -20,6 +20,7 @@
 - [x] `/generador-tarjetas-comunicacion/` — Generador de tarjetas AAC ✅ 6/6 secciones (lote 30)
 - [x] `/semaforo-emocional/` — Semáforo de regulación emocional ✅ 6/6 secciones + ShareCard (2026-03-14)
 - [x] `/recordatorio-medicacion/` — Recordatorio visual de medicación ✅ 6/6 secciones + ShareCard (2026-03-14)
+- [x] `/historias-sociales/` — Historias Sociales Visuales (técnica Carol Gray) ✅ 6/6 secciones + ShareCard (2026-03-14)
 - [ ] `/temporizador-visual/` — **EXCLUIDO**: herramienta trivial según criterios PROFESIONALIZACION.md
 
 ---

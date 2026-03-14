@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 253+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 254+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 253,
+  "total_tools": 254,
   "last_updated": "2026-03-14",
   "features": {
     "all_free": true,
@@ -35,7 +35,7 @@
       "name": "Estudiantes",
       "icon": "🧮",
       "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 57
+      "tool_count": 58
     },
     {
       "id": "finanzas",
@@ -84,14 +84,14 @@
       "name": "Productividad",
       "icon": "⚡",
       "description": "Organización personal y herramientas del día a día",
-      "tool_count": 49
+      "tool_count": 50
     },
     {
       "id": "salud",
       "name": "Salud y Bienestar",
       "icon": "🏥",
       "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 38
+      "tool_count": 39
     },
     {
       "id": "viajes",
@@ -107,21 +107,21 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 99
+      "tool_count": 100
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 91
+      "tool_count": 92
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 89
+      "tool_count": 90
     },
     {
       "id": "dinero",
@@ -6302,6 +6302,35 @@
         "polimedicacion"
       ],
       "icon": "💊"
+    },
+    {
+      "slug": "historias-sociales",
+      "name": "Historias Sociales Visuales",
+      "url": "https://meskeia.com/historias-sociales/",
+      "description": "Crea y lee historias sociales visuales para preparar situaciones nuevas o difíciles. Técnica de Carol Gray adaptada. 3 historias de ejemplo incluidas. Para autismo, TDAH, discapacidad cognitiva y educadores.",
+      "suites": [
+        "salud",
+        "productividad",
+        "estudiantes"
+      ],
+      "contexts": [
+        "casa",
+        "estudio",
+        "trabajo"
+      ],
+      "keywords": [
+        "historias sociales",
+        "social stories",
+        "Carol Gray",
+        "autismo situaciones nuevas",
+        "preparacion situaciones",
+        "pictogramas historia",
+        "TDAH rutinas",
+        "discapacidad cognitiva",
+        "narrativa visual",
+        "regulacion emocional autismo"
+      ],
+      "icon": "📖"
     }
   ],
   "llm_instructions": {

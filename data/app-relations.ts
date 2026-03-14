@@ -917,6 +917,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Gestiona el estado emocional en el día' },
     { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Reduce la ansiedad asociada a medicación' },
   ],
+  'historias-sociales': [
+    { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Identifica el estado emocional antes de la situación' },
+    { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Organiza el día visualmente con pictogramas' },
+    { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Expresa emociones y necesidades con símbolos' },
+    { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Técnicas de calma para momentos difíciles' },
+  ],
 };
 
 /**

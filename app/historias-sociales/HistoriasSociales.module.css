@@ -1,0 +1,1000 @@
+/* ============================================
+   Historias Sociales Visuales
+   meskeIA - Paleta oficial
+   ============================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.12);
+
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #888888;
+  --border: #404040;
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.title {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  font-weight: 900;
+  margin: 0 0 0.75rem;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ============================================
+   SECCIONES
+   ============================================ */
+.seccion {
+  margin-bottom: 2rem;
+}
+
+.seccionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.seccionTitulo {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.seccionHeader .seccionTitulo {
+  margin: 0;
+}
+
+/* ============================================
+   EJEMPLOS
+   ============================================ */
+.ejemplosGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.ejemploCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.ejemploCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.ejemploCard:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.ejemploIcono {
+  font-size: 2.5rem;
+}
+
+.ejemploTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ejemploPags {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   HISTORIAS CREADAS
+   ============================================ */
+.historiasGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.historiaCard {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.historiaCardBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.historiaCardBtn:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.historiaIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.historiaTitulo {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.historiaPags {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.btnEliminar {
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  border-left: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background 0.15s ease;
+}
+
+.btnEliminar:hover {
+  background: #FEF2F2;
+}
+
+/* ============================================
+   VACÍO
+   ============================================ */
+.vacio {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--text-secondary);
+}
+
+.vacioEmoji {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.vacio p {
+  margin: 0 0 1.5rem;
+  font-size: 1.05rem;
+}
+
+/* ============================================
+   LECTOR DE HISTORIA
+   ============================================ */
+.lectorHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 80px 0 1.5rem;
+}
+
+.btnVolver {
+  background: none;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btnVolver:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.lectorTitulo {
+  flex: 1;
+  font-size: clamp(1.1rem, 4vw, 1.5rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.lectorPagNum {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Puntos de progreso */
+.lectorProgreso {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.lectorDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--border);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.lectorDotVisto {
+  background: var(--secondary);
+}
+
+.lectorDotActivo {
+  background: var(--primary);
+  transform: scale(1.4);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.25);
+}
+
+/* Tarjeta de página */
+.paginaCard {
+  background: var(--bg-card);
+  border: 3px solid var(--primary);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.paginaEmoji {
+  font-size: 5rem;
+  line-height: 1;
+  display: block;
+}
+
+.paginaTexto {
+  font-size: clamp(1.2rem, 4vw, 1.6rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 560px;
+}
+
+.paginaTipo {
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1.5px solid;
+  border-radius: 99px;
+  padding: 0.2rem 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Navegación lector */
+.lectorNav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.btnNavPag {
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnNavPag:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnNavPag:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btnNavPagNext {
+  padding: 0.75rem 1.75rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnNavPagNext:hover {
+  background: #256a8a;
+  transform: translateY(-1px);
+}
+
+.btnFinHistoria {
+  padding: 0.75rem 1.75rem;
+  background: #16A34A;
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnFinHistoria:hover {
+  background: #15803D;
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   FORMULARIO CREAR HISTORIA
+   ============================================ */
+.formCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.formGrupo {
+  margin-bottom: 1.5rem;
+}
+
+.formLabel {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  color: var(--text-primary);
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Emoji selector */
+.emojiSelector {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.emojiBtn {
+  width: 44px;
+  height: 44px;
+  font-size: 1.3rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emojiBtn:hover {
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
+.emojiBtnActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.2);
+}
+
+.emojiSelectorSmall {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+}
+
+.emojiBtnSmall {
+  width: 36px;
+  height: 36px;
+  font-size: 1.1rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emojiBtnSmall:hover {
+  border-color: var(--primary);
+}
+
+/* Páginas editor */
+.paginasLista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.paginaEditor {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+
+.paginaEditorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.paginaEditorNum {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btnRemovePag {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.25rem 0.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnRemovePag:hover {
+  border-color: #DC2626;
+  background: #FEF2F2;
+}
+
+/* Tipos de página */
+.tiposGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.tipoBtn {
+  padding: 0.4rem 0.5rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.tipoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tipoBtnActivo {
+  font-weight: 700;
+}
+
+.tipoDesc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+
+.paginaEmojiRow {
+  margin-bottom: 0.75rem;
+}
+
+.paginaTextarea {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.paginaTextarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.btnAddPag {
+  padding: 0.6rem 1.25rem;
+  background: none;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.btnAddPag:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.04);
+}
+
+/* ============================================
+   BOTONES GENERALES
+   ============================================ */
+.btnPrimary {
+  padding: 0.75rem 1.75rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnPrimary:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnPrimary:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.btnSecondary {
+  padding: 0.75rem 1.75rem;
+  background: none;
+  color: var(--text-secondary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnSecondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.formAcciones {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+/* ============================================
+   AVISO
+   ============================================ */
+.avisoBox {
+  background: #FFF7ED;
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+[data-theme='dark'] .avisoBox {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: #D97706;
+}
+
+.avisoBox h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #92400E;
+  margin: 0 0 0.5rem;
+}
+
+[data-theme='dark'] .avisoBox h3 {
+  color: #FCD34D;
+}
+
+.avisoBox p {
+  font-size: 0.88rem;
+  color: #78350F;
+  line-height: 1.55;
+  margin: 0;
+}
+
+[data-theme='dark'] .avisoBox p {
+  color: #FDE68A;
+}
+
+/* ============================================
+   SECCIÓN EDUCATIVA (patrón v2.0)
+   ============================================ */
+.guiaSeccion {
+  margin-bottom: 2rem;
+}
+
+.guiaSeccion h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  background: var(--bg-card);
+}
+
+.comparativaTable th {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td { border-bottom: none; }
+.comparativaTable tr:hover td { background: rgba(46, 134, 171, 0.03); }
+
+.celdaDestacada {
+  color: var(--primary) !important;
+  font-weight: 700;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.escenarioIcono {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.escenarioCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.escenarioCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+}
+
+.faqItem:last-child { border-bottom: none; }
+
+.faqItem dt {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.faqItem dd {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  font-weight: 900;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.step > div { flex: 1; }
+
+.step strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.step p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.tipIcono {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.tipCard h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.warningBox {
+  background: #FFF7ED;
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: #D97706;
+}
+
+.warningBox h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #92400E;
+  margin: 0 0 1rem;
+}
+
+[data-theme='dark'] .warningBox h3 {
+  color: #FCD34D;
+}
+
+.warningBox ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.warningBox li {
+  font-size: 0.88rem;
+  color: #78350F;
+  line-height: 1.55;
+}
+
+[data-theme='dark'] .warningBox li {
+  color: #FDE68A;
+}
+
+.warningBox strong {
+  color: #92400E;
+}
+
+[data-theme='dark'] .warningBox strong {
+  color: #FCD34D;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 640px) {
+  .ejemplosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tiposGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .formAcciones {
+    flex-direction: column-reverse;
+  }
+
+  .paginaCard {
+    padding: 2rem 1.25rem;
+    min-height: 220px;
+  }
+
+  .paginaEmoji {
+    font-size: 4rem;
+  }
+}
+
+/* Reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  :global(*),
+  :global(*::before),
+  :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
