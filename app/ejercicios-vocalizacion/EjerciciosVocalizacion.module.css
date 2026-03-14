@@ -69,7 +69,14 @@
   border-radius: var(--radius-lg);
   padding: 1.75rem 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: var(--shadow);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0.5rem;
+  z-index: 10;
+}
+
+[data-theme='dark'] .seccionMic {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .micInactivo {
@@ -525,44 +532,99 @@
 }
 
 /* ============================================
-   FRASES
+   FRASES — Modo tarjeta única
    ============================================ */
-.frasesLista {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  margin-bottom: 1.5rem;
+.fraseCard {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.06) 0%, rgba(72, 169, 166, 0.06) 100%);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-lg);
+  padding: 2rem 1.75rem;
+  margin-bottom: 1.25rem;
+  text-align: center;
 }
 
-.fraseBtn {
+[data-theme='dark'] .fraseCard {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.12) 0%, rgba(72, 169, 166, 0.12) 100%);
+}
+
+.fraseCardTexto {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+}
+
+.fraseCardDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+.fraseNavegacion {
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.9rem 1.1rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.fraseCounter {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.btnNavFrase {
+  padding: 0.5rem 1.1rem;
   background: var(--bg-card);
   border: 2px solid var(--border);
   border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  text-align: left;
   transition: all 0.18s ease;
 }
 
-.fraseBtn:hover:not(:disabled) {
+.btnNavFrase:hover:not(:disabled) {
   border-color: var(--primary);
-  background: rgba(46, 134, 171, 0.04);
+  color: var(--primary);
 }
 
-.fraseBtn:disabled {
-  opacity: 0.45;
+.btnNavFrase:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-.fraseBtnActiva {
-  border-color: var(--primary) !important;
-  background: rgba(46, 134, 171, 0.07) !important;
+.btnNavFrase:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }
 
-.fraseBtn:focus-visible {
+.btnIniciarFrase {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.btnIniciarFrase:hover {
+  background: #256a8a;
+  transform: translateY(-1px);
+}
+
+.btnIniciarFrase:focus-visible {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
 }

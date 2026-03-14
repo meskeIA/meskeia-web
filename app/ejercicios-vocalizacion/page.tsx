@@ -46,14 +46,36 @@ const VOCALES: EjercicioVocal[] = [
 ];
 
 const FRASES: FraseEjercicio[] = [
+  // Saludos y cortesía
   { texto: '¡Buenos días! ¿Cómo estás hoy?', descripcion: 'Saludo con entonación ascendente' },
-  { texto: 'El cielo es azul y el sol brilla fuerte.', descripcion: 'Frase declarativa con pausas naturales' },
+  { texto: '¡Buenas tardes! Me alegra mucho verte.', descripcion: 'Saludo cálido con énfasis en "alegra"' },
+  { texto: '¡Buenas noches! Que descanses bien.', descripcion: 'Despedida con voz suave y fluida' },
+  { texto: '¿Puedes ayudarme, por favor? Muchas gracias.', descripcion: 'Petición cortés con claridad vocal' },
+  // Familia y hogar
   { texto: 'Mamá, papá, hermana, hermano.', descripcion: 'Palabras familiares con énfasis vocal' },
+  { texto: 'Quiero un vaso de agua fría, por favor.', descripcion: 'Petición cotidiana, volumen constante' },
+  { texto: 'El desayuno está listo en la cocina.', descripcion: 'Frase del hogar con ritmo natural' },
+  { texto: 'Hoy me siento bien y con energía.', descripcion: 'Estado de ánimo positivo, voz firme' },
+  // Naturaleza y entorno
+  { texto: 'El cielo es azul y el sol brilla fuerte.', descripcion: 'Frase declarativa con pausas naturales' },
+  { texto: 'Los pájaros cantan al amanecer.', descripcion: 'Frase corta con sonidos suaves' },
+  { texto: 'La lluvia cae despacio sobre el jardín.', descripcion: 'Ritmo pausado, vocales abiertas' },
+  { texto: 'El viento mueve las hojas de los árboles.', descripcion: 'Frase larga, mantener volumen hasta el final' },
+  // Actividades diarias
   { texto: 'Uno, dos, tres, cuatro, cinco, seis.', descripcion: 'Secuencia numérica con volumen constante' },
   { texto: 'Me llamo... y vivo en...', descripcion: 'Presentación personal con voz proyectada' },
-  { texto: '¿Puedes ayudarme, por favor? Gracias.', descripcion: 'Petición educada con claridad' },
-  { texto: 'El perro corre, el gato duerme.', descripcion: 'Dos frases cortas con pausa intermedia' },
+  { texto: 'Hoy voy a caminar por el parque.', descripcion: 'Plan del día con ritmo natural' },
+  { texto: 'Leo el periódico por las mañanas.', descripcion: 'Hábito cotidiano, articulación clara' },
+  // Emociones y bienestar
   { texto: '¡Bien! ¡Muy bien! ¡Excelente!', descripcion: 'Expresiones de ánimo con énfasis creciente' },
+  { texto: 'Estoy orgulloso de mi esfuerzo de hoy.', descripcion: 'Frase de autoánimo, proyección vocal' },
+  { texto: 'Me gusta escuchar música por las tardes.', descripcion: 'Preferencia personal, dicción fluida' },
+  { texto: 'Con práctica constante mejoro cada día.', descripcion: 'Frase motivadora, vocales claras' },
+  // Mayor dificultad vocal
+  { texto: 'El perro corre, el gato duerme, el pájaro canta.', descripcion: 'Tres frases seguidas, mantener el volumen' },
+  { texto: 'Treinta y tres tramos de tren traquetean.', descripcion: 'Trabalenguas con consonantes repetidas' },
+  { texto: 'Ayer fui al médico y me sentí mucho mejor.', descripcion: 'Frase narrativa, dicción sostenida' },
+  { texto: 'La práctica diaria es la clave del progreso vocal.', descripcion: 'Frase larga: proyectar hasta la última palabra' },
 ];
 
 const UMBRAL_VOZ = 15; // Nivel mínimo de volumen (0-100) para contar como voz activa
@@ -82,6 +104,9 @@ export default function EjerciciosVocalizacionPage() {
   const [objetivoSeg, setObjetivoSeg] = useState(10);
   const [ejercicioCompleto, setEjercicioCompleto] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Índice de frase actual (modo tarjeta)
+  const [indiceFrase, setIndiceFrase] = useState(0);
 
   // Historial
   const [historial, setHistorial] = useState<RegistroSesion[]>([]);
@@ -232,6 +257,33 @@ export default function EjerciciosVocalizacionPage() {
       });
     }
   }, [ejercicioActual, segundosVoz, ejercicioCompleto, objetivoSeg, guardarRegistro]);
+
+  const resetFrase = useCallback(() => {
+    setEjercicioActual(null);
+    setEnEjercicio(false);
+    setEjercicioCompleto(false);
+    setSegundosVoz(0);
+    if (timerRef.current) clearInterval(timerRef.current);
+  }, []);
+
+  const irAFrase = useCallback((nuevoIndice: number) => {
+    resetFrase();
+    setIndiceFrase(nuevoIndice);
+  }, [resetFrase]);
+
+  const fraseAnterior = useCallback(() => {
+    irAFrase(indiceFrase > 0 ? indiceFrase - 1 : FRASES.length - 1);
+  }, [indiceFrase, irAFrase]);
+
+  const fraseSiguiente = useCallback(() => {
+    irAFrase(indiceFrase < FRASES.length - 1 ? indiceFrase + 1 : 0);
+  }, [indiceFrase, irAFrase]);
+
+  const iniciarFraseActual = useCallback(() => {
+    const f = FRASES[indiceFrase];
+    const duracion = Math.max(5, Math.round(f.texto.split(' ').length * 0.9));
+    iniciarEjercicio(f, duracion);
+  }, [indiceFrase, iniciarEjercicio]);
 
   // Calcular color y nivel del medidor de volumen
   const getColorVolumen = (nivel: number): string => {
@@ -455,73 +507,77 @@ export default function EjerciciosVocalizacionPage() {
                 El temporizador avanza solo cuando se detecta tu voz.
               </p>
 
-              <div className={styles.frasesLista}>
-                {FRASES.map((f, i) => (
-                  <button
-                    key={i}
-                    className={`${styles.fraseBtn} ${ejercicioActual && !('letra' in ejercicioActual) && (ejercicioActual as FraseEjercicio).texto === f.texto ? styles.fraseBtnActiva : ''}`}
-                    onClick={() => {
-                      if (!enEjercicio) {
-                        const duracion = Math.max(5, Math.round(f.texto.split(' ').length * 0.9));
-                        iniciarEjercicio(f, duracion);
-                      }
-                    }}
-                    disabled={enEjercicio}
-                    aria-label={`Ejercicio de frase: ${f.texto}`}
-                  >
-                    <span className={styles.fraseTexto}>{f.texto}</span>
-                    <span className={styles.fraseDesc}>{f.descripcion}</span>
-                  </button>
-                ))}
+              {/* Tarjeta de frase */}
+              <div className={styles.fraseCard}>
+                <p className={styles.fraseCardTexto}>{FRASES[indiceFrase].texto}</p>
+                <p className={styles.fraseCardDesc}>{FRASES[indiceFrase].descripcion}</p>
               </div>
 
-              {ejercicioActual && !('letra' in ejercicioActual) && (
-                <div className={styles.ejercicioActivo}>
-                  <div className={styles.fraseActiva} aria-live="polite">
-                    &ldquo;{(ejercicioActual as FraseEjercicio).texto}&rdquo;
-                  </div>
+              {/* Navegación entre frases */}
+              <div className={styles.fraseNavegacion}>
+                <button
+                  className={styles.btnNavFrase}
+                  onClick={fraseAnterior}
+                  disabled={enEjercicio}
+                  aria-label="Frase anterior"
+                >
+                  ← Anterior
+                </button>
+                <span className={styles.fraseCounter}>{indiceFrase + 1} / {FRASES.length}</span>
+                <button
+                  className={styles.btnNavFrase}
+                  onClick={fraseSiguiente}
+                  disabled={enEjercicio}
+                  aria-label="Siguiente frase"
+                >
+                  Siguiente →
+                </button>
+              </div>
 
+              {/* Botón iniciar */}
+              {!enEjercicio && !ejercicioCompleto && (
+                <button className={styles.btnIniciarFrase} onClick={iniciarFraseActual}>
+                  ▶ Iniciar esta frase
+                </button>
+              )}
+
+              {/* Progreso durante el ejercicio */}
+              {enEjercicio && (
+                <div className={styles.ejercicioActivo}>
                   <div className={styles.progresoWrapper}>
                     <div className={styles.progresoLineal}>
                       <div
                         className={styles.progresoLinealRelleno}
-                        style={{
-                          width: `${progresoEjercicio}%`,
-                          backgroundColor: ejercicioCompleto ? '#16A34A' : '#2E86AB',
-                        }}
+                        style={{ width: `${progresoEjercicio}%`, backgroundColor: '#2E86AB' }}
                       />
                     </div>
-                    <div className={styles.progresoLinealTexto}>
-                      {segundosVoz}s / {objetivoSeg}s
+                    <div className={styles.progresoLinealTexto}>{segundosVoz}s / {objetivoSeg}s</div>
+                    <div className={styles.indicadorVoz} role="status" aria-live="polite">
+                      {volumenActual >= UMBRAL_VOZ
+                        ? <span className={styles.vozOk}>✓ Voz detectada — sigue leyendo</span>
+                        : <span className={styles.vozBaja}>↑ Lee más fuerte para avanzar</span>
+                      }
                     </div>
-
-                    {ejercicioCompleto ? (
-                      <div className={styles.exito} role="status">
-                        🎉 ¡Frase completada!
-                      </div>
-                    ) : (
-                      <div className={styles.indicadorVoz} role="status" aria-live="polite">
-                        {volumenActual >= UMBRAL_VOZ
-                          ? <span className={styles.vozOk}>✓ Voz detectada — sigue leyendo</span>
-                          : <span className={styles.vozBaja}>↑ Lee más fuerte para avanzar</span>
-                        }
-                      </div>
-                    )}
                   </div>
+                  <button className={styles.btnDetener} onClick={detenerEjercicio}>
+                    ⏹ Detener ejercicio
+                  </button>
+                </div>
+              )}
 
-                  {enEjercicio && (
-                    <button className={styles.btnDetener} onClick={detenerEjercicio}>
-                      ⏹ Detener ejercicio
-                    </button>
-                  )}
-                  {ejercicioCompleto && (
-                    <button
-                      className={styles.btnNuevo}
-                      onClick={() => { setEjercicioActual(null); setEjercicioCompleto(false); setSegundosVoz(0); }}
-                    >
-                      ↩ Elegir otra frase
-                    </button>
-                  )}
+              {/* Al completar */}
+              {ejercicioCompleto && (
+                <div className={styles.ejercicioActivo}>
+                  <div className={styles.progresoWrapper}>
+                    <div className={styles.progresoLineal}>
+                      <div className={styles.progresoLinealRelleno} style={{ width: '100%', backgroundColor: '#16A34A' }} />
+                    </div>
+                    <div className={styles.progresoLinealTexto}>{segundosVoz}s / {objetivoSeg}s</div>
+                  </div>
+                  <div className={styles.exito} role="status">🎉 ¡Frase completada!</div>
+                  <button className={styles.btnNuevo} onClick={fraseSiguiente}>
+                    ▶ Siguiente frase
+                  </button>
                 </div>
               )}
             </section>
