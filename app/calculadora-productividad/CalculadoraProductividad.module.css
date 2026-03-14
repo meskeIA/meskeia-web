@@ -432,6 +432,390 @@
   color: var(--text-primary);
 }
 
+/* ============================================================
+   PATRÓN v2.0 — Secciones educativas profesionales
+   ============================================================ */
+
+/* Tabla Comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: var(--bg-card);
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: var(--bg-primary);
+}
+
+.tableNote {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: #256a8a;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: #333333;
+}
+
+/* Casos de Uso — Escenarios */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.escenarioHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.escenarioCard p {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.escenarioExample {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 3px solid var(--primary);
+}
+
+.escenarioTip {
+  font-size: 0.85rem !important;
+  color: var(--text-muted) !important;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  border-left: 3px solid var(--secondary) !important;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .escenarioExample,
+[data-theme='dark'] .escenarioTip {
+  background: #333333;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.faqItem h3 {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1rem;
+  color: var(--primary);
+  line-height: 1.4;
+}
+
+.faqItem p {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.faqItem p + p {
+  margin-top: var(--spacing-sm);
+}
+
+.faqTip {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 3px solid var(--secondary);
+  font-size: 0.88rem !important;
+  color: var(--text-muted) !important;
+  margin-top: var(--spacing-sm) !important;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .faqTip {
+  background: #333333;
+}
+
+/* Guía Paso a Paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.1rem;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h3 {
+  margin: 0 0 var(--spacing-xs);
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .stepNumber {
+  background: #256a8a;
+}
+
+/* Mejores Prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.tipIcon {
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-bottom: var(--spacing-xs);
+}
+
+.tipCard h3 {
+  margin: 0 0 var(--spacing-xs);
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+/* Warning Box */
+.warningBox {
+  background: #fff8e1;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  border: 2px solid #f39c12;
+  margin-bottom: var(--spacing-xl);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.warningHeader h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #7d5a00;
+}
+
+.warningIcon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.warningBox > p {
+  margin: 0 0 var(--spacing-md);
+  color: #7d5a00;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.warningList {
+  padding-left: var(--spacing-xl);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.warningList li {
+  color: #5a3e00;
+  font-size: 0.93rem;
+  line-height: 1.65;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2000;
+  border-color: #f39c12;
+}
+
+[data-theme='dark'] .warningHeader h2 {
+  color: #f0c040;
+}
+
+[data-theme='dark'] .warningBox > p,
+[data-theme='dark'] .warningList li {
+  color: #d4a820;
+}
+
+/* ============================================================
+   Responsive — nuevas clases patrón v2.0
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .stepNumber {
+    margin-top: 0;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.82rem;
+  }
+
+  .warningBox {
+    padding: var(--spacing-lg);
+  }
+
+  .warningHeader h2 {
+    font-size: 1.1rem;
+  }
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .summaryGrid {

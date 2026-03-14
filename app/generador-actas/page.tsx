@@ -1120,6 +1120,404 @@ export default function GeneradorActasPage() {
             </div>
           </div>
         </section>
+
+        {/* ── SECCIÓN 1: Tabla Comparativa de tipos de actas ── */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de Tipos de Actas</h2>
+          <p className={styles.introParagraph}>
+            No todas las actas son iguales. El nivel de formalidad, las obligaciones legales y quién debe firmarlas
+            varían según el tipo de organización. Elige el formato adecuado para evitar problemas jurídicos.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>Acta de equipo interno</th>
+                  <th>Acta de junta directiva</th>
+                  <th>Acta de comunidad de propietarios</th>
+                  <th>Acta notarial</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Obligatoriedad legal</strong></td>
+                  <td>No obligatoria</td>
+                  <td>Obligatoria (Ley de Sociedades de Capital, art. 97–99)</td>
+                  <td>Obligatoria (LPH, art. 19)</td>
+                  <td>Voluntaria u obligatoria según estatutos</td>
+                </tr>
+                <tr>
+                  <td><strong>Quién la firma</strong></td>
+                  <td>Opcional — responsable de reunión</td>
+                  <td>Presidente y Secretario del consejo</td>
+                  <td>Presidente y Secretario de la comunidad</td>
+                  <td>Notario público + partes</td>
+                </tr>
+                <tr>
+                  <td><strong>Dónde se archiva</strong></td>
+                  <td>Carpeta de equipo / herramienta de gestión</td>
+                  <td>Libro de Actas societario (Registro Mercantil)</td>
+                  <td>Libro de Actas de la comunidad</td>
+                  <td>Protocolo notarial</td>
+                </tr>
+                <tr>
+                  <td><strong>Validez jurídica</strong></td>
+                  <td>Valor probatorio limitado</td>
+                  <td>Alta — impugnable en 40 días (art. 204 LSC)</td>
+                  <td>Alta — impugnable en 3 meses (art. 18 LPH)</td>
+                  <td>Máxima — fe pública notarial</td>
+                </tr>
+                <tr>
+                  <td><strong>Nivel de formalidad</strong></td>
+                  <td>Bajo</td>
+                  <td>Alto</td>
+                  <td>Alto</td>
+                  <td>Máximo</td>
+                </tr>
+                <tr>
+                  <td><strong>Cuándo se usa</strong></td>
+                  <td>Equipos de proyecto, reuniones internas de empresa</td>
+                  <td>SA, SL, cooperativas, fundaciones con consejo</td>
+                  <td>Juntas de propietarios de comunidades</td>
+                  <td>Acuerdos societarios críticos, ampliaciones de capital</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>¿Quién Necesita Actas y Para Qué?</h2>
+          <p className={styles.introParagraph}>
+            Las actas sirven a organizaciones muy diferentes. Estos son los cuatro perfiles más habituales en España
+            y cómo pueden sacar partido a un generador de actas profesional.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👥</span>
+                <h3>Equipo de proyecto interno</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Un equipo de desarrollo documenta las decisiones de su sprint review
+                semanal para que quede constancia de los cambios de alcance acordados con el cliente.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Clave:</strong> Aunque no hay obligación legal, tener registro escrito evita conflictos
+                sobre qué se acordó. Incluir siempre los acuerdos y las tareas asignadas con fechas.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏘️</span>
+                <h3>Comunidad de propietarios</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> El secretario de una comunidad levanta acta de la junta anual donde
+                se aprueban las cuotas de mantenimiento y se acuerda la reparación del tejado.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Clave:</strong> La LPH (art. 19) obliga a que el acta se remita a los propietarios
+                en un plazo máximo de 10 días. Debe recoger el quórum y el sentido del voto de cada propietario.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏢</span>
+                <h3>Pyme con consejo de administración</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Una SL con tres socios documenta en acta los acuerdos del consejo
+                para aprobar el presupuesto anual y nombrar un nuevo apoderado.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Clave:</strong> La Ley de Sociedades de Capital (art. 97–99) exige libro de actas
+                legalizado. Los acuerdos sin acta válida pueden ser impugnados judicialmente hasta 1 año después
+                si son contrarios a la ley.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🤝</span>
+                <h3>ONG y asociaciones</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> La junta directiva de una ONG registra en acta las decisiones
+                sobre captación de fondos, proyectos aprobados y cambios de estatutos.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Clave:</strong> La Ley Orgánica 1/2002 de asociaciones exige documentar los acuerdos
+                de la asamblea general. Las actas son necesarias para tramitar subvenciones públicas y
+                acreditar decisiones ante notarios y registros.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre Actas</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Es obligatorio redactar actas de reunión?</h4>
+              <p>
+                Depende del tipo de organización. Para SA y SL es obligatorio por la Ley de Sociedades de Capital
+                (arts. 97–99 LSC). Para comunidades de propietarios lo exige el artículo 19 de la LPH.
+                Para equipos de trabajo internos no existe obligación legal, pero es una buena práctica.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuál es la diferencia entre un acta y una minuta?</h4>
+              <p>
+                El acta es el documento formal y definitivo que recoge los acuerdos adoptados; tiene valor
+                probatorio. La minuta es el borrador previo, un resumen informal de lo tratado que se
+                circula para revisión antes de aprobar el acta oficial.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Quién debe firmar un acta?</h4>
+              <p>
+                En juntas de SA/SL la firma el presidente y el secretario del consejo o junta. En comunidades
+                de propietarios, el presidente y el secretario. En reuniones de equipo sin régimen legal
+                específico basta con que la firme quien la redacta; aunque todos los asistentes pueden
+                firmar para mayor validez.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuánto tiempo hay que conservar las actas?</h4>
+              <p>
+                La legislación mercantil española (Código de Comercio, art. 30) exige conservar los libros
+                y documentos de empresa durante un mínimo de <strong>6 años</strong> desde el último asiento.
+                Para SA y SL la recomendación práctica es conservarlas indefinidamente, ya que los acuerdos
+                societarios pueden ser revisados décadas después.
+              </p>
+              <p className={styles.faqTip}>
+                Consejo: guarda las actas en formato PDF/A firmado digitalmente para garantizar la integridad
+                a largo plazo.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Tiene validez un acta sin notario?</h4>
+              <p>
+                Sí, en la mayoría de los casos. Un acta interna firmada por presidente y secretario tiene
+                plena validez para acuerdos ordinarios. Solo es obligatoria la intervención notarial
+                en supuestos específicos como ampliaciones de capital, modificación de estatutos en SA o
+                cuando los propios estatutos lo exijan.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué ocurre si alguien no firma el acta?</h4>
+              <p>
+                El acta sigue siendo válida si la firman al menos el presidente y el secretario. El desacuerdo
+                de un asistente se puede hacer constar en el propio documento como voto particular o
+                discrepancia expresa. No firmar no anula el acuerdo adoptado por mayoría.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo se rectifica un acta incorrecta?</h4>
+              <p>
+                Se redacta un acta de corrección o diligencia de subsanación que haga referencia expresa
+                al acta original (indicando fecha y número), describe el error y establece el texto correcto.
+                En SA/SL esta corrección debe aprobarse en la siguiente reunión del órgano correspondiente.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Las actas en formato digital tienen validez legal?</h4>
+              <p>
+                Sí, siempre que cumplan los requisitos del Reglamento eIDAS (UE 910/2014) y la legislación
+                española. Una firma electrónica cualificada otorga al documento digital la misma validez
+                que la firma manuscrita. El libro de actas electrónico es válido para SA/SL si está
+                legalizado telemáticamente en el Registro Mercantil.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Guía Paso a Paso: Cómo Redactar un Acta Profesional</h2>
+          <p className={styles.introParagraph}>
+            Sigue estos 7 pasos para redactar actas que sean claras, completas y con valor jurídico.
+          </p>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Prepara el orden del día con antelación</h4>
+                <p>
+                  Envía la convocatoria con al menos 48–72 horas de antelación incluyendo el orden del día,
+                  la fecha, la hora y el lugar. Para juntas de SA/SL la LSC exige plazos mínimos según estatutos.
+                  Un orden del día claro facilita enormemente la redacción posterior del acta.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Documenta asistencia y quórum</h4>
+                <p>
+                  Al inicio, registra a todos los asistentes (nombre, cargo y si están presentes o representados).
+                  Verifica que se cumple el quórum necesario para tomar acuerdos válidos. En juntas de
+                  comunidades es imprescindible anotar la cuota de participación de cada propietario.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Toma notas durante la reunión, no después</h4>
+                <p>
+                  Designa a un secretario que tome notas en tiempo real. No intentes transcribir todo:
+                  anota los puntos clave debatidos, las posturas relevantes y, sobre todo, los acuerdos
+                  adoptados con el resultado de la votación si la hubiera.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Numera y describe cada acuerdo</h4>
+                <p>
+                  Cada decisión adoptada debe quedar numerada correlativamente (Acuerdo 1, Acuerdo 2...).
+                  Incluye el texto exacto de lo aprobado, los votos a favor, en contra y abstenciones.
+                  Esta numeración es esencial para futuras referencias y para impugnar acuerdos si fuera necesario.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Registra las tareas con responsable y plazo</h4>
+                <p>
+                  Cada compromiso adquirido debe ir acompañado del nombre de la persona responsable y
+                  una fecha límite concreta. Sin responsable y sin fecha, las tareas raramente se ejecutan.
+                  Este apartado es la base del seguimiento en la próxima reunión.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Obtén las firmas y aprobación</h4>
+                <p>
+                  El acta debe ser firmada por el presidente y el secretario. Para mayor seguridad,
+                  puede aprobarse en la misma reunión ("aprobación del acta anterior") o al inicio
+                  de la siguiente. En entornos digitales, usa firma electrónica cualificada.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Distribuye y archiva en menos de 24 horas</h4>
+                <p>
+                  Envía el acta a todos los asistentes y a los ausentes que deban estar informados.
+                  Archiva el original en el libro de actas (físico o electrónico legalizado) y guarda
+                  una copia en PDF/A. La LPH exige que las actas de comunidades se remitan en 10 días.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>6 Mejores Prácticas para Actas Profesionales</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⏱️</span>
+              <h4>Redacta en tiempo real</h4>
+              <p>
+                Toma notas durante la reunión, no horas después. Los detalles se olvidan rápidamente
+                y redactar a posteriori aumenta el riesgo de imprecisiones o sesgos involuntarios.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <h4>Solo acuerdos, no transcripciones</h4>
+              <p>
+                El acta recoge decisiones y acuerdos, no una transcripción literal del debate.
+                Un acta concisa es más útil y tiene mayor claridad jurídica que una larga y detallada.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📋</span>
+              <h4>Cabecera completa siempre</h4>
+              <p>
+                Incluye sin excepción: fecha, hora de inicio y fin, lugar o plataforma virtual,
+                asistentes con cargo, convocante y secretario. Un acta sin cabecera completa pierde
+                valor probatorio.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔢</span>
+              <h4>Numera los acuerdos</h4>
+              <p>
+                Numera cada acuerdo correlativamente dentro del acta y usa una numeración anual para
+                las propias actas (Acta 001/2025, Acta 002/2025...). Facilita las referencias cruzadas
+                y el archivo sistemático.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📤</span>
+              <h4>Borrador en menos de 24 horas</h4>
+              <p>
+                Envía un borrador del acta a los asistentes dentro de las 24 horas siguientes a la
+                reunión. La aprobación rápida reduce discrepancias y garantiza que todos tienen la
+                misma versión de lo acordado.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔒</span>
+              <h4>Archiva con firma digital</h4>
+              <p>
+                Guarda las actas en PDF/A con firma electrónica cualificada. Este formato garantiza
+                la integridad del documento a largo plazo y cumple con los requisitos del Reglamento
+                eIDAS para validez legal en la UE.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box — Errores Comunes ── */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>6 Errores que Pueden Invalidar tu Acta</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li>
+              <strong>No levantar acta de decisiones importantes.</strong> En SA y SL, los acuerdos del
+              consejo sin acta válida carecen de prueba suficiente y pueden ser impugnados o declarados nulos.
+            </li>
+            <li>
+              <strong>Acta sin firmas ni fecha.</strong> Un documento sin fecha y sin la firma del secretario
+              y presidente pierde su valor probatorio. Los juzgados lo consideran un simple borrador sin efecto legal.
+            </li>
+            <li>
+              <strong>Redactar el acta semanas después.</strong> Esperar días o semanas aumenta el riesgo
+              de errores, lagunas y versiones contradictorias entre los asistentes. La legislación societaria
+              insta a aprobar el acta "en la misma sesión o en la siguiente".
+            </li>
+            <li>
+              <strong>Mezclar opiniones con acuerdos.</strong> El acta debe reflejar los acuerdos adoptados,
+              no los debates. Incluir interpretaciones subjetivas o comentarios personales puede generar
+              controversias y debilitar el valor jurídico del documento.
+            </li>
+            <li>
+              <strong>No distribuir el acta a los participantes.</strong> En comunidades de propietarios,
+              no enviar el acta en el plazo de 10 días establecido por la LPH puede acarrear reclamaciones.
+              En SA/SL, no notificar a los socios ausentes limita su derecho de impugnación.
+            </li>
+            <li>
+              <strong>No numerar ni correlacionar las actas.</strong> Un libro de actas sin numeración
+              correlativa dificulta la búsqueda de antecedentes y puede generar problemas en auditorías,
+              inspecciones de Hacienda o procedimientos ante el Registro Mercantil.
+            </li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-actas')} />

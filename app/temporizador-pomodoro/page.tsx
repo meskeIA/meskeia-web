@@ -705,6 +705,340 @@ export default function TemporizadorPomodoroPage() {
             <li><strong>Revisa al final del día:</strong> ¿Cuántos pomodoros completaste? ¿Qué funcionó mejor?</li>
           </ul>
         </section>
+
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de técnicas de gestión del tiempo</h2>
+          <p className={styles.introParagraph}>
+            El Pomodoro no es la única técnica. Conocer las alternativas te ayuda a elegir la que mejor encaja con tu trabajo y personalidad.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Técnica</th>
+                  <th>Duración de bloque</th>
+                  <th>Descansos incluidos</th>
+                  <th>Ideal para</th>
+                  <th>Curva de aprendizaje</th>
+                  <th>Compatible en equipo</th>
+                  <th>Herramientas recomendadas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Pomodoro</strong></td>
+                  <td>25 min (ajustable)</td>
+                  <td>Sí, cada bloque</td>
+                  <td>Tareas fragmentadas, estudiantes, escritores</td>
+                  <td>Baja — listo en 1 día</td>
+                  <td>Moderada</td>
+                  <td>Este temporizador, Forest, Be Focused</td>
+                </tr>
+                <tr>
+                  <td><strong>Timeboxing</strong></td>
+                  <td>Variable (15–90 min)</td>
+                  <td>No obligatorios</td>
+                  <td>Proyectos con múltiples entregables</td>
+                  <td>Baja — fácil de adoptar</td>
+                  <td>Alta — ideal con calendarios</td>
+                  <td>Google Calendar, Notion, Reclaim.ai</td>
+                </tr>
+                <tr>
+                  <td><strong>GTD</strong></td>
+                  <td>Sin bloques fijos</td>
+                  <td>No contemplados</td>
+                  <td>Gestores de proyectos, equipos grandes</td>
+                  <td>Alta — requiere semanas</td>
+                  <td>Alta con herramienta correcta</td>
+                  <td>Things 3, OmniFocus, Todoist</td>
+                </tr>
+                <tr>
+                  <td><strong>Deep Work</strong></td>
+                  <td>90–180 min</td>
+                  <td>No durante el bloque</td>
+                  <td>Trabajo cognitivo intenso, investigadores</td>
+                  <td>Media — requiere práctica</td>
+                  <td>Baja — requiere aislamiento</td>
+                  <td>Freedom, Cold Turkey, RescueTime</td>
+                </tr>
+                <tr>
+                  <td><strong>Time Blocking</strong></td>
+                  <td>Bloques de calendario</td>
+                  <td>Planificados manualmente</td>
+                  <td>Profesionales con agenda densa</td>
+                  <td>Media — exige planificación</td>
+                  <td>Alta — visible para el equipo</td>
+                  <td>Google Calendar, Fantastical, Motion</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>Casos de uso según tu perfil</h2>
+          <p className={styles.introParagraph}>
+            La técnica Pomodoro se adapta de forma diferente según el tipo de trabajo. Aquí cuatro perfiles reales con sus particularidades.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
+                <h3>Estudiante universitario preparando exámenes</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Examen de Estadística en 5 días. Material: 8 temas, 200 páginas.
+              </p>
+              <p>
+                Divide el temario en bloques concretos (1 tema = 2–3 pomodoros). Alterna entre lectura activa (25 min) y repaso sin notas (5 min de descanso activo). Estudios de la Universidad de Michigan muestran que el repaso espaciado cada 25 min mejora la retención hasta un 40% frente a sesiones maratonianas. Usa el preset <strong>Clásico (25/5)</strong>.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: Apaga el móvil completamente durante cada pomodoro. Las interrupciones fragmentan la memoria de trabajo y obligan al cerebro a recargar el contexto (coste cognitivo de switching: ~23 min para recuperar concentración plena).
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
+                <h3>Programador en tareas de concentración profunda</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Implementar un módulo complejo con mucha lógica de negocio.
+              </p>
+              <p>
+                El flujo de programación requiere bloques más largos que 25 min. Prueba el preset <strong>Largo (50/10)</strong> o el <strong>Ultra (90/15)</strong>. Reserva los primeros 5 minutos de cada bloque para leer el código anterior y planificar el siguiente paso. Los 10–15 min de descanso son ideales para revisar pull requests o responder mensajes de equipo.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: Escribe una nota al final de cada pomodoro con "próximo paso concreto". Evita quedar sin hilo al retomar el trabajo.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">✍️</span>
+                <h3>Escritor o creador de contenido con entregas diarias</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> 3 artículos semanales, guiones de vídeo y gestión de RRSS.
+              </p>
+              <p>
+                Separa la escritura (modo creativo, bloques de 25 min sin editar) de la edición (modo crítico, bloques separados). Este enfoque reduce el bloqueo del escritor. Asigna pomodoros distintos para investigación, borrador y revisión. Un escritor profesional promedio completa entre 500 y 800 palabras por pomodoro de escritura pura.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: Durante el descanso, aleja la vista de la pantalla 20 segundos mirando a 6 metros de distancia (regla 20-20-20). Previene la fatiga ocular en jornadas largas.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
+                <h3>Trabajador con muchas interrupciones en oficina</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Open space, Slack activo, reuniones frecuentes e imprevistas.
+              </p>
+              <p>
+                Reserva bloques de 25 min en el calendario como "tiempo de concentración". Comunica a tu equipo que respondes mensajes en los descansos. Si una interrupción es inevitable, anota dónde quedaste y reinicia el pomodoro. No lo cuentes como completado: un pomodoro roto no cuenta. Considera usar auriculares con cancelación de ruido como señal visual de "no molestar".
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: El método "Inform, negotiate, call back" de Cirillo: informar que estás en un pomodoro, negociar cuándo responderás, y cumplirlo. Reduce interrupciones un 60% según el propio Cirillo.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre el Pomodoro</h2>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt>¿Quién inventó la Técnica Pomodoro y cómo funciona exactamente?</dt>
+              <dd>
+                Francesco Cirillo la desarrolló en 1987 siendo estudiante universitario en Roma. Usaba un temporizador de cocina con forma de tomate para dividir el estudio en bloques de 25 minutos separados por descansos cortos. La clave del método es la <strong>indivisibilidad del pomodoro</strong>: una vez iniciado, no se puede pausar ni interrumpir. Si algo externo lo interrumpe, se descarta y empieza de nuevo. Cirillo publicó el método completo en su libro de 2006 y lo distribuye gratuitamente en PDF.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Por qué 25 minutos y no otro tiempo?</dt>
+              <dd>
+                Los 25 minutos son el punto de partida de Cirillo, no un valor científico absoluto. La investigadora de DeskTime (2014) encontró que el patrón más productivo en su análisis de 5,5 millones de usuarios era <strong>52 minutos de trabajo seguidos de 17 minutos de descanso</strong>. Estudios de la Técnica de Aprendizaje de Florida State muestran que los atletas de élite trabajan en bloques de 90 minutos con un máximo de 4 bloques diarios. Los 25 min son una convención práctica: suficientemente cortos para no intimidar y largos para generar progreso real.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Qué hago si me interrumpen durante un pomodoro?</dt>
+              <dd>
+                Cirillo distingue entre interrupciones internas (distracciones propias) y externas (otras personas). Para las internas: anota el pensamiento en un papel y vuelve inmediatamente al trabajo. Para las externas: aplica el método <em>inform-negotiate-call back</em> — informa que estás ocupado, negocia cuándo podrás atender y cumple la promesa. Si la interrupción es inevitable y el pomodoro se rompe, <strong>no lo cuentes como completado</strong>. Reinícialo desde cero. Esta regla refuerza la integridad del sistema.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Puedo adaptar la duración del pomodoro a mi ritmo?</dt>
+              <dd>
+                Sí, y se recomienda hacerlo una vez dominada la técnica básica. Este temporizador incluye presets de 15/3, 25/5, 50/10 y 90/15. Para adaptarte: empieza con 25/5 durante 1–2 semanas, observa en qué momento tu concentración empieza a decaer naturalmente y usa ese tiempo como tu bloque personal. Algunas personas funcionan mejor con 20/4, otras con 40/8. Lo importante es que el bloque sea <strong>fijo e indivisible</strong> una vez iniciado.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Qué diferencia hay entre el descanso corto y el descanso largo?</dt>
+              <dd>
+                El <strong>descanso corto (5 min)</strong> es una pausa de recuperación activa: levantarse, estirarse, beber agua, mirar por la ventana. No revisar correo ni redes sociales, ya que activan el mismo modo de atención que el trabajo. El <strong>descanso largo (15–30 min)</strong> llega cada 4 pomodoros y permite una recuperación neurológica más profunda: dar un paseo, comer algo, hacer una llamada personal o simplemente no hacer nada. El cerebro consolida información durante estos períodos de descanso mayor.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Cómo gestiono tareas que duran más de un pomodoro?</dt>
+              <dd>
+                Divide la tarea en subtareas concretas y asigna pomodoros estimados a cada una. Por ejemplo: "Escribir informe trimestral" → "Esquema del informe" (1 pomodoro) + "Introducción y datos" (2 pomodoros) + "Análisis y conclusiones" (2 pomodoros) + "Revisión y formato" (1 pomodoro). Si una tarea consume más de 5–7 pomodoros sin descomposición natural, es señal de que está mal definida. Hacerla más concreta mejora tanto la estimación como la motivación.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿El Pomodoro funciona con trabajo creativo?</dt>
+              <dd>
+                Sí, con una adaptación importante: separa las fases creativas (generación de ideas, escritura libre, bocetos) de las fases críticas (edición, revisión, refinamiento) en pomodoros distintos. Mezclarlas genera bloqueo creativo. Durante la fase generativa, usa el pomodoro para proteger el tiempo de flujo sin autocrítica. Durante la fase crítica, úsalo para mantener el ritmo y evitar perfeccionismo paralizante. Escritores como Nicholas Sparks y periodistas de medios como el NYT reportan usar variantes de esta técnica.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Cuántos pomodoros al día son sostenibles?</dt>
+              <dd>
+                Cirillo recomienda un máximo de <strong>4 pomodoros seguidos</strong> antes del descanso largo. En una jornada laboral de 8 horas, son razonables entre 8 y 12 pomodoros (3,3 a 5 horas de trabajo concentrado real). El estudio de DeskTime citado anteriormente muestra que los trabajadores más productivos solo trabajan concentrados unas <strong>4 horas al día</strong>. Empezar con 4–6 pomodoros diarios y aumentar gradualmente es más sostenible que intentar 16 desde el primer día.
+              </dd>
+            </div>
+          </dl>
+          <p className={styles.faqTip}>
+            ¿No encuentras respuesta a tu pregunta? La mayoría de dudas sobre la técnica tienen respuesta en el libro original de Cirillo, disponible gratuitamente en <em>francescocirillo.com</em>.
+          </p>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Cómo implementar el Pomodoro efectivamente: guía paso a paso</h2>
+          <p className={styles.introParagraph}>
+            Seguir estos 7 pasos desde el primer día marca la diferencia entre una práctica esporádica y un sistema de productividad real.
+          </p>
+          <ol className={styles.stepGuide} aria-label="Pasos para implementar la técnica Pomodoro">
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <h4>Prepara la lista de tareas del día</h4>
+                <p>Antes de encender el temporizador, escribe en papel o en tu gestor de tareas todo lo que necesitas hacer hoy. Asigna una estimación en pomodoros a cada ítem (1, 2 o 3 pomodoros). Si una tarea supera 3 pomodoros, divídela. Este paso tarda 5–10 minutos y evita el "¿qué hago ahora?" entre pomodoros.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <h4>Elimina las fuentes de distracción antes de empezar</h4>
+                <p>Silencia notificaciones del móvil, cierra las pestañas del navegador que no necesitas y activa el modo "No molestar". Si trabajas en oficina, coloca auriculares o un cartel visual. Este ritual de preparación activa mentalmente el modo concentración antes de iniciar el temporizador.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <h4>Escribe la tarea en el campo de tarea actual</h4>
+                <p>Usa el campo "¿En qué estás trabajando?" del temporizador para escribir la tarea específica del pomodoro actual. Ser concreto ("Escribir el apartado de metodología" en lugar de "Escribir el informe") activa mejor el foco y hace más satisfactoria la finalización.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <h4>Inicia el temporizador y trabaja sin interrumpirte</h4>
+                <p>Pulsa "Iniciar" y dedica toda tu atención a la tarea definida. Si surge un pensamiento o tarea nueva, anótalo en un papel (lista de "pendientes imprevistos") y vuelve de inmediato al trabajo. El pomodoro es sagrado: no se pausa, no se interrumpe. Si lo rompes, reinícialo desde cero.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <h4>Al sonar la alarma, toma el descanso completo</h4>
+                <p>Cuando suena la campana, para <em>inmediatamente</em>, aunque estés "en el mejor momento". Levántate de la silla, estira brazos y cuello, bebe agua. Evita revisar el móvil o el correo durante estos 5 minutos: el descanso debe ser de verdad. El cerebro necesita este tiempo para consolidar lo aprendido.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">6</span>
+              <div className={styles.stepContent}>
+                <h4>Cada 4 pomodoros, toma un descanso largo de 15–30 minutos</h4>
+                <p>Después de completar 4 pomodoros, el cerebro necesita una recuperación más profunda. Sal a caminar, come algo, escucha música o simplemente cierra los ojos. No fuerces otro bloque de trabajo hasta haber completado este descanso. El temporizador te avisará automáticamente si tienes configurado el descanso largo.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">7</span>
+              <div className={styles.stepContent}>
+                <h4>Revisa tu rendimiento al final del día</h4>
+                <p>Consulta las estadísticas del temporizador: ¿cuántos pomodoros completaste? ¿En qué momento del día fuiste más productivo? Anota qué funcionó y qué no. Esta revisión de 5 minutos al día —llamada "retrospectiva diaria" por Cirillo— es lo que transforma la técnica en un sistema de mejora continua.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas para sacar el máximo al Pomodoro</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
+              <h4>Prepara la lista antes de empezar</h4>
+              <p>Dedica 10 minutos cada mañana a planificar tus pomodoros del día. Tener claro "qué harás en el siguiente bloque" elimina el tiempo muerto entre sesiones y reduce la fricción para retomar el trabajo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔕</span>
+              <h4>Silencia todas las notificaciones durante el bloque</h4>
+              <p>Un estudio de Gloria Mark (UCI, 2008) demostró que cada notificación interrumpe la concentración una media de 23 minutos. En un pomodoro de 25 min, una sola notificación puede anular el efecto completo de la sesión. Modo avión o No Molestar es imprescindible.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🍅</span>
+              <h4>No rompas un pomodoro a mitad bajo ningún concepto</h4>
+              <p>La regla de oro de Cirillo. Un pomodoro interrumpido no cuenta y debe reiniciarse desde cero. Esta regla parece rígida, pero es precisamente la que entrena tu capacidad de concentración sostenida con el tiempo. Trátalo como un contrato de 25 minutos contigo mismo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🚶</span>
+              <h4>Usa los descansos para moverte, no para las redes sociales</h4>
+              <p>Las redes sociales activan el mismo sistema de recompensa dopaminérgico que el trabajo intenso, impidiendo la recuperación real. Reserva los descansos para actividades físicas o de baja estimulación: caminar, estirarte, respirar profundo o simplemente mirar por la ventana.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
+              <h4>Registra las interrupciones en un papel</h4>
+              <p>Ten una hoja en blanco junto al teclado para anotar cualquier pensamiento, tarea o idea que surja durante el pomodoro. Esto libera la mente de la presión de "recordar" y permite volver al trabajo sin ansiedad. Revisar esa lista al final del día suele revelar patrones de distracción útiles para mejorar.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🕐</span>
+              <h4>Adapta el tamaño del bloque a tu cronotipo</h4>
+              <p>Las personas vespertinas (nocturnos) alcanzan su pico de concentración entre las 18:00 y las 21:00. Las matutinas, entre las 9:00 y las 12:00. Programa tus pomodoros de mayor exigencia cognitiva en tu ventana de máximo rendimiento, y reserva los bloques de menor concentración para tareas administrativas o rutinarias.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox} role="alert">
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>Errores comunes que sabotean la técnica</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Interrumpir el pomodoro constantemente.</strong> Cada vez que pausas y reanudas, el cerebro necesita entre 5 y 23 minutos para recuperar la concentración plena. Un pomodoro interrumpido es peor que no haber empezado: genera la falsa sensación de haber trabajado sin los beneficios reales.
+              </li>
+              <li>
+                <strong>Ignorar los descansos porque "estás en racha".</strong> Saltarse los descansos acumula fatiga cognitiva que se manifiesta horas después como errores, irritabilidad o bloqueo. La racha percibida no es concentración sostenida: es una señal de que el cerebro empieza a funcionar en piloto automático.
+              </li>
+              <li>
+                <strong>Hacer demasiados pomodoros seguidos sin descanso largo.</strong> Superar 4 pomodoros consecutivos sin pausa larga reduce el rendimiento en los siguientes bloques. Los estudios de Anders Ericsson sobre práctica deliberada en músicos y deportistas de élite confirman que 4 bloques de 90 min (o equivalente) es el máximo diario sostenible para trabajo cognitivo de alta exigencia.
+              </li>
+              <li>
+                <strong>No planificar las tareas previamente.</strong> Empezar un pomodoro sin saber exactamente qué hacer lleva a los primeros minutos de improvisación y búsqueda, que son los más valiosos para entrar en estado de flujo. La lista de tareas previa no es opcional: es parte del método.
+              </li>
+              <li>
+                <strong>Usar Pomodoro en tareas que requieren flujo continuo.</strong> Hay trabajos donde las interrupciones cada 25 minutos son contraproducentes: cirugía, sesiones de terapia, negociaciones largas o performances en directo. Para estas situaciones, métodos como Deep Work o Time Blocking son más adecuados.
+              </li>
+              <li>
+                <strong>No registrar ni revisar el progreso.</strong> Sin datos de cuántos pomodoros completas al día, es imposible mejorar la estimación de tareas ni identificar cuándo eres más productivo. Las estadísticas del temporizador son tu sistema de feedback. Revisarlas 5 minutos al final del día es la diferencia entre una herramienta y un sistema.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps

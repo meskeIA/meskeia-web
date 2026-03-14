@@ -1009,6 +1009,370 @@
 }
 
 /* ==========================================
+   EDUCATIONAL SECTION — PATRÓN v2.0
+   ========================================== */
+
+/* ── 1. Tabla Comparativa ── */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-top: var(--spacing-lg);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 700px;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.comparativaTable thead th {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.comparativaTable thead th:first-child {
+  border-radius: 0;
+}
+
+.comparativaTable tbody tr:nth-child(even) {
+  background: var(--hover);
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable td:first-child {
+  color: var(--text-primary);
+  min-width: 160px;
+}
+
+.comparativaTable td:not(:first-child) {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .comparativaTable thead th {
+  background: var(--primary);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: var(--border);
+}
+
+@media (max-width: 768px) {
+  .tableWrapper {
+    border-radius: var(--radius);
+  }
+  .comparativaTable {
+    font-size: 0.82rem;
+  }
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+/* ── 2. Casos de Uso (Escenarios) ── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.escenarioIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.escenarioHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.escenarioExample {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.escenarioTip {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(46, 134, 171, 0.07);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--secondary);
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .escenarioTip {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 3. FAQ ── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+}
+
+.faqItem h4 {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.faqItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.65;
+}
+
+.faqItem p + p {
+  margin-top: var(--spacing-sm);
+}
+
+.faqTip {
+  margin-top: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(72, 169, 166, 0.1);
+  border-radius: var(--radius);
+  font-style: italic;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+@media (max-width: 768px) {
+  .faqItem {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ── 4. Guía Paso a Paso ── */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.stepNumber {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.stepContent p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.65;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+@media (max-width: 768px) {
+  .step {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+  .stepNumber {
+    width: 34px;
+    height: 34px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ── 5. Mejores Prácticas — tipCard ya existe, añadir .tipIcon ── */
+.tipIcon {
+  font-size: 1.75rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 6. Warning Box ── */
+.warningBox {
+  background: #fff8e1;
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.warningIcon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.warningHeader h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0;
+}
+
+.warningList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-left: var(--spacing-lg);
+  margin: 0;
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  color: #78350f;
+  line-height: 1.6;
+  padding-left: var(--spacing-xs);
+}
+
+.warningList li strong {
+  color: #92400e;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: #F59E0B;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: #fbbf24;
+}
+
+@media (max-width: 768px) {
+  .warningBox {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+  .warningList {
+    padding-left: var(--spacing-md);
+  }
+}
+
+/* ==========================================
    ESTILOS DE IMPRESIÓN
    ==========================================
    Estos estilos se aplican al imprimir o
