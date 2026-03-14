@@ -885,7 +885,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto', description: 'Lee textos en voz alta' },
     { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Textos más fáciles de leer' },
     { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer con círculo de colores' },
-    { url: '/ejercicios-vocalizacion/', icon: '🎙️', name: 'Vocalización Parkinson', description: 'Ejercicios de voz con medidor' },
+    { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Expresa tu estado emocional visualmente' },
   ],
   'ejercicios-vocalizacion': [
     { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Técnicas de respiración consciente' },
@@ -897,31 +897,31 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer con círculo de colores' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC para comunicar' },
     { url: '/generador-tarjetas-comunicacion/', icon: '🃏', name: 'Generador de Tarjetas', description: 'Crea e imprime tarjetas AAC' },
-    { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Textos más fáciles de leer' },
+    { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Gestiona el estado emocional de la rutina' },
   ],
   'generador-tarjetas-comunicacion': [
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC en pantalla con voz' },
     { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Agenda visual con pictogramas' },
     { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Textos más fáciles de leer' },
-    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto', description: 'Lee textos en voz alta' },
+    { url: '/historias-sociales/', icon: '📖', name: 'Historias Sociales', description: 'Usa las tarjetas para ilustrar historias' },
   ],
   'semaforo-emocional': [
     { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Técnicas de calma para el estado rojo' },
     { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Estructura el día para reducir activación' },
-    { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Mide el tiempo de las estrategias' },
+    { url: '/historias-sociales/', icon: '📖', name: 'Historias Sociales', description: 'Prepara situaciones que generan activación' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Expresa lo que necesitas con símbolos' },
   ],
   'recordatorio-medicacion': [
     { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Organiza el día con horarios visuales' },
     { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Cuenta atrás hasta la próxima toma' },
     { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Gestiona el estado emocional en el día' },
-    { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Reduce la ansiedad asociada a medicación' },
+    { url: '/historias-sociales/', icon: '📖', name: 'Historias Sociales', description: 'Crea una historia sobre la rutina de medicación' },
   ],
   'historias-sociales': [
     { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Identifica el estado emocional antes de la situación' },
     { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Organiza el día visualmente con pictogramas' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Expresa emociones y necesidades con símbolos' },
-    { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Técnicas de calma para momentos difíciles' },
+    { url: '/recordatorio-medicacion/', icon: '💊', name: 'Recordatorio Medicación', description: 'Gestiona la rutina de medicación visualmente' },
   ],
 };
 
