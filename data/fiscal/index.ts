@@ -1,0 +1,15 @@
+/**
+ * data/fiscal — Datos fiscales meskeIA
+ *
+ * Repositorio centralizado de datos normativos para herramientas de
+ * orientación fiscal. Cada módulo incluye metadatos de versión:
+ * fuente, fecha de verificación y URL oficial.
+ *
+ * IMPORTANTE: Estos datos son orientativos. Actualizar trimestralmente
+ * o cuando se publiquen cambios normativos significativos.
+ *
+ * Última revisión: 2025-01-15
+ */
+
+export * from './autonomos';
+export * from './irpf';

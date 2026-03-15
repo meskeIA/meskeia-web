@@ -955,6 +955,38 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
   ],
+  // FAMILIA: FISCAL AUTÓNOMOS
+  // ==========================================
+  'estimador-cuota-autonomo': [
+    { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Estimador Sueldo Neto', description: 'Bruto a neto con IRPF y SS' },
+    { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
+    { url: '/asistente-alta-autonomo/', icon: '📋', name: 'Asistente Alta Autónomo', description: 'Trámites para darte de alta' },
+    { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Plazos y obligaciones fiscales' },
+  ],
+  'estimador-sueldo-neto': [
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuota RETA por ingresos reales' },
+    { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Optimiza tus deducciones' },
+    { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
+  ],
+  'orientador-gastos-deducibles': [
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuota RETA por ingresos reales' },
+    { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Estimador Sueldo Neto', description: 'Bruto a neto con IRPF y SS' },
+    { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'No pierdas ningún plazo fiscal' },
+    { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
+  ],
+  'calendario-fiscal-emprendedor': [
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuota RETA por ingresos reales' },
+    { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Optimiza tus deducciones' },
+    { url: '/asistente-alta-autonomo/', icon: '📋', name: 'Asistente Alta Autónomo', description: 'Trámites para darte de alta' },
+    { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
+  ],
+  'asistente-alta-autonomo': [
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuánto pagarás a la Seguridad Social' },
+    { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Tus obligaciones fiscales como autónomo' },
+    { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Qué puedes deducir' },
+    { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: '¿Autónomo o SL? Compara' },
+  ],
 };
 
 /**
@@ -1037,6 +1069,11 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'plazos-legales': { title: 'Más herramientas legales y fiscales', icon: '⚖️' },
     'comparador-formas-juridicas': { title: 'Herramientas para emprender', icon: '⚖️' },
     'asistente-constitucion-asociacion': { title: 'Más herramientas legales', icon: '⚖️' },
+    'estimador-cuota-autonomo': { title: 'Más herramientas para autónomos', icon: '💼' },
+    'estimador-sueldo-neto': { title: 'Más herramientas fiscales', icon: '💶' },
+    'orientador-gastos-deducibles': { title: 'Más herramientas fiscales', icon: '🧾' },
+    'calendario-fiscal-emprendedor': { title: 'Herramientas para emprendedores', icon: '📅' },
+    'asistente-alta-autonomo': { title: 'Más herramientas para autónomos', icon: '📋' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };

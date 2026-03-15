@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 257+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 262+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 257,
+  "total_tools": 262,
   "last_updated": "2026-03-15",
   "features": {
     "all_free": true,
@@ -56,7 +56,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 18
+      "tool_count": 23
     },
     {
       "id": "tecnicas",
@@ -84,7 +84,7 @@
       "name": "Legal y Fiscal",
       "icon": "⚖️",
       "description": "Orientación en impuestos, herencias, trámites legales y obligaciones fiscales en España",
-      "tool_count": 3
+      "tool_count": 8
     },
     {
       "id": "marketing",
@@ -121,7 +121,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 103
+      "tool_count": 108
     },
     {
       "id": "estudio",
@@ -142,7 +142,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 49
+      "tool_count": 54
     },
     {
       "id": "creando",
@@ -163,7 +163,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 46
+      "tool_count": 47
     }
   ],
   "tools": [
@@ -6434,6 +6434,127 @@
         "fundadores"
       ],
       "icon": "🎗️"
+    },
+    {
+      "slug": "estimador-cuota-autonomo",
+      "name": "Estimador de Cuota de Autónomo",
+      "url": "https://meskeia.com/estimador-cuota-autonomo/",
+      "description": "Estima orientativamente tu cuota mensual a la Seguridad Social según el sistema de cotización por ingresos reales 2025. Incluye tabla de tramos RETA y bonificaciones disponibles",
+      "suites": [
+        "legal-fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "cuota autonomo",
+        "cotizacion reta",
+        "ingresos reales",
+        "tramos autonomo",
+        "tarifa plana autonomo",
+        "base cotizacion",
+        "seguridad social autonomo 2025"
+      ],
+      "icon": "💼"
+    },
+    {
+      "slug": "estimador-sueldo-neto",
+      "name": "Estimador de Sueldo Neto",
+      "url": "https://meskeia.com/estimador-sueldo-neto/",
+      "description": "Oriéntate sobre tu sueldo neto a partir del bruto o viceversa. Incluye IRPF, Seguridad Social y deducciones personales y familiares para España 2025",
+      "suites": [
+        "legal-fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "sueldo neto bruto",
+        "irpf 2025",
+        "seguridad social trabajador",
+        "nomina",
+        "retencion irpf",
+        "calcular neto",
+        "salario neto"
+      ],
+      "icon": "💶"
+    },
+    {
+      "slug": "orientador-gastos-deducibles",
+      "name": "Orientador de Gastos Deducibles",
+      "url": "https://meskeia.com/orientador-gastos-deducibles/",
+      "description": "Oriéntate sobre qué gastos puedes deducir como autónomo en España y estima tu ahorro fiscal potencial en IRPF e IVA. Herramienta educativa para autónomos en estimación directa",
+      "suites": [
+        "legal-fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "gastos deducibles autonomo",
+        "deducir gastos irpf",
+        "iva soportado",
+        "estimacion directa",
+        "ahorro fiscal",
+        "gastos profesionales"
+      ],
+      "icon": "🧾"
+    },
+    {
+      "slug": "calendario-fiscal-emprendedor",
+      "name": "Calendario Fiscal Emprendedor",
+      "url": "https://meskeia.com/calendario-fiscal-emprendedor/",
+      "description": "Consulta orientativa del calendario de obligaciones fiscales para autónomos y sociedades en España 2025. Plazos de modelos 303, 130, 111, 190, 347, 100 y más",
+      "suites": [
+        "legal-fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "calendario fiscal autonomo",
+        "modelos tributarios",
+        "plazos aeat",
+        "modelo 303",
+        "modelo 130",
+        "declaracion trimestral",
+        "obligaciones fiscales"
+      ],
+      "icon": "📅"
+    },
+    {
+      "slug": "asistente-alta-autonomo",
+      "name": "Asistente Alta Autónomo",
+      "url": "https://meskeia.com/asistente-alta-autonomo/",
+      "description": "Asistente orientativo paso a paso para darte de alta como autónomo en España. Información sobre trámites, bases de cotización, tarifa plana y obligaciones fiscales iniciales",
+      "suites": [
+        "legal-fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero",
+        "curiosidad"
+      ],
+      "keywords": [
+        "alta autonomo",
+        "darse de alta autonomo",
+        "tramites autonomo",
+        "reta",
+        "tarifa plana",
+        "modelo 036",
+        "modelo 037",
+        "hacienda autonomo"
+      ],
+      "icon": "📋"
     }
   ],
   "llm_instructions": {
