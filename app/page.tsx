@@ -89,6 +89,15 @@ const guidesData = [
     toolsCount: 9,
     available: true,
   },
+  {
+    id: 'herencias',
+    name: 'Guía para Gestionar una Herencia',
+    icon: '📜',
+    description: 'Documentos, impuestos y plazos para tramitar una herencia en España',
+    url: '/guia/herencias/',
+    toolsCount: 4,
+    available: true,
+  },
 ];
 
 function HomeContent() {

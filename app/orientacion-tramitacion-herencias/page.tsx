@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './OrientacionHerencias.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
 import Link from 'next/link';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -711,6 +711,7 @@ export default function OrientacionTramitacionHerenciasPage() {
         </section>
       </EducationalSection>
 
+      <ShareCard appName="orientacion-tramitacion-herencias" />
       <RelatedApps apps={getRelatedApps('orientacion-tramitacion-herencias')} />
       <Footer appName="orientacion-tramitacion-herencias" />
     </div>
