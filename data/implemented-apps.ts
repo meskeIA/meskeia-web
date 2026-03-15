@@ -326,6 +326,8 @@ export const implementedAppsUrls = [
   "/estimador-irpf/",                   // Estimador orientativo cuota IRPF 2025 con tramos y mínimos
   "/estimador-plusvalias-irpf/",        // Estimador ganancias patrimoniales base del ahorro IRPF 2025
   "/comparador-autonomo-vs-sl/",        // Comparador fiscal autónomo vs sociedad limitada
+  "/estimador-impuesto-sucesiones/",    // Estimador ISD sucesiones 17 CCAA (estatal + Cataluña + forales)
+  "/estimador-impuesto-donaciones/",    // Estimador ISD donaciones 17 CCAA (estatal + Cataluña + forales)
 ];
 
 /**
