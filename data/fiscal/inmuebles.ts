@@ -128,8 +128,53 @@ export const COSTES_COMPRAVENTA_2025 = {
 
 export const PLUSVALIA_MUNICIPAL_META = {
   nombre: 'Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (IIVTNU)',
-  baseNormativa: 'RDL 26/2021, de 8 de noviembre (método objetivo o directo)',
-  quien: 'Paga el vendedor. En herencias, el heredero.',
-  nota: 'El importe varía enormemente según el municipio (tipo máximo 30%), los años de tenencia y el valor catastral del suelo. Consultar al Ayuntamiento o gestoría.',
+  baseNormativa: 'RDL 26/2021, de 8 de noviembre + coeficientes actualizados por Ley de Presupuestos',
+  quien: 'Paga el vendedor. En herencias, el heredero. En donaciones, el donatario.',
+  tipoMaximoLegal: 30,  // % — Límite legal que ningún municipio puede superar
+  tipoOrientativo: 25,  // % — Media orientativa para estimaciones sin dato municipal
+  nota: 'El tipo impositivo lo fija cada Ayuntamiento hasta el máximo legal del 30%. Consulta el tipo exacto de tu municipio antes de calcular.',
   urlReferencia: 'https://sede.agenciatributaria.gob.es',
+  verificado: '2025-01-15',
+  vigencia: '2025',
+  aviso: 'Los coeficientes se actualizan anualmente por Ley de Presupuestos. Verificar para el ejercicio en curso.',
 };
+
+/**
+ * Coeficientes máximos IIVTNU por años de tenencia — 2025
+ *
+ * Fuente: RDL 26/2021 + actualización anual vía Ley de Presupuestos.
+ * Los Ayuntamientos pueden aplicar coeficientes INFERIORES a estos máximos.
+ * Para calcular: Base imponible = Valor catastral del suelo × coeficiente
+ *
+ * ⚠️ Si España no aprueba PGE, se prorrogan los del ejercicio anterior.
+ * Verificar en: https://www.hacienda.gob.es
+ */
+export interface CoeficienteIIVTNU {
+  anios: number;        // Años de tenencia (0 = menos de 1 año)
+  label: string;        // Etiqueta legible
+  coeficiente: number;  // Coeficiente máximo legal
+}
+
+export const COEFICIENTES_IIVTNU_2025: CoeficienteIIVTNU[] = [
+  { anios: 0,  label: 'Menos de 1 año',  coeficiente: 0.14 },
+  { anios: 1,  label: '1 año',           coeficiente: 0.13 },
+  { anios: 2,  label: '2 años',          coeficiente: 0.15 },
+  { anios: 3,  label: '3 años',          coeficiente: 0.16 },
+  { anios: 4,  label: '4 años',          coeficiente: 0.17 },
+  { anios: 5,  label: '5 años',          coeficiente: 0.17 },
+  { anios: 6,  label: '6 años',          coeficiente: 0.16 },
+  { anios: 7,  label: '7 años',          coeficiente: 0.12 },
+  { anios: 8,  label: '8 años',          coeficiente: 0.10 },
+  { anios: 9,  label: '9 años',          coeficiente: 0.09 },
+  { anios: 10, label: '10 años',         coeficiente: 0.08 },
+  { anios: 11, label: '11 años',         coeficiente: 0.08 },
+  { anios: 12, label: '12 años',         coeficiente: 0.08 },
+  { anios: 13, label: '13 años',         coeficiente: 0.08 },
+  { anios: 14, label: '14 años',         coeficiente: 0.10 },
+  { anios: 15, label: '15 años',         coeficiente: 0.12 },
+  { anios: 16, label: '16 años',         coeficiente: 0.16 },
+  { anios: 17, label: '17 años',         coeficiente: 0.20 },
+  { anios: 18, label: '18 años',         coeficiente: 0.26 },
+  { anios: 19, label: '19 años',         coeficiente: 0.36 },
+  { anios: 20, label: '20 o más años',   coeficiente: 0.45 },
+];

@@ -1,0 +1,535 @@
+/* ── EstimadorPlusvaliaMunicipal.module.css ── */
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary, #1A1A1A);
+  background: var(--bg-primary, #FAFAFA);
+}
+
+[data-theme='dark'] .container {
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --border: #404040;
+}
+
+/* ── Hero ─────────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  border-radius: 16px;
+  color: white;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.92;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Aviso metodológico ───────────────────────────────── */
+.avisoMetodologico {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: #e8f4fd;
+  border: 1px solid #b3d7f0;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #1a4a6b;
+}
+
+[data-theme='dark'] .avisoMetodologico {
+  background: #1a3a50;
+  border-color: #2E86AB;
+  color: #a8d4ef;
+}
+
+.avisoIcon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* ── Layout principal ─────────────────────────────────── */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Panel de inputs ──────────────────────────────────── */
+.inputPanel,
+.resultsPanel {
+  background: var(--bg-card, #fff);
+  border-radius: 16px;
+  padding: 1.75rem;
+  border: 1px solid var(--border, #E5E5E5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+[data-theme='dark'] .inputPanel,
+[data-theme='dark'] .resultsPanel {
+  background: #2A2A2A;
+  border-color: #404040;
+}
+
+.panelTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+  color: var(--text-primary, #1A1A1A);
+}
+
+[data-theme='dark'] .panelTitle {
+  color: #E5E5E5;
+}
+
+/* ── Field group ──────────────────────────────────────── */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary, #1A1A1A);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+[data-theme='dark'] .label {
+  color: #E5E5E5;
+}
+
+.coefBadge {
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: #2E86AB;
+  color: white;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+}
+
+.select {
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--border, #E5E5E5);
+  border-radius: 10px;
+  font-size: 0.92rem;
+  background: var(--bg-primary, #FAFAFA);
+  color: var(--text-primary, #1A1A1A);
+  cursor: pointer;
+  appearance: auto;
+}
+
+[data-theme='dark'] .select {
+  background: #1A1A1A;
+  border-color: #555;
+  color: #E5E5E5;
+}
+
+.select:focus {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.helperText {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+}
+
+[data-theme='dark'] .helperText {
+  color: #B0B0B0;
+}
+
+/* ── Toggle método real ───────────────────────────────── */
+.toggleSection {
+  background: var(--bg-primary, #F5F5F5);
+  border: 1.5px dashed var(--border, #DDD);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+[data-theme='dark'] .toggleSection {
+  background: #222;
+  border-color: #555;
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.92rem;
+  color: var(--text-primary, #1A1A1A);
+}
+
+[data-theme='dark'] .toggleLabel {
+  color: #E5E5E5;
+}
+
+.toggleInput {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #2E86AB;
+  cursor: pointer;
+}
+
+.toggleText { line-height: 1.4; }
+
+.metodorealPanel {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border, #E5E5E5);
+}
+
+[data-theme='dark'] .metodorealPanel {
+  border-color: #404040;
+}
+
+.subPanelTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: #2E86AB;
+}
+
+/* ── Errores ──────────────────────────────────────────── */
+.errores {
+  background: #fef3f2;
+  border: 1.5px solid #f87171;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+}
+
+[data-theme='dark'] .errores {
+  background: #3a1a1a;
+  border-color: #f87171;
+}
+
+.errorItem {
+  font-size: 0.88rem;
+  color: #b91c1c;
+  margin: 0.2rem 0;
+}
+
+[data-theme='dark'] .errorItem {
+  color: #fca5a5;
+}
+
+/* ── Botones ──────────────────────────────────────────── */
+.btnRow {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.btnPrimary {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.85rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: #2E86AB;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnPrimary:hover {
+  background: #256a8a;
+  transform: translateY(-1px);
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.btnSecondary {
+  padding: 0.85rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: 1.5px solid var(--border, #DDD);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnSecondary:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.btnSecondary:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+/* ── Resultados ───────────────────────────────────────── */
+.metodoSection {
+  margin-bottom: 1.5rem;
+}
+
+.metodoTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary, #1A1A1A);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+[data-theme='dark'] .metodoTitle {
+  color: #E5E5E5;
+}
+
+.recomendadoBadge {
+  font-size: 0.75rem;
+  background: #48A9A6;
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.resultadoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 500px) {
+  .resultadoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sinGanancia {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .sinGanancia {
+  background: #1a3320;
+  border-color: #4ade80;
+  color: #a7f3d0;
+}
+
+.sinGananciaIcon { font-size: 1.5rem; flex-shrink: 0; }
+
+.avisoIncompleto {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #888);
+  margin: 0.5rem 0 0;
+  font-style: italic;
+}
+
+[data-theme='dark'] .avisoIncompleto {
+  color: #B0B0B0;
+}
+
+.notaCalculo {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-primary, #F5F5F5);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #555);
+}
+
+[data-theme='dark'] .notaCalculo {
+  background: #333;
+  color: #B0B0B0;
+}
+
+/* ── Aviso específico IIVTNU ──────────────────────────── */
+.avisoEspecifico {
+  background: #fff8e7;
+  border: 2px solid #f59e0b;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+}
+
+[data-theme='dark'] .avisoEspecifico {
+  background: #2a2010;
+  border-color: #f59e0b;
+}
+
+.avisoEspecificoTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  color: #92400e;
+}
+
+[data-theme='dark'] .avisoEspecificoTitle {
+  color: #fbbf24;
+}
+
+.avisoLista {
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #78350f;
+}
+
+[data-theme='dark'] .avisoLista {
+  color: #fde68a;
+}
+
+.avisoConclusion {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #78350f;
+  margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f59e0b;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .avisoConclusion {
+  color: #fde68a;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+/* ── Sección educativa ────────────────────────────────── */
+.guideSection {
+  margin-bottom: 1.5rem;
+}
+
+.guideSection h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 0 0 0.5rem;
+}
+
+.guideSection p,
+.guideSection li {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--text-secondary, #444);
+  margin: 0.25rem 0;
+}
+
+[data-theme='dark'] .guideSection p,
+[data-theme='dark'] .guideSection li {
+  color: #B0B0B0;
+}
+
+.guideSection ul {
+  padding-left: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+/* ── Tabla coeficientes ───────────────────────────────── */
+.tablaScroll {
+  overflow-x: auto;
+  margin: 1rem 0 0.5rem;
+}
+
+.tablaCoeficientes {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tablaCoeficientes th {
+  background: #2E86AB;
+  color: white;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tablaCoeficientes td {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border, #E5E5E5);
+  color: var(--text-primary, #1A1A1A);
+}
+
+[data-theme='dark'] .tablaCoeficientes td {
+  border-color: #404040;
+  color: #E5E5E5;
+}
+
+.tablaCoeficientes tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+[data-theme='dark'] .tablaCoeficientes tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.tablaNote {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #888);
+  font-style: italic;
+  margin: 0.5rem 0 0;
+}
+
+[data-theme='dark'] .tablaNote {
+  color: #B0B0B0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(*), :global(*::before), :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

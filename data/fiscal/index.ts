@@ -17,3 +17,4 @@ export * from './sociedades';
 export * from './inmuebles';
 export * from './sucesiones';
 export * from './donaciones';
+export * from './intereses';
