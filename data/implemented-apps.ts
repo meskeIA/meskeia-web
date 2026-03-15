@@ -323,6 +323,9 @@ export const implementedAppsUrls = [
   "/orientador-gastos-deducibles/",     // Orientador gastos deducibles autónomo IRPF+IVA
   "/calendario-fiscal-emprendedor/",    // Calendario fiscal obligaciones autónomos y sociedades 2025
   "/asistente-alta-autonomo/",          // Asistente orientativo para darse de alta como autónomo
+  "/estimador-irpf/",                   // Estimador orientativo cuota IRPF 2025 con tramos y mínimos
+  "/estimador-plusvalias-irpf/",        // Estimador ganancias patrimoniales base del ahorro IRPF 2025
+  "/comparador-autonomo-vs-sl/",        // Comparador fiscal autónomo vs sociedad limitada
 ];
 
 /**

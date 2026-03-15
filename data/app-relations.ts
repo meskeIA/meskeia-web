@@ -985,7 +985,27 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuánto pagarás a la Seguridad Social' },
     { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Tus obligaciones fiscales como autónomo' },
     { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Qué puedes deducir' },
-    { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: '¿Autónomo o SL? Compara' },
+    { url: '/comparador-autonomo-vs-sl/', icon: '⚖️', name: 'Comparador Autónomo vs SL', description: '¿Cuándo conviene una SL?' },
+  ],
+  // FAMILIA: IRPF Y FISCAL GENERAL
+  // ==========================================
+  'estimador-irpf': [
+    { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Estimador Sueldo Neto', description: 'IRPF + SS en tu nómina' },
+    { url: '/estimador-plusvalias-irpf/', icon: '💹', name: 'Estimador Plusvalías IRPF', description: 'IRPF por venta de activos' },
+    { url: '/comparador-autonomo-vs-sl/', icon: '⚖️', name: 'Comparador Autónomo vs SL', description: 'Comparativa fiscal completa' },
+    { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Plazos y obligaciones fiscales' },
+  ],
+  'estimador-plusvalias-irpf': [
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuota íntegra declaración renta' },
+    { url: '/simulador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Todos los gastos de compraventa' },
+    { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Estimador Sueldo Neto', description: 'Tu sueldo neto con IRPF' },
+    { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
+  ],
+  'comparador-autonomo-vs-sl': [
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuota RETA por ingresos reales' },
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuánto pagarás en la renta' },
+    { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
+    { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Obligaciones fiscales como autónomo o SL' },
   ],
 };
 
@@ -1074,6 +1094,9 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'orientador-gastos-deducibles': { title: 'Más herramientas fiscales', icon: '🧾' },
     'calendario-fiscal-emprendedor': { title: 'Herramientas para emprendedores', icon: '📅' },
     'asistente-alta-autonomo': { title: 'Más herramientas para autónomos', icon: '📋' },
+    'estimador-irpf': { title: 'Más herramientas fiscales', icon: '📊' },
+    'estimador-plusvalias-irpf': { title: 'Herramientas de fiscalidad patrimonial', icon: '💹' },
+    'comparador-autonomo-vs-sl': { title: 'Herramientas para emprendedores', icon: '⚖️' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };

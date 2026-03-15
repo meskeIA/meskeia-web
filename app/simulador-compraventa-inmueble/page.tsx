@@ -276,9 +276,9 @@ export default function SimuladorCompraventaPage() {
       {/* Hero Section */}
       <header className={styles.hero}>
         <span className={styles.heroIcon}>🏠</span>
-        <h1 className={styles.title}>Simulador de Compraventa Inmobiliaria</h1>
+        <h1 className={styles.title}>Estimador de Gastos de Compraventa Inmobiliaria</h1>
         <p className={styles.subtitle}>
-          Calcula todos los gastos de compra y venta de inmuebles en España: vivienda, garaje, trastero,
+          Oriéntate sobre los gastos de compra y venta de inmuebles en España: vivienda, garaje, trastero,
           local comercial, nave industrial y terreno. ITP/IVA por comunidad autónoma, notaría, registro y plusvalía.
         </p>
       </header>

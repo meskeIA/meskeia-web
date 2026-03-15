@@ -13,3 +13,5 @@
 
 export * from './autonomos';
 export * from './irpf';
+export * from './sociedades';
+export * from './inmuebles';
