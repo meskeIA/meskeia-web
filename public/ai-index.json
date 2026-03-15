@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 250+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 263,
+  "total_tools": 279,
   "updated": "2026-03-15",
   "features": {
     "all_free": true,
@@ -677,6 +677,109 @@
           "slug": "orientador-intereses-demora",
           "url": "https://meskeia.com/orientador-intereses-demora/",
           "description": "Estima los intereses por facturas impagadas o deudas vencidas. Interés comercial (Ley 3/2004, BCE+8pp) e interés legal del dinero (Código Civil) para España 2025."
+        }
+      ]
+    },
+    {
+      "name": "Legal y Fiscal",
+      "description": "Impuestos, trámites legales, autónomos, herencias y obligaciones fiscales en España",
+      "icon": "⚖️",
+      "tools": [
+        {
+          "name": "Estimador IRPF",
+          "slug": "estimador-irpf",
+          "url": "https://meskeia.com/estimador-irpf/",
+          "description": "Estima tu cuota de IRPF 2025: tramos, mínimos personales y familiares, retenciones"
+        },
+        {
+          "name": "Estimador Plusvalías IRPF",
+          "slug": "estimador-plusvalias-irpf",
+          "url": "https://meskeia.com/estimador-plusvalias-irpf/",
+          "description": "Estima el IRPF por venta de inmuebles, fondos o acciones. Tramos base del ahorro 2025"
+        },
+        {
+          "name": "Estimador Sueldo Neto",
+          "slug": "estimador-sueldo-neto",
+          "url": "https://meskeia.com/estimador-sueldo-neto/",
+          "description": "Calcula tu sueldo neto desde el bruto o viceversa. IRPF y Seguridad Social 2025"
+        },
+        {
+          "name": "Estimador Cuota de Autónomo",
+          "slug": "estimador-cuota-autonomo",
+          "url": "https://meskeia.com/estimador-cuota-autonomo/",
+          "description": "Estima tu cuota mensual RETA según ingresos reales 2025. Tramos y bonificaciones"
+        },
+        {
+          "name": "Comparador Autónomo vs SL",
+          "slug": "comparador-autonomo-vs-sl",
+          "url": "https://meskeia.com/comparador-autonomo-vs-sl/",
+          "description": "Compara la carga fiscal entre ser autónomo y constituir una Sociedad Limitada"
+        },
+        {
+          "name": "Orientador de Gastos Deducibles",
+          "slug": "orientador-gastos-deducibles",
+          "url": "https://meskeia.com/orientador-gastos-deducibles/",
+          "description": "Qué gastos puedes deducir como autónomo en IRPF e IVA. Estimación ahorro fiscal"
+        },
+        {
+          "name": "Calendario Fiscal Emprendedor",
+          "slug": "calendario-fiscal-emprendedor",
+          "url": "https://meskeia.com/calendario-fiscal-emprendedor/",
+          "description": "Plazos de obligaciones fiscales para autónomos y sociedades 2025. Modelos 303, 130, 111..."
+        },
+        {
+          "name": "Asistente Alta Autónomo",
+          "slug": "asistente-alta-autonomo",
+          "url": "https://meskeia.com/asistente-alta-autonomo/",
+          "description": "Guía paso a paso para darse de alta como autónomo. Trámites, bases de cotización y tarifa plana"
+        },
+        {
+          "name": "Comparador de Formas Jurídicas",
+          "slug": "comparador-formas-juridicas",
+          "url": "https://meskeia.com/comparador-formas-juridicas/",
+          "description": "Compara autónomo, SL, cooperativa, asociación y comunidad de bienes. Capital, fiscalidad y trámites"
+        },
+        {
+          "name": "Asistente Constitución Sociedad",
+          "slug": "asistente-constitucion-sociedad",
+          "url": "https://meskeia.com/asistente-constitucion-sociedad/",
+          "description": "Guía para constituir SL, SLU o SA. Checklist 20 trámites, datos sociales y estimación de costes"
+        },
+        {
+          "name": "Asistente Constitución Asociación",
+          "slug": "asistente-constitucion-asociacion",
+          "url": "https://meskeia.com/asistente-constitucion-asociacion/",
+          "description": "Guía para constituir una asociación sin ánimo de lucro. Acta fundacional y estatutos orientativos"
+        },
+        {
+          "name": "Estimador Impuesto de Sucesiones",
+          "slug": "estimador-impuesto-sucesiones",
+          "url": "https://meskeia.com/estimador-impuesto-sucesiones/",
+          "description": "Estima el Impuesto de Sucesiones en las 17 CCAA. Tarifa estatal, Cataluña y regímenes forales"
+        },
+        {
+          "name": "Estimador Impuesto de Donaciones",
+          "slug": "estimador-impuesto-donaciones",
+          "url": "https://meskeia.com/estimador-impuesto-donaciones/",
+          "description": "Estima el Impuesto de Donaciones en las 17 CCAA. Bonificaciones autonómicas y regímenes forales"
+        },
+        {
+          "name": "Orientación Tramitación Herencias",
+          "slug": "orientacion-tramitacion-herencias",
+          "url": "https://meskeia.com/orientacion-tramitacion-herencias/",
+          "description": "Checklist personalizado de documentos y timeline de 9 pasos para tramitar una herencia en España"
+        },
+        {
+          "name": "Guía de Plazos Legales",
+          "slug": "plazos-legales",
+          "url": "https://meskeia.com/plazos-legales/",
+          "description": "Plazos de prescripción y caducidad en España: garantías, deudas, laboral, fiscal y tráfico"
+        },
+        {
+          "name": "Guía para Gestionar una Herencia",
+          "slug": "guia/herencias",
+          "url": "https://meskeia.com/guia/herencias/",
+          "description": "Guía completa: documentos, impuestos y plazos para tramitar una herencia en España. 4 herramientas integradas"
         }
       ]
     },
@@ -1747,5 +1850,5 @@
     "llm_index": "https://meskeia.com/llm-index.json",
     "sitemap": "https://meskeia.com/sitemap.xml"
   },
-  "last_updated": "2026-02-23"
+  "last_updated": "2026-03-15"
 }
