@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 262+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 272+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 262,
+  "total_tools": 272,
   "last_updated": "2026-03-15",
   "features": {
     "all_free": true,
@@ -15,113 +15,14 @@
     "dark_mode": true,
     "spanish_number_format": true
   },
-  "suites": [
-    {
-      "id": "accesibilidad",
-      "name": "Accesibilidad e Inclusión",
-      "icon": "♿",
-      "description": "Herramientas para personas con autismo, TDAH, dislexia, discapacidad visual o cognitiva",
-      "tool_count": 15
-    },
-    {
-      "id": "cultura",
-      "name": "Cultura General",
-      "icon": "📚",
-      "description": "Conocimiento, referencias y aprendizaje",
-      "tool_count": 46
-    },
-    {
-      "id": "diseno",
-      "name": "Diseño y Desarrollo",
-      "icon": "🎨",
-      "description": "Herramientas para diseñadores y desarrolladores",
-      "tool_count": 28
-    },
-    {
-      "id": "estudiantes",
-      "name": "Estudiantes",
-      "icon": "🧮",
-      "description": "Matemáticas, ciencias y herramientas de estudio",
-      "tool_count": 58
-    },
-    {
-      "id": "finanzas",
-      "name": "Finanzas e Inversión",
-      "icon": "📈",
-      "description": "Ahorro, inversión y planificación financiera",
-      "tool_count": 36
-    },
-    {
-      "id": "freelance",
-      "name": "Freelance y Autónomo",
-      "icon": "💼",
-      "description": "Herramientas para profesionales independientes",
-      "tool_count": 23
-    },
-    {
-      "id": "tecnicas",
-      "name": "Herramientas Técnicas",
-      "icon": "🔧",
-      "description": "Herramientas especializadas y técnicas",
-      "tool_count": 32
-    },
-    {
-      "id": "inmobiliaria",
-      "name": "Inmobiliaria y Hogar",
-      "icon": "🏘️",
-      "description": "Hipotecas, alquiler y gestión del hogar",
-      "tool_count": 24
-    },
-    {
-      "id": "juegos",
-      "name": "Juegos y Ocio",
-      "icon": "🎲",
-      "description": "Diversión y entretenimiento",
-      "tool_count": 23
-    },
-    {
-      "id": "legal-fiscal",
-      "name": "Legal y Fiscal",
-      "icon": "⚖️",
-      "description": "Orientación en impuestos, herencias, trámites legales y obligaciones fiscales en España",
-      "tool_count": 8
-    },
-    {
-      "id": "marketing",
-      "name": "Marketing y Contenido",
-      "icon": "📢",
-      "description": "SEO, redes sociales y creación de contenido",
-      "tool_count": 25
-    },
-    {
-      "id": "productividad",
-      "name": "Productividad",
-      "icon": "⚡",
-      "description": "Organización personal y herramientas del día a día",
-      "tool_count": 50
-    },
-    {
-      "id": "salud",
-      "name": "Salud y Bienestar",
-      "icon": "🏥",
-      "description": "Salud personal, nutrición y cuidado de mascotas",
-      "tool_count": 39
-    },
-    {
-      "id": "viajes",
-      "name": "Viajes y Turismo",
-      "icon": "✈️",
-      "description": "Planifica viajes, divisas, enchufes y presupuestos de viaje",
-      "tool_count": 14
-    }
-  ],
+  "suites": [],
   "moments": [
     {
       "id": "trabajo",
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 108
+      "tool_count": 113
     },
     {
       "id": "estudio",
@@ -135,14 +36,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 90
+      "tool_count": 95
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 54
+      "tool_count": 64
     },
     {
       "id": "creando",
@@ -1667,7 +1568,8 @@
       "url": "https://meskeia.com/calculadora-jubilacion/",
       "description": "Planifica tu jubilación calculando ahorros necesarios y pensión estimada",
       "suites": [
-        "finanzas"
+        "finanzas",
+        "jubilacion"
       ],
       "contexts": [
         "dinero"
@@ -2029,7 +1931,8 @@
       "url": "https://meskeia.com/calculadora-fire/",
       "description": "Calcula cuánto necesitas para alcanzar la independencia financiera (FIRE). Regla del 4% y proyección hasta tu retiro anticipado",
       "suites": [
-        "finanzas"
+        "finanzas",
+        "jubilacion"
       ],
       "contexts": [
         "dinero"
@@ -2120,7 +2023,8 @@
       "url": "https://meskeia.com/calculadora-seguro-vida/",
       "description": "Calcula cuánto seguro de vida necesitas para proteger a tu familia según tus ingresos, deudas, hipoteca y situación familiar",
       "suites": [
-        "finanzas"
+        "finanzas",
+        "jubilacion"
       ],
       "contexts": [
         "dinero",
@@ -4067,7 +3971,8 @@
       "url": "https://meskeia.com/calculadora-tension-arterial/",
       "description": "Clasifica tu presión arterial según guías ESH/ESC 2018: óptima, normal, normal-alta, HTA Grado 1/2/3 o crisis hipertensiva. Calcula TAM, presión de pulso y guarda historial local",
       "suites": [
-        "salud"
+        "salud",
+        "jubilacion"
       ],
       "contexts": [
         "casa",
@@ -4094,7 +3999,8 @@
       "url": "https://meskeia.com/planificador-chequeos-medicos/",
       "description": "Consulta qué revisiones médicas preventivas te corresponden según tu edad y sexo. Basado en recomendaciones del Ministerio de Sanidad y SEMFyC. Marca las revisiones completadas en la sesión",
       "suites": [
-        "salud"
+        "salud",
+        "jubilacion"
       ],
       "contexts": [
         "casa",
@@ -4660,7 +4566,8 @@
       "url": "https://meskeia.com/calculadora-colesterol/",
       "description": "Analiza tus niveles de colesterol: ratios CT/HDL, LDL/HDL, fórmula de Friedewald y recomendaciones de riesgo cardiovascular",
       "suites": [
-        "salud"
+        "salud",
+        "jubilacion"
       ],
       "contexts": [
         "casa"
@@ -6555,6 +6462,237 @@
         "hacienda autonomo"
       ],
       "icon": "📋"
+    },
+    {
+      "slug": "estimador-irpf",
+      "name": "Estimador IRPF",
+      "url": "https://meskeia.com/estimador-irpf/",
+      "description": "Estima orientativamente tu cuota de IRPF 2025: cuota íntegra por tramos, mínimos personales y familiares, retenciones y resultado orientativo (a pagar o devolver)",
+      "suites": [
+        "legal-fiscal",
+        "jubilacion"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "estimador irpf",
+        "declaracion renta 2025",
+        "cuota irpf",
+        "tramos irpf",
+        "minimo personal",
+        "retencion irpf",
+        "a pagar devolver hacienda"
+      ],
+      "icon": "📊"
+    },
+    {
+      "slug": "estimador-plusvalias-irpf",
+      "name": "Estimador Plusvalías IRPF",
+      "url": "https://meskeia.com/estimador-plusvalias-irpf/",
+      "description": "Estima orientativamente el IRPF a pagar por la venta de inmuebles, fondos, acciones u otros activos. Calcula la ganancia patrimonial y aplica los tramos de la base del ahorro 2025",
+      "suites": [
+        "legal-fiscal",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero",
+        "trabajo"
+      ],
+      "keywords": [
+        "plusvalias irpf",
+        "ganancias patrimoniales",
+        "venta inmueble impuestos",
+        "venta acciones irpf",
+        "base del ahorro 2025",
+        "calculo plusvalia"
+      ],
+      "icon": "💹"
+    },
+    {
+      "slug": "comparador-autonomo-vs-sl",
+      "name": "Comparador Autónomo vs SL",
+      "url": "https://meskeia.com/comparador-autonomo-vs-sl/",
+      "description": "Compara orientativamente la carga fiscal entre ser autónomo (IRPF + RETA) y constituir una Sociedad Limitada (IS + dividendos). Descubre qué conviene más según tu nivel de ingresos",
+      "suites": [
+        "legal-fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "autonomo vs sl",
+        "autónomo o sociedad limitada",
+        "cuando crear sl",
+        "fiscalidad sl",
+        "is 25",
+        "comparativa fiscal autonomo sociedad"
+      ],
+      "icon": "⚖️"
+    },
+    {
+      "slug": "estimador-impuesto-sucesiones",
+      "name": "Estimador Impuesto de Sucesiones",
+      "url": "https://meskeia.com/estimador-impuesto-sucesiones/",
+      "description": "Estima orientativamente el Impuesto de Sucesiones (ISD) en las 17 comunidades autónomas de España. Incluye tarifa estatal, Cataluña y regímenes forales (PV, Navarra). Siempre con advertencia de consultar asesor fiscal.",
+      "suites": [
+        "legal-fiscal",
+        "jubilacion"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "impuesto sucesiones",
+        "herencias españa",
+        "ISD 2025",
+        "calculadora sucesiones",
+        "herencia ccaa",
+        "bonificacion sucesiones"
+      ],
+      "icon": "⚖️"
+    },
+    {
+      "slug": "estimador-impuesto-donaciones",
+      "name": "Estimador Impuesto de Donaciones",
+      "url": "https://meskeia.com/estimador-impuesto-donaciones/",
+      "description": "Estima orientativamente el Impuesto de Donaciones en las 17 comunidades autónomas de España. Régimen común (14 CCAA) con bonificaciones, más Cataluña (tarifa propia), País Vasco y Navarra (régimen foral aproximado).",
+      "suites": [
+        "legal-fiscal",
+        "jubilacion"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "impuesto donaciones",
+        "donacion españa",
+        "ISD donaciones 2025",
+        "calculadora donaciones ccaa",
+        "donacion inmueble impuesto"
+      ],
+      "icon": "🎁"
+    },
+    {
+      "slug": "asistente-constitucion-sociedad",
+      "name": "Asistente Constitución Sociedad",
+      "url": "https://meskeia.com/asistente-constitucion-sociedad/",
+      "description": "Guía paso a paso para constituir una SL, SLU o SA en España. Checklist de 20 trámites organizados en 4 fases, formulario de datos sociales y estimación de costes (notaría, registro, gestoría).",
+      "suites": [
+        "legal-fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "constituir sociedad limitada",
+        "crear sl",
+        "costes sl",
+        "alta sociedad",
+        "asistente constitucion sociedad",
+        "tramites crear empresa"
+      ],
+      "icon": "🏢"
+    },
+    {
+      "slug": "orientacion-tramitacion-herencias",
+      "name": "Orientación para Tramitar una Herencia",
+      "url": "https://meskeia.com/orientacion-tramitacion-herencias/",
+      "description": "Asistente interactivo para gestionar una herencia en España: checklist personalizado de documentos según tu situación, timeline de 9 pasos, plazos críticos (6 meses IS y plusvalía) y costes orientativos de notaría y registro.",
+      "suites": [
+        "legal-fiscal",
+        "jubilacion"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "tramitar herencia",
+        "checklist herencia",
+        "documentos herencia",
+        "plazos herencia",
+        "orden gestiones herencia",
+        "costes notaria herencia"
+      ],
+      "icon": "📋"
+    },
+    {
+      "slug": "guiaherencias",
+      "name": "Guía para Gestionar una Herencia",
+      "url": "https://meskeia.com/guia/herencias/",
+      "description": "Guía completa para tramitar una herencia en España: etapas del proceso, caso de estudio, herramientas para cada paso y preguntas frecuentes. Enlaza el estimador de sucesiones, donaciones y compraventa.",
+      "suites": [
+        "legal-fiscal",
+        "jubilacion"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "guia herencia españa",
+        "pasos tramitar herencia",
+        "herencia impuestos ccaa",
+        "gestionar herencia paso a paso"
+      ],
+      "icon": "📜"
+    },
+    {
+      "slug": "estimador-plusvalia-municipal",
+      "name": "Estimador Plusvalía Municipal (IIVTNU)",
+      "url": "https://meskeia.com/estimador-plusvalia-municipal/",
+      "description": "Oriéntate sobre el Impuesto de Plusvalía Municipal (IIVTNU) al vender o heredar un inmueble urbano en España. Compara el método objetivo y el método real según RDL 26/2021. Coeficientes 2025 actualizados.",
+      "suites": [
+        "legal-fiscal",
+        "inmobiliaria",
+        "jubilacion"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "plusvalia municipal",
+        "IIVTNU",
+        "impuesto venta piso ayuntamiento",
+        "metodo objetivo metodo real",
+        "RDL 26/2021",
+        "plusvalia herencia",
+        "calcular plusvalia municipal"
+      ],
+      "icon": "🏙️"
+    },
+    {
+      "slug": "orientador-intereses-demora",
+      "name": "Orientador de Intereses de Demora",
+      "url": "https://meskeia.com/orientador-intereses-demora/",
+      "description": "Oriéntate sobre los intereses que puedes reclamar por facturas impagadas o deudas vencidas en España. Calcula orientativamente el interés comercial (Ley 3/2004, BCE+8pp) y el interés legal (Código Civil) para 2025.",
+      "suites": [
+        "legal-fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "intereses demora",
+        "ley morosidad",
+        "ley 3/2004",
+        "facturas impagadas",
+        "interes legal dinero",
+        "reclamar deuda",
+        "demora comercial 2025"
+      ],
+      "icon": "📄"
     }
   ],
   "llm_instructions": {

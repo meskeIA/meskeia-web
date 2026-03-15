@@ -18,6 +18,7 @@ export const SUITE_IDS = [
   'freelance',
   'tecnicas',
   'inmobiliaria',
+  'jubilacion',
   'juegos',
   'legal-fiscal',
   'marketing',
@@ -77,6 +78,12 @@ export const suites = [
     name: 'Inmobiliaria y Hogar',
     icon: '🏘️',
     description: 'Hipotecas, alquiler y gestión del hogar'
+  },
+  {
+    id: 'jubilacion' as SuiteType,
+    name: 'Jubilación y Patrimonio',
+    icon: '🌅',
+    description: 'Planifica tu etapa de jubilación: pensiones, patrimonio, herencias y salud preventiva'
   },
   {
     id: 'juegos' as SuiteType,
