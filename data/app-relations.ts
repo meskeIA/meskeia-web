@@ -1025,6 +1025,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Gastos al vender inmuebles heredados' },
     { url: '/guia/herencias/', icon: '📜', name: 'Guía Herencias', description: 'Journey completo para gestionar la herencia' },
   ],
+  'asistente-constitucion-sociedad': [
+    { url: '/asistente-alta-autonomo/', icon: '📝', name: 'Asistente Alta Autónomo', description: 'Alternativa sin constituir sociedad' },
+    { url: '/asistente-constitucion-asociacion/', icon: '🤝', name: 'Asistente Constitución Asociación', description: 'Para entidades sin ánimo de lucro' },
+    { url: '/comparador-autonomo-vs-sl/', icon: '⚖️', name: 'Comparador Autónomo vs SL', description: '¿Cuándo conviene crear una SL?' },
+    { url: '/comparador-formas-juridicas/', icon: '📊', name: 'Comparador Formas Jurídicas', description: 'SL, SA, cooperativa, autónomo...' },
+  ],
   'guia-herencias': [
     { url: '/orientacion-tramitacion-herencias/', icon: '📋', name: 'Orientación Herencias', description: 'Checklist interactivo de documentos' },
     { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Estimador Sucesiones', description: 'Cuánto pagas de IS según tu CCAA' },

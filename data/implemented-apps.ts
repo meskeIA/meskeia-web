@@ -328,6 +328,7 @@ export const implementedAppsUrls = [
   "/comparador-autonomo-vs-sl/",        // Comparador fiscal autónomo vs sociedad limitada
   "/estimador-impuesto-sucesiones/",    // Estimador ISD sucesiones 17 CCAA (estatal + Cataluña + forales)
   "/estimador-impuesto-donaciones/",    // Estimador ISD donaciones 17 CCAA (estatal + Cataluña + forales)
+  "/asistente-constitucion-sociedad/",       // Checklist SL/SLU/SA + formulario datos + costes estimados
   "/orientacion-tramitacion-herencias/", // Checklist interactivo + timeline + plazos + costes herencias
   "/guia/herencias/",                   // Guía landing page: journey hereditario con 4 herramientas
 ];
