@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './PlazosLegales.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   PLAZOS_LEGALES,
@@ -265,6 +265,7 @@ export default function PlazosLegalesPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('plazos-legales')} />
+      <ShareCard appName="plazos-legales" />
       <Footer appName="plazos-legales" />
     </div>
   );

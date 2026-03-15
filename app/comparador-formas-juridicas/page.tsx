@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorFormasJuridicas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -862,6 +862,7 @@ export default function ComparadorFormasJuridicasPage() {
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('comparador-formas-juridicas')} />
+      <ShareCard appName="comparador-formas-juridicas" />
       <Footer appName="comparador-formas-juridicas" />
     </div>
   );
