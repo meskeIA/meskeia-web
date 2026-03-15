@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-13 | **Total profesionalizadas**: ~124 | **Pendientes**: ~97
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-15 | **Total profesionalizadas**: ~139 | **Pendientes**: ~97
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -56,6 +56,24 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 - [x] `/guia-reclamar-seguro-coche/` — Cuándo reclamar al seguro del coche ✅ lote 21
 - [x] `/asistente-reclamaciones/` — Derechos del consumidor: plazos, OMIC ✅ lote 21
 
+### Legal y Fiscal
+
+- [ ] `/estimador-irpf/` — Estimador IRPF 2025: tramos, mínimos personales y familiares, retenciones
+- [ ] `/estimador-plusvalias-irpf/` — Estimador Plusvalías IRPF: venta inmuebles, fondos, acciones. Base del ahorro 2025
+- [ ] `/estimador-sueldo-neto/` — Estimador Sueldo Neto/Bruto: IRPF + Seguridad Social trabajador 2025
+- [ ] `/estimador-cuota-autonomo/` — Estimador Cuota RETA: tramos ingresos reales 2025
+- [ ] `/comparador-autonomo-vs-sl/` — Comparador Autónomo vs SL: carga fiscal según nivel de ingresos
+- [ ] `/orientador-gastos-deducibles/` — Orientador Gastos Deducibles autónomo: IRPF e IVA
+- [ ] `/calendario-fiscal-emprendedor/` — Calendario Fiscal: plazos modelos 303, 130, 111... 2025
+- [ ] `/asistente-alta-autonomo/` — Asistente Alta Autónomo: trámites, tarifa plana, modelos 036/037
+- [ ] `/comparador-formas-juridicas/` — Comparador Formas Jurídicas: autónomo, SL, cooperativa, CB
+- [ ] `/asistente-constitucion-sociedad/` — Asistente Constitución SL/SLU/SA: checklist 20 trámites + costes _(creada 2026-03-14)_
+- [ ] `/asistente-constitucion-asociacion/` — Asistente Constitución Asociación: acta fundacional + estatutos
+- [ ] `/estimador-impuesto-sucesiones/` — Estimador Impuesto Sucesiones: 17 CCAA + regímenes forales _(creada 2026-03-14)_
+- [ ] `/estimador-impuesto-donaciones/` — Estimador Impuesto Donaciones: 17 CCAA + bonificaciones autonómicas _(creada 2026-03-14)_
+- [ ] `/orientacion-tramitacion-herencias/` — Orientación Tramitación Herencias: checklist personalizado + timeline 9 pasos _(creada 2026-03-15)_
+- [ ] `/plazos-legales/` — Guía Plazos Legales: prescripción, caducidad, garantías, laboral, fiscal
+
 ### Salud y Bienestar
 
 - [x] `/calculadora-macros/` — Macronutrientes: proteínas, carbos, grasas según objetivo ✅ lote 21
@@ -84,8 +102,8 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 
 - [x] `/calculadora-electricidad/` — Calculadora de electricidad ✅ lote 24
 - [x] `/tabla-periodica/` — Tabla periódica interactiva ✅ lote 24
-- [ ] `/glosario-fisica-quimica/` — Glosario física y química
-- [ ] `/conversor-unidades-rf/` — dBm, Watts, VSWR, longitud de onda
+- [x] `/glosario-fisica-quimica/` — Glosario física y química ✅ lote 31
+- [x] `/conversor-unidades-rf/` — dBm, Watts, VSWR, longitud de onda ✅ lote 31
 
 ### Biomedicina
 
@@ -99,17 +117,17 @@ Apps de uso frecuente con buen potencial educativo.
 
 ### Productividad y Utilidades
 
-- [ ] `/time-tracker/` — Control de horas trabajadas
-- [ ] `/calculadora-productividad/` — Ingresos por hora efectiva real
+- [x] `/time-tracker/` — Control de horas trabajadas ✅ lote 32
+- [x] `/calculadora-productividad/` — Ingresos por hora efectiva real ✅ lote 33
 - [ ] `/planificador-turnos/` — Planificador de turnos
-- [ ] `/temporizador-pomodoro/` — Técnica Pomodoro con estadísticas
-- [ ] `/lista-tareas/` — Gestión de tareas
+- [x] `/temporizador-pomodoro/` — Técnica Pomodoro con estadísticas ✅ lote 33
+- [x] `/lista-tareas/` — Gestión de tareas ✅ lote 33
 - [ ] `/generador-codigos-barras/` — Generador de códigos de barras
 - [ ] `/informacion-tiempo/` — Información meteorológica
-- [ ] `/presupuesto-viaje/` — Presupuesto de viaje con división de gastos
+- [x] `/presupuesto-viaje/` — Presupuesto de viaje con división de gastos ✅ lote 33
 - [ ] `/enchufes-por-pais/` — Qué enchufe y adaptador necesitas (60+ países)
 - [ ] `/comparador-coste-vida/` — Coste de vida en 55+ ciudades
-- [ ] `/generador-actas/` — Actas de reunión profesionales
+- [x] `/generador-actas/` — Actas de reunión profesionales ✅ lote 33
 - [ ] `/sonometro/` — Medidor de nivel de ruido en dB
 - [ ] `/metronomo/` — Metrónomo online con tap tempo
 - [ ] `/generador-tonos/` — Generador de frecuencias de audio
@@ -138,17 +156,17 @@ Apps de uso frecuente con buen potencial educativo.
 - [x] `/cifrado-vigenere/` — Cifrado polialfabético con clave ✅ lote 25
 - [x] `/cifrado-transposicion/` — Columnas, Rail Fence, Escítala ✅ lote 25
 - [x] `/cifrado-playfair/` — Matriz 5x5, digramas ✅ lote 25
-- [ ] `/cifrado-aes/` — AES-256 GCM/CBC moderno
+- [x] `/cifrado-aes/` — AES-256 GCM/CBC moderno ✅ lote 31
 - [x] `/generador-hashes/` — MD5, SHA-256, SHA-512 ✅ lote 25
 
 ### SEO y Marketing
 
-- [ ] `/generador-palabras-clave/` — Generador de palabras clave
-- [ ] `/analizador-titulos-seo/` — Analizador de títulos SEO
-- [ ] `/calculadora-legibilidad/` — Índices de legibilidad de texto
-- [ ] `/calculadora-tiempo-lectura/` — Tiempo estimado de lectura
-- [ ] `/generador-schema-markup/` — Schema.org markup
-- [ ] `/analizador-geo/` — Optimización GEO/AEO para IAs
+- [x] `/generador-palabras-clave/` — Generador de palabras clave ✅ lote 31
+- [x] `/analizador-titulos-seo/` — Analizador de títulos SEO ✅ lote 31
+- [x] `/calculadora-legibilidad/` — Índices de legibilidad de texto ✅ lote 32
+- [x] `/calculadora-tiempo-lectura/` — Tiempo estimado de lectura ✅ lote 32
+- [x] `/generador-schema-markup/` — Schema.org markup ✅ lote 32
+- [x] `/analizador-geo/` — Optimización GEO/AEO para IAs ✅ lote 32
 
 ### Creatividad y Diseño
 
@@ -276,6 +294,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 | Categoría | Profesionalizadas | Pendientes |
 |-----------|:-----------------:|:----------:|
 | Finanzas e Inversión | 24 | 0 (ALTA completada) |
+| **Legal y Fiscal** | **0** | **15** |
 | Salud y Bienestar | 16 | 4 |
 | Matemáticas y Estadística | 2 | 12 |
 | Productividad / Sensores | 14 | 15 |
@@ -292,7 +311,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 | Herramientas Web / Tecnología | 5 | 5 |
 | Calculadoras y Utilidades | 7 | 10 |
 | Biomedicina | 1 | 1 |
-| **TOTAL** | **~107** | **~114** |
+| **TOTAL** | **~107** | **~129** |
 
 ---
 
@@ -300,6 +319,9 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote 33 | 2026-03-14 | `calculadora-productividad`, `temporizador-pomodoro`, `generador-actas`, `presupuesto-viaje`, `lista-tareas` | `ff250ff` |
+| Lote 32 | 2026-03-14 | `calculadora-legibilidad`, `calculadora-tiempo-lectura`, `generador-schema-markup`, `analizador-geo`, `time-tracker` | `ddc3037` |
+| Lote 31 | 2026-03-14 | `glosario-fisica-quimica`, `conversor-unidades-rf`, `cifrado-aes`, `generador-palabras-clave`, `analizador-titulos-seo` | `b366fae` |
 | Lote 27 | 2026-03-11 | `generador-anagramas`, `generador-lorem-ipsum`, `conjugador-verbos`, `tablas-multiplicar`, `limpiador-texto` | `4e1d5b3` |
 | Lote 26 | 2026-03-11 | `conversor-morse`, `conversor-braille`, `conversor-binario`, `conversor-texto`, `conversor-numeros-romanos` | `0da882a` |
 | Lote 25 | 2026-03-11 | `cifrado-clasico`, `cifrado-vigenere`, `cifrado-transposicion`, `cifrado-playfair`, `generador-hashes` | `6661636` |
