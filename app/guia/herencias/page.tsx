@@ -158,7 +158,7 @@ export default function GuiaHerenciasPage() {
       </header>
 
       <LegalNotice />
-      <DisclaimerCard variant="general" severity="high" />
+      <DisclaimerCard variant="financial" severity="high" />
 
       {/* Journey */}
       <section className={styles.journeySection}>

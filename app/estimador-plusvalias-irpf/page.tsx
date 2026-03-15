@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './EstimadorPlusvalias.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -149,6 +149,8 @@ export default function EstimadorPlusvalidasIRPFPage() {
           Oriéntate sobre el IRPF por la venta de inmuebles, fondos, acciones u otros activos
         </p>
       </header>
+
+      <DisclaimerCard variant="financial" severity="medium" />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

@@ -106,6 +106,13 @@
   border-radius: 4px;
 }
 
+.disclaimerResponsabilidad {
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0;
+  color: var(--danger);
+}
+
 /* Layout principal */
 .mainContent {
   display: grid;

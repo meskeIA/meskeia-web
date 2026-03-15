@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './EstimadorSueldoNeto.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2025, BASES_SS_2025, MINIMOS_IRPF_2025 } from '@/data/fiscal';
@@ -257,6 +257,8 @@ export default function EstimadorSueldoNetoPage() {
           Oriéntate sobre tu salario bruto a neto o viceversa. IRPF y Seguridad Social para España 2025.
         </p>
       </header>
+
+      <DisclaimerCard variant="financial" severity="medium" />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

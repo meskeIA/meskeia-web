@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstimadorCuotaAutonomo.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA } from '@/data/fiscal';
@@ -239,6 +239,8 @@ export default function EstimadorCuotaAutonomoPage() {
           Estima tu cuota mensual orientativa según el sistema de cotización por ingresos reales
         </p>
       </header>
+
+      <DisclaimerCard variant="financial" severity="medium" />
 
       {/* Referencia Normativa */}
       <div className={styles.normativaBox}>

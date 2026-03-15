@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorFormasJuridicas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -494,6 +494,8 @@ export default function ComparadorFormasJuridicasPage() {
           Descubre qué estructura legal se adapta mejor a tu proyecto: autónomo, sociedad, cooperativa o asociación
         </p>
       </header>
+
+      <DisclaimerCard variant="financial" severity="medium" />
 
       {/* Navegación de vistas */}
       <div className={styles.vistas}>

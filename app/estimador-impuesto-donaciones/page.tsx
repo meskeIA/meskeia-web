@@ -234,6 +234,9 @@ export default function EstimadorImpuestoDonacionesPage() {
           <li>Castilla-La Mancha: la bonificación requiere escritura pública</li>
           <li><strong>Plazo: 1 mes desde la donación (Modelo 651). Consulta siempre con asesor fiscal.</strong></li>
         </ul>
+        <p className={styles.disclaimerResponsabilidad}>
+          meskeIA no se responsabiliza de decisiones basadas en estas herramientas.
+        </p>
       </div>
 
       <div className={styles.mainContent}>

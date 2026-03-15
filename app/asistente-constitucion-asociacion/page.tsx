@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './AsistenteConstitucionAsociacion.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatDate } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -741,6 +741,8 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
           Genera paso a paso los documentos necesarios para constituir tu Asociación sin Ánimo de Lucro
         </p>
       </header>
+
+      <DisclaimerCard variant="financial" severity="medium" />
 
       {/* Progress Bar */}
       <div className={styles.progressSection}>

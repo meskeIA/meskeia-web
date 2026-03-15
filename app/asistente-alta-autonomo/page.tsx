@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './AsistenteAltaAutonomo.module.css';
-import { MeskeiaLogo, Footer, NumberInput, RelatedApps, EducationalSection, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -434,6 +434,8 @@ export default function AsistenteAltaAutonomoPage() {
           Checklist interactivo con todos los trámites y calculadora de cuota.
         </p>
       </header>
+
+      <DisclaimerCard variant="financial" severity="medium" />
 
       {/* Info rápida */}
       <section className={styles.infoRapida}>

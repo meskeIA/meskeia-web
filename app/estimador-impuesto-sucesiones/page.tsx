@@ -386,6 +386,9 @@ export default function EstimadorImpuestoSucesionesPage() {
         <p className={styles.disclaimerPlazo}>
           📅 Plazo de autoliquidación: <strong>6 meses</strong> desde el fallecimiento (prorrogable 6 meses más)
         </p>
+        <p className={styles.disclaimerResponsabilidad}>
+          meskeIA no se responsabiliza de decisiones basadas en estas herramientas.
+        </p>
       </div>
 
       <div className={styles.mainContent}>

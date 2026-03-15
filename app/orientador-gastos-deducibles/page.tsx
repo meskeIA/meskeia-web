@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './OrientadorGastosDeducibles.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -184,6 +184,8 @@ export default function OrientadorGastosDeduciblesPage() {
           Descubre qué gastos puedes deducir como autónomo y oriéntate sobre tu ahorro fiscal potencial en IRPF e IVA
         </p>
       </header>
+
+      <DisclaimerCard variant="financial" severity="medium" />
 
       {/* Banner informativo */}
       <div className={styles.infoBanner}>

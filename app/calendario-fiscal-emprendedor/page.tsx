@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './CalendarioFiscal.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -573,6 +573,8 @@ export default function CalendarioFiscalPage() {
           Todas las fechas y modelos tributarios para autónomos y sociedades en España
         </p>
       </header>
+
+      <DisclaimerCard variant="financial" severity="medium" />
 
       {/* Selector de tipo */}
       <div className={styles.selectorTipo}>

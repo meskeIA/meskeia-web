@@ -90,6 +90,13 @@
   font-size: 0.9rem;
 }
 
+.disclaimerResponsabilidad {
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0;
+  color: var(--danger);
+}
+
 .mainContent {
   display: grid;
   grid-template-columns: 1fr 1fr;
