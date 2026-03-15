@@ -780,6 +780,18 @@
           "slug": "guia/herencias",
           "url": "https://meskeia.com/guia/herencias/",
           "description": "Guía completa: documentos, impuestos y plazos para tramitar una herencia en España. 4 herramientas integradas"
+        },
+        {
+          "name": "Estimador Plusvalía Municipal (IIVTNU)",
+          "slug": "estimador-plusvalia-municipal",
+          "url": "https://meskeia.com/estimador-plusvalia-municipal/",
+          "description": "Orientación sobre el IIVTNU al vender o heredar un inmueble. Método objetivo y método real según RDL 26/2021. Coeficientes 2025."
+        },
+        {
+          "name": "Orientador de Intereses de Demora",
+          "slug": "orientador-intereses-demora",
+          "url": "https://meskeia.com/orientador-intereses-demora/",
+          "description": "Oriéntate sobre los intereses por facturas impagadas. Interés comercial (Ley 3/2004, BCE+8pp) e interés legal del dinero (CC) para España 2025."
         }
       ]
     },

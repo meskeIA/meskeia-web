@@ -73,6 +73,8 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 - [ ] `/estimador-impuesto-donaciones/` — Estimador Impuesto Donaciones: 17 CCAA + bonificaciones autonómicas _(creada 2026-03-14)_
 - [ ] `/orientacion-tramitacion-herencias/` — Orientación Tramitación Herencias: checklist personalizado + timeline 9 pasos _(creada 2026-03-15)_
 - [ ] `/plazos-legales/` — Guía Plazos Legales: prescripción, caducidad, garantías, laboral, fiscal
+- [ ] `/estimador-plusvalia-municipal/` — Estimador Plusvalía Municipal (IIVTNU): método objetivo y real, coeficientes 2025 _(creada 2026-03-15)_
+- [ ] `/orientador-intereses-demora/` — Orientador Intereses de Demora: comercial (Ley 3/2004) + legal (CC) por semestres _(creado 2026-03-15)_
 
 ### Salud y Bienestar
 
@@ -294,7 +296,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 | Categoría | Profesionalizadas | Pendientes |
 |-----------|:-----------------:|:----------:|
 | Finanzas e Inversión | 24 | 0 (ALTA completada) |
-| **Legal y Fiscal** | **0** | **15** |
+| **Legal y Fiscal** | **0** | **17** |
 | Salud y Bienestar | 16 | 4 |
 | Matemáticas y Estadística | 2 | 12 |
 | Productividad / Sensores | 14 | 15 |
