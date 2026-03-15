@@ -55,6 +55,35 @@ Clasificación **NO excluyente**: una app puede pertenecer a múltiples suites.
 | `data/implemented-apps.ts` | URLs de apps implementadas |
 | `data/app-relations.ts` | Cross-linking entre apps |
 | `public/ai-index.json` | Índice para indexación por IAs |
+| `data/fiscal/` | **Datos normativos centralizados** (ver tabla abajo) |
+
+### Módulos de datos fiscales (`data/fiscal/`)
+
+Repositorio centralizado de datos normativos para la Suite Legal-Fiscal. Cada módulo incluye metadatos de versión, fuente oficial y fecha de verificación.
+
+| Módulo | Contenido |
+|--------|-----------|
+| `data/fiscal/irpf.ts` | Tramos IRPF, mínimos personales y familiares 2025 |
+| `data/fiscal/autonomos.ts` | Tramos RETA, tipo cotización, bonificaciones 2025 |
+| `data/fiscal/inmuebles.ts` | ITP/AJD por CCAA, IVA obra nueva, coeficientes IIVTNU 2025, plusvalías IRPF |
+| `data/fiscal/intereses.ts` | Tipos de demora comercial (Ley 3/2004) por semestre, interés legal, interés tributario |
+| `data/fiscal/sucesiones.ts` | Tarifas ISD por CCAA, grupos, bonificaciones |
+| `data/fiscal/donaciones.ts` | Tarifas impuesto donaciones por CCAA |
+| `data/fiscal/sociedades.ts` | Tipos IS, regímenes especiales |
+
+### ⚠️ Regla obligatoria para apps Legal-Fiscal
+
+**ANTES de hardcodear cualquier dato normativo** (tipos impositivos, coeficientes, tramos, tipos de interés, plazos legales), revisar si ya existe en `data/fiscal/`.
+
+```typescript
+// ✅ CORRECTO — importar desde data/fiscal/
+import { COEFICIENTES_IIVTNU_2025, TIPOS_DEMORA_COMERCIAL } from '@/data/fiscal';
+
+// ❌ INCORRECTO — hardcodear en el componente
+const coeficientes = [{ anios: 1, coef: 0.13 }, ...];
+```
+
+Cuando los datos no existan aún, **crear el módulo correspondiente** en `data/fiscal/` con metadatos de versión, y luego importarlo desde la app. Nunca inline.
 
 ---
 
