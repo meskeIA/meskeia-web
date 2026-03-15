@@ -933,6 +933,28 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/historias-sociales/', icon: '📖', name: 'Historias Sociales', description: 'Prepara situaciones nuevas' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz' },
   ],
+
+  // ==========================================
+  // FAMILIA: LEGAL Y FISCAL
+  // ==========================================
+  'plazos-legales': [
+    { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
+    { url: '/asistente-constitucion-asociacion/', icon: '🎗️', name: 'Asistente Constitución Asociación', description: 'Genera el acta y estatutos' },
+    { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
+  ],
+  'comparador-formas-juridicas': [
+    { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción, garantías y reclamaciones' },
+    { url: '/asistente-constitucion-asociacion/', icon: '🎗️', name: 'Asistente Constitución Asociación', description: 'Genera acta y estatutos' },
+    { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
+  ],
+  'asistente-constitucion-asociacion': [
+    { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: '¿Asociación o SL? Compara opciones' },
+    { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción, garantías y reclamaciones' },
+    { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
+  ],
 };
 
 /**
@@ -1010,6 +1032,11 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
 
     // Referencia
     'paises-del-mundo': { title: 'Más herramientas de referencia', icon: '🌍' },
+
+    // Legal y Fiscal
+    'plazos-legales': { title: 'Más herramientas legales y fiscales', icon: '⚖️' },
+    'comparador-formas-juridicas': { title: 'Herramientas para emprender', icon: '⚖️' },
+    'asistente-constitucion-asociacion': { title: 'Más herramientas legales', icon: '⚖️' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };

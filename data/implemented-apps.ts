@@ -313,6 +313,11 @@ export const implementedAppsUrls = [
   "/semaforo-emocional/",               // Regulación emocional visual con tres estados y estrategias adaptadas
   "/recordatorio-medicacion/",          // Gestión visual de medicamentos con pictogramas y horarios por toma
   "/historias-sociales/",               // Historias sociales visuales para preparar situaciones nuevas (técnica Carol Gray)
+
+  // Legal y Fiscal - Fase 1 (orientación, bajo riesgo)
+  "/plazos-legales/",                   // Guía orientativa de plazos de prescripción y caducidad en España
+  "/comparador-formas-juridicas/",      // Comparador orientativo: autónomo, SL, cooperativa, asociación, CB
+  "/asistente-constitucion-asociacion/", // Asistente para generar documentos orientativos de constitución de asociación
 ];
 
 /**

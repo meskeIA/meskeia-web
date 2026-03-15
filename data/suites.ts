@@ -5,7 +5,7 @@
  * Una app puede pertenecer a múltiples suites (clasificación NO excluyente).
  * Ordenadas alfabéticamente por nombre.
  *
- * Actualizado: 2026-02-19
+ * Actualizado: 2026-03-15
  */
 
 // Tipos de suites disponibles (exportado como valor para compatibilidad con Turbopack)
@@ -19,6 +19,7 @@ export const SUITE_IDS = [
   'tecnicas',
   'inmobiliaria',
   'juegos',
+  'legal-fiscal',
   'marketing',
   'productividad',
   'salud',
@@ -27,7 +28,7 @@ export const SUITE_IDS = [
 
 export type SuiteType = typeof SUITE_IDS[number];
 
-// Definición de las 13 Suites (ordenadas alfabéticamente por nombre)
+// Definición de las 14 Suites (ordenadas alfabéticamente por nombre)
 export const suites = [
   {
     id: 'accesibilidad' as SuiteType,
@@ -82,6 +83,12 @@ export const suites = [
     name: 'Juegos y Ocio',
     icon: '🎲',
     description: 'Diversión y entretenimiento'
+  },
+  {
+    id: 'legal-fiscal' as SuiteType,
+    name: 'Legal y Fiscal',
+    icon: '⚖️',
+    description: 'Orientación en impuestos, herencias, trámites legales y obligaciones fiscales en España'
   },
   {
     id: 'marketing' as SuiteType,

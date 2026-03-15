@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 254+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 257+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 254,
-  "last_updated": "2026-03-14",
+  "total_tools": 257,
+  "last_updated": "2026-03-15",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -56,7 +56,7 @@
       "name": "Freelance y Autónomo",
       "icon": "💼",
       "description": "Herramientas para profesionales independientes",
-      "tool_count": 17
+      "tool_count": 18
     },
     {
       "id": "tecnicas",
@@ -78,6 +78,13 @@
       "icon": "🎲",
       "description": "Diversión y entretenimiento",
       "tool_count": 23
+    },
+    {
+      "id": "legal-fiscal",
+      "name": "Legal y Fiscal",
+      "icon": "⚖️",
+      "description": "Orientación en impuestos, herencias, trámites legales y obligaciones fiscales en España",
+      "tool_count": 3
     },
     {
       "id": "marketing",
@@ -114,7 +121,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 100
+      "tool_count": 103
     },
     {
       "id": "estudio",
@@ -135,7 +142,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 47
+      "tool_count": 49
     },
     {
       "id": "creando",
@@ -156,7 +163,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 44
+      "tool_count": 46
     }
   ],
   "tools": [
@@ -6353,6 +6360,80 @@
         "regulacion emocional autismo"
       ],
       "icon": "📖"
+    },
+    {
+      "slug": "plazos-legales",
+      "name": "Guía de Plazos Legales",
+      "url": "https://meskeia.com/plazos-legales/",
+      "description": "Consulta orientativa de los plazos de prescripción, caducidad y reclamación más importantes en España: garantías, deudas, laboral, fiscal, tráfico y más",
+      "suites": [
+        "legal-fiscal"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero",
+        "curiosidad"
+      ],
+      "keywords": [
+        "plazos legales",
+        "prescripcion",
+        "caducidad",
+        "garantia productos",
+        "reclamacion",
+        "despido",
+        "multa trafico",
+        "herencia",
+        "hacienda"
+      ],
+      "icon": "⏱️"
+    },
+    {
+      "slug": "comparador-formas-juridicas",
+      "name": "Comparador de Formas Jurídicas",
+      "url": "https://meskeia.com/comparador-formas-juridicas/",
+      "description": "Compara orientativamente las formas jurídicas para emprender en España: autónomo, sociedad limitada, cooperativa, asociación y comunidad de bienes. Capital, fiscalidad, responsabilidad y trámites",
+      "suites": [
+        "legal-fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero"
+      ],
+      "keywords": [
+        "formas juridicas",
+        "autonomo vs sl",
+        "sociedad limitada",
+        "cooperativa",
+        "asociacion",
+        "emprender",
+        "responsabilidad limitada",
+        "capital social"
+      ],
+      "icon": "⚖️"
+    },
+    {
+      "slug": "asistente-constitucion-asociacion",
+      "name": "Asistente Constitución Asociación",
+      "url": "https://meskeia.com/asistente-constitucion-asociacion/",
+      "description": "Asistente paso a paso para constituir una asociación sin ánimo de lucro en España. Genera orientativamente el Acta Fundacional y Estatutos para el Registro de Asociaciones",
+      "suites": [
+        "legal-fiscal"
+      ],
+      "contexts": [
+        "trabajo",
+        "curiosidad"
+      ],
+      "keywords": [
+        "constituir asociacion",
+        "asociacion sin animo lucro",
+        "acta fundacional",
+        "estatutos asociacion",
+        "registro asociaciones",
+        "ong",
+        "fundadores"
+      ],
+      "icon": "🎗️"
     }
   ],
   "llm_instructions": {

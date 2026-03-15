@@ -410,6 +410,13 @@ export const applicationsDatabase: Application[] = [
   { name: "Semáforo Emocional", suites: ["accesibilidad", "salud", "productividad", "estudiantes"], contexts: ["casa", "estudio", "trabajo"], icon: "🚦", description: "Herramienta visual de regulación emocional con tres estados (muy activado, activado, tranquilo) y estrategias adaptadas para cada uno. Historial del día. Para autismo, TDAH, ansiedad y educación emocional.", url: "/semaforo-emocional/", keywords: ["semaforo emocional", "regulacion emocional", "autismo emociones", "tdah emociones", "ansiedad", "zonas regulacion", "educacion emocional", "estrategias calma", "identificar emociones", "accesibilidad emocional"] },
   { name: "Recordatorio Visual de Medicación", suites: ["accesibilidad", "salud", "productividad"], contexts: ["casa", "trabajo"], icon: "💊", description: "Gestiona y recuerda tus medicamentos con pictogramas, colores y horarios visuales. Marca cada toma del día como tomada. Historial local, sin registro. Para autismo, TDAH, discapacidad cognitiva y mayores con polimedicación.", url: "/recordatorio-medicacion/", keywords: ["recordatorio medicacion", "pastillero visual", "gestion medicamentos", "autismo medicacion", "discapacidad cognitiva pastillas", "TDAH medicacion", "pictogramas medicamentos", "mayores medicacion", "polimedicacion"] },
   { name: "Historias Sociales Visuales", suites: ["accesibilidad", "salud", "productividad", "estudiantes"], contexts: ["casa", "estudio", "trabajo"], icon: "📖", description: "Crea y lee historias sociales visuales para preparar situaciones nuevas o difíciles. Técnica de Carol Gray adaptada. 3 historias de ejemplo incluidas. Para autismo, TDAH, discapacidad cognitiva y educadores.", url: "/historias-sociales/", keywords: ["historias sociales", "social stories", "Carol Gray", "autismo situaciones nuevas", "preparacion situaciones", "pictogramas historia", "TDAH rutinas", "discapacidad cognitiva", "narrativa visual", "regulacion emocional autismo"] },
+
+  // ============================================
+  // Suite Legal y Fiscal - Fase 1 (orientación sin cálculo fiscal)
+  // ============================================
+  { name: "Guía de Plazos Legales", suites: ["legal-fiscal"], contexts: ["trabajo", "dinero", "curiosidad"], icon: "⏱️", description: "Consulta orientativa de los plazos de prescripción, caducidad y reclamación más importantes en España: garantías, deudas, laboral, fiscal, tráfico y más", url: "/plazos-legales/", keywords: ["plazos legales", "prescripcion", "caducidad", "garantia productos", "reclamacion", "despido", "multa trafico", "herencia", "hacienda"] },
+  { name: "Comparador de Formas Jurídicas", suites: ["legal-fiscal", "freelance"], contexts: ["trabajo", "dinero"], icon: "⚖️", description: "Compara orientativamente las formas jurídicas para emprender en España: autónomo, sociedad limitada, cooperativa, asociación y comunidad de bienes. Capital, fiscalidad, responsabilidad y trámites", url: "/comparador-formas-juridicas/", keywords: ["formas juridicas", "autonomo vs sl", "sociedad limitada", "cooperativa", "asociacion", "emprender", "responsabilidad limitada", "capital social"] },
+  { name: "Asistente Constitución Asociación", suites: ["legal-fiscal"], contexts: ["trabajo", "curiosidad"], icon: "🎗️", description: "Asistente paso a paso para constituir una asociación sin ánimo de lucro en España. Genera orientativamente el Acta Fundacional y Estatutos para el Registro de Asociaciones", url: "/asistente-constitucion-asociacion/", keywords: ["constituir asociacion", "asociacion sin animo lucro", "acta fundacional", "estatutos asociacion", "registro asociaciones", "ong", "fundadores"] },
 ];
 
 // ============================================
@@ -442,6 +449,7 @@ export const getSuiteCounts = (): Record<SuiteType, number> => {
     tecnicas: 0,
     inmobiliaria: 0,
     juegos: 0,
+    'legal-fiscal': 0,
     marketing: 0,
     productividad: 0,
     salud: 0,
