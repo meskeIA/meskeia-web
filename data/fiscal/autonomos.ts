@@ -11,16 +11,18 @@
  */
 
 export const FISCAL_AUTONOMOS_META = {
-  fuente: 'Real Decreto-ley 13/2022, de 26 de julio + Orden ISM/835/2023',
+  fuente: 'Real Decreto-ley 13/2022 + RDL 16/2025 (prorroga tabla 2025 para 2026)',
   descripcion: 'Sistema de cotización por ingresos reales para autónomos',
-  verificado: '2025-01-01',
-  vigencia: '2025',
+  verificado: '2026-03-16',
+  vigencia: '2026',
   urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/Afiliacion/10817',
-  nota: 'Datos 2025 basados en la tabla transitoria del RDL 13/2022. Verificar posibles ajustes para 2026 en la fuente oficial.',
+  nota: 'Tabla de tramos CONGELADA para 2026 (igual que 2025) por RDL 16/2025. El tipo total sube de 31,40% a 31,50% por incremento del MEI (0,80%→0,90%).',
 };
 
-// Tipo de cotización general RETA 2025
-export const TIPO_COTIZACION_RETA = 0.313; // 31,30%
+// Tipo de cotización general RETA 2026
+// Desglose: CC 28,30% + AT/EP 1,30% + Cese 0,90% + FP 0,10% + MEI 0,90% = 31,50%
+// MEI sube de 0,80% (2025) a 0,90% (2026) por RDL 16/2025
+export const TIPO_COTIZACION_RETA = 0.315; // 31,50%
 
 // Tramo de cotización por ingresos reales
 export interface TramoCotizacion {

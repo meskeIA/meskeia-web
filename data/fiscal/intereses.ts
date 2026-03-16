@@ -11,8 +11,8 @@
  *   - Tipos BCE:         https://www.ecb.europa.eu/stats/policy_and_exchange_rates
  *   - BOE publicación:   https://www.boe.es
  *
- * Verificado: 2025-01-15
- * Vigencia: 2025 (H1 y H2 con tipos BCE vigentes)
+ * Verificado: 2026-03-16
+ * Vigencia: 2026 (H1 y H2 con tipos BCE vigentes)
  *
  * ⚠️ ACTUALIZACIÓN NECESARIA:
  *   - Los tipos comerciales se publican cada 6 meses en el BOE (enero y julio).
@@ -22,8 +22,8 @@
 
 export const FISCAL_INTERESES_META = {
   fuente: 'Ley 3/2004 (morosidad) + Ley de Presupuestos (interés legal)',
-  verificado: '2025-01-15',
-  vigencia: '2025',
+  verificado: '2026-03-16',
+  vigencia: '2026',
   urlOficialLey3: 'https://www.boe.es/buscar/act.php?id=BOE-A-2004-21830',
   urlOficialBCE: 'https://www.ecb.europa.eu/stats/policy_and_exchange_rates',
   nota: 'Los tipos comerciales se actualizan semestralmente. Verifica siempre el BOE antes de usar estas cifras en una reclamación real.',
@@ -35,8 +35,8 @@ export const FISCAL_INTERESES_META = {
 
 export const INTERES_LEGAL_DINERO_2025 = {
   tipo: 3.25,            // % anual
-  vigencia: '2025',
-  base: 'Prórroga PGE 2023 (no aprobados PGE 2024/2025)',
+  vigencia: '2026',
+  base: 'Prórroga PGE 2023 (no aprobados PGE 2024/2025/2026)',
   nota: 'Aplicable a deudas civiles y mercantiles sin pacto expreso (art. 1108 CC). Verificar si hay PGE aprobado para el año en curso.',
 };
 
@@ -60,6 +60,22 @@ export interface TipoDemoraComercial {
  * y actualizar 'vigenciaHasta' del semestre anterior si es necesario.
  */
 export const TIPOS_DEMORA_COMERCIAL: TipoDemoraComercial[] = [
+  {
+    semestre: 'H1 2026',
+    tipoBCE: 2.15,
+    incremento: 8,
+    tipoTotal: 10.15,
+    vigenciaDesde: '2026-01-01',
+    vigenciaHasta: '2026-06-30',
+  },
+  {
+    semestre: 'H2 2025',
+    tipoBCE: 2.15,
+    incremento: 8,
+    tipoTotal: 10.15,
+    vigenciaDesde: '2025-07-01',
+    vigenciaHasta: '2025-12-31',
+  },
   {
     semestre: 'H1 2025',
     tipoBCE: 3.15,

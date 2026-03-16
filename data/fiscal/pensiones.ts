@@ -12,9 +12,9 @@
  */
 
 export const FISCAL_PENSIONES_META = {
-  fuente: 'LGSS (RDL 8/2015) + Ley 21/2021 de Reforma de Pensiones + LPGE 2025',
-  verificado: '2025-01-15',
-  vigencia: '2025',
+  fuente: 'LGSS (RDL 8/2015) + Ley 21/2021 de Reforma de Pensiones + RDL 16/2025 (prórroga)',
+  verificado: '2026-03-16',
+  vigencia: '2026',
   urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas',
   nota: 'Las cifras son orientativas. La SS calcula la pensión real a partir de tu historial completo de cotización. Consulta tu vida laboral en la Sede Electrónica de la SS.',
 };
@@ -61,14 +61,15 @@ export const TRAMOS_PORCENTAJE_PENSION_2025: TramosPorcentajePension[] = [
   { mesesDesde: 277, mesesHasta: 9999, porcentajeBase: 70.16, incrementoPorMes: 0.19 },
 ];
 
-// ─── Límites de pensión 2025 (euros/mes, 14 pagas) ───────────────────────────
+// ─── Límites de pensión 2026 (euros/mes, 14 pagas) ───────────────────────────
+// Actualizado 2026-03-16. Revalorización ~2,8% IPC.
 
 export const LIMITES_PENSION_2025 = {
-  maximaMensual:   3267.60,  // Pensión máxima mensual 2025
-  maximaAnual:     45746.40, // Pensión máxima anual (× 14 pagas)
-  minimaConConyuge:  967.40, // Mínima ≥65 con cónyuge a cargo
-  minimaSinConyuge:  784.20, // Mínima ≥65 sin cónyuge
-  minimaSolo:        784.20,
+  maximaMensual:   3359.60,  // Pensión máxima mensual 2026 (era 3.267,60 en 2025)
+  maximaAnual:     47034.40, // Pensión máxima anual (× 14 pagas)
+  minimaConConyuge: 1256.60, // Mínima ≥65 con cónyuge a cargo (17.592,40 € / 14)
+  minimaSinConyuge:  888.70, // Mínima ≥65 con cónyuge no a cargo (12.441,80 € / 14)
+  minimaSolo:        936.20, // Mínima ≥65 unidad unipersonal (13.106,80 € / 14)
 };
 
 // ─── Base Reguladora ──────────────────────────────────────────────────────────
