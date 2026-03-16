@@ -20,6 +20,9 @@ export const implementedAppsUrls = [
   "/estimador-pension-publica/",        // Estimador pensión SS: base reguladora, % por años, pensión mensual
   "/estimador-brecha-jubilacion/",      // Brecha pensión-sueldo: cuánto perderás y ahorro mensual necesario
   "/orientador-jubilacion-anticipada/", // Jubilación anticipada: requisitos, coeficientes reductores SS 2025
+  "/orientador-plan-pensiones/",        // Plan de pensiones: desgravación IRPF, capital acumulado, pensión complementaria
+  "/estimador-irpf-pensionista/",       // IRPF pensionista: reducción RRT, mínimo personal edad, pensión neta mensual
+  "/orientador-jubilacion-parcial/",    // Jubilación parcial: contrato relevo, pensión parcial + salario combinados
   "/calculadora-jubilacion/",
   "/calculadora-inversiones/",
   "/test-perfil-inversor/",

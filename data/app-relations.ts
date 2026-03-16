@@ -47,7 +47,9 @@ const jubilacionApps: RelatedApp[] = [
   { url: '/estimador-pension-publica/', icon: '🌅', name: 'Estimador de Pensión Pública', description: 'Cuánto cobrarás al jubilarte' },
   { url: '/estimador-brecha-jubilacion/', icon: '📉', name: 'Brecha de Jubilación', description: 'Lo que perderás al jubilarte' },
   { url: '/orientador-jubilacion-anticipada/', icon: '⏩', name: 'Jubilación Anticipada', description: '¿Puedes jubilarte antes?' },
-  { url: '/calculadora-fire/', icon: '🔥', name: 'Calculadora FIRE', description: 'Independencia financiera' },
+  { url: '/orientador-plan-pensiones/', icon: '💼', name: 'Plan de Pensiones', description: 'Ahorro fiscal y pensión complementaria' },
+  { url: '/estimador-irpf-pensionista/', icon: '📊', name: 'IRPF Pensionista', description: 'Cuánto pagas de renta al jubilarte' },
+  { url: '/orientador-jubilacion-parcial/', icon: '⚖️', name: 'Jubilación Parcial', description: 'Trabaja y cobra pensión a la vez' },
 ];
 
 const patrimonioPensionApps: RelatedApp[] = [
@@ -1077,8 +1079,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Qué pagarás de renta' },
   ],
   'orientador-jubilacion-anticipada': [
-    ...jubilacionApps.filter(a => a.url !== '/orientador-jubilacion-anticipada/'),
-    ...patrimonioPensionApps.slice(0, 1),
+    ...jubilacionApps.filter(a => a.url !== '/orientador-jubilacion-anticipada/').slice(0, 4),
+  ],
+  'orientador-plan-pensiones': [
+    ...jubilacionApps.filter(a => a.url !== '/orientador-plan-pensiones/').slice(0, 4),
+  ],
+  'estimador-irpf-pensionista': [
+    ...jubilacionApps.filter(a => a.url !== '/estimador-irpf-pensionista/').slice(0, 4),
+  ],
+  'orientador-jubilacion-parcial': [
+    ...jubilacionApps.filter(a => a.url !== '/orientador-jubilacion-parcial/').slice(0, 4),
   ],
 };
 

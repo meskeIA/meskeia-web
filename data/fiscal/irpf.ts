@@ -73,3 +73,30 @@ export const BASES_SS_2025 = {
   minima: 1184.40,
   maxima: 4720.50,
 };
+
+// ─── Rendimientos del trabajo: gastos deducibles y reducción 2025 ─────────────
+
+/**
+ * Gastos deducibles generales de los rendimientos del trabajo.
+ * Ley 35/2006 IRPF art. 19.2.f
+ */
+export const GASTOS_DEDUCIBLES_TRABAJO_2025 = {
+  importeGeneral: 2000,  // €/año (todos los contribuyentes con rendimientos del trabajo)
+};
+
+/**
+ * Reducción por rendimientos netos del trabajo (RNT) 2025
+ * Se aplica sobre el Rendimiento Neto del Trabajo (ingresos - gastos deducibles).
+ * Ley 35/2006 IRPF art. 20 (según LPGE 2025)
+ *
+ * - RNT ≤ 13.115 €: reducción de 6.498 €
+ * - 13.115 < RNT < 16.825 €: 6.498 - 1,14 × (RNT - 13.115)
+ * - RNT ≥ 16.825 €: reducción de 2.364 €
+ */
+export const REDUCCION_RENDIMIENTOS_TRABAJO_2025 = {
+  limite1:               13115,   // RNT hasta aquí: reducción máxima
+  reduccion1:             6498,   // €/año de reducción
+  limite2:               16825,   // RNT a partir de aquí: reducción mínima
+  reduccion2:             2364,   // €/año de reducción
+  factorInterpolacion:    1.14,   // Factor interpolación entre límite1 y límite2
+};

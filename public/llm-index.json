@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 275+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 278+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 275,
-  "last_updated": "2026-03-15",
+  "total_tools": 278,
+  "last_updated": "2026-03-16",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -43,7 +43,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 67
+      "tool_count": 70
     },
     {
       "id": "creando",
@@ -1626,6 +1626,72 @@
         "eje anticipada 2025"
       ],
       "icon": "⏩"
+    },
+    {
+      "slug": "orientador-plan-pensiones",
+      "name": "Orientador de Plan de Pensiones",
+      "url": "https://meskeia.com/orientador-plan-pensiones/",
+      "description": "Descubre cuánto desgravas en IRPF con un plan de pensiones, el capital que acumularás y la pensión complementaria mensual que obtendrás al jubilarte.",
+      "suites": [
+        "jubilacion",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "plan de pensiones",
+        "deduccion irpf plan pensiones",
+        "limite aportacion plan pensiones 2025",
+        "ahorro fiscal jubilacion",
+        "pension complementaria privada",
+        "cuanto aportar plan pensiones"
+      ],
+      "icon": "💼"
+    },
+    {
+      "slug": "estimador-irpf-pensionista",
+      "name": "Estimador IRPF Pensionista",
+      "url": "https://meskeia.com/estimador-irpf-pensionista/",
+      "description": "Estima el IRPF que pagas siendo jubilado: reducción por rendimientos del trabajo, mínimo personal por edad (65/75 años) y pensión neta mensual real.",
+      "suites": [
+        "jubilacion",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "irpf pensionista",
+        "declaracion renta jubilado",
+        "cuanto paga irpf pensionista",
+        "reduccion rendimientos trabajo pension",
+        "minimo personal 65 años irpf",
+        "pension neta mensual real"
+      ],
+      "icon": "📊"
+    },
+    {
+      "slug": "orientador-jubilacion-parcial",
+      "name": "Orientador de Jubilación Parcial",
+      "url": "https://meskeia.com/orientador-jubilacion-parcial/",
+      "description": "Descubre si puedes acceder a la jubilación parcial con contrato de relevo: requisitos SS, pensión parcial, salario reducido e ingresos totales combinados.",
+      "suites": [
+        "jubilacion",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "jubilacion parcial",
+        "contrato de relevo",
+        "requisitos jubilacion parcial 2025",
+        "pension parcial seguridad social",
+        "compatible trabajo y pension",
+        "reduccion jornada jubilacion"
+      ],
+      "icon": "⚖️"
     },
     {
       "slug": "calculadora-jubilacion",

@@ -128,3 +128,38 @@ export const REQUISITOS_ANTICIPADA_VOLUNTARIA = {
   anosMinimoCotizados: 35,
   maxMesesAnticipacion: 24, // hasta 2 años antes
 };
+
+// ─── Plan de Pensiones: límites fiscales 2025 ────────────────────────────────
+
+export const FISCAL_PLAN_PENSIONES_META = {
+  fuente: 'Ley 35/2006 IRPF art. 51 + LPGE 2025',
+  verificado: '2025-01-15',
+  vigencia: '2025',
+  urlOficial: 'https://sede.agenciatributaria.gob.es',
+  nota: 'Límites orientativos 2025. Consulta con tu entidad gestora o asesor fiscal.',
+};
+
+export const LIMITES_PLAN_PENSIONES_2025 = {
+  limiteIndividualAnual:    1500,  // €/año (solo aportación del trabajador)
+  limiteEmpresaAnual:       8500,  // €/año adicional si incluye contribución empresarial
+  limiteTotalAnual:        10000,  // €/año suma individual + empresa
+  limiteDiscapacidadAnual: 24250,  // Para personas con discapacidad ≥ 33%
+};
+
+// ─── Jubilación Parcial: requisitos 2025 ─────────────────────────────────────
+
+export const JUBILACION_PARCIAL_META = {
+  fuente: 'LGSS (RDL 8/2015) arts. 215 y 216 + Ley 21/2021',
+  verificado: '2025-01-15',
+  vigencia: '2025',
+  urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas/Jubilacion',
+  nota: 'Requisitos orientativos del régimen general. Existen supuestos especiales por convenio colectivo o sector. Verifica siempre en la SS.',
+};
+
+export const REQUISITOS_JUBILACION_PARCIAL = {
+  edadMinima:              60,     // Años cumplidos (régimen general con contrato de relevo)
+  anosCotizadosMinimos:    33,     // Años cotizados mínimos (con contrato de relevo)
+  reduccionJornadaMin:     25,     // % mínimo de reducción de jornada
+  reduccionJornadaMax:     75,     // % máximo de reducción (normal; 85% casos especiales)
+  exigeContratoRelevo:     true,   // El empleador debe contratar un relevista simultáneamente
+};
