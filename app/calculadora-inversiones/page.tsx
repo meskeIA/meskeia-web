@@ -114,16 +114,17 @@ export default function CalculadoraInversionesPage() {
     // Capital proyectado
     const capitalProyectado = capital * Math.pow(1 + rentabilidad, horizonteTemporal);
 
-    // Escenario pesimista (rentabilidad - volatilidad/2)
-    const rentabilidadPesimista = Math.max(0, rentabilidad - volatilidad / 200);
+    // Escenario pesimista (rentabilidad - 1σ de volatilidad)
+    const rentabilidadPesimista = Math.max(0, rentabilidad - volatilidad / 100);
     const capitalPesimista = capital * Math.pow(1 + rentabilidadPesimista, horizonteTemporal);
 
-    // Escenario optimista (rentabilidad + volatilidad/2)
-    const rentabilidadOptimista = rentabilidad + volatilidad / 200;
+    // Escenario optimista (rentabilidad + 1σ de volatilidad)
+    const rentabilidadOptimista = rentabilidad + volatilidad / 100;
     const capitalOptimista = capital * Math.pow(1 + rentabilidadOptimista, horizonteTemporal);
 
-    // Sharpe ratio simplificado (asumiendo tasa libre de riesgo 1%)
-    const sharpeRatio = (perfilActual.rentabilidadEsperada - 1) / volatilidad;
+    // Sharpe ratio (tasa libre de riesgo: Bono España 10y 2026 ≈ 3,75%)
+    const tasaLibreDeRiesgo = 3.75;
+    const sharpeRatio = (perfilActual.rentabilidadEsperada - tasaLibreDeRiesgo) / volatilidad;
 
     return {
       capitalProyectado,

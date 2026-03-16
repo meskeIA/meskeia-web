@@ -167,13 +167,13 @@ export default function ComparadorVehiculosPage() {
       if (cuotaMensual > 0 && plazoMeses > 0) {
         const totalCuotas = cuotaMensual * plazoMeses;
         const capitalFinanciado = precioVenta - entrada;
-        const interesesPagados = (entrada + totalCuotas + comisionApertura) - precioVenta;
+        const interesesPagados = (totalCuotas + comisionApertura) - capitalFinanciado;
         const valorResidual = precioVenta * (valorResidualPct / 100);
         const depreciacion = precioVenta - valorResidual;
 
-        // Gastos proporcionales al tiempo de financiación
+        // Gastos proporcionales al tiempo de uso (igual que opción contado)
         const anyosFinanciacion = plazoMeses / 12;
-        const gastosFinanciacion = gastosAnuales * Math.max(anyosFinanciacion, anyosUso);
+        const gastosFinanciacion = gastosAnuales * anyosUso;
 
         const costeTotal = depreciacion + interesesPagados + comisionApertura + gastosFinanciacion;
 

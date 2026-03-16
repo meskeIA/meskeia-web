@@ -94,13 +94,13 @@ const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
   { value: 'vpo', label: 'Vivienda de Protección Oficial' },
 ];
 
-// Tramos IRPF para ganancias patrimoniales 2024
+// Tramos IRPF para ganancias patrimoniales 2025 (base del ahorro)
 const TRAMOS_IRPF_AHORRO = [
   { hasta: 6000, tipo: 19 },
   { hasta: 50000, tipo: 21 },
   { hasta: 200000, tipo: 23 },
   { hasta: 300000, tipo: 27 },
-  { hasta: Infinity, tipo: 28 },
+  { hasta: Infinity, tipo: 30 }, // 2025: tipo máximo 30% (era 28% en 2024)
 ];
 
 export default function SimuladorCompraventaPage() {

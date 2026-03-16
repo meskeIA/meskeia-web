@@ -138,14 +138,21 @@ function calcularParametrosCartera(cartera: CarteraConfig): { rentabilidad: numb
     rentabilidad += pesos[i] * asset.rentabilidadMedia;
   });
 
-  // Volatilidad simplificada (asumiendo correlación baja entre activos)
-  // En realidad debería usar matriz de covarianzas, pero simplificamos
+  // Volatilidad con matriz de correlaciones simplificada (Markowitz)
+  // σ_p² = Σ w_i²·σ_i² + 2·Σ_{i<j} w_i·w_j·σ_i·σ_j·ρ_ij
+  // Correlaciones aproximadas: RV-RF=0.25, RV-LIQ=0.1, RV-ALT=0.4, RF-LIQ=0.05, RF-ALT=0.15, LIQ-ALT=0.05
+  const correlaciones = [
+    [1.00, 0.25, 0.10, 0.40],
+    [0.25, 1.00, 0.05, 0.15],
+    [0.10, 0.05, 1.00, 0.05],
+    [0.40, 0.15, 0.05, 1.00],
+  ];
   let varianza = 0;
-  ASSET_CLASSES.forEach((asset, i) => {
-    varianza += Math.pow(pesos[i] * asset.volatilidad, 2);
-  });
-  // Añadir algo de correlación entre RV y Alt
-  varianza += 2 * pesos[0] * pesos[3] * 0.4 * ASSET_CLASSES[0].volatilidad * ASSET_CLASSES[3].volatilidad;
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 4; j++) {
+      varianza += pesos[i] * pesos[j] * ASSET_CLASSES[i].volatilidad * ASSET_CLASSES[j].volatilidad * correlaciones[i][j];
+    }
+  }
 
   return {
     rentabilidad,
