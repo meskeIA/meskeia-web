@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraMovimiento.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -172,6 +172,8 @@ export default function CalculadoraMovimientoPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-movimiento" />
 
       <div className={styles.mainContent}>
         {/* Panel de configuración */}
