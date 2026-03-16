@@ -93,7 +93,7 @@ export default function AnalizadorDensidadSeoPage() {
       .map(([phrase, count]) => ({
         phrase,
         count,
-        density: (count / (totalPalabras - 1)) * 100,
+        density: (count / totalPalabras) * 100,
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 15);
@@ -113,7 +113,7 @@ export default function AnalizadorDensidadSeoPage() {
       .map(([phrase, count]) => ({
         phrase,
         count,
-        density: (count / (totalPalabras - 2)) * 100,
+        density: (count / totalPalabras) * 100,
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './CalculadoraHuellaCarbono.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -29,10 +29,11 @@ const FACTORES = {
   bus: 0.089,
   metro: 0.033,
   tren: 0.041,
-  // Vuelos (kg CO2 por vuelo ida y vuelta)
-  vueloCorto: 250, // < 1500 km
-  vueloMedio: 600, // 1500-4000 km
-  vueloLargo: 1800, // > 4000 km
+  // Vuelos (kg CO2 por vuelo ida y vuelta, incl. factor forzamiento radiativo)
+  // Fuente: ICAO Carbon Calculator, ADEME 2024
+  vueloCorto: 350,  // < 1500 km — ej. Madrid-París i/v ≈ 350 kg CO2
+  vueloMedio: 900,  // 1500-4000 km — ej. Madrid-Estambul i/v ≈ 900 kg CO2
+  vueloLargo: 2500, // > 4000 km — ej. Madrid-Nueva York i/v ≈ 2.500 kg CO2
   // Hogar
   electricidad: 0.25, // kg CO2 por kWh (mix español 2024)
   gasNatural: 2.0, // kg CO2 por m³
@@ -760,15 +761,14 @@ export default function CalculadoraHuellaCarbono() {
         )}
       </div>
 
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta calculadora proporciona una <strong>estimación orientativa</strong> basada en factores de emisión medios.
-          Los valores reales pueden variar según tu ubicación, proveedor de energía y hábitos específicos.
-          Para un cálculo más preciso, consulta con expertos en sostenibilidad.
-        </p>
-      </div>
+      <DisclaimerCard
+        variant="educational"
+        severity="low"
+        context="calculadora-huella-carbono"
+        collapsible={false}
+      >
+        <p>Esta calculadora proporciona una <strong>estimación orientativa</strong> basada en factores de emisión medios (fuentes: MITECO, ICAO, ADEME). Los valores reales varían según tu ubicación, proveedor de energía y hábitos específicos.</p>
+      </DisclaimerCard>
 
       {/* Contenido educativo */}
       <EducationalSection

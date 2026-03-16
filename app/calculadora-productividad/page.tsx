@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './CalculadoraProductividad.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -180,6 +180,13 @@ export default function CalculadoraProductividadPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="financial"
+        severity="medium"
+        context="calculadora-productividad"
+        collapsible={false}
+      />
 
       {/* Proyectos */}
       <div className={styles.projectsSection}>
