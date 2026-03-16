@@ -44,15 +44,15 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 ### Finanzas e Inversión
 
 - [x] `/amortizacion-hipoteca/` — Amortización anticipada: reducir cuota vs plazo ✅ lote 19
-- [x] `/calculadora-inversiones/` — Calculadora de inversiones ✅ lote 19 (ya profesionalizada)
-- [x] `/simulador-cartera-inversion/` — Monte Carlo, Sharpe, volatilidad ✅ lote 19 (ya profesionalizada)
-- [x] `/calculadora-fire/` — Independencia financiera, retiro anticipado ✅ lote 19
-- [x] `/calculadora-alquiler-vs-compra/` — Análisis alquiler vs compra vivienda ✅ lote 19
-- [x] `/simulador-compraventa-inmueble/` — Gastos: ITP/IVA, notaría, registro, plusvalía ✅ lote 20
-- [x] `/calculadora-coste-vivienda/` — Coste real mensual de mantener vivienda ✅ lote 20
+- [x] `/estimador-inversiones/` — Estimador de Inversiones ✅ lote 19 (ya profesionalizada)
+- [x] `/estimador-cartera-inversion/` — Monte Carlo, Sharpe, volatilidad ✅ lote 19 (ya profesionalizada)
+- [x] `/estimador-fire/` — Independencia financiera, retiro anticipado ✅ lote 19
+- [x] `/orientador-alquiler-vs-compra/` — Análisis alquiler vs compra vivienda ✅ lote 19
+- [x] `/estimador-compraventa-inmueble/` — Gastos: ITP/IVA, notaría, registro, plusvalía ✅ lote 20
+- [x] `/estimador-coste-vivienda/` — Coste real mensual de mantener vivienda ✅ lote 20
 - [x] `/comparador-tipos-seguros/` — Guía: tipos de seguros vida, auto, hogar, salud ✅ lote 20
 - [x] `/checklist-coberturas-seguros/` — Qué seguros necesitas según tu perfil ✅ lote 20
-- [x] `/calculadora-infraseguro/` — Regla proporcional: cuánto cobras si tienes infraseguro ✅ lote 20
+- [x] `/estimador-infraseguro/` — Regla proporcional: cuánto cobras si tienes infraseguro ✅ lote 20
 - [x] `/guia-reclamar-seguro-coche/` — Cuándo reclamar al seguro del coche ✅ lote 21
 - [x] `/asistente-reclamaciones/` — Derechos del consumidor: plazos, OMIC ✅ lote 21
 
@@ -82,7 +82,7 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 - [x] `/planificador-embarazo/` — FPP, checklist, compras, vacunas ✅ lote 21
 - [x] `/planificador-mascota/` — Cachorro/gatito, checklist, compras, vacunas ✅ lote 21
 - [x] `/calculadora-alimentacion-mascotas/` — Raciones, tóxicos, transición pienso ✅ lote 22
-- [x] `/calculadora-medicamentos-mascotas/` — Antiparasitarios, frecuencia, síntomas ✅ lote 22
+- [x] `/orientador-medicamentos-mascotas/` — Antiparasitarios, frecuencia, síntomas ✅ lote 22
 - [x] `/seguimiento-ciclo-menstrual/` — Ventana fértil, ovulación (nueva 2026-02-19) ✅ lote 22
 - [x] `/planificador-chequeos-medicos/` — Chequeos preventivos por edad/sexo (nueva 2026-02-23) ✅ lote 22
 
@@ -200,7 +200,7 @@ Apps de uso frecuente con buen potencial educativo.
 
 ### Emprendimiento y Negocios
 
-- [ ] `/calculadora-break-even/` — Punto de equilibrio
+- [ ] `/estimador-break-even/` — Punto de equilibrio
 - [ ] `/generador-nombres-empresa/` — Generador de nombres de empresa
 
 ### Campus Digital
@@ -245,9 +245,9 @@ Apps de uso frecuente con buen potencial educativo.
 - [ ] `/conversor-tallas/` — Conversor de tallas internacional
 - [ ] `/calculadora-edad-mascotas/` — Edad perros/gatos en años humanos
 - [ ] `/planificador-boda/` — Wedding planner: checklist, presupuesto, timeline
-- [ ] `/calculadora-reformas-hogar/` — Presupuesto por tipo y m²
+- [ ] `/estimador-reformas-hogar/` — Presupuesto por tipo y m²
 - [ ] `/calculadora-huella-carbono/` — Huella de carbono personal
-- [ ] `/calculadora-gastos-comunidad/` — Gastos comunidad propietarios (nueva 2026-02-19)
+- [ ] `/estimador-gastos-comunidad/` — Gastos comunidad propietarios (nueva 2026-02-19)
 
 ### Herramientas Web y Tecnología
 
@@ -260,7 +260,7 @@ Apps de uso frecuente con buen potencial educativo.
 ### Nuevas Apps (2026-02-23)
 
 - [ ] `/checklist-documentos-viaje/` — Checklist documentos: España, Europa, internacional
-- [ ] `/simulador-jet-lag/` — Calculadora jet lag: diferencia horaria, adaptación
+- [ ] `/orientador-jet-lag/` — Calculadora jet lag: diferencia horaria, adaptación
 - [ ] `/quiz-paises-capitales/` — Quiz geografía: capitales, banderas
 - [ ] `/quiz-verbos-irregulares/` — Quiz verbos irregulares inglés (75 verbos A1-B2)
 - [ ] `/quiz-figuras-retoricas/` — Quiz figuras retóricas ESO/Bach/Selectividad
@@ -350,10 +350,10 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 | Lote 25 | 2026-03-11 | `cifrado-clasico`, `cifrado-vigenere`, `cifrado-transposicion`, `cifrado-playfair`, `generador-hashes` | `6661636` |
 | Lote 24 | 2026-03-11 | `visualizador-algoritmos`, `visualizador-estructuras-datos`, `calculadora-algebra-booleana`, `calculadora-electricidad`, `tabla-periodica` | `29456c6` |
 | Lote 23 | 2026-03-11 | `calculadora-distribuciones`, `inferencia-bayesiana`, `calculadora-algebra-abstracta`, `calculadora-teoria-colas`, `calculadora-estadistica-medica` | `d5bf6a4` |
-| Lote 22 | 2026-03-10 | `calculadora-alimentacion-mascotas`, `calculadora-medicamentos-mascotas`, `seguimiento-ciclo-menstrual`, `planificador-chequeos-medicos`, `estadistica-avanzada`(verif.) | `dacaccd` |
+| Lote 22 | 2026-03-10 | `calculadora-alimentacion-mascotas`, `orientador-medicamentos-mascotas`, `seguimiento-ciclo-menstrual`, `planificador-chequeos-medicos`, `estadistica-avanzada`(verif.) | `dacaccd` |
 | Lote 21 | 2026-03-10 | `guia-reclamar-seguro-coche`, `asistente-reclamaciones`, `calculadora-macros`, `planificador-embarazo`, `planificador-mascota` | `3a8c210` |
-| Lote 20 | 2026-03-10 | `simulador-compraventa-inmueble`, `calculadora-coste-vivienda`(verificada), `comparador-tipos-seguros`, `checklist-coberturas-seguros`, `calculadora-infraseguro` | `258faf4` |
-| Lote 19 | 2026-03-10 | `amortizacion-hipoteca`, `calculadora-inversiones`(verif.), `simulador-cartera-inversion`(verif.), `calculadora-fire`, `calculadora-alquiler-vs-compra` | `1ea0146` |
+| Lote 20 | 2026-03-10 | `estimador-compraventa-inmueble`, `estimador-coste-vivienda`(verificada), `comparador-tipos-seguros`, `checklist-coberturas-seguros`, `estimador-infraseguro` | `258faf4` |
+| Lote 19 | 2026-03-10 | `amortizacion-hipoteca`, `estimador-inversiones`(verif.), `estimador-cartera-inversion`(verif.), `estimador-fire`, `orientador-alquiler-vs-compra` | `1ea0146` |
 | — | 2026-03-10 | `calculadora-suscripciones`, `simulador-puertas-logicas` | `5d23136` |
 | — | 2026-03-10 | Verificadas: `golden-hour`, `matriz-eisenhower`, `conversor-horarios`, `codificador-base64`, `seguimiento-habitos` | `508b873` |
 | — | 2026-03-05 | `golden-hour`, `matriz-eisenhower`, `conversor-horarios` (parcial) | `3e42761` |
