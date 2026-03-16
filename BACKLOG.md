@@ -1,6 +1,6 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-03-15
+> **Última actualización**: 2026-03-16
 > **Apps totales**: 254 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
@@ -39,7 +39,7 @@
     - ⏸️ `eslint` 9→10 **suspendido indefinidamente** hasta que `eslint-config-next` soporte oficialmente ESLint 10. No revisar en audits hasta que haya confirmación oficial de compatibilidad. Riesgo: lint se rompe completamente si se actualiza antes.
     - ✅ Next.js/React al día.
     - ✅ `@trpc/*` 11.10.0 → 11.12.0 **completado** (2026-03-09). Build OK.
-    - 🟢 `@trpc/*` 11.12.0 → 11.12.1 disponible (patch menor, sin breaking changes). Actualizable en próxima sesión de mantenimiento. *(detectado: 2026-03-15)*
+    - 🟢 `@trpc/*` 11.12.0 → 11.13.4 disponible (minor, sin breaking changes). Actualizable en próxima sesión de mantenimiento. *(actualizado: 2026-03-16)*
     - 🟢 `baseline-browser-mapping` advertencia durante build ("datos de hace 2 meses"). Actualizar con `npm i baseline-browser-mapping@latest -D` en próxima sesión de mantenimiento. *(detectado: 2026-03-15)*
     - ✅ `sql.js` 1.14.0 → 1.14.1 **completado** (2026-03-09).
     - ✅ `@types/node` 22.19.13 → 22.19.15 **completado** (2026-03-09). No subir a v25 (no LTS).
@@ -103,9 +103,10 @@
 
 > Apps con más usos reales que aún están pendientes de profesionalizar. Priorizar estas sobre el resto.
 
-- [ ] **calculadora-notas** — #5 en ranking (44 usos). Pendiente en inventario. Alto valor educativo (sistema de notas español, ponderación, media ponderada).
-- [ ] **generador-tonos** — #10 en ranking (32 usos). Pendiente en inventario. Contexto educativo: física del sonido, frecuencias, uso en audiología.
-- [ ] **conversor-braille** — #11 en ranking (31 usos). Pendiente en inventario. Alto valor social: historia del braille, sistemas, accesibilidad.
+- [x] **calculadora-notas** — #5 en ranking (45 usos). ✅ Ya profesionalizada (2026-02-23). *(verificado en auditoría: 2026-03-16)*
+- [x] **generador-anagramas** — #7 en ranking (43 usos). ✅ Ya profesionalizada: tabla comparativa, 4 casos de uso, 8 FAQs, guía 6 pasos, 6 tips, warning box. *(verificado en auditoría: 2026-03-16)*
+- [x] **generador-tonos** — #11 en ranking (33 usos). ✅ Profesionalizada: tabla 8 rangos de frecuencia, 4 casos de uso, 8 FAQs, guía test de audición 6 pasos, 6 tips, warning box 5 puntos. *(2026-03-16)*
+- [x] **conversor-braille** — #10 en ranking (34 usos). ✅ Ya profesionalizada: tabla comparativa 5 tipos, 4 casos de uso, 8 FAQs, guía 6 pasos, 6 tips, warning box 6 puntos. *(verificado en auditoría: 2026-03-16)*
 
 ---
 
