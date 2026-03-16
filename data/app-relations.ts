@@ -65,10 +65,22 @@ const saludMayoresApps: RelatedApp[] = [
 ];
 
 const patrimonioPensionApps: RelatedApp[] = [
-  { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Impuesto de Sucesiones', description: 'Cuánto pagas por herencia' },
+  { url: '/estimador-legitimas/', icon: '⚖️', name: 'Estimador de Legítimas', description: 'Herencia forzosa por régimen civil' },
+  { url: '/estimador-impuesto-sucesiones/', icon: '🏛️', name: 'Impuesto de Sucesiones', description: 'Cuánto pagas por herencia' },
   { url: '/estimador-impuesto-donaciones/', icon: '🎁', name: 'Impuesto de Donaciones', description: 'Donar en vida vs herencia' },
   { url: '/orientacion-tramitacion-herencias/', icon: '📋', name: 'Tramitar una Herencia', description: 'Guía paso a paso' },
   { url: '/estimador-plusvalia-municipal/', icon: '🏙️', name: 'Plusvalía Municipal', description: 'Al vender o heredar inmueble' },
+];
+
+// ==========================================
+// FAMILIA: JUBILACIÓN FISCAL (Lote B2)
+// ==========================================
+const jubilacionFiscalApps: RelatedApp[] = [
+  { url: '/optimizador-rentas-60/', icon: '📊', name: 'Optimizador de Rentas 60+', description: 'Estrategia IRPF: pensión + PP + ahorro' },
+  { url: '/estimador-irpf-pensionista/', icon: '🧮', name: 'IRPF Pensionista', description: 'Cuota y retención sobre la pensión' },
+  { url: '/orientador-plan-pensiones/', icon: '📈', name: 'Plan de Pensiones', description: 'Desgravación y capital acumulado' },
+  { url: '/estimador-brecha-jubilacion/', icon: '📉', name: 'Brecha de Jubilación', description: 'Cuánto perderás respecto al sueldo' },
+  { url: '/estimador-pension-publica/', icon: '🏛️', name: 'Pensión Pública', description: 'Base reguladora y % por años cotizados' },
 ];
 
 // ==========================================
@@ -1116,6 +1128,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'orientador-grado-dependencia': [
     ...saludMayoresApps.filter(a => a.url !== '/orientador-grado-dependencia/'),
+  ],
+  'estimador-legitimas': [
+    ...patrimonioPensionApps.filter(a => a.url !== '/estimador-legitimas/'),
+  ],
+  'optimizador-rentas-60': [
+    ...jubilacionFiscalApps.filter(a => a.url !== '/optimizador-rentas-60/'),
   ],
 };
 

@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 283+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 285+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 283,
+  "total_tools": 285,
   "last_updated": "2026-03-16",
   "features": {
     "all_free": true,
@@ -43,7 +43,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 72
+      "tool_count": 74
     },
     {
       "id": "creando",
@@ -1763,6 +1763,51 @@
         "test iof osteoporosis"
       ],
       "icon": "🦴"
+    },
+    {
+      "slug": "estimador-legitimas",
+      "name": "Estimador de Legítimas",
+      "url": "https://meskeia.com/estimador-legitimas/",
+      "description": "Calcula la herencia forzosa y la parte de libre disposición según el régimen civil de tu CCAA (Código Civil, Cataluña, Aragón, Galicia, Baleares, País Vasco, Navarra).",
+      "suites": [
+        "jubilacion",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "legitima herencia",
+        "calculo legitima",
+        "tercio legitima estricta mejora",
+        "herencia forzosa españa",
+        "legitima cataluña aragon galicia",
+        "parte libre disposicion herencia",
+        "herederos forzosos"
+      ],
+      "icon": "⚖️"
+    },
+    {
+      "slug": "optimizador-rentas-60",
+      "name": "Optimizador de Rentas 60+",
+      "url": "https://meskeia.com/optimizador-rentas-60/",
+      "description": "Estrategia IRPF para pensionistas: calcula el orden óptimo de retirada de fondos (pensión pública, plan de pensiones, ahorro, alquiler) para minimizar el impuesto total.",
+      "suites": [
+        "jubilacion",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "optimizar rentas jubilacion",
+        "irpf pensionista plan pensiones",
+        "orden retirada fondos jubilacion",
+        "estrategia fiscal mayores 60",
+        "minimizar impuestos jubilacion",
+        "plan pensiones irpf retiro"
+      ],
+      "icon": "📊"
     },
     {
       "slug": "test-fragilidad",
