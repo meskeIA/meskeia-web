@@ -148,6 +148,9 @@
 - [x] **contador-silabas** — ✅ Profesionalizada: tabla fenómenos fonéticos (diptongo/hiato/sinalefa), 4 casos uso, 8 FAQs, guía análisis métrico 6 pasos, 6 tips, warning. *(2026-03-16)*
 - [x] **test-velocidad-escritura** — ✅ Profesionalizada: tabla WPM por nivel/profesión, 4 casos uso, 8 FAQs, guía plan 6 semanas, 6 tips, warning. *(2026-03-16)*
 - [x] **generador-tipografias** — ✅ Profesionalizada: tabla 5 familias tipográficas, 4 casos uso, 8 FAQs, guía elección 6 pasos, 6 principios, warning. *(2026-03-16)*
+- [x] **comparador-textos** — ✅ Profesionalizada: tabla 5 tipos comparación (diff/similitud/hash/semántica), 4 casos uso, 8 FAQs, guía 6 pasos, 6 tips, warning. *(2026-03-16)*
+- [x] **conversor-imagenes** — ✅ Profesionalizada: tabla 5 formatos imagen (JPEG/PNG/WebP/GIF/SVG), 4 casos uso, 8 FAQs, guía elección 6 pasos, 6 tips, warning. *(2026-03-16)*
+- [x] **test-habitos-saludables** — ✅ Profesionalizada: tabla 5 áreas hábitos, 4 perfiles beneficiarios, 8 FAQs (evidencia científica), guía plan 6 semanas, 6 claves, warning. *(2026-03-16)*
 - [ ] **planificador-mudanzas** — Hogar: fases de una mudanza, checklist por semanas, tabla comparativa contratar empresa vs mudanza propia.
 - [ ] **calculadora-percentiles** — Estadística/salud: qué es un percentil, uso en pediatría/estadística, tabla interpretación.
 

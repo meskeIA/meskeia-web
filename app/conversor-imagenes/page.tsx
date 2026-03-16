@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import styles from './ConversorImagenes.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type OutputFormat = 'jpeg' | 'png' | 'webp';
@@ -380,6 +380,174 @@ export default function ConversorImagenesPage() {
           </div>
         </div>
       </div>
+
+      <EducationalSection
+        title="Guía de Formatos de Imagen"
+        subtitle="Todo lo que necesitas saber para elegir el formato correcto"
+        icon="🖼️"
+      >
+        {/* Tabla comparativa */}
+        <div className={styles.eduTablaWrapper}>
+          <table className={styles.eduTabla}>
+            <thead>
+              <tr>
+                <th>Formato</th>
+                <th>Compresión</th>
+                <th>Transparencia</th>
+                <th>Mejor uso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>JPEG/JPG</strong></td>
+                <td>Con pérdida (lossy)</td>
+                <td>No</td>
+                <td>Fotos, fondos complejos</td>
+              </tr>
+              <tr>
+                <td><strong>PNG</strong></td>
+                <td>Sin pérdida (lossless)</td>
+                <td>Sí (alpha)</td>
+                <td>Logos, capturas, gráficos</td>
+              </tr>
+              <tr>
+                <td><strong>WebP</strong></td>
+                <td>Con/sin pérdida</td>
+                <td>Sí</td>
+                <td>Web moderna (Chrome/Firefox)</td>
+              </tr>
+              <tr>
+                <td><strong>GIF</strong></td>
+                <td>Sin pérdida (256 colores)</td>
+                <td>Sí (1 bit)</td>
+                <td>Animaciones simples</td>
+              </tr>
+              <tr>
+                <td><strong>SVG</strong></td>
+                <td>Vectorial</td>
+                <td>Sí</td>
+                <td>Iconos, ilustraciones escalables</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Casos de uso */}
+        <h3>Casos de uso habituales</h3>
+        <div className={styles.eduEscenariosGrid}>
+          <div className={styles.eduEscenarioCard}>
+            <span className={styles.eduEscenarioIcon}>📱</span>
+            <h4>Redes sociales</h4>
+            <p>Usa JPEG a 80-85% para fotos. Para Instagram Stories o posts con texto, WebP reduce el tamaño sin pérdida visible.</p>
+          </div>
+          <div className={styles.eduEscenarioCard}>
+            <span className={styles.eduEscenarioIcon}>🌐</span>
+            <h4>Web y e-commerce</h4>
+            <p>WebP es el estándar actual: hasta 30% más pequeño que JPEG a igual calidad. Mejora Core Web Vitals (LCP).</p>
+          </div>
+          <div className={styles.eduEscenarioCard}>
+            <span className={styles.eduEscenarioIcon}>🎨</span>
+            <h4>Diseño gráfico</h4>
+            <p>PNG para exportar activos con transparencia. Mantén siempre el original en alta resolución antes de convertir.</p>
+          </div>
+          <div className={styles.eduEscenarioCard}>
+            <span className={styles.eduEscenarioIcon}>📧</span>
+            <h4>Email marketing</h4>
+            <p>JPEG sigue siendo el más seguro en emails (máxima compatibilidad). Evita WebP en clientes como Outlook.</p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <h3>Preguntas frecuentes</h3>
+        <dl className={styles.eduFaqList}>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Qué calidad JPEG debo usar?</dt>
+            <dd className={styles.eduFaqRespuesta}>Entre 75-85% es el punto óptimo: reducción de tamaño notable sin degradación apreciable a simple vista. Solo baja del 60% si el tamaño de archivo es crítico.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Cuándo usar PNG en lugar de JPEG?</dt>
+            <dd className={styles.eduFaqRespuesta}>Cuando la imagen tiene texto, bordes nítidos, transparencia o es un logo. JPEG genera artefactos de compresión en estos casos. Para fotos, JPEG casi siempre es mejor.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿WebP es compatible con todos los navegadores?</dt>
+            <dd className={styles.eduFaqRespuesta}>Sí, desde 2021 todos los navegadores modernos lo soportan (Chrome, Firefox, Safari, Edge). Para sitios que deban soportar IE11 o Safari antiguo, usa JPEG/PNG como fallback.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Qué ocurre con la transparencia al convertir a JPEG?</dt>
+            <dd className={styles.eduFaqRespuesta}>JPEG no soporta transparencia. Los píxeles transparentes se rellenan con blanco (fondo por defecto). Si necesitas conservar la transparencia, usa PNG o WebP.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Redimensionar reduce la calidad?</dt>
+            <dd className={styles.eduFaqRespuesta}>Reducir resolución (downscale) apenas pierde calidad perceptible. Ampliar (upscale) genera pixelado porque se inventan píxeles. Nunca amplíes más de un 20-30%.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Cuál es la diferencia entre DPI y PPI?</dt>
+            <dd className={styles.eduFaqRespuesta}>PPI (píxeles por pulgada) es para pantallas; DPI (puntos por pulgada) es para impresión. Para web, los DPI no importan — solo cuentan las dimensiones en píxeles. Para imprimir, necesitas al menos 300 DPI.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Qué tamaño es «demasiado grande» para una web?</dt>
+            <dd className={styles.eduFaqRespuesta}>Google recomienda que cada imagen pese menos de 200 KB para mantener tiempos de carga óptimos. Una foto de producto en e-commerce debería ser de 50-150 KB en formato WebP o JPEG a 80%.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Qué dimensiones usar para miniaturas en YouTube?</dt>
+            <dd className={styles.eduFaqRespuesta}>1280×720 píxeles (16:9) es el estándar oficial. El archivo no debe superar 2 MB. Usa JPEG a 90% para máxima calidad visible en pantallas 4K.</dd>
+          </div>
+        </dl>
+
+        {/* Guía paso a paso */}
+        <h3>Cómo elegir el formato correcto en 6 pasos</h3>
+        <ol className={styles.eduPasosList}>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>1</span>
+            <div><strong>¿Necesitas transparencia?</strong> Sí → PNG o WebP. No → continúa al paso 2.</div>
+          </li>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>2</span>
+            <div><strong>¿Es una fotografía o ilustración con muchos colores?</strong> Sí → JPEG o WebP. No (logos, texto) → PNG.</div>
+          </li>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>3</span>
+            <div><strong>¿Es para web moderna?</strong> Usa WebP siempre que puedas: mejor compresión que JPEG y PNG.</div>
+          </li>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>4</span>
+            <div><strong>Define las dimensiones objetivo</strong> según el destino (ver presets de redes sociales).</div>
+          </li>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>5</span>
+            <div><strong>Ajusta la calidad</strong>: empieza en 85% y baja hasta que el tamaño sea aceptable sin pérdida visible.</div>
+          </li>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>6</span>
+            <div><strong>Compara tamaños</strong>: el indicador de reducción te muestra el ahorro. Un 40-70% es un buen resultado.</div>
+          </li>
+        </ol>
+
+        {/* Tips */}
+        <h3>6 buenas prácticas con imágenes</h3>
+        <div className={styles.eduTipsGrid}>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>💾</span><p>Guarda siempre el original sin comprimir antes de convertir.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>📐</span><p>Redimensiona antes de comprimir para mejores resultados.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🔄</span><p>Convierte lotes de imágenes del mismo tipo con los mismos ajustes.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🌐</span><p>Para web, activa lazy loading en imágenes below-the-fold.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>📱</span><p>Genera versiones 1x y 2x para pantallas Retina/HiDPI.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🔍</span><p>Usa Google PageSpeed para auditar el impacto de tus imágenes.</p></div>
+        </div>
+
+        {/* Warning */}
+        <div className={styles.warningBox}>
+          <span className={styles.warningIcono}>⚠️</span>
+          <div>
+            <strong>Conversión con pérdida</strong>
+            <ul>
+              <li>Cada conversión JPEG → JPEG acumula pérdida de calidad. Parte siempre del original.</li>
+              <li>La reducción de tamaño no implica reducción de dimensiones (y viceversa).</li>
+              <li>Ampliar una imagen de baja resolución no la mejora — solo la hace más grande y borrosa.</li>
+              <li>El procesado ocurre 100% en tu navegador: ninguna imagen se sube a ningún servidor.</li>
+            </ul>
+          </div>
+        </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('conversor-imagenes')} />
 

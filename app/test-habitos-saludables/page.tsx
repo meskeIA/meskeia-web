@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './TestHabitos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Question {
@@ -625,6 +625,174 @@ export default function TestHabitosPage() {
           <li><strong>Consulta con profesionales</strong>: Para una evaluación completa de tu estado de salud, acude a tu médico o nutricionista</li>
         </ul>
       </DisclaimerCard>
+
+      <EducationalSection
+        title="Ciencia de los Hábitos Saludables"
+        subtitle="Evidencia científica para entender y transformar tu estilo de vida"
+        icon="🌱"
+      >
+        {/* Tabla comparativa */}
+        <div className={styles.eduTablaWrapper}>
+          <table className={styles.eduTabla}>
+            <thead>
+              <tr>
+                <th>Área</th>
+                <th>Hábito clave</th>
+                <th>Beneficio principal</th>
+                <th>Tiempo mínimo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sueño</strong></td>
+                <td>7-9 h regulares</td>
+                <td>Memoria, inmunidad, peso</td>
+                <td>Inmediato</td>
+              </tr>
+              <tr>
+                <td><strong>Ejercicio</strong></td>
+                <td>150 min/semana moderado</td>
+                <td>Cardiovascular, estado de ánimo</td>
+                <td>2-4 semanas</td>
+              </tr>
+              <tr>
+                <td><strong>Nutrición</strong></td>
+                <td>5 raciones fruta/verdura</td>
+                <td>Micronutrientes, digestión</td>
+                <td>1-2 semanas</td>
+              </tr>
+              <tr>
+                <td><strong>Hidratación</strong></td>
+                <td>1,5-2 L agua/día</td>
+                <td>Concentración, piel, riñones</td>
+                <td>24-48 horas</td>
+              </tr>
+              <tr>
+                <td><strong>Gestión estrés</strong></td>
+                <td>10 min meditación/día</td>
+                <td>Cortisol, presión arterial</td>
+                <td>4-8 semanas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Casos de uso */}
+        <h3>¿Quién se beneficia de este test?</h3>
+        <div className={styles.eduEscenariosGrid}>
+          <div className={styles.eduEscenarioCard}>
+            <span className={styles.eduEscenarioIcon}>🏃</span>
+            <h4>Personas activas</h4>
+            <p>Identifica qué áreas fuera del ejercicio están limitando tu rendimiento y recuperación.</p>
+          </div>
+          <div className={styles.eduEscenarioCard}>
+            <span className={styles.eduEscenarioIcon}>💼</span>
+            <h4>Profesionales con estrés</h4>
+            <p>Detecta si los hábitos de sueño y descanso están comprometidos por la carga laboral.</p>
+          </div>
+          <div className={styles.eduEscenarioCard}>
+            <span className={styles.eduEscenarioIcon}>👨‍👩‍👧</span>
+            <h4>Familias</h4>
+            <p>Evalúa el estilo de vida familiar y detecta áreas de mejora colectivas (alimentación, pantallas).</p>
+          </div>
+          <div className={styles.eduEscenarioCard}>
+            <span className={styles.eduEscenarioIcon}>🎓</span>
+            <h4>Estudiantes</h4>
+            <p>El sueño y la nutrición impactan directamente en el aprendizaje. Este test ayuda a priorizar.</p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <h3>Preguntas frecuentes</h3>
+        <dl className={styles.eduFaqList}>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Cuánto tarda en formarse un hábito?</dt>
+            <dd className={styles.eduFaqRespuesta}>La idea popular de «21 días» es un mito. Un estudio de la UCL (Lally, 2010) encontró que la media real es 66 días, con rangos de 18 a 254 días según la complejidad del hábito.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Qué es el modelo de «bucle de hábito»?</dt>
+            <dd className={styles.eduFaqRespuesta}>Charles Duhigg describe el bucle: señal → rutina → recompensa. Para cambiar un hábito, mantén la señal y la recompensa, pero cambia la rutina. Identificar la señal es el paso más difícil.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Cuántas horas de sueño son suficientes?</dt>
+            <dd className={styles.eduFaqRespuesta}>La OMS y la NSF recomiendan 7-9 horas para adultos. Menos de 6 horas crónicas se asocia con obesidad, diabetes tipo 2, deterioro cognitivo y mayor mortalidad.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Realmente importa cuándo como, no solo qué como?</dt>
+            <dd className={styles.eduFaqRespuesta}>Sí. La crononutrición muestra que comer tarde altera el ritmo circadiano y el metabolismo. Cenar antes de las 20:00 y hacer ayuno nocturno de 12 h se asocia con mejor control glucémico.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Qué ejercicio es mejor para empezar?</dt>
+            <dd className={styles.eduFaqRespuesta}>Caminar 30 minutos diarios es la intervención con mejor relación esfuerzo-beneficio para sedentarios. La OMS recomienda 150-300 min/semana de actividad moderada o 75-150 min intensa.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Las pantallas antes de dormir afectan realmente?</dt>
+            <dd className={styles.eduFaqRespuesta}>Sí. La luz azul suprime la melatonina hasta 3 horas. Evita pantallas 1 h antes de dormir o usa filtros de luz azul desde las 20:00. Esto también mejora la calidad de sueño profundo.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Es malo tomar café?</dt>
+            <dd className={styles.eduFaqRespuesta}>No con moderación. Hasta 3-4 tazas al día (400 mg cafeína) es seguro para la mayoría de adultos. El problema es tomarlo después de las 14:00: su vida media de 5-6 h altera el sueño nocturno.</dd>
+          </div>
+          <div className={styles.eduFaqItem}>
+            <dt className={styles.eduFaqPregunta}>¿Cómo sé si tengo estrés crónico?</dt>
+            <dd className={styles.eduFaqRespuesta}>Señales: tensión muscular persistente, insomnio, irritabilidad, digestión irregular, mayor frecuencia de resfriados. El estrés crónico eleva el cortisol, suprime el sistema inmune y aumenta la inflamación.</dd>
+          </div>
+        </dl>
+
+        {/* Guía paso a paso */}
+        <h3>Plan de mejora de hábitos en 6 semanas</h3>
+        <ol className={styles.eduPasosList}>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>1</span>
+            <div><strong>Semana 1 — Diagnóstico:</strong> Haz este test y anota tus puntuaciones por área. Elige solo 1-2 áreas a mejorar (no todas a la vez).</div>
+          </li>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>2</span>
+            <div><strong>Semana 2 — Define el hábito mínimo viable:</strong> Ej: «Caminar 10 min después de comer» en vez de «hacer ejercicio». Cuanto más pequeño, más probable de cumplirse.</div>
+          </li>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>3</span>
+            <div><strong>Semana 3 — Ancla a una rutina existente:</strong> Conecta el nuevo hábito a algo que ya haces. Ej: «Después de desayunar, tomo 5 min de sol en el balcón».</div>
+          </li>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>4</span>
+            <div><strong>Semana 4 — Registra el progreso:</strong> Usa un calendario o app. Ver la cadena de días cumplidos («don't break the chain») es un motivador potente.</div>
+          </li>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>5</span>
+            <div><strong>Semana 5 — Aumenta gradualmente:</strong> Si caminas 10 min, pasa a 15. El incremento del 10% semanal es sostenible y evita abandono.</div>
+          </li>
+          <li className={styles.eduPaso}>
+            <span className={styles.eduPasoNum}>6</span>
+            <div><strong>Semana 6 — Repite el test:</strong> Mide el cambio en tus puntuaciones. Celebra mejoras pequeñas y añade el siguiente hábito prioritario.</div>
+          </li>
+        </ol>
+
+        {/* Tips */}
+        <h3>6 claves para que los hábitos duren</h3>
+        <div className={styles.eduTipsGrid}>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🎯</span><p>Un hábito a la vez. El «todo o nada» es la principal causa de abandono.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>📅</span><p>Misma hora, mismo lugar. La consistencia contextual acelera la automatización.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>👥</span><p>Comparte tu objetivo con alguien. La responsabilidad social duplica la adherencia.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>⚡</span><p>Prepara el entorno: zapatillas a la vista, fruta en la encimera, móvil fuera del dormitorio.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🔄</span><p>Los fallos son normales. Fallar un día no rompe el hábito; abandonar tras el fallo, sí.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🧠</span><p>Reencuadra la identidad: «soy una persona activa» funciona mejor que «intento hacer ejercicio».</p></div>
+        </div>
+
+        {/* Warning */}
+        <div className={styles.warningBox}>
+          <span className={styles.warningIcono}>⚠️</span>
+          <div>
+            <strong>Importante sobre este test</strong>
+            <ul>
+              <li>Los resultados son orientativos y no sustituyen la evaluación de un profesional sanitario.</li>
+              <li>Cambios drásticos de dieta o ejercicio sin supervisión pueden ser contraproducentes.</li>
+              <li>Si tienes condiciones de salud preexistentes, consulta a tu médico antes de modificar hábitos.</li>
+              <li>El bienestar es multifactorial: un test no puede capturar toda la complejidad individual.</li>
+            </ul>
+          </div>
+        </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('test-habitos-saludables')} />
 
