@@ -608,21 +608,20 @@ export default function GuiaRespiracionPage() {
           </div>
         </section>
 
-        {/* WARNING BOX */}
-        <section className={styles.guiaSeccion}>
-          <div className={styles.warningBox}>
-            <h3>⚠️ Señales de alarma: cuándo parar y consultar al médico</h3>
-            <ul>
-              <li><strong>Hipertensión arterial no controlada:</strong> las técnicas con retención (Cuadrada, 4-7-8) pueden aumentar transitoriamente la presión. Consulta a tu médico antes de practicarlas.</li>
-              <li><strong>Mareo intenso, palpitaciones o malestar:</strong> detén el ejercicio inmediatamente si experimentas cualquiera de estos síntomas. Son señales de que la técnica no es adecuada para ti en ese momento.</li>
-              <li><strong>La técnica 4-7-8 en ataques de pánico activos:</strong> durante un ataque de pánico, la retención de 7 segundos puede aumentar la sensación de ahogo. Usa Diafragmática simple en su lugar.</li>
-              <li><strong>Más de 4 ciclos consecutivos de 4-7-8:</strong> el Dr. Weil, creador de esta técnica, recomienda no superar 4 repeticiones seguidas, especialmente al principio. Aumenta gradualmente con el tiempo.</li>
-              <li><strong>Asma activa o EPOC descompensada:</strong> en crisis agudas, no practiques sin indicación médica. La respiración guiada es una herramienta de bienestar, no un tratamiento de urgencia.</li>
-              <li><strong>Esta app no sustituye la fisioterapia respiratoria:</strong> si tienes una condición respiratoria diagnosticada, la guía de respiración puede complementar, pero nunca reemplazar, el plan de tratamiento de tu equipo médico.</li>
-            </ul>
-          </div>
-        </section>
       </EducationalSection>
+
+      {/* WARNING BOX — siempre visible, fuera de la sección colapsable */}
+      <div className={styles.warningBox} role="note" aria-label="Señales de alarma y contraindicaciones">
+        <h3>⚠️ Señales de alarma: cuándo parar y consultar al médico</h3>
+        <ul>
+          <li><strong>Hipertensión arterial no controlada:</strong> las técnicas con retención (Cuadrada, 4-7-8) pueden aumentar transitoriamente la presión. Consulta a tu médico antes de practicarlas.</li>
+          <li><strong>Mareo intenso, palpitaciones o malestar:</strong> detén el ejercicio inmediatamente si experimentas cualquiera de estos síntomas. Son señales de que la técnica no es adecuada para ti en ese momento.</li>
+          <li><strong>La técnica 4-7-8 en ataques de pánico activos:</strong> durante un ataque de pánico, la retención de 7 segundos puede aumentar la sensación de ahogo. Usa Diafragmática simple en su lugar.</li>
+          <li><strong>Más de 4 ciclos consecutivos de 4-7-8:</strong> el Dr. Weil, creador de esta técnica, recomienda no superar 4 repeticiones seguidas, especialmente al principio. Aumenta gradualmente con el tiempo.</li>
+          <li><strong>Asma activa o EPOC descompensada:</strong> en crisis agudas, no practiques sin indicación médica. La respiración guiada es una herramienta de bienestar, no un tratamiento de urgencia.</li>
+          <li><strong>Esta app no sustituye la fisioterapia respiratoria:</strong> si tienes una condición respiratoria diagnosticada, la guía de respiración puede complementar, pero nunca reemplazar, el plan de tratamiento de tu equipo médico.</li>
+        </ul>
+      </div>
 
       <RelatedApps apps={getRelatedApps('guia-respiracion')} />
       <ShareCard appName="guia-respiracion" />

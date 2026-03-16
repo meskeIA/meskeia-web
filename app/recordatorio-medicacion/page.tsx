@@ -9,6 +9,7 @@ import {
   RelatedApps,
   ShareCard,
   EducationalSection,
+  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -264,11 +265,12 @@ export default function RecordatorioMedicacionPage() {
           </button>
         </div>
 
-        {/* Aviso importante */}
-        <div className={styles.avisoBox}>
-          <h3>⚠️ Aviso importante</h3>
-          <p>Esta herramienta es un <strong>apoyo visual</strong> para la gestión de medicamentos. <strong>No sustituye</strong> a la prescripción médica ni a la supervisión de un profesional sanitario. Consulta siempre a tu médico o farmacéutico.</p>
-        </div>
+        {/* Aviso médico */}
+        <DisclaimerCard
+          variant="medical"
+          severity="high"
+          context="recordatorio-medicacion"
+        />
 
         {/* Sección educativa */}
         <EducationalSection

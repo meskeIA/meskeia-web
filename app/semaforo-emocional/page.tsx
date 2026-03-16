@@ -317,6 +317,10 @@ export default function SemaforoEmocionalPage() {
           <h2>Preguntas frecuentes</h2>
           <dl className={styles.faqList}>
             <div className={styles.faqItem}>
+              <dt>¿En qué modelo se basa este semáforo emocional?</dt>
+              <dd>Está inspirado en las <strong>Zonas de Regulación</strong> de Leah Kuypers (2011), un marco curricular ampliamente utilizado en logopedia, psicología y educación especial. El modelo original incluye 4 zonas: <strong>Azul</strong> (baja activación: cansancio, tristeza, aburrimiento), <strong>Verde</strong> (calma, listo para aprender), <strong>Amarillo</strong> (alerta, nerviosismo, excitación elevada) y <strong>Rojo</strong> (muy activado, fuera de control). Esta herramienta utiliza 3 zonas (verde, amarillo, rojo) como simplificación accesible. Para el trabajo completo con las 4 zonas, consulta el programa oficial de Leah Kuypers o a un especialista.</dd>
+            </div>
+            <div className={styles.faqItem}>
               <dt>¿Qué hago si el usuario siempre pulsa el mismo color?</dt>
               <dd>Es información valiosa, no un problema. Si siempre pulsa rojo, puede que tenga dificultades para identificar estados intermedios, o que su entorno genere mucha activación. Trabajar la diferenciación de estados con el terapeuta es el siguiente paso.</dd>
             </div>
