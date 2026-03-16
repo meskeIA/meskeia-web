@@ -39,7 +39,7 @@ const tools = [
     id: 'simulador-compraventa-inmueble',
     name: 'Estimador de Gastos de Compraventa',
     icon: '🏠',
-    url: '/simulador-compraventa-inmueble/',
+    url: '/estimador-compraventa-inmueble/',
     question: '¿Cuánto cuesta vender o comprar un inmueble heredado?',
     description: 'Calcula todos los gastos al vender o comprar un inmueble: ITP/IVA, AJD, notaría, registro, gestoría e inmobiliaria.',
     step: 4,

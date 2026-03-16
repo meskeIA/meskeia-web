@@ -9,13 +9,13 @@
 
 export const implementedAppsUrls = [
   // Finanzas (apps universales, sin normativa española)
-  "/calculadora-inflacion/",
-  "/calculadora-tir-van/",
+  "/estimador-inflacion/",
+  "/estimador-tir-van/",
   "/control-gastos/",
-  "/interes-compuesto/",
-  "/simulador-hipoteca/",
-  "/simulador-compraventa-inmueble/", // Gastos de compraventa: ITP/IVA, notaría, registro, plusvalía
-  "/simulador-prestamos/",           // Compara sistemas francés, alemán, americano
+  "/estimador-interes-compuesto/",
+  "/estimador-hipoteca/",
+  "/estimador-compraventa-inmueble/", // Gastos de compraventa: ITP/IVA, notaría, registro, plusvalía
+  "/estimador-prestamos/",           // Compara sistemas francés, alemán, americano
   "/amortizacion-hipoteca/",         // Amortización anticipada: reducir cuota vs plazo
   "/estimador-pension-publica/",        // Estimador pensión SS: base reguladora, % por años, pensión mensual
   "/estimador-brecha-jubilacion/",      // Brecha pensión-sueldo: cuánto perderás y ahorro mensual necesario
@@ -31,24 +31,24 @@ export const implementedAppsUrls = [
   "/optimizador-rentas-60/",            // Optimizador de Rentas 60+: estrategia IRPF pensión + PP + ahorro + alquiler
   "/test-fragilidad/",                  // Test de Fragilidad (Escala FRAIL): 5 ítems, 3 niveles (robusto/pre-frágil/frágil)
   "/orientador-grado-dependencia/",     // Orientador Grado de Dependencia BVD: Grado I/II/III + prestaciones SAAD
-  "/calculadora-jubilacion/",
-  "/calculadora-inversiones/",
+  "/estimador-jubilacion/",
+  "/estimador-inversiones/",
   "/test-perfil-inversor/",
-  "/simulador-cartera-inversion/",    // Monte Carlo, Sharpe, volatilidad
+  "/estimador-cartera-inversion/",    // Monte Carlo, Sharpe, volatilidad
   "/calculadora-suscripciones/",      // Control de suscripciones recurrentes
   "/calculadora-roommates/",          // División gastos piso compartido
-  "/calculadora-fondo-emergencia/",   // Cuánto ahorrar como colchón de seguridad
-  "/calculadora-regla-50-30-20/",     // Distribución presupuesto 50/30/20
-  "/calculadora-fire/",               // Independencia financiera, retiro anticipado
-  "/calculadora-alquiler-vs-compra/", // Análisis alquiler vs compra vivienda
-  "/calculadora-coste-plazos/",       // Coste real financiación a plazos, TAE oculta
-  "/calculadora-deuda/",              // Método bola de nieve vs avalancha
+  "/estimador-fondo-emergencia/",   // Cuánto ahorrar como colchón de seguridad
+  "/orientador-regla-50-30-20/",     // Distribución presupuesto 50/30/20
+  "/estimador-fire/",               // Independencia financiera, retiro anticipado
+  "/orientador-alquiler-vs-compra/", // Análisis alquiler vs compra vivienda
+  "/estimador-coste-plazos/",       // Coste real financiación a plazos, TAE oculta
+  "/estimador-deuda/",              // Método bola de nieve vs avalancha
   "/comparador-vehiculos/",           // Comparador: contado vs financiación vs renting vs leasing
-  "/calculadora-coste-vivienda/",     // Coste real mensual de mantener vivienda
-  "/calculadora-seguro-vida/",          // Necesidades de seguro de vida para proteger a la familia
+  "/estimador-coste-vivienda/",     // Coste real mensual de mantener vivienda
+  "/orientador-seguro-vida/",          // Necesidades de seguro de vida para proteger a la familia
   "/comparador-tipos-seguros/",         // Guía educativa: tipos de seguros vida, auto, hogar, salud
   "/checklist-coberturas-seguros/",     // Qué seguros necesitas según tu perfil
-  "/calculadora-infraseguro/",          // Regla proporcional: cuánto cobras si tienes infraseguro
+  "/estimador-infraseguro/",          // Regla proporcional: cuánto cobras si tienes infraseguro
   "/guia-reclamar-seguro-coche/",       // Guía: cuándo reclamar al seguro del coche
   "/asistente-reclamaciones/",          // Asistente reclamaciones consumidor: derechos, plazos, OMIC
 
@@ -68,7 +68,7 @@ export const implementedAppsUrls = [
   "/calculadora-edad-mascotas/",     // Edad perros/gatos en años humanos
   "/planificador-boda/",             // Wedding planner: checklist, presupuesto, timeline
   "/planificador-mudanzas/",         // Mudanza: tareas, inventario, presupuesto
-  "/calculadora-reformas-hogar/",    // Reformas: presupuesto estimado por tipo y m²
+  "/estimador-reformas-hogar/",    // Reformas: presupuesto estimado por tipo y m²
   "/calculadora-huella-carbono/",    // Huella de carbono personal
 
   // Matemáticas y Estadística (13 implementadas)
@@ -171,8 +171,8 @@ export const implementedAppsUrls = [
   "/tirador-dados/",            // Dados virtuales para rol y juegos de mesa
 
   // Salud y Bienestar (15 implementadas)
-  "/calculadora-imc/",
-  "/calculadora-colesterol/",         // Colesterol: ratios, Friedewald, riesgo cardiovascular
+  "/orientador-imc/",
+  "/orientador-colesterol/",         // Colesterol: ratios, Friedewald, riesgo cardiovascular
   "/calculadora-calorias-ejercicio/",
   "/calculadora-macros/",             // Macronutrientes: proteínas, carbos, grasas según objetivo
   "/calculadora-hidratacion/",
@@ -184,9 +184,9 @@ export const implementedAppsUrls = [
   "/planificador-embarazo/",         // Planificador embarazo: FPP, checklist, compras, vacunas
   "/planificador-mascota/",          // Planificador mascota: cachorro/gatito, checklist, compras, vacunas
   "/calculadora-alimentacion-mascotas/", // Alimentación perros/gatos: raciones, tóxicos, transición pienso
-  "/calculadora-medicamentos-mascotas/", // Medicamentos mascotas: antiparasitarios, frecuencia, síntomas
+  "/orientador-medicamentos-mascotas/", // Medicamentos mascotas: antiparasitarios, frecuencia, síntomas
   "/calculadora-tamano-adulto-perro/",   // Predicción peso adulto cachorros
-  "/calculadora-percentiles/",       // Percentiles peso/talla infantil OMS
+  "/orientador-percentiles/",       // Percentiles peso/talla infantil OMS
 
   // Herramientas Web y Tecnología (6 implementadas)
   "/validador-json/",
@@ -213,9 +213,9 @@ export const implementedAppsUrls = [
   "/generador-og-images/",          // Imágenes OG para redes sociales 1200x630
 
   // Emprendimiento y Negocios (7 implementadas) - Apps España-específicas movidas
-  "/calculadora-tarifa-freelance/",
-  "/calculadora-break-even/",
-  "/calculadora-roi-marketing/",
+  "/orientador-tarifa-freelance/",
+  "/estimador-break-even/",
+  "/estimador-roi-marketing/",
   "/planificador-cashflow/",
   "/generador-nombres-empresa/",
   "/generador-facturas/",           // Facturas para autónomos con IVA/IRPF
@@ -300,19 +300,19 @@ export const implementedAppsUrls = [
   // Nuevas apps (2026-02-19)
   "/calculadora-rentabilidad-alquiler/", // ROI inversión inmobiliaria: rentabilidad bruta/neta, cash flow, payback
   "/seguimiento-ciclo-menstrual/",       // Ciclo menstrual: ventana fértil, ovulación, próximas fechas (cálculo local)
-  "/calculadora-gastos-comunidad/",      // Gastos comunidad propietarios: reparto igual o por coeficiente
+  "/estimador-gastos-comunidad/",      // Gastos comunidad propietarios: reparto igual o por coeficiente
 
   // Nuevas apps (2026-02-23)
   "/juego-ahorcado/",                    // Juego del ahorcado en español: 4 categorías, 100% local
   "/checklist-documentos-viaje/",        // Checklist documentos de viaje: España, Europa, internacional
-  "/simulador-jet-lag/",                 // Calculadora jet lag: diferencia horaria, días adaptación, recomendaciones
+  "/orientador-jet-lag/",                 // Calculadora jet lag: diferencia horaria, días adaptación, recomendaciones
   "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
   "/quiz-verbos-irregulares/",           // Quiz verbos irregulares inglés: 75 verbos A1-B2, opción múltiple
   "/quiz-figuras-retoricas/",            // Quiz figuras retóricas: 27 figuras ESO/Bach/Selectividad con feedback educativo
   "/quiz-reinos-naturaleza/",            // Quiz Reinos de la Naturaleza: 43 organismos sorprendentes, clasificación por grupos
   "/guia-seguro-viaje/",                 // Coberturas recomendadas por destino/tipo de viaje + checklist 12 puntos
   "/planificador-itinerario/",           // Organiza días y actividades de viaje con horarios y notas
-  "/calculadora-tension-arterial/",      // Clasificación ESH/ESC 2018: TAM, presión de pulso e historial local
+  "/orientador-tension-arterial/",      // Clasificación ESH/ESC 2018: TAM, presión de pulso e historial local
   "/planificador-chequeos-medicos/",     // Chequeos preventivos por edad/sexo: referencia Ministerio Sanidad y SEMFyC
 
   // Apps de Accesibilidad (2026-03-13)

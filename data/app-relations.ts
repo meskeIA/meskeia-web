@@ -88,19 +88,19 @@ const jubilacionFiscalApps: RelatedApp[] = [
 // FAMILIA: FINANZAS PERSONALES
 // ==========================================
 const finanzasInversionApps: RelatedApp[] = [
-  { url: '/interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Crecimiento de inversiones' },
-  { url: '/calculadora-inversiones/', icon: '💹', name: 'Calculadora Inversiones', description: 'Rentabilidad y riesgo' },
+  { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Crecimiento de inversiones' },
+  { url: '/estimador-inversiones/', icon: '💹', name: 'Calculadora Inversiones', description: 'Rentabilidad y riesgo' },
   { url: '/test-perfil-inversor/', icon: '🎯', name: 'Perfil Inversor', description: 'Descubre tu perfil' },
-  { url: '/simulador-cartera-inversion/', icon: '📊', name: 'Simulador Cartera', description: 'Monte Carlo y Sharpe' },
-  { url: '/calculadora-tir-van/', icon: '📉', name: 'TIR y VAN', description: 'Análisis de proyectos' },
+  { url: '/estimador-cartera-inversion/', icon: '📊', name: 'Simulador Cartera', description: 'Monte Carlo y Sharpe' },
+  { url: '/estimador-tir-van/', icon: '📉', name: 'TIR y VAN', description: 'Análisis de proyectos' },
 ];
 
 const finanzasHipotecaApps: RelatedApp[] = [
-  { url: '/simulador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
-  { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
+  { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+  { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
   { url: '/amortizacion-hipoteca/', icon: '💰', name: 'Amortización Anticipada', description: 'Reducir cuota vs plazo' },
-  { url: '/simulador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas' },
-  { url: '/calculadora-alquiler-vs-compra/', icon: '🔑', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
+  { url: '/estimador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas' },
+  { url: '/orientador-alquiler-vs-compra/', icon: '🔑', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
 ];
 
 // ==========================================
@@ -108,10 +108,10 @@ const finanzasHipotecaApps: RelatedApp[] = [
 // ==========================================
 const inversionInmobiliariaApps: RelatedApp[] = [
   { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI, cash flow y payback' },
-  { url: '/calculadora-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
-  { url: '/simulador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
-  { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
-  { url: '/calculadora-gastos-comunidad/', icon: '🏘️', name: 'Gastos de Comunidad', description: 'Reparto cuotas propietarios' },
+  { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
+  { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+  { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
+  { url: '/estimador-gastos-comunidad/', icon: '🏘️', name: 'Gastos de Comunidad', description: 'Reparto cuotas propietarios' },
 ];
 
 // ==========================================
@@ -120,20 +120,20 @@ const inversionInmobiliariaApps: RelatedApp[] = [
 const saludFemeninaApps: RelatedApp[] = [
   { url: '/seguimiento-ciclo-menstrual/', icon: '🌸', name: 'Ciclo Menstrual', description: 'Ventana fértil y ovulación' },
   { url: '/planificador-embarazo/', icon: '🤰', name: 'Planificador Embarazo', description: 'Semanas y checklist' },
-  { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice de masa corporal' },
-  { url: '/calculadora-percentiles/', icon: '📏', name: 'Percentiles Infantiles', description: 'Peso y talla OMS' },
+  { url: '/orientador-imc/', icon: '⚖️', name: 'Orientador IMC', description: 'Índice de masa corporal' },
+  { url: '/orientador-percentiles/', icon: '📏', name: 'Percentiles Infantiles', description: 'Peso y talla OMS' },
 ];
 
 const finanzasPersonalesApps: RelatedApp[] = [
   { url: '/control-gastos/', icon: '💳', name: 'Control de Gastos', description: 'Gestiona tu presupuesto' },
   { url: '/calculadora-suscripciones/', icon: '📱', name: 'Control Suscripciones', description: 'Gastos recurrentes' },
   { url: '/calculadora-roommates/', icon: '🏘️', name: 'Gastos Compartidos', description: 'División justa' },
-  { url: '/calculadora-jubilacion/', icon: '👴', name: 'Calculadora Jubilación', description: 'Planifica tu retiro' },
-  { url: '/calculadora-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto ahorrar' },
-  { url: '/calculadora-regla-50-30-20/', icon: '📊', name: 'Regla 50/30/20', description: 'Distribuye tu presupuesto' },
-  { url: '/calculadora-fire/', icon: '🔥', name: 'Calculadora FIRE', description: 'Independencia financiera' },
-  { url: '/calculadora-coste-plazos/', icon: '💳', name: 'Coste Real a Plazos', description: 'TAE e intereses ocultos' },
-  { url: '/calculadora-deuda/', icon: '🎯', name: 'Calculadora de Deuda', description: 'Bola de nieve vs avalancha' },
+  { url: '/estimador-jubilacion/', icon: '👴', name: 'Calculadora Jubilación', description: 'Planifica tu retiro' },
+  { url: '/estimador-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto ahorrar' },
+  { url: '/orientador-regla-50-30-20/', icon: '📊', name: 'Regla 50/30/20', description: 'Distribuye tu presupuesto' },
+  { url: '/estimador-fire/', icon: '🔥', name: 'Estimador FIRE', description: 'Independencia financiera' },
+  { url: '/estimador-coste-plazos/', icon: '💳', name: 'Coste Real a Plazos', description: 'TAE e intereses ocultos' },
+  { url: '/estimador-deuda/', icon: '🎯', name: 'Estimador de Deuda', description: 'Bola de nieve vs avalancha' },
 ];
 
 const fiscalApps: RelatedApp[] = [
@@ -145,9 +145,9 @@ const fiscalApps: RelatedApp[] = [
 // ==========================================
 const saludApps: RelatedApp[] = [
   { url: '/planificador-chequeos-medicos/', icon: '🏥', name: 'Chequeos Médicos', description: 'Revisiones preventivas por edad' },
-  { url: '/calculadora-tension-arterial/', icon: '🩺', name: 'Tensión Arterial', description: 'Clasifica tu presión (ESH/ESC)' },
-  { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice de masa corporal' },
-  { url: '/calculadora-colesterol/', icon: '🫀', name: 'Calculadora Colesterol', description: 'Ratios y riesgo cardiovascular' },
+  { url: '/orientador-tension-arterial/', icon: '🩺', name: 'Tensión Arterial', description: 'Clasifica tu presión (ESH/ESC)' },
+  { url: '/orientador-imc/', icon: '⚖️', name: 'Orientador IMC', description: 'Índice de masa corporal' },
+  { url: '/orientador-colesterol/', icon: '🫀', name: 'Calculadora Colesterol', description: 'Ratios y riesgo cardiovascular' },
   { url: '/calculadora-calorias-ejercicio/', icon: '🔥', name: 'Calorías Diarias', description: 'Necesidades calóricas' },
   { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora Macros', description: 'Proteínas, carbos, grasas' },
   { url: '/calculadora-hidratacion/', icon: '💧', name: 'Hidratación', description: 'Agua recomendada' },
@@ -168,7 +168,7 @@ const saludHabitosApps: RelatedApp[] = [
 const mascotasApps: RelatedApp[] = [
   { url: '/planificador-mascota/', icon: '📋', name: 'Planificador Mascota', description: 'Checklist completo' },
   { url: '/calculadora-alimentacion-mascotas/', icon: '🍖', name: 'Alimentación Mascotas', description: 'Raciones diarias' },
-  { url: '/calculadora-medicamentos-mascotas/', icon: '💊', name: 'Medicamentos Mascotas', description: 'Dosis antiparasitarios' },
+  { url: '/orientador-medicamentos-mascotas/', icon: '💊', name: 'Medicamentos Mascotas', description: 'Dosis antiparasitarios' },
   { url: '/calculadora-edad-mascotas/', icon: '🎂', name: 'Edad Mascotas', description: 'Años humanos' },
 ];
 
@@ -259,7 +259,7 @@ const disenoExtraApps: RelatedApp[] = [
 // FAMILIA: FREELANCE Y NEGOCIOS
 // ==========================================
 const freelanceApps: RelatedApp[] = [
-  { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu hora' },
+  { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu hora' },
   { url: '/calculadora-presupuestos/', icon: '📋', name: 'Presupuestos', description: 'Propuestas a clientes' },
   { url: '/generador-facturas/', icon: '🧾', name: 'Generador Facturas', description: 'Facturas con IVA/IRPF' },
 ];
@@ -271,7 +271,7 @@ const emprendimientoApps: RelatedApp[] = [
 ];
 
 const negociosApps: RelatedApp[] = [
-  { url: '/calculadora-roi-marketing/', icon: '📊', name: 'ROI Marketing', description: 'Retorno inversión' },
+  { url: '/estimador-roi-marketing/', icon: '📊', name: 'ROI Marketing', description: 'Retorno inversión' },
   { url: '/planificador-cashflow/', icon: '💰', name: 'Cashflow', description: 'Flujo de caja' },
   { url: '/generador-nombres-empresa/', icon: '✨', name: 'Nombres Empresa', description: 'Ideas de nombres' },
   { url: '/generador-carruseles/', icon: '📱', name: 'Carruseles', description: 'Instagram/LinkedIn' },
@@ -321,7 +321,7 @@ const viajesApps: RelatedApp[] = [
   { url: '/planificador-itinerario/', icon: '🗓️', name: 'Planificador Itinerario', description: 'Organiza días y actividades' },
   { url: '/lista-equipaje/', icon: '🧳', name: 'Lista Equipaje', description: 'Checklist de viaje' },
   { url: '/checklist-documentos-viaje/', icon: '📋', name: 'Documentos de Viaje', description: 'Pasaporte, visado y más' },
-  { url: '/simulador-jet-lag/', icon: '✈️', name: 'Simulador Jet Lag', description: 'Impacto del cambio horario' },
+  { url: '/orientador-jet-lag/', icon: '✈️', name: 'Simulador Jet Lag', description: 'Impacto del cambio horario' },
   { url: '/conversor-horarios/', icon: '🌍', name: 'Conversor Horarios', description: 'Zonas horarias' },
   { url: '/conversor-divisas/', icon: '💱', name: 'Conversor Divisas', description: 'Tipos de cambio BCE' },
   { url: '/presupuesto-viaje/', icon: '🗺️', name: 'Presupuesto Viaje', description: 'Planifica y divide gastos' },
@@ -391,7 +391,7 @@ const informaticaApps: RelatedApp[] = [
 const biomedicinaApps: RelatedApp[] = [
   { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador Genética', description: 'Cruces mendelianos' },
   { url: '/calculadora-estadistica-medica/', icon: '🩺', name: 'Estadística Médica', description: 'Sensibilidad, VPP, NNT' },
-  { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice masa corporal' },
+  { url: '/orientador-imc/', icon: '⚖️', name: 'Orientador IMC', description: 'Índice masa corporal' },
   { url: '/vitaminas-minerales/', icon: '🥗', name: 'Vitaminas y Minerales', description: 'Guía nutrientes' },
   { url: '/huesos-cuerpo-humano/', icon: '🦴', name: 'Huesos Humanos', description: 'Anatomía esqueleto' },
 ];
@@ -453,7 +453,7 @@ const hogarApps: RelatedApp[] = [
 // ==========================================
 const familiaApps: RelatedApp[] = [
   { url: '/planificador-embarazo/', icon: '🤰', name: 'Planificador Embarazo', description: 'Semanas y checklist' },
-  { url: '/calculadora-percentiles/', icon: '📏', name: 'Percentiles Infantiles', description: 'Peso y talla OMS' },
+  { url: '/orientador-percentiles/', icon: '📏', name: 'Percentiles Infantiles', description: 'Peso y talla OMS' },
   { url: '/calculadora-fechas/', icon: '📅', name: 'Calculadora Fechas', description: 'Días entre fechas' },
 ];
 
@@ -468,22 +468,22 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'temporizador-pomodoro': [...estudiantesApps.filter(a => a.url !== '/temporizador-pomodoro/').slice(0, 2), ...productividadApps.slice(0, 2)],
 
   // FINANZAS - INVERSIÓN
-  'interes-compuesto': finanzasInversionApps.filter(a => a.url !== '/interes-compuesto/'),
-  'calculadora-inversiones': finanzasInversionApps.filter(a => a.url !== '/calculadora-inversiones/'),
+  'interes-compuesto': finanzasInversionApps.filter(a => a.url !== '/estimador-interes-compuesto/'),
+  'calculadora-inversiones': finanzasInversionApps.filter(a => a.url !== '/estimador-inversiones/'),
   'test-perfil-inversor': finanzasInversionApps.filter(a => a.url !== '/test-perfil-inversor/'),
-  'simulador-cartera-inversion': finanzasInversionApps.filter(a => a.url !== '/simulador-cartera-inversion/'),
-  'calculadora-tir-van': finanzasInversionApps.filter(a => a.url !== '/calculadora-tir-van/'),
+  'simulador-cartera-inversion': finanzasInversionApps.filter(a => a.url !== '/estimador-cartera-inversion/'),
+  'calculadora-tir-van': finanzasInversionApps.filter(a => a.url !== '/estimador-tir-van/'),
 
   // FINANZAS - HIPOTECA / INMOBILIARIA
-  'simulador-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/simulador-hipoteca/'),
-  'simulador-compraventa-inmueble': finanzasHipotecaApps.filter(a => a.url !== '/simulador-compraventa-inmueble/'),
+  'simulador-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/estimador-hipoteca/'),
+  'simulador-compraventa-inmueble': finanzasHipotecaApps.filter(a => a.url !== '/estimador-compraventa-inmueble/'),
   'amortizacion-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/amortizacion-hipoteca/'),
-  'simulador-prestamos': finanzasHipotecaApps.filter(a => a.url !== '/simulador-prestamos/'),
-  'calculadora-alquiler-vs-compra': finanzasHipotecaApps.filter(a => a.url !== '/calculadora-alquiler-vs-compra/'),
+  'simulador-prestamos': finanzasHipotecaApps.filter(a => a.url !== '/estimador-prestamos/'),
+  'calculadora-alquiler-vs-compra': finanzasHipotecaApps.filter(a => a.url !== '/orientador-alquiler-vs-compra/'),
   'calculadora-coste-vivienda': [
-    { url: '/simulador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
-    { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
-    { url: '/calculadora-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Compara opciones' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
+    { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Compara opciones' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Coste de electrodomésticos' },
   ],
 
@@ -491,55 +491,55 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-rentabilidad-alquiler': inversionInmobiliariaApps.filter(a => a.url !== '/calculadora-rentabilidad-alquiler/'),
   'calculadora-gastos-comunidad': [
     { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI, cash flow y payback' },
-    { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
-    { url: '/calculadora-coste-vivienda/', icon: '🏠', name: 'Coste Real Vivienda', description: 'Gasto mensual total del hogar' },
-    { url: '/calculadora-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero completo' },
+    { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
+    { url: '/estimador-coste-vivienda/', icon: '🏠', name: 'Coste Real Vivienda', description: 'Gasto mensual total del hogar' },
+    { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero completo' },
   ],
 
   // FINANZAS - PERSONALES
   'control-gastos': finanzasPersonalesApps.filter(a => a.url !== '/control-gastos/'),
   'calculadora-suscripciones': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-suscripciones/'),
   'calculadora-roommates': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-roommates/'),
-  'calculadora-jubilacion': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-jubilacion/'),
-  'calculadora-fondo-emergencia': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-fondo-emergencia/'),
-  'calculadora-regla-50-30-20': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-regla-50-30-20/'),
-  'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/calculadora-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
-  'calculadora-coste-plazos': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-coste-plazos/').slice(0, 4),
-  'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-deuda/').slice(0, 4),
+  'calculadora-jubilacion': finanzasPersonalesApps.filter(a => a.url !== '/estimador-jubilacion/'),
+  'calculadora-fondo-emergencia': finanzasPersonalesApps.filter(a => a.url !== '/estimador-fondo-emergencia/'),
+  'calculadora-regla-50-30-20': finanzasPersonalesApps.filter(a => a.url !== '/orientador-regla-50-30-20/'),
+  'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/estimador-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
+  'calculadora-coste-plazos': finanzasPersonalesApps.filter(a => a.url !== '/estimador-coste-plazos/').slice(0, 4),
+  'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
   'comparador-vehiculos': [
-    { url: '/simulador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas de amortización' },
-    { url: '/calculadora-coste-plazos/', icon: '💳', name: 'Coste Real a Plazos', description: 'TAE e intereses ocultos' },
-    { url: '/calculadora-tir-van/', icon: '📉', name: 'TIR y VAN', description: 'Análisis de inversiones' },
+    { url: '/estimador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas de amortización' },
+    { url: '/estimador-coste-plazos/', icon: '💳', name: 'Coste Real a Plazos', description: 'TAE e intereses ocultos' },
+    { url: '/estimador-tir-van/', icon: '📉', name: 'TIR y VAN', description: 'Análisis de inversiones' },
   ],
   'calculadora-seguro-vida': [
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
     { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas según tu perfil' },
-    { url: '/calculadora-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
+    { url: '/estimador-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
     { url: '/guia-reclamar-seguro-coche/', icon: '🚗', name: 'Guía Seguro Coche', description: 'Cuándo reclamar al seguro' },
   ],
   'comparador-tipos-seguros': [
-    { url: '/calculadora-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro necesitas' },
+    { url: '/orientador-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro necesitas' },
     { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas según tu perfil' },
-    { url: '/calculadora-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
+    { url: '/estimador-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
     { url: '/guia-reclamar-seguro-coche/', icon: '🚗', name: 'Guía Seguro Coche', description: 'Cuándo reclamar al seguro' },
   ],
   'checklist-coberturas-seguros': [
-    { url: '/calculadora-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro de vida necesitas' },
+    { url: '/orientador-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro de vida necesitas' },
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
-    { url: '/calculadora-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
+    { url: '/estimador-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
     { url: '/guia-reclamar-seguro-coche/', icon: '🚗', name: 'Guía Seguro Coche', description: 'Cuándo reclamar al seguro' },
   ],
   'calculadora-infraseguro': [
-    { url: '/calculadora-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro de vida necesitas' },
+    { url: '/orientador-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro de vida necesitas' },
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
     { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas según tu perfil' },
     { url: '/guia-reclamar-seguro-coche/', icon: '🚗', name: 'Guía Seguro Coche', description: 'Cuándo reclamar al seguro' },
   ],
   'guia-reclamar-seguro-coche': [
-    { url: '/calculadora-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro de vida necesitas' },
+    { url: '/orientador-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro Vida', description: 'Cuánto seguro de vida necesitas' },
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
     { url: '/checklist-coberturas-seguros/', icon: '✅', name: 'Checklist Coberturas', description: 'Qué seguros necesitas según tu perfil' },
-    { url: '/calculadora-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
+    { url: '/estimador-infraseguro/', icon: '⚖️', name: 'Calculadora Infraseguro', description: 'Regla proporcional en siniestros' },
   ],
   'asistente-reclamaciones': [
     { url: '/guia-reclamar-seguro-coche/', icon: '🚗', name: 'Reclamar Seguro Coche', description: 'Cuándo reclamar al seguro del coche' },
@@ -547,9 +547,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   // SALUD
   'planificador-chequeos-medicos': saludApps.filter(a => a.url !== '/planificador-chequeos-medicos/').slice(0, 4),
-  'calculadora-tension-arterial': saludApps.filter(a => a.url !== '/calculadora-tension-arterial/').slice(0, 4),
-  'calculadora-imc': saludApps.filter(a => a.url !== '/calculadora-imc/').slice(0, 4),
-  'calculadora-colesterol': saludApps.filter(a => a.url !== '/calculadora-colesterol/').slice(0, 4),
+  'calculadora-tension-arterial': saludApps.filter(a => a.url !== '/orientador-tension-arterial/').slice(0, 4),
+  'calculadora-imc': saludApps.filter(a => a.url !== '/orientador-imc/').slice(0, 4),
+  'calculadora-colesterol': saludApps.filter(a => a.url !== '/orientador-colesterol/').slice(0, 4),
   'calculadora-calorias-ejercicio': saludApps.filter(a => a.url !== '/calculadora-calorias-ejercicio/'),
   'calculadora-macros': saludApps.filter(a => a.url !== '/calculadora-macros/'),
   'calculadora-hidratacion': saludApps.filter(a => a.url !== '/calculadora-hidratacion/'),
@@ -563,7 +563,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // MASCOTAS
   'planificador-mascota': [...mascotasApps.filter(a => a.url !== '/planificador-mascota/').slice(0, 3), mascotasExtraApps[1]],
   'calculadora-alimentacion-mascotas': [...mascotasApps.filter(a => a.url !== '/calculadora-alimentacion-mascotas/').slice(0, 3), mascotasExtraApps[0]],
-  'calculadora-medicamentos-mascotas': [...mascotasApps.filter(a => a.url !== '/calculadora-medicamentos-mascotas/').slice(0, 3), mascotasExtraApps[1]],
+  'calculadora-medicamentos-mascotas': [...mascotasApps.filter(a => a.url !== '/orientador-medicamentos-mascotas/').slice(0, 3), mascotasExtraApps[1]],
   'calculadora-edad-mascotas': [...mascotasApps.filter(a => a.url !== '/calculadora-edad-mascotas/').slice(0, 3), mascotasExtraApps[0]],
   'calculadora-tamano-adulto-perro': mascotasApps,
   'guia-cuidado-mascota': mascotasApps,
@@ -631,11 +631,11 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // FREELANCE Y NEGOCIOS
-  'calculadora-tarifa-freelance': freelanceApps.filter(a => a.url !== '/calculadora-tarifa-freelance/'),
+  'calculadora-tarifa-freelance': freelanceApps.filter(a => a.url !== '/orientador-tarifa-freelance/'),
   'calculadora-presupuestos': freelanceApps.filter(a => a.url !== '/calculadora-presupuestos/'),
   'generador-facturas': freelanceApps.filter(a => a.url !== '/generador-facturas/'),
-  'calculadora-break-even': [...freelanceApps.filter(a => a.url !== '/calculadora-break-even/').slice(0, 2), ...negociosApps.slice(0, 2)],
-  'calculadora-roi-marketing': negociosApps.filter(a => a.url !== '/calculadora-roi-marketing/'),
+  'calculadora-break-even': [...freelanceApps.filter(a => a.url !== '/estimador-break-even/').slice(0, 2), ...negociosApps.slice(0, 2)],
+  'calculadora-roi-marketing': negociosApps.filter(a => a.url !== '/estimador-roi-marketing/'),
   'planificador-cashflow': [...negociosApps.filter(a => a.url !== '/planificador-cashflow/').slice(0, 2), ...freelanceApps.slice(0, 2)],
   'generador-nombres-empresa': negociosApps.filter(a => a.url !== '/generador-nombres-empresa/'),
   'generador-carruseles': [...negociosApps.filter(a => a.url !== '/generador-carruseles/').slice(0, 2), ...seoApps.slice(0, 2)],
@@ -676,7 +676,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'presupuesto-viaje': viajesApps.filter(a => a.url !== '/presupuesto-viaje/').slice(0, 4),
   'enchufes-por-pais': viajesApps.filter(a => a.url !== '/enchufes-por-pais/').slice(0, 4),
   'comparador-coste-vida': viajesApps.filter(a => a.url !== '/comparador-coste-vida/').slice(0, 4),
-  'simulador-jet-lag': viajesApps.filter(a => a.url !== '/simulador-jet-lag/').slice(0, 4),
+  'simulador-jet-lag': viajesApps.filter(a => a.url !== '/orientador-jet-lag/').slice(0, 4),
   'planificador-itinerario': viajesApps.filter(a => a.url !== '/planificador-itinerario/').slice(0, 4),
   'generador-actas': [...productividadApps.slice(0, 2), ...textoApps.slice(0, 2)],
 
@@ -772,14 +772,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'calculadora-reformas-hogar': [
     { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios por m²' },
-    { url: '/simulador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
-    { url: '/calculadora-coste-vivienda/', icon: '🏠', name: 'Coste Real Vivienda', description: 'Gasto mensual total del hogar' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/estimador-coste-vivienda/', icon: '🏠', name: 'Coste Real Vivienda', description: 'Gasto mensual total del hogar' },
     { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
   ],
 
   // FAMILIA
   'planificador-embarazo': saludFemeninaApps.filter(a => a.url !== '/planificador-embarazo/'),
-  'calculadora-percentiles': familiaApps.filter(a => a.url !== '/calculadora-percentiles/'),
+  'calculadora-percentiles': familiaApps.filter(a => a.url !== '/orientador-percentiles/'),
 
   // SALUD FEMENINA
   'seguimiento-ciclo-menstrual': saludFemeninaApps.filter(a => a.url !== '/seguimiento-ciclo-menstrual/'),
@@ -877,26 +877,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // GUÍAS
   'guia-ahorrar-dinero': [
     { url: '/control-gastos/', icon: '📊', name: 'Control de Gastos', description: 'Registra y categoriza tus gastos' },
-    { url: '/calculadora-regla-50-30-20/', icon: '🥧', name: 'Regla 50/30/20', description: 'Distribuye tu sueldo' },
-    { url: '/calculadora-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Tu colchón de seguridad' },
-    { url: '/calculadora-deuda/', icon: '🧨', name: 'Eliminar Deudas', description: 'Bola de nieve vs avalancha' },
+    { url: '/orientador-regla-50-30-20/', icon: '🥧', name: 'Regla 50/30/20', description: 'Distribuye tu sueldo' },
+    { url: '/estimador-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Tu colchón de seguridad' },
+    { url: '/estimador-deuda/', icon: '🧨', name: 'Eliminar Deudas', description: 'Bola de nieve vs avalancha' },
   ],
   'guia-vivir-sano': [
-    { url: '/calculadora-imc/', icon: '⚖️', name: 'Calculadora de IMC', description: 'Peso e índice de masa corporal' },
+    { url: '/orientador-imc/', icon: '⚖️', name: 'Calculadora de IMC', description: 'Peso e índice de masa corporal' },
     { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora de Macros', description: 'Proteínas, carbos y grasas' },
     { url: '/calculadora-hidratacion/', icon: '💧', name: 'Hidratación Diaria', description: 'Cuánta agua necesitas' },
     { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento de Hábitos', description: 'Crea hábitos duraderos' },
   ],
   'guia-comprar-coche': [
     { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
-    { url: '/simulador-prestamos/', icon: '🏦', name: 'Simulador de Préstamos', description: 'Cuota y coste total' },
+    { url: '/estimador-prestamos/', icon: '🏦', name: 'Estimador de Préstamos', description: 'Cuota y coste total' },
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
-    { url: '/calculadora-seguro-vida/', icon: '🛡️', name: 'Seguro de Vida', description: 'Cobertura para tu préstamo' },
+    { url: '/orientador-seguro-vida/', icon: '🛡️', name: 'Seguro de Vida', description: 'Cobertura para tu préstamo' },
   ],
   'guia-montar-negocio': [
-    { url: '/calculadora-break-even/', icon: '⚖️', name: 'Break-Even', description: 'Punto de equilibrio del negocio' },
+    { url: '/estimador-break-even/', icon: '⚖️', name: 'Break-Even', description: 'Punto de equilibrio del negocio' },
     { url: '/planificador-cashflow/', icon: '💸', name: 'Planificador Cashflow', description: 'Flujo de caja mensual' },
-    { url: '/calculadora-tarifa-freelance/', icon: '💰', name: 'Tarifa Freelance', description: 'Cuánto cobrar por hora' },
+    { url: '/orientador-tarifa-freelance/', icon: '💰', name: 'Tarifa Freelance', description: 'Cuánto cobrar por hora' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
   ],
 
@@ -984,19 +984,19 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'plazos-legales': [
     { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
     { url: '/asistente-constitucion-asociacion/', icon: '🎗️', name: 'Asistente Constitución Asociación', description: 'Genera el acta y estatutos' },
-    { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
   ],
   'comparador-formas-juridicas': [
     { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción, garantías y reclamaciones' },
     { url: '/asistente-constitucion-asociacion/', icon: '🎗️', name: 'Asistente Constitución Asociación', description: 'Genera acta y estatutos' },
-    { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
   ],
   'asistente-constitucion-asociacion': [
     { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: '¿Asociación o SL? Compara opciones' },
     { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción, garantías y reclamaciones' },
-    { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
   ],
   // FAMILIA: FISCAL AUTÓNOMOS
@@ -1010,7 +1010,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'estimador-sueldo-neto': [
     { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuota RETA por ingresos reales' },
     { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Optimiza tus deducciones' },
-    { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
   ],
   'orientador-gastos-deducibles': [
@@ -1041,7 +1041,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'estimador-plusvalias-irpf': [
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuota íntegra declaración renta' },
-    { url: '/simulador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Todos los gastos de compraventa' },
+    { url: '/estimador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Todos los gastos de compraventa' },
     { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Estimador Sueldo Neto', description: 'Tu sueldo neto con IRPF' },
     { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
   ],
@@ -1054,19 +1054,19 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'estimador-impuesto-donaciones': [
     { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Estimador Sucesiones', description: 'Impuesto por recibir una herencia' },
     { url: '/orientacion-tramitacion-herencias/', icon: '📋', name: 'Orientación Herencias', description: 'Checklist y orden de gestiones' },
-    { url: '/simulador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Gastos de compraventa inmobiliaria' },
+    { url: '/estimador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Gastos de compraventa inmobiliaria' },
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuota orientativa de la renta' },
   ],
   'estimador-impuesto-sucesiones': [
     { url: '/estimador-impuesto-donaciones/', icon: '🎁', name: 'Estimador Donaciones', description: 'Impuesto por recibir una donación' },
     { url: '/orientacion-tramitacion-herencias/', icon: '📋', name: 'Orientación Herencias', description: 'Checklist y orden de gestiones' },
-    { url: '/simulador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Gastos de compraventa inmobiliaria' },
+    { url: '/estimador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Gastos de compraventa inmobiliaria' },
     { url: '/estimador-plusvalias-irpf/', icon: '💹', name: 'Estimador Plusvalías IRPF', description: 'Impuesto por venta de activos' },
   ],
   'orientacion-tramitacion-herencias': [
     { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Estimador Sucesiones', description: 'Cuánto pagas de IS según tu CCAA' },
     { url: '/estimador-impuesto-donaciones/', icon: '🎁', name: 'Estimador Donaciones', description: 'Impuesto por recibir una donación' },
-    { url: '/simulador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Gastos al vender inmuebles heredados' },
+    { url: '/estimador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Gastos al vender inmuebles heredados' },
     { url: '/guia/herencias/', icon: '📜', name: 'Guía Herencias', description: 'Journey completo para gestionar la herencia' },
   ],
   'asistente-constitucion-sociedad': [
@@ -1079,17 +1079,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientacion-tramitacion-herencias/', icon: '📋', name: 'Orientación Herencias', description: 'Checklist interactivo de documentos' },
     { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Estimador Sucesiones', description: 'Cuánto pagas de IS según tu CCAA' },
     { url: '/estimador-impuesto-donaciones/', icon: '🎁', name: 'Estimador Donaciones', description: 'Impuesto por recibir una donación' },
-    { url: '/simulador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Gastos al vender inmuebles heredados' },
+    { url: '/estimador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Gastos al vender inmuebles heredados' },
   ],
   'estimador-plusvalia-municipal': [
-    { url: '/simulador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría, registro y gestoría' },
+    { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría, registro y gestoría' },
     { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Estimador Sucesiones', description: 'Impuesto de herencias por CCAA' },
     { url: '/estimador-plusvalias-irpf/', icon: '💹', name: 'Plusvalías en IRPF', description: 'IRPF por ganancias patrimoniales' },
     { url: '/orientacion-tramitacion-herencias/', icon: '📋', name: 'Orientación Herencias', description: 'Guía para tramitar una herencia' },
   ],
   'orientador-intereses-demora': [
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Crea facturas profesionales' },
-    { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu tarifa hora sostenible' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu tarifa hora sostenible' },
     { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción y caducidad en España' },
     { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
   ],

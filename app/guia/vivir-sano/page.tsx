@@ -12,7 +12,7 @@ const tools = [
     id: 'imc',
     name: 'Calculadora de IMC',
     icon: '⚖️',
-    url: '/calculadora-imc/',
+    url: '/orientador-imc/',
     question: '¿Está mi peso en el rango saludable?',
     description: 'Calcula tu Índice de Masa Corporal y entiende qué significa para tu salud a largo plazo.',
     step: 1,
@@ -284,7 +284,7 @@ export default function GuiaVivirSanoPage() {
           Calcula tu IMC para saber en qué punto estás.
           Es el primer paso para entender qué necesitas mejorar.
         </p>
-        <Link href="/calculadora-imc/" className={styles.ctaButton}>
+        <Link href="/orientador-imc/" className={styles.ctaButton}>
           Calcular mi IMC
         </Link>
       </section>

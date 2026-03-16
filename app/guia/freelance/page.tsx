@@ -19,9 +19,9 @@ const tools = [
   },
   {
     id: 'tarifa-freelance',
-    name: 'Calculadora Tarifa Freelance',
+    name: 'Orientador Tarifa Freelance',
     icon: '💰',
-    url: '/calculadora-tarifa-freelance/',
+    url: '/orientador-tarifa-freelance/',
     question: '¿Cuánto debería cobrar por hora/proyecto?',
     description: 'Calcula tu tarifa considerando gastos, impuestos, vacaciones y horas reales de trabajo.',
     step: 2,
@@ -55,9 +55,9 @@ const tools = [
   },
   {
     id: 'calculadora-break-even',
-    name: 'Calculadora Break-Even',
+    name: 'Estimador Break-Even',
     icon: '⚖️',
-    url: '/calculadora-break-even/',
+    url: '/estimador-break-even/',
     question: '¿Cuántos proyectos necesito para no perder dinero?',
     description: 'Calcula el mínimo de ingresos o proyectos para cubrir todos tus gastos fijos como freelance.',
     step: 6,
@@ -284,7 +284,7 @@ export default function GuiaFreelancePage() {
           Empieza calculando cuánto cobrar por tus servicios.
           Es la base para que tu negocio sea rentable.
         </p>
-        <Link href="/calculadora-tarifa-freelance/" className={styles.ctaButton}>
+        <Link href="/orientador-tarifa-freelance/" className={styles.ctaButton}>
           Calcular mi tarifa freelance
         </Link>
       </section>

@@ -10,9 +10,9 @@ import { getRelatedApps } from '@/data/app-relations';
 const tools = [
   {
     id: 'simulador-hipoteca',
-    name: 'Simulador de Hipoteca',
+    name: 'Estimador de Hipoteca',
     icon: '🏦',
-    url: '/simulador-hipoteca/',
+    url: '/estimador-hipoteca/',
     question: '¿Cuánto pagaré de cuota mensual?',
     description: 'Calcula tu cuota según capital, plazo e interés. Compara escenarios con diferentes tipos de interés.',
     step: 1,
@@ -21,7 +21,7 @@ const tools = [
     id: 'gastos-compraventa',
     name: 'Gastos de Compraventa',
     icon: '📋',
-    url: '/simulador-compraventa-inmueble/',
+    url: '/estimador-compraventa-inmueble/',
     question: '¿Cuánto me costará la compra además del precio?',
     description: 'Calcula ITP/IVA, notaría, registro y todos los gastos de compraventa en tu comunidad autónoma.',
     step: 2,
@@ -30,7 +30,7 @@ const tools = [
     id: 'alquiler-vs-compra',
     name: 'Alquiler vs Compra',
     icon: '⚖️',
-    url: '/calculadora-alquiler-vs-compra/',
+    url: '/orientador-alquiler-vs-compra/',
     question: '¿Me conviene más comprar o seguir alquilando?',
     description: 'Análisis financiero a largo plazo. Compara el coste real de cada opción en tu situación.',
     step: 3,
@@ -48,7 +48,7 @@ const tools = [
     id: 'coste-vivienda',
     name: 'Coste Real de Vivienda',
     icon: '🏠',
-    url: '/calculadora-coste-vivienda/',
+    url: '/estimador-coste-vivienda/',
     question: '¿Cuánto me cuesta realmente mantener mi casa?',
     description: 'Hipoteca, comunidad, IBI, seguros, suministros... El coste mensual real de ser propietario.',
     step: 5,
@@ -112,7 +112,7 @@ const caseStudy = {
   title: 'María y Carlos quieren comprar su primera vivienda',
   situation: 'Pareja de 32 años, ingresos netos conjuntos de 3.500€/mes, ahorrados 45.000€. Buscan piso de unos 200.000€ en Madrid.',
   steps: [
-    { tool: 'Simulador de Hipoteca', result: 'Con 160.000€ de hipoteca a 25 años al 3%, cuota de 758€/mes (21% de ingresos). Viable.' },
+    { tool: 'Estimador de Hipoteca', result: 'Con 160.000€ de hipoteca a 25 años al 3%, cuota de 758€/mes (21% de ingresos). Viable.' },
     { tool: 'Gastos de Compraventa', result: 'En Madrid, ITP 6% (12.000€) + notaría/registro/gestoría (≈ 2.500€) = 14.500€. Total necesario: 40.000€ entrada + 14.500€ gastos = 54.500€.' },
     { tool: 'Alquiler vs Compra', result: 'Pagando 1.100€ de alquiler actual, comprar sale mejor a partir del año 7. Planean quedarse 10+ años.' },
   ],
@@ -267,7 +267,7 @@ export default function GuiaComprarCasaPage() {
           Empieza calculando cuánto puedes permitirte de hipoteca.
           Es el primer paso para saber qué vivienda buscar.
         </p>
-        <Link href="/simulador-hipoteca/" className={styles.ctaButton}>
+        <Link href="/estimador-hipoteca/" className={styles.ctaButton}>
           Simular mi hipoteca
         </Link>
       </section>

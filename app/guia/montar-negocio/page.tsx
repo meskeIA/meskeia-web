@@ -19,9 +19,9 @@ const tools = [
   },
   {
     id: 'break-even',
-    name: 'Calculadora Break-Even',
+    name: 'Estimador Break-Even',
     icon: '⚖️',
-    url: '/calculadora-break-even/',
+    url: '/estimador-break-even/',
     question: '¿Cuánto tengo que vender para cubrir gastos?',
     description: 'Calcula el punto de equilibrio de tu negocio: unidades vendidas o ingresos mínimos para no perder dinero. Fundamental antes de lanzar.',
     step: 2,
@@ -39,7 +39,7 @@ const tools = [
     id: 'tarifa-freelance',
     name: 'Calculadora de Tarifa Freelance',
     icon: '💰',
-    url: '/calculadora-tarifa-freelance/',
+    url: '/orientador-tarifa-freelance/',
     question: '¿Cuánto tengo que cobrar por hora para vivir bien?',
     description: 'Calcula tu tarifa mínima viable teniendo en cuenta cuota de autónomos, IRPF, vacaciones y gastos. Sin subestimarte.',
     step: 4,
@@ -48,7 +48,7 @@ const tools = [
     id: 'roi-marketing',
     name: 'ROI de Marketing',
     icon: '📢',
-    url: '/calculadora-roi-marketing/',
+    url: '/estimador-roi-marketing/',
     question: '¿Cuánto me está rentando la publicidad?',
     description: 'Mide el retorno de tus inversiones en marketing. Descubre qué canales funcionan y cuáles estás desperdiciando.',
     step: 5,
@@ -130,7 +130,7 @@ const caseStudy = {
   title: 'Elena quiere montar su consultoría de comunicación tras 10 años en empresa',
   situation: 'Comunicadora de 35 años, sueldo neto actual 2.200€/mes. Quiere montar su propia consultoría pero no sabe si es viable ni cuánto cobrar.',
   steps: [
-    { tool: 'Calculadora Break-Even', result: 'Con gastos fijos de 800€/mes (cuota autónomos + herramientas) y tarifa de 60€/h, necesita facturar 13,3 horas al mes solo para no perder. Viable.' },
+    { tool: 'Estimador Break-Even', result: 'Con gastos fijos de 800€/mes (cuota autónomos + herramientas) y tarifa de 60€/h, necesita facturar 13,3 horas al mes solo para no perder. Viable.' },
     { tool: 'Calculadora de Tarifa Freelance', result: 'Tarifa mínima para mantener el mismo nivel de vida: 52€/h. Con 100 horas facturables al mes (realista con 2-3 clientes): 5.200€ brutos = 2.800€ netos. Mejor que en empresa.' },
     { tool: 'Planificador de Cashflow', result: 'Los 3 primeros meses los clientes pagan a 30-60 días. Necesita colchón de 3.000€ para cubrir esos desfases iniciales sin agobios.' },
   ],
@@ -284,7 +284,7 @@ export default function GuiaMontarNegocioPage() {
           Empieza calculando el break-even de tu negocio.
           Si los números salen, tienes una idea viable. Si no, es mejor saberlo ahora.
         </p>
-        <Link href="/calculadora-break-even/" className={styles.ctaButton}>
+        <Link href="/estimador-break-even/" className={styles.ctaButton}>
           Calcular mi punto de equilibrio
         </Link>
       </section>

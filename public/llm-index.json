@@ -450,9 +450,9 @@
       "icon": "📦"
     },
     {
-      "slug": "calculadora-reformas-hogar",
-      "name": "Calculadora de Reformas del Hogar",
-      "url": "https://meskeia.com/calculadora-reformas-hogar/",
+      "slug": "estimador-reformas-hogar",
+      "name": "Estimador Reformas del Hogar",
+      "url": "https://meskeia.com/estimador-reformas-hogar/",
       "description": "Estima el presupuesto de tus reformas: cocina, baño, pintura, suelos, eléctrica y más. Precios de referencia España 2026 por m²",
       "suites": [
         "inmobiliaria",
@@ -1095,9 +1095,9 @@
       "icon": "👤"
     },
     {
-      "slug": "calculadora-tarifa-freelance",
-      "name": "Calculadora Tarifa Freelance",
-      "url": "https://meskeia.com/calculadora-tarifa-freelance/",
+      "slug": "orientador-tarifa-freelance",
+      "name": "Orientador Tarifa Freelance",
+      "url": "https://meskeia.com/orientador-tarifa-freelance/",
       "description": "Calcula tu tarifa freelance ideal considerando gastos, impuestos, vacaciones y margen de beneficio. Evita cobrar de menos",
       "suites": [
         "freelance"
@@ -1116,9 +1116,9 @@
       "icon": "💼"
     },
     {
-      "slug": "calculadora-break-even",
-      "name": "Calculadora Break-Even",
-      "url": "https://meskeia.com/calculadora-break-even/",
+      "slug": "estimador-break-even",
+      "name": "Estimador Break-Even",
+      "url": "https://meskeia.com/estimador-break-even/",
       "description": "Calcula el punto de equilibrio de tus productos. Analiza margen de contribución, rentabilidad y escenarios de costos/precios",
       "suites": [
         "freelance"
@@ -1158,9 +1158,9 @@
       "icon": "💼"
     },
     {
-      "slug": "calculadora-roi-marketing",
-      "name": "Calculadora ROI Marketing",
-      "url": "https://meskeia.com/calculadora-roi-marketing/",
+      "slug": "estimador-roi-marketing",
+      "name": "Estimador ROI Marketing",
+      "url": "https://meskeia.com/estimador-roi-marketing/",
       "description": "Calcula el ROI por canal de marketing (Google Ads, Facebook, email, SEO). Analiza CAC, CLV y optimiza tu inversión publicitaria",
       "suites": [
         "freelance",
@@ -1507,9 +1507,9 @@
       "icon": "🤖"
     },
     {
-      "slug": "simulador-hipoteca",
-      "name": "Simulador de Hipoteca",
-      "url": "https://meskeia.com/simulador-hipoteca/",
+      "slug": "estimador-hipoteca",
+      "name": "Estimador de Hipoteca",
+      "url": "https://meskeia.com/estimador-hipoteca/",
       "description": "Calcula tu hipoteca con cuadro de amortización completo y análisis detallado",
       "suites": [
         "inmobiliaria",
@@ -1532,9 +1532,9 @@
       "icon": "💰"
     },
     {
-      "slug": "simulador-compraventa-inmueble",
-      "name": "Simulador de Compraventa Inmobiliaria",
-      "url": "https://meskeia.com/simulador-compraventa-inmueble/",
+      "slug": "estimador-compraventa-inmueble",
+      "name": "Estimador Compraventa Inmobiliaria",
+      "url": "https://meskeia.com/estimador-compraventa-inmueble/",
       "description": "Calcula todos los gastos de compra y venta de inmuebles en España: ITP/IVA por CCAA, notaría, registro, plusvalía municipal e IRPF del vendedor",
       "suites": [
         "inmobiliaria",
@@ -1881,9 +1881,9 @@
       "icon": "📋"
     },
     {
-      "slug": "calculadora-jubilacion",
-      "name": "Calculadora de Jubilación",
-      "url": "https://meskeia.com/calculadora-jubilacion/",
+      "slug": "estimador-jubilacion",
+      "name": "Estimador de Jubilación",
+      "url": "https://meskeia.com/estimador-jubilacion/",
       "description": "Planifica tu jubilación calculando ahorros necesarios y pensión estimada",
       "suites": [
         "finanzas",
@@ -1903,9 +1903,9 @@
       "icon": "💰"
     },
     {
-      "slug": "calculadora-inversiones",
-      "name": "Calculadora de Inversiones",
-      "url": "https://meskeia.com/calculadora-inversiones/",
+      "slug": "estimador-inversiones",
+      "name": "Estimador de Inversiones",
+      "url": "https://meskeia.com/estimador-inversiones/",
       "description": "Simula el crecimiento de tus inversiones con interés compuesto",
       "suites": [
         "finanzas"
@@ -1924,9 +1924,9 @@
       "icon": "💰"
     },
     {
-      "slug": "interes-compuesto",
-      "name": "Calculadora de Interés Compuesto",
-      "url": "https://meskeia.com/interes-compuesto/",
+      "slug": "estimador-interes-compuesto",
+      "name": "Estimador Interés Compuesto",
+      "url": "https://meskeia.com/estimador-interes-compuesto/",
       "description": "Calcula el interés compuesto de tus ahorros e inversiones a largo plazo",
       "suites": [
         "finanzas"
@@ -1967,9 +1967,9 @@
       "icon": "🎯"
     },
     {
-      "slug": "simulador-cartera-inversion",
-      "name": "Simulador de Cartera de Inversión",
-      "url": "https://meskeia.com/simulador-cartera-inversion/",
+      "slug": "estimador-cartera-inversion",
+      "name": "Estimador de Cartera de Inversión",
+      "url": "https://meskeia.com/estimador-cartera-inversion/",
       "description": "Simula la evolución de tu cartera con Monte Carlo. Sharpe, volatilidad, percentiles y probabilidad de alcanzar objetivos",
       "suites": [
         "finanzas"
@@ -2013,9 +2013,9 @@
       "icon": "💰"
     },
     {
-      "slug": "calculadora-tir-van",
-      "name": "Calculadora TIR-VAN",
-      "url": "https://meskeia.com/calculadora-tir-van/",
+      "slug": "estimador-tir-van",
+      "name": "Estimador TIR-VAN",
+      "url": "https://meskeia.com/estimador-tir-van/",
       "description": "Calcula TIR y VAN para análisis de inversiones y proyectos",
       "suites": [
         "finanzas",
@@ -2038,9 +2038,9 @@
       "icon": "💰"
     },
     {
-      "slug": "simulador-prestamos",
-      "name": "Simulador de Préstamos",
-      "url": "https://meskeia.com/simulador-prestamos/",
+      "slug": "estimador-prestamos",
+      "name": "Estimador de Préstamos",
+      "url": "https://meskeia.com/estimador-prestamos/",
       "description": "Compara sistemas de amortización: francés, alemán y americano. Cuadro completo, TAE vs TIN y comisiones",
       "suites": [
         "inmobiliaria",
@@ -2086,9 +2086,9 @@
       "icon": "🏠"
     },
     {
-      "slug": "calculadora-inflacion",
-      "name": "Calculadora de Inflación",
-      "url": "https://meskeia.com/calculadora-inflacion/",
+      "slug": "estimador-inflacion",
+      "name": "Estimador de Inflación",
+      "url": "https://meskeia.com/estimador-inflacion/",
       "description": "Calcula cómo la inflación afecta tu dinero. Poder adquisitivo histórico con datos del INE desde 1961",
       "suites": [
         "finanzas"
@@ -2179,9 +2179,9 @@
       "icon": "🏠"
     },
     {
-      "slug": "calculadora-alquiler-vs-compra",
-      "name": "Calculadora Alquiler vs Compra",
-      "url": "https://meskeia.com/calculadora-alquiler-vs-compra/",
+      "slug": "orientador-alquiler-vs-compra",
+      "name": "Orientador Alquiler vs Compra",
+      "url": "https://meskeia.com/orientador-alquiler-vs-compra/",
       "description": "¿Alquilar o comprar vivienda? Análisis financiero completo con hipoteca, gastos y coste de oportunidad",
       "suites": [
         "inmobiliaria"
@@ -2201,9 +2201,9 @@
       "icon": "🏡"
     },
     {
-      "slug": "calculadora-fondo-emergencia",
-      "name": "Calculadora Fondo de Emergencia",
-      "url": "https://meskeia.com/calculadora-fondo-emergencia/",
+      "slug": "estimador-fondo-emergencia",
+      "name": "Estimador Fondo de Emergencia",
+      "url": "https://meskeia.com/estimador-fondo-emergencia/",
       "description": "Calcula cuánto dinero necesitas como fondo de emergencia según tu situación laboral, gastos y cargas familiares",
       "suites": [
         "finanzas"
@@ -2222,9 +2222,9 @@
       "icon": "🛡️"
     },
     {
-      "slug": "calculadora-regla-50-30-20",
-      "name": "Calculadora Regla 50/30/20",
-      "url": "https://meskeia.com/calculadora-regla-50-30-20/",
+      "slug": "orientador-regla-50-30-20",
+      "name": "Orientador Regla 50/30/20",
+      "url": "https://meskeia.com/orientador-regla-50-30-20/",
       "description": "Distribuye tus ingresos según la regla 50/30/20: necesidades, deseos y ahorro. Analiza si tu presupuesto está equilibrado",
       "suites": [
         "finanzas"
@@ -2244,9 +2244,9 @@
       "icon": "📊"
     },
     {
-      "slug": "calculadora-fire",
-      "name": "Calculadora FIRE",
-      "url": "https://meskeia.com/calculadora-fire/",
+      "slug": "estimador-fire",
+      "name": "Estimador FIRE",
+      "url": "https://meskeia.com/estimador-fire/",
       "description": "Calcula cuánto necesitas para alcanzar la independencia financiera (FIRE). Regla del 4% y proyección hasta tu retiro anticipado",
       "suites": [
         "finanzas",
@@ -2266,9 +2266,9 @@
       "icon": "🔥"
     },
     {
-      "slug": "calculadora-coste-plazos",
-      "name": "Calculadora Coste Real a Plazos",
-      "url": "https://meskeia.com/calculadora-coste-plazos/",
+      "slug": "estimador-coste-plazos",
+      "name": "Estimador Coste Real a Plazos",
+      "url": "https://meskeia.com/estimador-coste-plazos/",
       "description": "Descubre el coste real de financiar productos a plazos. Calcula la TAE, los intereses ocultos y cuánto pagas de más",
       "suites": [
         "finanzas"
@@ -2290,9 +2290,9 @@
       "icon": "💳"
     },
     {
-      "slug": "calculadora-deuda",
-      "name": "Calculadora de Deuda",
-      "url": "https://meskeia.com/calculadora-deuda/",
+      "slug": "estimador-deuda",
+      "name": "Estimador de Deuda",
+      "url": "https://meskeia.com/estimador-deuda/",
       "description": "Elimina tus deudas más rápido. Compara el método bola de nieve vs avalancha y descubre cuál te ahorra más",
       "suites": [
         "finanzas"
@@ -2336,9 +2336,9 @@
       "icon": "🚗"
     },
     {
-      "slug": "calculadora-seguro-vida",
-      "name": "Calculadora Seguro de Vida",
-      "url": "https://meskeia.com/calculadora-seguro-vida/",
+      "slug": "orientador-seguro-vida",
+      "name": "Orientador Seguro de Vida",
+      "url": "https://meskeia.com/orientador-seguro-vida/",
       "description": "Calcula cuánto seguro de vida necesitas para proteger a tu familia según tus ingresos, deudas, hipoteca y situación familiar",
       "suites": [
         "finanzas",
@@ -2409,9 +2409,9 @@
       "icon": "✅"
     },
     {
-      "slug": "calculadora-infraseguro",
-      "name": "Calculadora de Infraseguro",
-      "url": "https://meskeia.com/calculadora-infraseguro/",
+      "slug": "estimador-infraseguro",
+      "name": "Estimador de Infraseguro",
+      "url": "https://meskeia.com/estimador-infraseguro/",
       "description": "Calcula cuánto cobrarías en caso de siniestro si tienes infraseguro. Regla proporcional según Ley de Contrato de Seguro",
       "suites": [
         "finanzas",
@@ -3026,9 +3026,9 @@
       "icon": "🐾"
     },
     {
-      "slug": "calculadora-coste-vivienda",
-      "name": "Calculadora Coste Vivienda",
-      "url": "https://meskeia.com/calculadora-coste-vivienda/",
+      "slug": "estimador-coste-vivienda",
+      "name": "Estimador Coste Vivienda",
+      "url": "https://meskeia.com/estimador-coste-vivienda/",
       "description": "Calcula el coste real mensual de mantener una vivienda: hipoteca, IBI, comunidad, seguros, suministros y mantenimiento. Ideal para segundas residencias y viviendas heredadas",
       "suites": [
         "inmobiliaria",
@@ -4206,9 +4206,9 @@
       "icon": "📋"
     },
     {
-      "slug": "simulador-jet-lag",
-      "name": "Simulador de Jet Lag",
-      "url": "https://meskeia.com/simulador-jet-lag/",
+      "slug": "orientador-jet-lag",
+      "name": "Orientador de Jet Lag",
+      "url": "https://meskeia.com/orientador-jet-lag/",
       "description": "Calcula el impacto del cambio horario en tu viaje. Días de adaptación, síntomas esperados y recomendaciones personalizadas según la dirección del vuelo",
       "suites": [
         "viajes",
@@ -4284,9 +4284,9 @@
       "icon": "🗓️"
     },
     {
-      "slug": "calculadora-tension-arterial",
-      "name": "Calculadora de Tensión Arterial",
-      "url": "https://meskeia.com/calculadora-tension-arterial/",
+      "slug": "orientador-tension-arterial",
+      "name": "Orientador Tensión Arterial",
+      "url": "https://meskeia.com/orientador-tension-arterial/",
       "description": "Clasifica tu presión arterial según guías ESH/ESC 2018: óptima, normal, normal-alta, HTA Grado 1/2/3 o crisis hipertensiva. Calcula TAM, presión de pulso y guarda historial local",
       "suites": [
         "salud",
@@ -4858,9 +4858,9 @@
       "icon": "🪞"
     },
     {
-      "slug": "calculadora-imc",
-      "name": "Calculadora IMC",
-      "url": "https://meskeia.com/calculadora-imc/",
+      "slug": "orientador-imc",
+      "name": "Orientador IMC",
+      "url": "https://meskeia.com/orientador-imc/",
       "description": "Calcula tu Índice de Masa Corporal y conoce tu clasificación según la OMS",
       "suites": [
         "salud"
@@ -4879,9 +4879,9 @@
       "icon": "⚖️"
     },
     {
-      "slug": "calculadora-colesterol",
-      "name": "Calculadora de Colesterol",
-      "url": "https://meskeia.com/calculadora-colesterol/",
+      "slug": "orientador-colesterol",
+      "name": "Orientador Colesterol",
+      "url": "https://meskeia.com/orientador-colesterol/",
       "description": "Analiza tus niveles de colesterol: ratios CT/HDL, LDL/HDL, fórmula de Friedewald y recomendaciones de riesgo cardiovascular",
       "suites": [
         "salud",
@@ -5179,9 +5179,9 @@
       "icon": "🍖"
     },
     {
-      "slug": "calculadora-medicamentos-mascotas",
-      "name": "Calculadora de Medicamentos Mascotas",
-      "url": "https://meskeia.com/calculadora-medicamentos-mascotas/",
+      "slug": "orientador-medicamentos-mascotas",
+      "name": "Orientador Medicamentos Mascotas",
+      "url": "https://meskeia.com/orientador-medicamentos-mascotas/",
       "description": "Calcula la dosis de antiparasitarios y medicamentos comunes para tu mascota según su peso. Incluye frecuencia de desparasitación y recordatorios",
       "suites": [
         "salud"
@@ -5225,9 +5225,9 @@
       "icon": "📏"
     },
     {
-      "slug": "calculadora-percentiles",
-      "name": "Calculadora Percentiles Infantiles",
-      "url": "https://meskeia.com/calculadora-percentiles/",
+      "slug": "orientador-percentiles",
+      "name": "Orientador Percentiles Infantiles",
+      "url": "https://meskeia.com/orientador-percentiles/",
       "description": "Calcula el percentil de peso y talla de tu bebé o niño según las tablas de crecimiento de la OMS",
       "suites": [
         "salud"
@@ -6220,9 +6220,9 @@
       "icon": "🌸"
     },
     {
-      "slug": "calculadora-gastos-comunidad",
-      "name": "Calculadora de Gastos de Comunidad",
-      "url": "https://meskeia.com/calculadora-gastos-comunidad/",
+      "slug": "estimador-gastos-comunidad",
+      "name": "Estimador Gastos de Comunidad",
+      "url": "https://meskeia.com/estimador-gastos-comunidad/",
       "description": "Calcula y reparte los gastos de la comunidad de propietarios: cuota mensual, derramas, reparto por coeficiente de participación o partes iguales. Gestiona el presupuesto de tu comunidad",
       "suites": [
         "inmobiliaria"
