@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 285+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 286+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 285,
+  "total_tools": 286,
   "last_updated": "2026-03-16",
   "features": {
     "all_free": true,
@@ -36,14 +36,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 100
+      "tool_count": 101
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 74
+      "tool_count": 75
     },
     {
       "id": "creando",
@@ -1763,6 +1763,30 @@
         "test iof osteoporosis"
       ],
       "icon": "🦴"
+    },
+    {
+      "slug": "estimador-pension-viudedad",
+      "name": "Estimador Pensión de Viudedad",
+      "url": "https://meskeia.com/estimador-pension-viudedad/",
+      "description": "Calcula la pensión de viudedad estimada 2025: porcentaje aplicable (52%, 60% o 70%), base reguladora, pensión mínima garantizada y verificación de requisitos de la Seguridad Social.",
+      "suites": [
+        "jubilacion",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "pension viudedad 2025",
+        "cuantia pension viudedad",
+        "como calcular pension viudedad",
+        "requisitos pension viudedad",
+        "pension viudedad 52 60 70 por ciento",
+        "base reguladora viudedad",
+        "pension minima viudedad"
+      ],
+      "icon": "💍"
     },
     {
       "slug": "estimador-legitimas",

@@ -45,6 +45,7 @@ const estudiantesApps: RelatedApp[] = [
 // ==========================================
 const jubilacionApps: RelatedApp[] = [
   { url: '/estimador-pension-publica/', icon: '🌅', name: 'Estimador de Pensión Pública', description: 'Cuánto cobrarás al jubilarte' },
+  { url: '/estimador-pension-viudedad/', icon: '💍', name: 'Pensión de Viudedad', description: 'Cuantía y requisitos 2025' },
   { url: '/estimador-brecha-jubilacion/', icon: '📉', name: 'Brecha de Jubilación', description: 'Lo que perderás al jubilarte' },
   { url: '/orientador-jubilacion-anticipada/', icon: '⏩', name: 'Jubilación Anticipada', description: '¿Puedes jubilarte antes?' },
   { url: '/orientador-plan-pensiones/', icon: '💼', name: 'Plan de Pensiones', description: 'Ahorro fiscal y pensión complementaria' },
@@ -1128,6 +1129,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'orientador-grado-dependencia': [
     ...saludMayoresApps.filter(a => a.url !== '/orientador-grado-dependencia/'),
+  ],
+  'estimador-pension-viudedad': [
+    ...jubilacionApps.filter(a => a.url !== '/estimador-pension-viudedad/').slice(0, 4),
   ],
   'estimador-legitimas': [
     ...patrimonioPensionApps.filter(a => a.url !== '/estimador-legitimas/'),

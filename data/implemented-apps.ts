@@ -26,6 +26,7 @@ export const implementedAppsUrls = [
   "/adaptacion-hogar/",                 // Checklist adaptaciones del hogar: costes, prioridades y ayudas públicas
   "/residencia-vs-cuidado-en-casa/",    // Comparativa costes residencia / SAD / cuidador en casa
   "/estimador-riesgo-osteoporosis/",    // Test validado (FRAX/IOF) de riesgo de osteoporosis
+  "/estimador-pension-viudedad/",        // Estimador Pensión de Viudedad: 52/60/70%, base reguladora, mínimos garantizados
   "/estimador-legitimas/",              // Estimador de Legítimas: herencia forzosa por CCAA (CC + 6 derechos forales)
   "/optimizador-rentas-60/",            // Optimizador de Rentas 60+: estrategia IRPF pensión + PP + ahorro + alquiler
   "/test-fragilidad/",                  // Test de Fragilidad (Escala FRAIL): 5 ítems, 3 niveles (robusto/pre-frágil/frágil)
