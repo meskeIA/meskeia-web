@@ -390,3 +390,190 @@
     font-size: 1.6rem;
   }
 }
+
+
+/* ===== SECCIÓN EDUCATIVA ===== */
+.eduTablaWrapper {
+  overflow-x: auto;
+  margin: 15px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.eduTabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.eduTabla th {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 2px solid rgba(46, 134, 171, 0.2);
+}
+.eduTabla td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+.eduTabla tr:last-child td { border-bottom: none; }
+.eduTabla tr:hover td { background: var(--bg-primary); }
+.eduEscenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 15px 0;
+}
+.eduEscenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+.eduEscenarioIcon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 8px;
+}
+.eduEscenarioCard h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.eduEscenarioCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+.eduFaqList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 15px 0;
+}
+.eduFaqItem {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.eduFaqPregunta {
+  padding: 13px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  background: var(--bg-primary);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.eduFaqPregunta::before {
+  content: "▶";
+  font-size: 0.65rem;
+  color: #2E86AB;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.eduFaqItem[open] .eduFaqPregunta::before { transform: rotate(90deg); }
+.eduFaqRespuesta {
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  border-top: 1px solid var(--border);
+  background: var(--bg-card);
+  margin: 0;
+}
+.eduPasosList {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.eduPaso {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.eduPasoNum {
+  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.eduPaso strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 4px;
+}
+.eduPaso p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+.eduTipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 15px 0;
+}
+.eduTipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.eduTipIcono {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 6px;
+}
+.eduTipCard h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.eduTipCard p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+.warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-top: 20px;
+  display: flex;
+  gap: 14px;
+}
+.warningIcono { font-size: 1.5rem; flex-shrink: 0; }
+.warningBox strong { display: block; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 10px; }
+.warningBox ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 7px; }
+.warningBox li { font-size: 0.83rem; color: var(--text-secondary); line-height: 1.5; }
+[data-theme="dark"] .eduTabla th { background: rgba(46, 134, 171, 0.15); }
+[data-theme="dark"] .eduFaqPregunta { background: var(--bg-card); }
+[data-theme="dark"] .warningBox { background: rgba(245, 158, 11, 0.06); border-color: rgba(245, 158, 11, 0.2); }
+@media (max-width: 600px) {
+  .eduEscenariosGrid { grid-template-columns: 1fr; }
+  .eduTipsGrid { grid-template-columns: 1fr; }
+  .warningBox { flex-direction: column; gap: 8px; }
+}

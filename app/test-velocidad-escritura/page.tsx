@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './TestVelocidadEscritura.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -305,6 +305,236 @@ export default function TestVelocidadEscrituraPage() {
           </button>
         </div>
       )}
+
+      <EducationalSection
+        title="Mecanografía, Productividad y Velocidad de Escritura"
+        subtitle="Entiende qué significa tu velocidad, cómo mejorarla y por qué importa"
+        icon="⌨️"
+      >
+        <section>
+          <h3>📊 Velocidades de Escritura por Nivel y Profesión</h3>
+          <div className={styles.eduTablaWrapper}>
+            <table className={styles.eduTabla}>
+              <thead>
+                <tr>
+                  <th>Nivel</th>
+                  <th>PPM (palabras/min)</th>
+                  <th>CPM (caracteres/min)</th>
+                  <th>Perfil típico</th>
+                  <th>Objetivo recomendado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Principiante</strong></td>
+                  <td>0 – 20 PPM</td>
+                  <td>0 – 100 CPM</td>
+                  <td>Usuario ocasional, método caza-teclas</td>
+                  <td>Aprender mecanografía táctil</td>
+                </tr>
+                <tr>
+                  <td><strong>Básico</strong></td>
+                  <td>20 – 40 PPM</td>
+                  <td>100 – 200 CPM</td>
+                  <td>Estudiante, uso cotidiano</td>
+                  <td>Alcanzar los 40 PPM con precisión</td>
+                </tr>
+                <tr>
+                  <td><strong>Intermedio</strong></td>
+                  <td>40 – 60 PPM</td>
+                  <td>200 – 300 CPM</td>
+                  <td>Oficinista, profesional general</td>
+                  <td>Mecanografía táctil consolidada</td>
+                </tr>
+                <tr>
+                  <td><strong>Avanzado</strong></td>
+                  <td>60 – 80 PPM</td>
+                  <td>300 – 400 CPM</td>
+                  <td>Secretario/a, periodista, programador</td>
+                  <td>Velocidad no limita el pensamiento</td>
+                </tr>
+                <tr>
+                  <td><strong>Experto</strong></td>
+                  <td>80 – 100 PPM</td>
+                  <td>400 – 500 CPM</td>
+                  <td>Transcriptor profesional, redactor</td>
+                  <td>Mantener alta precisión (&gt;97%)</td>
+                </tr>
+                <tr>
+                  <td><strong>Élite</strong></td>
+                  <td>&gt; 100 PPM</td>
+                  <td>&gt; 500 CPM</td>
+                  <td>Campeones de mecanografía</td>
+                  <td>Récord mundial: ~316 PPM (Barbara Blackburn)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h3>🎯 ¿Para Qué Importa la Velocidad de Escritura?</h3>
+          <div className={styles.eduEscenariosGrid}>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>💼</span>
+              <h4>Productividad Laboral</h4>
+              <p>Un profesional que escribe 60 PPM en lugar de 30 PPM produce el doble de texto en el mismo tiempo. Para roles como redactor, analista, consultor o administrativo, la velocidad de escritura impacta directamente en cuánto trabajo puedes completar. Muchas empresas exigen mínimo 40-50 PPM como requisito para puestos de backoffice.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🎓</span>
+              <h4>Oposiciones y Exámenes</h4>
+              <p>Varias oposiciones en España incluyen prueba de mecanografía (Cuerpo General Administrativo del Estado, auxiliares administrativos de CCAA, etc.) con velocidad mínima de 180-200 pulsaciones por minuto. En exámenes universitarios con entrega digital, una mayor velocidad permite dedicar más tiempo a pensar y menos a teclear.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>💻</span>
+              <h4>Programación y Desarrollo</h4>
+              <p>Los programadores no solo escriben código: también documentan, responden issues, hacen code review y comunican en Slack/email. Aunque la velocidad de escritura no es la limitación principal en programación (lo es el pensamiento), pasar de 30 a 60 PPM reduce la fricción mental y permite mantener mejor el flujo (estado &quot;flow&quot;) mientras se programa.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🎤</span>
+              <h4>Transcripción y Periodismo</h4>
+              <p>Los transcriptores profesionales y periodistas necesitan 80+ PPM para transcribir audio en tiempo real o tomar notas de rueda de prensa. La estenografía digital (taquigrafía con teclado) puede alcanzar 200+ PPM. Aplicaciones como el subtitulado en directo para televisión requieren velocidades de 300+ PPM con precisión casi perfecta.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>❓ Preguntas Frecuentes sobre Velocidad de Escritura</h3>
+          <div className={styles.eduFaqList}>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqPregunta}>¿Qué diferencia hay entre PPM y CPM?</summary>
+              <p className={styles.eduFaqRespuesta}><strong>PPM (palabras por minuto)</strong>: se calcula dividiendo los caracteres escritos entre 5 (longitud media de palabra en inglés) y entre los minutos. Es la medida más usada internacionalmente. <strong>CPM (caracteres por minuto)</strong>: cuenta directamente cada carácter, incluyendo espacios. En español, las palabras son más largas que en inglés (media ~5,5 caracteres vs ~4,5), por lo que un test en español con 40 PPM equivale a más CPM que el mismo test en inglés. <strong>PPM netas</strong>: PPM brutas menos penalización por errores; es la medida más honesta de rendimiento real.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqPregunta}>¿Cuál es la velocidad media de un adulto en España?</summary>
+              <p className={styles.eduFaqRespuesta}>Según estudios de plataformas de mecanografía como Keybr y TypeRacer, la media global es de 40-50 PPM. En España, con teclado QWERTY español, los estudios de productividad laboral estiman una media de 35-45 PPM para trabajadores de oficina. Los jóvenes que han crecido con smartphones tienden a ser más rápidos en móvil pero más variables en teclado físico. Los &quot;nativos digitales&quot; con formación en mecanografía táctil suelen superar los 60 PPM con facilidad.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqPregunta}>¿Qué es la mecanografía táctil y por qué es importante?</summary>
+              <p className={styles.eduFaqRespuesta}>La <strong>mecanografía táctil</strong> (touch typing) es la técnica de escribir sin mirar el teclado, usando todos los dedos con posición fija de partida (manos en &quot;ASDF JKL;&quot;, dedos índice en F y J que tienen marcas táctiles). Sus ventajas: velocidad 2-3 veces mayor que el método &quot;caza-teclas&quot;, menos fatiga visual (no hay que alternar vista entre pantalla y teclado), menor carga cognitiva. Aprenderla lleva 20-40 horas de práctica pero los beneficios duran toda la vida laboral.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqPregunta}>¿Importa más la velocidad o la precisión?</summary>
+              <p className={styles.eduFaqRespuesta}>La <strong>precisión siempre primero</strong>. Una precisión baja genera errores que hay que corregir, lo que en la práctica reduce la velocidad neta. Los expertos en mecanografía recomiendan: mantener siempre por encima del 95-97% de precisión y solo entonces intentar aumentar la velocidad. El cerebro aprende los patrones motores de los errores igual que los correctos; si practicas rápido y con errores, estás aprendiendo también los errores. &quot;Slow is smooth, smooth is fast&quot; es el principio: la fluidez sin errores acaba siendo más rápida que la velocidad con correcciones.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqPregunta}>¿Qué teclado es mejor para mejorar la velocidad?</summary>
+              <p className={styles.eduFaqRespuesta}>Para empezar: cualquier teclado físico de tamaño completo es válido. Para optimizar: los <strong>teclados mecánicos</strong> con switches de tacto claro (Cherry MX Brown, Blue) dan retroalimentación táctil que facilita saber cuándo se ha registrado la pulsación, reduciendo errores. Los teclados <strong>compactos TKL</strong> (sin numpad) reducen el desplazamiento del ratón. El layout <strong>Colemak</strong> es alternativo al QWERTY y potencialmente más eficiente para el español, pero la curva de aprendizaje es alta. Para la mayoría: un buen teclado mecánico QWERTY es suficiente para superar los 80 PPM.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqPregunta}>¿Cuánto tiempo se tarda en mejorar significativamente?</summary>
+              <p className={styles.eduFaqRespuesta}>Con <strong>15-20 minutos de práctica diaria deliberada</strong> (no escritura casual, sino ejercicios estructurados), los estudios muestran: semanas 1-2: dominar la posición de los dedos y alcanzar 20 PPM táctil (más lento que antes). Semana 3-4: 30-35 PPM, empezando a ser cómodo. Mes 2-3: 40-50 PPM, ya comparable con el método antiguo pero con más precisión. Mes 4-6: 60+ PPM. El umbral de 80 PPM generalmente requiere 6-12 meses de práctica consistente. La clave es la práctica <strong>deliberada</strong> (con dificultad, corrigiendo errores) vs la práctica casual (solo escribir lo que ya sabes).</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqPregunta}>¿Hay riesgo de lesiones por escribir rápido?</summary>
+              <p className={styles.eduFaqRespuesta}>Sí. Las lesiones más comunes son el <strong>síndrome del túnel carpiano</strong> (compresión del nervio mediano en la muñeca), la <strong>tendinitis</strong> (inflamación de tendones de los dedos) y el <strong>síndrome del dolor cervical</strong> por mala postura. La prevención incluye: muñecas rectas al escribir (no doblarlas), descansos de 5 minutos cada hora (regla 20-20-20 extendida), ratón y teclado a la misma altura que los codos, pantalla a nivel de los ojos. La velocidad alta con mala ergonomía aumenta el riesgo; la velocidad alta con buena ergonomía puede mantenerse durante décadas.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqPregunta}>¿Los jóvenes que escriben mucho en móvil son más rápidos en teclado?</summary>
+              <p className={styles.eduFaqRespuesta}>No necesariamente. Escribir en móvil usa principalmente los pulgares y desarrolla un patrón motor completamente distinto al del teclado físico. Algunos estudios muestran que usuarios intensivos de smartphone pueden alcanzar 85-100 CPM en móvil (equivalente a ~30-35 PPM), comparable con usuarios de teclado básico pero lejos de los expertos en mecanografía táctil. El aprendizaje de un tipo de escritura no transfiere automáticamente al otro; son habilidades distintas que se desarrollan por separado.</p>
+            </details>
+          </div>
+        </section>
+
+        <section>
+          <h3>📋 Cómo Mejorar tu Velocidad de Escritura: Plan de 6 Semanas</h3>
+          <ol className={styles.eduPasosList}>
+            <li className={styles.eduPaso}>
+              <span className={styles.eduPasoNum}>1</span>
+              <div>
+                <strong>Semana 1: Aprende la posición base</strong>
+                <p>Coloca los dedos índice en las teclas F y J (tienen una pequeña marca táctil). Dedos restantes de la mano izquierda en A-S-D; de la derecha en K-L-Ñ. Pulgares en la barra espaciadora. No mires el teclado. Empieza solo con las teclas centrales. Usa plataformas como Typingclub, Keybr o Typeracer en modo aprendizaje.</p>
+              </div>
+            </li>
+            <li className={styles.eduPaso}>
+              <span className={styles.eduPasoNum}>2</span>
+              <div>
+                <strong>Semana 2-3: Amplía al teclado completo</strong>
+                <p>Aprende gradualmente la fila superior (QWERTY) y la inferior (ZXCVB). Dedica cada sesión a un grupo de teclas nuevas. Acepta que irás más lento que antes — es normal y temporal. El objetivo es consolidar la posición correcta de los dedos, no la velocidad.</p>
+              </div>
+            </li>
+            <li className={styles.eduPaso}>
+              <span className={styles.eduPasoNum}>3</span>
+              <div>
+                <strong>Semana 4: Practica palabras comunes</strong>
+                <p>El 200 palabras más frecuentes del español forman el 50% del texto que escribes. Practicar esas palabras específicas (de, que, en, la, el, una...) te da el mayor retorno de inversión. Usa Keybr en modo &quot;palabras frecuentes en español&quot;. Objetivo: 30-35 PPM con precisión &gt;95%.</p>
+              </div>
+            </li>
+            <li className={styles.eduPaso}>
+              <span className={styles.eduPasoNum}>4</span>
+              <div>
+                <strong>Semana 5: Textos completos</strong>
+                <p>Empieza a escribir textos continuos (noticias, artículos, emails). La escritura de textos reales activa patrones de palabras que los ejercicios aislados no trabajan. Usa TypeRacer o MonkeyType en español. Anota tu velocidad neta al final de cada sesión para ver la progresión.</p>
+              </div>
+            </li>
+            <li className={styles.eduPaso}>
+              <span className={styles.eduPasoNum}>5</span>
+              <div>
+                <strong>Semana 6+: Identifica y trabaja tus teclas débiles</strong>
+                <p>Plataformas como Keybr analizan qué teclas cometes más errores o tardas más. Dedica las sesiones siguientes específicamente a esas teclas. Los &quot;cuellos de botella&quot; individuales (la ñ, las tildes, el guión) son los que más fácil se mejoran con práctica dirigida.</p>
+              </div>
+            </li>
+            <li className={styles.eduPaso}>
+              <span className={styles.eduPasoNum}>6</span>
+              <div>
+                <strong>Mantenimiento: 10 minutos diarios indefinidamente</strong>
+                <p>La mecanografía táctil es una habilidad motora que se deteriora sin práctica. Una vez alcanzado tu objetivo, mantén la habilidad con 10 minutos diarios de escritura en TypeRacer o simplemente siendo consciente de tu postura cuando escribes emails y documentos reales.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>💡 Consejos para Mejorar Más Rápido</h3>
+          <div className={styles.eduTipsGrid}>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcono}>🎯</span>
+              <h4>Precisión antes que velocidad</h4>
+              <p>Si cometes más del 5% de errores, reduce la velocidad. Los errores refuerzan los patrones incorrectos. Configura tu herramienta de práctica para que no te permita continuar si hay errores sin corregir.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcono}>⏱️</span>
+              <h4>15 minutos diarios &gt; 2 horas semanales</h4>
+              <p>La memoria muscular se consolida mejor con práctica distribuida. 15 minutos cada día durante 30 días supera enormemente a una sesión de 2 horas el fin de semana. La consistencia es más importante que la intensidad.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcono}>🚫</span>
+              <h4>Nunca mires el teclado</h4>
+              <p>Tapar el teclado con un trapo o usar una cubierta ciega acelera el aprendizaje táctil. Mirar las teclas es un hábito que frena el automatismo. El dolor de ir lento sin mirar es temporal; el beneficio de no mirar es permanente.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcono}>💆</span>
+              <h4>Postura y ergonomía desde el día 1</h4>
+              <p>Espalda recta, pies apoyados en el suelo, codos a 90°, muñecas rectas (no dobladas hacia arriba). Una postura correcta desde el principio evita lesiones y también mejora la velocidad: la tensión corporal ralentiza los dedos.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcono}>📊</span>
+              <h4>Haz tests regulares para ver el progreso</h4>
+              <p>Usa este test una vez por semana, siempre bajo las mismas condiciones (misma hora, mismo estado de ánimo, teclado habitual). Ver el progreso en una gráfica es motivador. La velocidad crece lentamente pero de forma constante con práctica diaria.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcono}>🔧</span>
+              <h4>Usa aceleradores de texto (snippets)</h4>
+              <p>Herramientas como TextExpander, AutoHotkey o el autocompletado del IDE expanden abreviaturas en texto completo. Escribir &quot;dir&quot; y obtener &quot;Estimado/a Sr./Sra.&quot; automáticamente multiplica tu velocidad efectiva. Combina buena mecanografía con automatización para productividad máxima.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className={styles.warningBox}>
+            <span className={styles.warningIcono}>⚠️</span>
+            <div>
+              <strong>Precauciones importantes sobre velocidad de escritura</strong>
+              <ul>
+                <li><strong>No fuerces la velocidad si hay dolor:</strong> El dolor en muñecas, dedos o antebrazos durante o después de escribir es una señal de alarma. Para inmediatamente y revisa tu postura y ergonomía antes de continuar. El síndrome del túnel carpiano puede volverse crónico si se ignoran los síntomas tempranos.</li>
+                <li><strong>Los tests en esta herramienta son orientativos:</strong> La velocidad real en trabajo cotidiano incluye pensar, editar y formatear, por lo que siempre es inferior a la velocidad en un test de copia. Tu velocidad &quot;real&quot; de trabajo es aproximadamente el 60-70% de tu velocidad en test.</li>
+                <li><strong>El calentamiento importa:</strong> Como cualquier habilidad motora fina, escribir en frío (primera hora de la mañana, tras una pausa larga) es más lento y con más errores. No te alarmes si tu primer test del día es significativamente peor que los siguientes.</li>
+                <li><strong>Velocidad alta con mala postura es contraproducente:</strong> Mejorar la velocidad con mala ergonomía aumenta el riesgo de lesiones por esfuerzo repetitivo (LER). Siempre prioriza la postura correcta aunque ello suponga escribir más despacio temporalmente.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('test-velocidad-escritura')} />
 
