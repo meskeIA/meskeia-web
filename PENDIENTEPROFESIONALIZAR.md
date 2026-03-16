@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-16 | **Total profesionalizadas**: ~139 | **Pendientes**: ~111
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-16 | **Total profesionalizadas**: ~146 | **Pendientes**: ~104
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -149,16 +149,16 @@ Apps de uso frecuente con buen potencial educativo.
 - [x] `/generador-actas/` — Actas de reunión profesionales ✅ lote 33
 - [ ] `/sonometro/` — Medidor de nivel de ruido en dB
 - [ ] `/metronomo/` — Metrónomo online con tap tempo
-- [ ] `/generador-tonos/` — Generador de frecuencias de audio
+- [x] `/generador-tonos/` — Generador de frecuencias de audio ✅ tabla 8 rangos frecuencia, 4 casos uso, 8 FAQs, guía test audición, 6 tips, warning *(2026-03-16 commit ba8c9f5)*
 - [ ] `/mi-ip/` — IP pública, geolocalización, ISP
 
 ### Texto y Documentos
 
 - [x] `/conjugador-verbos/` — Conjugador de verbos español con irregulares ✅ lote 27
 - [x] `/tablas-multiplicar/` — Entrenador de tablas gamificado ✅ lote 27
-- [ ] `/contador-silabas/` — Separar y contar sílabas en español
+- [x] `/contador-silabas/` — Separar y contar sílabas en español ✅ tabla fenómenos fonéticos, 4 casos uso, 8 FAQs, guía análisis métrico, 6 tips, warning *(2026-03-16 commit fee8755)*
 - [x] `/conversor-texto/` — Conversor de texto ✅ lote 26
-- [ ] `/comparador-textos/` — Comparador de textos
+- [x] `/comparador-textos/` — Comparador de textos ✅ tabla 5 tipos comparación, 4 casos uso, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-16 commit b9ba48b)*
 - [ ] `/conversor-markdown-html/` — Markdown a HTML
 - [x] `/conversor-morse/` — Código morse ✅ lote 26
 - [x] `/conversor-numeros-romanos/` — Números romanos ✅ lote 26
@@ -191,7 +191,7 @@ Apps de uso frecuente con buen potencial educativo.
 
 - [ ] `/generador-gradientes/` — Generador de gradientes CSS
 - [ ] `/generador-sombras/` — Generador de sombras CSS
-- [ ] `/generador-tipografias/` — Generador y comparador de tipografías
+- [x] `/generador-tipografias/` — Generador y comparador de tipografías ✅ tabla 5 familias tipográficas, 4 casos uso, 8 FAQs, guía elección, 6 principios, warning *(2026-03-16 commit fee8755)*
 - [ ] `/creador-thumbnails/` — Thumbnails para YouTube
 - [ ] `/generador-og-images/` — Imágenes OG para redes sociales
 - [ ] `/calculadora-aspectos/` — Calculadora de relaciones de aspecto
@@ -222,7 +222,7 @@ Apps de uso frecuente con buen potencial educativo.
 ### Salud (densidad media)
 
 - [ ] `/planificador-menu/` — Planificador de menú semanal
-- [ ] `/test-habitos-saludables/` — Test de hábitos saludables
+- [x] `/test-habitos-saludables/` — Test de hábitos saludables ✅ tabla 5 áreas hábitos, 4 perfiles, 8 FAQs evidencia científica, plan 6 semanas, 6 claves, warning *(2026-03-16 commit b9ba48b)*
 - [ ] `/calculadora-tamano-adulto-perro/` — Predicción peso adulto cachorros
 
 ### Matemáticas Básicas
@@ -254,7 +254,7 @@ Apps de uso frecuente con buen potencial educativo.
 - [ ] `/conversor-base64/` — Conversor Base64 (distinto de codificador-base64)
 - [ ] `/generador-utm/` — Generador de parámetros UTM
 - [ ] `/validador-regex/` — Validador de expresiones regulares
-- [ ] `/conversor-imagenes/` — Conversor de formatos de imagen
+- [x] `/conversor-imagenes/` — Conversor de formatos de imagen ✅ tabla 5 formatos (JPEG/PNG/WebP/GIF/SVG), 4 casos uso, 8 FAQs, guía elección, 6 tips, warning *(2026-03-16 commit b9ba48b)*
 - [ ] `/compresor-imagenes/` — Compresor de imágenes por lotes
 
 ### Nuevas Apps (2026-02-23)
@@ -289,7 +289,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 ### Juegos y Entretenimiento _(densidad: reducida — sección educativa temática)_
 
-- [ ] `/test-velocidad-escritura/` — Test de velocidad de escritura
+- [x] `/test-velocidad-escritura/` — Test de velocidad de escritura ✅ tabla WPM por nivel, 4 casos uso, 8 FAQs, guía plan 6 semanas, 6 tips, warning *(2026-03-16 commit fee8755)*
 - [ ] `/juego-piedra-papel-tijera/` — Piedra, papel, tijera
 - [ ] `/juego-tres-en-raya/` — Tres en raya
 - [ ] `/juego-memoria/` — Juego de memoria
@@ -339,6 +339,9 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote B3 | 2026-03-16 | `comparador-textos`, `conversor-imagenes`, `test-habitos-saludables` | `b9ba48b` |
+| Lote B2 | 2026-03-16 | `contador-silabas`, `test-velocidad-escritura`, `generador-tipografias` | `fee8755` |
+| Lote B1 | 2026-03-16 | `generador-tonos` (individual) | `ba8c9f5` |
 | Lote 33 | 2026-03-14 | `calculadora-productividad`, `temporizador-pomodoro`, `generador-actas`, `presupuesto-viaje`, `lista-tareas` | `ff250ff` |
 | Lote 32 | 2026-03-14 | `calculadora-legibilidad`, `calculadora-tiempo-lectura`, `generador-schema-markup`, `analizador-geo`, `time-tracker` | `ddc3037` |
 | Lote 31 | 2026-03-14 | `glosario-fisica-quimica`, `conversor-unidades-rf`, `cifrado-aes`, `generador-palabras-clave`, `analizador-titulos-seo` | `b366fae` |
