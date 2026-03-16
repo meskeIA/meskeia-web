@@ -179,7 +179,7 @@ export default function CalculadoraTIRVANPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📈 Calculadora TIR y VAN</h1>
+        <h1 className={styles.title}>📈 Estimador TIR y VAN</h1>
         <p className={styles.subtitle}>
           Evalúa la rentabilidad de tus proyectos de inversión
         </p>

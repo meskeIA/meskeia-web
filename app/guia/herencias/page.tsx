@@ -36,7 +36,7 @@ const tools = [
     step: 3,
   },
   {
-    id: 'simulador-compraventa-inmueble',
+    id: 'estimador-compraventa-inmueble',
     name: 'Estimador de Gastos de Compraventa',
     icon: '🏠',
     url: '/estimador-compraventa-inmueble/',

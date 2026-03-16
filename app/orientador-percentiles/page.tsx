@@ -156,7 +156,7 @@ export default function CalculadoraPercentilesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Calculadora de Percentiles Infantiles</h1>
+        <h1 className={styles.title}>Orientador Percentiles Infantiles</h1>
         <p className={styles.subtitle}>
           Compara el peso y talla de tu hijo con las tablas de la OMS
         </p>

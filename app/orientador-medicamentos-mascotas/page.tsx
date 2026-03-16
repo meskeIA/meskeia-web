@@ -206,7 +206,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💊 Calculadora de Medicamentos</h1>
+        <h1 className={styles.title}>💊 Orientador Medicamentos Mascotas</h1>
         <p className={styles.subtitle}>
           Guía de antiparasitarios para perros y gatos
         </p>

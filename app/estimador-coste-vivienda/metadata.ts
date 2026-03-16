@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Calculadora Coste Real de Vivienda - Gastos Mensuales Totales | meskeIA',
+  title: 'Estimador Coste Real de Vivienda - Gastos Mensuales Totales | meskeIA',
   description: 'Calcula el coste real mensual de mantener una vivienda: hipoteca, IBI, comunidad, seguros, suministros, mantenimiento y más. Ideal para segundas residencias y viviendas heredadas.',
   keywords: 'coste vivienda, gastos vivienda, mantenimiento casa, IBI, comunidad propietarios, seguro hogar, segunda residencia, vivienda vacaciones, gastos fijos vivienda, coste real inmueble',
   authors: [{ name: 'meskeIA' }],
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora Coste Real de Vivienda | meskeIA',
+    title: 'Estimador Coste Real de Vivienda | meskeIA',
     description: 'Descubre cuánto cuesta realmente mantener una vivienda al mes. Incluye todos los gastos: fijos, variables y ocultos.',
     url: 'https://meskeia.com/estimador-coste-vivienda/',
     siteName: 'meskeIA',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculadora Coste Real de Vivienda',
+    title: 'Estimador Coste Real de Vivienda',
     description: 'Calcula el coste mensual real de mantener una vivienda con todos los gastos incluidos.',
   },
   other: {

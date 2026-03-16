@@ -299,7 +299,7 @@ export default function CalculadoraIMCPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⚖️ Calculadora de IMC</h1>
+        <h1 className={styles.title}>⚖️ Orientador IMC</h1>
         <p className={styles.subtitle}>
           Calcula tu Índice de Masa Corporal y conoce tu clasificación según la OMS
         </p>

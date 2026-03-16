@@ -54,7 +54,7 @@ const tools = [
     step: 5,
   },
   {
-    id: 'calculadora-break-even',
+    id: 'estimador-break-even',
     name: 'Estimador Break-Even',
     icon: '⚖️',
     url: '/estimador-break-even/',

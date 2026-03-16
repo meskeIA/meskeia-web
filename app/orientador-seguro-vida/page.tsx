@@ -132,7 +132,7 @@ export default function CalculadoraSeguroVidaPage() {
 
       <header className={styles.hero}>
         <span className={styles.heroIcon}>🛡️</span>
-        <h1 className={styles.title}>Calculadora de Seguro de Vida</h1>
+        <h1 className={styles.title}>Orientador Seguro de Vida</h1>
         <p className={styles.subtitle}>
           Descubre cuánto capital necesitas para proteger a tu familia ante imprevistos
         </p>

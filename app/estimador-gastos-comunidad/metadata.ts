@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora Gastos de Comunidad - meskeIA',
+    title: 'Estimador Gastos de Comunidad - meskeIA',
     description: 'Reparte los gastos de tu comunidad de propietarios de forma justa y transparente',
     url: 'https://meskeia.com/estimador-gastos-comunidad/',
     siteName: 'meskeIA',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculadora Gastos de Comunidad - meskeIA',
+    title: 'Estimador Gastos de Comunidad - meskeIA',
     description: 'Calcula cuánto paga cada vecino según coeficiente o partes iguales',
   },
 };

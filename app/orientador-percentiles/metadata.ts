@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Percentiles Infantiles - Peso y Talla OMS | meskeIA',
+  title: 'Orientador Percentiles Infantiles - Peso y Talla OMS | meskeIA',
   description: 'Calcula el percentil de peso y talla de tu bebé o niño según las tablas de crecimiento de la OMS. Compara con niños de su misma edad y sexo.',
   keywords: 'calculadora percentiles, percentil peso bebé, percentil talla niño, tablas OMS, crecimiento infantil, curvas crecimiento',
   authors: [{ name: 'meskeIA' }],
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora de Percentiles Infantiles - meskeIA',
+    title: 'Orientador Percentiles Infantiles - meskeIA',
     description: 'Calcula el percentil de peso y talla de tu hijo según tablas OMS',
     url: 'https://meskeia.com/orientador-percentiles',
     siteName: 'meskeIA',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculadora de Percentiles Infantiles - meskeIA',
+    title: 'Orientador Percentiles Infantiles - meskeIA',
     description: 'Calcula el percentil de peso y talla de tu hijo según tablas OMS',
   },
 };

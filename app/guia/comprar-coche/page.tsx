@@ -18,7 +18,7 @@ const tools = [
     step: 1,
   },
   {
-    id: 'simulador-prestamos',
+    id: 'estimador-prestamos',
     name: 'Estimador de Préstamos',
     icon: '🏦',
     url: '/estimador-prestamos/',

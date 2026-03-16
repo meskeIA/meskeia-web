@@ -27,7 +27,7 @@ const tools = [
     step: 2,
   },
   {
-    id: 'calculadora-inversiones',
+    id: 'estimador-inversiones',
     name: 'Estimador de Inversiones',
     icon: '💰',
     url: '/estimador-inversiones/',
@@ -36,7 +36,7 @@ const tools = [
     step: 3,
   },
   {
-    id: 'simulador-cartera',
+    id: 'estimador-cartera',
     name: 'Simulador de Cartera',
     icon: '📊',
     url: '/estimador-cartera-inversion/',

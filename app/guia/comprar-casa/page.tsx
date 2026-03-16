@@ -9,7 +9,7 @@ import { getRelatedApps } from '@/data/app-relations';
 // Herramientas disponibles para compra de vivienda
 const tools = [
   {
-    id: 'simulador-hipoteca',
+    id: 'estimador-hipoteca',
     name: 'Estimador de Hipoteca',
     icon: '🏦',
     url: '/estimador-hipoteca/',

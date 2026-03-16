@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Medicamentos para Perros y Gatos | meskeIA',
+  title: 'Orientador Medicamentos para Perros y Gatos | meskeIA',
   description: 'Calcula la dosis de antiparasitarios y medicamentos comunes para tu mascota según su peso. Incluye frecuencia de desparasitación y recordatorios.',
   keywords: 'dosis medicamento perro, antiparasitario perro, desparasitar gato, pipeta perro, collar antiparasitario, dosis por peso mascota',
   authors: [{ name: 'meskeIA' }],
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora de Medicamentos para Perros y Gatos',
+    title: 'Orientador Medicamentos para Perros y Gatos',
     description: 'Calcula dosis de antiparasitarios y medicamentos según el peso de tu mascota',
     url: 'https://meskeia.com/orientador-medicamentos-mascotas',
     siteName: 'meskeIA',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculadora de Medicamentos para Mascotas',
+    title: 'Orientador Medicamentos para Mascotas',
     description: 'Dosificación segura de antiparasitarios y medicamentos veterinarios',
   },
 };

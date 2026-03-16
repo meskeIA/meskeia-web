@@ -99,7 +99,7 @@ export default function CalculadoraCosteViviendaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Calculadora Coste Real de Vivienda</h1>
+        <h1 className={styles.title}>Estimador Coste Real de Vivienda</h1>
         <p className={styles.subtitle}>
           Descubre cuánto cuesta realmente mantener tu vivienda al mes.
           Introduce solo los gastos que tengas.
