@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-15 | **Total profesionalizadas**: ~139 | **Pendientes**: ~97
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-16 | **Total profesionalizadas**: ~139 | **Pendientes**: ~111
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -110,6 +110,23 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 ### Biomedicina
 
 - [x] `/calculadora-estadistica-medica/` — Sensibilidad, especificidad, VPP, VPN, OR, RR, NNT ✅ lote 23
+
+### Suite Jubilación _(creadas 2026-03-16)_
+
+- [ ] `/estimador-pension-publica/` — Estimador Pensión Pública: base reguladora, % por años cotizados, integración con carrera de seguro _(creada 2026-03-16)_
+- [ ] `/estimador-pension-viudedad/` — Estimador Pensión de Viudedad: 52/60/70%, base reguladora, mínimos garantizados 2025 _(creada 2026-03-16)_
+- [ ] `/estimador-brecha-jubilacion/` — Estimador Brecha de Jubilación: ahorro adicional necesario para mantener nivel de vida _(creada 2026-03-16)_
+- [ ] `/orientador-jubilacion-anticipada/` — Orientador Jubilación Anticipada: coeficientes reductores, tipos (voluntaria/involuntaria), requisitos _(creada 2026-03-16)_
+- [ ] `/orientador-plan-pensiones/` — Orientador Plan de Pensiones: PP vs EPSV vs PPA vs PIAS, ventajas fiscales, límites deducción _(creada 2026-03-16)_
+- [ ] `/estimador-irpf-pensionista/` — Estimador IRPF Pensionista: retención, tramos, mínimo personal ≥65/≥75, reducción pensión _(creada 2026-03-16)_
+- [ ] `/orientador-jubilacion-parcial/` — Orientador Jubilación Parcial: requisitos, porcentajes, contrato de relevo obligatorio _(creada 2026-03-16)_
+- [ ] `/adaptacion-hogar/` — Adaptación del Hogar para Mayor Independencia: checklist por estancias, ayudas técnicas _(creada 2026-03-16)_
+- [ ] `/residencia-vs-cuidado-en-casa/` — Residencia vs Cuidado en Casa: comparativa económica y personal por horas/día _(creada 2026-03-16)_
+- [ ] `/estimador-riesgo-osteoporosis/` — Estimador de Riesgo de Osteoporosis: FRAX simplificado, factores de riesgo, T-score orientativo _(creada 2026-03-16)_
+- [ ] `/test-fragilidad/` — Test de Fragilidad FRAIL: 5 ítems validados, clasificación robusto/pre-frágil/frágil _(creada 2026-03-16)_
+- [ ] `/orientador-grado-dependencia/` — Orientador Grado de Dependencia: BVD simplificado (16 preguntas), prestaciones SAAD por grado _(creada 2026-03-16)_
+- [ ] `/estimador-legitimas/` — Estimador de Legítimas: 7 regímenes civiles españoles, distribución de la herencia _(creada 2026-03-16)_
+- [ ] `/optimizador-rentas-60/` — Optimizador de Rentas +60: IRPF pensión + PP + capital mobiliario + alquiler, estrategia fiscal _(creada 2026-03-16)_
 
 ---
 
@@ -313,7 +330,8 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 | Herramientas Web / Tecnología | 5 | 5 |
 | Calculadoras y Utilidades | 7 | 10 |
 | Biomedicina | 1 | 1 |
-| **TOTAL** | **~107** | **~129** |
+| **Suite Jubilación** | **0** | **14** |
+| **TOTAL** | **~107** | **~143** |
 
 ---
 

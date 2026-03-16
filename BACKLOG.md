@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-03-09
-> **Apps totales**: 251 | **Suites**: 12
+> **Última actualización**: 2026-03-15
+> **Apps totales**: 254 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -39,6 +39,8 @@
     - ⏸️ `eslint` 9→10 **suspendido indefinidamente** hasta que `eslint-config-next` soporte oficialmente ESLint 10. No revisar en audits hasta que haya confirmación oficial de compatibilidad. Riesgo: lint se rompe completamente si se actualiza antes.
     - ✅ Next.js/React al día.
     - ✅ `@trpc/*` 11.10.0 → 11.12.0 **completado** (2026-03-09). Build OK.
+    - 🟢 `@trpc/*` 11.12.0 → 11.12.1 disponible (patch menor, sin breaking changes). Actualizable en próxima sesión de mantenimiento. *(detectado: 2026-03-15)*
+    - 🟢 `baseline-browser-mapping` advertencia durante build ("datos de hace 2 meses"). Actualizar con `npm i baseline-browser-mapping@latest -D` en próxima sesión de mantenimiento. *(detectado: 2026-03-15)*
     - ✅ `sql.js` 1.14.0 → 1.14.1 **completado** (2026-03-09).
     - ✅ `@types/node` 22.19.13 → 22.19.15 **completado** (2026-03-09). No subir a v25 (no LTS).
     - 🟡 `dompurify` CVE moderado (XSS, GHSA-v2wj-7wpq-c8vv): afecta `jspdf` y `html2pdf.js`. `npm audit fix` añadiría 61 paquetes nuevos (riesgo breaking change). Requiere sesión dedicada para revisar si jspdf tiene nueva versión compatible. *(detectado: 2026-03-09)*
@@ -94,8 +96,18 @@
 ## 🟣 PROFESIONALIZACIÓN DE APPS EXISTENTES
 
 > Aplicar el patrón v2.0: tabla comparativa, casos de uso, FAQ, guía paso a paso, tips, warning box.
-> **Estado actual**: ≥164 apps profesionalizadas de 250 (≥66%). *(actualizado: 2026-03-01 — +3 apps: combustible, porcentajes, roommates)*
+> **Estado actual**: ~170 apps profesionalizadas de 254 (~67%). *(actualizado: 2026-03-15 — pendientes confirmados: 94 en inventario, muchos son cursos/triviales)*
 > **No aplica a**: juegos, cursos, guías (sub-apps), utilidades triviales (cronómetro, dado, espejo, lupa, diapasón, notas, contador-manual, ruleta, radio).
+
+### 🔴 Candidatos prioritarios (top uso real en analytics — 2026-03-15)
+
+> Apps con más usos reales que aún están pendientes de profesionalizar. Priorizar estas sobre el resto.
+
+- [ ] **calculadora-notas** — #5 en ranking (44 usos). Pendiente en inventario. Alto valor educativo (sistema de notas español, ponderación, media ponderada).
+- [ ] **generador-tonos** — #10 en ranking (32 usos). Pendiente en inventario. Contexto educativo: física del sonido, frecuencias, uso en audiología.
+- [ ] **conversor-braille** — #11 en ranking (31 usos). Pendiente en inventario. Alto valor social: historia del braille, sistemas, accesibilidad.
+
+---
 
 ### 🟡 Pendientes confirmados (genuinamente sin EducationalSection)
 
