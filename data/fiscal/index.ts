@@ -18,3 +18,4 @@ export * from './inmuebles';
 export * from './sucesiones';
 export * from './donaciones';
 export * from './intereses';
+export * from './pensiones';

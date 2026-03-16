@@ -17,6 +17,9 @@ export const implementedAppsUrls = [
   "/simulador-compraventa-inmueble/", // Gastos de compraventa: ITP/IVA, notaría, registro, plusvalía
   "/simulador-prestamos/",           // Compara sistemas francés, alemán, americano
   "/amortizacion-hipoteca/",         // Amortización anticipada: reducir cuota vs plazo
+  "/estimador-pension-publica/",        // Estimador pensión SS: base reguladora, % por años, pensión mensual
+  "/estimador-brecha-jubilacion/",      // Brecha pensión-sueldo: cuánto perderás y ahorro mensual necesario
+  "/orientador-jubilacion-anticipada/", // Jubilación anticipada: requisitos, coeficientes reductores SS 2025
   "/calculadora-jubilacion/",
   "/calculadora-inversiones/",
   "/test-perfil-inversor/",

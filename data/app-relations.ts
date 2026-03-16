@@ -41,6 +41,23 @@ const estudiantesApps: RelatedApp[] = [
 // herenciasApps y donacionesApps eliminadas
 
 // ==========================================
+// FAMILIA: JUBILACIÓN Y PATRIMONIO
+// ==========================================
+const jubilacionApps: RelatedApp[] = [
+  { url: '/estimador-pension-publica/', icon: '🌅', name: 'Estimador de Pensión Pública', description: 'Cuánto cobrarás al jubilarte' },
+  { url: '/estimador-brecha-jubilacion/', icon: '📉', name: 'Brecha de Jubilación', description: 'Lo que perderás al jubilarte' },
+  { url: '/orientador-jubilacion-anticipada/', icon: '⏩', name: 'Jubilación Anticipada', description: '¿Puedes jubilarte antes?' },
+  { url: '/calculadora-fire/', icon: '🔥', name: 'Calculadora FIRE', description: 'Independencia financiera' },
+];
+
+const patrimonioPensionApps: RelatedApp[] = [
+  { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Impuesto de Sucesiones', description: 'Cuánto pagas por herencia' },
+  { url: '/estimador-impuesto-donaciones/', icon: '🎁', name: 'Impuesto de Donaciones', description: 'Donar en vida vs herencia' },
+  { url: '/orientacion-tramitacion-herencias/', icon: '📋', name: 'Tramitar una Herencia', description: 'Guía paso a paso' },
+  { url: '/estimador-plusvalia-municipal/', icon: '🏙️', name: 'Plusvalía Municipal', description: 'Al vender o heredar inmueble' },
+];
+
+// ==========================================
 // FAMILIA: FINANZAS PERSONALES
 // ==========================================
 const finanzasInversionApps: RelatedApp[] = [
@@ -1048,6 +1065,20 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu tarifa hora sostenible' },
     { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción y caducidad en España' },
     { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
+  ],
+
+  // JUBILACIÓN Y PATRIMONIO
+  'estimador-pension-publica': [
+    ...jubilacionApps.filter(a => a.url !== '/estimador-pension-publica/'),
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Qué pagarás de renta' },
+  ],
+  'estimador-brecha-jubilacion': [
+    ...jubilacionApps.filter(a => a.url !== '/estimador-brecha-jubilacion/'),
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Qué pagarás de renta' },
+  ],
+  'orientador-jubilacion-anticipada': [
+    ...jubilacionApps.filter(a => a.url !== '/orientador-jubilacion-anticipada/'),
+    ...patrimonioPensionApps.slice(0, 1),
   ],
 };
 

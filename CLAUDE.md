@@ -70,10 +70,11 @@ Repositorio centralizado de datos normativos para la Suite Legal-Fiscal. Cada m�
 | `data/fiscal/sucesiones.ts` | Tarifas ISD por CCAA, grupos, bonificaciones |
 | `data/fiscal/donaciones.ts` | Tarifas impuesto donaciones por CCAA |
 | `data/fiscal/sociedades.ts` | Tipos IS, regímenes especiales |
+| `data/fiscal/pensiones.ts` | Datos SS jubilación: porcentajes por años, pensión máx/mín, coeficientes anticipada 2025 |
 
-### ⚠️ Regla obligatoria para apps Legal-Fiscal
+### ⚠️ Regla obligatoria para apps Legal-Fiscal y Jubilación
 
-**ANTES de hardcodear cualquier dato normativo** (tipos impositivos, coeficientes, tramos, tipos de interés, plazos legales), revisar si ya existe en `data/fiscal/`.
+**ANTES de hardcodear cualquier dato normativo** (tipos impositivos, coeficientes, tramos, tipos de interés, plazos legales, datos de Seguridad Social), revisar si ya existe en `data/fiscal/`.
 
 ```typescript
 // ✅ CORRECTO — importar desde data/fiscal/

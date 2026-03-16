@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 272+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 275+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 272,
+  "total_tools": 275,
   "last_updated": "2026-03-15",
   "features": {
     "all_free": true,
@@ -43,7 +43,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 64
+      "tool_count": 67
     },
     {
       "id": "creando",
@@ -1561,6 +1561,71 @@
         "venta"
       ],
       "icon": "📋"
+    },
+    {
+      "slug": "estimador-pension-publica",
+      "name": "Estimador de Pensión Pública",
+      "url": "https://meskeia.com/estimador-pension-publica/",
+      "description": "Estima orientativamente tu pensión pública de jubilación según años cotizados y base de cotización. Basado en la fórmula de la Seguridad Social 2025.",
+      "suites": [
+        "jubilacion",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "pension publica",
+        "jubilacion ss",
+        "años cotizados",
+        "base reguladora",
+        "cuanto cobro al jubilarme",
+        "seguridad social pension"
+      ],
+      "icon": "🌅"
+    },
+    {
+      "slug": "estimador-brecha-jubilacion",
+      "name": "Estimador de Brecha de Jubilación",
+      "url": "https://meskeia.com/estimador-brecha-jubilacion/",
+      "description": "Calcula cuánto perderás mensualmente al jubilarte respecto a tu sueldo actual y el ahorro mensual necesario para cubrir la diferencia.",
+      "suites": [
+        "jubilacion",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "brecha jubilacion",
+        "diferencia pension sueldo",
+        "cuanto pierdo al jubilarme",
+        "ahorro complementario jubilacion",
+        "plan pensiones necesario"
+      ],
+      "icon": "📉"
+    },
+    {
+      "slug": "orientador-jubilacion-anticipada",
+      "name": "Orientador de Jubilación Anticipada",
+      "url": "https://meskeia.com/orientador-jubilacion-anticipada/",
+      "description": "Descubre si puedes jubilarte antes de la edad ordinaria, los requisitos de la SS, los coeficientes reductores aplicables y el impacto en tu pensión.",
+      "suites": [
+        "jubilacion",
+        "finanzas"
+      ],
+      "contexts": [
+        "dinero"
+      ],
+      "keywords": [
+        "jubilacion anticipada",
+        "jubilarme antes",
+        "coeficientes reductores",
+        "jubilacion voluntaria",
+        "jubilacion involuntaria",
+        "eje anticipada 2025"
+      ],
+      "icon": "⏩"
     },
     {
       "slug": "calculadora-jubilacion",
