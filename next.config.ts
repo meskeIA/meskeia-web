@@ -88,6 +88,7 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       // Apps renombradas en febrero 2026
+      { source: '/simulador-gastos-deducibles/', destination: '/orientador-gastos-deducibles/', permanent: true },
       { source: '/test-habitos/', destination: '/test-habitos-saludables/', permanent: true },
       { source: '/conversor-codigo-morse/', destination: '/conversor-morse/', permanent: true },
       { source: '/calculadora-tamano-cachorro/', destination: '/calculadora-tamano-adulto-perro/', permanent: true },
