@@ -11,17 +11,7 @@ import {
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
 } from '@/data/fiscal/irpf';
-
-// ─── Datos fiscales complementarios ───────────────────────────────────────────
-
-// Tramos base del ahorro IRPF 2025 (Ley 35/2006, art. 66 + LPGE 2025)
-const TRAMOS_AHORRO_2025 = [
-  { hasta: 6000,      tipo: 19 },
-  { hasta: 50000,     tipo: 21 },
-  { hasta: 200000,    tipo: 23 },
-  { hasta: 300000,    tipo: 27 },
-  { hasta: Infinity,  tipo: 28 },
-];
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal/inmuebles';
 
 // ─── Utilidades fiscales ───────────────────────────────────────────────────────
 
@@ -145,7 +135,7 @@ function calcularIRPF(fuentes: Fuentes): ResultadoIRPF | null {
   // ── Cuotas ──────────────────────────────────────────────────────────────────
   const cuotaGeneral = calcularCuota(baseGeneralLiquidable, TRAMOS_IRPF_2025);
   const cuotaMinimo = calcularCuota(minimoPersonal, TRAMOS_IRPF_2025); // El mínimo personal reduce la cuota
-  const cuotaAhorro = calcularCuota(baseAhorro, TRAMOS_AHORRO_2025);
+  const cuotaAhorro = calcularCuota(baseAhorro, TRAMOS_GANANCIAS_PATRIMONIALES_2025);
 
   // La cuota íntegra = cuota(base) - cuota(mínimo)
   // Para simplificar orientativamente: cuota total = cuota(base liquidable) + cuota ahorro
@@ -158,7 +148,7 @@ function calcularIRPF(fuentes: Fuentes): ResultadoIRPF | null {
 
   // Tipo marginal en la base del ahorro (€1 más de capital mobiliario)
   let tipoAhorroMarginal = 19;
-  if (capitalMobiliario > 300000) tipoAhorroMarginal = 28;
+  if (capitalMobiliario > 300000) tipoAhorroMarginal = 30;
   else if (capitalMobiliario > 200000) tipoAhorroMarginal = 27;
   else if (capitalMobiliario > 50000) tipoAhorroMarginal = 23;
   else if (capitalMobiliario > 6000) tipoAhorroMarginal = 21;

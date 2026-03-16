@@ -530,6 +530,18 @@ export default function CalculadoraRentabilidadAlquilerPage() {
         </section>
       )}
 
+      {/* NOTA FISCAL */}
+      {resultado && (
+        <div className={styles.notaFiscal} role="note" aria-label="Nota sobre fiscalidad del alquiler">
+          <strong>🧾 Fiscalidad del alquiler (orientación)</strong>
+          <ul>
+            <li><strong>Amortización deducible:</strong> el 3% del valor de construcción del inmueble (excluido el suelo) reduce el rendimiento neto anual en IRPF.</li>
+            <li><strong>Reducción por arrendamiento de vivienda habitual:</strong> el rendimiento neto positivo tiene una reducción del 50% en IRPF (60% en contratos anteriores a 2023 con el mismo arrendatario).</li>
+            <li>Estas reducciones pueden mejorar significativamente la rentabilidad neta real. Consulta con un asesor fiscal para tu situación concreta.</li>
+          </ul>
+        </div>
+      )}
+
       {/* DISCLAIMER FINANCIERO */}
       <DisclaimerCard
         variant="financial"

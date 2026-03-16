@@ -41,8 +41,8 @@ export const RETENCIONES_IS_2025 = {
 
 export const AUTONOMO_SOCIETARIO_2025 = {
   baseMinimaMensual:    1634.88, // € — Base mínima obligatoria para adm. con control
-  cuotaMinimaMensual:   511.51,  // € — Cuota mínima mensual (31,3% de la base)
-  nota: 'Los administradores con participación ≥25% que controlan la sociedad cotizan por base mínima obligatoria, no por ingresos reales. Verificar en SS.',
+  cuotaMinimaMensual:   514.99,  // € — Cuota mínima mensual (31,5% de la base desde 2026 por subida MEI)
+  nota: 'Los administradores con participación ≥25% que controlan la sociedad cotizan por base mínima obligatoria, no por ingresos reales. Tipo 31,5% (RDL 16/2025). Verificar en SS.',
 };
 
 // ─── Gastos deducibles relevantes en SL ──────────────────────────────────────

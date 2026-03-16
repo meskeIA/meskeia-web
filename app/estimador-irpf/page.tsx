@@ -11,6 +11,8 @@ import {
   MINIMOS_IRPF_2025,
   COTIZACIONES_SS_2025,
   BASES_SS_2025,
+  REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  GASTOS_DEDUCIBLES_TRABAJO_2025,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -77,6 +79,13 @@ function calcularSSLaboralAnual(brutoAnual: number): number {
   return baseMensual * (tipoTotal / 100) * 12;
 }
 
+function calcularReduccionRRT(rnt: number): number {
+  const { limite1, reduccion1, limite2, reduccion2, factorInterpolacion } = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
+  if (rnt <= limite1) return reduccion1;
+  if (rnt >= limite2) return reduccion2;
+  return reduccion1 - factorInterpolacion * (rnt - limite1);
+}
+
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function EstimadorIRPFPage() {
@@ -113,19 +122,20 @@ export default function EstimadorIRPFPage() {
 
     if (bruto <= 0 && capital <= 0) return;
 
-    // Reducción por rendimientos del trabajo (art. 20 LIRPF) — estimación orientativa
-    let reduccionTrabajo = 0;
-    if (esTrabajador && bruto > 0) {
-      if (bruto <= 14047.5) reduccionTrabajo = 6498;
-      else if (bruto <= 19747.5) reduccionTrabajo = 6498 - 1.14286 * (bruto - 14047.5);
-      else reduccionTrabajo = 2000;
-    }
-
     // SS laboral (si es trabajador)
     const ssAnual = esTrabajador ? calcularSSLaboralAnual(bruto) : 0;
 
-    // Base imponible general
-    const baseImponibleGeneral = Math.max(0, bruto - ssAnual - reduccionTrabajo) + capital;
+    // Gastos deducibles generales del trabajo (art. 19.2.f LIRPF)
+    const gastosDeducibles = esTrabajador && bruto > 0 ? GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral : 0;
+
+    // Rendimiento Neto del Trabajo (RNT) = bruto - SS - gastos deducibles
+    const rnt = Math.max(0, bruto - ssAnual - gastosDeducibles);
+
+    // Reducción por RNT (art. 20 LIRPF) — sobre el RNT, con umbrales correctos 2025
+    const reduccionTrabajo = esTrabajador && bruto > 0 ? calcularReduccionRRT(rnt) : 0;
+
+    // Base imponible general = RNTR + capital mobiliario
+    const baseImponibleGeneral = Math.max(0, rnt - reduccionTrabajo) + capital;
 
     // Mínimos
     const minimosPersonalesFamiliares = calcularMinimos(situacion, hijos, hijosM3);

@@ -5,6 +5,7 @@ import styles from './AsistenteAltaAutonomo.module.css';
 import { MeskeiaLogo, Footer, NumberInput, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import { TIPO_COTIZACION_RETA, TARIFA_PLANA_2025, BASES_RETA_2025 } from '@/data/fiscal/autonomos';
 
 // Tipos
 type TipoActividad = 'profesional' | 'empresarial' | 'artistica';
@@ -42,21 +43,21 @@ interface ChecklistItem {
   enlaceUtil?: { texto: string; url: string };
 }
 
-// Bases de cotización 2024/2025 (tramos por rendimientos)
+// Bases de cotización 2026 (tramos por rendimientos reales — RDL 13/2022)
 const BASES_COTIZACION = {
-  minima: { base: 950.98, descripcion: 'Base mínima (rendimientos bajos)' },
+  minima: { base: BASES_RETA_2025.minima, descripcion: 'Base mínima (rendimientos bajos)' },
   media: { base: 1200, descripcion: 'Base intermedia' },
-  maxima: { base: 4720.50, descripcion: 'Base máxima' },
+  maxima: { base: BASES_RETA_2025.maxima, descripcion: 'Base máxima' },
 };
 
-// Cuota autónomo 2024 (tipo general: 31.30%)
-const TIPO_COTIZACION = 0.3130;
+// Tipo cotización autónomo 2026 (31,50% — RDL 16/2025)
+const TIPO_COTIZACION = TIPO_COTIZACION_RETA;
 
-// Tarifa plana 2024
+// Tarifa plana 2026
 const TARIFA_PLANA = {
-  importe: 80,
-  duracion: 12, // meses
-  ampliacion: { importe: 80, duracion: 12, condicion: 'rendimientos < SMI' },
+  importe: TARIFA_PLANA_2025.cuota,
+  duracion: TARIFA_PLANA_2025.duracion,
+  ampliacion: { importe: TARIFA_PLANA_2025.cuota, duracion: TARIFA_PLANA_2025.duracion, condicion: 'rendimientos < SMI' },
 };
 
 // Checklist por fases

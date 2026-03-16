@@ -11,7 +11,7 @@ type TipoContribuyente = 'autonomo' | 'sociedad' | 'ambos';
 type Trimestre = 1 | 2 | 3 | 4;
 
 // Tipo de plazo trimestral
-type TipoPlazoTrimestral = 'dia20' | 'dia30' | 'dia20_4t_enero' | 'modelo202';
+type TipoPlazoTrimestral = 'dia20' | 'dia30' | 'dia20_4t_enero' | 'dia20_4t_enero30' | 'modelo202';
 
 // Tipo de plazo anual
 type TipoPlazoAnual = 'enero30' | 'enero31' | 'febrero28' | 'julio1' | 'julio25';
@@ -120,12 +120,22 @@ const calcularFechaTrimestre = (
       break;
 
     case 'dia20_4t_enero':
-      // Día 20 para 1T-3T, día 20 enero para 4T
+      // Día 20 para 1T-3T, día 20 enero para 4T (retenciones: 111, 115, 123)
       if (trimestre === 4) {
         fecha = new Date(anio + 1, 0, 20); // 20 enero año siguiente
       } else {
         const meses = [3, 6, 9];
         fecha = new Date(anio, meses[trimestre - 1], 20);
+      }
+      break;
+
+    case 'dia20_4t_enero30':
+      // Día 20 para 1T-3T, día 30 enero para 4T (IVA: 303, intracomunitarias: 349)
+      if (trimestre === 4) {
+        fecha = new Date(anio + 1, 0, 30); // 30 enero año siguiente
+      } else {
+        const meses303 = [3, 6, 9];
+        fecha = new Date(anio, meses303[trimestre - 1], 20);
       }
       break;
 
@@ -204,7 +214,7 @@ const MODELOS_CONFIG: ModeloFiscalConfig[] = [
     descripcion: 'Autoliquidación IVA trimestral',
     aplicaA: ['autonomo', 'sociedad'],
     periodicidad: 'trimestral',
-    tipoPlazoTrimestral: 'dia30', // 1T-3T día 20, 4T día 30 enero
+    tipoPlazoTrimestral: 'dia20_4t_enero30', // 1T-3T día 20, 4T día 30 enero
     icon: '📊',
     importante: true,
   },
@@ -274,7 +284,7 @@ const MODELOS_CONFIG: ModeloFiscalConfig[] = [
     descripcion: 'Declaración recapitulativa de operaciones intracomunitarias',
     aplicaA: ['autonomo', 'sociedad'],
     periodicidad: 'trimestral',
-    tipoPlazoTrimestral: 'dia30',
+    tipoPlazoTrimestral: 'dia20_4t_enero30', // 1T-3T día 20, 4T día 30 enero
     icon: '🇪🇺',
     importante: false,
   },

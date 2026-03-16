@@ -15,6 +15,7 @@ import {
   TIPOS_IS_2025,
   RETENCIONES_IS_2025,
   AUTONOMO_SOCIETARIO_2025,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
 } from '@/data/fiscal';
 
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
@@ -29,6 +30,21 @@ function calcularCuotaIRPF(baseLiquidable: number): number {
     if (base <= 0) break;
     cuota += base * (tramo.tipo / 100);
     restante -= base;
+    limiteAnterior = tramo.hasta;
+  }
+  return cuota;
+}
+
+function calcularCuotaBaseAhorro(base: number): number {
+  let cuota = 0;
+  let restante = Math.max(0, base);
+  let limiteAnterior = 0;
+  for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
+    const anchura = tramo.hasta - limiteAnterior;
+    const baseTramo = Math.min(restante, anchura);
+    if (baseTramo <= 0) break;
+    cuota += baseTramo * (tramo.tipo / 100);
+    restante -= baseTramo;
     limiteAnterior = tramo.hasta;
   }
   return cuota;
@@ -93,16 +109,10 @@ function calcularSL(beneficio: number, gastosDeducibles: number, tipoIS: number,
   // Autónomo societario obligatorio (cotización administrador)
   const cuotaAutoSocietario = AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual * 12;
 
-  // Si reparte dividendos: IRPF sobre dividendos (19% sobre los primeros 6.000 €, etc.)
+  // Si reparte dividendos: IRPF sobre dividendos usando tramos oficiales base del ahorro
   let irpfDividendos = 0;
   if (repartirDividendos) {
-    // Base del ahorro por dividendos (simplificado: 19% hasta 6000, 21% hasta 50000, 23% hasta 200k, 27% hasta 300k, 30% resto)
-    const div = beneficioNeto;
-    if (div <= 6000) irpfDividendos = div * 0.19;
-    else if (div <= 50000) irpfDividendos = 6000 * 0.19 + (div - 6000) * 0.21;
-    else if (div <= 200000) irpfDividendos = 6000 * 0.19 + 44000 * 0.21 + (div - 50000) * 0.23;
-    else if (div <= 300000) irpfDividendos = 6000 * 0.19 + 44000 * 0.21 + 150000 * 0.23 + (div - 200000) * 0.27;
-    else irpfDividendos = 6000 * 0.19 + 44000 * 0.21 + 150000 * 0.23 + 100000 * 0.27 + (div - 300000) * 0.30;
+    irpfDividendos = calcularCuotaBaseAhorro(beneficioNeto);
   }
 
   const totalCargas = cuotaIS + cuotaAutoSocietario + irpfDividendos;

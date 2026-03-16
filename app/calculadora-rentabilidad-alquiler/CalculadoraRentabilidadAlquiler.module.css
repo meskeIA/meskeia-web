@@ -478,6 +478,21 @@
 [data-theme='dark'] .warningBox { background: rgba(255, 193, 7, 0.1); border-color: rgba(255, 193, 7, 0.4); }
 [data-theme='dark'] .warningHeader strong, [data-theme='dark'] .warningList li { color: #ffc107; }
 
+.notaFiscal {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-size: 0.875rem;
+  color: #1e40af;
+}
+.notaFiscal strong { display: block; margin-bottom: 8px; font-size: 0.9rem; }
+.notaFiscal ul { margin: 0; padding-left: 20px; }
+.notaFiscal li { margin-bottom: 6px; line-height: 1.5; }
+
+[data-theme='dark'] .notaFiscal { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: #93c5fd; }
+
 @media (max-width: 768px) {
   .escenariosGrid { grid-template-columns: 1fr; }
   .tipsGrid { grid-template-columns: repeat(2, 1fr); }
