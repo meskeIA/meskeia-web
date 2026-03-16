@@ -311,7 +311,7 @@ export default function CalculadoraEdadMascotasPage() {
       </div>
 
 
-      <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="calculadora-edad-mascotas">
+      <DisclaimerCard variant="medical" severity="medium" collapsible={false} context="calculadora-edad-mascotas">
         <p>Esta calculadora usa fórmulas científicas actualizadas, pero es <strong>solo orientativa</strong>:</p>
         <ul className={styles.disclaimerList}>
           <li><strong>La edad biológica varía</strong>: Depende de raza, tamaño, alimentación, ejercicio y genética individual</li>

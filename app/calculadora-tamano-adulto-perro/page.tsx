@@ -356,7 +356,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
       
 
-      <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="calculadora-tamano-adulto-perro">
+      <DisclaimerCard variant="medical" severity="medium" collapsible={false} context="calculadora-tamano-adulto-perro">
         <p>Esta calculadora usa curvas de crecimiento promedio. <strong>Limitaciones:</strong></p>
         <ul className={styles.disclaimerList}>
           <li><strong>En mestizos la predicción es menos precisa</strong>: Depende de las razas parentales y su proporción genética</li>

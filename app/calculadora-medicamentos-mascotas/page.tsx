@@ -492,14 +492,15 @@ export default function CalculadoraMedicamentosMascotasPage() {
 
       
 
-      <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="calculadora-medicamentos-mascotas">
+      <DisclaimerCard variant="medical" severity="critical" collapsible={false} context="calculadora-medicamentos-mascotas">
         <p><strong>⚠️ NUNCA administres medicamentos sin consultar a tu veterinario:</strong></p>
         <ul className={styles.disclaimerList}>
           <li><strong>Dosis incorrectas pueden ser tóxicas</strong>: Especialmente en cachorros, gatos o mascotas con enfermedades renales/hepáticas</li>
           <li><strong>Interacciones medicamentosas</strong>: Si tu mascota toma otros medicamentos, pueden haber incompatibilidades</li>
           <li><strong>Resistencias a antiparasitarios</strong>: El uso inadecuado genera resistencias en pulgas/garrapatas</li>
         </ul>
-        <p className={styles.highlight}><strong>🐾 Esta calculadora es orientativa. Tu veterinario debe prescribir tratamientos según el peso exacto, estado de salud y historial de tu mascota.</strong></p>
+        <p><strong>🚫 PELIGRO: La permetrina (presente en antiparasitarios de perro) es extremadamente tóxica para los gatos — puede causar convulsiones y la muerte. NUNCA uses productos de perro en gatos.</strong></p>
+        <p className={styles.highlight}><strong>🐾 Esta calculadora es orientativa. Solo el veterinario puede prescribir tratamientos según el peso exacto, estado de salud e historial de tu mascota.</strong></p>
         <p>meskeIA no asume ninguna responsabilidad por decisiones tomadas en base a los resultados de esta herramienta, ni por un uso inadecuado de la misma.</p>
       </DisclaimerCard>
 

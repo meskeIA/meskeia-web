@@ -151,7 +151,7 @@ const comprasInicial: Omit<CompraItem, 'comprado'>[] = [
   { id: 'p49', nombre: 'Documentación (DNI, tarjeta SS, cartilla)', categoria: 'hospital', prioridad: 'esencial' },
 ];
 
-// Calendario de vacunación España 2024
+// Calendario de vacunación España 2024/2025 (fuente: AEP/CCAA)
 const calendarioVacunas: Vacuna[] = [
   { nombre: 'Hepatitis B', edad: 'Recién nacido', descripcion: '1ª dosis en las primeras 24 horas' },
   { nombre: 'Hepatitis B + DTPa + VPI + Hib', edad: '2 meses', descripcion: 'Vacuna hexavalente (6 en 1)' },
