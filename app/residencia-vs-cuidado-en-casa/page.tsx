@@ -33,28 +33,32 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
   const residenciaMin = 1600;
   const residenciaMax = 3200;
 
-  // SAD privado: precio/hora × horas × días/mes (~22 laborables, pero SAD es también fines)
+  // SAD privado: precio/hora × horas × días/mes (~22 laborables, pero SAD también en fines)
   // Usamos 26 días de media para incluir fines de semana parciales
-  const precioHoraSAD = 18; // €/hora media nacional SAD privado
+  const precioHoraSAD = 18; // €/hora media nacional SAD privado de agencia
   const costeSADMin = Math.round(horasDia * precioHoraSAD * 22);
   const costeSADMax = Math.round(horasDia * 22 * 26);
 
-  // Cuidador en casa: depende de horas
+  // Cuidador en casa: coste real = salario neto + SS empleador (~32%) + prorrata 14 pagas
+  // SMI 2025 = 1.134 €/mes (12 pagas) → coste total empleador ~1.750 €/mes en jornada completa
   let cuidadorMin: number;
   let cuidadorMax: number;
   let cuidadorTipo: string;
 
   if (horasDia <= 4) {
-    cuidadorMin = Math.round(horasDia * 15 * 22);
-    cuidadorMax = Math.round(horasDia * 22 * 22);
+    // €16-20/h efectivos (neto + cuota SS empleador proporcional)
+    cuidadorMin = Math.round(horasDia * 16 * 22);
+    cuidadorMax = Math.round(horasDia * 20 * 22);
     cuidadorTipo = 'Auxiliar a tiempo parcial';
   } else if (horasDia <= 8) {
-    cuidadorMin = 900;
-    cuidadorMax = 1400;
+    // Jornada completa: SMI 2025 + SS empleador + prorrata pagas extras ≈ 1.750 € mínimo real
+    cuidadorMin = 1750;
+    cuidadorMax = 2200;
     cuidadorTipo = 'Auxiliar a jornada completa';
   } else {
-    cuidadorMin = 1100;
-    cuidadorMax = 1600;
+    // Interno: salario inferior por alojamiento incluido; coste total empleador 1.300-1.700 €
+    cuidadorMin = 1300;
+    cuidadorMax = 1700;
     cuidadorTipo = 'Cuidador interno (incluye alojamiento)';
   }
 
