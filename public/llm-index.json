@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 278+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 281+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 278,
+  "total_tools": 281,
   "last_updated": "2026-03-16",
   "features": {
     "all_free": true,
@@ -36,14 +36,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 95
+      "tool_count": 98
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 70
+      "tool_count": 71
     },
     {
       "id": "creando",
@@ -1692,6 +1692,77 @@
         "reduccion jornada jubilacion"
       ],
       "icon": "⚖️"
+    },
+    {
+      "slug": "adaptacion-hogar",
+      "name": "Adaptación del Hogar",
+      "url": "https://meskeia.com/adaptacion-hogar/",
+      "description": "Checklist interactivo de adaptaciones del hogar para mayores y personas con movilidad reducida. Costes orientativos, ítems con ayudas públicas y prioridades por estancia.",
+      "suites": [
+        "salud",
+        "jubilacion",
+        "inmobiliaria"
+      ],
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "adaptacion hogar mayores",
+        "accesibilidad vivienda",
+        "barras apoyo bano",
+        "silla salvaescaleras",
+        "rampa acceso",
+        "ducha accesible",
+        "ayudas adaptacion hogar imserso"
+      ],
+      "icon": "🏠"
+    },
+    {
+      "slug": "residencia-vs-cuidado-en-casa",
+      "name": "Residencia vs Cuidado en Casa",
+      "url": "https://meskeia.com/residencia-vs-cuidado-en-casa/",
+      "description": "Compara costes y factores de residencia privada, servicio de ayuda a domicilio (SAD) y cuidador en casa para elegir la mejor opción de cuidado para mayores.",
+      "suites": [
+        "salud",
+        "jubilacion",
+        "finanzas"
+      ],
+      "contexts": [
+        "casa",
+        "dinero"
+      ],
+      "keywords": [
+        "residencia mayores coste",
+        "cuidador en casa precio",
+        "sad servicio ayuda domicilio",
+        "residencia vs domicilio",
+        "cuanto cuesta residencia mayores españa",
+        "comparativa cuidado mayores"
+      ],
+      "icon": "🏡"
+    },
+    {
+      "slug": "estimador-riesgo-osteoporosis",
+      "name": "Estimador de Riesgo de Osteoporosis",
+      "url": "https://meskeia.com/estimador-riesgo-osteoporosis/",
+      "description": "Test de 12 preguntas basado en factores de riesgo validados (FRAX/IOF) para estimar el riesgo de osteoporosis y recibir recomendaciones preventivas personalizadas.",
+      "suites": [
+        "salud",
+        "jubilacion"
+      ],
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "riesgo osteoporosis",
+        "test osteoporosis",
+        "frax osteoporosis",
+        "fractura osea riesgo",
+        "prevencion osteoporosis",
+        "osteoporosis factores riesgo",
+        "test iof osteoporosis"
+      ],
+      "icon": "🦴"
     },
     {
       "slug": "calculadora-jubilacion",

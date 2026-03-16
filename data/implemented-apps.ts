@@ -23,6 +23,9 @@ export const implementedAppsUrls = [
   "/orientador-plan-pensiones/",        // Plan de pensiones: desgravación IRPF, capital acumulado, pensión complementaria
   "/estimador-irpf-pensionista/",       // IRPF pensionista: reducción RRT, mínimo personal edad, pensión neta mensual
   "/orientador-jubilacion-parcial/",    // Jubilación parcial: contrato relevo, pensión parcial + salario combinados
+  "/adaptacion-hogar/",                 // Checklist adaptaciones del hogar: costes, prioridades y ayudas públicas
+  "/residencia-vs-cuidado-en-casa/",    // Comparativa costes residencia / SAD / cuidador en casa
+  "/estimador-riesgo-osteoporosis/",    // Test validado (FRAX/IOF) de riesgo de osteoporosis
   "/calculadora-jubilacion/",
   "/calculadora-inversiones/",
   "/test-perfil-inversor/",

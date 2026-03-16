@@ -1,0 +1,27 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Residencia vs Cuidado en Casa - Comparativa de costes | meskeIA',
+  description: 'Compara los costes orientativos de residencia privada, servicio de ayuda a domicilio (SAD) y cuidador en casa para elegir la opción de cuidado más adecuada.',
+  keywords: 'residencia mayores coste, cuidador en casa precio, sad servicio ayuda domicilio, residencia vs domicilio, cuanto cuesta residencia mayores españa, comparativa cuidado mayores',
+  authors: [{ name: 'meskeIA' }],
+  creator: 'meskeIA',
+  publisher: 'meskeIA',
+  robots: 'index, follow',
+  openGraph: {
+    type: 'website',
+    title: 'Residencia vs Cuidado en Casa | meskeIA',
+    description: 'Comparativa de costes: residencia privada, SAD y cuidador en casa.',
+    url: 'https://meskeia.com/residencia-vs-cuidado-en-casa/',
+    siteName: 'meskeIA',
+    locale: 'es_ES',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Residencia vs Cuidado en Casa | meskeIA',
+    description: 'Comparativa de opciones de cuidado para mayores: costes y factores clave',
+  },
+  other: {
+    'application-name': 'Residencia vs Cuidado en Casa meskeIA',
+  },
+};

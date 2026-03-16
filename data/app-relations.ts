@@ -52,6 +52,16 @@ const jubilacionApps: RelatedApp[] = [
   { url: '/orientador-jubilacion-parcial/', icon: '⚖️', name: 'Jubilación Parcial', description: 'Trabaja y cobra pensión a la vez' },
 ];
 
+// ==========================================
+// FAMILIA: SALUD MAYORES (Lote A)
+// ==========================================
+const saludMayoresApps: RelatedApp[] = [
+  { url: '/adaptacion-hogar/', icon: '🏠', name: 'Adaptación del Hogar', description: 'Checklist accesibilidad y costes' },
+  { url: '/residencia-vs-cuidado-en-casa/', icon: '🏡', name: 'Residencia vs Cuidado', description: 'Comparativa de opciones de cuidado' },
+  { url: '/estimador-riesgo-osteoporosis/', icon: '🦴', name: 'Riesgo de Osteoporosis', description: 'Test de factores de riesgo validados' },
+  { url: '/planificador-chequeos-medicos/', icon: '🏥', name: 'Chequeos Médicos', description: 'Revisiones preventivas por edad' },
+];
+
 const patrimonioPensionApps: RelatedApp[] = [
   { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Impuesto de Sucesiones', description: 'Cuánto pagas por herencia' },
   { url: '/estimador-impuesto-donaciones/', icon: '🎁', name: 'Impuesto de Donaciones', description: 'Donar en vida vs herencia' },
@@ -1089,6 +1099,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'orientador-jubilacion-parcial': [
     ...jubilacionApps.filter(a => a.url !== '/orientador-jubilacion-parcial/').slice(0, 4),
+  ],
+  'adaptacion-hogar': [
+    ...saludMayoresApps.filter(a => a.url !== '/adaptacion-hogar/'),
+  ],
+  'residencia-vs-cuidado-en-casa': [
+    ...saludMayoresApps.filter(a => a.url !== '/residencia-vs-cuidado-en-casa/'),
+  ],
+  'estimador-riesgo-osteoporosis': [
+    ...saludMayoresApps.filter(a => a.url !== '/estimador-riesgo-osteoporosis/'),
   ],
 };
 
