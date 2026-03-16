@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './CalculadoraPresupuestos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, EducationalSection, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -257,6 +257,13 @@ export default function CalculadoraPresupuestosPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        context="calculadora-presupuestos"
+        collapsible={false}
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de edición */}

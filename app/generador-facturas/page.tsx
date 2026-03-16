@@ -820,9 +820,8 @@ export default function GeneradorFacturasPage() {
                     onChange={e => setConfig({ ...config, porcentajeIrpf: parseInt(e.target.value) })}
                     className={styles.select}
                   >
-                    <option value={7}>7% (Nuevos autónomos)</option>
-                    <option value={15}>15% (General)</option>
-                    <option value={19}>19% (Profesionales)</option>
+                    <option value={7}>7% (Nuevos autónomos — 1er y 2º año)</option>
+                    <option value={15}>15% (General — actividades profesionales)</option>
                   </select>
                 </div>
               )}

@@ -414,7 +414,7 @@ export default function CalculadoraBreakEvenPage() {
         variant="financial"
         severity="high"
         context="calculadora-break-even"
-        collapsible={true}
+        collapsible={false}
       />
 
 

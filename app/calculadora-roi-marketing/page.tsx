@@ -660,7 +660,7 @@ export default function CalculadoraROIMarketingPage() {
         variant="financial"
         severity="high"
         context="calculadora-roi-marketing"
-        collapsible={true}
+        collapsible={false}
       />
 
       

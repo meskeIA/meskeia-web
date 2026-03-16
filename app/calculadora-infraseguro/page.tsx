@@ -219,7 +219,7 @@ export default function CalculadoraInfraseguroPage() {
         variant="financial"
         severity="high"
         context="calculadora-infraseguro"
-        collapsible={true}
+        collapsible={false}
       />
 
 

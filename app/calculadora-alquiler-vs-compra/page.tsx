@@ -82,8 +82,17 @@ export default function CalculadoraAlquilerVsCompraPage() {
     let alquilerActual = alquiler;
 
     for (let año = 1; año <= horizonte; año++) {
-      // COMPRA: Pagos del año
-      const pagosHipotecaAño = Math.min(cuotaHipoteca * 12, capitalPendiente + (capitalPendiente * interes));
+      // COMPRA: Pagos del año — bucle mensual para amortización precisa (fórmula francesa)
+      let capitalMes = capitalPendiente;
+      let amortizacionAño = 0;
+      let pagosHipotecaAño = 0;
+      for (let mes = 0; mes < 12 && capitalMes > 0; mes++) {
+        const interesMes = capitalMes * interesMensual;
+        const amortMes = Math.min(cuotaHipoteca - interesMes, capitalMes);
+        pagosHipotecaAño += interesMes + amortMes;
+        amortizacionAño += amortMes;
+        capitalMes = Math.max(0, capitalMes - amortMes);
+      }
       const ibiAño = ibiAnual;
       const comunidadAño = comunidadMensual * 12;
       const seguroAño = seguroAnual;
@@ -92,8 +101,6 @@ export default function CalculadoraAlquilerVsCompraPage() {
       totalPagadoCompra += pagosHipotecaAño + ibiAño + comunidadAño + seguroAño + mantenimientoAño;
 
       // Actualizar capital pendiente
-      let interesesAño = capitalPendiente * interes;
-      let amortizacionAño = pagosHipotecaAño - interesesAño;
       capitalPendiente = Math.max(0, capitalPendiente - amortizacionAño);
 
       // Revalorización
@@ -167,7 +174,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
       <DisclaimerCard
         variant="financial"
         severity="high"
-        collapsible={true}
+        collapsible={false}
         context="alquiler-vs-compra"
       >
         <p>

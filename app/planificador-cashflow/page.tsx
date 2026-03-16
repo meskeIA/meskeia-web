@@ -585,7 +585,7 @@ export default function PlanificadorCashFlowPage() {
         variant="financial"
         severity="high"
         context="planificador-cashflow"
-        collapsible={true}
+        collapsible={false}
       />
 
       

@@ -119,7 +119,9 @@ export default function CalculadoraTarifaFreelancePage() {
     // Anuales
     const facturacionAnual = brutoConMargenMensual * 12;
     const gastosAnuales = totalGastosMensuales * 12;
-    const irpfAnual = facturacionAnual * irpf;
+    // IRPF se aplica sobre el rendimiento neto (facturación - gastos deducibles), no sobre la facturación bruta
+    const rendimientoNetoAnual = facturacionAnual - gastosAnuales;
+    const irpfAnual = rendimientoNetoAnual * irpf;
     const beneficioNetoAnual = facturacionAnual - gastosAnuales - irpfAnual;
 
     return {
@@ -483,7 +485,7 @@ export default function CalculadoraTarifaFreelancePage() {
         variant="financial"
         severity="high"
         context="calculadora-tarifa-freelance"
-        collapsible={true}
+        collapsible={false}
       />
 
       
@@ -621,7 +623,7 @@ export default function CalculadoraTarifaFreelancePage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cuál es la diferencia entre tarifa bruta y neta?</h4>
-              <p>La bruta incluye IRPF (~15-20%) y cotización autónomo (~300 €/mes). La neta es lo que realmente ingresas tras pagar impuestos y cuota de autónomo.</p>
+              <p>La bruta incluye IRPF (~15-20%) y cotización autónomo (cuota variable según ingresos reales: 204-1.478 €/mes en 2026). La neta es lo que realmente ingresas tras pagar impuestos y cuota de autónomo.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cuándo y cuánto debo subir mi tarifa?</h4>
@@ -641,7 +643,7 @@ export default function CalculadoraTarifaFreelancePage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué tarifa cobran otros en mi sector?</h4>
-              <p>Benchmarks 2024: dev junior 25-40 €/h, senior 65-95 €/h, diseñador 35-65 €/h, consultor 55-90 €/h. Consulta LinkedIn, Malt y Workana para tu perfil.</p>
+              <p>Benchmarks 2025: dev junior 25-40 €/h, senior 65-95 €/h, diseñador 35-65 €/h, consultor 55-90 €/h. Consulta LinkedIn, Malt y Workana para tu perfil.</p>
             </div>
           </div>
         </div>
@@ -661,7 +663,7 @@ export default function CalculadoraTarifaFreelancePage() {
               <div className={styles.stepNumber}>2</div>
               <div className={styles.stepContent}>
                 <strong>Añade costes de autónomo</strong>
-                <p>Cuota de Seguridad Social (~300 €), IRPF estimado (15-20% los primeros años) y gestoría (~100 €/mes). Son gastos fijos inevitables.</p>
+                <p>Cuota de Seguridad Social (mínimo ~204 €/mes en 2026, variable según ingresos reales), IRPF estimado (15-20% los primeros años) y gestoría (~100 €/mes). Son gastos inevitables.</p>
               </div>
             </div>
             <div className={styles.eduStep}>
