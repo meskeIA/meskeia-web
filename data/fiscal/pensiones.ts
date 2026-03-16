@@ -164,3 +164,34 @@ export const REQUISITOS_JUBILACION_PARCIAL = {
   reduccionJornadaMax:     75,     // % máximo de reducción (normal; 85% casos especiales)
   exigeContratoRelevo:     true,   // El empleador debe contratar un relevista simultáneamente
 };
+
+// ─── Pensión de Viudedad: datos normativos 2026 ───────────────────────────────
+// Fuente: LGSS arts. 219-231 (RDL 8/2015) + Resolución INSS pensiones mínimas 2026
+// Revalorización 2026: +2,8% IPC respecto a 2025
+// Verificado: 2026-03-16
+// SMI 2026: pendiente RDL oficial (se mantiene 1.323 €/mes de 2025)
+
+export const PENSION_VIUDEDAD_2026 = {
+  // Porcentajes aplicables sobre la base reguladora (LGSS art. 231)
+  porcentajeGeneral:       52,   // % — Caso general
+  porcentaje60:            60,   // % — ≥65 años sin otra pensión pública y rentas < SMI
+  porcentaje70:            70,   // % — Cargas familiares + rentas del trabajo < 75% SMI
+
+  // SMI 2026 mensual (14 pagas = €15.876 anuales / 12; sin actualización oficial aún)
+  smiMensual:            1323,
+  limiteIngresos70:       992,   // 75% del SMI mensual (992,25 → redondeado)
+
+  // Pensiones mínimas garantizadas 2026 (brutas/mes, 14 pagas)
+  // Revalorizadas +2,8% IPC respecto a valores 2025
+  minimoMenor60SinCargas:   583,  // 2025: 567 € → +2,8% ≈ 583 €
+  minimoMenor60ConCargas:   785,  // 2025: 763 € → +2,8% ≈ 785 €
+  minimo60a64:              769,  // 2025: 748 € → +2,8% ≈ 769 €
+  minimo65SinDiscap:        853,  // 2025: 830 € → +2,8% ≈ 853 €
+  minimo65ConDiscap65:     1079,  // 2025: 1.050 € → +2,8% ≈ 1.079 €
+
+  // Pensión máxima SS 2026 (igual que LIMITES_PENSION_2025.maximaMensual)
+  pensionMaxima:          3359.60,
+
+  // Base reguladora para causante en activo: BR = (24 bases × media) / 28
+  divisorBaseReguladora:    28,
+};

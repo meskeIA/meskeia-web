@@ -5,35 +5,10 @@ import styles from './EstimadorPensionViudedad.module.css';
 import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import { PENSION_VIUDEDAD_2026 } from '@/data/fiscal/pensiones';
 
-// ─── Datos normativos 2025 ────────────────────────────────────────────────────
-// Fuente: LGSS arts. 219-231 + Real Decreto 8/2015 + Resolución INSS pensiones mínimas 2025
-
-const PENSION_VIUDEDAD_2025 = {
-  // Porcentajes aplicables sobre la base reguladora
-  porcentajeGeneral:       52,  // Caso general
-  porcentaje60:            60,  // ≥65 años sin otra pensión pública y rentas bajas
-  porcentaje70:            70,  // Cargas familiares + rentas del trabajo inferiores al 75% SMI
-
-  // SMI 2025 mensual (14 pagas = €15.876 anuales / 12 = €1.323/mes)
-  // Para límite del 70%: 75% del SMI mensual
-  smiMensual:           1323,
-  limiteIngresos70:      992,   // 75% del SMI 2025 mensual (orientativo)
-
-  // Pensiones mínimas garantizadas 2025 (brutas/mes)
-  minimoMenor60SinCargas:   567,
-  minimoMenor60ConCargas:   763,
-  minimo60a64:              748,
-  minimo65SinDiscap:        830,
-  minimo65ConDiscap65:     1050,
-
-  // Pensión máxima SS 2025
-  pensionMaxima:           3268,
-
-  // Base reguladora: divisor para causante en activo
-  // BR = suma últimas 24 bases cotización / 28
-  divisorBaseReguladora:     28,
-};
+// Alias para compatibilidad interna
+const PENSION_VIUDEDAD_2025 = PENSION_VIUDEDAD_2026;
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
