@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 281+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 283+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 281,
+  "total_tools": 283,
   "last_updated": "2026-03-16",
   "features": {
     "all_free": true,
@@ -36,14 +36,14 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 98
+      "tool_count": 100
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 71
+      "tool_count": 72
     },
     {
       "id": "creando",
@@ -1763,6 +1763,53 @@
         "test iof osteoporosis"
       ],
       "icon": "🦴"
+    },
+    {
+      "slug": "test-fragilidad",
+      "name": "Test de Fragilidad (Escala FRAIL)",
+      "url": "https://meskeia.com/test-fragilidad/",
+      "description": "Test validado de 5 ítems (escala FRAIL) para detectar fragilidad o pre-fragilidad en personas mayores. Orientación sobre riesgo de caídas, dependencia y recomendaciones preventivas.",
+      "suites": [
+        "salud",
+        "jubilacion"
+      ],
+      "contexts": [
+        "casa"
+      ],
+      "keywords": [
+        "test fragilidad mayores",
+        "escala FRAIL",
+        "fragilidad anciano",
+        "sarcopenia test",
+        "prevencion dependencia mayores",
+        "test pre-fragilidad",
+        "criterios Fried fragilidad"
+      ],
+      "icon": "🧓"
+    },
+    {
+      "slug": "orientador-grado-dependencia",
+      "name": "Orientador Grado de Dependencia",
+      "url": "https://meskeia.com/orientador-grado-dependencia/",
+      "description": "Cuestionario orientativo basado en el Baremo BVD (RD 174/2011) para estimar el grado de dependencia (I, II o III) y conocer las prestaciones del SAAD a las que se puede acceder.",
+      "suites": [
+        "salud",
+        "jubilacion"
+      ],
+      "contexts": [
+        "casa",
+        "dinero"
+      ],
+      "keywords": [
+        "grado dependencia",
+        "baremo dependencia BVD",
+        "SAAD dependencia",
+        "valoracion dependencia España",
+        "grado I II III dependencia",
+        "solicitar dependencia",
+        "LAPAD dependencia"
+      ],
+      "icon": "📋"
     },
     {
       "slug": "calculadora-jubilacion",

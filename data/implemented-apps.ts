@@ -26,6 +26,8 @@ export const implementedAppsUrls = [
   "/adaptacion-hogar/",                 // Checklist adaptaciones del hogar: costes, prioridades y ayudas públicas
   "/residencia-vs-cuidado-en-casa/",    // Comparativa costes residencia / SAD / cuidador en casa
   "/estimador-riesgo-osteoporosis/",    // Test validado (FRAX/IOF) de riesgo de osteoporosis
+  "/test-fragilidad/",                  // Test de Fragilidad (Escala FRAIL): 5 ítems, 3 niveles (robusto/pre-frágil/frágil)
+  "/orientador-grado-dependencia/",     // Orientador Grado de Dependencia BVD: Grado I/II/III + prestaciones SAAD
   "/calculadora-jubilacion/",
   "/calculadora-inversiones/",
   "/test-perfil-inversor/",

@@ -59,6 +59,8 @@ const saludMayoresApps: RelatedApp[] = [
   { url: '/adaptacion-hogar/', icon: '🏠', name: 'Adaptación del Hogar', description: 'Checklist accesibilidad y costes' },
   { url: '/residencia-vs-cuidado-en-casa/', icon: '🏡', name: 'Residencia vs Cuidado', description: 'Comparativa de opciones de cuidado' },
   { url: '/estimador-riesgo-osteoporosis/', icon: '🦴', name: 'Riesgo de Osteoporosis', description: 'Test de factores de riesgo validados' },
+  { url: '/test-fragilidad/', icon: '🧓', name: 'Test de Fragilidad', description: 'Escala FRAIL: detección precoz de fragilidad' },
+  { url: '/orientador-grado-dependencia/', icon: '📋', name: 'Grado de Dependencia', description: 'Orientación BVD y prestaciones SAAD' },
   { url: '/planificador-chequeos-medicos/', icon: '🏥', name: 'Chequeos Médicos', description: 'Revisiones preventivas por edad' },
 ];
 
@@ -1108,6 +1110,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'estimador-riesgo-osteoporosis': [
     ...saludMayoresApps.filter(a => a.url !== '/estimador-riesgo-osteoporosis/'),
+  ],
+  'test-fragilidad': [
+    ...saludMayoresApps.filter(a => a.url !== '/test-fragilidad/'),
+  ],
+  'orientador-grado-dependencia': [
+    ...saludMayoresApps.filter(a => a.url !== '/orientador-grado-dependencia/'),
   ],
 };
 
