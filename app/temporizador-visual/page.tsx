@@ -297,42 +297,173 @@ export default function TemporizadorVisualPage() {
       </section>
 
       <EducationalSection
-        title="📚 ¿Para qué sirve el temporizador visual?"
-        subtitle="Información sobre el uso de temporizadores en personas con necesidades especiales"
+        title="⏱️ Todo sobre el Temporizador Visual"
+        subtitle="Cómo usar el tiempo visual para apoyar la autonomía, la concentración y las rutinas"
       >
-        <section className={styles.guiaSeccion}>
-          <h2>¿Por qué un temporizador visual?</h2>
-          <p>
-            Muchas personas con autismo, TDAH u otras condiciones cognitivas tienen dificultades
-            para percibir el paso del tiempo. El tiempo abstracto es difícil de comprender,
-            pero un círculo que se vacía y cambia de color es concreto y fácil de entender.
-          </p>
+        {/* Tabla comparativa */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Tipo de temporizador</th>
+                <th>Representación del tiempo</th>
+                <th>Mejor para</th>
+                <th>Limitación</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Visual (este)</td>
+                <td>Círculo que se vacía + colores</td>
+                <td>Autismo, TDAH, niños, mayores</td>
+                <td>Requiere pantalla visible</td>
+              </tr>
+              <tr>
+                <td>Reloj de arena físico</td>
+                <td>Arena que cae</td>
+                <td>Niños pequeños sin tecnología</td>
+                <td>Tiempo fijo, no personalizable</td>
+              </tr>
+              <tr>
+                <td>Temporizador de cocina</td>
+                <td>Pitido al terminar</td>
+                <td>Adultos, uso puntual</td>
+                <td>No muestra progreso visual</td>
+              </tr>
+              <tr>
+                <td>Pomodoro</td>
+                <td>Ciclos trabajo/descanso</td>
+                <td>Productividad laboral</td>
+                <td>Estructura rígida de 25 min</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <h2>Usos habituales</h2>
-          <ul>
-            <li><strong>Transiciones</strong>: Avisar cuánto falta para cambiar de actividad</li>
-            <li><strong>Tareas</strong>: Limitar el tiempo dedicado a una actividad</li>
-            <li><strong>Descansos</strong>: Marcar el tiempo de pausa entre actividades</li>
-            <li><strong>Rutinas</strong>: Dar estructura temporal a la jornada</li>
-            <li><strong>Deberes</strong>: Trabajar en bloques cortos con descanso entre ellos</li>
-          </ul>
+        {/* Casos de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🧩</span>
+              <strong>Autismo y TEA</strong>
+            </div>
+            <p>El tiempo abstracto es difícil de comprender. Un círculo que se vacía y cambia de color es concreto e inmediato.</p>
+            <div className={styles.escenarioExample}>Ejemplo: 10 min para terminar los deberes antes del recreo</div>
+            <div className={styles.escenarioTip}>Empieza con tiempos cortos (2-3 min) hasta que la persona se familiarice</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>⚡</span>
+              <strong>TDAH y dificultades de atención</strong>
+            </div>
+            <p>Ver visualmente cuánto tiempo queda ayuda a mantener el foco y reduce la ansiedad por no saber cuándo termina.</p>
+            <div className={styles.escenarioExample}>Ejemplo: 5 min de lectura + 2 min de descanso en ciclos</div>
+            <div className={styles.escenarioTip}>El color rojo actúa como aviso natural sin necesidad de interrupciones verbales</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+              <strong>Familias con niños</strong>
+            </div>
+            <p>Evita discusiones del tipo &quot;¿cuánto falta?&quot;. El niño puede ver por sí mismo el tiempo restante y autorregularse.</p>
+            <div className={styles.escenarioExample}>Ejemplo: 15 min de pantalla, cuando se acabe el tiempo se apaga</div>
+            <div className={styles.escenarioTip}>Implica al niño en elegir el tiempo para aumentar su compromiso</div>
+          </div>
+        </div>
 
-          <h2>El significado de los colores</h2>
-          <ul>
-            <li><strong style={{ color: '#22C55E' }}>Verde</strong>: Queda mucho tiempo, estás bien</li>
-            <li><strong style={{ color: '#EAB308' }}>Amarillo</strong>: Ya has pasado la mitad</li>
-            <li><strong style={{ color: '#F97316' }}>Naranja</strong>: Queda poco tiempo, prepárate</li>
-            <li><strong style={{ color: '#EF4444' }}>Rojo</strong>: Quedan muy pocos minutos</li>
-          </ul>
+        {/* FAQ */}
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <strong>¿Por qué cambia de color el círculo?</strong>
+            <p>Verde (más del 60% restante) → Amarillo (40-60%) → Naranja (20-40%) → Rojo (menos del 20%). Es una señal visual progresiva de urgencia.</p>
+            <span className={styles.faqTip}>El cambio de color es gradual para evitar sobresaltos.</span>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Funciona en modo pantalla completa?</strong>
+            <p>Sí. Puedes usar el modo pantalla completa del navegador (F11) para que el círculo ocupe toda la pantalla y sea visible desde lejos.</p>
+            <span className={styles.faqTip}>Ideal para proyectarlo en clase o colocarlo en la pared.</span>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Qué pasa cuando suena la alarma?</strong>
+            <p>Suena una secuencia de tres tonos ascendentes y el círculo queda en estado &quot;Terminado&quot;. Debes pulsar Reiniciar para volver a usarlo.</p>
+            <span className={styles.faqTip}>Puedes desactivar el sonido si resulta molesto o perturbador.</span>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Puedo usar tiempos distintos a los predefinidos?</strong>
+            <p>Sí. Usa el campo &quot;Otro tiempo...&quot; para introducir cualquier duración entre 1 y 180 minutos y pulsa Aplicar.</p>
+            <span className={styles.faqTip}>Los presets de 1, 2, 5, 10, 15, 20 y 30 minutos cubren la mayoría de situaciones habituales.</span>
+          </div>
+        </div>
 
-          <h2>Consejos de uso</h2>
-          <ul>
-            <li>Empieza con tiempos cortos (1-5 min) hasta que la persona se familiarice</li>
-            <li>Usa el sonido si ayuda a la persona, desactívalo si le resulta molesto</li>
-            <li>El botón Reiniciar siempre vuelve al tiempo seleccionado</li>
-            <li>Combínalo con el Planificador de Rutinas para una jornada estructurada</li>
+        {/* Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <strong>Elige la duración</strong>
+              <p>Selecciona uno de los presets o introduce un tiempo personalizado en el campo de texto.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <strong>Configura el sonido</strong>
+              <p>Activa o desactiva la alarma final según las necesidades de la persona que lo usará.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <strong>Pulsa Iniciar</strong>
+              <p>El círculo empieza a vaciarse. Puedes pausar y continuar en cualquier momento.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <strong>Observa los colores</strong>
+              <p>Verde → Amarillo → Naranja → Rojo. Cada color indica cuánto tiempo queda de forma intuitiva.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🕐</span>
+            <strong>Empieza con tiempos cortos</strong>
+            <p>1-5 minutos para que la persona se familiarice antes de aumentar la duración.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🔇</span>
+            <strong>Adapta el sonido</strong>
+            <p>Desactiva la alarma si resulta molesta. El cambio de color ya avisa visualmente.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📱</span>
+            <strong>Orienta la pantalla</strong>
+            <p>En móvil, usa orientación vertical. En tablet o proyector, horizontal para mayor tamaño.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🔄</span>
+            <strong>Combínalo con rutinas</strong>
+            <p>Úsalo junto al Planificador de Rutinas para estructurar toda la jornada con tiempos.</p>
+          </div>
+        </div>
+
+        {/* Warning box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores frecuentes al usar el temporizador visual</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Tiempo demasiado largo al principio:</strong> Empezar con 30 min puede generar ansiedad. Comienza con 2-5 min.</li>
+            <li><strong>Cambiar el tiempo mientras corre:</strong> Reinicia siempre antes de cambiar la duración para que el círculo sea coherente.</li>
+            <li><strong>Usar el sonido con personas sensibles:</strong> La alarma puede resultar perturbadora. Prueba sin sonido primero.</li>
+            <li><strong>Pantalla no visible:</strong> El efecto visual solo funciona si la persona puede ver el círculo claramente desde donde está.</li>
           </ul>
-        </section>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('temporizador-visual')} />

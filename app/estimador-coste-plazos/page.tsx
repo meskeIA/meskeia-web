@@ -331,74 +331,191 @@ export default function CalculadoraCostePlazosPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="¿Qué es la TAE y por qué importa?"
-        subtitle="Aprende a detectar el coste real de las financiaciones"
+        title="💳 Todo sobre la Financiación a Plazos"
+        subtitle="Entiende la TAE, detecta intereses ocultos y decide cuándo compensa financiar"
         icon="📚"
       >
-        <div className={styles.guideContent}>
-          <section className={styles.guideSection}>
-            <h3>📊 TAE vs TIN: La Diferencia Clave</h3>
-            <div className={styles.guideGrid}>
-              <div className={styles.guideCard}>
-                <h4>TIN (Tipo de Interés Nominal)</h4>
-                <p>
-                  Es el interés &quot;puro&quot; que te cobran por el préstamo. No incluye comisiones
-                  ni otros gastos. Es el número que las tiendas anuncian porque suele ser más bajo.
-                </p>
-              </div>
-              <div className={styles.guideCard}>
-                <h4>TAE (Tasa Anual Equivalente)</h4>
-                <p>
-                  Incluye el TIN más todas las comisiones y gastos. Es el indicador real del
-                  coste de la financiación. Por ley, debe aparecer en los contratos.
-                </p>
-              </div>
-            </div>
-          </section>
+        {/* Tabla comparativa */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Indicador</th>
+                <th>Qué incluye</th>
+                <th>Quién lo usa</th>
+                <th>¿Fiable para comparar?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>TIN</strong> (Tipo Interés Nominal)</td>
+                <td>Solo el interés puro del préstamo</td>
+                <td>Las tiendas en su publicidad</td>
+                <td>❌ No (oculta comisiones)</td>
+              </tr>
+              <tr>
+                <td><strong>TAE</strong> (Tasa Anual Equivalente)</td>
+                <td>TIN + comisiones + gastos</td>
+                <td>Contratos legales (obligatorio)</td>
+                <td>✅ Sí (coste real)</td>
+              </tr>
+              <tr>
+                <td><strong>Coste total</strong></td>
+                <td>Todo lo que pagas al final</td>
+                <td>Esta calculadora</td>
+                <td>✅ Sí (importe exacto)</td>
+              </tr>
+              <tr>
+                <td><strong>Cuota mensual</strong></td>
+                <td>Solo el pago periódico</td>
+                <td>La mayoría de ofertas</td>
+                <td>❌ No (no muestra el total)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <section className={styles.guideSection}>
-            <h3>🚨 Señales de Alerta en Financiaciones</h3>
-            <ul className={styles.alertaLista}>
-              <li>
-                <strong>&quot;0% de interés&quot;</strong> pero con comisión de apertura:
-                La TAE real no será 0%.
-              </li>
-              <li>
-                <strong>Solo muestran la cuota mensual</strong>:
-                Calcula siempre el total (cuota × meses).
-              </li>
-              <li>
-                <strong>Seguros obligatorios</strong>:
-                Algunos incluyen seguros que aumentan el coste.
-              </li>
-              <li>
-                <strong>Penalizaciones por cancelación anticipada</strong>:
-                Revisa si puedes pagar antes sin coste extra.
-              </li>
-            </ul>
-          </section>
-
-          <section className={styles.guideSection}>
-            <h3>💡 Cuándo Sí Tiene Sentido Financiar</h3>
-            <div className={styles.guideGrid}>
-              <div className={styles.guideCard}>
-                <h4>✅ Financiación sin intereses real</h4>
-                <p>Si la TAE es 0% y no hay comisiones ocultas, es como un préstamo gratis.</p>
-              </div>
-              <div className={styles.guideCard}>
-                <h4>✅ Emergencias necesarias</h4>
-                <p>Si necesitas algo urgente (electrodoméstico averiado) y no tienes ahorros.</p>
-              </div>
-              <div className={styles.guideCard}>
-                <h4>❌ Para caprichos</h4>
-                <p>Si puedes esperar y ahorrar, evita pagar intereses por algo no urgente.</p>
-              </div>
-              <div className={styles.guideCard}>
-                <h4>❌ TAE superior al 15-20%</h4>
-                <p>Es muy cara. Mejor ahorrar o buscar alternativas de financiación.</p>
-              </div>
+        {/* Casos de uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>📱</span>
+              <strong>Compra de tecnología</strong>
             </div>
-          </section>
+            <p>Móviles, portátiles y televisores suelen ofrecerse con financiación a 12-24 meses. La TAE puede superar el 20%.</p>
+            <div className={styles.escenarioExample}>Ejemplo: iPhone 15 Pro a 55,38 €/mes × 24 = 1.329,12 € (vs 1.329 € contado → TAE ~0%)</div>
+            <div className={styles.escenarioTip}>Si el total a plazos es igual al precio de contado, la financiación es realmente gratuita</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🛋️</span>
+              <strong>Electrodomésticos y hogar</strong>
+            </div>
+            <p>Las grandes superficies ofrecen &quot;sin intereses&quot; pero con seguros obligatorios o comisiones de apertura que elevan la TAE real.</p>
+            <div className={styles.escenarioExample}>Ejemplo: Lavadora 549 € a 12 meses → verifica si hay comisión de apertura oculta</div>
+            <div className={styles.escenarioTip}>Lee la letra pequeña del contrato: los seguros obligatorios no aparecen en el anuncio</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🚗</span>
+              <strong>Vehículos y motos</strong>
+            </div>
+            <p>Los préstamos de concesionario suelen tener TAE entre el 6% y el 12%. Compara siempre con un préstamo personal de banco.</p>
+            <div className={styles.escenarioExample}>Ejemplo: Moto 3.500 € → financiación concesionario al 9% TAE vs préstamo banco al 5% TAE</div>
+            <div className={styles.escenarioTip}>Un préstamo personal suele ser más barato que la financiación del punto de venta</div>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <div className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <strong>¿Qué significa &quot;0% de intereses&quot; en realidad?</strong>
+            <p>Puede ser financiación genuinamente gratuita o puede ocultar comisiones de apertura, seguros obligatorios o precio de contado inflado. Usa esta calculadora para comprobarlo: si el total a plazos supera el precio de contado, hay costes ocultos.</p>
+            <span className={styles.faqTip}>Si el total a plazos = precio de contado exacto, la TAE es realmente 0%.</span>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Cómo calcula esta herramienta la TAE?</strong>
+            <p>Usa el método Newton-Raphson para encontrar la tasa mensual equivalente y la convierte a tasa anual. Es una aproximación muy precisa, válida para comparar opciones aunque pueda diferir ligeramente de la TAE oficial del contrato.</p>
+            <span className={styles.faqTip}>La TAE oficial del contrato puede variar si hay gastos no incluidos en la cuota.</span>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿A partir de qué TAE se considera &quot;cara&quot; una financiación?</strong>
+            <p>Por encima del 15-20% anual se considera alta. Las tarjetas revolving suelen estar entre el 20% y el 30%. Algunos créditos rápidos superan el 100% TAE, lo que los hace muy perjudiciales.</p>
+            <span className={styles.faqTip}>El Banco de España publica trimestralmente el tipo medio del mercado como referencia.</span>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Puedo cancelar anticipadamente la financiación?</strong>
+            <p>Depende del contrato. Muchas financiaciones permiten cancelación anticipada, pero algunas cobran una penalización. Revisa las condiciones antes de firmar.</p>
+            <span className={styles.faqTip}>La Ley de Crédito al Consumo limita las penalizaciones por cancelación anticipada a un máximo del 1%.</span>
+          </div>
+          <div className={styles.faqItem}>
+            <strong>¿Cuándo tiene sentido financiar aunque haya intereses?</strong>
+            <p>Cuando necesitas algo urgente (electrodoméstico averiado), cuando la TAE es inferior a la rentabilidad de tus ahorros, o cuando el importe financiado es pequeño y el coste total es asumible.</p>
+            <span className={styles.faqTip}>Si tienes ahorros con rentabilidad superior a la TAE del préstamo, puede ser mejor financiar.</span>
+          </div>
+        </div>
+
+        {/* Guía paso a paso */}
+        <div className={styles.stepGuide}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <strong>Obtén el precio de contado real</strong>
+              <p>Busca el precio sin financiación. A veces el precio &quot;con financiación&quot; ya está inflado respecto al contado.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <strong>Introduce cuota, meses y entrada</strong>
+              <p>Usa los datos exactos del contrato o la oferta. Si hay entrada, inclúyela en el campo correspondiente.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <strong>Analiza la TAE y el coste total</strong>
+              <p>Compara el total a plazos con el precio de contado. La diferencia es lo que pagas por financiar.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <strong>Decide basándote en el porcentaje extra</strong>
+              <p>Si el coste de financiación supera el 10-15% del precio, considera ahorrar y comprar al contado.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>5</div>
+            <div className={styles.stepContent}>
+              <strong>Compara con otras opciones</strong>
+              <p>Prueba diferentes plazos: menos meses = menos intereses aunque la cuota mensual sea mayor.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mejores prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🔍</span>
+            <strong>Siempre compara la TAE</strong>
+            <p>Es el único indicador legal que permite comparar financiaciones de forma justa.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📋</span>
+            <strong>Lee el contrato completo</strong>
+            <p>Seguros obligatorios, comisiones de gestión y penalizaciones aparecen en la letra pequeña.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>💰</span>
+            <strong>Menos meses = menos intereses</strong>
+            <p>Si puedes asumir una cuota mayor, reduce el plazo para pagar menos en total.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🏦</span>
+            <strong>Compara con tu banco</strong>
+            <p>Un préstamo personal de tu banco suele ser más barato que la financiación del punto de venta.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📅</span>
+            <strong>Calcula el coste mensual real</strong>
+            <p>Divide el coste total de financiación entre los meses. Así ves lo que pagas de más cada mes.</p>
+          </div>
+        </div>
+
+        {/* Warning box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores frecuentes al financiar compras</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Fijarse solo en la cuota mensual:</strong> Una cuota baja puede implicar un plazo muy largo y un coste total muy alto.</li>
+            <li><strong>Asumir que &quot;0% intereses&quot; es gratis:</strong> Comprueba siempre si el precio de contado es menor que el total a plazos.</li>
+            <li><strong>No leer sobre seguros obligatorios:</strong> Algunos contratos incluyen seguros que incrementan el coste real significativamente.</li>
+            <li><strong>Financiar artículos de capricho:</strong> Si puedes esperar 2-3 meses y ahorrar, evitarás pagar intereses innecesarios.</li>
+            <li><strong>Ignorar la penalización por cancelación:</strong> Antes de amortizar anticipadamente, verifica si hay coste por hacerlo.</li>
+          </ul>
         </div>
       </EducationalSection>
 

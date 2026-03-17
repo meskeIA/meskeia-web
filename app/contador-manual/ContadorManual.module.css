@@ -424,3 +424,246 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* === EDUCATIONAL SECTION v2.0 === */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+[data-theme='dark'] .tableWrapper {
+  border-color: #444;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  color: var(--text-primary);
+}
+.comparativaTable tr:nth-child(even) td {
+  background: #f8f9fa;
+}
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #333;
+}
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: #2f2f2f;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+[data-theme='dark'] .escenarioCard {
+  border-color: #444;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.escenarioIcon {
+  font-size: 1.3rem;
+}
+
+.escenarioExample {
+  font-size: 0.82rem;
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+}
+
+.escenarioTip {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+}
+.faqItem strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+.faqItem p {
+  color: var(--text-secondary);
+  margin: 0 0 0.25rem;
+  font-size: 0.92rem;
+}
+
+.faqTip {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-style: italic;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.stepContent {
+  flex: 1;
+}
+.stepContent strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+.stepContent p {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+[data-theme='dark'] .tipCard {
+  border-color: #444;
+}
+.tipCard strong {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+.tipCard p {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+}
+
+.warningBox {
+  background: #fff8e1;
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+}
+[data-theme='dark'] .warningBox {
+  background: #2a2000;
+  border-color: #b45309;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  color: #92400e;
+}
+[data-theme='dark'] .warningHeader {
+  color: #fbbf24;
+}
+
+.warningIcon {
+  font-size: 1.2rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.warningList li {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+.warningList li strong {
+  color: #92400e;
+}
+[data-theme='dark'] .warningList li strong {
+  color: #fbbf24;
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+  .tipsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
