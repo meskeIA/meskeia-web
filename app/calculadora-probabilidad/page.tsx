@@ -890,6 +890,325 @@ export default function CalculadoraProbabilidadPage() {
             </div>
           </section>
 
+          {/* SECCIÓN 1 — Tabla Comparativa: Enfoques de Probabilidad */}
+          <section className={styles.guideSection}>
+            <h2>📐 Enfoques de la Probabilidad: Tabla Comparativa</h2>
+            <p className={styles.introParagraph}>
+              Existen cuatro grandes enfoques para definir y calcular probabilidades. Cada uno se aplica en contextos distintos y parte de supuestos diferentes.
+            </p>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Enfoque</th>
+                    <th>Definición</th>
+                    <th>Fórmula clave</th>
+                    <th>Cuándo usar</th>
+                    <th>Ejemplo concreto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Clásica (Laplace)</strong></td>
+                    <td>Todos los resultados son igualmente posibles</td>
+                    <td>P(A) = casos favorables / casos totales</td>
+                    <td>Juegos de azar simétricos, dados, monedas, urnas</td>
+                    <td>P(cara) = 1/2 = 0,5 con moneda justa</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Frecuentista</strong></td>
+                    <td>Límite de la frecuencia relativa tras muchos ensayos</td>
+                    <td>P(A) = lím n→∞ (n_A / n)</td>
+                    <td>Experimentos repetibles, control de calidad, medicina</td>
+                    <td>Lanzar moneda 10.000 veces → cara ≈ 5.000 veces → P ≈ 0,5</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Subjetiva (Bayesiana)</strong></td>
+                    <td>Grado de creencia o confianza del observador, actualizable con evidencia</td>
+                    <td>P(A|B) = P(B|A) × P(A) / P(B)</td>
+                    <td>Diagnóstico médico, IA, decisiones con información parcial</td>
+                    <td>Test COVID positivo (sensibilidad 99%): probabilidad real de infección depende de prevalencia</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Geométrica</strong></td>
+                    <td>Proporción de área o longitud favorable sobre el total</td>
+                    <td>P(A) = medida favorable / medida total</td>
+                    <td>Problemas continuos, dardos, geometría probabilística</td>
+                    <td>Aguja de Buffon: P(cruzar línea) = 2L / (πd) donde L es longitud de aguja y d separación de líneas</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* SECCIÓN 2 — Casos de Uso por Perfil */}
+          <section className={styles.guideSection}>
+            <h2>👤 Quién Usa la Probabilidad: 4 Perfiles Reales</h2>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🧮</span>
+                  <div>
+                    <strong>Estudiante de ESO/Bachillerato</strong>
+                    <p>Combinatoria y probabilidad clásica</p>
+                  </div>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <strong>Problema típico:</strong> ¿De cuántas formas se puede formar un comité de 3 personas de entre 8 candidatos?<br />
+                  <em>C(8,3) = 8! / (3! × 5!) = 56 combinaciones</em>
+                </div>
+                <div className={styles.escenarioTip}>
+                  Tip: Distingue siempre si el orden importa (permutación) o no (combinación) antes de escribir la fórmula.
+                </div>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🩺</span>
+                  <div>
+                    <strong>Médico o Profesional de la Salud</strong>
+                    <p>Interpretación de tests diagnósticos</p>
+                  </div>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <strong>Caso real:</strong> Test con sensibilidad 95% y especificidad 90%, enfermedad con prevalencia 1%.<br />
+                  <em>Valor predictivo positivo (VPP) = P(enfermo|positivo) ≈ 8,7% — no el 95% que intuitivamente se asume</em>
+                </div>
+                <div className={styles.escenarioTip}>
+                  Tip: Usa siempre el Teorema de Bayes con la prevalencia real de la población. El VPP varía radicalmente según el contexto.
+                </div>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🏭</span>
+                  <div>
+                    <strong>Gestor de Riesgos</strong>
+                    <p>Evaluación de fallos y fiabilidad</p>
+                  </div>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <strong>Escenario:</strong> Un componente falla con probabilidad 0,02 en cada uso. ¿Cuál es la probabilidad de que falle exactamente 1 vez en 10 usos?<br />
+                  <em>P(X=1) = C(10,1) × 0,02¹ × 0,98⁹ ≈ 0,167 (16,7%)</em>
+                </div>
+                <div className={styles.escenarioTip}>
+                  Tip: La distribución binomial es perfecta para modelar fallos en sistemas con n ensayos independientes y probabilidad de fallo constante.
+                </div>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🎰</span>
+                  <div>
+                    <strong>Aficionado a Juegos de Azar</strong>
+                    <p>Entender la ventaja de la banca</p>
+                  </div>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <strong>Ejemplo — Ruleta europea:</strong> La banca tiene 37 números (1-36 + 0). Apostar a un número: P(ganar) = 1/37 ≈ 2,7%, pero el pago es 35:1.<br />
+                  <em>Valor esperado por €1 = (1/37 × 35) − (36/37 × 1) = −0,027 € → ventaja banca 2,7%</em>
+                </div>
+                <div className={styles.escenarioTip}>
+                  Tip: El valor esperado siempre es negativo para el jugador en juegos de casino. La probabilidad no &ldquo;recuerda&rdquo; tiradas anteriores (falacia del jugador).
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 3 — FAQ Profesional */}
+          <section className={styles.guideSection}>
+            <h2>❓ Preguntas Frecuentes: Probabilidad en Profundidad</h2>
+            <div className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Qué diferencia hay entre probabilidad y estadística?</div>
+                <div className={styles.faqRespuesta}>
+                  La probabilidad parte de un modelo conocido y predice resultados futuros. La estadística va en sentido contrario: parte de datos observados para inferir el modelo subyacente. Ejemplo: probabilidad dice &ldquo;si la moneda es justa, en 100 lanzamientos esperamos ~50 caras&rdquo;; estadística dice &ldquo;hemos obtenido 62 caras en 100 lanzamientos, ¿es la moneda justa?&rdquo;
+                </div>
+                <div className={styles.faqTip}>Regla práctica: probabilidad = deducción del modelo; estadística = inducción desde los datos.</div>
+              </div>
+
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Qué es la probabilidad condicionada y cómo se interpreta?</div>
+                <div className={styles.faqRespuesta}>
+                  P(A|B) es la probabilidad de que ocurra A <em>sabiendo</em> que B ya ha ocurrido. Se calcula como P(A|B) = P(A∩B) / P(B). Reduce el espacio muestral al subconjunto compatible con B. Ejemplo: P(sacar 6 | el dado es par) = P({`{6}`} ∩ {`{2,4,6}`}) / P({`{2,4,6}`}) = (1/6) / (3/6) = 1/3 ≈ 33,3%.
+                </div>
+                <div className={styles.faqTip}>Visualízalo como: &ldquo;dado que estamos en el mundo donde B es verdad, ¿con qué frecuencia ocurre A?&rdquo;</div>
+              </div>
+
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Qué significa que dos sucesos sean independientes?</div>
+                <div className={styles.faqRespuesta}>
+                  A y B son independientes si P(A∩B) = P(A) × P(B), es decir, si el conocimiento de que B ocurrió no modifica la probabilidad de A. Equivalentemente, P(A|B) = P(A). Ejemplo con moneda y dado: P(cara ∩ sacar 6) = 0,5 × (1/6) = 1/12. Verificación: P(cara|sacar 6) = P(cara) = 0,5. Contra-ejemplo: extracción sin reposición — la segunda extracción depende de la primera.
+                </div>
+                <div className={styles.faqTip}>No confundir independencia con mutua exclusión: dos eventos mutuamente excluyentes con P &gt; 0 son necesariamente dependientes.</div>
+              </div>
+
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Cómo funciona el Teorema de Bayes en diagnóstico médico?</div>
+                <div className={styles.faqRespuesta}>
+                  Ejemplo completo: enfermedad con prevalencia 1% (P(E)=0,01), test con sensibilidad 95% (P(+|E)=0,95) y especificidad 90% (P(−|no E)=0,90). Entonces P(+|no E)=0,10. Aplicando Bayes: P(E|+) = [0,95 × 0,01] / [0,95 × 0,01 + 0,10 × 0,99] = 0,0095 / (0,0095 + 0,099) ≈ 0,087 = 8,7%. A pesar de un test positivo, solo hay 8,7% de probabilidad real de estar enfermo.
+                </div>
+                <div className={styles.faqTip}>Este resultado contraintuitivo se llama paradoja de los falsos positivos. La baja prevalencia domina el resultado.</div>
+              </div>
+
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Por qué la probabilidad de cara/cruz no es exactamente 50%?</div>
+                <div className={styles.faqRespuesta}>
+                  En teoría (enfoque clásico de Laplace), P(cara) = 1/2 = 0,5 exactamente si la moneda es perfectamente simétrica y homogénea. En la práctica, los experimentos físicos muestran desviaciones mínimas: monedas reales tienen ligeras asimetrías de peso. El enfoque frecuentista confirma que tras muchos lanzamientos la frecuencia relativa se aproxima a 0,5 (ley de los grandes números), pero nunca con precisión infinita.
+                </div>
+                <div className={styles.faqTip}>La diferencia entre probabilidad teórica (modelo matemático) y frecuencia empírica (experimento real) es fundamental en estadística.</div>
+              </div>
+
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Qué es la falacia del jugador y por qué es un error cognitivo?</div>
+                <div className={styles.faqRespuesta}>
+                  La falacia del jugador (gambler&apos;s fallacy) es creer que una racha de un resultado hace más probable el resultado contrario en el siguiente evento independiente. Ejemplo: ruleta muestra 10 rojos seguidos → P(negro en la siguiente tirada) sigue siendo 18/37 ≈ 48,6%, no aumenta. Los eventos pasados no &ldquo;desequilibran&rdquo; los futuros porque son estadísticamente independientes. La falacia se produce porque el cerebro busca patrones donde no los hay.
+                </div>
+                <div className={styles.faqTip}>La falacia inversa (hot hand fallacy) es creer que la racha continuará. Ambos son errores cognitivos bien documentados en psicología del comportamiento.</div>
+              </div>
+
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Cómo se calcula la probabilidad con dos dados?</div>
+                <div className={styles.faqRespuesta}>
+                  El espacio muestral de dos dados tiene 6 × 6 = 36 resultados equiprobables. Para calcular P(suma = k): contar los pares (d1, d2) tal que d1+d2=k. Suma 7: (1,6)(2,5)(3,4)(4,3)(5,2)(6,1) → 6 casos → P = 6/36 = 1/6 ≈ 16,7%. Suma 2: solo (1,1) → P = 1/36 ≈ 2,8%. Suma 12: solo (6,6) → P = 1/36. La suma 7 es la más probable porque tiene más combinaciones.
+                </div>
+                <div className={styles.faqTip}>Con la calculadora: casos favorables = número de pares que suman k, casos posibles = 36.</div>
+              </div>
+
+              <div className={styles.faqItem}>
+                <div className={styles.faqPregunta}>¿Qué es la ley de los grandes números?</div>
+                <div className={styles.faqRespuesta}>
+                  La ley de los grandes números (Bernoulli, 1713) establece que la frecuencia relativa de un suceso converge a su probabilidad teórica cuando el número de ensayos tiende a infinito. Versión débil: para cualquier ε &gt; 0, P(|frecuencia − p| &gt; ε) → 0 cuando n → ∞. Ejemplo: lanzar moneda 10 veces puede dar 7 caras (70%); lanzarla 1.000.000 de veces dará entre 49,9% y 50,1% con altísima probabilidad.
+                </div>
+                <div className={styles.faqTip}>La ley de los grandes números NO dice que las desviaciones se &ldquo;compensarán&rdquo; — las desviaciones absolutas crecen, solo la proporción converge.</div>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 4 — Guía Paso a Paso (7 pasos) */}
+          <section className={styles.guideSection}>
+            <h2>🗺️ Cómo Resolver Cualquier Problema de Probabilidad: 7 Pasos</h2>
+            <div className={styles.stepGuide}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <strong>Identifica el experimento aleatorio</strong>
+                  <p>Define claramente el experimento: ¿qué acción se realiza? ¿qué resultado se observa? Ejemplo: &ldquo;lanzar un dado de 6 caras una vez&rdquo;. Sin experimento bien definido, el cálculo carece de base.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <strong>Define el espacio muestral (Ω)</strong>
+                  <p>Lista o describe todos los resultados posibles. Dado: Ω = {`{1,2,3,4,5,6}`}. Dos dados: 36 pares. Moneda 3 veces: 2³ = 8 resultados. El tamaño de Ω es el denominador en la probabilidad clásica.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <strong>Define el suceso de interés (A)</strong>
+                  <p>Expresa el evento como subconjunto de Ω. &ldquo;Sacar número par&rdquo; = {`{2,4,6}`}. &ldquo;Sumar más de 9 con dos dados&rdquo; = {`{(4,6),(5,5),(5,6),(6,4),(6,5),(6,6)}`}. Contar los elementos de A da el numerador.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepContent}>
+                  <strong>Verifica la equiprobabilidad o asigna probabilidades</strong>
+                  <p>En el enfoque clásico, todos los resultados deben ser equiprobables. Si no lo son (dado cargado, urna con bolas de distinto peso), debes asignar probabilidades individuales y asegurarte de que sumen 1.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>5</div>
+                <div className={styles.stepContent}>
+                  <strong>Elige el modelo y aplica la fórmula</strong>
+                  <p>Selección sin orden → C(n,r). Selección con orden → P(n,r). Ensayos independientes éxito/fallo → Binomial B(n,p). Condicionado → P(A|B) = P(A∩B)/P(B). Probabilidad directa → P = F/T. Aplica la fórmula con los valores identificados.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>6</div>
+                <div className={styles.stepContent}>
+                  <strong>Verifica que el resultado sea válido (0 ≤ P ≤ 1)</strong>
+                  <p>Una probabilidad siempre está entre 0 y 1. Si obtienes un valor fuera de ese rango, revisa el espacio muestral o los casos favorables. Verifica también que P(A) + P(Ā) = 1 donde Ā es el complementario de A.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>7</div>
+                <div className={styles.stepContent}>
+                  <strong>Interpreta el resultado en el contexto del problema</strong>
+                  <p>Convierte a porcentaje para comunicar (0,167 → 16,7%). Compara con referencias: P &lt; 1% es muy improbable; P &gt; 90% es casi seguro. Para decisiones, calcula también el valor esperado: E[X] = Σ(x · P(x)) para saber si la apuesta o inversión es favorable.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 5 — Mejores Prácticas */}
+          <section className={styles.guideSection}>
+            <h2>💡 Mejores Prácticas: 6 Tips Accionables</h2>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <div className={styles.tipIcon}>🌳</div>
+                <strong>Usa diagramas de árbol para probabilidad compuesta</strong>
+                <p>Cuando hay varios pasos (extraer bolita, luego otra), dibuja el árbol de probabilidades. Las ramas representan resultados y sus etiquetas son probabilidades. La probabilidad de un camino completo es el producto de sus ramas: P(rojo, luego azul) = P(rojo) × P(azul|rojo).</p>
+              </div>
+              <div className={styles.tipCard}>
+                <div className={styles.tipIcon}>📊</div>
+                <strong>Construye tablas de contingencia para Bayes</strong>
+                <p>Antes de aplicar Bayes, construye una tabla 2×2 con valores absolutos (no porcentajes). Con población hipotética de 10.000 personas: enfermedad presente/ausente × test positivo/negativo. Esto hace visible el número de falsos positivos y facilita el cálculo mental.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <div className={styles.tipIcon}>✅</div>
+                <strong>Verifica siempre que las probabilidades sumen 1</strong>
+                <p>Después de calcular todas las probabilidades de un espacio muestral, su suma debe ser exactamente 1. Si no, hay un error en el modelo. Ejemplo binomial: Σ P(X=k) para k de 0 a n siempre da 1. Es la prueba de coherencia básica de cualquier modelo probabilístico.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <div className={styles.tipIcon}>🔄</div>
+                <strong>Usa el complementario para simplificar</strong>
+                <p>P(al menos 1 éxito en n ensayos) = 1 − P(ningún éxito) = 1 − (1−p)ⁿ. Casi siempre es más sencillo calcular el complementario. Ejemplo: P(al menos un 6 en 4 lanzamientos) = 1 − (5/6)⁴ ≈ 1 − 0,482 = 0,518 (51,8%).</p>
+              </div>
+              <div className={styles.tipCard}>
+                <div className={styles.tipIcon}>🔢</div>
+                <strong>Verifica la independencia antes de multiplicar</strong>
+                <p>P(A∩B) = P(A) × P(B) solo si A y B son independientes. Con extracción sin reposición, la segunda probabilidad cambia: extraer 2 ases de 52 cartas → P = (4/52) × (3/51) = 12/2652 ≈ 0,45%. No uses (4/52)² ya que los eventos son dependientes.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <div className={styles.tipIcon}>📐</div>
+                <strong>Redondea al final, no en pasos intermedios</strong>
+                <p>En cálculos con múltiples pasos (Bayes, binomial acumulada), mantén todos los decimales hasta el resultado final. Redondear en cada paso acumula error. Ejemplo: P(A∩B) = 0,95 × 0,01 = 0,0095 (no 0,01 redondeado), luego calcular el denominador completo y redondear solo al presentar el resultado.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 6 — Warning Box: Errores Clásicos */}
+          <section className={styles.guideSection}>
+            <h2>⚠️ Errores Clásicos que Debes Evitar</h2>
+            <div className={styles.warningBox}>
+              <div className={styles.warningHeader}>
+                <span className={styles.warningIcon}>🚨</span>
+                <strong>6 errores frecuentes en cálculo de probabilidades</strong>
+              </div>
+              <ul className={styles.warningList}>
+                <li>
+                  <strong>Falacia del jugador:</strong> Creer que 10 rojos seguidos en la ruleta hace más probable el negro. La probabilidad de cada tirada independiente NO cambia: P(rojo) = 18/37 siempre, independientemente de tiradas previas. Los números no tienen memoria.
+                </li>
+                <li>
+                  <strong>Confundir frecuencia relativa con probabilidad teórica:</strong> Si en 20 lanzamientos de moneda salen 13 caras (65%), eso no significa que P(cara) = 0,65. La frecuencia relativa converge a la probabilidad solo con muchos ensayos (ley de los grandes números). Con 20 lanzamientos, la variabilidad es alta.
+                </li>
+                <li>
+                  <strong>No verificar independencia antes de multiplicar:</strong> P(A∩B) = P(A) × P(B) solo vale si A y B son independientes. Extraer 2 cartas de una baraja sin reposición: P(as en 1.ª y as en 2.ª) = (4/52) × (3/51) ≠ (4/52)². Ignorar la dependencia lleva a probabilidades incorrectas.
+                </li>
+                <li>
+                  <strong>Confundir P(A|B) con P(B|A):</strong> Son probabilidades distintas. P(positivo|enfermo) = sensibilidad del test ≠ P(enfermo|positivo) = valor predictivo positivo. Este error, conocido como &ldquo;transposición del condicional&rdquo;, es frecuente en medicina y derecho y puede tener consecuencias graves.
+                </li>
+                <li>
+                  <strong>Usar combinaciones cuando el orden importa:</strong> Si el problema pide &ldquo;¿de cuántas formas puede quedar el pódio (1.º, 2.º, 3.º)?&rdquo;, el orden importa → permutaciones P(n,r). Usar C(n,r) subestimaría el resultado: P(10,3) = 720 ≠ C(10,3) = 120.
+                </li>
+                <li>
+                  <strong>Aplicar la binomial sin verificar sus condiciones:</strong> La distribución B(n,p) requiere: (1) n ensayos fijos, (2) exactamente dos resultados (éxito/fallo), (3) probabilidad p constante, (4) ensayos independientes. Si extraes bolas sin reposición de una urna, p cambia en cada extracción → la distribución correcta es la hipergeométrica, no la binomial.
+                </li>
+              </ul>
+            </div>
+          </section>
+
         </div>
       </EducationalSection>
 

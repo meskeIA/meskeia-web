@@ -356,348 +356,449 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
         title="📚 ¿Quieres aprender más sobre Estadística Descriptiva?"
         subtitle="Descubre conceptos clave, fórmulas y cuándo usar cada medida"
       >
-        {/* Conceptos Fundamentales */}
+
+        {/* SECCIÓN 1: Tabla Comparativa */}
         <section className={styles.guideSection}>
-          <h2>Medidas Estadísticas: Resumen Comparativo</h2>
+          <h2>Tabla Comparativa de Medidas Estadísticas</h2>
           <p className={styles.introParagraph}>
-            La estadística descriptiva organiza sus medidas en tres grandes grupos. Conocer cuándo
-            aplicar cada una es clave para interpretar correctamente tus datos.
+            Cada medida estadística responde a una pregunta diferente. Esta tabla compara las
+            principales medidas de tendencia central y dispersión con ejemplos numéricos reales
+            usando el conjunto de datos: <strong>salarios mensuales (€): 1.200, 1.400, 1.400, 1.600, 1.800, 1.800, 1.800, 2.100, 2.500, 8.000</strong>.
           </p>
-
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>📊 Media Aritmética (x̄)</h4>
-              <p>
-                Suma de todos los valores dividida por n: x̄ = Σx / n.
-                Intuitiva y fácil de calcular, pero sensible a valores extremos (outliers).
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>📍 Mediana</h4>
-              <p>
-                Valor central al ordenar los datos. Más robusta que la media ante outliers.
-                Ideal para distribuciones asimétricas (salarios, precios inmobiliarios).
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>🎯 Moda</h4>
-              <p>
-                Valor más frecuente. Puede haber varias modas (bimodal, multimodal)
-                o ninguna si todos los valores son únicos.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>📉 Desviación Estándar (s / σ)</h4>
-              <p>
-                Mide la dispersión de los datos respecto a la media. Es la raíz cuadrada
-                de la varianza. Versión muestral (s) divide por n-1; poblacional (σ) por n.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>📏 Rango Intercuartil (IQR)</h4>
-              <p>
-                Diferencia entre Q3 y Q1. Representa el 50% central de los datos.
-                Es robusto ante outliers y se usa para detectar valores atípicos.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>📐 Coeficiente de Variación (CV)</h4>
-              <p>
-                Desviación estándar expresada como porcentaje de la media: CV = (s / x̄) × 100.
-                Permite comparar la dispersión relativa entre conjuntos de distinta escala.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Tabla Comparativa */}
-        <section className={styles.guideSection}>
-          <h2>Tabla Comparativa: ¿Qué medida usar?</h2>
-          <div className={styles.tablaWrapper}>
-            <table className={styles.tablaComparativa}>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
               <thead>
                 <tr>
                   <th>Medida</th>
-                  <th>Categoría</th>
+                  <th>Definición</th>
                   <th>Fórmula</th>
-                  <th>Cuándo usarla</th>
-                  <th>Limitación</th>
+                  <th>Cuándo usar</th>
+                  <th>Sensibilidad outliers</th>
+                  <th>Ejemplo (salarios)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td><strong>Media</strong></td>
-                  <td>Tendencia central</td>
-                  <td>Σx / n</td>
-                  <td>Datos simétricos sin outliers</td>
-                  <td>Muy sensible a valores extremos</td>
+                  <td>Promedio aritmético de todos los valores</td>
+                  <td>x̄ = Σx / n</td>
+                  <td>Datos simétricos sin valores extremos</td>
+                  <td><span className={styles.sensibilidadAlta}>Alta</span></td>
+                  <td>2.260 € (distorsionada por 8.000 €)</td>
                 </tr>
                 <tr>
                   <td><strong>Mediana</strong></td>
-                  <td>Tendencia central</td>
-                  <td>Valor central ordenado</td>
-                  <td>Datos asimétricos o con outliers</td>
-                  <td>No usa todos los valores</td>
+                  <td>Valor central al ordenar los datos</td>
+                  <td>Valor en posición (n+1)/2</td>
+                  <td>Datos asimétricos, ingresos, precios</td>
+                  <td><span className={styles.sensibilidadBaja}>Baja</span></td>
+                  <td>1.800 € (representa mejor al trabajador típico)</td>
                 </tr>
                 <tr>
                   <td><strong>Moda</strong></td>
-                  <td>Tendencia central</td>
-                  <td>Valor más frecuente</td>
-                  <td>Datos categóricos o discretos</td>
-                  <td>Puede no existir o haber varias</td>
+                  <td>Valor que aparece con mayor frecuencia</td>
+                  <td>argmax(frecuencia)</td>
+                  <td>Datos discretos o categóricos</td>
+                  <td><span className={styles.sensibilidadBaja}>Baja</span></td>
+                  <td>1.800 € (aparece 3 veces)</td>
                 </tr>
                 <tr>
-                  <td><strong>Desv. Estándar</strong></td>
-                  <td>Dispersión</td>
-                  <td>√[Σ(x-x̄)² / (n-1)]</td>
-                  <td>Cuantificar variabilidad</td>
-                  <td>Misma unidad que los datos</td>
+                  <td><strong>Varianza (s²)</strong></td>
+                  <td>Promedio de desviaciones al cuadrado respecto a la media</td>
+                  <td>Σ(x−x̄)² / (n−1)</td>
+                  <td>Base para otros cálculos estadísticos</td>
+                  <td><span className={styles.sensibilidadAlta}>Alta</span></td>
+                  <td>3.440.044 €² (unidades al cuadrado, difícil de interpretar)</td>
                 </tr>
                 <tr>
-                  <td><strong>Varianza</strong></td>
-                  <td>Dispersión</td>
-                  <td>Σ(x-x̄)² / (n-1)</td>
-                  <td>Base para otros cálculos</td>
-                  <td>Unidades al cuadrado (difícil interpretar)</td>
+                  <td><strong>Desv. Estándar (s)</strong></td>
+                  <td>Raíz cuadrada de la varianza; dispersión en las mismas unidades que los datos</td>
+                  <td>√[Σ(x−x̄)² / (n−1)]</td>
+                  <td>Cuantificar variabilidad; reportar junto a la media</td>
+                  <td><span className={styles.sensibilidadAlta}>Alta</span></td>
+                  <td>1.854,74 € — indica dispersión muy elevada</td>
                 </tr>
                 <tr>
-                  <td><strong>IQR</strong></td>
-                  <td>Dispersión</td>
-                  <td>Q3 − Q1</td>
-                  <td>Datos con outliers</td>
-                  <td>No considera datos extremos</td>
-                </tr>
-                <tr>
-                  <td><strong>Coef. Variación</strong></td>
-                  <td>Dispersión relativa</td>
-                  <td>(s / x̄) × 100%</td>
-                  <td>Comparar grupos distintos</td>
-                  <td>No válido si la media ≈ 0</td>
-                </tr>
-                <tr>
-                  <td><strong>Cuartiles (Q1, Q3)</strong></td>
-                  <td>Posición</td>
-                  <td>Percentiles 25 y 75</td>
-                  <td>Análisis de distribución</td>
-                  <td>Sensibles al tamaño muestral pequeño</td>
+                  <td><strong>Rango</strong></td>
+                  <td>Diferencia entre el valor máximo y el mínimo</td>
+                  <td>máx − mín</td>
+                  <td>Primera inspección rápida de la amplitud</td>
+                  <td><span className={styles.sensibilidadAlta}>Muy alta</span></td>
+                  <td>6.800 € (de 1.200 € a 8.000 €)</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </section>
 
-        {/* Casos de Uso */}
+        {/* SECCIÓN 2: Casos de Uso */}
         <section className={styles.guideSection}>
-          <h2>¿Para qué se usa la estadística descriptiva?</h2>
+          <h2>Casos de Uso Reales: 4 Perfiles</h2>
           <p className={styles.introParagraph}>
-            La estadística descriptiva es una herramienta fundamental en múltiples disciplinas.
-            Aquí algunos perfiles que la usan a diario:
+            La estadística descriptiva se aplica en contextos muy distintos. Estos cuatro perfiles
+            muestran cómo las mismas herramientas resuelven problemas reales y concretos.
           </p>
-          <div className={styles.casosUsoGrid}>
-            <div className={styles.casoCard}>
-              <span className={styles.casoIcon}>🎓</span>
-              <div className={styles.casoTitle}>Estudiante</div>
-              <div className={styles.casoSubtitle}>Bachillerato / Universidad</div>
-              <p className={styles.casoDesc}>
-                Analizar notas de clase, calcular la media del grupo, comparar la variabilidad
-                entre asignaturas o verificar ejercicios de estadística.
+          <div className={styles.escenariosGrid}>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎓</span>
+                <div>
+                  <strong>Estudiante de Bachillerato</strong>
+                  <div className={styles.escenarioSubtitle}>Análisis de encuesta de clase</div>
+                </div>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Ha encuestado a 25 compañeros sobre horas de estudio semanales:
+                2, 4, 5, 5, 6, 6, 7, 7, 7, 8, 8, 8, 8, 9, 10, 10, 11, 12, 14, 15, 15, 18, 20, 22, 30.
+                Media = 10,4 h, mediana = 8 h.
+              </p>
+              <p className={styles.escenarioTip}>
+                La mediana (8 h) describe mejor al estudiante típico; la media sube por los valores extremos (22, 30 h).
+                La desviación estándar de 6,8 h indica alta variabilidad entre compañeros.
               </p>
             </div>
-            <div className={styles.casoCard}>
-              <span className={styles.casoIcon}>🔬</span>
-              <div className={styles.casoTitle}>Investigador</div>
-              <div className={styles.casoSubtitle}>Ciencias sociales / Salud</div>
-              <p className={styles.casoDesc}>
-                Describir los resultados de una encuesta o ensayo clínico: media de edades,
-                desviación de respuestas, distribución de variables clínicas.
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👥</span>
+                <div>
+                  <strong>Analista de RRHH</strong>
+                  <div className={styles.escenarioSubtitle}>Comparación de salarios por departamento</div>
+                </div>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Salarios del departamento de ventas (n=8): 1.800, 1.900, 2.000, 2.100, 2.200, 2.300, 2.400, 5.500 €.
+                Media = 2.525 €, mediana = 2.150 €, desv. típica = 1.182 €, CV = 46,8%.
+              </p>
+              <p className={styles.escenarioTip}>
+                El CV de 46,8% alerta sobre alta desigualdad interna. El salario del director (5.500 €) infla la media;
+                la mediana de 2.150 € es el indicador justo para negociación colectiva.
               </p>
             </div>
-            <div className={styles.casoCard}>
-              <span className={styles.casoIcon}>📈</span>
-              <div className={styles.casoTitle}>Analista de negocio</div>
-              <div className={styles.casoSubtitle}>Empresa / Finanzas</div>
-              <p className={styles.casoDesc}>
-                Analizar KPIs de ventas, rendimiento de equipos, variabilidad en tiempos
-                de entrega o márgenes de beneficio por producto.
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏥</span>
+                <div>
+                  <strong>Médico Investigador</strong>
+                  <div className={styles.escenarioSubtitle}>Interpretación de ensayo clínico</div>
+                </div>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Reducción de presión arterial (mmHg) en 10 pacientes tras tratamiento:
+                8, 10, 12, 12, 14, 14, 15, 16, 18, 21. Media = 14,0, mediana = 14,0, desv. típica = 3,62, error estándar = 1,14.
+              </p>
+              <p className={styles.escenarioTip}>
+                La coincidencia de media y mediana indica distribución simétrica — buena señal de normalidad.
+                El error estándar de 1,14 permite construir un intervalo de confianza del 95%: 14,0 ± 2,3 mmHg.
               </p>
             </div>
-            <div className={styles.casoCard}>
-              <span className={styles.casoIcon}>📐</span>
-              <div className={styles.casoTitle}>Profesor de estadística</div>
-              <div className={styles.casoSubtitle}>Educación</div>
-              <p className={styles.casoDesc}>
-                Preparar ejemplos didácticos, verificar soluciones de ejercicios y
-                explicar el significado de cada estadístico con datos reales.
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🛍️</span>
+                <div>
+                  <strong>Comercio Local</strong>
+                  <div className={styles.escenarioSubtitle}>Análisis de ventas mensuales</div>
+                </div>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Ventas diarias en euros durante enero (n=31): media = 847 €,
+                mediana = 720 €, moda = 680 € (10 días), desv. típica = 312 €, máximo = 2.100 € (reyes).
+              </p>
+              <p className={styles.escenarioTip}>
+                La moda de 680 € marca el nivel de ventas habitual. La desviación de 312 € indica variabilidad
+                manejable. El máximo de 2.100 € es un outlier (Reyes Magos) que no debe usarse para proyecciones.
               </p>
             </div>
+
           </div>
         </section>
 
-        {/* FAQ */}
+        {/* SECCIÓN 3: FAQ */}
         <section className={styles.guideSection}>
           <h2>Preguntas Frecuentes sobre Estadística Descriptiva</h2>
           <ul className={styles.faqList}>
             <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cuál es la diferencia entre media y mediana?</div>
+              <div className={styles.faqPregunta}>¿Cuándo es mejor usar la mediana que la media?</div>
               <div className={styles.faqRespuesta}>
-                La <strong>media</strong> suma todos los valores y divide por n — es sensible a outliers. La <strong>mediana</strong>
-                es el valor central al ordenar los datos — es robusta ante valores extremos. Si el sueldo medio es muy
-                superior al mediano, hay pocos salarios muy altos que elevan la media. En esos casos, la mediana
-                describe mejor la situación &quot;típica&quot;.
+                Usa la <strong>mediana</strong> cuando los datos están sesgados o contienen outliers. Ejemplo clásico:
+                si 9 personas ganan 1.500 € y 1 gana 15.000 €, la media es 3.000 € pero la mediana es 1.500 €.
+                La mediana describe mejor la realidad de las 9 personas. Regla práctica: si media &gt; mediana en más
+                de un 10%, usa la mediana como medida de centro.
               </div>
             </li>
             <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Qué es un valor atípico (outlier) y cómo afecta?</div>
+              <div className={styles.faqPregunta}>¿Qué significa una desviación típica alta?</div>
               <div className={styles.faqRespuesta}>
-                Un <strong>outlier</strong> es un valor muy alejado del resto del conjunto. Se detecta con la regla IQR:
-                son outliers los valores menores que Q1 − 1.5×IQR o mayores que Q3 + 1.5×IQR. Los outliers
-                distorsionan la media y la desviación estándar, pero apenas afectan a la mediana y al IQR.
+                Una <strong>desviación típica alta</strong> significa que los datos están muy dispersos respecto a la media.
+                Por ejemplo, si la temperatura media de una ciudad es 15 °C con s=2 °C, casi todos los días
+                están entre 13 y 17 °C. Pero con s=8 °C, hay días de 7 °C y días de 23 °C. El <strong>coeficiente de
+                variación</strong> (CV = s/media × 100) es más útil que s en solitario: CV &lt; 15% = baja variabilidad,
+                CV 15-30% = moderada, CV &gt; 30% = alta.
               </div>
             </li>
             <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cuándo usar la desviación muestral (s) y cuándo la poblacional (σ)?</div>
+              <div className={styles.faqPregunta}>¿Cómo identificar outliers con la regla IQR?</div>
               <div className={styles.faqRespuesta}>
-                Usa la <strong>muestral (s)</strong> cuando tienes una muestra y quieres inferir sobre una población mayor
-                (divide por n-1, corrección de Bessel). Usa la <strong>poblacional (σ)</strong> cuando tienes todos los datos
-                de la población completa (divide por n). En la práctica, casi siempre se trabaja con muestras,
-                por lo que s es la más habitual.
+                Calcula Q1 y Q3. Un dato es <strong>outlier leve</strong> si está fuera de [Q1 − 1,5·IQR, Q3 + 1,5·IQR]
+                y <strong>outlier extremo</strong> si supera [Q1 − 3·IQR, Q3 + 3·IQR]. Ejemplo: notas del grupo Q1=5, Q3=8, IQR=3.
+                Límites = [5 − 4,5, 8 + 4,5] = [0,5, 12,5]. En notas de 0-10 no hay outliers. Si hubiera un 0,2 o un
+                10,0 repetido en otro contexto, sería sospechoso. Siempre investiga el origen antes de eliminar un dato.
               </div>
             </li>
             <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Qué mide el coeficiente de variación (CV) y para qué sirve?</div>
+              <div className={styles.faqPregunta}>¿Qué es el coeficiente de variación y cuándo se usa?</div>
               <div className={styles.faqRespuesta}>
-                El <strong>CV = (s / x̄) × 100%</strong> expresa la desviación estándar como porcentaje de la media.
-                Permite comparar la variabilidad de conjuntos con distintas escalas o unidades. Por ejemplo,
-                si el sueldo tiene CV=20% y las temperaturas CV=5%, los sueldos son relativamente más variables.
-                No es válido cuando la media es 0 o negativa.
+                El <strong>CV = (s / x̄) × 100%</strong> es la desviación típica expresada como porcentaje de la media.
+                Permite comparar la variabilidad de series con distintas unidades o escalas. Ejemplo: comparas dos
+                inversiones — Fondo A (media 1.000 €, s=50 €, CV=5%) vs Fondo B (media 50.000 €, s=3.000 €, CV=6%).
+                Aunque s del Fondo B es mayor, ambos tienen variabilidad relativa similar. No es válido si la
+                media es 0 o negativa (como temperaturas en °C que cruzan el 0).
               </div>
             </li>
             <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Qué son los cuartiles y el rango intercuartil (IQR)?</div>
+              <div className={styles.faqPregunta}>¿Diferencia entre varianza poblacional y muestral?</div>
               <div className={styles.faqRespuesta}>
-                Los <strong>cuartiles</strong> dividen los datos ordenados en cuatro partes iguales: Q1 (25%), Q2/mediana (50%)
-                y Q3 (75%). El <strong>IQR = Q3 − Q1</strong> contiene el 50% central de los datos. Es una medida de
-                dispersión robusta, muy utilizada en diagramas de caja (boxplots) y para detectar outliers.
+                La <strong>varianza poblacional (σ²)</strong> divide por N (todos los individuos) y la
+                <strong> muestral (s²)</strong> divide por n−1. Esta diferencia se llama corrección de Bessel
+                y sirve para que s² sea un estimador insesgado de σ². Ejemplo: notas de 5 alumnos: 6, 7, 8, 7, 7.
+                Media = 7. Varianza poblacional = 0,4 (divide por 5). Varianza muestral = 0,5 (divide por 4).
+                Usa muestral si son una muestra de un grupo mayor; usa poblacional si tienes todos los datos del universo.
               </div>
             </li>
             <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Qué es el error estándar y cómo se interpreta?</div>
+              <div className={styles.faqPregunta}>¿Qué es una distribución sesgada y cómo reconocerla?</div>
               <div className={styles.faqRespuesta}>
-                El <strong>error estándar (SE) = s / √n</strong> mide la precisión de la media muestral como estimador
-                de la media poblacional. Cuanto mayor sea n (tamaño muestral), menor será el error estándar
-                y más fiable será la estimación. Se usa para construir intervalos de confianza.
+                Una distribución está <strong>sesgada a la derecha</strong> (positiva) cuando hay pocos valores muy altos
+                que estiran la cola derecha — típico en salarios, precios de vivienda o rentas. Se reconoce porque
+                media &gt; mediana. Está <strong>sesgada a la izquierda</strong> (negativa) cuando hay pocos valores muy
+                bajos — media &lt; mediana. Con sesgo fuerte, la media engaña: un informe debe incluir siempre
+                mediana y rango intercuartil junto a la media.
               </div>
             </li>
             <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cuándo tiene sentido calcular la moda?</div>
+              <div className={styles.faqPregunta}>¿Cómo interpretar un histograma de datos?</div>
               <div className={styles.faqRespuesta}>
-                La <strong>moda</strong> tiene más sentido con datos discretos o categóricos (talla más vendida, nota
-                más frecuente, respuesta más común en una encuesta). En datos continuos con muchos decimales,
-                casi nunca hay repeticiones, por lo que la moda carece de significado práctico.
+                Un <strong>histograma</strong> muestra cómo se distribuyen los valores agrupados en intervalos (barras).
+                Busca: (1) <strong>simetría</strong> — si las barras son simétricas alrededor del centro, la distribución es
+                aproximadamente normal; (2) <strong>colas largas</strong> — barra aislada a la derecha o izquierda indica sesgo
+                o outlier; (3) <strong>bimodalidad</strong> — dos picos sugieren dos subgrupos mezclados (ej. hombres y mujeres
+                en datos de altura). Los picos del histograma coinciden aproximadamente con la moda.
               </div>
             </li>
             <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Qué indica la suma de cuadrados Σ(x − x̄)²?</div>
+              <div className={styles.faqPregunta}>¿Cuántos datos necesito para que la media sea fiable?</div>
               <div className={styles.faqRespuesta}>
-                La <strong>suma de cuadrados</strong> mide la dispersión total de los datos respecto a la media.
-                Es la base para calcular la varianza (dividiendo por n o n-1). También se usa en ANOVA
-                y regresión lineal para descomponer la variabilidad total en partes explicadas y no explicadas.
+                No hay un número mágico, pero como referencia: con <strong>n ≥ 30</strong> la media muestral tiende a
+                distribuirse normalmente (teorema central del límite) independientemente de la distribución original.
+                Con n &lt; 10 la media es muy inestable — un solo dato atípico puede cambiarla drásticamente. El
+                <strong> error estándar (s/√n)</strong> cuantifica esta incertidumbre: con n=10, s=5 → SE=1,58; con n=100 → SE=0,5.
+                Duplicar el tamaño muestral reduce el error a la mitad.
               </div>
             </li>
           </ul>
+          <p className={styles.faqTip}>
+            Consejo: para datos de ingresos, precios o cualquier variable con distribución asimétrica,
+            reporta siempre mediana + IQR en lugar de media + desviación típica.
+          </p>
         </section>
 
-        {/* Guía paso a paso */}
+        {/* SECCIÓN 4: Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>Guía para analizar un conjunto de datos (6 pasos)</h2>
-          <ol className={styles.pasosList}>
-            <li className={styles.paso}>
-              <span className={styles.pasoNum}>1</span>
-              <div className={styles.pasoContent}>
-                <div className={styles.pasoTitle}>Recopilar y limpiar los datos</div>
-                <p className={styles.pasoDesc}>
-                  Introduce todos los valores. Detecta y decide cómo tratar los datos faltantes
-                  o claramente erróneos antes de calcular cualquier estadístico.
+          <h2>Guía Paso a Paso: Analizar un Conjunto de Datos (7 Pasos)</h2>
+          <p className={styles.introParagraph}>
+            Sigue este proceso completo para cualquier análisis estadístico descriptivo, desde la
+            recogida de datos hasta la comunicación de resultados. Ejemplo práctico: <strong>notas
+            de matemáticas de 20 alumnos</strong>.
+          </p>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Recolectar y organizar los datos</strong>
+                <p>
+                  Escribe o importa todos los valores. Verifica que no haya errores tipográficos
+                  ni datos duplicados involuntarios. Ejemplo: 4, 5, 6, 6, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 10, 10, 4, 3, 9, 8.
+                  <strong> n = 20 alumnos.</strong>
                 </p>
               </div>
             </li>
-            <li className={styles.paso}>
-              <span className={styles.pasoNum}>2</span>
-              <div className={styles.pasoContent}>
-                <div className={styles.pasoTitle}>Calcular medidas de tendencia central</div>
-                <p className={styles.pasoDesc}>
-                  Calcula la media, mediana y moda. Compáralas: si media ≠ mediana, hay asimetría
-                  o posibles outliers. Elige la más representativa según el contexto.
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Detectar y gestionar datos faltantes o erróneos</strong>
+                <p>
+                  Revisa valores imposibles (nota 11/10, edad negativa). Decide si imputar, eliminar
+                  o marcar los datos problemáticos. Documenta siempre las decisiones tomadas.
+                  En este ejemplo: todos los valores están entre 0-10, no hay anomalías.
                 </p>
               </div>
             </li>
-            <li className={styles.paso}>
-              <span className={styles.pasoNum}>3</span>
-              <div className={styles.pasoContent}>
-                <div className={styles.pasoTitle}>Analizar la dispersión</div>
-                <p className={styles.pasoDesc}>
-                  Calcula la desviación estándar y la varianza. Con datos asimétricos o outliers,
-                  usa el IQR en su lugar. Un CV alto (&gt;30%) indica alta variabilidad relativa.
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Calcular medidas de tendencia central</strong>
+                <p>
+                  Media = 7,3; Mediana = 8; Moda = 8 (aparece 5 veces). La mediana y la moda coinciden
+                  en 8 y la media es 7,3 — hay ligero sesgo a la izquierda por los suspensos (3, 4, 4, 5).
                 </p>
               </div>
             </li>
-            <li className={styles.paso}>
-              <span className={styles.pasoNum}>4</span>
-              <div className={styles.pasoContent}>
-                <div className={styles.pasoTitle}>Examinar los cuartiles y detectar outliers</div>
-                <p className={styles.pasoDesc}>
-                  Calcula Q1, Q2 y Q3. Usa la regla IQR para identificar valores atípicos:
-                  outlier si x &lt; Q1 − 1.5×IQR o x &gt; Q3 + 1.5×IQR.
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Calcular medidas de dispersión</strong>
+                <p>
+                  Desv. estándar muestral s = 1,92; Varianza s² = 3,69; Rango = 7 (de 3 a 10);
+                  IQR = Q3 − Q1 = 9 − 6,5 = 2,5. CV = (1,92 / 7,3) × 100 = 26,3% — variabilidad moderada-alta.
                 </p>
               </div>
             </li>
-            <li className={styles.paso}>
-              <span className={styles.pasoNum}>5</span>
-              <div className={styles.pasoContent}>
-                <div className={styles.pasoTitle}>Evaluar la forma de la distribución</div>
-                <p className={styles.pasoDesc}>
-                  Compara media y mediana para estimar la asimetría (skewness).
-                  Si media &gt; mediana, distribución sesgada a la derecha; si media &lt; mediana, a la izquierda.
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Identificar outliers con la regla IQR</strong>
+                <p>
+                  Límite inferior = Q1 − 1,5 × IQR = 6,5 − 3,75 = 2,75. Límite superior = Q3 + 1,5 × IQR = 9 + 3,75 = 12,75.
+                  Ningún dato cae fuera de [2,75, 12,75] en el rango 0-10. No hay outliers en este conjunto.
                 </p>
               </div>
             </li>
-            <li className={styles.paso}>
-              <span className={styles.pasoNum}>6</span>
-              <div className={styles.pasoContent}>
-                <div className={styles.pasoTitle}>Interpretar y comunicar los resultados</div>
-                <p className={styles.pasoDesc}>
-                  No presentes solo números: contextualiza cada estadístico. Especifica si usas
-                  estadísticos muestrales o poblacionales y el tamaño de la muestra (n).
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Evaluar la forma de la distribución</strong>
+                <p>
+                  Media (7,3) &lt; Mediana (8) indica ligero sesgo negativo (cola izquierda por los suspensos).
+                  Los datos se concentran entre 7 y 9, con pocos valores bajos que arrastran la media hacia abajo.
+                  La distribución no es estrictamente normal pero tampoco está muy sesgada.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Interpretar y comunicar los resultados</strong>
+                <p>
+                  Redacta las conclusiones en lenguaje claro: &quot;El grupo obtuvo una nota mediana de 8 con una
+                  variabilidad moderada (s=1,92). La mayoría de alumnos (15 de 20) aprobaron. Los 4 suspensos
+                  arrastran la media a 7,3, por lo que la mediana es el indicador más representativo del grupo.&quot;
+                  Incluye siempre n, la medida elegida y su justificación.
                 </p>
               </div>
             </li>
           </ol>
         </section>
 
-        {/* Tips y Errores */}
+        {/* SECCIÓN 5: Mejores Prácticas */}
         <section className={styles.guideSection}>
-          <h2>Tips y errores frecuentes</h2>
-          <div className={styles.tipsErrorsSection}>
-            <div className={styles.tipsColumn}>
-              <div className={styles.tipsHeader}>✓ Buenas prácticas</div>
-              <div className={styles.tipItem}>Usa la mediana con datos asimétricos o cuando haya outliers.</div>
-              <div className={styles.tipItem}>Especifica siempre si el estadístico es muestral (s) o poblacional (σ).</div>
-              <div className={styles.tipItem}>Compara media y mediana para detectar asimetría antes de elegir.</div>
-              <div className={styles.tipItem}>Usa el CV para comparar datasets de distinta escala o unidad.</div>
-              <div className={styles.tipItem}>Reporta el tamaño muestral (n) junto a cualquier estadístico.</div>
-              <div className={styles.tipItem}>Usa el IQR para detectar outliers en lugar del rango bruto.</div>
+          <h2>6 Mejores Prácticas para Análisis Estadístico</h2>
+          <p className={styles.introParagraph}>
+            Estos seis consejos accionables mejorarán la calidad y la honestidad de cualquier
+            análisis estadístico descriptivo.
+          </p>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <strong>Visualiza siempre primero</strong>
+              <p>
+                Antes de interpretar cualquier estadístico, representa los datos en un histograma
+                o diagrama de caja. Un CV=30% puede deberse a datos normalmente dispersos o a
+                dos grupos mezclados — solo el gráfico lo revela.
+              </p>
             </div>
-            <div className={styles.errorsColumn}>
-              <div className={styles.errorsHeader}>✗ Errores comunes</div>
-              <div className={styles.errorItem}>Confundir la desviación muestral (s) con la poblacional (σ).</div>
-              <div className={styles.errorItem}>Usar la media con datos muy asimétricos o con outliers extremos.</div>
-              <div className={styles.errorItem}>Calcular la moda cuando todos los valores son únicos (no existe).</div>
-              <div className={styles.errorItem}>Interpretar una desviación estándar alta como &quot;malo&quot; sin contexto.</div>
-              <div className={styles.errorItem}>Sacar conclusiones estadísticas con muestras muy pequeñas (n &lt; 10).</div>
-              <div className={styles.errorItem}>Ignorar los outliers en lugar de investigar su origen y decidir cómo tratarlos.</div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔍</span>
+              <strong>Comprueba outliers antes de calcular la media</strong>
+              <p>
+                Aplica la regla IQR como primer paso. Si hay outliers, decide conscientemente
+                si incluirlos (y justificarlo) o usar mediana + IQR como alternativa robusta.
+                Nunca elimines outliers sin documentar el motivo.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💶</span>
+              <strong>Usa mediana para ingresos y precios</strong>
+              <p>
+                Los datos de salarios, precios inmobiliarios, rentas o tiempos de espera suelen
+                tener distribuciones asimétricas. La mediana es siempre más honesta que la media
+                en estos contextos. El INE y Eurostat la usan por defecto.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📏</span>
+              <strong>Reporta media + desviación típica juntas</strong>
+              <p>
+                Una media sin su desviación típica no dice nada. Escribe siempre: &quot;Media = 7,3
+                (s = 1,92, n = 20)&quot;. Esto permite calcular intervalos de confianza y comparar
+                grupos con rigor estadístico.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📐</span>
+              <strong>Usa el CV para comparar series distintas</strong>
+              <p>
+                Si comparas la variabilidad de salarios (en euros) con la de temperaturas (en °C),
+                el CV elimina el problema de escala. Dos series son comparables en variabilidad
+                relativa aunque sus unidades sean completamente distintas.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <strong>Distingue muestra de población</strong>
+              <p>
+                Si tus datos son una muestra de un grupo mayor, usa s (divide por n−1) y menciona
+                el error estándar. Si tienes todos los datos del universo (ej. todos los empleados
+                de una empresa), usa σ (divide por n). Confundirlos lleva a estimaciones sesgadas.
+              </p>
             </div>
           </div>
         </section>
+
+        {/* SECCIÓN 6: Warning Box — Errores Clásicos */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <strong>6 Errores Clásicos que Debes Evitar</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Usar la media con datos sesgados.</strong> Los salarios, precios de vivienda
+                y tiempos de respuesta casi siempre tienen distribuciones asimétricas. Presentar solo
+                la media sin la mediana genera una imagen distorsionada de la realidad.
+              </li>
+              <li>
+                <strong>Dividir por n en vez de n−1 al calcular la varianza muestral.</strong> Este error
+                subestima la variabilidad real de la población. La corrección de Bessel (÷ n−1) es obligatoria
+                cuando trabajas con una muestra y quieres inferir sobre la población.
+              </li>
+              <li>
+                <strong>Confundir error estándar con desviación típica.</strong> La desviación típica mide
+                la dispersión de los datos individuales. El error estándar (s/√n) mide la incertidumbre
+                de la media como estimador. Con n=100, el error estándar es 10 veces menor que s.
+              </li>
+              <li>
+                <strong>Ignorar outliers sin justificación.</strong> Eliminar un valor extremo porque
+                &quot;molesta&quot; al análisis es manipulación estadística. Si decides excluirlo, documenta
+                el criterio (ej. regla IQR×1,5) y presenta el análisis con y sin él.
+              </li>
+              <li>
+                <strong>Sacar conclusiones con n pequeño.</strong> Con n &lt; 10, los estadísticos son
+                muy inestables — un solo dato diferente puede cambiar la media un 20% o la desviación
+                típica un 50%. Siempre indica n junto a cada estadístico y sé cauto con muestras pequeñas.
+              </li>
+              <li>
+                <strong>Presentar la varianza como medida de dispersión final.</strong> La varianza está
+                en unidades al cuadrado (€², cm², etc.), lo que la hace difícil de interpretar directamente.
+                Usa siempre la desviación típica (raíz de la varianza) para comunicar resultados al público general.
+              </li>
+            </ul>
+          </div>
+        </section>
+
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-estadistica')} />

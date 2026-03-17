@@ -363,6 +363,277 @@ export default function ComparadorCosteVida() {
             solo uno de los factores: calidad del sistema sanitario, clima, idioma e integración social
             también son determinantes.
           </p>
+
+          {/* ===== SECCIÓN 1: TABLA COMPARATIVA CIUDADES ESPAÑOLAS ===== */}
+          <h3>Coste de vida en las principales ciudades españolas (2025)</h3>
+          <p>
+            Comparativa de las ciudades más representativas de España. El índice toma Madrid como referencia (100).
+            Datos orientativos basados en estimaciones de mercado para 2025.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Ciudad</th>
+                  <th>Alquiler 1 hab. centro</th>
+                  <th>Cesta básica/mes</th>
+                  <th>Transporte público/mes</th>
+                  <th>Cena restaurante</th>
+                  <th>Índice (Madrid=100)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Madrid</strong></td>
+                  <td>~1.400 €</td>
+                  <td>~290 €</td>
+                  <td>~55 €</td>
+                  <td>~12 €</td>
+                  <td><strong>100</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Barcelona</strong></td>
+                  <td>~1.550 €</td>
+                  <td>~310 €</td>
+                  <td>~80 €</td>
+                  <td>~14 €</td>
+                  <td><strong>118</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Bilbao</strong></td>
+                  <td>~1.050 €</td>
+                  <td>~280 €</td>
+                  <td>~50 €</td>
+                  <td>~13 €</td>
+                  <td><strong>95</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Valencia</strong></td>
+                  <td>~900 €</td>
+                  <td>~265 €</td>
+                  <td>~45 €</td>
+                  <td>~11 €</td>
+                  <td><strong>86</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Palma</strong></td>
+                  <td>~1.100 €</td>
+                  <td>~275 €</td>
+                  <td>~48 €</td>
+                  <td>~12 €</td>
+                  <td><strong>92</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Sevilla</strong></td>
+                  <td>~800 €</td>
+                  <td>~255 €</td>
+                  <td>~42 €</td>
+                  <td>~10 €</td>
+                  <td><strong>82</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className={styles.fuenteTexto}>
+            Estimaciones de mercado 2025. El alquiler corresponde a un piso de 1 dormitorio en zona céntrica. Variaciones significativas según barrio.
+          </p>
+
+          {/* ===== SECCIÓN 2: CASOS DE USO ===== */}
+          <h3>¿Para quién es útil este comparador?</h3>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
+                <strong>Profesional con oferta en otra ciudad</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Te ofrecen un trabajo en Barcelona con un 20% más de sueldo. ¿Compensa el traslado desde Valencia?
+              </p>
+              <p className={styles.escenarioTip}>
+                Usa el comparador para ver que Barcelona tiene un índice ~37% más alto que Valencia. Con ese aumento salarial, tu poder adquisitivo real disminuiría.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
+                <strong>Estudiante que elige ciudad</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Admisión en Madrid y en Sevilla. ¿Cuánto más necesitarás al mes en Madrid?
+              </p>
+              <p className={styles.escenarioTip}>
+                La diferencia en alquiler entre Sevilla (~800 €) y Madrid (~1.400 €) supone unos 600 € más al mes solo en vivienda. Un factor determinante para la beca o ayuda familiar.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏖️</span>
+                <strong>Jubilado que busca ciudad más económica</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Jubilación de 1.500 €/mes. ¿En qué ciudad española se vive mejor con esa pensión?
+              </p>
+              <p className={styles.escenarioTip}>
+                Con 1.500 €, vivir en Sevilla o Valencia ofrece un margen de ahorro mensual que en Madrid resultaría imposible. El índice 82 de Sevilla frente al 100 de Madrid es determinante.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
+                <strong>Nómada digital que elige base en España</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Ingresos remotos de 3.000 €/mes netos. ¿Dónde en España obtienes más calidad de vida?
+              </p>
+              <p className={styles.escenarioTip}>
+                Valencia, Sevilla o ciudades medias como Málaga o Alicante combinan buen clima, infraestructura digital, comunidad expat y un índice de coste muy inferior a Madrid o Barcelona.
+              </p>
+            </div>
+          </div>
+
+          {/* ===== SECCIÓN 3: FAQ ===== */}
+          <h3>Preguntas frecuentes sobre coste de vida</h3>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt>¿Cómo se calcula el índice de coste de vida?</dt>
+              <dd>El índice agrega varios componentes (vivienda, alimentación, transporte, servicios) ponderados por su peso en el gasto medio de un hogar. La metodología más extendida (Numbeo, ECA International) toma una ciudad de referencia —aquí Madrid = 100— y expresa el resto de ciudades en relación a ella.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Qué ciudad española es más cara en alquiler?</dt>
+              <dd>Barcelona lidera el alquiler en zona centro (~1.550 €/mes para 1 dormitorio en 2025), seguida de Madrid (~1.400 €), Palma (~1.100 €) y Bilbao (~1.050 €). En zonas periféricas, los precios pueden ser un 30-40% inferiores.</dd>
+              <p className={styles.faqTip}>Consejo: compara siempre el alquiler en relación al sueldo neto medio de cada ciudad, no en valor absoluto.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Qué sueldo necesito para vivir bien en Madrid vs Valencia?</dt>
+              <dd>Para un nivel de vida holgado (alquiler individual, ocio, ahorro), en Madrid se estima en torno a 2.500-3.000 €/mes netos, mientras que en Valencia basta con 1.800-2.200 €/mes. La diferencia proviene principalmente del alquiler y del coste del ocio.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Incluye el coste de vida los impuestos?</dt>
+              <dd>No. El índice refleja el coste de bienes y servicios de consumo directo (alquiler, comida, transporte, ocio). Los impuestos sobre la renta, que varían por Comunidad Autónoma, no están incluidos y pueden alterar significativamente el poder adquisitivo real.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Cuánto más barato es el interior de España vs la costa?</dt>
+              <dd>Las ciudades del interior como Salamanca, Valladolid, Zaragoza o Murcia suelen tener un índice entre 65 y 80 (Madrid=100). El alquiler puede ser un 40-50% inferior al de Barcelona, con una calidad de vida comparable en términos de servicios públicos, sanidad y ocio.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Cómo afecta el teletrabajo a la elección de ciudad?</dt>
+              <dd>El teletrabajo ha desacoplado el salario del lugar de residencia. Un trabajador con sueldo de empresa madrileña que se traslada a Sevilla puede ahorrar 600-900 €/mes solo en vivienda, manteniendo el mismo ingreso. Esto ha generado una migración interna notable desde 2021.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Qué diferencia hay entre coste de vida y poder adquisitivo?</dt>
+              <dd>El coste de vida mide cuánto cuestan las cosas. El poder adquisitivo mide cuánto puedes comprar con tu sueldo. Una ciudad puede tener alto coste de vida pero también salarios más altos, resultando en un poder adquisitivo similar o mayor. Siempre analiza ambas variables juntas.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Merece la pena una subida de sueldo del 15% si la ciudad es un 25% más cara?</dt>
+              <dd>No, en términos de poder adquisitivo puro. Si tu sueldo sube un 15% pero el coste de vida sube un 25%, perderás aproximadamente un 8% de capacidad de gasto real. Necesitarías una subida de al menos el 25% para mantener el mismo nivel de vida, y más para mejorar.</dd>
+            </div>
+          </dl>
+
+          {/* ===== SECCIÓN 4: GUÍA PASO A PASO ===== */}
+          <h3>Cómo evaluar si un traslado laboral compensa económicamente</h3>
+          <p>Sigue estos 7 pasos para tomar la decisión con datos, no con intuición:</p>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula tu sueldo neto actual</strong>
+                <p>Descuenta IRPF, Seguridad Social y cualquier deducción autonómica. Es la cifra real con la que operas, no el bruto.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula el sueldo neto en la ciudad destino</strong>
+                <p>Atención: el IRPF varía por Comunidad Autónoma. Un mismo bruto puede suponer entre 50 y 300 € netos de diferencia según la CCAA.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Compara el alquiler equivalente</strong>
+                <p>Busca el coste de un piso similar (zona, tamaño, calidades) en la ciudad destino. Es el mayor factor diferencial: puede suponer 400-800 €/mes más o menos.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Suma los costes de transporte</strong>
+                <p>Incluye bono mensual de transporte público, parking si aplica y desplazamientos frecuentes a tu ciudad de origen para visitar familia.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>Estima alimentación y ocio</strong>
+                <p>Usa el índice de supermercado y restaurantes de este comparador como referencia. Una diferencia del 10-15% en alimentación puede suponer 30-50 €/mes.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">6</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula el ahorro resultante en ambas ciudades</strong>
+                <p>Sueldo neto − (alquiler + transporte + alimentación + ocio + suministros) = ahorro mensual. Compara el resultado en origen y destino.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">7</span>
+              <div className={styles.stepContent}>
+                <strong>Incluye factores no económicos</strong>
+                <p>Calidad del sistema sanitario, red de contactos profesionales, clima, idioma local y conciliación familiar también determinan si el traslado vale la pena a largo plazo.</p>
+              </div>
+            </li>
+          </ol>
+
+          {/* ===== SECCIÓN 5: MEJORES PRÁCTICAS ===== */}
+          <h3>6 claves para comparar ciudades correctamente</h3>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
+              <strong>Trabaja siempre en porcentaje de sueldo neto</strong>
+              <p>Que un alquiler cueste 800 € o 1.400 € no dice nada sin saber si cobras 1.800 € o 3.500 € netos. Usa el porcentaje: lo recomendable es destinar menos del 30% del neto a vivienda.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🚇</span>
+              <strong>Incluye el coste real de los desplazamientos</strong>
+              <p>Vivir en la periferia para ahorrar alquiler puede compensarse con 60-120 €/mes en transporte y 1-2 horas diarias. Calcula el coste total del trayecto, incluyendo tu tiempo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🏘️</span>
+              <strong>Compara también zonas periféricas</strong>
+              <p>El precio del centro es el peor caso. Barrios bien conectados a 20 min del centro pueden costar un 25-40% menos en alquiler, con calidad de vida comparable o mejor.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🏥</span>
+              <strong>Valora la calidad de los servicios públicos</strong>
+              <p>Una ciudad más barata con peor sanidad pública, educación o seguridad puede implicar gastos privados que no aparecen en el índice. Consulta rankings de calidad de vida municipal.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
+              <strong>Actualiza los datos antes de decidir</strong>
+              <p>El mercado del alquiler en España ha variado un 15-30% en algunas ciudades en los últimos 2 años. Los índices son orientativos; contrasta con portales actualizados (Idealista, Fotocasa) para el barrio concreto.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
+              <strong>Considera el coste energético estacional</strong>
+              <p>Ciudades del interior peninsular tienen veranos muy calurosos e inviernos fríos, lo que incrementa el gasto en climatización. En la costa mediterránea, el coste energético doméstico suele ser más estable y menor.</p>
+            </div>
+          </div>
+
+          {/* ===== SECCIÓN 6: WARNING BOX — ERRORES FRECUENTES ===== */}
+          <div className={styles.warningBox} role="alert">
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <strong>Errores frecuentes al comparar ciudades</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li><strong>Comparar precios sin ajustar por sueldo local.</strong> Un alquiler de 800 € en Sevilla y uno de 1.400 € en Madrid pueden representar el mismo porcentaje del sueldo medio local — o ser radicalmente distintos según tu situación concreta.</li>
+              <li><strong>Ignorar el coste de suministros en ciudades con clima extremo.</strong> Calefacción en Burgos o aire acondicionado en Sevilla pueden añadir 80-150 €/mes al presupuesto, un coste invisible en los índices estándar.</li>
+              <li><strong>Olvidar que el IPC varía por categoría de gasto.</strong> El IPC de alimentación puede subir un 8% mientras el de transporte sube solo un 2%. Si tu gasto principal es alimentación, el impacto real es mayor que el IPC general.</li>
+              <li><strong>No incluir ocio y salidas en el presupuesto.</strong> El ocio nocturno, restauración y actividades culturales varían enormemente entre ciudades. En Madrid o Barcelona, un presupuesto de ocio moderado puede suponer 300-500 €/mes; en Salamanca o Valladolid, la mitad.</li>
+              <li><strong>Tomar el precio del centro como referencia única.</strong> Los índices de coste de vida suelen usar precios céntricos. La realidad del 80% de los residentes es vivir en zonas periféricas con precios significativamente inferiores.</li>
+              <li><strong>Ignorar el impacto del IRPF autonómico al comparar sueldos.</strong> Un sueldo bruto idéntico puede generar hasta 400 €/mes netos de diferencia entre la Comunidad de Madrid (bonificaciones) y otras CCAA con tipos más altos. El sueldo neto real es lo que importa.</li>
+            </ul>
+          </div>
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('comparador-coste-vida')} />

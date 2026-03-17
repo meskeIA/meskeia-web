@@ -702,6 +702,408 @@ export default function CalculadoraTeoriaNumerosPage() {
             </div>
           </div>
         </section>
+
+        {/* Sección 1: Tabla Comparativa de Conjuntos Numéricos */}
+        <section className={styles.guideSection}>
+          <h2>Tabla Comparativa: Conjuntos Numéricos</h2>
+          <p className={styles.introParagraph}>
+            Los números se organizan en conjuntos anidados: cada conjunto amplía al anterior añadiendo nuevos elementos.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Conjunto</th>
+                  <th>Qué incluye</th>
+                  <th>Ejemplos</th>
+                  <th>Op. cerradas</th>
+                  <th>Aplicación típica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Naturales (ℕ)</strong></td>
+                  <td>Enteros positivos desde 1 (o 0 según convenio)</td>
+                  <td>1, 2, 3, 97, 1000</td>
+                  <td>+, ×</td>
+                  <td>Contar elementos, índices de arrays</td>
+                </tr>
+                <tr>
+                  <td><strong>Enteros (ℤ)</strong></td>
+                  <td>Naturales + cero + negativos</td>
+                  <td>−5, 0, 7, −1000</td>
+                  <td>+, −, ×</td>
+                  <td>Temperaturas, deudas, posiciones relativas</td>
+                </tr>
+                <tr>
+                  <td><strong>Racionales (ℚ)</strong></td>
+                  <td>Fracciones p/q con q ≠ 0</td>
+                  <td>1/2, −3/4, 0,333…</td>
+                  <td>+, −, ×, ÷</td>
+                  <td>Proporciones, probabilidades, tipos de interés</td>
+                </tr>
+                <tr>
+                  <td><strong>Irracionales (ℝ\ℚ)</strong></td>
+                  <td>Decimales infinitos no periódicos</td>
+                  <td>√2 ≈ 1,414…, π ≈ 3,14159…, φ ≈ 1,618…</td>
+                  <td>+, −, ×, ÷ (resultado puede ser racional)</td>
+                  <td>Geometría, trigonometría, diseño áureo</td>
+                </tr>
+                <tr>
+                  <td><strong>Reales (ℝ)</strong></td>
+                  <td>Racionales + irracionales; toda la recta numérica</td>
+                  <td>−7, 0, 2/3, π, e, √5</td>
+                  <td>+, −, ×, ÷</td>
+                  <td>Física, estadística, cálculo diferencial</td>
+                </tr>
+                <tr>
+                  <td><strong>Complejos (ℂ)</strong></td>
+                  <td>Reales + parte imaginaria (a + bi, i² = −1)</td>
+                  <td>3 + 2i, −i, 0 + 5i</td>
+                  <td>+, −, ×, ÷</td>
+                  <td>Ingeniería eléctrica, señales AC, mecánica cuántica</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Sección 2: Casos de Uso */}
+        <section className={styles.guideSection}>
+          <h2>Casos de Uso: ¿Quién usa la Teoría de Números?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎓</span>
+                <h4>Estudiante de ESO/Bachillerato</h4>
+              </div>
+              <p><strong>Situación:</strong> Estudia conjuntos numéricos para el examen de 4.º ESO.</p>
+              <p className={styles.escenarioExample}>
+                <strong>Ejemplo:</strong> Clasificar √2 (irracional), 3/7 (racional), −5 (entero), π (trascendente).
+                Usar la calculadora para verificar si 97 es primo antes del examen.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: repasa que ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ — cada conjunto contiene al anterior.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💻</span>
+                <h4>Programador — Criptografía RSA</h4>
+              </div>
+              <p><strong>Situación:</strong> Implementa RSA-2048 para cifrar comunicaciones.</p>
+              <p className={styles.escenarioExample}>
+                <strong>Ejemplo:</strong> RSA elige dos primos p y q de ~1.024 bits cada uno.
+                Su producto n = p×q (2.048 bits) forma la clave pública. La seguridad depende
+                de que factorizar n sea computacionalmente inviable.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: usa la aritmética modular para calcular d×e ≡ 1 (mod φ(n)) — la clave privada.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔬</span>
+                <h4>Matemático — Congruencias Modulares</h4>
+              </div>
+              <p><strong>Situación:</strong> Estudia el Teorema Chino del Resto para sistemas de congruencias.</p>
+              <p className={styles.escenarioExample}>
+                <strong>Ejemplo:</strong> Resolver x ≡ 2 (mod 3) y x ≡ 3 (mod 5).
+                Por TCR, como MCD(3,5)=1, existe solución única módulo 15: x = 8.
+                Verificar: 8 mod 3 = 2 ✓, 8 mod 5 = 3 ✓.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: el TCR funciona solo si los módulos son coprimos dos a dos (MCD = 1).
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>⚡</span>
+                <h4>Ingeniero — Circuitos AC</h4>
+              </div>
+              <p><strong>Situación:</strong> Analiza impedancias en circuitos de corriente alterna.</p>
+              <p className={styles.escenarioExample}>
+                <strong>Ejemplo:</strong> La impedancia Z = R + jX donde j es la unidad imaginaria
+                (j² = −1). Un circuito RLC tiene Z = 50 + j·30 Ω. El módulo |Z| = √(50² + 30²) ≈ 58,3 Ω
+                determina la corriente máxima.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: los números complejos en forma polar (|Z|∠θ) simplifican la multiplicación de impedancias.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 3: FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre Teoría de Números</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es un número primo y cómo se comprueba?</h4>
+              <p>
+                Un número primo es un entero mayor que 1 cuyo únicos divisores son 1 y él mismo.
+                Para verificar si n es primo, basta dividirlo por todos los enteros de 2 hasta √n:
+                si ninguno divide exactamente, es primo. Por ejemplo, 97 es primo porque no es divisible
+                por 2, 3, 5, 7 (los únicos primos ≤ √97 ≈ 9,8).
+              </p>
+              <p className={styles.faqTip}>Primeros 15 primos: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuántos números primos hay?</h4>
+              <p>
+                Infinitos. Euclides lo demostró hacia el año 300 a.C. mediante reducción al absurdo:
+                si existiera un primo máximo, el producto de todos los primos más 1 sería divisible
+                por un primo no incluido en la lista, contradicción. El teorema de los números primos
+                establece que la cantidad de primos menores que n es aproximadamente n / ln(n).
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el Teorema Fundamental de la Aritmética?</h4>
+              <p>
+                Todo entero mayor que 1 se puede expresar como producto de números primos de forma
+                única (salvo el orden). Por ejemplo, 360 = 2³ × 3² × 5. Esta unicidad hace a los primos
+                los &quot;bloques de construcción&quot; de los enteros y es la base de la factorización
+                usada en criptografía.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Para qué sirven los números primos en criptografía?</h4>
+              <p>
+                RSA, el algoritmo más usado en internet (HTTPS, SSH, PGP), basa su seguridad en la
+                dificultad de factorizar el producto de dos primos grandes. Dado n = p × q con p y q
+                primos de 1.024 bits cada uno, factorizar n requiere miles de años con los mejores
+                algoritmos actuales, aunque multiplicar p × q lleva microsegundos.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es la aritmética modular?</h4>
+              <p>
+                Sistema donde los números &quot;dan la vuelta&quot; al llegar a un módulo m, como las horas
+                en un reloj de 12h. Se escribe a ≡ b (mod m) si m divide a (a − b). Aplicaciones:
+                criptografía (RSA, AES), códigos ISBN/IBAN (dígitos de control), calendarios
+                (día de la semana de cualquier fecha) y teoría de juegos.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Diferencia entre número irracional y trascendente?</h4>
+              <p>
+                Todo trascendente es irracional, pero no al revés. Un número irracional no se puede
+                expresar como p/q (ej: √2). Un número trascendente además no es raíz de ningún
+                polinomio con coeficientes enteros (ej: π, e). √2 es irracional pero algebraico
+                (raíz de x² − 2 = 0). π y e son trascendentes.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el número de oro (φ)?</h4>
+              <p>
+                φ = (1 + √5) / 2 ≈ 1,6180339887… Es la solución positiva de x² = x + 1. Aparece
+                en la sucesión de Fibonacci (el cociente de términos consecutivos tiende a φ), en
+                proporciones estéticas del arte y arquitectura, en la espiral de las conchas y en
+                la distribución de hojas (filotaxia). 1/φ = φ − 1 ≈ 0,618.
+              </p>
+              <p className={styles.faqTip}>φ ≈ 1,618 — razón áurea presente en el Partenón, obras de Da Vinci y en la naturaleza.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo funciona el test de primalidad de Miller-Rabin?</h4>
+              <p>
+                Es un test probabilístico que determina si n es probablemente primo en tiempo
+                O(k · log²n), donde k es el número de rondas. Escribe n − 1 = 2ˢ · d, elige
+                una base a aleatoria y comprueba si aᵈ ≡ 1 (mod n) o a²ʳᵈ ≡ −1 (mod n) para
+                algún r. Con k = 40 rondas, la probabilidad de error es menor que 4⁻⁴⁰ ≈ 10⁻²⁴.
+                OpenSSL usa este test para generar claves RSA.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 4: Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Guía Paso a Paso: Factorizar un Número y Verificar si es Primo</h2>
+          <p className={styles.introParagraph}>
+            Aprende a factorizar cualquier entero positivo usando la criba de Eratóstenes
+            y el método de división por prueba.
+          </p>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Construye la criba de Eratóstenes hasta √n</strong>
+                <p>
+                  Para factorizar n, solo necesitas los primos hasta √n. Ejemplo: para n = 360,
+                  √360 ≈ 18,9, así que necesitas los primos hasta 18: {'{'}2, 3, 5, 7, 11, 13, 17{'}'}.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Divide por 2 todas las veces posibles</strong>
+                <p>
+                  360 ÷ 2 = 180, 180 ÷ 2 = 90, 90 ÷ 2 = 45. Ya no es divisible por 2.
+                  Anotamos el factor 2³.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Divide por el siguiente primo (3)</strong>
+                <p>
+                  45 ÷ 3 = 15, 15 ÷ 3 = 5. Ya no es divisible por 3. Anotamos 3².
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Continúa con 5, 7, 11…</strong>
+                <p>
+                  5 ÷ 5 = 1. El cociente es 1, hemos terminado. Anotamos 5¹.
+                  Resultado: 360 = 2³ × 3² × 5.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Verifica la factorización</strong>
+                <p>
+                  2³ × 3² × 5 = 8 × 9 × 5 = 8 × 45 = 360. ✓
+                  El número de divisores es (3+1)(2+1)(1+1) = 4 × 3 × 2 = 24 divisores.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Para verificar si es primo: ¿el cociente final es mayor que 1?</strong>
+                <p>
+                  Si tras dividir por todos los primos hasta √n el cociente restante es mayor que 1,
+                  ese cociente es un factor primo. Si desde el inicio ningún primo hasta √n divide a n,
+                  entonces n es primo. Ejemplo: para 97, ningún primo hasta 9 (2, 3, 5, 7) divide a 97,
+                  así que 97 es primo.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Aplica la criba de Eratóstenes para listar primos en un rango</strong>
+                <p>
+                  Crea un array de booleanos de tamaño n+1 inicializado a verdadero. Marca como falso
+                  los múltiplos de cada primo p comenzando desde p². Al terminar, los índices que siguen
+                  siendo verdaderos son primos. Para el rango 1–50 obtienes:
+                  2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47 (15 primos).
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Sección 5: Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores Prácticas al Trabajar con Teoría de Números</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⚡</span>
+              <h4>Solo divide hasta √n para verificar primalidad</h4>
+              <p>
+                Si n tiene un divisor d {'>'} √n, entonces n/d {'<'} √n ya fue encontrado antes.
+                Esto reduce la complejidad de O(n) a O(√n) — para n = 10⁹, de 10⁹ a solo ~31.623 iteraciones.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔍</span>
+              <h4>Usa criterios de divisibilidad antes de dividir</h4>
+              <p>
+                Descarta candidatos rápidamente: divisible por 2 si termina en par, por 3 si la
+                suma de dígitos es múltiplo de 3, por 5 si termina en 0 o 5, por 7 aplica la
+                regla de los 2 últimos dígitos. Esto evita cálculos costosos.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <h4>Usa el Teorema Chino del Resto para congruencias</h4>
+              <p>
+                Si tienes un sistema de congruencias con módulos coprimos, el TCR garantiza
+                solución única módulo el producto de los módulos. Útil para reducir cálculos:
+                trabajar módulo 3 y 5 por separado y combinar en módulo 15.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🛡️</span>
+              <h4>Usa exponenciación modular rápida para criptografía</h4>
+              <p>
+                Calcular aⁿ mod m directamente desborda. La exponenciación binaria descompone
+                el exponente en potencias de 2 y aplica mod en cada paso: complejidad O(log n)
+                en lugar de O(n). Esencial para RSA con exponentes de 2.048 bits.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📐</span>
+              <h4>El algoritmo de Euclides es la forma más rápida de calcular el MCD</h4>
+              <p>
+                MCD(a, b) = MCD(b, a mod b), con caso base MCD(a, 0) = a.
+                Ejemplo: MCD(252, 105) → MCD(105, 42) → MCD(42, 21) → MCD(21, 0) = 21.
+                Solo 4 pasos frente a listar todos los divisores.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏗️</span>
+              <h4>Usa la criba segmentada para rangos de primos grandes</h4>
+              <p>
+                La criba de Eratóstenes clásica requiere O(n) memoria. La criba segmentada
+                divide el rango en bloques del tamaño de la caché L1 (~32 KB), calculando
+                cada bloque independientemente. Permite encontrar primos hasta 10¹² con
+                memoria constante.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 6: Warning Box — Errores Comunes */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Errores Comunes en Teoría de Números</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Confundir primo con impar.</strong> No todo número impar es primo (ej: 9 = 3×3,
+                15 = 3×5, 25 = 5×5). Y el único primo par es 2. Verificar siempre dividiendo hasta √n.
+              </li>
+              <li>
+                <strong>Olvidar que 1 no es primo.</strong> El 1 no cumple la definición: un primo
+                necesita exactamente dos divisores distintos (1 y él mismo). El 1 solo tiene un divisor.
+                Esta exclusión preserva la unicidad del Teorema Fundamental de la Aritmética.
+              </li>
+              <li>
+                <strong>Errores en criterios de divisibilidad.</strong> El criterio del 3 comprueba
+                la suma de dígitos, no el último dígito. El criterio del 9 también usa la suma de dígitos
+                (debe ser múltiplo de 9). El del 11 alterna suma y resta de dígitos. Confundirlos
+                genera falsos positivos/negativos.
+              </li>
+              <li>
+                <strong>Confundir número irracional con número &quot;muy grande&quot;.</strong>
+                Los irracionales no son números enormes — son números cuya representación decimal es
+                infinita y no periódica. √2 ≈ 1,41421… es irracional pero menor que 2. Un millón
+                (1.000.000) es perfectamente racional (= 10⁶/1).
+              </li>
+              <li>
+                <strong>No tener en cuenta el límite de los enteros de 32/64 bits.</strong>
+                En programación, un int de 32 bits solo llega hasta 2.147.483.647 (≈ 2,1 × 10⁹).
+                Para primos RSA de 2.048 bits hacen falta bibliotecas de aritmética de precisión
+                arbitraria (BigInt en JavaScript, Python nativo, Java BigInteger).
+              </li>
+              <li>
+                <strong>Asumir que MCD(a, b) siempre es menor que ambos.</strong> Si a divide a b,
+                entonces MCD(a, b) = a — igual al menor. Y MCD(n, n) = n. Nunca asumir que el MCD
+                es estrictamente menor que los dos valores de entrada sin verificarlo.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-teoria-numeros')} />

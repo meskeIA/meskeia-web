@@ -623,6 +623,309 @@ export default function CalculadoraMatematicaPage() {
             </div>
           </div>
         </section>
+
+        {/* SECCIÓN 1: Tabla Comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de Operaciones Matemáticas</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo de operación</th>
+                  <th>Qué resuelve</th>
+                  <th>Nivel educativo típico</th>
+                  <th>Herramientas necesarias</th>
+                  <th>Aplicación práctica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Aritmética básica</strong></td>
+                  <td>Sumas, restas, multiplicaciones y divisiones de números reales</td>
+                  <td>Primaria (6-12 años)</td>
+                  <td>Calculadora básica, papel y lápiz</td>
+                  <td>Presupuestos, cambio en efectivo, recetas de cocina</td>
+                </tr>
+                <tr>
+                  <td><strong>Potencias y raíces</strong></td>
+                  <td>Multiplicaciones repetidas y sus inversas (2⁴ = 16, √16 = 4)</td>
+                  <td>ESO (12-16 años)</td>
+                  <td>Calculadora científica</td>
+                  <td>Interés compuesto, áreas, física (E = mc²)</td>
+                </tr>
+                <tr>
+                  <td><strong>Logaritmos</strong></td>
+                  <td>Exponentes inversos: log₁₀(100) = 2 porque 10² = 100</td>
+                  <td>Bachillerato (16-18 años)</td>
+                  <td>Calculadora científica o tabla logarítmica</td>
+                  <td>Escala Richter, pH, decibelios, tiempo de duplicación</td>
+                </tr>
+                <tr>
+                  <td><strong>Trigonometría</strong></td>
+                  <td>Relaciones entre ángulos y lados de triángulos (seno, coseno)</td>
+                  <td>Bachillerato (16-18 años)</td>
+                  <td>Calculadora en modo grados o radianes</td>
+                  <td>Navegación, arquitectura, física ondulatoria, GPS</td>
+                </tr>
+                <tr>
+                  <td><strong>Álgebra lineal (matrices)</strong></td>
+                  <td>Sistemas de ecuaciones y transformaciones geométricas</td>
+                  <td>Universidad (1º-2º curso)</td>
+                  <td>Software matemático (MATLAB, Python)</td>
+                  <td>Gráficos 3D, machine learning, criptografía, redes neuronales</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* SECCIÓN 2: Casos de Uso */}
+        <section className={styles.guideSection}>
+          <h2>¿Quién usa estas operaciones y para qué?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧒</span>
+                <h4>Estudiante de Primaria/ESO</h4>
+              </div>
+              <p>Necesita resolver operaciones básicas y fracciones para exámenes y problemas cotidianos.</p>
+              <div className={styles.escenarioExample}>
+                <strong>Ejemplo real:</strong> Calcular 3/4 + 1/2 = 5/4 = 1,25. Con esta calculadora obtiene el resultado simplificado al instante.
+              </div>
+              <p className={styles.escenarioTip}>Usa la sección <em>Fracciones</em> para verificar sus cálculos paso a paso.</p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📐</span>
+                <h4>Estudiante de Bachillerato</h4>
+              </div>
+              <p>Trabaja con funciones logarítmicas y exponenciales en matemáticas de 1º y 2º de bachillerato.</p>
+              <div className={styles.escenarioExample}>
+                <strong>Ejemplo real:</strong> Resolver log₂(128) = 7 (porque 2⁷ = 128). También comprueba que ln(e³) = 3.
+              </div>
+              <p className={styles.escenarioTip}>Usa la sección <em>Logaritmos</em> para comparar log, ln y log₂ simultáneamente.</p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚙️</span>
+                <h4>Ingeniero en Diseño</h4>
+              </div>
+              <p>Calcula potencias y raíces para dimensionar componentes mecánicos o eléctricos.</p>
+              <div className={styles.escenarioExample}>
+                <strong>Ejemplo real:</strong> Si la resistencia R = √(P/G) y P = 100 W, G = 4 S, entonces R = √25 = 5 Ω.
+              </div>
+              <p className={styles.escenarioTip}>Usa <em>Potencias</em> y <em>Raíces</em> para cálculos rápidos sin errores de redondeo.</p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">💹</span>
+                <h4>Analista Financiero</h4>
+              </div>
+              <p>Usa logaritmos para calcular el tiempo de duplicación de una inversión con interés compuesto.</p>
+              <div className={styles.escenarioExample}>
+                <strong>Ejemplo real:</strong> Con un 7% anual, ¿cuándo se duplica el capital? t = ln(2) / ln(1,07) ≈ 10,24 años (regla del 70: 70/7 = 10 años).
+              </div>
+              <p className={styles.escenarioTip}>Usa <em>Logaritmos</em> con base e (natural) para modelos de crecimiento continuo.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 3: FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre Matemáticas</h2>
+          <ol className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <strong>¿Qué es el orden de las operaciones (PEMDAS/BODMAS)?</strong>
+              <p>
+                Es la jerarquía que determina qué operación se realiza primero: <em>Paréntesis, Exponentes, Multiplicación/División, Adición/Sustracción</em>.
+                Ejemplo: <strong>2 + 3 × 4 = 14</strong> (no 20), porque primero se hace 3 × 4 = 12, luego 2 + 12 = 14.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Por qué no se puede dividir por cero?</strong>
+              <p>
+                Porque no existe ningún número que multiplicado por 0 dé un valor distinto de 0. Si 6 ÷ 0 = x, entonces x × 0 = 6, lo cual es imposible.
+                En la calculadora aparecerá error o <em>Infinity</em> según el contexto.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Qué es la raíz cuadrada de un número negativo?</strong>
+              <p>
+                No existe como número real. Por ejemplo, √(−9) no tiene solución en ℝ porque ningún número real al cuadrado da negativo.
+                En matemáticas avanzadas se usa el número imaginario <em>i</em>, donde i² = −1, y √(−9) = 3i.
+              </p>
+              <p className={styles.faqTip}>Esta calculadora indica el error automáticamente al intentar raíces de índice par con radicando negativo.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cuál es la diferencia entre log y ln?</strong>
+              <p>
+                <strong>log</strong> (sin subíndice) suele referirse al <em>logaritmo decimal</em> en base 10: log(100) = 2.
+                <strong>ln</strong> es el <em>logaritmo natural</em> en base e ≈ 2,71828: ln(e²) = 2.
+                La relación entre ambos es: log(x) = ln(x) / ln(10) ≈ ln(x) / 2,3026.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Qué es un número irracional?</strong>
+              <p>
+                Un número que no puede expresarse como fracción p/q de enteros. Su decimal no tiene período.
+                Ejemplos: √2 = 1,41421356…, π = 3,14159265…, e = 2,71828182…
+                Aparecen frecuentemente al calcular raíces y logaritmos.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Para qué sirven los logaritmos en la vida real?</strong>
+              <p>
+                Comprimen escalas enormes en valores manejables. La escala Richter: un sismo de magnitud 7 libera 10 veces más energía que uno de magnitud 6.
+                El pH: un líquido con pH 3 tiene 100 veces más iones H⁺ que uno con pH 5. Los decibelios: cada 10 dB duplica la percepción sonora.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo se calcula una potencia fraccionaria?</strong>
+              <p>
+                Una potencia fraccionaria combina raíz y potencia: x^(m/n) = ⁿ√(xᵐ).
+                Ejemplo: 8^(2/3) = ³√(8²) = ³√64 = 4. También: 27^(1/3) = ³√27 = 3.
+                En la sección de potencias puedes introducir exponentes decimales como 0,5 (equivalente a raíz cuadrada).
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Qué es la notación científica?</strong>
+              <p>
+                Forma de expresar números muy grandes o muy pequeños como producto de un número entre 1 y 10 por una potencia de 10.
+                Ejemplo: la velocidad de la luz es 300.000.000 m/s = <strong>3 × 10⁸ m/s</strong>.
+                La masa de un electrón es 0,00000000000000000000000000000091 kg = <strong>9,1 × 10⁻³¹ kg</strong>.
+              </p>
+            </li>
+          </ol>
+        </section>
+
+        {/* SECCIÓN 4: Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Guía: Resolver Expresiones Matemáticas Complejas (PEMDAS)</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+            Sigue estos 7 pasos para resolver cualquier expresión respetando el orden de operaciones correcto.
+          </p>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Identifica los paréntesis más internos</strong>
+                <p>Busca el par de paréntesis más profundo y resuélvelo primero. En <code>(2 + (3 × 4))</code>, primero calculas el paréntesis interior: 3 × 4 = 12.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Resuelve las potencias y raíces</strong>
+                <p>Una vez eliminados los paréntesis internos, calcula exponentes y raíces de izquierda a derecha. Ejemplo: 2³ = 8 antes de multiplicar.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Multiplica y divide (de izquierda a derecha)</strong>
+                <p>Estas operaciones tienen la misma prioridad. <code>12 ÷ 3 × 2 = 4 × 2 = 8</code>, no 12 ÷ 6 = 2. Resuelve en el orden en que aparecen.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Suma y resta (de izquierda a derecha)</strong>
+                <p>Igual que el paso anterior: misma prioridad, de izquierda a derecha. <code>10 − 3 + 2 = 7 + 2 = 9</code>, no 10 − 5 = 5.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Verifica la expresión completa con un ejemplo</strong>
+                <p>Aplica todo a <code>2 + 3 × (4² − 6) ÷ 5</code>: primero 4² = 16, luego 16 − 6 = 10, luego 3 × 10 = 30, luego 30 ÷ 5 = 6, finalmente 2 + 6 = <strong>8</strong>.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Comprueba el resultado con estimación</strong>
+                <p>Redondea cada número al entero más cercano y opera mentalmente. Si el resultado exacto se aleja mucho de la estimación, revisa el proceso.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Añade paréntesis explícitos si hay dudas</strong>
+                <p>Cuando la expresión es ambigua, agrupa con paréntesis aunque no sean estrictamente necesarios. <code>(2 + 3) × 4</code> es inequívoco: resultado 20.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* SECCIÓN 5: Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores Prácticas al Calcular con esta Herramienta</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
+              <h4>Usa paréntesis para mayor claridad</h4>
+              <p>Aunque la calculadora siga el orden correcto, escribir <code>(3 × 4) + 2</code> en lugar de <code>3 × 4 + 2</code> elimina cualquier ambigüedad y te ayuda a revisar tu trabajo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
+              <h4>Verifica con estimación aproximada</h4>
+              <p>Antes de aceptar un resultado, estima mentalmente. Si calculas 97 × 103, espera un resultado cerca de 100² = 10.000. El resultado exacto es 9.991, lo que confirma que es correcto.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
+              <h4>Cambia la base de logaritmos con la fórmula adecuada</h4>
+              <p>Para calcular log₅(125), usa el cambio de base: log₅(125) = log(125) / log(5) = 2,0969 / 0,6990 = 3. Introduce la base 5 en la sección de logaritmos y obtendrás el resultado directo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
+              <h4>Distingue grados de radianes en trigonometría</h4>
+              <p>sen(30°) = 0,5 en grados, pero sen(30) en radianes ≈ −0,988. Antes de calcular funciones trigonométricas, confirma la unidad angular que usa tu calculadora o fórmula.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">➗</span>
+              <h4>Simplifica fracciones antes de operar</h4>
+              <p>Trabajar con fracciones reducidas reduce errores de cálculo. En lugar de operar 12/18 + 8/12, simplifica primero: 2/3 + 2/3 = 4/3. La calculadora de fracciones simplifica automáticamente.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔁</span>
+              <h4>Aprovecha las propiedades de los logaritmos</h4>
+              <p>log(a × b) = log(a) + log(b) y log(aⁿ) = n × log(a). Por ejemplo, log(8) = log(2³) = 3 × log(2) ≈ 3 × 0,301 = 0,903. Estas propiedades simplifican cálculos complejos.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 6: Warning Box — Errores Clásicos */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>Errores Clásicos que Debes Evitar</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Ignorar el orden de operaciones:</strong> 2 + 3 × 4 <em>no</em> es 20. Primero la multiplicación: 3 × 4 = 12, luego la suma: 2 + 12 = <strong>14</strong>.
+              </li>
+              <li>
+                <strong>Confundir a² con 2a:</strong> Si a = 5, entonces a² = 5² = 25, pero 2a = 2 × 5 = 10. Son expresiones completamente distintas.
+              </li>
+              <li>
+                <strong>Creer que √(a + b) = √a + √b:</strong> √(9 + 16) = √25 = 5, <em>no</em> √9 + √16 = 3 + 4 = 7. La raíz no distribuye sobre la suma.
+              </li>
+              <li>
+                <strong>Creer que log(a + b) = log(a) + log(b):</strong> log(2 + 8) = log(10) = 1, pero log(2) + log(8) = log(16) ≈ 1,204. Solo se cumple log(a × b) = log(a) + log(b).
+              </li>
+              <li>
+                <strong>Dividir por cero:</strong> 5 ÷ 0 no es infinito ni 0; es una operación <em>indefinida</em>. En programación genera error o el valor especial <code>Infinity</code>.
+              </li>
+              <li>
+                <strong>Confundir grados y radianes:</strong> cos(90°) = 0, pero cos(90 rad) ≈ −0,448. Antes de usar valores trigonométricos, verifica siempre la unidad angular del cálculo.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calculadora-matematica')} />
