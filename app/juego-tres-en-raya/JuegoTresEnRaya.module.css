@@ -339,3 +339,442 @@
     font-size: 0.8rem;
   }
 }
+
+/* ═══════════════════════════════════════════
+   SECCIÓN EDUCATIVA
+   ═══════════════════════════════════════════ */
+
+.guideSection {
+  margin-bottom: 32px;
+}
+
+.guideSection h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.guideSection p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+/* ── Tabla Comparativa ── */
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-top: 12px;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 540px;
+}
+
+.comparativaTable thead {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+}
+
+.comparativaTable thead th {
+  padding: 12px 16px;
+  text-align: left;
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.comparativaTable tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.comparativaTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.comparativaTable tbody td {
+  padding: 11px 16px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+/* ── Escenarios Grid ── */
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.escenarioCard:hover {
+  border-color: #2E86AB;
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.12);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.escenarioHeader h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.escenarioIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.escenarioTip {
+  font-size: 0.83rem;
+  color: #2E86AB;
+  line-height: 1.5;
+  padding: 8px 10px;
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 3px solid #2E86AB;
+  border-radius: 0 6px 6px 0;
+  margin: 0;
+}
+
+[data-theme='dark'] .escenarioTip {
+  background: rgba(46, 134, 171, 0.15);
+  color: #7FB3D3;
+  border-left-color: #7FB3D3;
+}
+
+/* ── FAQ ── */
+
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faqItem {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.faqItem details {
+  width: 100%;
+}
+
+.faqItem details summary {
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.faqItem details summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem details summary::after {
+  content: '▾';
+  font-size: 1rem;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.faqItem details[open] summary::after {
+  transform: rotate(-180deg);
+}
+
+.faqItem details summary:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.faqItem details p {
+  padding: 0 16px 14px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.faqTip {
+  margin-top: 8px !important;
+  font-size: 0.82rem !important;
+  color: #2E86AB !important;
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 3px solid #2E86AB;
+  padding: 8px 10px !important;
+  border-radius: 0 6px 6px 0;
+}
+
+[data-theme='dark'] .faqTip {
+  color: #7FB3D3 !important;
+  background: rgba(46, 134, 171, 0.15);
+  border-left-color: #7FB3D3;
+}
+
+/* ── Guía Paso a Paso ── */
+
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+
+.step:hover {
+  border-color: #2E86AB;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.stepContent p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Tips Grid ── */
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tipCard:hover {
+  border-color: #48A9A6;
+  box-shadow: 0 4px 12px rgba(72, 169, 166, 0.1);
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.tipCard h4 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.tipCard p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Warning Box ── */
+
+.warningBox {
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  padding: 20px 22px;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.warningHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #D97706;
+  margin: 0;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #F59E0B;
+}
+
+.warningIcon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  padding-left: 18px;
+  position: relative;
+}
+
+.warningList li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: #D97706;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+[data-theme='dark'] .warningList li::before {
+  color: #F59E0B;
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+/* ── Responsive sección educativa ── */
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable thead th,
+  .comparativaTable tbody td {
+    padding: 9px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .guideSection h2 {
+    font-size: 1.05rem;
+  }
+
+  .stepNumber {
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+  }
+
+  .escenarioCard,
+  .tipCard {
+    padding: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .escenarioCard,
+  .tipCard,
+  .step,
+  .faqItem details summary {
+    transition: none;
+  }
+}

@@ -519,6 +519,270 @@ export default function TiradorDadosPage() {
             </ul>
             <p>Ejemplo: <strong>2d6+3</strong> = lanzar 2 dados de 6 caras y sumar 3 al total.</p>
           </section>
+
+          {/* Tabla Comparativa */}
+          <section className={styles.eduSection}>
+            <h3>📊 Comparativa de tipos de dado</h3>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Dado</th>
+                    <th>Caras</th>
+                    <th>Valores posibles</th>
+                    <th>Prob. valor medio</th>
+                    <th>Uso principal</th>
+                    <th>Juego asociado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>D4</strong></td>
+                    <td>4</td>
+                    <td>1 – 4</td>
+                    <td>50 % (2 o 3)</td>
+                    <td>Daño armas pequeñas, curación menor</td>
+                    <td>D&D, Pathfinder</td>
+                  </tr>
+                  <tr>
+                    <td><strong>D6</strong></td>
+                    <td>6</td>
+                    <td>1 – 6</td>
+                    <td>33 % (3 o 4)</td>
+                    <td>Dado universal para juegos de mesa</td>
+                    <td>Parchís, Risk, Monopoly</td>
+                  </tr>
+                  <tr>
+                    <td><strong>D8</strong></td>
+                    <td>8</td>
+                    <td>1 – 8</td>
+                    <td>25 % (4 o 5)</td>
+                    <td>Daño armas medianas</td>
+                    <td>D&D, Pathfinder</td>
+                  </tr>
+                  <tr>
+                    <td><strong>D10</strong></td>
+                    <td>10</td>
+                    <td>1 – 10</td>
+                    <td>20 % (5 o 6)</td>
+                    <td>Porcentajes, daño armas largas</td>
+                    <td>D&D, Vampire: The Masquerade</td>
+                  </tr>
+                  <tr>
+                    <td><strong>D20</strong></td>
+                    <td>20</td>
+                    <td>1 – 20</td>
+                    <td>10 % (10 o 11)</td>
+                    <td>Ataques, salvaciones y habilidades</td>
+                    <td>D&D 5e, Pathfinder 2e</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* Casos de Uso */}
+          <section className={styles.eduSection}>
+            <h3>🎯 Casos de uso frecuentes</h3>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🎲</span>
+                  <strong>Juegos de mesa clásicos</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Parchís, Risk y Monopoly utilizan exclusivamente el D6 para mover fichas,
+                  resolver combates o avanzar por el tablero.
+                </p>
+                <p className={styles.escenarioTip}>
+                  Consejo: en Risk, lanzar 3D6 como atacante vs. 2D6 como defensor
+                  te da una ligera ventaja estadística a largo plazo.
+                </p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>⚔️</span>
+                  <strong>Rol y RPG</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  D&D, Pathfinder y sistemas narrativos emplean todos los poliedros
+                  (D4, D6, D8, D10, D12, D20) según la acción que se resuelva.
+                </p>
+                <p className={styles.escenarioTip}>
+                  Consejo: tener al menos un dado de cada tipo agiliza las sesiones
+                  y evita interrupciones para calcular a mano.
+                </p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🤔</span>
+                  <strong>Decisiones neutras</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Un D6 (par/impar) o un D20 pueden resolver dilemas cotidianos
+                  cuando ninguna opción es claramente superior.
+                </p>
+                <p className={styles.escenarioTip}>
+                  Consejo: el dado elimina el sesgo de preferencia personal
+                  y hace la decisión genuinamente aleatoria.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className={styles.eduSection}>
+            <h3>❓ Preguntas frecuentes</h3>
+            <div className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <strong>¿Son realmente aleatorios los dados digitales?</strong>
+                <p>
+                  Utilizan generadores pseudoaleatorios (PRNG) como <code>Math.random()</code>,
+                  suficientemente impredecibles para juegos casuales pero no aptos para criptografía.
+                  Para juegos competitivos serios se recomienda hardware físico certificado.
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Qué dado se usa en Dungeons &amp; Dragons?</strong>
+                <p>
+                  El D20 es el icónico de D&D: se lanza para ataques, salvaciones y pruebas
+                  de habilidad. El juego también emplea D4, D6, D8, D10, D12 y D100
+                  según el arma o hechizo utilizado.
+                </p>
+                <p className={styles.faqTip}>El 20 natural es un crítico; el 1 natural es una pifia.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Cuántos dados necesito para jugar al Risk?</strong>
+                <p>
+                  El atacante usa hasta 3D6 y el defensor hasta 2D6. Con este tirador
+                  puedes simular ambos lanzamientos seleccionando el D6 y ajustando
+                  la cantidad de dados a 3 o a 2.
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Qué es la distribución de probabilidad de 2D6?</strong>
+                <p>
+                  Con 2D6 hay 36 combinaciones posibles. El resultado 7 es el más probable
+                  (6 combinaciones, ~16,7 %), mientras que 2 y 12 son los más raros
+                  (1 combinación cada uno, ~2,8 %).
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Existe ventaja estadística al tirar más dados?</strong>
+                <p>
+                  Sí. A mayor número de dados, la distribución de resultados se acerca
+                  a la normal (campana de Gauss), centrando los valores alrededor de la media
+                  y reduciendo la probabilidad de resultados extremos.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Guía Paso a Paso */}
+          <section className={styles.eduSection}>
+            <h3>🗺️ Cómo usar el tirador en tu partida</h3>
+            <div className={styles.stepGuide}>
+              <div className={styles.step}>
+                <span className={styles.stepNumber}>1</span>
+                <div className={styles.stepContent}>
+                  <strong>Selecciona el tipo de dado según el juego</strong>
+                  <p>Elige D6 para juegos de mesa clásicos o el poliedro que indique el
+                  manual de tu juego de rol.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <span className={styles.stepNumber}>2</span>
+                <div className={styles.stepContent}>
+                  <strong>Elige la cantidad de dados necesarios</strong>
+                  <p>Ajusta el contador de dados: 2D6 para Risk, 1D20 para D&amp;D,
+                  4D6 para crear personajes en muchos RPG.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <span className={styles.stepNumber}>3</span>
+                <div className={styles.stepContent}>
+                  <strong>Tira y lee el resultado total</strong>
+                  <p>El resultado se muestra individualmente por dado y como suma total.
+                  Usa el historial para comparar tiradas anteriores.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <span className={styles.stepNumber}>4</span>
+                <div className={styles.stepContent}>
+                  <strong>Para rol, añade modificadores al resultado</strong>
+                  <p>Introduce tu modificador de característica o bonificador de competencia
+                  directamente en el campo de modificador antes de lanzar.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <span className={styles.stepNumber}>5</span>
+                <div className={styles.stepContent}>
+                  <strong>Registra resultados importantes en sesiones largas</strong>
+                  <p>El historial guarda hasta 50 tiradas con hora exacta, fórmula utilizada
+                  y total final para revisión durante la partida.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Mejores Prácticas */}
+          <section className={styles.eduSection}>
+            <h3>💡 Mejores prácticas con dados</h3>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🎯</span>
+                <strong>Usa el dado correcto para cada juego</strong>
+                <p>Consultar el reglamento evita errores que desequilibran las mecánicas
+                de juego diseñadas por los autores.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📊</span>
+                <strong>Aprende las probabilidades básicas del D6 para Risk</strong>
+                <p>El atacante con 3D6 gana en promedio un 37 % de los combates
+                individuales; el defensor tiene ligera ventaja en empates.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>⚔️</span>
+                <strong>En rol RPG, ten dados de todos los tipos</strong>
+                <p>D4, D6, D8, D10, D12 y D20 cubren todas las situaciones de D&amp;D y
+                sistemas derivados sin improvisar sustituciones.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🧮</span>
+                <strong>El promedio de 2D6 es 7 (la suma más probable)</strong>
+                <p>En Catan, Monopoly y Risk, planificar alrededor del 7 maximiza
+                la eficiencia de recursos y posicionamiento en el tablero.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Warning Box */}
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <strong>Errores comunes al usar dados</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Usar D6 para todo</strong> cuando el juego especifica otro tipo de dado:
+                cada poliedro tiene una distribución distinta que afecta el balance del juego.
+              </li>
+              <li>
+                <strong>No conocer la diferencia entre tirada con ventaja/desventaja en D&amp;D</strong>:
+                lanzar 2D20 y quedarse con el mayor (ventaja) o el menor (desventaja) altera
+                significativamente la probabilidad de éxito.
+              </li>
+              <li>
+                <strong>Apostar dinero real</strong> basándose en dados digitales para juegos oficiales:
+                los torneos y competiciones reglamentadas requieren dados físicos certificados.
+              </li>
+              <li>
+                <strong>Ignorar que 1D6+1D6 ≠ 2D6 en probabilidades de RPG</strong>:
+                lanzar los dados por separado y sumarlos es idéntico matemáticamente, pero
+                algunos sistemas de reglas especifican tiradas independientes por cada dado.
+              </li>
+            </ul>
+          </div>
         </div>
       </EducationalSection>
 

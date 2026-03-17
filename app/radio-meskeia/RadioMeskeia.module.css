@@ -512,3 +512,423 @@
     max-height: 300px;
   }
 }
+
+/* ────────────────────────────────────────────
+   EDUCATIONAL SECTION — Radio meskeIA
+──────────────────────────────────────────── */
+
+/* Sección genérica con separación vertical */
+.guideSection {
+  margin-bottom: 2rem;
+}
+
+.guideSection h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.guideSection p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* ── Tabla Comparativa ── */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border, #E5E7EB);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.comparativaTable thead tr {
+  background: var(--primary, #2E86AB);
+  color: #ffffff;
+}
+
+.comparativaTable th {
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border, #E5E7EB);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:nth-child(odd) {
+  background: var(--bg-primary, #FAFAFA);
+}
+
+.comparativaTable tbody tr:hover {
+  background: var(--hover, #F0F9FF);
+}
+
+[data-theme='dark'] .comparativaTable thead tr {
+  background: #1E5F7A;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(odd) {
+  background: #1F1F1F;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: #2A3A4A;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #3A3A3A;
+}
+
+/* ── Casos de Uso (Escenarios) ── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: 12px;
+  padding: 18px;
+  transition: box-shadow 0.2s;
+}
+
+.escenarioCard:hover {
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.escenarioHeader h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+
+.escenarioTip {
+  font-size: 0.82rem;
+  color: var(--primary, #2E86AB);
+  font-style: italic;
+  line-height: 1.45;
+  margin: 0;
+}
+
+[data-theme='dark'] .escenarioTip {
+  color: var(--accent, #7FB3D3);
+}
+
+/* ── FAQ ── */
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.faqItem {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+}
+
+.faqItem details {
+  width: 100%;
+}
+
+.faqItem summary {
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.faqItem summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem summary::before {
+  content: '▶';
+  font-size: 0.65rem;
+  color: var(--primary, #2E86AB);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.faqItem details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.faqItem details p {
+  padding: 0 16px 12px;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.faqTip {
+  font-size: 0.82rem;
+  color: var(--primary, #2E86AB);
+  font-style: italic;
+  padding-top: 4px;
+}
+
+[data-theme='dark'] .faqTip {
+  color: var(--accent, #7FB3D3);
+}
+
+/* ── Guía Paso a Paso ── */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  counter-reset: none;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.stepContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.stepContent p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Mejores Prácticas (Tips) ── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.tipCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: 12px;
+  padding: 18px;
+  transition: box-shadow 0.2s;
+}
+
+.tipCard:hover {
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+}
+
+.tipIcon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.tipCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Warning Box ── */
+.warningBox {
+  background: #FFFBEB;
+  border: 1px solid #FCD34D;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2D2200;
+  border-color: #92400E;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.warningHeader h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #92400E;
+  margin: 0;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #FDE68A;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.warningList li {
+  font-size: 0.875rem;
+  color: #78350F;
+  line-height: 1.55;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #FDE68A;
+}
+
+.warningList strong {
+  color: #92400E;
+}
+
+[data-theme='dark'] .warningList strong {
+  color: #FCD34D;
+}
+
+/* ── Responsive Educational ── */
+@media (max-width: 480px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .step {
+    padding: 14px;
+  }
+
+  .stepNumber {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ── Accesibilidad: movimiento reducido ── */
+@media (prefers-reduced-motion: reduce) {
+  .escenarioCard,
+  .tipCard {
+    transition: none;
+  }
+}

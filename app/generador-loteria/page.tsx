@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorLoteria.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type LotteryType = 'primitiva' | 'euromillones' | 'bonoloto' | 'gordo' | 'lototurf';
@@ -374,6 +374,341 @@ export default function GeneradorLoteriaPage() {
           </div>
         </div>
       </div>
+
+      {/* Contenido educativo colapsable */}
+      <EducationalSection
+        title="¿Quieres entender mejor las loterías y la probabilidad?"
+        subtitle="Compara loterías españolas, resuelve dudas frecuentes y aprende a jugar con cabeza"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de loterías españolas</h2>
+          <p>
+            Las principales loterías de la ONCE y LAE tienen reglas y probabilidades muy distintas.
+            Esta tabla te ayuda a elegir la que mejor se adapta a tu presupuesto y preferencias.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Lotería</th>
+                  <th>Combinación</th>
+                  <th>Probabilidad bote</th>
+                  <th>Precio / apuesta</th>
+                  <th>Bote mínimo</th>
+                  <th>Días de sorteo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🎱 La Primitiva</td>
+                  <td>6 de 49 + Reintegro</td>
+                  <td>1 entre 13.983.816</td>
+                  <td>1,00 €</td>
+                  <td>3.000.000 €</td>
+                  <td>Jueves y Sábados</td>
+                </tr>
+                <tr>
+                  <td>🍀 Bonoloto</td>
+                  <td>6 de 49 + Reintegro</td>
+                  <td>1 entre 13.983.816</td>
+                  <td>0,50 €</td>
+                  <td>400.000 €</td>
+                  <td>Lunes a Sábado</td>
+                </tr>
+                <tr>
+                  <td>⭐ Euromillones</td>
+                  <td>5 de 50 + 2 Estrellas</td>
+                  <td>1 entre 139.838.160</td>
+                  <td>2,50 €</td>
+                  <td>17.000.000 €</td>
+                  <td>Martes y Viernes</td>
+                </tr>
+                <tr>
+                  <td>🎰 El Gordo</td>
+                  <td>5 de 54 + Clave</td>
+                  <td>1 entre 31.625.100</td>
+                  <td>1,50 €</td>
+                  <td>5.000.000 €</td>
+                  <td>Domingos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>¿Para quién es útil este generador?</h2>
+          <p>
+            Aunque los números generados aleatoriamente tienen la misma probabilidad que cualquier
+            otro, el generador aporta valor en situaciones muy concretas.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎲</span>
+                <h4>Jugador ocasional</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Juegas de vez en cuando y no quieres repetir las mismas combinaciones de
+                siempre. El generador te da una selección nueva cada vez, sin esfuerzo.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: guarda las combinaciones favoritas para llevar el resguardo exacto
+                a la administración de lotería o jugar por internet.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">👥</span>
+                <h4>Grupo de amigos o peña</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Jugas en grupo y necesitáis varios boletos distintos. Genera varias
+                combinaciones a la vez (hasta 10) para repartir entre los participantes
+                sin duplicados.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: jugando en peña el coste individual baja, pero el premio también
+                se divide. Acordad por escrito el porcentaje de cada miembro antes del sorteo.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
+                <h4>Usuario curioso sobre probabilidad</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Quieres entender la diferencia real de probabilidades entre loterías y
+                comprobar que ningún número es &quot;más afortunado&quot; que otro estadísticamente.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: compara la tabla de probabilidades. La diferencia entre Euromillones
+                (1/139M) y El Gordo (1/31M) es enorme, aunque ambos botes sean tentadores.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre loterías y probabilidad</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Los números generados aleatoriamente tienen más probabilidad de ganar?</summary>
+                <p>
+                  No. Cada combinación posible tiene exactamente la misma probabilidad de salir premiada,
+                  independientemente de si la elegiste tú, la generó un ordenador o la elige la máquina
+                  del sorteo. La aleatoriedad del generador es tan válida como cualquier otro método.
+                </p>
+                <p className={styles.faqTip}>
+                  Dato matemático: en La Primitiva hay 13.983.816 combinaciones posibles. Todas tienen
+                  la misma probabilidad: 1 entre 13.983.816.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Existe algún número &quot;más frecuente&quot; en La Primitiva?</summary>
+                <p>
+                  No en términos estadísticos. Aunque en el pasado ciertos números hayan salido más veces,
+                  cada sorteo es independiente. La &quot;frecuencia histórica&quot; de un número no influye
+                  en la probabilidad del siguiente sorteo. Es la llamada falacia del jugador.
+                </p>
+                <p className={styles.faqTip}>
+                  Los sorteos de La Primitiva están supervisados por el organismo regulador español
+                  (Loterías y Apuestas del Estado) y son auditados para garantizar la aleatoriedad.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué probabilidad tengo de acertar el bote de La Primitiva?</summary>
+                <p>
+                  La probabilidad de acertar los 6 números principales es de 1 entre 13.983.816.
+                  Para tener una probabilidad del 50% de acertar al menos una vez necesitarías
+                  comprar más de 9,6 millones de boletos. Si compras uno por semana, estadísticamente
+                  tardarías unos 269.000 años en acertar.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Merece la pena jugar en grupo (peña)?</summary>
+                <p>
+                  Depende del objetivo. En grupo reduces el coste individual y aumentas el número
+                  de combinaciones jugadas por el mismo precio, lo que incrementa la probabilidad
+                  de ganar algo. Sin embargo, si ganáis el bote, el premio se divide entre todos.
+                  El valor esperado por euro invertido es el mismo que jugando solo.
+                </p>
+                <p className={styles.faqTip}>
+                  Consejo práctico: firmad un acuerdo escrito con el porcentaje de cada participante
+                  antes del sorteo. Evita conflictos en caso de premio.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuánto se lleva Hacienda de un premio de lotería en España?</summary>
+                <p>
+                  Los premios de loterías del Estado superiores a 40.000 € tributan al 20% sobre
+                  el exceso. Por ejemplo, si ganas 1.000.000 €, pagas el 20% sobre 960.000 €
+                  (el exceso sobre 40.000 €), es decir, 192.000 € de impuestos. El tipo es fijo,
+                  no progresivo como el IRPF general.
+                </p>
+                <p className={styles.faqTip}>
+                  Referencia legal: artículo 13 de la Ley 16/2012, de 27 de diciembre. Los premios
+                  de la ONCE y Cruz Roja también están incluidos.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Cómo usar el generador: 5 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Elige la lotería que quieres jugar</strong>
+                <p>
+                  Selecciona entre Primitiva, Bonoloto, Euromillones o El Gordo. Cada una tiene
+                  rangos de números y reglas distintas. Compara la tabla de probabilidades antes
+                  de decidir cuánto dinero invertir.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Genera los números aleatorios</strong>
+                <p>
+                  Pulsa el botón de generar. Los números son estadísticamente iguales de válidos
+                  que cualquier combinación que elijas manualmente. No hay estrategia que mejore
+                  las probabilidades matemáticas.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Verifica si ya tienes ese boleto</strong>
+                <p>
+                  Si juegas en grupo o tienes boletos anteriores activos, comprueba que la
+                  combinación generada no coincide con ninguna que ya tengas. Dos boletos
+                  iguales no aumentan las probabilidades de manera significativa.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Establece un presupuesto mensual máximo</strong>
+                <p>
+                  Decide cuánto dinero puedes dedicar al juego sin que afecte a tu economía.
+                  El valor esperado de la lotería es siempre negativo: por cada euro invertido
+                  el retorno medio es inferior a 1 €. Juega solo con dinero que puedes perder.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>Guarda el comprobante de compra para reclamar premios</strong>
+                <p>
+                  Una vez jugado el boleto, guarda siempre el resguardo físico o el justificante
+                  digital. Sin él no podrás cobrar ningún premio, independientemente de que
+                  puedas demostrar que jugaste esa combinación.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>4 consejos para jugar con responsabilidad</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">💶</span>
+              <h4>Fija un presupuesto mensual y no lo superes</h4>
+              <p>
+                Decide de antemano cuánto dinero destinas a lotería al mes y cúmplelo.
+                El gasto en juego debe ser una partida de ocio, nunca una inversión ni
+                una estrategia de ahorro.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">👥</span>
+              <h4>Jugar en grupo reduce el coste, pero también el premio</h4>
+              <p>
+                Una peña te permite comprar más combinaciones por menos dinero, pero si
+                ganáis el bote cada miembro recibe solo su parte proporcional. El valor
+                esperado por euro es idéntico jugando solo o en grupo.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
+              <h4>Ningún número tiene más probabilidad que otro</h4>
+              <p>
+                Las estadísticas de &quot;números calientes&quot; o &quot;números fríos&quot; son un mito.
+                Cada sorteo es independiente del anterior. No existe ningún método
+                matemático que mejore las probabilidades de acertar.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🧾</span>
+              <h4>Guarda siempre el resguardo de la apuesta</h4>
+              <p>
+                Sin el resguardo original (físico o digital) no podrás cobrar ningún
+                premio. Guárdalo en un lugar seguro hasta que se celebre el sorteo y
+                compruebes el resultado oficial.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores frecuentes al jugar a la lotería</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Gastar más de lo que puedes permitirte creyendo en &quot;sistemas&quot; ganadores.</strong>{' '}
+                No existe ningún sistema matemático que mejore las probabilidades de ganar.
+                Cualquier método de selección de números tiene la misma probabilidad que
+                los generados aleatoriamente.
+              </li>
+              <li>
+                <strong>Pensar que los números frecuentes tienen más probabilidad (falacia del jugador).</strong>{' '}
+                Que un número haya salido muchas veces en el pasado no aumenta ni disminuye
+                su probabilidad en el próximo sorteo. Cada sorteo es un evento independiente.
+              </li>
+              <li>
+                <strong>No declarar premios a Hacienda (obligatorio si superan 40.000 €).</strong>{' '}
+                Los premios de lotería del Estado superiores a 40.000 € tributan al 20% sobre
+                el exceso. No declararlos constituye una infracción tributaria grave con
+                sanciones adicionales.
+              </li>
+              <li>
+                <strong>Perder el resguardo de la apuesta ganadora.</strong>{' '}
+                Sin el comprobante de compra no podrás cobrar el premio, aunque puedas
+                demostrar que jugaste esa combinación. Guarda siempre el resguardo físico
+                o el justificante digital hasta comprobar el resultado oficial.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-loteria')} />
 

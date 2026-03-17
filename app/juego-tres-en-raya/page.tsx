@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoTresEnRaya.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Casilla = 'X' | 'O' | null;
@@ -336,6 +336,334 @@ export default function JuegoTresEnRayaPage() {
           </div>
         </div>
       </div>
+
+      {/* Contenido educativo colapsable */}
+      <EducationalSection
+        title="¿Quieres aprender más sobre el Tres en Raya?"
+        subtitle="Variantes del juego, estrategia minimax, FAQ y guía de movimientos óptimos"
+        icon="🎮"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section className={styles.guideSection}>
+          <h2>Variantes del Tres en Raya en el mundo</h2>
+          <p>
+            El Tic-Tac-Toe clásico es solo el punto de partida. Existen variantes con
+            tableros más grandes, más fichas o reglas especiales que aumentan la complejidad
+            estratégica considerablemente.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Variante</th>
+                  <th>Tablero</th>
+                  <th>Condición de victoria</th>
+                  <th>Empates posibles</th>
+                  <th>Complejidad estratégica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🎯 Clásico (Tic-Tac-Toe)</td>
+                  <td>3 × 3</td>
+                  <td>3 en línea</td>
+                  <td>Sí (con juego perfecto)</td>
+                  <td>Baja — 255.168 partidas posibles</td>
+                </tr>
+                <tr>
+                  <td>🟢 Gomoku</td>
+                  <td>15 × 15</td>
+                  <td>5 en línea</td>
+                  <td>Muy raros</td>
+                  <td>Muy alta — comparable al ajedrez</td>
+                </tr>
+                <tr>
+                  <td>🔵 Cuatro en Raya</td>
+                  <td>7 × 6 (vertical)</td>
+                  <td>4 en línea</td>
+                  <td>Posibles</td>
+                  <td>Media — el primer jugador puede forzar victoria</td>
+                </tr>
+                <tr>
+                  <td>🌀 Ultimate Tic-Tac-Toe</td>
+                  <td>9 tableros 3 × 3</td>
+                  <td>Ganar 3 sub-tableros en línea</td>
+                  <td>Raros</td>
+                  <td>Alta — posiciones estratégicas encadenadas</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>¿Quién juega al Tres en Raya y para qué?</h2>
+          <p>
+            Aunque parece un juego simple, el Tres en Raya tiene aplicaciones reales
+            en educación, informática y entretenimiento cotidiano.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧒</span>
+                <h4>Niños aprendiendo estrategia</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un niño de 6 años aprende a anticipar los movimientos del rival,
+                a bloquear amenazas y a planificar con un turno de antelación.
+              </p>
+              <p className={styles.escenarioTip}>
+                El Tres en Raya es el primer juego donde los niños desarrollan
+                pensamiento estratégico básico sin reglas complejas.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🤖</span>
+                <h4>Introducción al algoritmo minimax</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                En cursos de IA y teoría de juegos, el Tres en Raya es el ejemplo
+                canónico para enseñar minimax porque el árbol de decisión es
+                pequeño y tratable manualmente.
+              </p>
+              <p className={styles.escenarioTip}>
+                El minimax implementado en esta app evalúa todas las ramas posibles
+                para elegir siempre el movimiento óptimo en dificultad alta.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">⏱️</span>
+                <h4>Entretenimiento en esperas cortas</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Una partida dura entre 30 segundos y 2 minutos. Ideal para sala
+                de espera, transporte público o cualquier pausa breve donde no
+                quieres empezar algo largo.
+              </p>
+              <p className={styles.escenarioTip}>
+                Prueba la dificultad &quot;Difícil&quot; si quieres un reto real:
+                la IA nunca comete errores con minimax completo.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre el Tres en Raya</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Puede ganar siempre el que empieza primero?</summary>
+                <p>
+                  No necesariamente. Con juego perfecto de ambos jugadores, el resultado
+                  siempre es empate independientemente de quién empiece. El primer jugador
+                  tiene una ligera ventaja inicial (más casillas a elegir), pero no puede
+                  forzar una victoria si el rival juega correctamente.
+                </p>
+                <p className={styles.faqTip}>
+                  Dato: el primer jugador gana en 131.184 posiciones, pierde en 77.904
+                  y empata en 46.080 de las 255.168 partidas posibles.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuántas combinaciones posibles tiene el Tres en Raya?</summary>
+                <p>
+                  El árbol de juego completo tiene 255.168 partidas posibles (sin contar
+                  simetrías). Si eliminamos posiciones simétricas equivalentes, quedan
+                  26.830 posiciones únicas. Es un juego resuelto: el resultado con juego
+                  perfecto siempre es empate.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué es el algoritmo minimax?</summary>
+                <p>
+                  Minimax es un algoritmo de teoría de juegos para juegos de suma cero
+                  con dos jugadores. Evalúa recursivamente todos los movimientos posibles
+                  asumiendo que el rival siempre jugará su mejor movimiento. El jugador
+                  MAX intenta maximizar su puntuación; el jugador MIN, minimizarla.
+                  Para el Tres en Raya, minimax garantiza juego óptimo perfecto.
+                </p>
+                <p className={styles.faqTip}>
+                  Esta app implementa minimax con poda implícita por profundidad para
+                  que la IA en dificultad &quot;Difícil&quot; nunca pueda ser vencida.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Puede vencer una IA perfecta siempre?</summary>
+                <p>
+                  No. Una IA perfecta (minimax completo) nunca pierde, pero tampoco puede
+                  ganar si el rival también juega de forma perfecta. El mejor resultado
+                  que puede obtener la IA es el empate. Solo gana cuando el rival comete
+                  un error. En dificultad &quot;Difícil&quot; de esta app, la IA no falla nunca.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Por qué siempre acaba en empate entre jugadores expertos?</summary>
+                <p>
+                  El Tres en Raya es un juego matemáticamente &quot;resuelto&quot;: existe una
+                  estrategia perfecta para ambos jugadores que garantiza el empate.
+                  Con solo 9 casillas y líneas ganadoras bien estudiadas, un jugador
+                  con experiencia reconoce todos los patrones y nunca deja ganar al rival.
+                  Por eso se usa como ejemplo de juego trivial en teoría de juegos.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Estrategia óptima: 5 principios fundamentales</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Ocupa el centro si está libre</strong>
+                <p>
+                  La casilla central (posición 4) participa en 4 de las 8 líneas ganadoras.
+                  Es la posición más poderosa del tablero. Si el centro está libre en tu
+                  turno, siempre debes tomarlo.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Si el rival ocupa el centro, ve a una esquina</strong>
+                <p>
+                  Las esquinas participan en 3 líneas ganadoras cada una, frente a las 2
+                  de los lados. Si no puedes tomar el centro, una esquina es siempre
+                  mejor que un lado.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Bloquea siempre las amenazas del rival</strong>
+                <p>
+                  Si el rival tiene dos fichas en una línea con la tercera casilla vacía,
+                  debes bloquear esa casilla inmediatamente. Ignorar una amenaza por
+                  atacar es el error más común entre jugadores novatos.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Crea un fork (doble amenaza)</strong>
+                <p>
+                  Un fork es una posición donde tienes dos líneas con dos fichas cada
+                  una simultáneamente. El rival solo puede bloquear una, así que ganas
+                  por la otra. Crear un fork es la única forma de ganar contra un rival
+                  atento que siempre bloquea.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>Con juego perfecto de ambos, el empate es inevitable</strong>
+                <p>
+                  Si ambos jugadores aplican estos principios, ninguno puede ganar.
+                  El Tres en Raya es un juego resuelto donde el empate es el resultado
+                  teórico con estrategia perfecta. Ganar requiere que el rival cometa un error.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>4 principios tácticos para no perder nunca</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
+              <h4>El centro es la posición más poderosa</h4>
+              <p>
+                La casilla central conecta con las 2 diagonales, la fila central
+                y la columna central. Ocúpala siempre que puedas. Si la IA la toma
+                primero, responde con una esquina, nunca con un lado.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
+              <h4>Las esquinas superan a los lados</h4>
+              <p>
+                Cada esquina cubre 3 líneas ganadoras; cada lado solo cubre 2.
+                Preferir esquinas sobre lados aumenta tus opciones de fork y
+                hace más difícil que el rival te bloquee todas las vías.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
+              <h4>El fork es la única victoria garantizada</h4>
+              <p>
+                Crear una doble amenaza simultánea (fork) es el único patrón que
+                garantiza ganar contra un rival que siempre bloquea. Busca
+                posiciones donde un movimiento cree dos amenazas a la vez.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
+              <h4>Bloquea antes de atacar</h4>
+              <p>
+                Una amenaza del rival no bloqueada se convierte en derrota en
+                el siguiente turno. La defensa tiene prioridad absoluta sobre
+                el ataque, salvo que tengas una victoria inmediata disponible.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores que hacen perder al instante</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Ignorar la amenaza del rival por atacar.</strong> Si el rival
+                tiene dos fichas en línea y no bloqueas, perderás en el siguiente turno
+                sin importar lo buena que sea tu jugada de ataque.
+              </li>
+              <li>
+                <strong>No reconocer el fork del oponente.</strong> Si el rival construye
+                silenciosamente una doble amenaza, no habrá forma de bloquear ambas.
+                Hay que identificar y neutralizar el fork antes de que se complete.
+              </li>
+              <li>
+                <strong>Jugar los lados cuando el centro está libre.</strong> Los lados
+                son las posiciones más débiles del tablero (solo 2 líneas ganadoras).
+                Elegirlos sobre el centro o las esquinas limita severamente las opciones.
+              </li>
+              <li>
+                <strong>Subestimar al rival en el primer movimiento.</strong> El primer
+                movimiento determina todo el árbol de posibilidades. Una mala elección
+                inicial cede la iniciativa y obliga a jugar en modo defensivo el resto
+                de la partida.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('juego-tres-en-raya')} />
 

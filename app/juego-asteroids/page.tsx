@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoAsteroids.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -910,6 +910,355 @@ export default function JuegoAsteroidsPage() {
           </div>
         </div>
       </div>
+
+      {/* Contenido educativo colapsable */}
+      <EducationalSection
+        title="¿Quieres saber más sobre Asteroids y los arcades clásicos?"
+        subtitle="Descubre la historia, la física y los secretos del clásico de los 80"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section className={styles.guideSection}>
+          <h2>4 arcades clásicos de los 80: comparativa</h2>
+          <p>
+            Asteroids no fue el único mito de los salones recreativos. Aquí puedes comparar
+            los cuatro títulos que definieron una generación de jugadores.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Juego</th>
+                  <th>Año original</th>
+                  <th>Mecánica principal</th>
+                  <th>Habilidad ejercitada</th>
+                  <th>Dificultad progresiva</th>
+                  <th>Legado cultural</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🚀 Asteroids</td>
+                  <td>1979</td>
+                  <td>Destruir rocas espaciales con inercia newtoniana</td>
+                  <td>Control de inercia y precisión de disparo</td>
+                  <td>Más asteroides y OVNI según nivel</td>
+                  <td>Primer juego con puntuación de más de 1 millón de pts</td>
+                </tr>
+                <tr>
+                  <td>👾 Space Invaders</td>
+                  <td>1978</td>
+                  <td>Disparar oleadas de alienígenas en formación</td>
+                  <td>Velocidad de reacción y gestión del tiempo</td>
+                  <td>Los invasores aceleran al quedar pocos</td>
+                  <td>Primer fenómeno cultural masivo del videojuego</td>
+                </tr>
+                <tr>
+                  <td>👻 Pac-Man</td>
+                  <td>1980</td>
+                  <td>Recorrer laberintos comiendo puntos y huyendo</td>
+                  <td>Memoria espacial y anticipación de patrones</td>
+                  <td>Los fantasmas aumentan velocidad y agresividad</td>
+                  <td>Primer personaje de videojuego reconocible mundialmente</td>
+                </tr>
+                <tr>
+                  <td>🐝 Galaga</td>
+                  <td>1981</td>
+                  <td>Disparar oleadas de insectos espaciales en formación</td>
+                  <td>Precisión de puntería y multitarea</td>
+                  <td>Formaciones más complejas y ataques en picado</td>
+                  <td>Referente del género shoot &apos;em up vertical</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>¿Para qué sirve jugar a Asteroids hoy?</h2>
+          <p>
+            Más allá de la diversión, los arcades clásicos tienen usos prácticos
+            y educativos que siguen siendo relevantes décadas después.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🕹️</span>
+                <h4>Nostalgia gamer</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Si creciste en los 80 o 90, Asteroids es un viaje directo a los
+                salones recreativos de barrio. La misma tensión, la misma inercia
+                impredecible, el mismo sonido de explosión.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: comparte la pantalla con alguien mayor y cuéntale que esto
+                costaba 25 pesetas por partida en 1980.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎯</span>
+                <h4>Ejercicio de reflejos y coordinación</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                La inercia newtoniana de la nave obliga al jugador a anticipar
+                trayectorias, coordinar rotación con disparo y tomar decisiones
+                rápidas bajo presión constante.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: 10-15 minutos diarios de Asteroids mejoran la coordinación
+                mano-ojo de forma similar a otros juegos de precisión.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
+                <h4>Historia de los videojuegos</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Asteroids es un documento vivo del estado de la tecnología en 1979.
+                Los gráficos vectoriales, la física simplificada y la dificultad
+                infinita son soluciones creativas a las limitaciones del hardware.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: ideal para introducir a estudiantes de programación en los
+                conceptos de bucle de juego, colisiones y física básica.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre Asteroids</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuándo fue creado el Asteroids original?</summary>
+                <p>
+                  Asteroids fue lanzado por Atari en noviembre de 1979. Fue diseñado
+                  por Lyle Rains y Ed Logg, y se convirtió en el juego arcade más
+                  vendido de Atari hasta esa fecha. Llegó a España en los salones
+                  recreativos a principios de los años 80.
+                </p>
+                <p className={styles.faqTip}>
+                  Dato: Atari vendió más de 70.000 cabinetes arcade de Asteroids
+                  en todo el mundo, una cifra récord para la época.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué hace especial la física de Asteroids?</summary>
+                <p>
+                  A diferencia de la mayoría de arcades de su época, Asteroids
+                  implementa inercia newtoniana real: la nave no se detiene al soltar
+                  el impulso, sino que sigue moviéndose hasta que otra fuerza la
+                  frena. Esto crea una curva de aprendizaje única donde el control
+                  del movimiento es tan importante como la puntería.
+                </p>
+                <p className={styles.faqTip}>
+                  Curiosidad: la pantalla envolvente (wrap-around) donde salir por
+                  un lado te hace aparecer por el opuesto fue una solución técnica
+                  que se convirtió en mecánica de juego icónica.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Los juegos arcade mejoran los reflejos?</summary>
+                <p>
+                  Varios estudios en neurociencia cognitiva han demostrado que los
+                  videojuegos de acción mejoran la velocidad de procesamiento visual
+                  y la toma de decisiones bajo presión. Los arcades como Asteroids,
+                  con su ritmo rápido y consecuencias inmediatas, son especialmente
+                  efectivos para entrenar reflejos y coordinación mano-ojo.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuál es el récord mundial de Asteroids?</summary>
+                <p>
+                  El récord oficial del Asteroids original en recreativa fue establecido
+                  por Scott Safran en 1982 con una puntuación de 41.336.440 puntos,
+                  en una partida que duró más de 58 horas continuas. Este récord fue
+                  reconocido por Twin Galaxies, la organización oficial de récords de
+                  videojuegos arcade, y se mantuvo durante décadas.
+                </p>
+                <p className={styles.faqTip}>
+                  Referencia: Twin Galaxies Leaderboards, Asteroids Classic Arcade.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Por qué los juegos retro siguen siendo populares?</summary>
+                <p>
+                  Los juegos retro ofrecen una combinación de nostalgia, accesibilidad
+                  inmediata (sin tutoriales largos) y dificultad honesta (el juego no
+                  te da ventajas). Además, su mecánica simple pero profunda sigue siendo
+                  satisfactoria décadas después, algo que muchos juegos modernos con
+                  gráficos complejos no logran. La comunidad retrogamer crece año a año
+                  en España y en todo el mundo.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Cómo dominar Asteroids en 5 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Aprende los controles básicos: girar, impulsar, disparar</strong>
+                <p>
+                  Usa las flechas izquierda y derecha para rotar la nave, la flecha
+                  arriba para aplicar impulso en la dirección que apuntas, y la barra
+                  espaciadora para disparar. En móvil, usa los botones táctiles de la
+                  parte inferior de la pantalla.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Gestiona la inercia: no hay frenos, hay que anticipar</strong>
+                <p>
+                  Este es el concepto más importante de Asteroids. La nave no para
+                  al soltar el impulso. Para detenerte, debes rotar 180° y aplicar
+                  impulso en sentido contrario. Practica moviéndote despacio al
+                  principio hasta interiorizar esta mecánica.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Destruye los asteroides grandes primero: dan menos fragmentos</strong>
+                <p>
+                  Un asteroide grande (20 pts) se divide en 2 medianos (50 pts cada uno).
+                  Un mediano se divide en 2 pequeños (100 pts cada uno). Destruir un
+                  grande por completo hasta los pequeños te da 420 puntos totales.
+                  Prioriza eliminar toda la cadena antes de pasar al siguiente grande.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Cuidado con los fragmentos pequeños: más rápidos y difíciles</strong>
+                <p>
+                  Los asteroides pequeños se mueven más deprisa que los grandes y
+                  tienen trayectorias más impredecibles. No los ignores creyendo que
+                  son menos peligrosos: son los que más muertes provocan a jugadores
+                  intermedios por exceso de confianza.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>Usa el hiperespacio solo como último recurso</strong>
+                <p>
+                  El hiperespacio (botón H en teclado) te teletransporta a una
+                  posición aleatoria del mapa. Puede salvarte de una colisión
+                  inminente, pero también puede teletransportarte encima de un
+                  asteroide. Úsalo únicamente cuando no haya escapatoria posible.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>4 estrategias para mejorar tu puntuación</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
+              <h4>Mantén el centro del campo libre</h4>
+              <p>
+                Intenta limpiar el área central del mapa antes que los bordes.
+                Estar en el centro te da más tiempo de reacción ante cualquier
+                asteroide que se aproxime desde cualquier dirección.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">💥</span>
+              <h4>Dispara en ráfagas cortas y precisas</h4>
+              <p>
+                El juego limita a 5 balas en pantalla simultáneamente. Disparar
+                sin control malgasta balas y te deja desprotegido. Apunta antes
+                de disparar y espera a que las balas impacten o desaparezcan
+                antes de volver a disparar.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔮</span>
+              <h4>Anticipa la trayectoria de los fragmentos</h4>
+              <p>
+                Al destruir un asteroide, sus fragmentos salen en direcciones
+                predecibles basadas en el ángulo de impacto. Con práctica,
+                podrás disparar de forma que los fragmentos resultantes queden
+                ya en la línea de fuego de tus próximas balas.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
+              <h4>El hiperespacio es un riesgo calculado</h4>
+              <p>
+                Aunque tentador en momentos de pánico, el hiperespacio puede
+                teletransportarte encima de un asteroide. Si lo usas, hazlo
+                solo cuando estás rodeado sin escapatoria y acepta que el
+                resultado es incierto. No es un poder, es una apuesta.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores que acaban con tu partida</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Disparar sin control.</strong> Llenar la pantalla de balas
+                parece efectivo pero agota tu límite de 5 proyectiles simultáneos,
+                dejándote sin defensa mientras la pantalla se llena de fragmentos
+                pequeños más rápidos y difíciles de esquivar.
+              </li>
+              <li>
+                <strong>Quedarse quieto en el centro.</strong> Mantenerse parado
+                en el centro del campo creyendo que tienes buena visión general
+                te convierte en un blanco estático fácil para los asteroides
+                y especialmente para los disparos del OVNI.
+              </li>
+              <li>
+                <strong>No gestionar la inercia.</strong> El error más común de
+                jugadores nuevos: aplicar impulso hacia un asteroide sin calcular
+                que la nave seguirá moviéndose en esa dirección aunque dejes de
+                pulsar. La inercia residual mata más que los propios asteroides.
+              </li>
+              <li>
+                <strong>Usar el hiperespacio impulsivamente.</strong> En momentos
+                de pánico, el instinto es pulsar el hiperespacio. Pero teletransportarte
+                al azar puede ser fatal: puedes aparecer encima de un asteroide o
+                directamente en la trayectoria de un disparo del OVNI.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('juego-asteroids')} />
 

@@ -723,3 +723,328 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ── Tabla Comparativa ── */
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 560px;
+}
+
+.comparativaTable thead tr {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.comparativaTable th {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:nth-child(even) {
+  background: var(--hover);
+}
+
+.comparativaTable tbody tr:hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+/* ── Escenarios Grid ── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.escenarioCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border-left: 4px solid var(--primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-left-color: var(--secondary);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.escenarioIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.escenarioTip {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  font-style: italic;
+  margin: 0;
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── FAQ ── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-left: 3px solid var(--accent);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-left-color: var(--secondary);
+}
+
+.faqItem strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.95rem;
+}
+
+.faqItem p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-xs);
+}
+
+.faqItem p:last-child {
+  margin-bottom: 0;
+}
+
+.faqTip {
+  color: var(--primary) !important;
+  font-weight: 600;
+  font-size: 0.85rem !important;
+}
+
+[data-theme='dark'] .faqTip {
+  color: var(--accent) !important;
+}
+
+/* ── Guía Paso a Paso ── */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.stepContent strong {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.stepContent p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Tips Grid ── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+}
+
+.tipCard strong {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Warning Box ── */
+.warningBox {
+  background: #FFF8E1;
+  border: 1px solid #FFC107;
+  border-left: 4px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+  border-left-color: #F59E0B;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.warningHeader strong {
+  color: #92400E;
+  font-size: 1rem;
+}
+
+[data-theme='dark'] .warningHeader strong {
+  color: #FCD34D;
+}
+
+.warningIcon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.warningList li {
+  color: #78350F;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #FDE68A;
+}
+
+.warningList li strong {
+  color: #92400E;
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: #FCD34D;
+}
+
+@media (max-width: 768px) {
+  .comparativaTable {
+    font-size: 0.82rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}

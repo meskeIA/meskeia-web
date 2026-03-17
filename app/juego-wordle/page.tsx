@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoWordle.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Palabras de 5 letras en español (sin tildes para simplificar)
@@ -337,6 +337,338 @@ export default function JuegoWordlePage() {
           </div>
         </div>
       </div>
+
+      <EducationalSection
+        title="¿Quieres dominar el Wordle en español?"
+        subtitle="Estrategias, variantes, preguntas frecuentes y guía paso a paso para resolver cada palabra"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section>
+          <h2>Variantes del Wordle: comparativa</h2>
+          <p>
+            El Wordle original se juega con 5 letras y 6 intentos, pero existen variantes
+            que aumentan el reto o la diversión. Aquí las principales:
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Variante</th>
+                  <th>Letras</th>
+                  <th>Intentos</th>
+                  <th>Información revelada</th>
+                  <th>Dificultad</th>
+                  <th>Estrategia inicial</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Wordle clásico</td>
+                  <td>5</td>
+                  <td>6</td>
+                  <td>Color por posición y presencia</td>
+                  <td>Media</td>
+                  <td>Palabra con 4-5 vocales distintas (AUDIO, REINA)</td>
+                </tr>
+                <tr>
+                  <td>Wordle difícil</td>
+                  <td>5</td>
+                  <td>6</td>
+                  <td>Igual, pero obliga a usar pistas</td>
+                  <td>Alta</td>
+                  <td>Máxima cobertura consonántica desde el turno 2</td>
+                </tr>
+                <tr>
+                  <td>Wordle doble</td>
+                  <td>5</td>
+                  <td>7</td>
+                  <td>Dos tableros simultáneos</td>
+                  <td>Muy alta</td>
+                  <td>Primera palabra que informe ambos tableros a la vez</td>
+                </tr>
+                <tr>
+                  <td>Wordle ilimitado</td>
+                  <td>5</td>
+                  <td>6</td>
+                  <td>Igual al clásico, sin límite diario</td>
+                  <td>Media</td>
+                  <td>Practicar con palabras poco frecuentes del español</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section>
+          <h2>Tres usos habituales del Wordle en español</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📖</span>
+                <h4>Ejercicio diario de vocabulario</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Jugar una partida cada mañana activa el léxico pasivo: palabras que
+                reconoces pero rara vez usas. El formato de pistas obliga a razonar
+                sobre la estructura de las palabras.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: anota las palabras que no conocías y búscalas en el diccionario
+                de la RAE para fijar su significado.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
+                <h4>Reto compartido con amigos y familia</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Todos intentan adivinar la misma palabra del día. Al terminar, cada
+                jugador comparte su resultado en emojis de colores para comparar
+                estrategias sin revelar la solución.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: compartir el tablero de emojis permite comparar estrategias
+                sin desvelar la palabra a quienes aún no han jugado.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔤</span>
+                <h4>Aprendizaje de palabras poco frecuentes</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Palabras como ZARPA, SURCO o TARJA aparecen en el juego pero pocas
+                veces en conversación cotidiana. El Wordle las incorpora de forma
+                natural en el vocabulario activo.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: si la palabra solución te era desconocida, es una oportunidad
+                de aprendizaje, no un fracaso. El juego amplía el vocabulario jugando.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section>
+          <h2>Preguntas frecuentes sobre el Wordle</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuál es la mejor primera palabra en español?</summary>
+                <p>
+                  Las mejores palabras iniciales cubren la mayor cantidad de letras
+                  frecuentes del español. Palabras como <strong>AUDIO</strong>,{' '}
+                  <strong>REINA</strong> o <strong>CAIRE</strong> incluyen 4-5 vocales
+                  distintas (A, E, I, O, U) y consonantes habituales. Así, en el primer
+                  intento ya sabrás qué vocales contiene la palabra objetivo.
+                </p>
+                <p className={styles.faqTip}>
+                  Dato: las letras más frecuentes en palabras de 5 letras del español
+                  son A, E, O, R, S, L, N, C, T.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué significan los colores verde, amarillo y gris?</summary>
+                <p>
+                  <strong>Verde (correcto):</strong> la letra está en la palabra y en
+                  la posición exacta que la pusiste.
+                  <br />
+                  <strong>Amarillo (presente):</strong> la letra está en la palabra,
+                  pero en una posición diferente.
+                  <br />
+                  <strong>Gris (ausente):</strong> la letra no aparece en ninguna
+                  posición de la palabra objetivo.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuántas palabras de 5 letras hay en español?</summary>
+                <p>
+                  El diccionario de la RAE contiene aproximadamente 8.000-10.000 palabras
+                  de 5 letras. Sin embargo, los juegos de Wordle en español suelen
+                  trabajar con un subconjunto de 2.000-3.000 palabras de uso común para
+                  que las soluciones sean reconocibles por la mayoría de jugadores.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Existe estrategia para siempre resolver en 3-4 intentos?</summary>
+                <p>
+                  No existe una estrategia infalible, pero sí una que maximiza las
+                  probabilidades: usar el intento 1 para cubrir vocales, el intento 2
+                  para consonantes frecuentes no usadas, y a partir del intento 3,
+                  aplicar razonamiento deductivo puro. Con buenas elecciones iniciales,
+                  resolver en 3-4 intentos es lo habitual.
+                </p>
+                <p className={styles.faqTip}>
+                  Consejo: en cada turno, elige la palabra que elimine el mayor número
+                  de candidatas posibles, no la que crees que podría ser la solución.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué es el modo difícil?</summary>
+                <p>
+                  En el modo difícil, estás obligado a usar en cada intento todas las
+                  letras que ya has confirmado (verdes y amarillas). No puedes probar
+                  una palabra que ignore una letra verde ya confirmada. Esto elimina la
+                  estrategia de usar &quot;palabras de descarte&quot; y obliga a jugar
+                  con información incompleta desde el principio.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section>
+          <h2>Estrategia en 5 pasos para resolver el Wordle</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Empieza con una palabra rica en vocales</strong>
+                <p>
+                  Usa AUDIO, REINA o EUROS como primera palabra. Estas palabras cubren
+                  las cinco vocales del español (A, E, I, O, U) o muy cerca de eso,
+                  revelando de inmediato cuáles vocales contiene la solución.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Usa el intento 2 para consonantes frecuentes</strong>
+                <p>
+                  En el segundo intento, prueba consonantes habituales que no hayas
+                  usado: R, S, L, N, C, T. Una buena segunda palabra es TRINO, CLARO
+                  o SALTO. Así cubres el espectro de consonantes más comunes del español.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Confirma la posición de las letras amarillas</strong>
+                <p>
+                  Una letra amarilla indica presencia pero posición incorrecta. En el
+                  siguiente intento, coloca esa letra en una posición diferente. Nunca
+                  repitas una letra amarilla en la misma posición: es intento desperdiciado.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Elimina letras grises en todos los intentos siguientes</strong>
+                <p>
+                  Las letras grises no están en la palabra. Descártalas completamente.
+                  Cada nuevo intento debe evitar todas las letras ya marcadas en gris.
+                  Usar una letra gris de nuevo es perder una oportunidad valiosa.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>En los últimos intentos, prioriza información sobre acierto</strong>
+                <p>
+                  Si en el intento 4 o 5 aún tienes varias candidatas posibles, elige
+                  la palabra que distinga mejor entre ellas, aunque no sea la que crees
+                  que es la solución. Maximizar información aumenta las posibilidades
+                  de acertar en el último intento.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section>
+          <h2>4 claves para mejorar tu puntuación</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔤</span>
+              <h4>Primera palabra con A, E, I, O</h4>
+              <p>
+                Las cuatro vocales principales cubren el 85 % de frecuencia vocálica
+                en palabras de 5 letras. Una sola palabra que las incluya todas elimina
+                la incertidumbre más básica desde el primer turno.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
+              <h4>No repitas letras descartadas</h4>
+              <p>
+                Cada letra gris es información confirmada: esa letra no existe en la
+                palabra. Usarla de nuevo en otro intento significa perder ese turno
+                sin ganar ningún dato nuevo. Es el error más frecuente.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📍</span>
+              <h4>En modo difícil, usa verdes en su posición</h4>
+              <p>
+                En modo difícil, las letras verdes deben mantenerse en su posición
+                en todos los intentos siguientes. Planifica ya desde el turno 1 qué
+                posiciones quieres confirmar para no quedarte sin opciones.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🧠</span>
+              <h4>Maximiza información en cada turno</h4>
+              <p>
+                Antes de escribir, pregúntate: &quot;¿esta palabra me da nueva información
+                aunque no sea la solución?&quot;. Un intento que confirma 3 letras nuevas
+                vale más que uno que solo prueba si tu hipótesis actual es correcta.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores que arruinan tu partida</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Repetir letras grises.</strong> Una letra gris confirma que
+                no está en la palabra. Volver a usarla desperdicia un intento entero
+                sin aportar ninguna información nueva.
+              </li>
+              <li>
+                <strong>No usar letras amarillas en posición diferente.</strong> Una
+                letra amarilla debe aparecer en el siguiente intento en otra posición.
+                Ignorarla o repetirla en la misma posición es un error de deducción básico.
+              </li>
+              <li>
+                <strong>Adivinar aleatoriamente sin lógica deductiva.</strong> Con 3
+                intentos consumidos ya tienes mucha información. Escribir una palabra
+                al azar en lugar de aplicar lo que sabes suele terminar en fracaso.
+              </li>
+              <li>
+                <strong>Ignorar las letras verdes confirmadas.</strong> Una letra verde
+                ocupa su posición de forma definitiva. Moverla o sustituirla en el
+                siguiente intento descarta una certeza y reduce el espacio de búsqueda
+                por la mitad innecesariamente.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('juego-wordle')} />
 

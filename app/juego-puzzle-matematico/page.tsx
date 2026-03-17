@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './JuegoPuzzleMatematico.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Modo = 'suma' | 'resta' | 'multiplicacion' | 'division' | 'mixto';
@@ -446,6 +446,268 @@ export default function JuegoPuzzleMatematicoPage() {
           </div>
         </div>
       </div>
+
+      {/* Contenido educativo colapsable */}
+      <EducationalSection
+        title="¿Quieres aprender más sobre Puzzles Matemáticos?"
+        subtitle="Tipos de puzzle, estrategias, consejos y preguntas frecuentes"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section>
+          <h2>Tipos de puzzle matemático</h2>
+          <p>Cada tipo entrena habilidades cognitivas distintas. Conocer sus diferencias ayuda a elegir el ejercicio más adecuado para tu objetivo.</p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo de puzzle</th>
+                  <th>Habilidad ejercitada</th>
+                  <th>Dificultad</th>
+                  <th>Tiempo resolución</th>
+                  <th>Nivel educativo recomendado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🧮 Cálculo mental</td>
+                  <td>Aritmética rápida, memoria de trabajo</td>
+                  <td>Baja–Media</td>
+                  <td>5–30 segundos</td>
+                  <td>Primaria (8+)</td>
+                </tr>
+                <tr>
+                  <td>🔢 Secuencias numéricas</td>
+                  <td>Reconocimiento de patrones, inducción</td>
+                  <td>Media</td>
+                  <td>30 seg–2 min</td>
+                  <td>Secundaria (12+)</td>
+                </tr>
+                <tr>
+                  <td>📐 Geometría</td>
+                  <td>Visualización espacial, razonamiento deductivo</td>
+                  <td>Media–Alta</td>
+                  <td>1–5 minutos</td>
+                  <td>Secundaria/Bachillerato (14+)</td>
+                </tr>
+                <tr>
+                  <td>🔣 Lógica numérica</td>
+                  <td>Razonamiento abstracto, álgebra básica</td>
+                  <td>Alta</td>
+                  <td>2–10 minutos</td>
+                  <td>Bachillerato/Adultos (16+)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section>
+          <h2>¿Quién se beneficia de practicar puzzles matemáticos?</h2>
+          <p>Desde estudiantes hasta profesionales, los puzzles matemáticos se adaptan a distintos objetivos y momentos vitales.</p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎒</span>
+                <h4>Estudiante de primaria o secundaria</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un alumno de 10 años practica sumas y restas contrarreloj para mejorar su velocidad en los exámenes. Con 10 minutos diarios nota diferencia en pocas semanas.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: empieza por el modo Suma hasta encadenar 10 correctas seguidas antes de subir a Mixto.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧠</span>
+                <h4>Adulto manteniendo agilidad mental</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Una persona de 45 años usa puzzles matemáticos como «gimnasia mental» diaria, igual que haría sudokus, para mantener activa la capacidad de cálculo y concentración.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: varía el modo cada día (lunes suma, martes multiplicación…) para estimular diferentes circuitos cognitivos.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📋</span>
+                <h4>Preparación de pruebas de aptitud numérica</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un opositor o candidato en proceso de selección con pruebas psicotécnicas entrena velocidad y precisión en operaciones básicas para mejorar su rendimiento bajo presión de tiempo.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: el modo Mixto simula la variedad de operaciones que suelen aparecer en tests de aptitud numérica. Practica en sesiones de 2–3 rondas.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section>
+          <h2>Preguntas frecuentes sobre puzzles matemáticos</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Los puzzles matemáticos mejoran la inteligencia?</summary>
+                <p>
+                  Los puzzles matemáticos no elevan el cociente intelectual de forma directa, pero sí mejoran habilidades concretas: velocidad de cálculo, memoria de trabajo, capacidad de concentración y resolución de problemas. Estas habilidades tienen un impacto práctico medible en el rendimiento académico y laboral.
+                </p>
+                <p className={styles.faqTip}>
+                  Referencia: estudios de neurociencia cognitiva señalan que la práctica de aritmética mental activa las regiones prefrontal y parietal del cerebro, asociadas a la función ejecutiva.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuánto tiempo al día es óptimo practicar?</summary>
+                <p>
+                  Entre 10 y 20 minutos diarios es suficiente para obtener mejoras perceptibles. Sesiones más largas no producen beneficios adicionales significativos y pueden causar fatiga cognitiva. La constancia diaria supera en eficacia a sesiones esporádicas de mayor duración.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué diferencia hay entre cálculo mental y razonamiento lógico?</summary>
+                <p>
+                  El cálculo mental implica ejecutar operaciones aritméticas con rapidez (sumar, restar, multiplicar, dividir). El razonamiento lógico-numérico implica identificar reglas, patrones o relaciones entre números sin necesariamente operar con ellos. Ambos son complementarios y se entrenan de forma diferente.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Los puzzles matemáticos ayudan en las matemáticas escolares?</summary>
+                <p>
+                  Sí, especialmente en lo que respecta a la automatización de operaciones básicas. Un alumno que no necesita pensar conscientemente en cuánto es 7×8 puede dedicar más capacidad cognitiva a resolver problemas de mayor complejidad. Es el mismo principio que aprender a leer con fluidez para poder entender textos.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿A qué edad es mejor empezar a practicar puzzles matemáticos?</summary>
+                <p>
+                  Los puzzles de cálculo mental básico son apropiados desde los 6–7 años, cuando los niños ya dominan la suma simple. Los de multiplicación y división a partir de los 8–9 años. Los adultos también se benefician en cualquier etapa de la vida; no existe una edad límite para mejorar la agilidad numérica.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section>
+          <h2>Cómo afrontar un puzzle matemático: 5 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Lee el problema completo antes de resolver</strong>
+                <p>
+                  Antes de escribir nada, asegúrate de entender qué pide el enunciado. En puzzles contrarreloj, la precipitación lleva a errores evitables que rompen la racha.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Identifica qué operación o patrón se pide</strong>
+                <p>
+                  ¿Es suma, resta, multiplicación, división? ¿Hay un patrón de secuencia? Reconocer el tipo de operación en un vistazo te ahorra tiempo y reduce errores.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Descompón en pasos simples</strong>
+                <p>
+                  Para operaciones complejas, divide el cálculo. Ejemplo: 47 × 8 = (40 × 8) + (7 × 8) = 320 + 56 = 376. Esta técnica de descomposición es clave en el cálculo mental avanzado.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Verifica el resultado con la operación inversa</strong>
+                <p>
+                  Si tienes tiempo, comprueba: si 47 × 8 = 376, entonces 376 ÷ 8 debería dar 47. Esta verificación rápida previene errores en exámenes y tests de aptitud.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>Aumenta la dificultad progresivamente</strong>
+                <p>
+                  Una vez que domines un modo con más de un 85 % de aciertos, sube al siguiente nivel o activa el modo Mixto. La sobrecarga progresiva es el principio que garantiza la mejora continua.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section>
+          <h2>4 claves para sacar el máximo partido</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
+              <h4>Practica 10–15 minutos diarios</h4>
+              <p>
+                La consistencia supera a la intensidad. Diez minutos cada día producen más mejora que una sesión de una hora a la semana. Hazlo un hábito, no un esfuerzo puntual.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🪜</span>
+              <h4>Empieza por el nivel más bajo hasta dominarlo</h4>
+              <p>
+                Muchos usuarios saltan al modo Mixto antes de tener automatizadas las operaciones básicas. Domina Suma y Resta al 90 %+ antes de introducir Multiplicación.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
+              <h4>No uses calculadora</h4>
+              <p>
+                El objetivo es precisamente forzar al cerebro a calcular. Usar una calculadora elimina el estímulo cognitivo y hace el ejercicio inútil para mejorar el cálculo mental.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
+              <h4>Revisa los errores para aprender el patrón</h4>
+              <p>
+                Si te equivocas repetidamente en las divisiones por 7, eso revela un punto débil concreto. Identificar el patrón de error te permite dirigir la práctica donde más la necesitas.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores frecuentes al practicar puzzles matemáticos</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Saltar a dificultades altas sin base sólida.</strong> Intentar el modo Mixto sin dominar primero las operaciones individuales genera frustración y no produce mejora real. Consolida cada nivel antes de avanzar.
+              </li>
+              <li>
+                <strong>Usar calculadora en puzzles de cálculo mental.</strong> Si recurres a la calculadora para verificar antes de responder, el ejercicio pierde todo su valor. El error y la autocorrección forman parte del aprendizaje.
+              </li>
+              <li>
+                <strong>Rendirse al primer bloqueo sin intentar estrategias distintas.</strong> Cuando una operación no sale de inmediato, prueba descomponer los números, estimar primero el orden de magnitud o usar la operación inversa como pista.
+              </li>
+              <li>
+                <strong>No revisar los errores (se repiten los mismos patrones).</strong> Los errores sistemáticos (siempre en multiplicaciones de 8, siempre en divisiones con resultado impar) indican un patrón que no se corregirá solo con más práctica sin reflexión consciente.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('juego-puzzle-matematico')} />
 

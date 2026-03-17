@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoPlatformRunner.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -840,6 +840,340 @@ export default function JuegoPlatformRunnerPage() {
           </div>
         </div>
       </div>
+
+      {/* Contenido educativo colapsable */}
+      <EducationalSection
+        title="¿Quieres saber más sobre juegos de plataformas?"
+        subtitle="Descubre los tipos de runner, cómo mejorar tus reflejos y los secretos del género"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section className={styles.guideSection}>
+          <h2>Tipos de juegos de plataformas</h2>
+          <p>
+            Los juegos de plataformas y runner abarcan subgéneros muy distintos, cada uno
+            con su propia mecánica y curva de aprendizaje. Aquí tienes una comparativa.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Mecánica principal</th>
+                  <th>Habilidad requerida</th>
+                  <th>Curva de dificultad</th>
+                  <th>Tiempo de sesión típico</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🏃 Runner infinito</td>
+                  <td>Correr y esquivar obstáculos generados aleatoriamente</td>
+                  <td>Reflejos rápidos y anticipación</td>
+                  <td>Progresiva (velocidad creciente)</td>
+                  <td>2 – 10 minutos</td>
+                </tr>
+                <tr>
+                  <td>🍄 Plataformas clásico</td>
+                  <td>Navegar niveles con saltos precisos y eliminar enemigos</td>
+                  <td>Precisión y memoria espacial</td>
+                  <td>Escalonada por niveles</td>
+                  <td>15 – 45 minutos</td>
+                </tr>
+                <tr>
+                  <td>🎵 Runner rítmico</td>
+                  <td>Sincronizar saltos y acciones con la música</td>
+                  <td>Sentido del ritmo y coordinación</td>
+                  <td>Alta desde el principio</td>
+                  <td>3 – 15 minutos</td>
+                </tr>
+                <tr>
+                  <td>🧩 Plataformas puzzle</td>
+                  <td>Resolver puzles usando mecánicas de salto y gravedad</td>
+                  <td>Pensamiento lógico y paciencia</td>
+                  <td>Variable según puzle</td>
+                  <td>20 – 60 minutos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>¿Cuándo jugar a un platform runner?</h2>
+          <p>
+            Los juegos de plataformas se adaptan perfectamente a distintos momentos del día
+            según lo que busques.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">⏱️</span>
+                <h4>Juego rápido en pausas cortas</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Tienes 5 – 10 minutos libres entre reuniones o mientras esperas. Un runner
+                infinito es perfecto: una partida rápida, sin necesidad de guardar progreso
+                ni recordar dónde estabas.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: los runners infinitos están diseñados para sesiones cortas. No hace
+                falta completar nada para sentir satisfacción.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚡</span>
+                <h4>Entrenamiento de reflejos y coordinación</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Jugar a plataformas de forma regular entrena la coordinación ojo-mano y los
+                tiempos de reacción. Útil para mantener agilidad mental en todas las edades.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: aumenta gradualmente la dificultad. El progreso en juegos de
+                reflejos es fácilmente medible comparando tus puntuaciones.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎮</span>
+                <h4>Entretenimiento casual sin compromisos</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                A diferencia de los RPGs o los juegos de estrategia, los runners no exigen
+                horas de dedicación ni seguir una historia. Puedes empezar y parar cuando
+                quieras sin perder nada importante.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: ideales para personas que quieren disfrutar de videojuegos sin
+                compromisos de tiempo o sin tener que aprender mecánicas complejas.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre plataformas y runners</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué es un endless runner?</summary>
+                <p>
+                  Un endless runner (runner infinito) es un género de videojuego en el que
+                  el personaje se mueve automáticamente hacia adelante sin detenerse. El
+                  jugador solo controla saltos, deslizamientos u otras acciones para esquivar
+                  obstáculos generados de forma procedural. El objetivo es sobrevivir el mayor
+                  tiempo o distancia posible. Temple Run y Subway Surfers son ejemplos icónicos.
+                </p>
+                <p className={styles.faqTip}>
+                  Curiosidad: el género despegó en dispositivos móviles gracias a que su
+                  mecánica de un solo botón es perfecta para pantallas táctiles.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Los juegos de plataformas mejoran los reflejos?</summary>
+                <p>
+                  Sí. Varios estudios de psicología cognitiva han demostrado que los juegos
+                  de acción y plataformas mejoran el tiempo de reacción visual, la atención
+                  dividida y la coordinación ojo-mano. El efecto es más pronunciado con
+                  práctica regular de 20 – 30 minutos diarios. No sustituyen el ejercicio
+                  físico, pero son un entrenamiento cognitivo real.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuál fue el primer juego de plataformas?</summary>
+                <p>
+                  Donkey Kong (Nintendo, 1981) se considera el primer juego de plataformas
+                  tal como los conocemos hoy, con saltos sobre obstáculos en un entorno
+                  vertical. Sin embargo, Space Panic (1980) ya usaba plataformas sin saltos.
+                  El género se popularizó masivamente con Super Mario Bros. (1985), que
+                  definió los estándares del scrolling lateral.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Por qué son tan adictivos los runners infinitos?</summary>
+                <p>
+                  Los runners infinitos usan varios mecanismos psicológicos de refuerzo:
+                  la generación aleatoria de obstáculos mantiene la novedad constante, las
+                  partidas cortas eliminan la barrera de entrada, y el marcador de récord
+                  activa el deseo de superación personal. Cada muerte es seguida de un
+                  &quot;casi lo consigo&quot; que motiva a intentarlo de nuevo inmediatamente.
+                </p>
+                <p className={styles.faqTip}>
+                  Consejo: establece un límite de partidas para evitar el bucle de
+                  &quot;una más&quot; en momentos de poco tiempo disponible.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cómo mejoro mi puntuación récord?</summary>
+                <p>
+                  La clave es la anticipación, no la reacción. Mira siempre unos pasos
+                  por delante del personaje, no solo donde está en ese momento. Identifica
+                  patrones de obstáculos repetidos (muchos juegos los tienen aunque parezcan
+                  aleatorios) y practica en sesiones cortas y concentradas en lugar de largas
+                  y agotadas. El cansancio es el mayor enemigo de los buenos reflejos.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Cómo dominar un platform runner: 5 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Familiarízate con el timing de salto</strong>
+                <p>
+                  Cada juego tiene su propia &quot;física&quot; de salto: altura, gravedad y tiempo
+                  de caída. Dedica las primeras partidas a interiorizar cuándo y cuánto
+                  debes pulsar el botón antes de tocar el obstáculo.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Aprende los patrones de obstáculos</strong>
+                <p>
+                  Aunque parezca aleatorio, la mayoría de runners usa un conjunto limitado
+                  de combinaciones de obstáculos. Con la práctica reconocerás visualmente
+                  las formaciones antes de que lleguen y sabrás cómo reaccionar.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Anticipa en lugar de reaccionar</strong>
+                <p>
+                  El gran salto de nivel viene cuando dejas de reaccionar a lo que ya
+                  está delante tuya y empiezas a leer el juego varios pasos por adelante.
+                  Entrena la vista para explorar el espacio que está por venir, no solo
+                  el obstáculo inmediato.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Mantén el ritmo y no te precipites</strong>
+                <p>
+                  La precipitación es la principal causa de errores. Cuando el juego
+                  acelera, tu tendencia será a tensar los músculos y pulsar antes de
+                  tiempo. Respira y confía en el timing que ya has interiorizado.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>Bate tu récord propio como objetivo gradual</strong>
+                <p>
+                  Compararte con otros jugadores puede ser desmotivador al principio.
+                  Fija como objetivo superar tu propia mejor marca en pequeños pasos:
+                  si tu récord es 500 puntos, apunta a 550. Este enfoque genera progreso
+                  continuo y sostenible.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>4 consejos para jugar mejor</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">👁️</span>
+              <h4>Anticipa, no reacciones en el último momento</h4>
+              <p>
+                La diferencia entre un jugador principiante y uno avanzado es la
+                anticipación. Los jugadores expertos leen el escenario con varios
+                fotogramas de antelación, dando tiempo a preparar la acción correcta.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🧘</span>
+              <h4>Mantén el estado de flow sin distracciones</h4>
+              <p>
+                Los mejores resultados llegan cuando estás completamente concentrado.
+                Silencia notificaciones, busca un entorno tranquilo y deja que el
+                juego ocupe toda tu atención. La distracción rompe el ritmo y causa
+                errores evitables.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
+              <h4>Sesiones cortas y frecuentes para mejorar</h4>
+              <p>
+                Treinta minutos diarios durante una semana son más efectivos que
+                tres horas de una sola vez. Las habilidades motoras y los reflejos
+                se consolidan durante el descanso entre sesiones, no durante el juego.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
+              <h4>Aprende de cada fallo identificando el obstáculo</h4>
+              <p>
+                Cuando mueras, identifica mentalmente qué obstáculo causó el error
+                y por qué fallaste (reacción tardía, salto demasiado pronto, etc.).
+                Este análisis consciente acelera la curva de aprendizaje mucho más
+                que simplemente repetir la partida sin reflexionar.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores habituales al jugar a runners</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Reaccionar tardíamente:</strong> el juego requiere anticipación,
+                no reacción. Si esperas a ver el obstáculo para decidir, ya es demasiado
+                tarde. Entrena la vista para leer el escenario por adelantado.
+              </li>
+              <li>
+                <strong>Perder la concentración buscando récords por encima de tus posibilidades:</strong>{' '}
+                la obsesión por superar marcas inalcanzables en el momento genera ansiedad
+                y empeora el rendimiento. El progreso gradual y la paciencia son más
+                efectivos que la presión extrema.
+              </li>
+              <li>
+                <strong>Jugar con cansancio extremo:</strong> los reflejos disminuyen
+                significativamente con el cansancio físico y mental. Una sesión agotada
+                produce más frustración que aprendizaje. Si llevas mucho tiempo jugando
+                sin mejorar, es la señal de que debes parar y descansar.
+              </li>
+              <li>
+                <strong>Sesiones demasiado largas sin descanso:</strong> la fatiga visual
+                y cognitiva se acumula rápidamente en juegos de alta intensidad de reflejos.
+                Descansa al menos 5 minutos por cada 30 – 40 minutos de juego para mantener
+                el rendimiento y cuidar la vista.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('juego-platform-runner')} />
 

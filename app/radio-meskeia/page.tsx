@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './RadioMeskeia.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import Hls from 'hls.js';
 
@@ -591,6 +591,346 @@ export default function RadioMeskeiaPage() {
           📡 Emisoras proporcionadas por <a href="https://www.radio-browser.info" target="_blank" rel="noopener noreferrer">Radio Browser</a> (base de datos comunitaria)
         </p>
       </div>
+
+      {/* Contenido educativo colapsable */}
+      <EducationalSection
+        title="¿Quieres sacar más partido a la radio online?"
+        subtitle="Descubre qué género musical ayuda a concentrarte, cuándo escuchar y cómo sacarle el máximo provecho al streaming de audio"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section className={styles.guideSection}>
+          <h2>Géneros y tipos de emisora: guía rápida</h2>
+          <p>
+            No todas las emisoras son iguales para cada momento. Esta tabla compara los cuatro
+            tipos más comunes según su efecto en la concentración, el estado de ánimo y la actividad
+            que mejor acompaña.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo de emisora</th>
+                  <th>Concentración al trabajar</th>
+                  <th>Estado de ánimo</th>
+                  <th>Momento del día recomendado</th>
+                  <th>Actividad compatible</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🎵 Música pop / hits</td>
+                  <td>Baja (letra distrae)</td>
+                  <td>Animado y festivo</td>
+                  <td>Tarde / noche</td>
+                  <td>Ejercicio, tareas del hogar, conducir</td>
+                </tr>
+                <tr>
+                  <td>🎷 Jazz / clásica</td>
+                  <td>Alta (sin letra)</td>
+                  <td>Relajado y sofisticado</td>
+                  <td>Mañana / tarde</td>
+                  <td>Teletrabajo, lectura, estudio</td>
+                </tr>
+                <tr>
+                  <td>📰 Noticias / radio generalista</td>
+                  <td>Muy baja (contenido verbal)</td>
+                  <td>Informado, activo</td>
+                  <td>Mañana temprano</td>
+                  <td>Desayuno, rutina matinal, cocinar</td>
+                </tr>
+                <tr>
+                  <td>🎧 Ambient / lo-fi trabajo</td>
+                  <td>Muy alta (sin letra, ritmo constante)</td>
+                  <td>Sereno y enfocado</td>
+                  <td>Cualquier hora</td>
+                  <td>Teletrabajo intenso, programar, escribir</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>Situaciones reales: quién usa radio online y cómo</h2>
+          <p>
+            La radio online se adapta a momentos muy distintos del día. Aquí tienes tres
+            perfiles habituales con su contexto y consejo práctico.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
+                <h4>Teletrabajador buscando concentración</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                María trabaja desde casa y necesita música de fondo que no la distraiga.
+                Prueba emisoras de jazz instrumental o lo-fi a volumen bajo (30-40 %) y
+                nota que su productividad mejora sin interrupciones lingüísticas.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: evita emisoras con locutores o publicidad frecuente durante bloques
+                de trabajo intenso; opta por géneros instrumentales continuos.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏃</span>
+                <h4>Persona haciendo deporte en casa</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Carlos hace su rutina de ejercicio en el salón. Elige emisoras de pop
+                energético o radio dance a volumen más alto (60-70 %) para mantener
+                el ritmo y la motivación durante toda la sesión.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: prepara con antelación la emisora antes de empezar para no perder
+                calor corporal buscando durante el entrenamiento.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🍳</span>
+                <h4>Escucha de noticias mientras cocina</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Ana aprovecha el tiempo de cocinar para escuchar las noticias de la mañana
+                en una emisora generalista. El audio de fondo le mantiene informada sin
+                necesitar mirar ninguna pantalla.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: las emisoras de radio generalista funcionan perfectamente para
+                tareas manuales que no requieren atención cognitiva elevada.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre radio online y streaming</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿La música mejora la productividad al trabajar?</summary>
+                <p>
+                  Depende del tipo de tarea y del género. Para tareas repetitivas o
+                  manuales, la música de fondo mejora el rendimiento y el estado de ánimo.
+                  Para tareas que requieren procesamiento verbal intenso (redactar, leer
+                  textos complejos), la música con letra puede interferir negativamente.
+                  La música instrumental, el jazz o el ambient son las opciones más neutras
+                  para el trabajo cognitivo.
+                </p>
+                <p className={styles.faqTip}>
+                  Referencia: efecto Mozart y estudios de productividad con música instrumental
+                  sin letra en entornos laborales.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué género es mejor para estudiar?</summary>
+                <p>
+                  Los géneros instrumentales sin letra son los más recomendados para el
+                  estudio: música clásica, jazz suave, lo-fi hip-hop o sonidos ambientales.
+                  Estos géneros evitan la interferencia lingüística que produce la letra de
+                  las canciones con el procesamiento de texto escrito. El ritmo constante
+                  y predecible también favorece el estado de flujo mental.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿La radio online consume muchos datos?</summary>
+                <p>
+                  El consumo depende de la calidad del stream. Una emisora estándar a
+                  128 kbps consume aproximadamente 58 MB por hora. A 320 kbps (alta
+                  calidad) sube a unos 144 MB por hora. En conexión WiFi esto es
+                  inapreciable; en datos móviles conviene elegir emisoras de menor bitrate
+                  si tienes una tarifa limitada.
+                </p>
+                <p className={styles.faqTip}>
+                  Dato: cada emisora muestra su bitrate en kbps en la lista de Radio meskeIA.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuál es la diferencia entre radio online y podcast?</summary>
+                <p>
+                  La radio online es emisión en directo y continua: no puedes pausar ni
+                  retroceder, y el contenido es determinado por la emisora en tiempo real.
+                  El podcast es contenido grabado bajo demanda: puedes escucharlo cuando
+                  quieras, pausar, retroceder y elegir el episodio concreto. La radio
+                  es más adecuada para música y noticias del momento; el podcast para
+                  formación, entretenimiento estructurado y contenidos en profundidad.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Puedo escuchar radio sin internet?</summary>
+                <p>
+                  La radio online requiere conexión a internet para el streaming en
+                  tiempo real. Sin embargo, la radio FM/AM tradicional funciona sin
+                  datos usando la antena del dispositivo. Algunos móviles conservan un
+                  sintonizador FM integrado que no consume datos. Para escuchar sin
+                  internet también puedes descargar podcasts previamente cuando tengas
+                  cobertura.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Cómo elegir la emisora perfecta: 5 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Identifica tu estado de ánimo y actividad</strong>
+                <p>
+                  Antes de elegir emisora, pregúntate qué vas a hacer: trabajar con
+                  concentración, hacer ejercicio, cocinar o simplemente relajarte. El
+                  contexto define qué tipo de audio es más adecuado en cada momento.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Elige el género apropiado para esa actividad</strong>
+                <p>
+                  Usa la tabla comparativa de esta sección como referencia. Para
+                  concentración, instrumentales. Para ejercicio, pop energético. Para
+                  tareas del hogar, noticias o music hits. Para máxima concentración,
+                  ambient o lo-fi.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Ajusta el volumen según la actividad</strong>
+                <p>
+                  Para trabajo cognitivo o estudio, mantén el volumen por debajo del
+                  50 % del máximo. Para ejercicio físico puedes subirlo a 60-70 %.
+                  El volumen excesivo prolongado puede causar fatiga auditiva.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Usa auriculares para mayor inmersión</strong>
+                <p>
+                  Los auriculares, especialmente los de cancelación de ruido, mejoran
+                  significativamente la experiencia de escucha en entornos con
+                  distracciones externas. Son especialmente útiles en espacios
+                  compartidos o cuando hay ruido ambiental.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>Explora emisoras nuevas cuando la rutina se vuelve monótona</strong>
+                <p>
+                  Si una emisora empieza a sentirse repetitiva o distrae en lugar de
+                  acompañar, es señal de cambiar. Radio meskeIA tiene miles de emisoras
+                  organizadas por país y categoría: aprovecha los filtros para descubrir
+                  nuevas opciones.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>4 buenas prácticas para escuchar radio con intención</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎹</span>
+              <h4>Música instrumental para tareas cognitivas</h4>
+              <p>
+                Cuando necesites leer, escribir o resolver problemas, opta siempre
+                por música sin letra. La voz humana compite con el procesamiento
+                lingüístico del cerebro y reduce el rendimiento en estas tareas.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔁</span>
+              <h4>No cambies de emisora constantemente</h4>
+              <p>
+                Cada cambio de emisora interrumpe el flujo de concentración.
+                Elige la emisora antes de empezar la tarea y mantenla hasta que
+                termines el bloque de trabajo. Cambiar cada pocos minutos genera
+                más distracción que silencio.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔉</span>
+              <h4>Volumen por debajo del 50 % para trabajar</h4>
+              <p>
+                El volumen óptimo de fondo para trabajo intelectual es el que permite
+                escuchar la música sin prestarle atención activa. Si te sorprendes
+                siguiendo la melodía o la letra, el volumen está demasiado alto.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">☁️</span>
+              <h4>Prueba radio ambiental para máxima concentración</h4>
+              <p>
+                El lo-fi, los café sounds y la música ambient están diseñados
+                específicamente para crear un fondo sonoro neutro y constante.
+                Son la opción más efectiva cuando necesitas el máximo nivel
+                de concentración sostenida.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores frecuentes al usar radio de fondo</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Música con letra para tareas que requieren leer o escribir.</strong> La
+                letra de las canciones interfiere directamente con el procesamiento lingüístico
+                del cerebro. Es uno de los mayores enemigos de la concentración al trabajar
+                con texto.
+              </li>
+              <li>
+                <strong>Volumen demasiado alto en exposición prolongada.</strong> Escuchar
+                audio por encima del 85 dB durante más de dos horas continuadas puede causar
+                daño auditivo acumulativo. Mantén el volumen en niveles conversacionales
+                y tómate descansos auditivos.
+              </li>
+              <li>
+                <strong>Cambiar de emisora cada pocos minutos.</strong> La búsqueda constante
+                de la emisora perfecta crea más interrupciones que la propia música. Decide
+                antes de empezar y no vuelvas a tocar el reproductor hasta terminar el bloque
+                de trabajo.
+              </li>
+              <li>
+                <strong>Usar radio con publicidad frecuente para concentración profunda.</strong> Los
+                cortes publicitarios en emisoras comerciales interrumpen el flujo sonoro de
+                forma abrupta. Para sesiones de trabajo intenso, elige emisoras sin publicidad
+                o con bloques publicitarios infrecuentes.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('radio-meskeia')} />
 

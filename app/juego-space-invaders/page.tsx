@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoSpaceInvaders.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -730,6 +730,337 @@ export default function JuegoSpaceInvadersPage() {
           </div>
         </div>
       </div>
+
+      <EducationalSection
+        title="¿Quieres dominar Space Invaders?"
+        subtitle="Historia, estrategias y curiosidades del clásico arcade de 1978"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa de Niveles ── */}
+        <section>
+          <h2>Comparativa de niveles: velocidad y estrategia</h2>
+          <p>
+            En Space Invaders la dificultad escala progresivamente. Cada nivel reduce el intervalo
+            de movimiento de los invasores, cambiando por completo la táctica necesaria para sobrevivir.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Nivel</th>
+                  <th>Velocidad invasores</th>
+                  <th>Puntos por invasor</th>
+                  <th>Dificultad defensas</th>
+                  <th>Estrategia recomendada</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🟢 Nivel 1 (lento)</td>
+                  <td>Muy pausada</td>
+                  <td>10 – 30 pts</td>
+                  <td>Baja</td>
+                  <td>Aprender patrones, acumular puntos con el OVNI</td>
+                </tr>
+                <tr>
+                  <td>🟡 Nivel 3 (medio)</td>
+                  <td>Notablemente más rápida</td>
+                  <td>10 – 30 pts</td>
+                  <td>Media</td>
+                  <td>Eliminar columnas laterales para reducir el frente de ataque</td>
+                </tr>
+                <tr>
+                  <td>🟠 Nivel 5 (rápido)</td>
+                  <td>Alta, difícil de seguir</td>
+                  <td>10 – 30 pts</td>
+                  <td>Alta</td>
+                  <td>Priorizar los invasores inferiores, mantenerse en los extremos</td>
+                </tr>
+                <tr>
+                  <td>🔴 Nivel 10+ (caótico)</td>
+                  <td>Casi instantánea</td>
+                  <td>10 – 30 pts</td>
+                  <td>Muy alta</td>
+                  <td>Anticipar aceleración final, disparos precisos sin malgastar</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section>
+          <h2>¿Por qué jugar Space Invaders hoy?</h2>
+          <p>
+            Más allá de la nostalgia, Space Invaders sigue siendo relevante por razones muy distintas
+            según quién se sienta frente al mando.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🕹️</span>
+                <h4>Retrogamer disfrutando del clásico de 1978</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un jugador que vivió la era dorada de los arcades reconoce al instante el movimiento
+                lateral sincronizado de los invasores y la sensación de urgencia cuando quedan pocos.
+              </p>
+              <p className={styles.escenarioTip}>
+                Curiosidad: en los arcades originales, el juego se aceleraba al quedar menos invasores
+                porque el hardware no tenía que calcular tantos sprites — ¡era un accidente que se
+                convirtió en mecánica de juego!
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧠</span>
+                <h4>Desarrollo de reflejos y concentración bajo presión</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Space Invaders exige coordinación ojo-mano, gestión del estrés ante la aceleración
+                progresiva y toma de decisiones rápidas con recursos limitados (solo 1 disparo en
+                pantalla a la vez).
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: jugar partidas cortas de 10-15 minutos entrena la atención sostenida y la
+                respuesta rápida, habilidades transferibles a muchos contextos cotidianos.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
+                <h4>Aprendizaje de la historia de los videojuegos</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Space Invaders (1978, Taito) es uno de los títulos que definió la industria: fue el
+                primer juego en guardar puntuaciones, popularizó las máquinas recreativas y transformó
+                Japón — llegó a haber escasez de monedas de 100 yenes por su popularidad.
+              </p>
+              <p className={styles.escenarioTip}>
+                Dato histórico: Space Invaders recaudó más de 500 millones de dólares en su primer
+                año de arcade, eclipsando a la industria cinematográfica de la época.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section>
+          <h2>Preguntas frecuentes sobre Space Invaders</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuándo se lanzó Space Invaders original?</summary>
+                <p>
+                  Space Invaders fue lanzado en julio de 1978 por Taito Corporation en Japón, y en
+                  Norte América por Midway en ese mismo año. Fue creado por Tomohiro Nishikado, quien
+                  diseñó también el hardware específico para poder ejecutar el juego, ya que la
+                  tecnología disponible no era suficiente.
+                </p>
+                <p className={styles.faqTip}>
+                  Dato: Nishikado se inspiró en juegos como Breakout de Atari y en la novela
+                  &quot;La guerra de los mundos&quot; de H.G. Wells para el diseño de los invasores.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Por qué se aceleran los invasores cuando quedan pocos?</summary>
+                <p>
+                  En el arcade original no fue un diseño intencional: el hardware de 1978 necesitaba
+                  calcular y dibujar cada sprite individualmente. Con menos invasores vivos, el
+                  procesador terminaba el ciclo de renderizado más rápido, resultando en un movimiento
+                  más veloz. Taito decidió conservar el &quot;bug&quot; porque hacía el juego más emocionante.
+                </p>
+                <p className={styles.faqTip}>
+                  En las versiones modernas esta aceleración se implementa de forma intencional como
+                  homenaje a la mecánica original.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué invasor da más puntos?</summary>
+                <p>
+                  En el arcade original, los invasores de la fila superior (los más pequeños, tipo
+                  cangrejo) valen 30 puntos, los de las filas intermedias 20 puntos, y los de las
+                  filas inferiores 10 puntos. El OVNI rojo que cruza en la parte superior puede valer
+                  entre 50 y 300 puntos dependiendo del número de disparo realizado.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuál es el récord mundial de puntuación?</summary>
+                <p>
+                  El récord oficial en la versión arcade original está en torno a los 110.000 puntos,
+                  alcanzado gracias al llamado &quot;kill screen kill&quot; — una técnica donde el juego
+                  se reinicia indefinidamente. En torneos modernos con reglas estrictas, las mejores
+                  marcas se sitúan alrededor de los 55.000-60.000 puntos en una sola partida sin
+                  reinicios.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Por qué Space Invaders fue tan revolucionario?</summary>
+                <p>
+                  Fue el primer videojuego en introducir el sistema de puntuaciones guardadas (high
+                  scores), creando la cultura de la competición. También popularizó el concepto de
+                  &quot;vidas&quot; múltiples, los enemigos que disparan de vuelta al jugador, y la tensión
+                  musical dinámica (los 4 notas que se aceleran). Transformó los videojuegos de
+                  curiosidades tecnológicas en fenómeno cultural global.
+                </p>
+                <p className={styles.faqTip}>
+                  Impacto económico: Atari pagó 2 millones de dólares por los derechos para la
+                  versión doméstica — la licencia más cara hasta esa fecha — y cuadruplicó las
+                  ventas de la Atari 2600.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section>
+          <h2>Guía táctica: 5 pasos para sobrevivir más tiempo</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Priorizar eliminar la columna lateral</strong>
+                <p>
+                  Empieza siempre atacando una de las columnas de los extremos. Cada columna eliminada
+                  reduce el ancho del frente de ataque invasor, lo que disminuye el área que puedes
+                  recibir disparos enemigos y te da más espacio para maniobrar.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Apuntar al invasor más bajo de cada columna</strong>
+                <p>
+                  Los invasores de la fila inferior son los que pueden alcanzarte primero al bajar.
+                  Eliminarlos también te permite llegar a los de las filas superiores (que valen más
+                  puntos) sin que la formación descienda demasiado rápido.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Usar las defensas como cobertura táctica</strong>
+                <p>
+                  Los búnkeres (defensas) absorben los disparos enemigos. Posiciona tu cañón detrás
+                  de una defensa intacta para disparar a través del hueco que tú mismo vayas creando.
+                  No te quedes detrás de una defensa ya muy destruida — no ofrece protección real.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>El OVNI rojo aparece periódicamente — vale muchos puntos</strong>
+                <p>
+                  El OVNI aparece cada cierto tiempo cruzando la parte superior de la pantalla. En el
+                  arcade original el valor (50, 100, 150 o 300 puntos) depende del número total de
+                  disparos realizados. Cuando lo veas, interrumpe momentáneamente la táctica habitual
+                  e intenta derribarlo antes de que desaparezca.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>En los últimos invasores, anticipar su aceleración</strong>
+                <p>
+                  Cuando quedan 5 o menos invasores, se mueven extremadamente rápido. En lugar de
+                  seguir su movimiento de forma reactiva, aprende el patrón lateral y dispara
+                  anticipándote a donde van a estar, no donde están ahora.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section>
+          <h2>4 hábitos que separan a los buenos jugadores</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
+              <h4>Eliminar por columnas, no por filas</h4>
+              <p>
+                Avanzar columna a columna reduce el frente de ataque progresivamente. Intentar limpiar
+                filas completas deja muchas columnas activas y expone al jugador a un campo de fuego
+                enemigo mucho más amplio.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
+              <h4>No malgastar disparos (solo 1 bala en pantalla)</h4>
+              <p>
+                Tu cañón solo puede tener 1 disparo activo en pantalla a la vez. Si disparas y la bala
+                sigue en vuelo, no puedes disparar de nuevo hasta que impacte o salga por arriba. Cada
+                disparo debe tener un objetivo real antes de presionar el gatillo.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
+              <h4>Usar las defensas inteligentemente</h4>
+              <p>
+                No te quedes estático detrás de una defensa ya destruida pensando que te protege.
+                Evalúa constantemente el estado de los búnkeres y reposiciónate en cuanto uno quede
+                inutilizable como cobertura.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🛸</span>
+              <h4>El OVNI vale entre 50 y 300 puntos</h4>
+              <p>
+                El valor del OVNI rojo no es aleatorio en el original: depende del número de disparo.
+                El disparo número 23 (y cada 15 disparos después) garantiza 300 puntos. En versiones
+                modernas el valor puede variar, pero siempre merece intentar derribarlo.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores que acaban con tu partida prematuramente</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Disparar sin apuntar.</strong> Solo puedes tener 1 bala en pantalla a la vez.
+                Disparar en cuanto se recarga sin un objetivo claro significa que pierdes el control
+                del timing y desperdicias la oportunidad de impactar al invasor que más amenaza.
+              </li>
+              <li>
+                <strong>Quedarse en el centro.</strong> El centro del campo es la posición más
+                expuesta: los invasores te atacan desde ambos flancos con el campo de fuego máximo.
+                Posicionarte en los extremos reduce el ángulo de ataque enemigo que tienes que cubrir.
+              </li>
+              <li>
+                <strong>No moverse lateralmente para esquivar.</strong> Los disparos enemigos son
+                lentos al principio. Un jugador que se queda inmóvil esperando disparar recibe impactos
+                que eran fácilmente esquivables con un simple paso lateral a tiempo.
+              </li>
+              <li>
+                <strong>Ignorar el OVNI rojo.</strong> Es la mayor fuente de puntos bonus del juego.
+                Pasar por alto sus apariciones porque &quot;interrumpe la estrategia&quot; es ceder cientos
+                de puntos que pueden marcar la diferencia entre superar o no un nivel de dificultad
+                alta.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('juego-space-invaders')} />
 

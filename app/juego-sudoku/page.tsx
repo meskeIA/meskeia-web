@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoSudoku.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Dificultad = 'facil' | 'medio' | 'dificil';
@@ -534,6 +534,333 @@ export default function JuegoSudokuPage() {
           </div>
         </div>
       </div>
+
+      {/* Contenido educativo colapsable */}
+      <EducationalSection
+        title="¿Quieres aprender más sobre Sudoku?"
+        subtitle="Técnicas, niveles, consejos y errores frecuentes para dominar el juego"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa de Niveles ── */}
+        <section>
+          <h2>Niveles de dificultad comparados</h2>
+          <p>
+            Cada nivel exige un conjunto diferente de técnicas. Conocer qué esperar en cada uno
+            te ayuda a elegir el reto adecuado y mejorar progresivamente.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Nivel</th>
+                  <th>Celdas dadas</th>
+                  <th>Técnicas necesarias</th>
+                  <th>Tiempo promedio</th>
+                  <th>Estrategia clave</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🟢 Fácil</td>
+                  <td>46 – 50</td>
+                  <td>Naked single</td>
+                  <td>5 – 10 min</td>
+                  <td>Buscar celdas con una sola opción</td>
+                </tr>
+                <tr>
+                  <td>🟡 Medio</td>
+                  <td>36 – 45</td>
+                  <td>Naked single + hidden single</td>
+                  <td>15 – 30 min</td>
+                  <td>Identificar números exclusivos por bloque</td>
+                </tr>
+                <tr>
+                  <td>🔴 Difícil</td>
+                  <td>26 – 35</td>
+                  <td>Pares desnudos, apuntamiento</td>
+                  <td>30 – 60 min</td>
+                  <td>Eliminar candidatos por intersección</td>
+                </tr>
+                <tr>
+                  <td>⚫ Experto</td>
+                  <td>17 – 25</td>
+                  <td>X-wing, swordfish, bifurcación</td>
+                  <td>60 – 120 min</td>
+                  <td>Bifurcación controlada con retroceso</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section>
+          <h2>¿Quién juega al sudoku y por qué?</h2>
+          <p>
+            El sudoku se adapta a distintos estilos de vida. Aquí tienes tres perfiles reales
+            que ilustran cómo encaja en el día a día.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧓</span>
+                <h4>Adulto mayor</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Resuelve un sudoku fácil cada mañana como ejercicio de pensamiento lógico diario,
+                manteniendo la mente activa y la concentración entrenada.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: empezar por el nivel fácil y progresar gradualmente es la clave
+                para que el reto sea estimulante sin resultar frustrante.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🚆</span>
+                <h4>Viajero en transporte</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Abre el sudoku en el móvil durante el trayecto en metro o tren como
+                entretenimiento offline, sin necesidad de conexión a internet.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: el nivel medio es ideal para trayectos de 20-30 minutos:
+                suficientemente retador para no aburrirse y resoluble antes de llegar.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
+                <h4>Estudiante</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Usa el sudoku como pausa activa entre sesiones de estudio para desarrollar
+                el razonamiento deductivo y la capacidad de concentración sostenida.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: una partida de 10 minutos entre bloques de estudio ayuda a resetear
+                la atención sin desconectar completamente del modo analítico.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section>
+          <h2>Preguntas frecuentes sobre el sudoku</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿El sudoku requiere matemáticas?</summary>
+                <p>
+                  No. El sudoku no usa operaciones aritméticas; los dígitos 1-9 son
+                  simplemente símbolos diferenciados. Podrías usar letras o colores
+                  y el juego funcionaría exactamente igual. Lo que entrena es la lógica
+                  deductiva y la atención, no el cálculo numérico.
+                </p>
+                <p className={styles.faqTip}>
+                  Dato: los puzzles originales japoneses se llamaban &quot;Sūji wa dokushin ni kagiru&quot;
+                  (los números deben aparecer solos), acuñado por Maki Kaji en 1984.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuántas soluciones puede tener un sudoku válido?</summary>
+                <p>
+                  Un sudoku bien formado tiene exactamente una solución única. Si un puzzle
+                  tiene más de una solución, se considera inválido o mal diseñado. Los
+                  generadores de puzzles verifican esta unicidad antes de presentar el juego.
+                  El número mínimo de pistas para garantizar unicidad es 17.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué técnica uso cuando me bloqueo?</summary>
+                <p>
+                  El primer paso es revisar si hay un <em>naked single</em> que se te escapó
+                  (una celda con un único candidato posible). Si no, busca <em>hidden singles</em>:
+                  un número que solo puede ir en una celda dentro de su fila, columna o bloque.
+                  Si sigues bloqueado, usa la función de notas para anotar candidatos en cada
+                  celda y busca pares desnudos en bloques.
+                </p>
+                <p className={styles.faqTip}>
+                  Consejo: en niveles fácil y medio, naked single y hidden single son
+                  suficientes para resolver el puzzle completo sin adivinar.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Mejora el sudoku la memoria?</summary>
+                <p>
+                  El sudoku entrena principalmente la memoria de trabajo a corto plazo
+                  (mantener candidatos en mente mientras se razona) y la concentración.
+                  Varios estudios sugieren que los juegos de lógica pueden retrasar el
+                  deterioro cognitivo asociado al envejecimiento, aunque no reemplazan
+                  otros hábitos saludables como el ejercicio físico o la dieta.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuál es la diferencia entre naked single y hidden single?</summary>
+                <p>
+                  Un <strong>naked single</strong> es una celda donde solo cabe un número:
+                  los otros 8 dígitos ya aparecen en su fila, columna o bloque. Un{' '}
+                  <strong>hidden single</strong> es un número que, aunque la celda tenga
+                  varios candidatos, solo puede colocarse en esa celda dentro de su fila,
+                  columna o bloque. El naked single es más fácil de detectar visualmente;
+                  el hidden single requiere analizar toda la unidad (fila/columna/bloque).
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section>
+          <h2>Cómo resolver un sudoku: 5 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Buscar celdas con una sola opción (naked single)</strong>
+                <p>
+                  Recorre el tablero buscando celdas vacías donde solo un número sea posible
+                  porque los otros 8 ya están en su fila, columna o bloque 3×3. Rellena
+                  todas las que encuentres antes de pasar al siguiente paso.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Identificar números que solo caben en una celda del bloque (hidden single)</strong>
+                <p>
+                  Para cada bloque 3×3, fila y columna, comprueba si hay un dígito que solo
+                  puede ir en una de las celdas vacías. Aunque esa celda tenga varios candidatos,
+                  si el número no cabe en ninguna otra posición de la unidad, va ahí.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Usar eliminación por filas y columnas</strong>
+                <p>
+                  Cuando un número ya está colocado en una fila o columna, elimínalo como
+                  candidato de todas las celdas vacías de esa fila o columna. Esto puede
+                  revelar nuevos naked singles o hidden singles en otros bloques.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Aplicar técnica de pares desnudos si hay bloqueo</strong>
+                <p>
+                  Si dos celdas del mismo bloque/fila/columna solo tienen los mismos dos
+                  candidatos, esos dos números no pueden ir en ninguna otra celda de esa
+                  unidad. Elimínalos del resto de candidatos para desbloquear el puzzle.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>En niveles difíciles, probar bifurcación controlada</strong>
+                <p>
+                  Si las técnicas anteriores no avanzan, elige una celda con solo dos
+                  candidatos, supón uno y resuelve hasta encontrar contradicción o solución.
+                  Si hay contradicción, el otro candidato es el correcto. Úsalo como último
+                  recurso; en fácil y medio nunca es necesario.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section>
+          <h2>4 mejores prácticas para mejorar tu juego</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
+              <h4>Empieza por el número más frecuente</h4>
+              <p>
+                Observa qué dígito aparece más veces en el tablero inicial. Con más
+                apariciones, hay menos celdas posibles para ese número, lo que facilita
+                completar sus posiciones restantes rápidamente.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">✏️</span>
+              <h4>Usa notas y candidatos en celdas difíciles</h4>
+              <p>
+                Activa el modo notas para anotar todos los números posibles en cada celda
+                dudosa. Ver los candidatos escritos reduce errores y hace visible cuándo
+                un par desnudo o hidden single aparece.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🧩</span>
+              <h4>Resuelve bloque por bloque antes de saltar</h4>
+              <p>
+                Trabaja un bloque 3×3 hasta agotarlo antes de pasar al siguiente. La
+                concentración en una unidad pequeña reduce la carga cognitiva y ayuda
+                a detectar hidden singles con más facilidad.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
+              <h4>Nunca adivines en niveles fácil/medio</h4>
+              <p>
+                En los dos primeros niveles siempre existe una deducción lógica válida.
+                Si sientes que tienes que adivinar, vuelve atrás: hay un naked single o
+                hidden single que no has visto. Adivinar invalida la lógica del puzzle.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores que arruinan tu partida</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Adivinar sin deducción.</strong> Colocar un número sin haberlo
+                deducido lógicamente invalida la coherencia del puzzle. Si el número es
+                incorrecto, los errores en cascada pueden hacer el tablero irresolvable.
+              </li>
+              <li>
+                <strong>No usar notas en niveles avanzados.</strong> En dificultad difícil
+                o experto intentar resolver de memoria sin anotar candidatos lleva
+                inevitablemente a errores. Las notas son una herramienta, no una trampa.
+              </li>
+              <li>
+                <strong>Olvidar actualizar candidatos tras poner un número.</strong> Al
+                colocar un dígito, debes eliminar ese número de los candidatos de todas las
+                celdas de la misma fila, columna y bloque. Omitirlo genera inconsistencias
+                que bloquean el avance.
+              </li>
+              <li>
+                <strong>Intentar el nivel experto sin dominar antes el difícil.</strong>{' '}
+                El salto entre difícil y experto es grande: aparecen técnicas como X-wing
+                o swordfish que requieren experiencia previa. Domina el nivel difícil
+                consistentemente antes de subir.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('juego-sudoku')} />
 

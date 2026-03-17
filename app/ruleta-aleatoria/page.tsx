@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './RuletaAleatoria.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface WheelItem {
@@ -445,6 +445,327 @@ export default function RuletaAleatoriaPage() {
           </div>
         </div>
       </div>
+
+      <EducationalSection
+        title="¿Quieres saber más sobre sorteos y selección aleatoria?"
+        subtitle="Descubre cómo funciona la aleatoriedad, cuándo usar cada método y cómo hacer sorteos justos"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section className={styles.guideSection}>
+          <h2>Métodos de selección aleatoria: comparativa</h2>
+          <p>
+            Existen distintas formas de elegir al azar. Cada método tiene sus ventajas según el número
+            de opciones y el contexto de uso.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Método</th>
+                  <th>N.º de opciones</th>
+                  <th>Equidad</th>
+                  <th>Velocidad</th>
+                  <th>Ideal para</th>
+                  <th>Limitación principal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🎡 Ruleta digital</td>
+                  <td>2 – 100+</td>
+                  <td>Alta</td>
+                  <td>Inmediata</td>
+                  <td>Sorteos en grupo, clase, streaming</td>
+                  <td>No válida legalmente sin certificación</td>
+                </tr>
+                <tr>
+                  <td>🎲 Dados</td>
+                  <td>2 – 6 (o múltiplos)</td>
+                  <td>Alta</td>
+                  <td>Inmediata</td>
+                  <td>Juegos de mesa, decisiones rápidas</td>
+                  <td>Limitado a 6 opciones por dado</td>
+                </tr>
+                <tr>
+                  <td>📋 Lista aleatoria</td>
+                  <td>Ilimitadas</td>
+                  <td>Muy alta</td>
+                  <td>Rápida</td>
+                  <td>Sorteos formales, listas de nombres</td>
+                  <td>Necesita herramienta o app adicional</td>
+                </tr>
+                <tr>
+                  <td>🪙 Moneda (cara/cruz)</td>
+                  <td>2 exactamente</td>
+                  <td>Alta</td>
+                  <td>Inmediata</td>
+                  <td>Decisiones binarias rápidas</td>
+                  <td>Solo sirve para 2 opciones</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>Cuándo usar la ruleta aleatoria</h2>
+          <p>
+            La ruleta digital encaja perfectamente en situaciones cotidianas donde se necesita
+            imparcialidad y rapidez.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">👩‍🏫</span>
+                <h4>Profesor en clase</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un docente tiene 30 alumnos y necesita elegir quién responde la siguiente pregunta.
+                Introduce todos los nombres en la ruleta y la gira frente a la clase.
+              </p>
+              <p className={styles.escenarioTip}>
+                Ventaja: ningún alumno puede alegar favoritismo. El resultado es visible para todos
+                en tiempo real.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🍕</span>
+                <h4>Grupo eligiendo restaurante</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Cinco amigos no se ponen de acuerdo sobre dónde cenar. Cada uno propone un
+                restaurante, se añaden a la ruleta y se gira: decisión tomada sin discusión.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: también sirve para decidir quién paga la ronda o elige la película
+                del viernes por la noche.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎁</span>
+                <h4>Organizador de sorteos online</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un creador de contenido sortea un producto entre sus seguidores. Añade los nombres
+                de los participantes, gira la ruleta en directo y anuncia el ganador al momento.
+              </p>
+              <p className={styles.escenarioTip}>
+                Recomendación: captura la pantalla o graba el giro como prueba de que el sorteo
+                fue transparente. Para sorteos con implicaciones legales, usa sistemas certificados.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Es realmente aleatoria la ruleta digital?</summary>
+                <p>
+                  La ruleta usa el generador de números pseudoaleatorios del navegador
+                  (<code>Math.random()</code>), que es suficientemente impredecible para uso cotidiano.
+                  No es criptográficamente seguro, pero para decidir quién responde en clase o elegir
+                  restaurante es completamente válido.
+                </p>
+                <p className={styles.faqTip}>
+                  Para sorteos con premios económicos o compromisos legales, lo más adecuado es
+                  un sistema de sorteo certificado por notario o plataforma acreditada.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Puede repetirse el mismo resultado seguido?</summary>
+                <p>
+                  Sí. La aleatoriedad auténtica no garantiza alternancia. Si tienes 4 opciones y
+                  giras tres veces, es posible obtener la misma opción dos o tres veces consecutivas.
+                  Esto es señal de que el sistema es realmente aleatorio, no de que esté roto.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cómo añado opciones con diferentes probabilidades?</summary>
+                <p>
+                  La ruleta asigna el mismo sector a cada opción, por lo que todas tienen
+                  la misma probabilidad. Si quieres que una opción tenga el doble de probabilidad,
+                  añádela dos veces a la lista. El tamaño del sector se calcula automáticamente
+                  proporcional al número de entradas.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Puedo usar la ruleta para sorteos legales en España?</summary>
+                <p>
+                  Depende del tipo de sorteo. Para sorteos internos sin premios económicos
+                  (elegir turno, asignar tareas) es perfectamente válida. Para concursos con premios,
+                  la Ley 13/2011 de regulación del juego y la normativa de consumo pueden exigir
+                  sistemas certificados, notario o plataforma de gestión acreditada.
+                </p>
+                <p className={styles.faqTip}>
+                  Consulta con un asesor legal si el sorteo tiene premios superiores a 200 € o
+                  involucra a más de 50 participantes.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué diferencia hay entre aleatorio y pseudoaleatorio?</summary>
+                <p>
+                  Un número verdaderamente aleatorio requiere una fuente de entropía física
+                  (ruido térmico, radioactividad). Los ordenadores generan números
+                  <em> pseudoaleatorios</em>: secuencias deterministas que parecen aleatorias
+                  pero parten de una semilla inicial. Para el 99 % de los usos cotidianos,
+                  la diferencia es irrelevante.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Cómo hacer un sorteo justo: 5 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Añade todas las opciones antes de girar</strong>
+                <p>
+                  Introduce la lista completa de participantes u opciones antes de hacer girar
+                  la ruleta. Añadir o eliminar opciones después del primer giro puede sesgar
+                  el resultado.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Verifica que todas tienen la misma probabilidad deseada</strong>
+                <p>
+                  Comprueba visualmente que los sectores de la ruleta son iguales. Si quieres
+                  ponderar alguna opción, añádela varias veces antes de girar.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Gira y acepta el resultado sin excusas</strong>
+                <p>
+                  El compromiso previo al giro es lo que da validez al sorteo. Si ya acordasteis
+                  respetar la ruleta, el resultado es inapelable.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Documenta el resultado si es un sorteo formal</strong>
+                <p>
+                  Para sorteos públicos o con participantes que no están presentes, haz una
+                  captura de pantalla o graba el giro. Así tienes prueba del proceso.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>Para sorteos legales, usa sistemas certificados</strong>
+                <p>
+                  Si el sorteo tiene implicaciones económicas o legales (premios, herencias,
+                  adjudicaciones), recurre a plataformas acreditadas, notario o servicios
+                  de sorteo con certificado digital.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>4 buenas prácticas para sorteos justos</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
+              <h4>Confirma las opciones antes de girar</h4>
+              <p>
+                Muestra la lista a todos los participantes antes del giro. La transparencia
+                previa elimina dudas sobre si se incluyeron o excluyeron opciones de forma
+                malintencionada.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🤝</span>
+              <h4>Acepta el primer resultado</h4>
+              <p>
+                El &quot;mejor de tres&quot; o repetir hasta obtener el resultado deseado anula por
+                completo la aleatoriedad. Un sorteo es válido con un único giro acordado
+                de antemano.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📸</span>
+              <h4>Captura pantalla en sorteos públicos</h4>
+              <p>
+                Si el sorteo es en directo o ante varios testigos, guarda una captura con
+                la lista de participantes visible y el resultado. Es la prueba más sencilla
+                de transparencia.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔤</span>
+              <h4>Usa opciones claras y sin ambigüedades</h4>
+              <p>
+                Escribe los nombres completos o las opciones de forma inequívoca. Evita
+                abreviaturas confusas que puedan generar discusión sobre a quién o qué
+                correspondía el resultado ganador.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores que invalidan un sorteo</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Usar la ruleta para decisiones importantes e irreversibles.</strong> Elegir
+                quién conduce de vuelta o asignar responsabilidades críticas de forma aleatoria
+                sin considerar aptitudes o circunstancias puede ser imprudente.
+              </li>
+              <li>
+                <strong>Repetir el giro hasta obtener el resultado deseado.</strong> Si alguien
+                sigue girando hasta que salga su opción favorita, el sorteo deja de ser aleatorio
+                y pierde toda validez moral y práctica.
+              </li>
+              <li>
+                <strong>Presentarlo como sorteo legal sin sistema certificado.</strong> Usar esta
+                ruleta para concursos con premios económicos sin cumplir la normativa vigente
+                puede acarrear sanciones administrativas.
+              </li>
+              <li>
+                <strong>No informar a los participantes del método usado en concursos.</strong> En
+                sorteos públicos, los participantes tienen derecho a conocer el sistema de selección.
+                La opacidad genera desconfianza y puede derivar en reclamaciones.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('ruleta-aleatoria')} />
 
