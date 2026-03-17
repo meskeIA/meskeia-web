@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~171 | **Pendientes**: ~79
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~193 | **Pendientes**: ~57
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -113,20 +113,20 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 
 ### Suite Jubilación _(creadas 2026-03-16)_
 
-- [ ] `/estimador-pension-publica/` — Estimador Pensión Pública: base reguladora, % por años cotizados, integración con carrera de seguro _(creada 2026-03-16)_
-- [ ] `/estimador-pension-viudedad/` — Estimador Pensión de Viudedad: 52/60/70%, base reguladora, mínimos garantizados 2025 _(creada 2026-03-16)_
-- [ ] `/estimador-brecha-jubilacion/` — Estimador Brecha de Jubilación: ahorro adicional necesario para mantener nivel de vida _(creada 2026-03-16)_
-- [ ] `/orientador-jubilacion-anticipada/` — Orientador Jubilación Anticipada: coeficientes reductores, tipos (voluntaria/involuntaria), requisitos _(creada 2026-03-16)_
-- [ ] `/orientador-plan-pensiones/` — Orientador Plan de Pensiones: PP vs EPSV vs PPA vs PIAS, ventajas fiscales, límites deducción _(creada 2026-03-16)_
-- [ ] `/estimador-irpf-pensionista/` — Estimador IRPF Pensionista: retención, tramos, mínimo personal ≥65/≥75, reducción pensión _(creada 2026-03-16)_
-- [ ] `/orientador-jubilacion-parcial/` — Orientador Jubilación Parcial: requisitos, porcentajes, contrato de relevo obligatorio _(creada 2026-03-16)_
-- [ ] `/adaptacion-hogar/` — Adaptación del Hogar para Mayor Independencia: checklist por estancias, ayudas técnicas _(creada 2026-03-16)_
-- [ ] `/residencia-vs-cuidado-en-casa/` — Residencia vs Cuidado en Casa: comparativa económica y personal por horas/día _(creada 2026-03-16)_
-- [ ] `/estimador-riesgo-osteoporosis/` — Estimador de Riesgo de Osteoporosis: FRAX simplificado, factores de riesgo, T-score orientativo _(creada 2026-03-16)_
-- [ ] `/test-fragilidad/` — Test de Fragilidad FRAIL: 5 ítems validados, clasificación robusto/pre-frágil/frágil _(creada 2026-03-16)_
-- [ ] `/orientador-grado-dependencia/` — Orientador Grado de Dependencia: BVD simplificado (16 preguntas), prestaciones SAAD por grado _(creada 2026-03-16)_
-- [ ] `/estimador-legitimas/` — Estimador de Legítimas: 7 regímenes civiles españoles, distribución de la herencia _(creada 2026-03-16)_
-- [ ] `/optimizador-rentas-60/` — Optimizador de Rentas +60: IRPF pensión + PP + capital mobiliario + alquiler, estrategia fiscal _(creada 2026-03-16)_
+- [x] `/estimador-pension-publica/` — Estimador Pensión Pública ✅ lote B9
+- [x] `/estimador-pension-viudedad/` — Estimador Pensión de Viudedad ✅ lote B9
+- [x] `/estimador-brecha-jubilacion/` — Estimador Brecha de Jubilación ✅ lote B9
+- [x] `/orientador-jubilacion-anticipada/` — Orientador Jubilación Anticipada ✅ lote B9
+- [x] `/orientador-plan-pensiones/` — Orientador Plan de Pensiones ✅ lote B9
+- [x] `/estimador-irpf-pensionista/` — Estimador IRPF Pensionista ✅ lote B9
+- [x] `/orientador-jubilacion-parcial/` — Orientador Jubilación Parcial ✅ lote B9
+- [x] `/adaptacion-hogar/` — Adaptación del Hogar para Mayor Independencia ✅ lote B10
+- [x] `/residencia-vs-cuidado-en-casa/` — Residencia vs Cuidado en Casa ✅ lote B10
+- [x] `/estimador-riesgo-osteoporosis/` — Estimador de Riesgo de Osteoporosis ✅ lote B10
+- [x] `/test-fragilidad/` — Test de Fragilidad FRAIL ✅ lote B10
+- [x] `/orientador-grado-dependencia/` — Orientador Grado de Dependencia ✅ lote B10
+- [x] `/estimador-legitimas/` — Estimador de Legítimas ✅ lote B10
+- [x] `/optimizador-rentas-60/` — Optimizador de Rentas +60 ✅ lote B10
 
 ---
 
@@ -238,15 +238,15 @@ Apps de uso frecuente con buen potencial educativo.
 
 ### Calculadoras y Utilidades (densidad media)
 
-- [ ] `/calculadora-propinas/` — Calculadora de propinas
-- [ ] `/calculadora-regla-de-tres/` — Regla de tres directa e inversa
-- [ ] `/calculadora-cocina/` — Conversiones de cocina
-- [ ] `/lista-compras/` — Lista de compras
-- [ ] `/conversor-tallas/` — Conversor de tallas internacional
-- [ ] `/calculadora-edad-mascotas/` — Edad perros/gatos en años humanos
-- [ ] `/planificador-boda/` — Wedding planner: checklist, presupuesto, timeline
+- [x] `/calculadora-propinas/` — Calculadora de propinas ✅ lote B11
+- [x] `/calculadora-regla-de-tres/` — Regla de tres directa e inversa ✅ lote B11
+- [x] `/calculadora-cocina/` — Conversiones de cocina ✅ lote B11
+- [x] `/lista-compras/` — Lista de compras ✅ lote B11
+- [x] `/conversor-tallas/` — Conversor de tallas internacional ✅ lote B11
+- [x] `/calculadora-edad-mascotas/` — Edad perros/gatos en años humanos ✅ lote B11
+- [x] `/planificador-boda/` — Wedding planner: checklist, presupuesto, timeline ✅ lote B11
 - [ ] `/estimador-reformas-hogar/` — Presupuesto por tipo y m²
-- [ ] `/calculadora-huella-carbono/` — Huella de carbono personal
+- [x] `/calculadora-huella-carbono/` — Huella de carbono personal ✅ lote B11
 - [ ] `/estimador-gastos-comunidad/` — Gastos comunidad propietarios (nueva 2026-02-19)
 
 ### Herramientas Web y Tecnología
@@ -330,8 +330,8 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 | Herramientas Web / Tecnología | 5 | 5 |
 | Calculadoras y Utilidades | 7 | 10 |
 | Biomedicina | 1 | 1 |
-| **Suite Jubilación** | **0** | **14** |
-| **TOTAL** | **~107** | **~143** |
+| **Suite Jubilación** | **14** | **0** |
+| **TOTAL** | **~121** | **~129** |
 
 ---
 
@@ -339,6 +339,9 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote B11 | 2026-03-17 | `calculadora-propinas`, `calculadora-regla-de-tres`, `calculadora-cocina`, `lista-compras`, `conversor-tallas`, `calculadora-edad-mascotas`, `planificador-boda`, `calculadora-huella-carbono` | `d297204` |
+| Lote B10 | 2026-03-17 | `adaptacion-hogar`, `residencia-vs-cuidado-en-casa`, `estimador-riesgo-osteoporosis`, `test-fragilidad`, `orientador-grado-dependencia`, `estimador-legitimas`, `optimizador-rentas-60` | `f8e2021` |
+| Lote B9 | 2026-03-17 | `estimador-pension-publica`, `estimador-pension-viudedad`, `estimador-brecha-jubilacion`, `orientador-jubilacion-anticipada`, `orientador-plan-pensiones`, `estimador-irpf-pensionista`, `orientador-jubilacion-parcial` | `f8e2021` |
 | Lote B8 | 2026-03-17 | `orientador-gastos-deducibles`, `calendario-fiscal-emprendedor`, `asistente-alta-autonomo`, `comparador-formas-juridicas`, `asistente-constitucion-sociedad`, `asistente-constitucion-asociacion`, `plazos-legales` | `90c4d4e` |
 | Lote B7 | 2026-03-17 | `estimador-irpf`, `estimador-sueldo-neto`, `estimador-cuota-autonomo`, `comparador-autonomo-vs-sl`, `estimador-plusvalias-irpf` | `b1aeabe` |
 | Lote B6 | 2026-03-17 | `estimador-impuesto-sucesiones`, `estimador-impuesto-donaciones`, `orientacion-tramitacion-herencias`, `estimador-plusvalia-municipal`, `orientador-intereses-demora` | `611bc11` |
