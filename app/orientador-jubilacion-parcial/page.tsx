@@ -303,6 +303,224 @@ export default function OrientadorJubilacionParcial() {
           <li><strong>Ventaja</strong>: Se siguen acumulando años de cotización, lo que puede mejorar la pensión definitiva.</li>
           <li><strong>Inconveniente</strong>: Requiere acuerdo del empleador y formalización de contrato de relevo, lo que no siempre es posible.</li>
         </ul>
+
+      {/* === SECCIONES PROFESIONALES v2.0 === */}
+
+      {/* 1. Tabla Comparativa */}
+      <div className={styles.tableWrapper}>
+        <h3>Jubilación parcial: requisitos según modalidad</h3>
+        <table className={styles.comparativaTable}>
+          <thead>
+            <tr>
+              <th>Característica</th>
+              <th>Con contrato de relevo</th>
+              <th>Sin contrato de relevo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Edad mínima</td>
+              <td>62 años (o 60 con 33+ años cotizados)</td>
+              <td>Edad legal de jubilación</td>
+            </tr>
+            <tr>
+              <td>Años cotizados mínimos</td>
+              <td>25 años</td>
+              <td>15 años</td>
+            </tr>
+            <tr>
+              <td>Reducción de jornada</td>
+              <td>25%-75% (hasta 85% en ciertos casos)</td>
+              <td>50% máximo</td>
+            </tr>
+            <tr>
+              <td>% pensión cobrada</td>
+              <td>Proporcional a reducción de jornada</td>
+              <td>Proporcional a reducción de jornada</td>
+            </tr>
+            <tr>
+              <td>Cotización durante parcial</td>
+              <td>Al 100% (por el relevista también)</td>
+              <td>Solo por tiempo trabajado</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 2. Casos de Uso */}
+      <div className={styles.escenariosGrid}>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>👷</span>
+            <strong>Trabajador industrial con 63 años</strong>
+          </div>
+          <p>30 años cotizados, quiere reducir jornada al 50% y cobra el 50% de la pensión mientras sigue trabajando. La empresa contrata relevista.</p>
+          <div className={styles.escenarioExample}>Ejemplo: Pensión estimada 1.500 €/mes → cobra 750 € + salario 50% jornada</div>
+          <div className={styles.escenarioTip}>💡 Durante la parcial, sigue cotizando al 100%, mejorando la pensión final.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>👩‍💼</span>
+            <strong>Directiva que quiere transición gradual</strong>
+          </div>
+          <p>62 años, 28 cotizados. Prefiere reducir al 25% de jornada los últimos 3 años. Cobra 25% de pensión y sigue siendo directiva parcial.</p>
+          <div className={styles.escenarioExample}>Ingresos: Salario 25% + pensión parcial 25% = ~75-80% ingreso anterior</div>
+          <div className={styles.escenarioTip}>💡 La reducción mínima del 25% es la opción menos penalizadora en términos de ingresos.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🏢</span>
+            <strong>Empresa con problemas para retener talento sénior</strong>
+          </div>
+          <p>La jubilación parcial permite a la empresa retener conocimiento sénior mientras incorpora nuevo talento (relevista) con menor coste salarial.</p>
+          <div className={styles.escenarioExample}>Win-win: empresa mantiene conocimiento, trabajador hace transición gradual</div>
+          <div className={styles.escenarioTip}>💡 El relevista puede ser un contrato indefinido o temporal según el caso y la normativa vigente.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>👴</span>
+            <strong>Persona con dificultad para trabajo a jornada completa</strong>
+          </div>
+          <p>Problemas de salud o fatiga que impiden la jornada completa pero no la incapacidad. La jubilación parcial es una solución intermedia adecuada.</p>
+          <div className={styles.escenarioExample}>Reducción 50%: media jornada + 50% pensión = ingresos dignos con menos esfuerzo</div>
+          <div className={styles.escenarioTip}>💡 Valorar también la incapacidad parcial si las limitaciones son reconocibles médicamente.</div>
+        </div>
+      </div>
+
+      {/* 3. FAQ */}
+      <div className={styles.faqList}>
+        <h3>Preguntas frecuentes sobre jubilación parcial</h3>
+        <div className={styles.faqItem}>
+          <strong>¿Qué es el contrato de relevo?</strong>
+          <p>Es el contrato que obliga a la empresa a contratar a un relevista (nuevo trabajador) cuando el jubilado parcial reduce su jornada. El relevista cubre la jornada liberada.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿La empresa está obligada a aceptar la jubilación parcial?</strong>
+          <p>No, requiere acuerdo entre trabajador y empresa. El trabajador no puede imponerla unilateralmente. Sin embargo, la empresa tampoco puede negarla sin causa si hay convenio colectivo que la regule.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Cómo se calcula la pensión final al jubilarse definitivamente?</strong>
+          <p>Durante la jubilación parcial se sigue cotizando al 100%, lo que mejora la base reguladora final. La pensión definitiva será mayor que si se hubiera jubilado parcialmente sin cotización completa.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Puedo cambiar el porcentaje de reducción de jornada?</strong>
+          <p>Sí, con acuerdo entre empresa y trabajador, se puede modificar el porcentaje de reducción dentro de los márgenes legales (25%-75% con relevo).</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿La jubilación parcial afecta a la pensión de viudedad del cónyuge?</strong>
+          <p>No, la cotización al 100% durante la jubilación parcial protege la base reguladora. La pensión definitiva no se reduce por haber estado en jubilación parcial.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Se puede compatibilizar con trabajo en otra empresa?</strong>
+          <p>Durante la jubilación parcial sigues siendo trabajador activo. No puedes trabajar para otra empresa en la actividad reducida, pero sí en actividades distintas si el contrato lo permite.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Cómo tributa la pensión parcial en IRPF?</strong>
+          <p>La pensión parcial tributa como rendimiento del trabajo igual que la pensión completa. Al cobrar también salario, ambos se acumulan en la base imponible general del IRPF.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Se puede pasar de jubilación parcial a total antes de la edad legal?</strong>
+          <p>Si cumples los requisitos de jubilación anticipada (voluntaria o involuntaria), sí es posible. En caso contrario, debes esperar a la edad legal para la jubilación total.</p>
+          <div className={styles.faqTip}>💡 Planificar con el asesor laboral antes de iniciar la jubilación parcial para prever todas las opciones.</div>
+        </div>
+      </div>
+
+      {/* 4. Guía Paso a Paso */}
+      <div className={styles.stepGuide}>
+        <h3>Cómo acceder a la jubilación parcial paso a paso</h3>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>1</div>
+          <div className={styles.stepContent}>
+            <strong>Verifica si cumples los requisitos</strong>
+            <p>Comprueba tu edad, años cotizados y convenio colectivo aplicable. Este orientador te ayuda con el cálculo. La edad mínima con relevo es 62 años (en 2025).</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>2</div>
+          <div className={styles.stepContent}>
+            <strong>Negocia con la empresa el porcentaje de reducción</strong>
+            <p>Decide qué porcentaje de jornada reducirás (25%-75%). Esto determinará la pensión parcial y el salario que cobrarás simultáneamente.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>3</div>
+          <div className={styles.stepContent}>
+            <strong>La empresa contrata al relevista</strong>
+            <p>La empresa debe contratar a un trabajador relevista para cubrir la jornada liberada. Sin relevista no hay jubilación parcial con relevo.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>4</div>
+          <div className={styles.stepContent}>
+            <strong>Firma el novación contractual</strong>
+            <p>Se modifica tu contrato de trabajo para reflejar la reducción de jornada. Firma también el contrato de relevo con el nuevo trabajador como testigo.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>5</div>
+          <div className={styles.stepContent}>
+            <strong>Solicita la pensión parcial al INSS</strong>
+            <p>Con la documentación del nuevo contrato de trabajo a tiempo parcial, solicita la pensión de jubilación parcial en el INSS. Puedes hacerlo online o presencialmente.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>6</div>
+          <div className={styles.stepContent}>
+            <strong>Inicio del cobro</strong>
+            <p>Tras la resolución del INSS, empiezas a cobrar la pensión parcial simultáneamente con el salario reducido. La cotización se mantiene al 100%.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Mejores Prácticas */}
+      <div className={styles.tipsGrid}>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🗓️</div>
+          <strong>Negocia con tiempo</strong>
+          <p>La empresa necesita tiempo para buscar al relevista. Planifica la jubilación parcial con 3-6 meses de antelación para facilitar la transición.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>📊</div>
+          <strong>Calcula el impacto real en ingresos</strong>
+          <p>Suma el salario reducido más la pensión parcial y compáralo con el salario actual. En muchos casos el total es el 80-85% del ingreso anterior.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🏦</div>
+          <strong>Mantén la cotización al 100%</strong>
+          <p>El gran beneficio de la jubilación parcial con relevo es seguir cotizando al 100% aunque trabajes menos. Esto mejora la pensión final definitiva.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>💡</div>
+          <strong>Aprovecha el período para planificar</strong>
+          <p>Los años de jubilación parcial son ideales para planificar la transición a la jubilación total: organiza finanzas, hobbies y rutinas antes del retiro completo.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>⚖️</div>
+          <strong>Consulta el convenio colectivo</strong>
+          <p>Algunos convenios tienen condiciones más favorables para la jubilación parcial que la ley general. Verifica el tuyo antes de negociar con la empresa.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>👥</div>
+          <strong>Involucra a los representantes sindicales</strong>
+          <p>En empresas con representación sindical, los delegados pueden facilitar la negociación y asegurar que se respetan todos los derechos en el proceso.</p>
+        </div>
+      </div>
+
+      {/* 6. Warning Box */}
+      <div className={styles.warningBox}>
+        <div className={styles.warningHeader}>
+          <span className={styles.warningIcon}>⚠️</span>
+          <strong>Errores frecuentes en la jubilación parcial</strong>
+        </div>
+        <ul className={styles.warningList}>
+          <li><strong>Confundir jubilación parcial con reducción de jornada ordinaria</strong>: Son figuras distintas. La reducción de jornada no genera pensión parcial; la jubilación parcial sí, pero requiere relevo.</li>
+          <li><strong>No verificar que la empresa contrata al relevista correctamente</strong>: Si el contrato de relevo no cumple los requisitos legales, el INSS puede denegar la pensión parcial.</li>
+          <li><strong>Desconocer que la empresa puede negarse</strong>: A diferencia de la reducción de jornada por conciliación, la jubilación parcial requiere acuerdo. La empresa puede negarse si no es conveniente operativamente.</li>
+          <li><strong>No calcular el impacto fiscal</strong>: Cobrar salario y pensión simultáneamente puede elevar el tipo efectivo de IRPF. Calcular la retención adecuada evita sorpresas en la declaración.</li>
+          <li><strong>Iniciar sin asesoramiento laboral</strong>: Los detalles del contrato de relevo, la cotización y los cálculos de pensión son complejos. Un gestor laboral evita errores costosos.</li>
+          <li><strong>No planificar la transición a jubilación total</strong>: La jubilación parcial es temporal. No planificar cuándo y cómo pasar a la jubilación total puede generar incertidumbre económica.</li>
+        </ul>
+      </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('orientador-jubilacion-parcial')} />

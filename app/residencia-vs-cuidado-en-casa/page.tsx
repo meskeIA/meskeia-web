@@ -271,6 +271,230 @@ export default function ResidenciaVsCuidadoCasa() {
         </ul>
         <h3>El papel de la valoración de dependencia</h3>
         <p>Solicitar el reconocimiento oficial de la dependencia (IMSERSO / CCAA) es el primer paso. Desbloquea prestaciones económicas, plazas en centros de día, SAD público y prioridad en residencias concertadas, reduciendo notablemente el coste real.</p>
+
+      {/* === SECCIONES PROFESIONALES v2.0 === */}
+
+      {/* 1. Tabla Comparativa */}
+      <div className={styles.tableWrapper}>
+        <h3>Comparativa: Residencia vs Cuidado en Casa</h3>
+        <table className={styles.comparativaTable}>
+          <thead>
+            <tr>
+              <th>Factor</th>
+              <th>Residencia</th>
+              <th>Cuidado en Casa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Coste mensual</td>
+              <td>1.500-4.500 € (pública/privada)</td>
+              <td>800-3.000 € (SAD/cuidador)</td>
+            </tr>
+            <tr>
+              <td>Atención médica 24h</td>
+              <td>Sí</td>
+              <td>No (salvo contratación adicional)</td>
+            </tr>
+            <tr>
+              <td>Entorno familiar</td>
+              <td>No (entorno institucional)</td>
+              <td>Sí</td>
+            </tr>
+            <tr>
+              <td>Adecuado para dependencia severa (Grado III)</td>
+              <td>Sí</td>
+              <td>Difícil sin apoyo intensivo</td>
+            </tr>
+            <tr>
+              <td>Impacto en vivienda propia</td>
+              <td>Puede mantenerse o venderse</td>
+              <td>Se mantiene habitada</td>
+            </tr>
+            <tr>
+              <td>Apoyo para cuidador familiar</td>
+              <td>Cuidador descanso total</td>
+              <td>Cuidador sobrecargado (riesgo burnout)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 2. Casos de Uso */}
+      <div className={styles.escenariosGrid}>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🏥</span>
+            <strong>Dependencia Grado III con necesidad médica</strong>
+          </div>
+          <p>Persona con demencia avanzada, incontinencia y riesgo de caídas. Necesita atención 24h que la familia no puede proveer. La residencia especializada es la opción más segura.</p>
+          <div className={styles.escenarioExample}>Indicador: Grado III + necesidad atención médica continua → residencia especializada</div>
+          <div className={styles.escenarioTip}>💡 La lista de espera en residencias públicas puede ser larga; solicitar plaza con antelación.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🏠</span>
+            <strong>Dependencia moderada con familia cercana</strong>
+          </div>
+          <p>Grado I-II, familia próxima, preferencia por el hogar. SAD + cuidador parcial puede ser suficiente con apoyos municipales y adaptación del hogar.</p>
+          <div className={styles.escenarioExample}>Solución: SAD municipal 3h/día + cuidador interno 2 días + teleasistencia</div>
+          <div className={styles.escenarioTip}>💡 Combinar SAD, teleasistencia y prestación económica del SAAD puede cubrir necesidades a coste razonable.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>👩‍👦</span>
+            <strong>Cuidador único con trabajo a jornada completa</strong>
+          </div>
+          <p>Hijo único trabajador, no puede atender a progenitor con dependencia durante el día. Sin red de apoyo, el cuidado en casa no es sostenible.</p>
+          <div className={styles.escenarioExample}>Alternativa: Centro de día + teleasistencia + cuidador nocturno eventual</div>
+          <div className={styles.escenarioTip}>💡 Los centros de día (no internamiento) son una solución intermedia menos costosa y más flexible.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🏘️</span>
+            <strong>Persona mayor que rechaza la residencia</strong>
+          </div>
+          <p>Autonomía suficiente pero soledad y riesgos. Prefiere su casa. Teleasistencia + visitas SAD + comunidad de vecinos puede ser viable con seguimiento estrecho.</p>
+          <div className={styles.escenarioExample}>Mínimo viable: teleasistencia + visita SAD diaria + red vecinal activa</div>
+          <div className={styles.escenarioTip}>💡 La teleasistencia avanzada (sensores de movimiento, detección de caídas) permite mayor autonomía con seguridad.</div>
+        </div>
+      </div>
+
+      {/* 3. FAQ */}
+      <div className={styles.faqList}>
+        <h3>Preguntas frecuentes: residencia vs cuidado en casa</h3>
+        <div className={styles.faqItem}>
+          <strong>¿Cuánto cuesta una residencia pública vs privada?</strong>
+          <p>La residencia pública cuesta entre 1.500-2.500 €/mes (con copago según renta). La privada, entre 2.000-4.500 € según calidad y ubicación. Las listas de espera en plazas públicas pueden ser de 1-3 años.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué es el SAD (Servicio de Atención Domiciliaria)?</strong>
+          <p>Servicio municipal que proporciona cuidados básicos en el domicilio (higiene, comidas, acompañamiento). Incluido en las prestaciones del SAAD, con copago según renta.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué diferencia hay entre centro de día y residencia?</strong>
+          <p>El centro de día es atención diurna (8-20h) sin internamiento. La persona duerme en casa. Es más barato y menos disruptivo, adecuado para dependencias moderadas.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Puede la familia cobrar por cuidar a un familiar?</strong>
+          <p>Sí, a través de la prestación económica para cuidados en el entorno familiar del SAAD (hasta 387 €/mes para Grado III). El cuidador debe darse de alta en la SS.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿La residencia implica perder la pensión?</strong>
+          <p>No, la pensión se sigue cobrando. Se destina al pago de la residencia (copago según renta). El Estado puede reclamar parte de los bienes al fallecimiento en algunas CCAA.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Se puede volver a casa desde la residencia?</strong>
+          <p>Sí, si la situación de salud mejora o la familia puede asumir los cuidados, es posible volver al domicilio. Las plazas públicas se pueden dejar con un periodo de preaviso.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué es la teleasistencia avanzada?</strong>
+          <p>Sistemas que van más allá del botón de emergencia: sensores de movimiento, detección de caídas, alertas médicas, videollamada. Permite mayor seguridad con mayor autonomía en casa.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Cómo afecta esta decisión a la herencia?</strong>
+          <p>La residencia consume el patrimonio más rápido. En algunas CCAA, el Estado puede exigir reintegro de prestaciones del SAAD con cargo a la herencia. Consultar con un abogado antes.</p>
+          <div className={styles.faqTip}>💡 Planificar con un notario puede proteger ciertos activos dentro de los límites legales.</div>
+        </div>
+      </div>
+
+      {/* 4. Guía Paso a Paso */}
+      <div className={styles.stepGuide}>
+        <h3>Cómo tomar la decisión: residencia vs cuidado en casa</h3>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>1</div>
+          <div className={styles.stepContent}>
+            <strong>Evalúa el grado de dependencia</strong>
+            <p>Si aún no hay valoración oficial, solicítala. El grado determina qué prestaciones están disponibles y qué nivel de cuidado es necesario objetivamente.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>2</div>
+          <div className={styles.stepContent}>
+            <strong>Analiza la situación familiar realista</strong>
+            <p>¿Hay cuidadores disponibles? ¿Cuántas horas pueden dedicar? ¿Tienen formación? ¿Cómo afectará a su trabajo y vida personal? Sé honesto sobre la capacidad familiar.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>3</div>
+          <div className={styles.stepContent}>
+            <strong>Consulta con el trabajador social</strong>
+            <p>Los trabajadores sociales del municipio o del SAAD pueden orientar sobre servicios disponibles, listas de espera, costes y opciones más adecuadas para el caso concreto.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>4</div>
+          <div className={styles.stepContent}>
+            <strong>Calcula el coste real de cada opción</strong>
+            <p>Suma SAD + adaptaciones + cuidador + teleasistencia para el cuidado en casa. Compara con el copago de residencia pública o el coste de privada.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>5</div>
+          <div className={styles.stepContent}>
+            <strong>Incluye a la persona dependiente en la decisión</strong>
+            <p>Siempre que sea posible, la persona mayor debe participar en la decisión. Sus preferencias son importantes aunque no siempre determinantes por razones de seguridad.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>6</div>
+          <div className={styles.stepContent}>
+            <strong>Revisa la decisión periódicamente</strong>
+            <p>La situación de dependencia evoluciona. Una solución adecuada hoy puede no serlo en 6-12 meses. Planifica revisiones periódicas con el equipo de atención.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Mejores Prácticas */}
+      <div className={styles.tipsGrid}>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>⏰</div>
+          <strong>Solicita la valoración de dependencia pronto</strong>
+          <p>Las listas de espera tanto para valoración como para plazas en residencias públicas son largas. No esperar a una crisis para iniciar los trámites.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🤝</div>
+          <strong>Cuida al cuidador</strong>
+          <p>El cuidador familiar tiene riesgo de síndrome de burnout. Incluir servicios de respiro, grupos de apoyo y tiempo libre en la planificación es fundamental.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>📱</div>
+          <strong>Invierte en teleasistencia</strong>
+          <p>Es uno de los servicios con mejor relación coste-beneficio. Da tranquilidad a la familia y seguridad a la persona mayor con un coste muy bajo.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🔄</div>
+          <strong>Considera soluciones mixtas</strong>
+          <p>El centro de día + casa es una opción intermedia valiosa. La persona duerme en casa pero recibe atención profesional durante el día.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>💼</div>
+          <strong>Verifica la regularización del cuidador</strong>
+          <p>Los cuidadores contratados en casa deben estar regularizados (Sistema Especial Empleados del Hogar). La economía sumergida conlleva riesgos legales y laborales.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>⚖️</div>
+          <strong>Planifica el aspecto patrimonial</strong>
+          <p>La decisión sobre residencia tiene implicaciones hereditarias. Consultar con un notario o abogado antes de tomar decisiones que afecten al patrimonio familiar.</p>
+        </div>
+      </div>
+
+      {/* 6. Warning Box */}
+      <div className={styles.warningBox}>
+        <div className={styles.warningHeader}>
+          <span className={styles.warningIcon}>⚠️</span>
+          <strong>Errores frecuentes en la decisión residencia vs casa</strong>
+        </div>
+        <ul className={styles.warningList}>
+          <li><strong>Decidir en crisis</strong>: Tomar la decisión después de una hospitalización urgente genera malas elecciones. Planificar antes de que la situación se agrave da mejores resultados.</li>
+          <li><strong>No valorar el impacto en el cuidador</strong>: La sobrecarga del cuidador puede llevar al colapso familiar. Si el cuidador no puede sostener el cuidado, la residencia puede ser mejor para todos.</li>
+          <li><strong>Elegir solo por coste</strong>: La opción más barata puede no ser la más adecuada para las necesidades médicas y emocionales de la persona dependiente.</li>
+          <li><strong>No explorar todas las ayudas públicas</strong>: Muchas familias pagan más de lo necesario por desconocimiento de las prestaciones del SAAD, SAD municipal o deducciones fiscales.</li>
+          <li><strong>Contratar cuidadores sin regularizar</strong>: Los cuidadores en economía sumergida no tienen acceso a bajas médicas ni prestaciones. Un accidente puede generar problemas legales graves para la familia.</li>
+          <li><strong>No planificar la evolución de la situación</strong>: Las necesidades de cuidado aumentan con el tiempo. Una solución adecuada hoy puede ser insuficiente en 2 años. Planificar la progresión evita decisiones urgentes.</li>
+        </ul>
+      </div>
+
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('residencia-vs-cuidado-en-casa')} />

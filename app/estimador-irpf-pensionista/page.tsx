@@ -300,6 +300,230 @@ export default function EstimadorIrpfPensionista() {
         <p>El rescate se suma íntegramente a los rendimientos del trabajo. Un rescate grande en forma de capital puede subir tu tipo marginal significativamente. Generalmente conviene rescatar en renta mensual para suavizar el impacto fiscal.</p>
         <h3>¿Quién está obligado a declarar?</h3>
         <p>Los pensionistas con única fuente de ingresos y pensión inferior a 22.000 €/año no están obligados a presentar declaración (salvo que tengan otras fuentes). Con varios pagadores, el límite baja a 15.000 €/año.</p>
+
+      {/* === SECCIONES PROFESIONALES v2.0 === */}
+
+      {/* 1. Tabla Comparativa */}
+      <div className={styles.tableWrapper}>
+        <h3>Reducciones y mínimos aplicables a pensionistas (2025)</h3>
+        <table className={styles.comparativaTable}>
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th>Importe</th>
+              <th>Condición</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Reducción rendimientos trabajo (general)</td>
+              <td>5.565 € (renta ≤13.115 €)</td>
+              <td>Todos los trabajadores/pensionistas</td>
+            </tr>
+            <tr>
+              <td>Mínimo personal general</td>
+              <td>5.550 €</td>
+              <td>Todos los contribuyentes</td>
+            </tr>
+            <tr>
+              <td>Mínimo por edad ≥65 años</td>
+              <td>918 € adicionales (total 6.468 €)</td>
+              <td>65 años o más a 31/12</td>
+            </tr>
+            <tr>
+              <td>Mínimo por edad ≥75 años</td>
+              <td>1.122 € adicionales (total 7.590 €)</td>
+              <td>75 años o más a 31/12</td>
+            </tr>
+            <tr>
+              <td>Límite obligación de declarar (un pagador)</td>
+              <td>22.000 €</td>
+              <td>Un solo pagador (pensión)</td>
+            </tr>
+            <tr>
+              <td>Límite obligación de declarar (dos pagadores)</td>
+              <td>15.000 € (si 2º pagador &gt;1.500 €)</td>
+              <td>Pensión + otro pagador</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 2. Casos de Uso */}
+      <div className={styles.escenariosGrid}>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>👴</span>
+            <strong>Pensionista con pensión única</strong>
+          </div>
+          <p>68 años, pensión de 19.000 €/año. Un solo pagador. Reducción rendimientos trabajo + mínimo por edad. Puede estar exento de declarar o con cuota mínima.</p>
+          <div className={styles.escenarioExample}>Base imponible: 19.000 - 5.565 (reducción) = 13.435 € → cuota reducida</div>
+          <div className={styles.escenarioTip}>💡 Si la retención aplicada es exacta, puede no ser obligatorio declarar aunque conviene hacerlo para verificar.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>👵</span>
+            <strong>Pensionista con pensión + alquiler</strong>
+          </div>
+          <p>72 años, pensión 14.000 € + alquiler vivienda 6.000 €/año. Dos fuentes de ingreso. La renta del alquiler se integra en base general menos gastos deducibles.</p>
+          <div className={styles.escenarioExample}>Total ingresos: 20.000 € → obligación de declarar (supera 22.000 € no aplica aquí)</div>
+          <div className={styles.escenarioTip}>💡 El alquiler permite deducir gastos (IBI, comunidad, seguros, amortización) que reducen el rendimiento neto.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>💑</span>
+            <strong>Matrimonio con dos pensiones</strong>
+          </div>
+          <p>Él cobra 18.000 €, ella 8.000 €. Cada uno tributa individualmente. Evaluar si declaración conjunta (3.400 € reducción extra) es más beneficiosa.</p>
+          <div className={styles.escenarioExample}>Individual vs conjunto: depende de la diferencia entre pensiones y tramos aplicables</div>
+          <div className={styles.escenarioTip}>💡 Generalmente la declaración conjunta beneficia cuando hay diferencia grande entre ingresos del matrimonio.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🏦</span>
+            <strong>Pensionista con plan de pensiones rescatado</strong>
+          </div>
+          <p>Rescata 30.000 € del plan en el año de jubilación. Esto se suma a la pensión pública como rendimiento del trabajo, puede disparar el tramo marginal.</p>
+          <div className={styles.escenarioExample}>Pensión 15.000 € + rescate PP 30.000 € = 45.000 € → tramo marginal más alto</div>
+          <div className={styles.escenarioTip}>💡 Rescatar el PP en años posteriores con menos ingresos puede ser fiscalmente más eficiente.</div>
+        </div>
+      </div>
+
+      {/* 3. FAQ */}
+      <div className={styles.faqList}>
+        <h3>Preguntas frecuentes sobre el IRPF del pensionista</h3>
+        <div className={styles.faqItem}>
+          <strong>¿Las pensiones públicas siempre tributan?</strong>
+          <p>Las pensiones del sistema público de SS tributan como rendimiento del trabajo. Existen exenciones totales solo para pensiones de incapacidad permanente absoluta o gran invalidez.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Cuándo estoy obligado a declarar siendo pensionista?</strong>
+          <p>Si tienes un solo pagador (solo pensión pública): obligatorio si superas 22.000 €. Si tienes dos pagadores y el segundo supera 1.500 €: obligatorio si el total supera 15.000 €.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿La pensión de viudedad también tributa?</strong>
+          <p>Sí, la pensión de viudedad tributa como rendimiento del trabajo igual que la pensión de jubilación. Se suma al resto de ingresos del ejercicio.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Puedo deducir gastos médicos como pensionista?</strong>
+          <p>No existe deducción estatal general por gastos médicos. Algunas comunidades autónomas tienen deducciones específicas por enfermedad crónica, discapacidad o cuidados.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué es el mínimo personal por edad?</strong>
+          <p>Es una cantidad que no tributa para proteger la subsistencia del contribuyente mayor. A los 65 años: 6.468 €; a los 75 años: 7.590 €. Se aplica al calcular la cuota íntegra.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Conviene declarar aunque no esté obligado?</strong>
+          <p>Sí puede convenir si la retención aplicada ha sido excesiva y puedes obtener devolución. También si tienes deducciones autonómicas o por inversión en vivienda habitual previa a 2013.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Cómo afecta la discapacidad al IRPF del pensionista?</strong>
+          <p>Con discapacidad ≥33%, hay reducciones y mínimos adicionales. Con ≥65% de discapacidad, la reducción por rendimientos trabajo puede elevarse a 7.750 €.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Pueden los hijos incluirme como ascendiente a cargo?</strong>
+          <p>Sí, si convives con ellos, tienes más de 65 años (o cualquier edad con discapacidad ≥33%), y no obtienes rentas superiores a 8.000 € anuales, tus hijos pueden aplicar el mínimo por ascendientes.</p>
+          <div className={styles.faqTip}>💡 En este caso tú no puedes presentar declaración conjunta con tus hijos, pero ellos sí pueden aplicar ese mínimo.</div>
+        </div>
+      </div>
+
+      {/* 4. Guía Paso a Paso */}
+      <div className={styles.stepGuide}>
+        <h3>Cómo preparar la declaración IRPF siendo pensionista</h3>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>1</div>
+          <div className={styles.stepContent}>
+            <strong>Reúne los datos de la pensión</strong>
+            <p>Solicita el certificado de retenciones al INSS (disponible en sede.seg-social.gob.es). Incluye el importe bruto anual y las retenciones practicadas.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>2</div>
+          <div className={styles.stepContent}>
+            <strong>Identifica todos tus ingresos</strong>
+            <p>Pensión pública, pensión complementaria, rentas de alquiler, dividendos, intereses, rescate de planes de pensiones. Cada uno tributa según su categoría.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>3</div>
+          <div className={styles.stepContent}>
+            <strong>Verifica las reducciones aplicables</strong>
+            <p>Reducción por rendimientos del trabajo según tu nivel de renta, mínimo personal por edad (65 o 75 años), mínimos familiares si proceden.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>4</div>
+          <div className={styles.stepContent}>
+            <strong>Revisa deducciones autonómicas</strong>
+            <p>Cada CCAA tiene deducciones propias para mayores: gastos por cuidados, alquiler de vivienda, discapacidad, etc. Consulta las de tu comunidad.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>5</div>
+          <div className={styles.stepContent}>
+            <strong>Compara individual vs conjunta</strong>
+            <p>Si estás casado, usa el simulador de la AEAT para ver cuál modalidad resulta más favorable. La diferencia puede ser de varios cientos de euros.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>6</div>
+          <div className={styles.stepContent}>
+            <strong>Presenta antes del 30 de junio</strong>
+            <p>El plazo es del 2 de abril al 30 de junio. Si sale a pagar y domicilias el pago, puedes presentar hasta el 25 de junio. Las prórrogas son muy limitadas.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Mejores Prácticas */}
+      <div className={styles.tipsGrid}>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>📋</div>
+          <strong>Solicita el certificado de retenciones en enero</strong>
+          <p>El INSS lo envía automáticamente, pero puedes descargarlo en la web de SS. Tenerlo pronto facilita la preparación de la declaración.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🔍</div>
+          <strong>Revisa el borrador con atención</strong>
+          <p>El borrador de la AEAT puede no incluir todas tus deducciones autonómicas o el mínimo por edad correcto. Siempre verificar antes de confirmar.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>💰</div>
+          <strong>Ajusta la retención de la pensión</strong>
+          <p>Si año tras año tienes retenciones en exceso o insuficientes, solicita al INSS el cambio del porcentaje de retención para cuadrar mejor.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🏠</div>
+          <strong>Aprovecha deducciones por alquiler</strong>
+          <p>Si alquilas tu vivienda habitual (siendo mayor), las deducciones por gastos pueden reducir significativamente el rendimiento neto del capital inmobiliario.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>👨‍👩‍👧</div>
+          <strong>Coordina con la familia</strong>
+          <p>Si un hijo te cuida o convives con él, puede aplicar el mínimo por ascendientes. Pero entonces tú no puedes declarar conjuntamente con tus hijos ni obtener esa deducción.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>📊</div>
+          <strong>Planifica el rescate del plan de pensiones</strong>
+          <p>No rescates el plan en el mismo año de jubilación si recibes alta pensión. Rescatarlo al año siguiente o en forma de renta minimiza la tributación.</p>
+        </div>
+      </div>
+
+      {/* 6. Warning Box */}
+      <div className={styles.warningBox}>
+        <div className={styles.warningHeader}>
+          <span className={styles.warningIcon}>⚠️</span>
+          <strong>Errores frecuentes en el IRPF del pensionista</strong>
+        </div>
+        <ul className={styles.warningList}>
+          <li><strong>Confirmar el borrador sin revisar</strong>: El borrador puede tener errores en mínimos por edad, deducciones autonómicas o tratamiento de otros ingresos. Siempre revisar antes de confirmar.</li>
+          <li><strong>No declarar pensiones del extranjero</strong>: Las pensiones de sistemas públicos extranjeros también tributan en España (convenios de doble imposición aparte). No declararlas es un error grave.</li>
+          <li><strong>Olvidar que la pensión de viudedad también tributa</strong>: Muchos pensionistas con viudedad olvidan incluirla, lo que puede generar liquidaciones de la AEAT.</li>
+          <li><strong>Rescatar el plan de pensiones en el año de jubilación</strong>: Ese año ya hay ingresos altos (últimas nóminas + pensión). Añadir el rescate del PP puede doblar la factura fiscal.</li>
+          <li><strong>No aprovechar deducciones autonómicas</strong>: Muchas CCAA tienen deducciones específicas para mayores que no aparecen en el borrador automáticamente.</li>
+          <li><strong>Desconocer el límite de 15.000 € con dos pagadores</strong>: Si la pensión y un segundo ingreso superan este umbral, hay obligación de declarar aunque cada uno por separado esté por debajo del límite.</li>
+        </ul>
+      </div>
+
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('estimador-irpf-pensionista')} />

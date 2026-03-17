@@ -302,6 +302,218 @@ export default function OrientadorGradoDependencia() {
         <p>Los <strong>servicios</strong> (SAD, centros de día, plazas residenciales) se prestan directamente. Las <strong>prestaciones económicas</strong> son pagos mensuales: la PECEF (para cuidadores familiares), la PEVS (para contratar servicios privados) y la de asistencia personal (para personas activas). La cuantía depende del grado y de la renta.</p>
         <h3>¿Cuánto tarda el proceso?</h3>
         <p>El plazo legal máximo es de 6 meses, pero en la práctica varía mucho por comunidad autónoma (de 3 a más de 18 meses). Por eso es importante solicitarlo cuanto antes: las prestaciones se cobran desde la fecha de solicitud, no desde la resolución.</p>
+
+      {/* === SECCIONES PROFESIONALES v2.0 === */}
+
+      {/* 1. Tabla Comparativa */}
+      <div className={styles.tableWrapper}>
+        <h3>Comparativa: Grados de dependencia y prestaciones (LAPAD)</h3>
+        <table className={styles.comparativaTable}>
+          <thead>
+            <tr>
+              <th>Grado</th>
+              <th>Nivel de dependencia</th>
+              <th>Prestación económica máx. (2025)</th>
+              <th>Servicios principales</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Grado I (Moderada)</td>
+              <td>Necesita ayuda 1 vez al día en varias ABVD</td>
+              <td>291 €/mes (vinculada servicio)</td>
+              <td>SAD, teleasistencia, centro de día</td>
+            </tr>
+            <tr>
+              <td>Grado II (Severa)</td>
+              <td>Necesita ayuda 2-3 veces al día, no permanente</td>
+              <td>426 €/mes (vinculada servicio)</td>
+              <td>SAD ampliado, centro de día, plaza residencial</td>
+            </tr>
+            <tr>
+              <td>Grado III (Gran dependencia)</td>
+              <td>Necesita ayuda continua las 24h</td>
+              <td>833 €/mes (vinculada servicio)</td>
+              <td>Residencia, atención domiciliaria intensiva</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 2. Casos de Uso */}
+      <div className={styles.escenariosGrid}>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🧓</span>
+            <strong>Persona mayor con movilidad limitada</strong>
+          </div>
+          <p>75 años, necesita ayuda para ducharse y vestirse pero puede comer sola y moverse por casa. Probable Grado I o II. La solicitud permite acceder a SAD y teleasistencia.</p>
+          <div className={styles.escenarioExample}>Grado I → SAD 3h/día + teleasistencia gratuita o de bajo coste</div>
+          <div className={styles.escenarioTip}>💡 Solicitar la valoración cuanto antes: los plazos son largos (3-12 meses) y los derechos son desde la solicitud.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🧠</span>
+            <strong>Persona con demencia moderada</strong>
+          </div>
+          <p>Alzheimer en fase moderada, desorientada, riesgo de fugas. Probable Grado II o III. Las prestaciones pueden financiar residencia o cuidadora interna permanente.</p>
+          <div className={styles.escenarioExample}>Grado III → plaza residencial cofinanciada o prestación cuidados familiares</div>
+          <div className={styles.escenarioTip}>💡 Para Grado III, la prestación para cuidados en el entorno familiar es una alternativa a la residencia.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>♿</span>
+            <strong>Persona joven con discapacidad severa</strong>
+          </div>
+          <p>30 años con parálisis cerebral. Puede tener Grado III y acceder a servicios de apoyo a la autonomía, asistencia personal y centros especializados de atención.</p>
+          <div className={styles.escenarioExample}>Grado III → asistencia personal (horas) + centro ocupacional + apoyo familiar</div>
+          <div className={styles.escenarioTip}>💡 El SAAD no es solo para mayores: aplica a cualquier persona con dependencia, independientemente de la edad.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>💔</span>
+            <strong>Persona tras accidente o enfermedad grave</strong>
+          </div>
+          <p>Ictus con hemiplejia. Dependencia sobrevenida. Puede solicitarse durante la rehabilitación. El proceso puede ser más rápido en situaciones de urgencia o riesgo vital.</p>
+          <div className={styles.escenarioExample}>Post-ictus: solicitud en el hospital, valoración urgente posible si hay riesgo</div>
+          <div className={styles.escenarioTip}>💡 La valoración puede realizarse en el hospital durante el ingreso. Consultarlo al trabajador social hospitalario.</div>
+        </div>
+      </div>
+
+      {/* 3. FAQ */}
+      <div className={styles.faqList}>
+        <h3>Preguntas frecuentes sobre la dependencia</h3>
+        <div className={styles.faqItem}>
+          <strong>¿Cómo se solicita la valoración de dependencia?</strong>
+          <p>Se solicita en los Servicios Sociales de la CCAA (presencialmente, por correo o online). Un trabajador social o enfermero de la administración realiza la valoración en el domicilio.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Cuánto tiempo tarda el reconocimiento?</strong>
+          <p>El plazo legal es 6 meses, pero en la práctica puede ser de 6 a 18 meses según la CCAA. Los derechos económicos se cuentan desde la fecha de solicitud, no de resolución.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué baremo se usa para valorar la dependencia?</strong>
+          <p>El Baremo de Valoración de la Dependencia (BVD). Evalúa la capacidad para realizar actividades básicas de la vida diaria (comer, bañarse, vestirse, moverse, control de esfínteres, etc.).</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Se puede recurrir si se está en desacuerdo con el grado?</strong>
+          <p>Sí. Existe recurso de alzada ante la administración y, si no se resuelve favorablemente, vía judicial. Es recomendable asesorarse con un abogado especializado o asociación de afectados.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Las prestaciones son compatibles entre sí?</strong>
+          <p>Las prestaciones económicas y los servicios generalmente no son compatibles entre sí. Se elige una modalidad en el Plan Individualizado de Atención (PIA), aunque hay excepciones.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿El cuidador familiar recibe cotización a la SS?</strong>
+          <p>Sí, quien recibe la prestación para cuidados en el entorno familiar tiene obligación de dar de alta al cuidador no profesional. El Estado cubre parte de la cotización mínima.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Hay que declarar las prestaciones de dependencia en IRPF?</strong>
+          <p>Las prestaciones del SAAD (SAD, residencia, centro de día) están exentas de IRPF. La prestación económica para cuidados en el entorno familiar también está exenta.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué pasa si la situación empeora tras el reconocimiento?</strong>
+          <p>Se puede solicitar una revisión del grado cuando hay cambio sustancial en el estado de salud. También hay revisiones de oficio periódicas por la administración.</p>
+          <div className={styles.faqTip}>💡 No esperar a que la situación sea crítica para solicitar la revisión; el proceso tarda meses.</div>
+        </div>
+      </div>
+
+      {/* 4. Guía Paso a Paso */}
+      <div className={styles.stepGuide}>
+        <h3>Cómo solicitar y tramitar el grado de dependencia</h3>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>1</div>
+          <div className={styles.stepContent}>
+            <strong>Reúne la documentación básica</strong>
+            <p>DNI, informe médico actualizado del médico de cabecera o especialista que describa las limitaciones funcionales, certificado de empadronamiento y formulario de solicitud de la CCAA.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>2</div>
+          <div className={styles.stepContent}>
+            <strong>Presenta la solicitud cuanto antes</strong>
+            <p>Los efectos económicos son desde la fecha de solicitud, no de la resolución. Presentarla antes, incluso si el expediente tarda, te protege económicamente.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>3</div>
+          <div className={styles.stepContent}>
+            <strong>Prepara la visita del valorador</strong>
+            <p>El valorador visitará el domicilio. Asegúrate de que la persona esté en sus condiciones habituales (no en un día especialmente bueno). Prepara medicación y documentación médica disponible.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>4</div>
+          <div className={styles.stepContent}>
+            <strong>Espera la resolución y revísala</strong>
+            <p>Compara el grado reconocido con las necesidades reales. Si no refleja la situación, tienes 1 mes para presentar recurso de alzada con documentación médica adicional.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>5</div>
+          <div className={styles.stepContent}>
+            <strong>Elabora el Plan Individualizado de Atención (PIA)</strong>
+            <p>El trabajador social de la CCAA propone las prestaciones o servicios más adecuados. Puedes negociar la modalidad que mejor se adapte a la situación familiar.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>6</div>
+          <div className={styles.stepContent}>
+            <strong>Inicia el cobro o el servicio</strong>
+            <p>Una vez aprobado el PIA, comienza la prestación. Las retroactivas (desde la solicitud) se abonan habitualmente en un único pago. Guarda toda la documentación.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Mejores Prácticas */}
+      <div className={styles.tipsGrid}>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>📅</div>
+          <strong>Solicita antes de que sea urgente</strong>
+          <p>El proceso tarda meses. Solicitar en cuanto aparecen limitaciones funcionales significativas da tiempo a recibir la prestación cuando más se necesita.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>📋</div>
+          <strong>Prepara informes médicos detallados</strong>
+          <p>Un informe médico que describa específicamente las limitaciones funcionales (no solo el diagnóstico) influye significativamente en la valoración del baremo.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🔍</div>
+          <strong>Infórmate sobre la CCAA específica</strong>
+          <p>Cada CCAA gestiona el SAAD de forma diferente en tiempos y procedimientos. Los Servicios Sociales municipales pueden orientar sobre el proceso local.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>⚖️</div>
+          <strong>No dudes en recurrir el grado</strong>
+          <p>Los recursos son efectivos. Si el grado reconocido no corresponde a la realidad, documentar bien el recurso con informes especializados puede cambiar el resultado.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>👨‍👩‍👧</div>
+          <strong>Involucra al trabajador social</strong>
+          <p>El trabajador social de Servicios Sociales puede asesorar sobre todas las prestaciones disponibles y ayudar en la tramitación. No tramitar solo si hay dificultades.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🔄</div>
+          <strong>Solicita revisión cuando cambia la situación</strong>
+          <p>Si el estado empeora, solicitar revisión permite acceder a prestaciones de grado superior. No esperar a la revisión de oficio, que puede tardar años.</p>
+        </div>
+      </div>
+
+      {/* 6. Warning Box */}
+      <div className={styles.warningBox}>
+        <div className={styles.warningHeader}>
+          <span className={styles.warningIcon}>⚠️</span>
+          <strong>Errores frecuentes en la tramitación de la dependencia</strong>
+        </div>
+        <ul className={styles.warningList}>
+          <li><strong>Esperar a que la situación sea crítica para solicitar</strong>: Los plazos son largos. Solicitar tarde puede suponer meses sin prestación cuando más se necesita.</li>
+          <li><strong>No presentar recursos ante grados bajos</strong>: El sistema tiene una tasa de recurso con éxito considerable. Aceptar sin más un grado que no refleja la realidad supone perder prestaciones.</li>
+          <li><strong>No acudir a la valoración en condiciones habituales</strong>: Si el día de la visita la persona está especialmente bien (por medicación, acompañamiento...), el valorador puede asignar un grado inferior al real.</li>
+          <li><strong>Desconocer que los derechos son desde la solicitud</strong>: Muchas familias creen que los derechos empiezan con la resolución. Las retroactivas pueden ser de meses o años de prestación acumulada.</li>
+          <li><strong>No comunicar cambios de situación</strong>: Si la persona se muda de CCAA, mejora significativamente o su situación empeora, hay obligación de comunicarlo. No hacerlo puede generar reclamaciones.</li>
+          <li><strong>Confundir prestaciones con servicios</strong>: Las prestaciones económicas son dinero. Los servicios (SAD, residencia) son atención directa. No son incompatibles en todos los casos: consultar en cada situación.</li>
+        </ul>
+      </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('orientador-grado-dependencia')} />

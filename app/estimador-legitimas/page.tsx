@@ -484,6 +484,230 @@ export default function EstimadorLegitimas() {
         <p>En el Derecho Común, el tercio de mejora permite al testador favorecer a uno o varios hijos/nietos sobre los demás dentro de ese tramo. Por ejemplo, puede dejarse íntegro a un hijo con discapacidad, sin infringir la legítima de los demás (que queda cubierta por el tercio estricto).</p>
         <h3>¿Cómo se calcula el caudal hereditario (haber hereditario)?</h3>
         <p>Patrimonio en el momento del fallecimiento + donaciones realizadas en vida (colación) − deudas y cargas. El impuesto de sucesiones no se descuenta para calcular las legítimas; se paga adicionalmente sobre la herencia recibida.</p>
+
+      {/* === SECCIONES PROFESIONALES v2.0 === */}
+
+      {/* 1. Tabla Comparativa */}
+      <div className={styles.tableWrapper}>
+        <h3>Comparativa: Legítimas por sistema civil territorial</h3>
+        <table className={styles.comparativaTable}>
+          <thead>
+            <tr>
+              <th>Territorio</th>
+              <th>Legítima hijos</th>
+              <th>Legítima cónyuge</th>
+              <th>Libertad de testar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Derecho Común (Código Civil)</td>
+              <td>2/3 del caudal (1/3 estricta + 1/3 mejora)</td>
+              <td>Usufructo del 1/3 mejora</td>
+              <td>Solo 1/3 libre</td>
+            </tr>
+            <tr>
+              <td>Cataluña</td>
+              <td>1/4 del caudal (solo en metálico)</td>
+              <td>Solo si no hay hijos (1/4 usufructo)</td>
+              <td>3/4 libres (mayor libertad)</td>
+            </tr>
+            <tr>
+              <td>País Vasco (Troncalidad)</td>
+              <td>1/3 o según bien troncal</td>
+              <td>Usufructo del haber conyugal</td>
+              <td>Variable según territorio foral</td>
+            </tr>
+            <tr>
+              <td>Navarra</td>
+              <td>Legítima formal (5 sueldos)</td>
+              <td>Usufructo de fidelidad</td>
+              <td>Prácticamente total (mayor del mundo)</td>
+            </tr>
+            <tr>
+              <td>Aragón</td>
+              <td>1/2 del caudal (legítima colectiva)</td>
+              <td>Usufructo viudal universal</td>
+              <td>1/2 libre si se cumple colectiva</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 2. Casos de Uso */}
+      <div className={styles.escenariosGrid}>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+            <strong>Matrimonio con hijos en Derecho Común</strong>
+          </div>
+          <p>Herencia de 300.000 €. Los hijos tienen derecho a 2/3 (200.000 €). Solo 100.000 € pueden distribuirse libremente. El tercio de mejora puede concentrarse en un hijo.</p>
+          <div className={styles.escenarioExample}>Caudal 300.000 €: 100.000 € legítima estricta + 100.000 € mejora + 100.000 € libre</div>
+          <div className={styles.escenarioTip}>💡 El tercio de mejora es útil para beneficiar a un hijo cuidador o con necesidades especiales.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🏘️</span>
+            <strong>Residente en Cataluña con patrimonio inmobiliario</strong>
+          </div>
+          <p>La legítima catalana (1/4) se paga en metálico, no necesariamente con el inmueble. Más libertad para transmitir la vivienda familiar íntegra a quien el testador quiera.</p>
+          <div className={styles.escenarioExample}>Caudal 400.000 €: legítima 100.000 € en metálico, 300.000 € libres para el heredero elegido</div>
+          <div className={styles.escenarioTip}>💡 La legítima catalana al 1/4 da mucha más flexibilidad que el derecho común para planificar la herencia.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🤝</span>
+            <strong>Sin hijos, con cónyuge y padres</strong>
+          </div>
+          <p>En derecho común, si no hay descendientes, los ascendientes tienen legítima (1/2 del caudal) y el cónyuge tiene derecho al usufructo del tercio libre.</p>
+          <div className={styles.escenarioExample}>Caudal 200.000 €: padres 100.000 € + cónyuge usufructo 1/3 libre (33.333 €)</div>
+          <div className={styles.escenarioTip}>💡 El seguro de vida no forma parte de la herencia y no está sujeto a legítimas.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>📜</span>
+            <strong>Herencia con donaciones en vida previas</strong>
+          </div>
+          <p>Se hacen donaciones en vida a un hijo. Estas donaciones se imputan a la legítima del donatario (&quot;colación&quot;). Si superan la legítima, el beneficiado deberá compensar a sus hermanos.</p>
+          <div className={styles.escenarioExample}>Donación 80.000 € + legítima 50.000 € → donatario ya tiene más de su legítima, sin más derecho</div>
+          <div className={styles.escenarioTip}>💡 Planificar bien las donaciones en vida evita conflictos entre herederos al momento del fallecimiento.</div>
+        </div>
+      </div>
+
+      {/* 3. FAQ */}
+      <div className={styles.faqList}>
+        <h3>Preguntas frecuentes sobre las legítimas</h3>
+        <div className={styles.faqItem}>
+          <strong>¿Qué herederos son forzosos en derecho común?</strong>
+          <p>Primero: los hijos y descendientes. Si no hay descendientes, los padres y ascendientes. El cónyuge superviviente no es heredero forzoso pero tiene derecho a usufructo de una parte.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Puedo desheredar a un hijo?</strong>
+          <p>Solo por causas tasadas en el Código Civil: atentado contra la vida del testador, abandono o malos tratos, privación de la libertad, negar alimentos, condenado por delitos contra la familia, etc.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Las donaciones en vida reducen la herencia?</strong>
+          <p>Sí, las donaciones a herederos forzosos se &quot;colacionan&quot; (se suman al caudal ficticio para calcular legítimas). Las donaciones a terceros pueden atacarse si vulneran legítimas.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿El seguro de vida forma parte de la herencia?</strong>
+          <p>No, el seguro de vida va directamente al beneficiario designado y no forma parte del caudal hereditario. No está sujeto a legítimas ni a impuesto de sucesiones como herencia.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué es la &quot;acción de suplemento de legítima&quot;?</strong>
+          <p>Es la acción judicial que el legitimario perjudicado puede ejercitar para reclamar su parte si el testamento no la respeta o si las donaciones la han vulnerado. Prescribe en 15 años.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Puedo beneficiar a mi cónyuge en Derecho Común?</strong>
+          <p>En derecho común, el cónyuge no es heredero forzoso. Puedes dejarle el tercio libre y el usufructo universal a tu cónyuge, pero los hijos reclamarian los 2/3 restantes (legítima).</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué ley se aplica si vivo en una CCAA pero nací en otra?</strong>
+          <p>La vecindad civil (no el empadronamiento) determina la ley aplicable. La vecindad civil se adquiere por origen, residencia continuada o declaración. Puede diferir del lugar de residencia actual.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Pueden los herederos renunciar a la legítima?</strong>
+          <p>Sí, pero solo una vez abierta la sucesión (tras el fallecimiento). No es posible renunciar anticipadamente a la legítima del testador vivo, excepto en algunos territorios forales (como Navarra).</p>
+          <div className={styles.faqTip}>💡 Consultar con notario o abogado especializado para planificar la herencia respetando las legítimas de la CCAA aplicable.</div>
+        </div>
+      </div>
+
+      {/* 4. Guía Paso a Paso */}
+      <div className={styles.stepGuide}>
+        <h3>Cómo planificar la herencia respetando las legítimas</h3>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>1</div>
+          <div className={styles.stepContent}>
+            <strong>Determina la ley aplicable</strong>
+            <p>Verifica tu vecindad civil (no solo domicilio). Si tienes inmuebles en distintas CCAA, el derecho aplicable a la herencia es el de la vecindad civil del fallecido.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>2</div>
+          <div className={styles.stepContent}>
+            <strong>Calcula el caudal hereditario</strong>
+            <p>Suma todos los bienes y derechos, resta las deudas. Si hubo donaciones previas, añade su valor al caudal ficticio para calcular correctamente las legítimas.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>3</div>
+          <div className={styles.stepContent}>
+            <strong>Identifica a los herederos forzosos</strong>
+            <p>Hijos, nietos (si el hijo ha fallecido), ascendientes si no hay descendientes. El cónyuge tiene derechos de usufructo. La concurrencia de todos determina las porciones.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>4</div>
+          <div className={styles.stepContent}>
+            <strong>Calcula las partes legítimas exactas</strong>
+            <p>Usa este estimador para calcular qué parte corresponde a cada heredero forzoso. El resto (tercio libre o lo que corresponda según la CCAA) puede distribuirse libremente.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>5</div>
+          <div className={styles.stepContent}>
+            <strong>Redacta el testamento con notario</strong>
+            <p>El notario asesora sobre cómo distribuir la herencia respetando las legítimas y maximizando la voluntad del testador. El testamento ante notario tiene plena validez.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>6</div>
+          <div className={styles.stepContent}>
+            <strong>Registra el testamento y comunícalo</strong>
+            <p>El notario registra automáticamente el testamento en el Registro Central. Informa a los herederos de la existencia del testamento para evitar conflictos tras el fallecimiento.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Mejores Prácticas */}
+      <div className={styles.tipsGrid}>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>📜</div>
+          <strong>Haz testamento cuanto antes</strong>
+          <p>Sin testamento, se aplica la herencia intestada. Puede diferir mucho de lo que se desea. Un testamento notarial cuesta entre 50-150 € y da total seguridad jurídica.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🔄</div>
+          <strong>Actualiza el testamento ante cambios</strong>
+          <p>Nacimiento de nuevos herederos, fallecimiento de beneficiarios, cambios patrimoniales significativos o divorcio son razones para revisar y actualizar el testamento.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>💡</div>
+          <strong>Aprovecha el tercio de mejora</strong>
+          <p>En derecho común, el tercio de mejora permite favorecer a un hijo cuidador, con discapacidad o que ha contribuido más a la familia, dentro de los límites legales.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🏦</div>
+          <strong>Usa seguros de vida para beneficiar al cónyuge</strong>
+          <p>El seguro de vida no forma parte de la herencia. Es una herramienta eficiente para dejar capital al cónyuge sin afectar a las legítimas de los hijos.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>⚖️</div>
+          <strong>Consulta la normativa de tu CCAA</strong>
+          <p>Las diferencias entre territorios forales y comunes son enormes. Un abogado o notario especializado en derecho sucesorio de tu CCAA es imprescindible para una planificación correcta.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>📊</div>
+          <strong>Planifica con antelación las donaciones</strong>
+          <p>Las donaciones en vida a herederos forzosos se imputan a la legítima. Planificar bien evita que un hijo reciba doblemente o que otro se sienta perjudicado.</p>
+        </div>
+      </div>
+
+      {/* 6. Warning Box */}
+      <div className={styles.warningBox}>
+        <div className={styles.warningHeader}>
+          <span className={styles.warningIcon}>⚠️</span>
+          <strong>Errores frecuentes en la planificación de legítimas</strong>
+        </div>
+        <ul className={styles.warningList}>
+          <li><strong>No tener en cuenta la vecindad civil</strong>: El lugar de residencia no determina la ley aplicable a la herencia. La vecindad civil (que puede ser diferente) es la clave.</li>
+          <li><strong>Creer que se puede desheredar sin causa legal</strong>: En derecho común, desheredar sin causa tasada es ineficaz. Los hijos pueden impugnar el testamento y reclamar la legítima.</li>
+          <li><strong>Olvidar incluir donaciones previas en el cálculo</strong>: Las donaciones en vida a herederos forzosos se computan. No incluirlas en el cálculo de legítimas puede llevar a conflictos graves.</li>
+          <li><strong>Creer que el cónyuge tiene derecho a la misma legítima que los hijos</strong>: El cónyuge en derecho común tiene derecho a usufructo, no a propiedad. Es una diferencia fundamental.</li>
+          <li><strong>Confundir la legítima con la &quot;herencia obligatoria&quot;</strong>: La legítima puede satisfacerse de distintas formas: en bienes, en metálico (especialmente en Cataluña), en derechos. No obliga a dar bienes concretos.</li>
+          <li><strong>No actualizar el testamento tras cambios familiares</strong>: Un testamento redactado antes de nuevos nacimientos, divorcios o fallecimientos puede no reflejar la voluntad actual ni respetar correctamente las legítimas.</li>
+        </ul>
+      </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('estimador-legitimas')} />

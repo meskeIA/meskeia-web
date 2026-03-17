@@ -269,6 +269,218 @@ export default function TestFragilidad() {
         </ul>
         <h3>Valoración Geriátrica Integral (VGI)</h3>
         <p>Si el test indica fragilidad, el siguiente paso es una VGI con el médico o geriatra. Evalúa de forma integral la situación funcional, cognitiva, emocional, social y farmacológica para diseñar un plan de intervención personalizado.</p>
+
+      {/* === SECCIONES PROFESIONALES v2.0 === */}
+
+      {/* 1. Tabla Comparativa */}
+      <div className={styles.tableWrapper}>
+        <h3>Comparativa: Niveles de fragilidad según escala FRAIL</h3>
+        <table className={styles.comparativaTable}>
+          <thead>
+            <tr>
+              <th>Nivel</th>
+              <th>Puntuación FRAIL</th>
+              <th>Características</th>
+              <th>Intervención recomendada</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Robusto / No frágil</td>
+              <td>0 puntos</td>
+              <td>Sin limitaciones, activo independiente</td>
+              <td>Mantenimiento preventivo</td>
+            </tr>
+            <tr>
+              <td>Pre-frágil</td>
+              <td>1-2 puntos</td>
+              <td>Limitaciones leves, reversible</td>
+              <td>Intervención temprana prioritaria</td>
+            </tr>
+            <tr>
+              <td>Frágil</td>
+              <td>3-5 puntos</td>
+              <td>Múltiples limitaciones, riesgo alto</td>
+              <td>Plan de atención integral urgente</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 2. Casos de Uso */}
+      <div className={styles.escenariosGrid}>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🚶</span>
+            <strong>Persona mayor activa (no frágil)</strong>
+          </div>
+          <p>72 años, camina 30 min diarios, sin limitaciones funcionales, bien nutrida. La prevención es la estrategia: mantener hábitos y vigilancia periódica.</p>
+          <div className={styles.escenarioExample}>Objetivo: mantener robustez con ejercicio, socialización y dieta mediterránea</div>
+          <div className={styles.escenarioTip}>💡 El test FRAIL anual permite detectar transición a pre-fragilidad cuando aún es reversible.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>⚠️</span>
+            <strong>Persona pre-frágil (1-2 puntos)</strong>
+          </div>
+          <p>75 años, refiere cansancio frecuente y ha bajado 4 kg en el último año. Pre-fragilidad: estado reversible con intervención adecuada. Ventana de oportunidad.</p>
+          <div className={styles.escenarioExample}>Intervención: programa ejercicio supervisado + valoración nutricional + revisión medicación</div>
+          <div className={styles.escenarioTip}>💡 La pre-fragilidad tiene alta reversibilidad. Intervenir ahora evita la progresión a fragilidad establecida.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🏥</span>
+            <strong>Persona frágil (3+ puntos)</strong>
+          </div>
+          <p>80 años, múltiples caídas, pérdida de fuerza muscular significativa, cansancio severo. Necesita valoración geriátrica integral y plan de cuidados multidisciplinar.</p>
+          <div className={styles.escenarioExample}>Plan: fisioterapia + adaptación hogar + revisión polifarmacia + soporte nutricional</div>
+          <div className={styles.escenarioTip}>💡 El geriatra puede solicitar Valoración Geriátrica Integral (VGI) para un plan de cuidados personalizado.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🔄</span>
+            <strong>Tras una hospitalización o enfermedad aguda</strong>
+          </div>
+          <p>Una hospitalización puede precipitar fragilidad en una persona que antes era robusta. El test post-hospitalización orienta la recuperación funcional necesaria.</p>
+          <div className={styles.escenarioExample}>Post-caída o post-infección: re-evaluación FRAIL a las 4-6 semanas para ajustar el plan</div>
+          <div className={styles.escenarioTip}>💡 El síndrome post-UCI es especialmente frecuente en mayores y requiere rehabilitación precoz.</div>
+        </div>
+      </div>
+
+      {/* 3. FAQ */}
+      <div className={styles.faqList}>
+        <h3>Preguntas frecuentes sobre fragilidad</h3>
+        <div className={styles.faqItem}>
+          <strong>¿Qué es exactamente la fragilidad?</strong>
+          <p>Es un síndrome geriátrico de vulnerabilidad fisiológica aumentada, resultado del envejecimiento de múltiples sistemas. No es lo mismo que discapacidad ni que enfermedad crónica, aunque puede coexistir con ambas.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿La fragilidad es inevitable con la edad?</strong>
+          <p>No. Hay personas de 90 años robustas y de 70 años frágiles. El estilo de vida, la actividad física, la nutrición y el manejo de enfermedades crónicas influyen enormemente en la trayectoria.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué diferencia hay entre fragilidad y sarcopenia?</strong>
+          <p>La sarcopenia es la pérdida de masa y fuerza muscular (un componente de la fragilidad). La fragilidad es un concepto más amplio que incluye también agotamiento, lentitud, baja actividad y pérdida de peso.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿El ejercicio puede revertir la fragilidad?</strong>
+          <p>Sí, el ejercicio de resistencia y equilibrio es la intervención más efectiva para la pre-fragilidad y fragilidad leve-moderada. Mejora la fuerza, el equilibrio y reduce el riesgo de caídas.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué es la polifarmacia y por qué agrava la fragilidad?</strong>
+          <p>Polifarmacia es tomar 5 o más medicamentos. Algunos medicamentos causan debilidad, caídas, confusión o pérdida de apetito en personas mayores. Revisar la medicación con el médico puede mejorar la fragilidad.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Cuándo debería consultar a un geriatra?</strong>
+          <p>Cuando hay fragilidad establecida (3+ puntos), tras una hospitalización, ante múltiples enfermedades crónicas o cuando la atención primaria no puede abordar la complejidad del caso.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué es la Valoración Geriátrica Integral (VGI)?</strong>
+          <p>Es una evaluación multidimensional que valora el estado funcional, cognitivo, nutricional, emocional y social. Permite crear un plan de cuidados individualizado y detectar problemas no identificados previamente.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Puede una persona frágil mejorar con tratamiento?</strong>
+          <p>Sí, aunque la mejora es más lenta que en pre-fragilidad. Con ejercicio adaptado, soporte nutricional, revisión de medicación y apoyo social, es posible recuperar funcionalidad.</p>
+          <div className={styles.faqTip}>💡 La motivación del paciente es clave. Los programas de ejercicio grupal en mayores tienen mejor adherencia que los individuales.</div>
+        </div>
+      </div>
+
+      {/* 4. Guía Paso a Paso */}
+      <div className={styles.stepGuide}>
+        <h3>Plan de acción según el resultado del test</h3>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>1</div>
+          <div className={styles.stepContent}>
+            <strong>Realiza el test FRAIL y anota el resultado</strong>
+            <p>Los 5 ítems (Fatigue, Resistance, Aerobic, Illnesses, Loss of weight) dan una puntuación de 0-5. Guarda la fecha para comparar en futuras evaluaciones.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>2</div>
+          <div className={styles.stepContent}>
+            <strong>Comenta el resultado con tu médico</strong>
+            <p>Presenta la puntuación en la próxima visita. El médico puede complementar con otras pruebas (velocidad de marcha, fuerza prensil, análisis) para confirmación diagnóstica.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>3</div>
+          <div className={styles.stepContent}>
+            <strong>Inicia un programa de ejercicio adaptado</strong>
+            <p>Independientemente del resultado, el ejercicio es beneficioso. Para pre-frágil o frágil, fisioterapia y programas específicos de fuerza y equilibrio son la base del tratamiento.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>4</div>
+          <div className={styles.stepContent}>
+            <strong>Valora el estado nutricional</strong>
+            <p>La desnutrición y sarcopenia están muy relacionadas. Un dietista puede evaluar la ingesta proteica (objetivo: 1,2-1,5 g/kg/día) y las necesidades calóricas.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>5</div>
+          <div className={styles.stepContent}>
+            <strong>Revisa la medicación con el médico</strong>
+            <p>Algunos fármacos contribuyen a la fragilidad. La deprescripción supervisada puede mejorar el estado funcional, el apetito y reducir el riesgo de caídas.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>6</div>
+          <div className={styles.stepContent}>
+            <strong>Repite el test cada 6-12 meses</strong>
+            <p>La fragilidad es dinámica. Monitorizar la evolución permite ajustar el plan. En personas robustas, anualmente; en pre-frágiles o frágiles, cada 6 meses.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Mejores Prácticas */}
+      <div className={styles.tipsGrid}>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🏋️</div>
+          <strong>Prioriza el ejercicio de fuerza</strong>
+          <p>Las personas mayores necesitan especialmente ejercicio de resistencia (pesas, bandas elásticas). El músculo se recupera a cualquier edad con el estímulo adecuado.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🥩</div>
+          <strong>Aumenta la ingesta proteica</strong>
+          <p>La proteína es esencial para mantener el músculo. Objetivo: 1,2-1,5 g/kg de peso/día. Distribuir en las tres comidas principales, no solo en la cena.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>👥</div>
+          <strong>Mantén la red social activa</strong>
+          <p>El aislamiento social acelera la fragilidad. Actividades en grupo, voluntariado, clubes de mayores o clases colectivas son tan importantes como el ejercicio.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>💊</div>
+          <strong>Revisa la polifarmacia regularmente</strong>
+          <p>Llevar una lista actualizada de todos los medicamentos al médico permite detectar interacciones y fármacos que ya no son necesarios o que perjudican.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>😴</div>
+          <strong>Cuida el sueño y el bienestar emocional</strong>
+          <p>Los trastornos del sueño y la depresión se asocian fuertemente con la fragilidad. Tratarlos mejora la energía, la movilidad y el apetito simultáneamente.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🎯</div>
+          <strong>Actúa en pre-fragilidad, no en fragilidad</strong>
+          <p>La pre-fragilidad es la ventana de mayor oportunidad. En este estadio, las intervenciones tienen más probabilidad de revertir el proceso que cuando la fragilidad ya está establecida.</p>
+        </div>
+      </div>
+
+      {/* 6. Warning Box */}
+      <div className={styles.warningBox}>
+        <div className={styles.warningHeader}>
+          <span className={styles.warningIcon}>⚠️</span>
+          <strong>Errores frecuentes ante la fragilidad</strong>
+        </div>
+        <ul className={styles.warningList}>
+          <li><strong>Confundir fragilidad con vejez normal</strong>: La fragilidad no es inevitable. Aceptarla como &quot;cosas de la edad&quot; impide intervenir cuando aún es reversible.</li>
+          <li><strong>Reducir la actividad por miedo a caídas</strong>: El sedentarismo agrava la fragilidad. El miedo a caer lleva a reducir la actividad, lo que a su vez debilita más la musculatura y el equilibrio.</li>
+          <li><strong>No informar al médico de la pérdida de peso no intencionada</strong>: Perder más de 4,5 kg sin proponérselo es una señal de alarma que requiere evaluación médica urgente.</li>
+          <li><strong>Ignorar el estado nutricional</strong>: Muchas personas mayores frágiles están desnutridas sin saberlo. Una dieta monótona o escasa en proteínas contribuye directamente a la pérdida muscular.</li>
+          <li><strong>No revisar la medicación periódicamente</strong>: Algunos fármacos prescritos hace años pueden ser contraproducentes en la actualidad. La revisión anual de la medicación es fundamental.</li>
+          <li><strong>Esperar a la hospitalización para actuar</strong>: La fragilidad multiplica el riesgo de complicaciones graves tras una hospitalización. Intervenir antes reduce drásticamente ese riesgo.</li>
+        </ul>
+      </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('test-fragilidad')} />

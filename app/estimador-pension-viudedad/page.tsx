@@ -443,6 +443,205 @@ export default function EstimadorPensionViudedad() {
         <p>La pensión de viudedad es compatible con el trabajo y con la pensión de jubilación propia. Sin embargo, puede reducirse o extinguirse si el beneficiario contrae nuevo matrimonio (salvo excepciones para mayores de 61 años con pensión insuficiente).</p>
         <h3>¿Cómo solicitarla?</h3>
         <p>En cualquier oficina de la Seguridad Social, por teléfono (901 10 65 70) o a través de Import@SS (sede electrónica). Presentar: DNI, certificado de matrimonio/convivencia, libro de familia, certificado de defunción y documentación laboral del causante.</p>
+
+        {/* SECCIÓN 1: Tabla Comparativa */}
+        <div className={styles.tableWrapper}>
+          <h3>Porcentajes de pensión de viudedad según circunstancias</h3>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Situación del viudo/a</th>
+                <th>Porcentaje</th>
+                <th>Condición principal</th>
+                <th>Duración</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>General (sin cargas familiares)</td><td>52%</td><td>Cualquier circunstancia</td><td>Vitalicia</td></tr>
+              <tr><td>Con hijos menores o discapacitados</td><td>70%</td><td>Mientras existan cargas familiares</td><td>Mientras dure la situación</td></tr>
+              <tr><td>Mayor de 65 años sin otras rentas</td><td>60%</td><td>Ingresos &lt; límite legal (anual)</td><td>Vitalicia</td></tr>
+              <tr><td>Pareja de hecho reconocida</td><td>52%</td><td>2+ años de convivencia + inscripción</td><td>Vitalicia</td></tr>
+              <tr><td>Ex cónyuge divorciado/separado</td><td>Proporcional</td><td>Pensión compensatoria activa</td><td>Según pensión compensatoria</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* SECCIÓN 2: Casos de Uso */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>👩‍👧‍👦</span>
+              <strong>Viuda con hijos menores a cargo</strong>
+            </div>
+            <p className={styles.escenarioExample}>Carmen, 45 años, pierde a su marido. Tiene 2 hijos de 8 y 11 años. Recibe el 70% de la BR del fallecido, más la pensión de orfandad de cada hijo (20% BR por hijo). Al cumplir el mayor 25 años (o cesar las cargas), el porcentaje baja al 52%.</p>
+            <p className={styles.escenarioTip}>💡 El 70% se mantiene mientras haya hijos menores de 25 años en el hogar que generen derecho a orfandad.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>👴</span>
+              <strong>Viudo mayor de 65 años sin otros ingresos</strong>
+            </div>
+            <p className={styles.escenarioExample}>Manuel, 70 años, queda viudo. No tiene pensión propia. Si sus rentas anuales son inferiores al límite establecido (rentas + pensión no superan el 75% del SMI en cómputo anual), percibirá el 70% de la BR de su esposa fallecida.</p>
+            <p className={styles.escenarioTip}>💡 El 70% para mayores de 65 sin ingresos evita situaciones de desprotección extrema.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>💑</span>
+              <strong>Pareja de hecho con inscripción previa</strong>
+            </div>
+            <p className={styles.escenarioExample}>Laura y Pedro llevan 5 años juntos, inscritos en el registro de parejas de hecho hace 3 años. Al fallecer Pedro, Laura tiene derecho al 52% de su BR, siempre que no existan ingresos superiores al límite legal y se acrediten 2 años de convivencia.</p>
+            <p className={styles.escenarioTip}>💡 La inscripción en el registro de parejas de hecho debe ser previa al fallecimiento y con al menos 2 años de antelación.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>⚖️</span>
+              <strong>Ex cónyuge divorciado con pensión compensatoria</strong>
+            </div>
+            <p className={styles.escenarioExample}>Ana y Jordi se divorciaron hace 10 años. Jordi pagaba pensión compensatoria a Ana. Al fallecer Jordi, Ana puede acceder a una parte de la pensión de viudedad proporcional a la pensión compensatoria, compitiendo con la nueva esposa (si la hubiera).</p>
+            <p className={styles.escenarioTip}>💡 Si hay nuevo cónyuge, la pensión de viudedad se reparte proporcionalmente al tiempo de matrimonio.</p>
+          </div>
+        </div>
+
+        {/* SECCIÓN 3: FAQ */}
+        <div className={styles.faqList}>
+          <details className={styles.faqItem}>
+            <summary>¿Cuánto tiempo hay para solicitar la pensión de viudedad?</summary>
+            <p>No hay plazo de caducidad para solicitarla, pero el reconocimiento de la pensión solo tiene efectos retroactivos de hasta 3 meses desde la fecha de solicitud. Por tanto, cuanto antes se solicite tras el fallecimiento, menos prestación se pierde. Se recomienda solicitar en el plazo de 3 meses.</p>
+            <p className={styles.faqTip}>💡 La solicitud puede hacerse telemáticamente en Importass (sede.seg-social.gob.es) o presencialmente en el INSS.</p>
+          </details>
+          <details className={styles.faqItem}>
+            <summary>¿Es compatible la pensión de viudedad con trabajar?</summary>
+            <p>Sí, la pensión de viudedad es compatible con el trabajo por cuenta propia o ajena. También es compatible con otras pensiones (jubilación, incapacidad permanente). Sin embargo, si se supera el límite de ingresos establecido, puede afectar al porcentaje (especialmente para el acceso al 70%).</p>
+            <p className={styles.faqTip}>💡 El límite de ingresos solo afecta al porcentaje (52% vs 70%), no al derecho a la pensión en sí.</p>
+          </details>
+          <details className={styles.faqItem}>
+            <summary>¿Qué ocurre si me vuelvo a casar?</summary>
+            <p>Si el beneficiario contrae nuevo matrimonio, pierde el derecho a la pensión de viudedad. No obstante, puede recuperarla si el nuevo matrimonio se disuelve (fallecimiento, divorcio, separación), siempre que se cumplan los requisitos. En viudas mayores de 61 años, la norma es más flexible.</p>
+            <p className={styles.faqTip}>💡 Desde 2010, existen excepciones: viudas/viudos mayores de 61 años o con pensión de viudedad superior al 75% de sus ingresos pueden mantenerla tras nuevo matrimonio.</p>
+          </details>
+          <details className={styles.faqItem}>
+            <summary>¿Cuáles son los requisitos de cotización del fallecido?</summary>
+            <p>Depende de la situación: si el fallecido estaba dado de alta o en situación asimilada, debe tener 500 días cotizados en los últimos 5 años. Si no estaba en alta, necesita al menos 15 años cotizados a lo largo de su vida laboral. Si fallece por accidente laboral o enfermedad profesional, no se exige período mínimo.</p>
+            <p className={styles.faqTip}>💡 Los fallecimientos por accidente de trabajo o enfermedad profesional generan derecho sin requisito de cotización previa.</p>
+          </details>
+          <details className={styles.faqItem}>
+            <summary>¿Tienen derecho las parejas del mismo sexo?</summary>
+            <p>Sí. Desde la Ley 13/2005, el matrimonio entre personas del mismo sexo tiene los mismos derechos, incluyendo la pensión de viudedad. Las parejas de hecho del mismo sexo también tienen derecho si cumplen los requisitos (inscripción, convivencia, límite de ingresos).</p>
+            <p className={styles.faqTip}>💡 Los mismos criterios de cotización y convivencia se aplican independientemente del género.</p>
+          </details>
+          <details className={styles.faqItem}>
+            <summary>¿Qué pasa si el fallecido era autónomo?</summary>
+            <p>Los trabajadores autónomos (RETA) también generan derecho a pensión de viudedad para su cónyuge o pareja de hecho, con los mismos requisitos de cotización. La base reguladora se calcula sobre las bases de cotización del RETA del fallecido, igual que para trabajadores por cuenta ajena.</p>
+            <p className={styles.faqTip}>💡 Los autónomos societarios (en régimen general por ser administradores) cotizan como trabajadores por cuenta ajena.</p>
+          </details>
+          <details className={styles.faqItem}>
+            <summary>¿Cuánto es la pensión mínima de viudedad en 2025?</summary>
+            <p>La pensión mínima de viudedad varía según la edad y las cargas familiares. En 2025, para beneficiarios menores de 60 años sin cargas familiares ronda los 630 €/mes; para mayores de 60 años sin cargas, unos 730 €/mes; y con cargas familiares, supera los 900 €/mes (14 pagas en todos los casos).</p>
+            <p className={styles.faqTip}>💡 Estos mínimos se actualizan anualmente con el IPC igual que el resto de pensiones.</p>
+          </details>
+          <details className={styles.faqItem}>
+            <summary>¿Pueden cobrar la pensión de viudedad los hijos huérfanos?</summary>
+            <p>No, la pensión de viudedad corresponde exclusivamente al cónyuge o pareja de hecho superviviente. Los hijos tienen derecho a una prestación diferente: la pensión de orfandad (20% de la BR por cada huérfano de padre o madre; 52% si es huérfano absoluto). Ambas prestaciones son independientes.</p>
+            <p className={styles.faqTip}>💡 La pensión de orfandad se extiende hasta los 21 años o 25 si estudia y no trabaja.</p>
+          </details>
+        </div>
+
+        {/* SECCIÓN 4: Guía Paso a Paso */}
+        <div className={styles.stepGuide}>
+          <h3>Cómo solicitar la pensión de viudedad paso a paso</h3>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>1</span>
+            <div className={styles.stepContent}>
+              <strong>Reúne la documentación necesaria</strong>
+              <p>Necesitarás: certificado de defunción, libro de familia o certificado de matrimonio/pareja de hecho, DNI del solicitante, vida laboral del fallecido, y documentación de ingresos propios si solicitas el 70%. Si hay hijos, también sus DNIs y datos académicos.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>2</span>
+            <div className={styles.stepContent}>
+              <strong>Verifica los requisitos de cotización del fallecido</strong>
+              <p>Consulta la vida laboral del fallecido para confirmar que cumple el requisito de cotización (500 días en los últimos 5 años si estaba en alta; 15 años totales si no estaba en alta). Este paso determina si existe derecho a la prestación.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>3</span>
+            <div className={styles.stepContent}>
+              <strong>Solicita en el plazo de 3 meses</strong>
+              <p>Para no perder retroactividad, presenta la solicitud en los 3 meses siguientes al fallecimiento. Puedes hacerlo por internet en Importass, por teléfono (901 106 570) o presencialmente en el INSS o mutuas colaboradoras.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>4</span>
+            <div className={styles.stepContent}>
+              <strong>Declara tus ingresos con exactitud</strong>
+              <p>Si quieres optar al 70%, debes declarar que tus ingresos anuales propios no superan el límite legal (aproximadamente 8.614 €/año en 2025). El INSS verificará esta información con la AEAT.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>5</span>
+            <div className={styles.stepContent}>
+              <strong>Espera la resolución del INSS</strong>
+              <p>El INSS tiene un plazo de 90 días para resolver. En la práctica, suele tardar entre 1 y 3 meses. Si la resolución es denegatoria, tienes 30 días para presentar reclamación previa ante el INSS y, posteriormente, demanda ante el Juzgado de lo Social.</p>
+            </div>
+          </div>
+          <div className={styles.step}>
+            <span className={styles.stepNumber}>6</span>
+            <div className={styles.stepContent}>
+              <strong>Revisa la notificación y primer pago</strong>
+              <p>Comprueba que el importe reconocido coincide con tu cálculo. Si hay discrepancias, solicita un desglose de la base reguladora calculada por el INSS. El primer pago incluye los atrasos desde la fecha de efectos económicos.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* SECCIÓN 5: Mejores Prácticas */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>⏰</span>
+            <strong>Solicita cuanto antes, no lo postergues</strong>
+            <p>El dolor del duelo puede llevar a aplazar trámites, pero la retroactividad es solo de 3 meses. Solicitar tarde supone perder prestación a la que tienes derecho desde el primer momento.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📂</span>
+            <strong>Guarda toda la documentación de convivencia</strong>
+            <p>Para parejas de hecho, los empadronamientos conjuntos, contratos de arrendamiento compartidos o escrituras de propiedad son prueba de convivencia. Conservar estos documentos facilitará la tramitación.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>💰</span>
+            <strong>Revisa si tienes derecho al 60% o 70%</strong>
+            <p>Muchos beneficiarios cobran el 52% sin saber que cumplen los requisitos para el 70%. Verifica tu situación de ingresos y cargas familiares antes de aceptar el porcentaje inicial reconocido.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📋</span>
+            <strong>Comunica cambios de circunstancias al INSS</strong>
+            <p>Si cambia tu estado civil, tus ingresos aumentan, o cesan las cargas familiares, debes comunicarlo al INSS. No hacerlo puede generar obligación de devolución de cantidades cobradas indebidamente.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🏛️</span>
+            <strong>Consulta con un gestor o asesor si la situación es compleja</strong>
+            <p>Si hay divorcio previo, múltiples cónyuges, parejas de hecho y matrimonial, o situaciones especiales de cotización, la ayuda de un profesional puede maximizar la prestación obtenida.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🔍</span>
+            <strong>Verifica el IRPF de la pensión</strong>
+            <p>La pensión de viudedad tributa como rendimiento del trabajo. Si es tu único ingreso y es inferior al mínimo personal, es posible que no estés obligado a declarar, pero conviene confirmarlo con Hacienda o un asesor fiscal.</p>
+          </div>
+        </div>
+
+        {/* SECCIÓN 6: Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores frecuentes al solicitar la pensión de viudedad</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Solicitar fuera del plazo de 3 meses:</strong> Pasado ese plazo, se pierde retroactividad y la prestación empieza desde la fecha de solicitud, no desde el fallecimiento.</li>
+            <li><strong>No acreditar la convivencia en parejas de hecho:</strong> Sin la inscripción en el registro con al menos 2 años de antelación al fallecimiento, no hay derecho a pensión de viudedad para parejas no casadas.</li>
+            <li><strong>Confundir pensión de viudedad con pensión de orfandad:</strong> Son prestaciones distintas. Los hijos no cobran viudedad; el cónyuge no cobra orfandad. Cada uno solicita la suya por separado.</li>
+            <li><strong>Asumir que el nuevo matrimonio siempre extingue el derecho:</strong> Hay excepciones para mayores de 61 años o cuando la pensión representa la mayor parte de los ingresos.</li>
+            <li><strong>No declarar cambios de ingresos:</strong> Si tus ingresos aumentan significativamente (herencia, nueva nómina, etc.) y no lo comunicas, puede generarse una deuda con la Seguridad Social.</li>
+            <li><strong>Olvidar solicitar la pensión de orfandad para los hijos:</strong> La pensión de viudedad no incluye automáticamente la de orfandad. Es una solicitud separada que debe tramitarse también, evitando así perder retroactividad también en esa prestación.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('estimador-pension-viudedad')} />

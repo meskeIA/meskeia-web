@@ -302,6 +302,223 @@ export default function OrientadorJubilacionAnticipada() {
           <li>Algunos convenios colectivos y EREs incluyen complementos del empleador.</li>
           <li>Consulta siempre con la SS tu historial exacto antes de decidir.</li>
         </ul>
+      {/* === SECCIONES PROFESIONALES v2.0 === */}
+
+      {/* 1. Tabla Comparativa */}
+      <div className={styles.tableWrapper}>
+        <h3>Comparativa: Jubilación anticipada voluntaria vs involuntaria</h3>
+        <table className={styles.comparativaTable}>
+          <thead>
+            <tr>
+              <th>Característica</th>
+              <th>Voluntaria</th>
+              <th>Involuntaria</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Años antes de la edad legal</td>
+              <td>Hasta 2 años</td>
+              <td>Hasta 4 años</td>
+            </tr>
+            <tr>
+              <td>Años cotizados mínimos</td>
+              <td>35 años</td>
+              <td>33 años</td>
+            </tr>
+            <tr>
+              <td>Coeficiente reductor mensual</td>
+              <td>Mayor penalización</td>
+              <td>Menor penalización</td>
+            </tr>
+            <tr>
+              <td>Causa requerida</td>
+              <td>Ninguna (decisión propia)</td>
+              <td>Despido, ERTE, insolvencia empresarial...</td>
+            </tr>
+            <tr>
+              <td>Pensión mínima requerida</td>
+              <td>Superior a la pensión mínima</td>
+              <td>No requerida</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 2. Casos de Uso */}
+      <div className={styles.escenariosGrid}>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>👷</span>
+            <strong>Trabajador con larga carrera (38+ años)</strong>
+          </div>
+          <p>Cumple requisito de 35 años y quiere jubilarse 2 años antes. El coeficiente reductor es bajo por su larga cotización.</p>
+          <div className={styles.escenarioExample}>Ejemplo: 2 años antes → reducción ~6-7% de la pensión completa</div>
+          <div className={styles.escenarioTip}>💡 Verificar si la reducción compensa los ingresos perdidos durante los 2 años.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>📉</span>
+            <strong>Trabajador afectado por ERE/ERTE</strong>
+          </div>
+          <p>Despedido a los 60+ años con 33+ años cotizados. Puede acceder a jubilación anticipada involuntaria con menor penalización.</p>
+          <div className={styles.escenarioExample}>Ejemplo: Despido a 61 años, 35 cotizados → jubilación con reducción 2,31%/trim</div>
+          <div className={styles.escenarioTip}>💡 Comparar con prestación por desempleo antes de solicitar jubilación anticipada.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>🩺</span>
+            <strong>Trabajador con problemas de salud</strong>
+          </div>
+          <p>Si tiene reconocida discapacidad o realiza trabajos con coeficientes reductores, puede anticipar sin penalización o con menos años.</p>
+          <div className={styles.escenarioExample}>Ejemplo: Miner, bombero, determinadas profesiones → antes de los 65 sin penalización</div>
+          <div className={styles.escenarioTip}>💡 Consultar si el convenio colectivo o profesión tiene coeficientes reductores.</div>
+        </div>
+        <div className={styles.escenarioCard}>
+          <div className={styles.escenarioHeader}>
+            <span className={styles.escenarioIcon}>💰</span>
+            <strong>Persona con ahorro privado suficiente</strong>
+          </div>
+          <p>Tiene plan de pensiones, fondos e inmuebles. La reducción en pensión pública la compensa con rentas privadas durante los años anticipados.</p>
+          <div className={styles.escenarioExample}>Estrategia: Reducción ~5% pensión pública + renta privada de 1.000 €/mes</div>
+          <div className={styles.escenarioTip}>💡 Calcular el break-even: ¿cuántos años tarda en compensar la reducción?</div>
+        </div>
+      </div>
+
+      {/* 3. FAQ */}
+      <div className={styles.faqList}>
+        <h3>Preguntas frecuentes sobre jubilación anticipada</h3>
+        <div className={styles.faqItem}>
+          <strong>¿Cuáles son los coeficientes reductores exactos?</strong>
+          <p>Para voluntaria: entre 1,625% y 2% por trimestre según años cotizados. Para involuntaria: entre 1,125% y 1,75% por trimestre. Se aplica sobre la pensión completa por cada trimestre adelantado.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿La reducción es permanente?</strong>
+          <p>Sí, la reducción por anticipación es permanente y se mantiene toda la vida. Solo se elimina si se llega a la edad legal sin haber cobrado aún la pensión.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué pasa con la pensión mínima?</strong>
+          <p>Para la jubilación anticipada voluntaria, la pensión resultante DESPUÉS de aplicar los coeficientes debe ser superior a la pensión mínima garantizada. Si no, no se puede acceder a la modalidad voluntaria.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Qué se considera causa involuntaria?</strong>
+          <p>Despido objetivo, colectivo (ERE), por extinción de empresa, por insolvencia/concurso del empresario, por muerte o jubilación del empresario individual, o fin de contrato temporal no renovado.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Puedo combinar desempleo y jubilación anticipada?</strong>
+          <p>No simultáneamente. Pero puedes agotar la prestación por desempleo primero y luego solicitar la jubilación anticipada, si aún cumples el requisito de edad.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Cómo afecta a la pensión de viudedad futura del cónyuge?</strong>
+          <p>La pensión de viudedad se calcula sobre la pensión del fallecido, incluyendo las reducciones por anticipación. Es un factor a considerar en la planificación familiar.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Se puede revocar la solicitud de jubilación anticipada?</strong>
+          <p>Antes de la resolución del INSS es posible desistir. Una vez reconocida y comenzada a cobrar, generalmente no es reversible.</p>
+        </div>
+        <div className={styles.faqItem}>
+          <strong>¿Los períodos de cuidado de hijos cuentan para los 35 años?</strong>
+          <p>Sí, los períodos de excedencia por cuidado de hijos (hasta 3 años por hijo) se computan como cotizados a efectos del acceso a la jubilación anticipada.</p>
+          <div className={styles.faqTip}>💡 Verificar que todos estos períodos están correctamente registrados en la vida laboral.</div>
+        </div>
+      </div>
+
+      {/* 4. Guía Paso a Paso */}
+      <div className={styles.stepGuide}>
+        <h3>Cómo acceder a la jubilación anticipada paso a paso</h3>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>1</div>
+          <div className={styles.stepContent}>
+            <strong>Verifica tu elegibilidad</strong>
+            <p>Comprueba tu edad actual, años cotizados (vida laboral) y determina si tu caso es voluntario o involuntario. Asegúrate de cumplir el mínimo de cotización.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>2</div>
+          <div className={styles.stepContent}>
+            <strong>Calcula los coeficientes reductores</strong>
+            <p>Usa este orientador para calcular exactamente qué reducción sufrirá tu pensión según los trimestres que te anticipas.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>3</div>
+          <div className={styles.stepContent}>
+            <strong>Valora la alternativa de esperar</strong>
+            <p>Compara la pensión reducida durante X años extra versus la pensión completa. Calcula el punto de equilibrio (break-even) en número de años de cobro.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>4</div>
+          <div className={styles.stepContent}>
+            <strong>Prepara la documentación</strong>
+            <p>DNI, vida laboral actualizada. Para involuntaria: documento acreditativo de la causa (carta de despido, certificado empresa en concurso, etc.).</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>5</div>
+          <div className={styles.stepContent}>
+            <strong>Solicita hasta 3 meses antes</strong>
+            <p>Presenta la solicitud en el INSS con hasta 3 meses de antelación a la fecha deseada. La efectividad de la pensión es desde la fecha indicada en la solicitud.</p>
+          </div>
+        </div>
+        <div className={styles.step}>
+          <div className={styles.stepNumber}>6</div>
+          <div className={styles.stepContent}>
+            <strong>Resolución y primer pago</strong>
+            <p>El INSS resuelve en 30-90 días. La pensión se pagará con efectos desde el día solicitado, con retroactividad si la resolución tarda.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Mejores Prácticas */}
+      <div className={styles.tipsGrid}>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🧮</div>
+          <strong>Calcula el break-even</strong>
+          <p>Divide los años de pensión reducida que cobrarías antes por el importe que "pierdes" para saber cuándo sale rentable la anticipación.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>📋</div>
+          <strong>Revisa bien la causa</strong>
+          <p>Si tu situación puede calificarse como involuntaria, los coeficientes son menores. Documentar correctamente la causa puede suponer cientos de euros más al mes.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🏦</div>
+          <strong>Considera el ahorro privado como puente</strong>
+          <p>Si te queda poco para los 35 años de cotización, valorar esperar y mientras tanto usar ahorro privado como renta complementaria.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>👨‍👩‍👧</div>
+          <strong>Ten en cuenta el impacto en viudedad</strong>
+          <p>La reducción permanente en tu pensión también reduce la pensión de viudedad de tu cónyuge. Inclúyelo en la decisión familiar.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>📅</div>
+          <strong>Solicítala con tiempo</strong>
+          <p>El INSS puede tardar meses en resolver. Solicitar con 3 meses de antelación evita quedarse sin ingresos entre el cese y el cobro de la pensión.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>💡</div>
+          <strong>Consulta un asesor laboral</strong>
+          <p>Las casuísticas son muy variadas. Un asesor laboral o gestor de SS puede analizar tu caso específico y calcular la mejor estrategia.</p>
+        </div>
+      </div>
+
+      {/* 6. Warning Box */}
+      <div className={styles.warningBox}>
+        <div className={styles.warningHeader}>
+          <span className={styles.warningIcon}>⚠️</span>
+          <strong>Errores frecuentes en la jubilación anticipada</strong>
+        </div>
+        <ul className={styles.warningList}>
+          <li><strong>No verificar el mínimo de cotización</strong>: Solicitar jubilación anticipada sin tener los 35 años (voluntaria) o 33 años (involuntaria) resulta en denegación automática.</li>
+          <li><strong>No acreditar la causa involuntaria</strong>: Presentarse como involuntario sin la documentación adecuada lleva a aplicar los coeficientes más altos de la voluntaria.</li>
+          <li><strong>No calcular el impacto real en euros</strong>: La reducción porcentual abstracta puede parecer pequeña, pero en términos de euros mensuales durante 20+ años es muy significativa.</li>
+          <li><strong>Solicitar demasiado tarde</strong>: Si se solicita sin antelación, puede haber un período sin ingresos entre el cese laboral y el inicio del pago de la pensión.</li>
+          <li><strong>No agotar primero el desempleo en casos involuntarios</strong>: A veces es más rentable cobrar el desempleo completo y luego jubilarse (si aún cumplen la edad mínima).</li>
+          <li><strong>Ignorar el impacto en el cónyuge</strong>: La reducción permanente afecta también a la futura pensión de viudedad del cónyuge, algo que raramente se considera.</li>
+        </ul>
+      </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('orientador-jubilacion-anticipada')} />
