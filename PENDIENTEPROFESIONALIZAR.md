@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~159 | **Pendientes**: ~91
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~164 | **Pendientes**: ~86
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -58,11 +58,11 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 
 ### Legal y Fiscal
 
-- [ ] `/estimador-irpf/` — Estimador IRPF 2025: tramos, mínimos personales y familiares, retenciones
-- [ ] `/estimador-plusvalias-irpf/` — Estimador Plusvalías IRPF: venta inmuebles, fondos, acciones. Base del ahorro 2025
-- [ ] `/estimador-sueldo-neto/` — Estimador Sueldo Neto/Bruto: IRPF + Seguridad Social trabajador 2025
-- [ ] `/estimador-cuota-autonomo/` — Estimador Cuota RETA: tramos ingresos reales 2025
-- [ ] `/comparador-autonomo-vs-sl/` — Comparador Autónomo vs SL: carga fiscal según nivel de ingresos
+- [x] `/estimador-irpf/` — Estimador IRPF 2025: tramos, mínimos personales y familiares, retenciones ✅ lote B7
+- [x] `/estimador-plusvalias-irpf/` — Estimador Plusvalías IRPF: venta inmuebles, fondos, acciones. Base del ahorro 2025 ✅ lote B7
+- [x] `/estimador-sueldo-neto/` — Estimador Sueldo Neto/Bruto: IRPF + Seguridad Social trabajador 2025 ✅ lote B7
+- [x] `/estimador-cuota-autonomo/` — Estimador Cuota RETA: tramos ingresos reales 2025 ✅ lote B7
+- [x] `/comparador-autonomo-vs-sl/` — Comparador Autónomo vs SL: carga fiscal según nivel de ingresos ✅ lote B7
 - [ ] `/orientador-gastos-deducibles/` — Orientador Gastos Deducibles autónomo: IRPF e IVA
 - [ ] `/calendario-fiscal-emprendedor/` — Calendario Fiscal: plazos modelos 303, 130, 111... 2025
 - [ ] `/asistente-alta-autonomo/` — Asistente Alta Autónomo: trámites, tarifa plana, modelos 036/037
@@ -339,6 +339,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote B7 | 2026-03-17 | `estimador-irpf`, `estimador-sueldo-neto`, `estimador-cuota-autonomo`, `comparador-autonomo-vs-sl`, `estimador-plusvalias-irpf` | `b1aeabe` |
 | Lote B6 | 2026-03-17 | `estimador-impuesto-sucesiones`, `estimador-impuesto-donaciones`, `orientacion-tramitacion-herencias`, `estimador-plusvalia-municipal`, `orientador-intereses-demora` | `611bc11` |
 | Lote B5 | 2026-03-17 | `generador-sombras`, `algebra-ecuaciones`, `metronomo`, `mi-ip` | `001ecff` |
 | Lote B4 | 2026-03-17 | `generador-gradientes`, `detector-idioma`, `conversor-markdown-html`, `calculadora-notas` | `ef83181` |
