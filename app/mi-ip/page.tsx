@@ -498,136 +498,183 @@ export default function MiIpPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre direcciones IP?"
-        subtitle="Descubre qué revela tu IP, diferencias entre IPv4 e IPv6, y cómo proteger tu privacidad"
+        title="Guía sobre Direcciones IP"
+        subtitle="Entiende qué es tu IP, para qué sirve y cómo afecta a tu privacidad online"
+        icon="🌐"
       >
-        <div className={styles.educationalContent}>
-          <section className={styles.eduSection}>
-            <h2>🔢 ¿Qué es una dirección IP?</h2>
-            <p>
-              Una <strong>dirección IP</strong> (Internet Protocol) es un identificador único que se asigna
-              a cada dispositivo conectado a internet. Funciona como tu &quot;dirección postal&quot; en la red,
-              permitiendo que otros dispositivos sepan dónde enviar la información que solicitas.
-            </p>
-            <div className={styles.infoGrid}>
-              <div className={styles.infoCard}>
-                <h4>🏠 IP Privada</h4>
-                <p>
-                  Es la que usa tu dispositivo dentro de tu red local (ej: 192.168.1.X).
-                  Solo es visible dentro de tu casa u oficina.
-                </p>
-              </div>
-              <div className={styles.infoCard}>
-                <h4>🌍 IP Pública</h4>
-                <p>
-                  Es la que ve el resto de internet. La asigna tu proveedor (ISP) y es la que
-                  mostramos en esta página.
-                </p>
-              </div>
-            </div>
-          </section>
+        {/* 1. TABLA COMPARATIVA — IPv4 vs IPv6 */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th>IPv4</th>
+                <th>IPv6</th>
+                <th>IP Pública</th>
+                <th>IP Privada</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Formato</td><td>4 grupos de 0-255 (ej: 192.168.1.1)</td><td>8 grupos hexadecimales (ej: 2001:db8::1)</td><td>Visible en internet</td><td>Solo en red local</td></tr>
+              <tr><td>Espacio de direcciones</td><td>~4.300 millones</td><td>~340 sextillones</td><td>Asignada por ISP</td><td>Asignada por router</td></tr>
+              <tr><td>Estado</td><td>Casi agotado</td><td>Prácticamente ilimitado</td><td>Única en internet</td><td>Repetida en millones de redes</td></tr>
+              <tr><td>Geolocalización</td><td>Aproximada (ciudad/región)</td><td>Aproximada (ciudad/región)</td><td>Geolocalizable</td><td>No geolocalizable</td></tr>
+              <tr><td>Mutabilidad</td><td>Dinámica o estática</td><td>Dinámica o estática</td><td>Cambia con reinicio del router</td><td>Cambia con cada conexión</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-          <section className={styles.eduSection}>
-            <h2>4️⃣ vs 6️⃣ IPv4 vs IPv6</h2>
-            <div className={styles.comparisonTable}>
-              <div className={styles.compRow}>
-                <span className={styles.compLabel}>Formato</span>
-                <span className={styles.compIpv4}>192.168.1.1</span>
-                <span className={styles.compIpv6}>2001:0db8:85a3::8a2e:0370:7334</span>
-              </div>
-              <div className={styles.compRow}>
-                <span className={styles.compLabel}>Direcciones</span>
-                <span className={styles.compIpv4}>~4.300 millones</span>
-                <span className={styles.compIpv6}>~340 sextillones</span>
-              </div>
-              <div className={styles.compRow}>
-                <span className={styles.compLabel}>Estado</span>
-                <span className={styles.compIpv4}>Agotándose</span>
-                <span className={styles.compIpv6}>Abundante</span>
-              </div>
+        {/* 2. CASOS DE USO */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🔧</span>
+              <strong>Administrador de Sistemas</strong>
             </div>
-            <p className={styles.compNote}>
-              IPv6 se creó porque las direcciones IPv4 se están agotando. Muchos dispositivos
-              ya soportan ambos protocolos.
-            </p>
-          </section>
+            <p>Verifica la IP pública del servidor o de la red corporativa para configurar reglas de firewall, acceso remoto, VPN y whitelisting en servicios externos o APIs con restricción por IP.</p>
+            <div className={styles.escenarioTip}>Tip: Si tu IP pública cambia frecuentemente, considera un servicio de DNS dinámico (DynDNS, No-IP) para mantener un nombre de dominio apuntando siempre a tu IP actual.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🛡️</span>
+              <strong>Usuario preocupado por la privacidad</strong>
+            </div>
+            <p>Comprueba qué información revela tu IP: país, ciudad aproximada, ISP y organización. Evalúa si necesitas una VPN para proteger tu identidad en actividades sensibles online.</p>
+            <div className={styles.escenarioTip}>Tip: Tu IP revela ciudad y ISP, no tu dirección exacta. Sin embargo, los servicios online pueden combinarla con otras señales (cookies, fingerprint) para identificarte.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>👨‍💻</span>
+              <strong>Desarrollador Web</strong>
+            </div>
+            <p>Consulta tu IP para probar reglas de geolocalización, restricciones por país o configuraciones de CDN en tus aplicaciones. Verifica que el tráfico se enruta correctamente desde tu región.</p>
+            <div className={styles.escenarioTip}>Tip: Las APIs de geolocalización por IP (ipinfo.io, ip-api.com) tienen limitaciones de precisión: funcionan a nivel ciudad/región, nunca a nivel calle o edificio.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎮</span>
+              <strong>Gamer / Streamer</strong>
+            </div>
+            <p>Verifica tu IP antes de compartir streams o conectarte a servidores de juego para evitar exponer tu ubicación real. Comprueba si tu ISP te asigna IP estática (mejor para hosting de servidores) o dinámica.</p>
+            <div className={styles.escenarioTip}>Tip: Nunca compartas tu IP pública en streams o partidas online. Puede usarse para ataques DDoS que saturan tu conexión.</div>
+          </div>
+        </div>
 
-          <section className={styles.eduSection}>
-            <h2>🔍 ¿Qué revela tu IP?</h2>
-            <div className={styles.revealGrid}>
-              <div className={styles.revealItem}>
-                <span className={styles.revealIcon}>✅</span>
-                <span className={styles.revealText}>País y ciudad aproximada</span>
-              </div>
-              <div className={styles.revealItem}>
-                <span className={styles.revealIcon}>✅</span>
-                <span className={styles.revealText}>Tu proveedor de internet</span>
-              </div>
-              <div className={styles.revealItem}>
-                <span className={styles.revealIcon}>✅</span>
-                <span className={styles.revealText}>Zona horaria</span>
-              </div>
-              <div className={styles.revealItem}>
-                <span className={styles.revealIcon}>❌</span>
-                <span className={styles.revealText}>Tu dirección exacta</span>
-              </div>
-              <div className={styles.revealItem}>
-                <span className={styles.revealIcon}>❌</span>
-                <span className={styles.revealText}>Tu nombre o identidad</span>
-              </div>
-              <div className={styles.revealItem}>
-                <span className={styles.revealIcon}>❌</span>
-                <span className={styles.revealText}>Tu historial de navegación</span>
-              </div>
+        {/* 3. FAQ */}
+        <details className={styles.faqList}>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Direcciones IP</summary>
+          <div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Puede alguien saber mi dirección exacta a través de mi IP?</div>
+              <div className={styles.faqRespuesta}>No directamente. Tu IP revela el país, ciudad aproximada (con margen de 20-50 km habitualmente) y tu proveedor de internet (ISP). Tu dirección física exacta solo puede obtenerse a través de tu ISP mediante una orden judicial. Las herramientas públicas de geolocalización por IP son inexactas a nivel de calle.</div>
             </div>
-          </section>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué diferencia hay entre IP pública e IP privada?</div>
+              <div className={styles.faqRespuesta}>La IP pública es la que ve el exterior de internet: la asigna tu ISP y es única globalmente. La IP privada es la que asigna tu router dentro de tu red local (192.168.x.x, 10.x.x.x o 172.16-31.x.x). Millones de dispositivos comparten los mismos rangos privados, pero cada uno tiene una IP pública diferente.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Por qué mi IP cambia a veces sola?</div>
+              <div className={styles.faqRespuesta}>La mayoría de ISP asignan IPs dinámicas: cambian cuando reinicias el router, tras cierto tiempo de conexión o cuando el ISP reasigna su pool de IPs. Las IPs estáticas (siempre la misma) son un servicio premium que generalmente se paga aparte, más útil para servidores y accesos remotos.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Una VPN oculta completamente mi IP?</div>
+              <div className={styles.faqRespuesta}>La VPN sustituye tu IP real por la del servidor VPN. Los sitios web ven la IP del servidor VPN, no la tuya. Sin embargo, tu ISP sigue viendo que te conectas al servidor VPN (aunque no qué haces). Las fugas de IP (WebRTC leaks) pueden revelar tu IP real incluso con VPN activa; compruébalas periódicamente.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué son las IPs reservadas y por qué no se usan en internet?</div>
+              <div className={styles.faqRespuesta}>Los rangos privados (RFC 1918): 10.0.0.0/8, 172.16.0.0/12 y 192.168.0.0/16 están reservados para redes locales y los routers nunca los enrutan hacia internet. También existen rangos especiales: 127.0.0.1 (loopback/localhost), 169.254.x.x (APIPA, cuando falla el DHCP) y 0.0.0.0 (red actual).</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Por qué están agotándose las IPs IPv4?</div>
+              <div className={styles.faqRespuesta}>IPv4 tiene 32 bits, lo que da 2³² = ~4.300 millones de direcciones. Con 8.000 millones de personas y miles de millones de dispositivos IoT, el espacio se agotó. La solución a corto plazo es NAT (múltiples dispositivos comparten una IP pública). IPv6 con 128 bits resuelve el problema definitivamente con 2¹²⁸ direcciones.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Pueden bloquearme en servicios web por mi IP?</div>
+              <div className={styles.faqRespuesta}>Sí. Los servicios web pueden bloquear IPs individuales, rangos de IPs o países enteros. Las causas más comunes: abuso de la plataforma, demasiadas peticiones (rate limiting), uso de VPN/Tor (algunos servicios los bloquean por política) o restricciones geográficas de contenido (geoblocking).</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué es el ISP y qué información tiene de mí?</div>
+              <div className={styles.faqRespuesta}>El ISP (Proveedor de Servicios de Internet) es tu operadora de internet (Movistar, Orange, Vodafone, etc.). Sabe tu dirección física, tiene registros de qué IPs usaste y cuándo, y técnicamente puede ver (aunque no siempre lo hace) a qué dominios te conectas. En España, el RGPD limita cómo pueden usar estos datos.</div>
+            </div>
+          </div>
+        </details>
 
-          <section className={styles.eduSection}>
-            <h2>🔄 ¿Por qué cambia mi IP?</h2>
-            <div className={styles.infoGrid}>
-              <div className={styles.infoCard}>
-                <h4>📡 IP Dinámica</h4>
-                <p>
-                  La mayoría de conexiones domésticas usan IP dinámica: tu proveedor te asigna
-                  una IP diferente cada cierto tiempo o cuando reinicias el router.
-                </p>
-              </div>
-              <div className={styles.infoCard}>
-                <h4>🏢 IP Estática</h4>
-                <p>
-                  Las empresas suelen contratar IP fija para servidores y servicios que necesitan
-                  ser siempre accesibles desde la misma dirección.
-                </p>
-              </div>
-            </div>
-          </section>
+        {/* 4. GUÍA PASO A PASO */}
+        <ol className={styles.pasosList}>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>1</span>
+            <div><strong>Consulta tu IP pública actual</strong> — Esta herramienta te muestra la IP pública con la que navegas ahora mismo. Es la IP que ven los servidores a los que te conectas.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>2</span>
+            <div><strong>Revisa la información de geolocalización</strong> — Comprueba el país, región y ciudad detectados. Verifica si coincide con tu ubicación real o si hay discrepancias (frecuente con IPs de ISP que tienen nodos en otra ciudad).</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>3</span>
+            <div><strong>Identifica tu ISP</strong> — El nombre del operador de internet que aparece es tu ISP. Útil para verificar que estás en la red correcta o para identificar si estás usando una VPN (aparecerá el proveedor VPN en lugar de tu ISP real).</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>4</span>
+            <div><strong>Nota el tipo de IP (IPv4 o IPv6)</strong> — La mayoría de conexiones muestran IPv4. Si ves una dirección con formato hexadecimal, tu ISP ya te asigna IPv6. Algunos servicios y herramientas de diagnóstico de red necesitan saber el tipo de IP.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>5</span>
+            <div><strong>Evalúa si necesitas protección adicional</strong> — Si la geolocalización es precisa o si te preocupa la privacidad para ciertas actividades online, considera usar una VPN de confianza para sustituir tu IP real por la del servidor VPN.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>6</span>
+            <div><strong>Comprueba tu IP privada si necesitas configurar la red local</strong> — En Windows: ipconfig. En Mac/Linux: ifconfig o ip addr. La IP privada es la que usan otros dispositivos de tu red local para comunicarse contigo.</div>
+          </li>
+        </ol>
 
-          <section className={styles.eduSection}>
-            <h2>🛡️ Protege tu privacidad</h2>
-            <div className={styles.tipsList}>
-              <div className={styles.tipItem}>
-                <span className={styles.tipIcon}>🔒</span>
-                <div>
-                  <strong>VPN (Red Privada Virtual)</strong>
-                  <p>Oculta tu IP real y la reemplaza por la del servidor VPN, cifrando tu tráfico.</p>
-                </div>
-              </div>
-              <div className={styles.tipItem}>
-                <span className={styles.tipIcon}>🧅</span>
-                <div>
-                  <strong>Tor Browser</strong>
-                  <p>Enruta tu tráfico por múltiples nodos, haciendo casi imposible rastrear tu IP real.</p>
-                </div>
-              </div>
-              <div className={styles.tipItem}>
-                <span className={styles.tipIcon}>📶</span>
-                <div>
-                  <strong>Proxy</strong>
-                  <p>Servidor intermedio que oculta tu IP, aunque con menos seguridad que una VPN.</p>
-                </div>
-              </div>
-            </div>
-          </section>
+        {/* 5. TIPS GRID */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔒</span>
+            <strong>No compartas tu IP</strong>
+            <p>Evita compartir tu IP pública en foros, chats o juegos online. Con tu IP y herramientas básicas se puede intentar un ataque DDoS o explorar puertos abiertos.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🌍</span>
+            <strong>VPN ≠ anonimato total</strong>
+            <p>Una VPN cambia tu IP pero no te hace completamente anónimo. Las cookies, fingerprinting del navegador y cuentas logueadas también identifican a los usuarios.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>⚡</span>
+            <strong>IP estática para servidores</strong>
+            <p>Si hospeadas un servidor web, de juegos o un sistema de cámaras en casa, una IP estática (de pago con tu ISP) simplifica mucho la configuración y el acceso remoto.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔄</span>
+            <strong>Cambiar IP dinámica</strong>
+            <p>Para cambiar tu IP dinámica: apaga el router 5-10 minutos. Si el ISP asigna IPs por tiempo de arrendamiento (lease time), tras reiniciar puede asignarte una distinta.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🛡️</span>
+            <strong>Comprueba fugas WebRTC</strong>
+            <p>Con VPN activa, los navegadores pueden filtrar tu IP real a través de WebRTC. Comprueba periódicamente que no tienes fugas desactivando WebRTC en el navegador o con extensiones.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>📍</span>
+            <strong>Geolocalización ≠ ubicación exacta</strong>
+            <p>La geolocalización por IP tiene una precisión de ciudad o región, con errores frecuentes de decenas de kilómetros. No se usa para encontrar personas, sino para segmentar servicios.</p>
+          </div>
+        </div>
+
+        {/* 6. WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcono}>⚠️</span>
+            <strong>Lo que tu IP revela (y lo que no) sobre ti</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Revela: país, ciudad aproximada e ISP</strong> — Esta información es pública y accesible a cualquier servidor al que te conectes. No hay forma de ocultarla sin VPN o proxy.</li>
+            <li><strong>No revela: tu dirección física exacta</strong> — Nadie puede encontrar tu casa solo con tu IP. Solo tu ISP tiene esa asociación y solo la facilita a autoridades con orden judicial.</li>
+            <li><strong>Los sitios registran tu IP en sus logs</strong> — Cada petición HTTP queda registrada con tu IP, timestamp y recurso solicitado. Esto es legal y estándar en toda la web.</li>
+            <li><strong>Una VPN gratuita puede ser peor que no tener VPN</strong> — Muchos proveedores VPN gratuitos monetizan tus datos de navegación, que es exactamente lo que intentas proteger. Usa VPNs de pago con política de no-logs auditada.</li>
+            <li><strong>El anonimato total en internet no existe</strong> — Incluso con VPN, Tor y todas las protecciones, los comportamientos de navegación, fingerprinting del dispositivo y metadatos pueden correlacionarse para identificar usuarios con suficiente motivación y recursos.</li>
+            <li><strong>RGPD y tu IP en España</strong> — Según el RGPD, la IP es un dato personal. Los sitios web deben informarte de que la registran (política de privacidad) y conservarla solo el tiempo necesario para su finalidad legítima.</li>
+          </ul>
         </div>
       </EducationalSection>
 

@@ -324,67 +324,185 @@ export default function MetronomoPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="Guía del metrónomo"
-        subtitle="Aprende a usar el metrónomo correctamente"
-        icon="📚"
+        title="Guía del Metrónomo"
+        subtitle="Todo lo que necesitas saber sobre el tempo, el ritmo y cómo practicar con metrónomo"
+        icon="🎵"
       >
-        <section className={styles.guideSection}>
-          <h2>¿Qué es un metrónomo?</h2>
-          <p className={styles.introParagraph}>
-            El metrónomo es una herramienta que produce pulsos regulares a un tempo específico,
-            medido en BPM (beats per minute). Es esencial para desarrollar el sentido del ritmo
-            y practicar con precisión.
-          </p>
+        {/* 1. TABLA COMPARATIVA — tempos y géneros musicales */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Indicación italiana</th>
+                <th>Rango BPM</th>
+                <th>Significado</th>
+                <th>Géneros típicos</th>
+                <th>Sensación</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Largo</td><td>40–60 BPM</td><td>Muy lento y amplio</td><td>Música fúnebre, adagios</td><td>Solemne, majestuoso</td></tr>
+              <tr><td>Adagio</td><td>66–76 BPM</td><td>Lento y expresivo</td><td>Baladas, slow jazz</td><td>Tranquilo, expresivo</td></tr>
+              <tr><td>Andante</td><td>76–108 BPM</td><td>Paso de marcha</td><td>Pop lento, bolero</td><td>Natural, caminando</td></tr>
+              <tr><td>Moderato</td><td>108–120 BPM</td><td>Moderado</td><td>Pop, rock moderado</td><td>Equilibrado</td></tr>
+              <tr><td>Allegro</td><td>120–156 BPM</td><td>Vivo y rápido</td><td>Rock, pop, salsa</td><td>Energético, animado</td></tr>
+              <tr><td>Presto</td><td>168–200 BPM</td><td>Muy rápido</td><td>Thrash metal, drum&amp;bass</td><td>Frenético, virtuoso</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>🎼 Términos de tempo</h4>
-              <ul>
-                <li><strong>Largo</strong>: 40-60 BPM (muy lento)</li>
-                <li><strong>Adagio</strong>: 66-76 BPM (lento)</li>
-                <li><strong>Andante</strong>: 76-108 BPM (caminando)</li>
-                <li><strong>Moderato</strong>: 108-120 BPM (moderado)</li>
-                <li><strong>Allegro</strong>: 120-156 BPM (rápido)</li>
-                <li><strong>Presto</strong>: 168-200 BPM (muy rápido)</li>
-              </ul>
+        {/* 2. CASOS DE USO */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎸</span>
+              <strong>Guitarrista / Bajista</strong>
             </div>
-            <div className={styles.contentCard}>
-              <h4>📊 Compases comunes</h4>
-              <ul>
-                <li><strong>4/4</strong>: El más común (pop, rock)</li>
-                <li><strong>3/4</strong>: Vals, baladas</li>
-                <li><strong>2/4</strong>: Marchas, polkas</li>
-                <li><strong>6/8</strong>: Baladas, jigs irlandeses</li>
-                <li><strong>5/4</strong>: Jazz progresivo</li>
-                <li><strong>7/8</strong>: Música balcánica</li>
-              </ul>
+            <p>Practica escalas, arpegios y riffs a tempo controlado, comenzando lento (50-60% del tempo objetivo) y aumentando gradualmente 5 BPM cada vez que dominas el pasaje sin errores.</p>
+            <div className={styles.escenarioTip}>Tip: Practica siempre el pasaje difícil más lento de lo que crees necesario. La velocidad viene sola una vez que los dedos aprenden el patrón.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🥁</span>
+              <strong>Baterista / Percusionista</strong>
+            </div>
+            <p>Desarrolla el tiempo interno y reduce el rusheo (acelerar inconscientemente) y el dragging (ralentizar) practicando con metrónomo en tiempos 2 y 4 para el estilo funk y jazz.</p>
+            <div className={styles.escenarioTip}>Tip: Programa el metrónomo solo en los tiempos 2 y 4 (backbeat) en lugar de en todos los tiempos. Es más difícil pero desarrolla mejor el tiempo interno.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎹</span>
+              <strong>Pianista / Instrumentista</strong>
+            </div>
+            <p>Trabaja pasajes técnicos complejos (octavas, tresillos, polirritmia) garantizando que ambas manos estén perfectamente sincronizadas antes de subir el tempo.</p>
+            <div className={styles.escenarioTip}>Tip: Para pasajes muy difíciles, practica con metrónomo a la mitad del tempo con subdivisión (negra = corchea), lo que revela problemas de sincronía ocultos.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎤</span>
+              <strong>Cantante / Compositor</strong>
+            </div>
+            <p>Fija el tempo exacto de una canción original para grabarla o para ensayar con la banda. Mide el BPM de canciones de referencia para adaptarlas a tu rango de voz o instrumento.</p>
+            <div className={styles.escenarioTip}>Tip: Usa el tap tempo para medir el BPM de cualquier canción simplemente golpeando al ritmo. La media de 8-16 taps es muy precisa.</div>
+          </div>
+        </div>
+
+        {/* 3. FAQ */}
+        <details className={styles.faqList}>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre el Metrónomo y el Tempo</summary>
+          <div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué son los BPM y cómo se miden?</div>
+              <div className={styles.faqRespuesta}>BPM (Beats Per Minute, pulsaciones por minuto) es la unidad que mide el tempo musical. Indica cuántos tiempos (negras en compás 4/4) hay en un minuto. Un metrónomo a 60 BPM da exactamente 1 click por segundo. La mayoría de música pop está entre 90 y 140 BPM.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Por qué debo practicar con metrónomo si luego toco sin él?</div>
+              <div className={styles.faqRespuesta}>El metrónomo es como las ruedas de entrenamiento de una bicicleta: desarrollas el tiempo interno y la regularidad métrica que llevarás siempre contigo. Los músicos profesionales practican con metrónomo no porque no tengan tiempo interno, sino porque lo están refinando constantemente.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿A qué tempo debo empezar a practicar un pasaje difícil?</div>
+              <div className={styles.faqRespuesta}>La regla clásica es empezar al 50-60% del tempo objetivo. Si la pieza está marcada a 120 BPM, empieza en 60-72 BPM. Solo sube el tempo cuando puedas tocar 3 repeticiones consecutivas sin errores. Subir 5 BPM cada vez es un ritmo de progresión sostenible.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué diferencia hay entre compás 4/4, 3/4 y 6/8?</div>
+              <div className={styles.faqRespuesta}>El numerador indica los tiempos por compás, el denominador la figura que vale un tiempo. 4/4: 4 negras por compás (marcha, rock, pop). 3/4: 3 negras (vals, mazurca). 6/8: 6 corcheas agrupadas en 2 tiempos de 3 (jig, barcarola, mucho pop moderno). El metrónomo marca el tiempo base en todos los casos.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué es el rusheo y cómo evitarlo?</div>
+              <div className={styles.faqRespuesta}>El rusheo es la tendencia inconsciente a acelerar en los pasajes técnicos difíciles o emocionantes. Se produce por la anticipación muscular. Para evitarlo: practica siempre con metrónomo, grábate y escucha, practica con subdivisiones (click en corcheas en lugar de negras) y practica más lento de lo que crees necesario.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué es el tap tempo y cuándo usarlo?</div>
+              <div className={styles.faqRespuesta}>El tap tempo permite medir el BPM de una canción simplemente golpeando al ritmo. Útil para: medir el tempo exacto de una canción antes de cubrirla, sincronizar efectos de delay y reverb al BPM de la música, o establecer el tempo de una composición que "suena bien" antes de formalizarlo.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cuál es el BPM ideal para practicar técnica de instrumento?</div>
+              <div className={styles.faqRespuesta}>Depende del ejercicio: escalas y arpegios se trabajan entre 60-100 BPM empezando; sightreading (lectura a vista) siempre lento (40-60 BPM); polirritmia y subdivisiones complejas a 60-80 BPM. La regla: el tempo de práctica correcto es aquel al que puedes tocar sin errores el 90% del tiempo.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Debo practicar siempre con metrónomo o a veces sin él?</div>
+              <div className={styles.faqRespuesta}>Ambos tienen su lugar. Con metrónomo: técnica, pasajes difíciles, sightreading, sincronización. Sin metrónomo: musicalidad, fraseo, dinámica, expresión, rubato. Un buen músico practica con y sin metrónomo: el metrónomo enseña la regularidad; la práctica libre enseña la expresión musical.</div>
             </div>
           </div>
-        </section>
+        </details>
 
-        <section className={styles.guideSection}>
-          <h2>Consejos de práctica</h2>
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>✅ Buenas prácticas</h4>
-              <ul>
-                <li>Empieza lento y aumenta gradualmente</li>
-                <li>Practica escalas con metrónomo</li>
-                <li>Usa el acento para sentir el compás</li>
-                <li>Mantén sesiones de 15-30 minutos</li>
-              </ul>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>🎯 Tap Tempo</h4>
-              <ul>
-                <li>Toca el botón al ritmo de una canción</li>
-                <li>Necesitas al menos 2 toques</li>
-                <li>Más toques = mayor precisión</li>
-                <li>Útil para transcribir canciones</li>
-              </ul>
-            </div>
+        {/* 4. GUÍA PASO A PASO */}
+        <ol className={styles.pasosList}>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>1</span>
+            <div><strong>Establece el tempo inicial</strong> — Para practicar un pasaje nuevo, fija el BPM al 50-60% del tempo final. Para mantener tiempo en una pieza conocida, fija el tempo de la partitura o usa tap tempo para medirlo.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>2</span>
+            <div><strong>Configura el compás</strong> — Selecciona el compás de la pieza (4/4 para la mayoría, 3/4 para valses, 6/8 para jigs). El acento en el primer tiempo te ayudará a orientarte dentro del compás.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>3</span>
+            <div><strong>Escucha varios clicks antes de tocar</strong> — Interioriza el pulso antes de empezar. Mueve el pie o la cabeza al ritmo para sentir el tempo corporalmente, no solo auditivamente.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>4</span>
+            <div><strong>Toca con atención al click</strong> — Si te pierdes o adelantas, no pares: vuelve a sincronizar. Parar y empezar de nuevo en cada error no entrena el tiempo; mantener el pulso sí lo hace.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>5</span>
+            <div><strong>Sube el tempo gradualmente</strong> — Solo cuando puedas tocar 3 repeticiones consecutivas sin errores, sube 5 BPM. La progresión sostenible es mejor que los saltos de tempo.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>6</span>
+            <div><strong>Grábate y evalúa</strong> — Periódicamente graba tu práctica y escucha si estás detrás o delante del click, si hay acelerones en los pasajes difíciles y si el tempo es uniforme en toda la pieza.</div>
+          </li>
+        </ol>
+
+        {/* 5. TIPS GRID */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🦶</span>
+            <strong>Mueve el cuerpo</strong>
+            <p>Marca el pulso con el pie o asiente con la cabeza. El tiempo interno se desarrolla mejor cuando lo sientes físicamente, no solo cuando lo escuchas.</p>
           </div>
-        </section>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🎯</span>
+            <strong>Regla del 90%</strong>
+            <p>El tempo correcto de práctica es aquel al que ejecutas bien el 90% de las notas. Si cometes más errores, baja el BPM. No hay prisa en el aprendizaje.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>📻</span>
+            <strong>Subdivide</strong>
+            <p>Para pasajes con figuras pequeñas (semicorcheas, tresillos), programa el click en la subdivisión (corchea) en lugar de la negra. Más información rítmica, más precisión.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔇</span>
+            <strong>Practica sin click</strong>
+            <p>Alterna sesiones con y sin metrónomo. Toca con click, luego apágalo e intenta mantener el mismo tempo. Eso desarrolla el tiempo interno verdadero.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🎚️</span>
+            <strong>Volumen adecuado</strong>
+            <p>El click debe ser audible pero no dominante. Si el metrónomo &quot;tapa&quot; tu instrumento, reduces la atención a los matices musicales que también hay que trabajar.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>📈</span>
+            <strong>Registro de tempos</strong>
+            <p>Apunta el BPM máximo al que dominas cada pasaje. En la siguiente sesión empieza 10 BPM por debajo para calentar. Es la forma más fiable de medir el progreso.</p>
+          </div>
+        </div>
+
+        {/* 6. WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcono}>⚠️</span>
+            <strong>Errores comunes al practicar con metrónomo</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Practicar demasiado rápido desde el principio</strong> — Tocar rápido con errores no enseña el pasaje; enseña a cometer esos errores con mayor velocidad. Empieza siempre lento.</li>
+            <li><strong>Parar en cada error</strong> — Parar y reiniciar en cada fallo no entrena la recuperación. Aprende a seguir tocando aunque te pierdas y a re-sincronizarte con el click.</li>
+            <li><strong>Subir el tempo demasiado rápido</strong> — Saltar de 80 a 120 BPM en una sesión no consolida el aprendizaje. El aumento progresivo de 5 BPM es más efectivo aunque parezca lento.</li>
+            <li><strong>Ignorar el metrónomo y tocar &quot;encima&quot;</strong> — Si siempre llegas al click en lugar de estar en él, estás anticipando. El click debe sonar dentro del sonido de tu instrumento, no antes.</li>
+            <li><strong>Usar solo el metrónomo para toda la práctica</strong> — La expresión musical, el rubato y la dinámica requieren práctica sin metrónomo. Un músico que solo practica con click puede sonar mecánico.</li>
+            <li><strong>No grabar para evaluar</strong> — La percepción propia del tiempo es subjetiva. Grábate para escuchar objetivamente si estás adelantado, retrasado o rushando en los pasajes difíciles.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('metronomo')} />

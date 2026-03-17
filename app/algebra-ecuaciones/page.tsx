@@ -601,352 +601,185 @@ export default function AlgebraEcuacionesPage() {
 
 
       <EducationalSection
-        title="¿Quieres aprender más sobre Ecuaciones Algebraicas?"
-        subtitle="Descubre métodos de resolución, conceptos clave, ejemplos prácticos y respuestas a las preguntas más frecuentes"
+        title="Guía de Resolución de Ecuaciones"
+        subtitle="Métodos, tipos y estrategias para resolver ecuaciones algebraicas paso a paso"
+        icon="🔢"
       >
-          {/* Sección 1: Introducción */}
-          <section className={styles.guideSection}>
-            <h2>¿Qué son las Ecuaciones Algebraicas?</h2>
-            <p className={styles.introParagraph}>
-              Las ecuaciones algebraicas son expresiones matemáticas que contienen una o más
-              incógnitas (variables) y establecen una igualdad entre dos expresiones. Resolver una
-              ecuación significa encontrar el valor o valores de la incógnita que hacen verdadera la
-              igualdad. Son fundamentales en matemáticas, física, ingeniería y muchas aplicaciones
-              prácticas del día a día.
-            </p>
+        {/* 1. TABLA COMPARATIVA — tipos de ecuaciones */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Tipo de Ecuación</th>
+                <th>Forma general</th>
+                <th>Número de soluciones</th>
+                <th>Método principal</th>
+                <th>Nivel</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Lineal (1er grado)</td><td>ax + b = 0</td><td>1 solución real</td><td>Despejar x directamente</td><td>ESO 1º-2º</td></tr>
+              <tr><td>Cuadrática (2º grado)</td><td>ax² + bx + c = 0</td><td>0, 1 o 2 soluciones reales</td><td>Fórmula cuadrática / factorización</td><td>ESO 3º-4º</td></tr>
+              <tr><td>Cúbica (3er grado)</td><td>ax³ + bx² + cx + d = 0</td><td>1 o 3 soluciones reales</td><td>Ruffini / fórmula de Cardano</td><td>Bachillerato</td></tr>
+              <tr><td>Racional</td><td>P(x)/Q(x) = 0</td><td>Variable (Q(x) ≠ 0)</td><td>Mínimo común denominador</td><td>ESO 4º / Bach.</td></tr>
+              <tr><td>Irracional</td><td>√f(x) = g(x)</td><td>Variable (verificar soluciones)</td><td>Elevar al cuadrado ambos miembros</td><td>Bachillerato</td></tr>
+              <tr><td>Sistema 2×2</td><td>ax+by=c, dx+ey=f</td><td>0, 1 o ∞ soluciones</td><td>Sustitución / reducción / Cramer</td><td>ESO 3º-4º</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-            <div className={styles.contentGrid}>
-              <div className={styles.contentCard}>
-                <h4>📐 Ecuaciones Lineales</h4>
-                <p>
-                  <strong>Forma:</strong> ax + b = c
-                </p>
-                <p>
-                  Las ecuaciones lineales son las más simples. Representan una línea recta cuando se
-                  grafican. Siempre tienen una única solución cuando a ≠ 0.
-                </p>
-                <p>
-                  <strong>Ejemplo:</strong> 2x + 5 = 13 → x = 4
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>📊 Ecuaciones Cuadráticas</h4>
-                <p>
-                  <strong>Forma:</strong> ax² + bx + c = 0
-                </p>
-                <p>
-                  Las ecuaciones cuadráticas representan parábolas. Pueden tener dos soluciones
-                  reales distintas, una solución doble, o soluciones complejas, dependiendo del
-                  discriminante.
-                </p>
-                <p>
-                  <strong>Ejemplo:</strong> x² - 5x + 6 = 0 → x₁ = 2, x₂ = 3
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>🔗 Sistemas de Ecuaciones</h4>
-                <p>
-                  <strong>Forma:</strong> a₁x + b₁y = c₁; a₂x + b₂y = c₂
-                </p>
-                <p>
-                  Los sistemas relacionan dos o más ecuaciones. Se resuelven encontrando valores que
-                  satisfacen simultáneamente todas las ecuaciones. Métodos comunes: sustitución,
-                  igualación y Cramer.
-                </p>
-                <p>
-                  <strong>Ejemplo:</strong> 2x + 3y = 8; x - y = 1 → x = 2, y = 1
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>🎯 Aplicaciones Prácticas</h4>
-                <p>
-                  Las ecuaciones algebraicas se usan en física (movimiento), economía (oferta y
-                  demanda), ingeniería (diseño de estructuras), informática (algoritmos) y vida
-                  cotidiana (cálculo de presupuestos, tasas de interés).
-                </p>
-              </div>
+        {/* 2. CASOS DE USO */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎓</span>
+              <strong>Estudiante de ESO / Bachillerato</strong>
             </div>
-          </section>
-
-          {/* Sección 2: Métodos de Resolución */}
-          <section className={styles.guideSection}>
-            <h2>Métodos de Resolución</h2>
-
-            <div className={styles.contentGrid}>
-              <div className={styles.contentCard}>
-                <h4>🧮 Despeje Algebraico (Lineales)</h4>
-                <p>
-                  <strong>Proceso:</strong>
-                </p>
-                <ol>
-                  <li>Aislar la variable en un lado de la ecuación</li>
-                  <li>Aplicar operaciones inversas (suma/resta, multiplicación/división)</li>
-                  <li>Simplificar hasta obtener el valor de x</li>
-                </ol>
-                <p>
-                  <strong>Ejemplo:</strong> 3x - 7 = 14 → 3x = 21 → x = 7
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>📐 Fórmula Cuadrática</h4>
-                <p>
-                  <strong>Fórmula:</strong> x = (-b ± √(b² - 4ac)) / (2a)
-                </p>
-                <p>
-                  Método universal para resolver ecuaciones cuadráticas. El discriminante (Δ = b² -
-                  4ac) determina el tipo de soluciones:
-                </p>
-                <ul>
-                  <li>Δ &gt; 0: Dos soluciones reales distintas</li>
-                  <li>Δ = 0: Una solución doble (raíz repetida)</li>
-                  <li>Δ &lt; 0: Dos soluciones complejas conjugadas</li>
-                </ul>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>✂️ Factorización</h4>
-                <p>
-                  Método alternativo para cuadráticas que se pueden factorizar fácilmente. Consiste
-                  en expresar ax² + bx + c como producto de dos binomios.
-                </p>
-                <p>
-                  <strong>Ejemplo:</strong> x² - 5x + 6 = 0 → (x - 2)(x - 3) = 0 → x = 2 o x = 3
-                </p>
-                <p>Aplica la propiedad: Si A·B = 0, entonces A = 0 o B = 0</p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>🎲 Regla de Cramer (Sistemas)</h4>
-                <p>
-                  Método basado en determinantes para resolver sistemas de ecuaciones lineales. Muy
-                  eficiente para sistemas 2x2 y 3x3.
-                </p>
-                <p>
-                  <strong>Fórmulas:</strong>
-                </p>
-                <ul>
-                  <li>det = a₁b₂ - a₂b₁ (determinante principal)</li>
-                  <li>x = (c₁b₂ - c₂b₁) / det</li>
-                  <li>y = (a₁c₂ - a₂c₁) / det</li>
-                </ul>
-              </div>
+            <p>Verifica los resultados de tus ejercicios de álgebra, comprende el proceso de resolución paso a paso y detecta dónde te has equivocado antes de entregar el examen.</p>
+            <div className={styles.escenarioTip}>Tip: Comprueba siempre sustituyendo la solución en la ecuación original. Si el resultado no es 0 (o la igualdad no se cumple), hay un error.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>📐</span>
+              <strong>Ingeniero / Físico</strong>
             </div>
-          </section>
-
-          {/* Sección 3: Conceptos Clave */}
-          <section className={styles.guideSection}>
-            <h2>Conceptos Clave</h2>
-
-            <div className={styles.contentGrid}>
-              <div className={styles.contentCard}>
-                <h4>🔢 Discriminante (Δ)</h4>
-                <p>
-                  <strong>Definición:</strong> Δ = b² - 4ac
-                </p>
-                <p>
-                  El discriminante de una ecuación cuadrática determina la naturaleza de sus raíces
-                  sin necesidad de calcularlas. Es una herramienta fundamental para clasificar
-                  ecuaciones cuadráticas.
-                </p>
-                <p>
-                  <strong>Interpretación geométrica:</strong> Indica cuántas veces la parábola cruza
-                  el eje x.
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>📍 Vértice de la Parábola</h4>
-                <p>
-                  <strong>Coordenadas:</strong> V = (-b/(2a), f(-b/(2a)))
-                </p>
-                <p>
-                  El vértice es el punto máximo o mínimo de una parábola. Si a &gt; 0, el vértice es
-                  un mínimo (parábola abre hacia arriba). Si a &lt; 0, es un máximo (parábola abre
-                  hacia abajo).
-                </p>
-                <p>
-                  <strong>Aplicación:</strong> Optimización de funciones, cálculo de trayectorias.
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>🎯 Raíces o Soluciones</h4>
-                <p>
-                  Las raíces son los valores de la variable que satisfacen la ecuación (hacen que la
-                  igualdad sea verdadera). También se llaman ceros de la función.
-                </p>
-                <p>
-                  <strong>Tipos:</strong>
-                </p>
-                <ul>
-                  <li>Reales: Se pueden representar en la recta numérica</li>
-                  <li>Complejas: Incluyen la unidad imaginaria i = √(-1)</li>
-                  <li>Múltiples: Raíces que aparecen más de una vez</li>
-                </ul>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>🧩 Determinante</h4>
-                <p>
-                  <strong>Definición:</strong> Número asociado a una matriz cuadrada
-                </p>
-                <p>
-                  En sistemas 2x2, el determinante indica si el sistema tiene solución única (det ≠
-                  0) o infinitas/ninguna solución (det = 0). Es fundamental en álgebra lineal.
-                </p>
-                <p>
-                  <strong>Interpretación geométrica:</strong> Representa el área del paralelogramo
-                  formado por los vectores fila.
-                </p>
-              </div>
+            <p>Resuelve ecuaciones que aparecen en problemas de circuitos eléctricos, mecánica, termodinámica y optimización donde las soluciones analíticas exactas son necesarias.</p>
+            <div className={styles.escenarioTip}>Tip: En ingeniería las ecuaciones cúbicas aparecen frecuentemente en cálculo de presiones, temperaturas críticas y análisis de estructuras.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>💼</span>
+              <strong>Profesional / Opositor</strong>
             </div>
-          </section>
-
-          {/* Sección 4: Ejemplos Reales */}
-          <section className={styles.guideSection}>
-            <h2>Ejemplos de la Vida Real</h2>
-
-            <div className={styles.contentGrid}>
-              <div className={styles.contentCard}>
-                <h4>🚗 Ana y el Viaje en Carro</h4>
-                <p>
-                  Ana conduce a una velocidad constante. Si después de 2 horas ha recorrido 150 km,
-                  ¿cuánto recorrerá en 5 horas?
-                </p>
-                <p>
-                  <strong>Ecuación:</strong> 2v = 150 → v = 75 km/h
-                </p>
-                <p>
-                  <strong>Respuesta:</strong> En 5 horas: 5 × 75 = 375 km
-                </p>
-                <p>
-                  <em>Ecuación lineal aplicada a velocidad constante.</em>
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>🏐 Carlos y el Lanzamiento de Pelota</h4>
-                <p>
-                  Carlos lanza una pelota verticalmente. La altura h(t) = -5t² + 20t + 1 (metros)
-                  describe su trayectoria. ¿En qué momento alcanza la altura máxima?
-                </p>
-                <p>
-                  <strong>Vértice:</strong> t = -20/(2×(-5)) = 2 segundos
-                </p>
-                <p>
-                  <strong>Altura máxima:</strong> h(2) = -5(4) + 40 + 1 = 21 metros
-                </p>
-                <p>
-                  <em>Ecuación cuadrática aplicada a movimiento parabólico.</em>
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>🛒 María en el Supermercado</h4>
-                <p>
-                  María compra manzanas (x) a 2€/kg y naranjas (y) a 3€/kg. Gasta 14€ en total y
-                  compra 2 kg más de manzanas que de naranjas.
-                </p>
-                <p>
-                  <strong>Sistema:</strong> 2x + 3y = 14; x = y + 2
-                </p>
-                <p>
-                  <strong>Solución:</strong> Sustituyendo: 2(y+2) + 3y = 14 → y = 2 kg, x = 4 kg
-                </p>
-                <p>
-                  <em>Sistema de ecuaciones aplicado a compras.</em>
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>💰 Luis e Inversión en Acciones</h4>
-                <p>
-                  Luis invierte 10.000€ en dos fondos. El fondo A rinde 5% anual y el fondo B rinde
-                  8%. Si gana 650€ al año, ¿cuánto invirtió en cada fondo?
-                </p>
-                <p>
-                  <strong>Sistema:</strong> x + y = 10000; 0,05x + 0,08y = 650
-                </p>
-                <p>
-                  <strong>Solución:</strong> x = 5.000€ (fondo A), y = 5.000€ (fondo B)
-                </p>
-                <p>
-                  <em>Sistema aplicado a finanzas e inversiones.</em>
-                </p>
-              </div>
+            <p>Practica la resolución de ecuaciones para pruebas de aptitud numérica, test de razonamiento lógico-matemático y exámenes de oposición que incluyen álgebra básica e intermedia.</p>
+            <div className={styles.escenarioTip}>Tip: En oposiciones el tiempo es clave. Aprende a reconocer cuadráticas factorizables visualmente antes de aplicar la fórmula general.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>👩‍🏫</span>
+              <strong>Docente / Tutor</strong>
             </div>
-          </section>
+            <p>Genera soluciones detalladas paso a paso para explicar en clase o en tutorías. Útil para crear enunciados de examen y verificar que los problemas planteados tienen solución real.</p>
+            <div className={styles.escenarioTip}>Tip: Una ecuación cuadrática sin soluciones reales (discriminante negativo) puede usarse para introducir los números complejos en Bachillerato.</div>
+          </div>
+        </div>
 
-          {/* Sección 5: FAQ */}
-          <section className={styles.guideSection}>
-            <h2>Preguntas Frecuentes (FAQ)</h2>
-
-            <div className={styles.contentGrid}>
-              <div className={styles.contentCard}>
-                <h4>❓ ¿Por qué mi ecuación cuadrática no tiene soluciones reales?</h4>
-                <p>
-                  Cuando el discriminante (Δ = b² - 4ac) es negativo, la ecuación no tiene
-                  soluciones reales, solo soluciones complejas (con números imaginarios).
-                  Geométricamente, significa que la parábola no cruza el eje x.
-                </p>
-                <p>
-                  <strong>Ejemplo:</strong> x² + 2x + 5 = 0 → Δ = 4 - 20 = -16 &lt; 0
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>❓ ¿Qué significa que un sistema tenga determinante cero?</h4>
-                <p>
-                  Si el determinante es cero (det = 0), el sistema no tiene solución única. Puede
-                  tener infinitas soluciones (ecuaciones dependientes) o ninguna solución (ecuaciones
-                  inconsistentes). Las rectas son paralelas o coincidentes.
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>❓ ¿Cuándo debo usar factorización vs fórmula cuadrática?</h4>
-                <p>
-                  Usa factorización cuando la ecuación se factoriza fácilmente con números enteros
-                  (más rápido). Usa la fórmula cuadrática cuando los coeficientes son decimales,
-                  fracciones, o la factorización no es evidente. La fórmula siempre funciona.
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>❓ ¿Puedo resolver ecuaciones de grado mayor a 2?</h4>
-                <p>
-                  Sí, pero se vuelven más complejas. Las ecuaciones cúbicas (grado 3) y cuárticas
-                  (grado 4) tienen fórmulas específicas. Para grado 5 o mayor, generalmente se
-                  requieren métodos numéricos o aproximaciones, ya que no existen fórmulas generales.
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>❓ ¿Qué es una raíz doble o múltiple?</h4>
-                <p>
-                  Una raíz doble ocurre cuando Δ = 0 en una ecuación cuadrática. Significa que la
-                  parábola toca el eje x en un solo punto (el vértice). Matemáticamente, la misma
-                  solución aparece dos veces: x₁ = x₂.
-                </p>
-                <p>
-                  <strong>Ejemplo:</strong> x² - 4x + 4 = 0 → (x - 2)² = 0 → x = 2 (raíz doble)
-                </p>
-              </div>
-
-              <div className={styles.contentCard}>
-                <h4>❓ ¿Por qué es importante el vértice de una parábola?</h4>
-                <p>
-                  El vértice representa el punto óptimo (máximo o mínimo) de la función cuadrática.
-                  Es crucial en problemas de optimización: maximizar ganancias, minimizar costos,
-                  calcular alturas máximas en proyectiles, etc.
-                </p>
-              </div>
+        {/* 3. FAQ */}
+        <details className={styles.faqList}>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Ecuaciones Algebraicas</summary>
+          <div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué es el discriminante de una ecuación cuadrática y qué indica?</div>
+              <div className={styles.faqRespuesta}>El discriminante es Δ = b² - 4ac. Si Δ &gt; 0: dos soluciones reales distintas. Si Δ = 0: una solución real doble (la parábola es tangente al eje X). Si Δ &lt; 0: no hay soluciones reales (sí complejas). Es el primer cálculo a hacer con cualquier cuadrática.</div>
             </div>
-          </section>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cuándo se usa Ruffini para resolver ecuaciones?</div>
+              <div className={styles.faqRespuesta}>La regla de Ruffini se aplica a polinomios de grado ≥ 2 cuando se conoce (o se puede adivinar) una raíz entera. Se busca entre los divisores del término independiente. Si p(a) = 0, entonces (x - a) es un factor y Ruffini divide el polinomio por ese factor, reduciendo el grado en 1.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Por qué hay que verificar las soluciones en ecuaciones irracionales?</div>
+              <div className={styles.faqRespuesta}>Al elevar ambos miembros al cuadrado para eliminar la raíz, se puede introducir soluciones extrañas que satisfacen la ecuación transformada pero no la original. Por ejemplo, √x = -2 no tiene solución, pero al elevar al cuadrado da x = 4, que al sustituir produce √4 = 2 ≠ -2. Siempre verificar.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué diferencia hay entre ecuación e identidad?</div>
+              <div className={styles.faqRespuesta}>Una ecuación es verdadera solo para ciertos valores de la incógnita (soluciones). Una identidad es verdadera para todos los valores: (a+b)² = a²+2ab+b² es una identidad, no una ecuación. Intentar &quot;resolver&quot; una identidad lleva a 0=0, lo que significa que es cierta para cualquier valor.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cuándo un sistema de ecuaciones tiene infinitas soluciones?</div>
+              <div className={styles.faqRespuesta}>Cuando las ecuaciones son dependientes (una es múltiplo de la otra), el sistema es compatible indeterminado y tiene infinitas soluciones. Geométricamente, las dos rectas son la misma. Si son paralelas (mismo coeficiente directivo, diferente término independiente) el sistema es incompatible y no tiene solución.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué es el Teorema de Vieta y para qué sirve?</div>
+              <div className={styles.faqRespuesta}>Para ax² + bx + c = 0 con raíces x₁ y x₂: la suma x₁+x₂ = -b/a y el producto x₁·x₂ = c/a. Sirve para comprobar resultados rápidamente (la suma y producto de las raíces deben coincidir), encontrar ecuaciones dadas sus raíces, y acelerar la factorización de cuadráticas con coeficientes enteros.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cuál es la diferencia entre el método de sustitución y el de reducción en sistemas?</div>
+              <div className={styles.faqRespuesta}>En sustitución se despeja una variable en una ecuación y se sustituye en la otra. Es más intuitivo. En reducción (o eliminación) se suman o restan las ecuaciones multiplicadas por coeficientes para eliminar una variable. La reducción es más eficiente cuando los coeficientes son fácilmente igualables.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cómo se resuelven las ecuaciones bicuadráticas?</div>
+              <div className={styles.faqRespuesta}>Una ecuación bicuadrática tiene la forma ax⁴ + bx² + c = 0. Se resuelve con el cambio de variable t = x²: la ecuación se convierte en at² + bt + c = 0, que es una cuadrática ordinaria. Se resuelve para t y luego x = ±√t (solo valores positivos de t dan soluciones reales).</div>
+            </div>
+          </div>
+        </details>
+
+        {/* 4. GUÍA PASO A PASO */}
+        <ol className={styles.pasosList}>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>1</span>
+            <div><strong>Identifica el tipo de ecuación</strong> — Determina el grado (mayor exponente de la incógnita) y si es lineal, cuadrática, racional, irracional o un sistema. El tipo determina el método.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>2</span>
+            <div><strong>Simplifica y ordena</strong> — Elimina denominadores (multiplicar por el mínimo común múltiplo), expande paréntesis y agrupa todos los términos en un mismo lado: f(x) = 0.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>3</span>
+            <div><strong>Aplica el método adecuado</strong> — Grado 1: despejar x. Grado 2: discriminante y fórmula cuadrática. Grado 3+: buscar raíces racionales con Ruffini. Sistemas: sustitución o reducción.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>4</span>
+            <div><strong>Obtén todas las soluciones</strong> — Un polinomio de grado n tiene exactamente n raíces (reales o complejas). Verifica que has encontrado todas o que has justificado por qué no hay más soluciones reales.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>5</span>
+            <div><strong>Verifica las soluciones</strong> — Sustituye cada solución en la ecuación original. Si hay denominadores, comprueba que no se anulan. Si hay raíces cuadradas, comprueba que la igualdad original se cumple (no la transformada).</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>6</span>
+            <div><strong>Expresa el resultado correctamente</strong> — Indica todas las soluciones. Si son complejas, exprésalas en forma a+bi. Si el sistema es indeterminado, exprésalo en forma paramétrica.</div>
+          </li>
+        </ol>
+
+        {/* 5. TIPS GRID */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>⚡</span>
+            <strong>Discriminante primero</strong>
+            <p>En cualquier cuadrática, calcula Δ = b²-4ac antes de nada. Si es negativo, no hay soluciones reales y ahorras tiempo de cálculo.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔍</span>
+            <strong>Factorización rápida</strong>
+            <p>Para x² + bx + c = 0 (a=1), busca dos números cuya suma sea b y cuyo producto sea c. Más rápido que la fórmula para coeficientes enteros pequeños.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>📋</span>
+            <strong>Vieta como verificación</strong>
+            <p>Suma de raíces = -b/a y producto = c/a. Comprueba esto tras resolver cualquier cuadrática. Si no coincide, hay un error de cálculo.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔢</span>
+            <strong>Ruffini: prueba con ±1, ±2...</strong>
+            <p>Los candidatos a raíces racionales son los divisores del término independiente divididos entre los del coeficiente principal. Empieza siempre por ±1.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>✏️</span>
+            <strong>Escribe cada paso</strong>
+            <p>En exámenes, la resolución paso a paso vale puntos parciales aunque el resultado final sea incorrecto. Nunca saltes pasos mentalmente.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🎯</span>
+            <strong>Comprueba siempre</strong>
+            <p>30 segundos de verificación sustituyendo la solución en la ecuación original evitan errores graves. Especialmente crítico en irracionales y racionales.</p>
+          </div>
+        </div>
+
+        {/* 6. WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcono}>⚠️</span>
+            <strong>Errores frecuentes al resolver ecuaciones</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Dividir ambos miembros por la incógnita</strong> — Si divides por x, pierdes la solución x = 0. Nunca dividas por una expresión que puede ser cero; lleva los términos al mismo lado y factoriza.</li>
+            <li><strong>Olvidar el ± al sacar raíz cuadrada</strong> — Si x² = 9, la solución es x = ±3, no solo x = 3. El signo negativo es tan válido como el positivo.</li>
+            <li><strong>No verificar soluciones en ecuaciones irracionales y racionales</strong> — Elevar al cuadrado o multiplicar por el denominador puede introducir soluciones extrañas. Siempre sustituye en la ecuación original.</li>
+            <li><strong>Confundir grado con número de soluciones reales</strong> — Una ecuación de grado 3 tiene siempre 3 raíces (contando multiplicidad y complejas), pero puede tener solo 1 solución real.</li>
+            <li><strong>Errores de signo al transponer términos</strong> — Al pasar un término al otro lado, cambia de signo. Este es el error más frecuente y se evita reescribiendo el paso completo sin hacer operaciones mentales.</li>
+            <li><strong>No comprobar las restricciones del dominio</strong> — En ecuaciones racionales, los valores que anulan el denominador son soluciones prohibidas aunque algebraicamente &quot;salgan&quot;.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('algebra-ecuaciones')} />
