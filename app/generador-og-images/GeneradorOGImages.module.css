@@ -633,3 +633,391 @@
   border-color: var(--primary);
   color: var(--primary);
 }
+
+/* ============================================
+   SECCIONES EDUCATIVAS v2.0
+   ============================================ */
+
+/* Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-lg) 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: var(--bg-card);
+}
+
+.comparativaTable thead {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.comparativaTable th {
+  padding: var(--spacing-md) var(--spacing-lg);
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover {
+  background: var(--hover);
+}
+
+.comparativaTable td:first-child {
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .comparativaTable {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: var(--border);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: var(--hover);
+}
+
+/* Grid de escenarios / casos de uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.escenarioCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.escenarioHeader h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-sm);
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-style: italic;
+  margin: 0;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .escenarioTip {
+  border-top-color: var(--border);
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.faqItem h4 {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.faqItem p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.faqItem p + p {
+  margin-top: var(--spacing-sm);
+}
+
+.faqTip {
+  margin-top: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: calc(var(--radius) / 2);
+  color: var(--primary) !important;
+  font-style: italic;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: var(--border);
+  border-left-color: var(--primary);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* Guía paso a paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+  position: relative;
+}
+
+.stepGuide::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 40px;
+  bottom: 20px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+  opacity: 0.3;
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  position: relative;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  margin: 0 0 var(--spacing-xs);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+/* Grid de tips / mejores prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.tipCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--secondary);
+}
+
+.tipIcon {
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.tipCard h4 {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+/* Warning Box */
+.warningBox {
+  background: rgba(255, 152, 0, 0.06);
+  border: 1px solid rgba(255, 152, 0, 0.35);
+  border-left: 4px solid #FF9800;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.warningHeader h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-left: var(--spacing-lg);
+  position: relative;
+}
+
+.warningList li::before {
+  content: '✕';
+  position: absolute;
+  left: 0;
+  color: #FF9800;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 152, 0, 0.08);
+  border-color: rgba(255, 152, 0, 0.3);
+  border-left-color: #FF9800;
+}
+
+/* Responsive para secciones v2.0 */
+@media (max-width: 768px) {
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.8rem;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .stepGuide::before {
+    display: none;
+  }
+
+  .stepNumber {
+    width: 34px;
+    height: 34px;
+    font-size: 0.9rem;
+  }
+}

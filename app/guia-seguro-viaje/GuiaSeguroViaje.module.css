@@ -484,8 +484,356 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :global(*), :global(*::before), :global(*::after) {
+  .container,
+  .opcionBtn,
+  .coberturaCard,
+  .checkItem,
+  .checkBox {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Tabla comparativa ─────────────────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+  border: 1px solid var(--border, #e5e5e5);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  min-width: 680px;
+}
+
+.comparativaTable th {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--text-primary);
+  font-weight: 700;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  border-bottom: 2px solid color-mix(in srgb, var(--primary) 25%, transparent);
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border, #eee);
+  color: var(--text-secondary);
+  vertical-align: top;
+  line-height: 1.4;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover td {
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
+}
+
+/* ─── Escenarios (casos de uso) ────────────────────────────────────────────── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.escenarioIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.escenarioExample {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.escenarioTip {
+  font-size: 0.8rem;
+  color: var(--primary);
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border-radius: 6px;
+  line-height: 1.4;
+  border-left: 3px solid var(--primary);
+}
+
+/* ─── FAQ ───────────────────────────────────────────────────────────────────── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.faqItem {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border, #eee);
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqItem dt {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem dd {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.faqTip {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--primary);
+  margin-top: 0.4rem;
+  font-style: italic;
+}
+
+/* ─── Guía paso a paso ─────────────────────────────────────────────────────── */
+.stepGuide {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--border, #eee);
+}
+
+.step:last-child {
+  border-bottom: none;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-top: 0.1rem;
+}
+
+.stepContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stepContent strong {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.stepContent p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* ─── Tips grid (mejores prácticas) ────────────────────────────────────────── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+
+.tipCard div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tipCard strong {
+  font-size: 0.87rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.tipCard p {
+  font-size: 0.79rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ─── Warning Box ───────────────────────────────────────────────────────────── */
+.warningBox {
+  background: color-mix(in srgb, #F59E0B 8%, transparent);
+  border: 1px solid color-mix(in srgb, #F59E0B 40%, transparent);
+  border-left: 4px solid #F59E0B;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.warningIcon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.warningList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.warningList li {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  padding-left: 1.1rem;
+  position: relative;
+}
+
+.warningList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #F59E0B;
+  font-weight: 700;
+}
+
+/* ─── Dark mode (secciones nuevas) ─────────────────────────────────────────── */
+[data-theme='dark'] .tableWrapper {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover td {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+[data-theme='dark'] .escenarioCard {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .escenarioTip {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+[data-theme='dark'] .faqItem {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .step {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .tipCard {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .warningBox {
+  background: color-mix(in srgb, #F59E0B 10%, transparent);
+  border-color: color-mix(in srgb, #F59E0B 35%, transparent);
+  border-left-color: #F59E0B;
+}
+
+/* ─── Responsive (secciones nuevas) ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable {
+    font-size: 0.78rem;
+  }
+
+  .step {
+    gap: 0.75rem;
+  }
+
+  .stepNumber {
+    width: 28px;
+    height: 28px;
+    font-size: 0.78rem;
   }
 }

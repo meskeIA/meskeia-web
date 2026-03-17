@@ -798,6 +798,270 @@ export default function GeneradorAvataresPage() {
               el mismo input siempre produce el mismo output visual.
             </p>
           </section>
+
+          {/* Tabla Comparativa de Estilos */}
+          <section className={styles.guideSection}>
+            <h2>Comparativa de estilos de avatar</h2>
+            <p>Cada estilo tiene sus puntos fuertes según el contexto de uso:</p>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Estilo</th>
+                    <th>Profesionalidad percibida</th>
+                    <th>Plataformas ideales</th>
+                    <th>Facilidad de creación</th>
+                    <th>Reconocimiento a escala pequeña</th>
+                    <th>Coherencia de marca</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Foto real</strong></td>
+                    <td>⭐⭐⭐⭐⭐</td>
+                    <td>LinkedIn, email profesional</td>
+                    <td>Media (requiere buena foto)</td>
+                    <td>⭐⭐⭐⭐</td>
+                    <td>⭐⭐⭐</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ilustración / Cartoon</strong></td>
+                    <td>⭐⭐⭐⭐</td>
+                    <td>Twitter, YouTube, blogs</td>
+                    <td>Baja (requiere diseñador)</td>
+                    <td>⭐⭐⭐⭐⭐</td>
+                    <td>⭐⭐⭐⭐⭐</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Minimalista geométrico</strong></td>
+                    <td>⭐⭐⭐⭐</td>
+                    <td>GitHub, apps técnicas, portfolios</td>
+                    <td>Alta (generadores automáticos)</td>
+                    <td>⭐⭐⭐⭐</td>
+                    <td>⭐⭐⭐⭐</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Pixel Art</strong></td>
+                    <td>⭐⭐</td>
+                    <td>Discord, Twitch, gaming, foros</td>
+                    <td>Media (editores de pixel)</td>
+                    <td>⭐⭐⭐</td>
+                    <td>⭐⭐⭐</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3D Render</strong></td>
+                    <td>⭐⭐⭐⭐</td>
+                    <td>Metaverso, apps 3D, presentaciones</td>
+                    <td>Baja (software especializado)</td>
+                    <td>⭐⭐⭐</td>
+                    <td>⭐⭐⭐⭐</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Abstracto / Inicial</strong></td>
+                    <td>⭐⭐⭐</td>
+                    <td>Apps empresariales, Slack, Jira</td>
+                    <td>Muy alta (automático)</td>
+                    <td>⭐⭐⭐⭐⭐</td>
+                    <td>⭐⭐⭐⭐</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* Casos de Uso */}
+          <section className={styles.guideSection}>
+            <h2>Casos de uso habituales</h2>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🧑‍💻</span>
+                  <h4>Freelance con presencia online</h4>
+                </div>
+                <p>Un profesional independiente necesita un avatar consistente en LinkedIn, GitHub, Twitter y Behance.</p>
+                <p className={styles.escenarioExample}><strong>Ejemplo:</strong> Diseñador que usa el mismo avatar ilustrado en todas sus plataformas para ser reconocible al instante.</p>
+                <p className={styles.escenarioTip}>Tip: Elige un estilo que refleje tu sector. Diseño → ilustración. Tecnología → geométrico o iniciales.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🏢</span>
+                  <h4>Empresa asignando avatares corporativos</h4>
+                </div>
+                <p>Una empresa quiere que todos sus empleados tengan avatares de perfil coherentes con el branding corporativo.</p>
+                <p className={styles.escenarioExample}><strong>Ejemplo:</strong> Generador de iniciales con los colores corporativos para cada empleado, sin necesitar fotos.</p>
+                <p className={styles.escenarioTip}>Tip: Usa el nombre completo como semilla para garantizar unicidad. El estilo "Iniciales" es el más corporativo.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🌐</span>
+                  <h4>Comunidad online con identidades anónimas</h4>
+                </div>
+                <p>Foros, comunidades y plataformas donde los usuarios quieren mantener privacidad pero tener identidad visual propia.</p>
+                <p className={styles.escenarioExample}><strong>Ejemplo:</strong> Reddit o Hacker News generando avatares únicos a partir del username, sin foto real.</p>
+                <p className={styles.escenarioTip}>Tip: El avatar generado desde el username garantiza que dos usuarios nunca tengan el mismo avatar.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>⚙️</span>
+                  <h4>Desarrollador creando avatares para su plataforma</h4>
+                </div>
+                <p>Un desarrollador necesita avatares por defecto para los usuarios de su app que aún no han subido foto de perfil.</p>
+                <p className={styles.escenarioExample}><strong>Ejemplo:</strong> GitHub genera un avatar geométrico único para cada cuenta nueva antes de subir foto.</p>
+                <p className={styles.escenarioTip}>Tip: Implementa generación determinista desde el email o ID de usuario para consistencia entre sesiones.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className={styles.guideSection}>
+            <h2>Preguntas frecuentes sobre avatares</h2>
+            <div className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <h4>¿Qué tamaño debe tener un avatar para redes sociales?</h4>
+                <p>El mínimo recomendado es <strong>400×400 píxeles</strong>. Twitter muestra 400×400, LinkedIn hasta 800×800, Instagram 180×180. Genera siempre en 512×512 como base y escala según necesidad. Un tamaño mayor nunca perjudica; uno menor sí provoca pixelado.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Es mejor foto real o avatar ilustrado para uso profesional?</h4>
+                <p>Depende del contexto. Para <strong>LinkedIn y entornos corporativos</strong>, la foto real genera más confianza y clics. Para <strong>desarrolladores, diseñadores y creadores de contenido</strong>, un avatar ilustrado consistente puede ser más memorable y reforzar la marca personal. Muchos profesionales exitosos usan avatar ilustrado en plataformas técnicas.</p>
+                <p className={styles.faqTip}>Regla práctica: Si vendes servicios B2B a empresas tradicionales, usa foto real. Si tu audiencia es digital-nativa, el avatar ilustrado funciona igual o mejor.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Cómo genero un avatar coherente con mi marca?</h4>
+                <p>Identifica los colores de tu marca (máximo 2-3) y elige un estilo de avatar que los use. Para marcas profesionales: iniciales o geométrico. Para marcas creativas: ilustración o abstracto. Para marcas técnicas: pixel art o geométrico. La consistencia entre plataformas es más importante que el estilo elegido.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Qué formato es mejor para avatares (PNG, JPG, SVG)?</h4>
+                <p><strong>PNG</strong> es el formato ideal: soporte para transparencia, sin pérdida de calidad al comprimir, ampliamente compatible. <strong>JPG</strong> pierde calidad en cada guardado y no soporta transparencia. <strong>SVG</strong> es perfecto si tu avatar es vectorial (no pixel art ni fotos), escala sin límite y pesa poco.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Puedo usar el mismo avatar en todas las redes?</h4>
+                <p>Sí, es lo recomendable para la coherencia de marca. Sin embargo, considera que algunas plataformas recortan en <strong>círculo</strong> (Twitter, LinkedIn, Discord) y otras en <strong>cuadrado</strong> (WhatsApp en algunos contextos). Verifica que tu avatar se vea bien en ambos formatos antes de usarlo universalmente.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Los avatares generados por IA tienen derechos de autor?</h4>
+                <p>En España y la UE, las obras generadas completamente por IA sin intervención creativa humana <strong>no son protegibles por derechos de autor</strong> según el marco legal actual (Directiva 2019/790). Los avatares generados algorítmicamente (como los de esta herramienta) pueden usarse libremente. Consulta los términos de servicio si usas herramientas de IA generativa externas.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Cada cuánto debo actualizar mi avatar?</h4>
+                <p>Lo ideal es mantener el mismo avatar entre <strong>6 meses y 2 años</strong>. Cambiar con demasiada frecuencia perjudica el reconocimiento de marca. Actualiza cuando: cambie significativamente tu imagen profesional, el avatar esté muy anticuado, o relances tu marca personal. Si cambias de foto real, mantén el estilo visual similar para facilitar el reconocimiento.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Cómo optimizo un avatar para que se vea bien en tamaño pequeño?</h4>
+                <p>Usa <strong>alto contraste</strong> entre el elemento principal y el fondo. Evita detalles finos que desaparecen a 32×32px. Si usas iniciales, prefiere fuentes bold con letra grande. Verifica siempre la versión miniatura antes de publicar. El recorte circular puede cortar bordes importantes: centra el elemento visual en el área segura central (70% del cuadrado).</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Guía Paso a Paso */}
+          <section className={styles.guideSection}>
+            <h2>Guía paso a paso para crear tu avatar</h2>
+            <div className={styles.stepGuide}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <h4>Define el uso principal</h4>
+                  <p>Decide si tu avatar es para uso <strong>profesional</strong> (LinkedIn, email corporativo), <strong>casual</strong> (redes sociales personales, foros) o <strong>gaming/entretenimiento</strong> (Discord, Twitch). El contexto determina el estilo adecuado.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <h4>Elige un estilo coherente con tu marca</h4>
+                  <p>Selecciona el estilo que mejor represente tu personalidad o marca. Para profesionales del diseño: ilustración o geométrico. Para desarrolladores: pixel art o iniciales. Para marcas corporativas: iniciales con colores de empresa.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <h4>Genera variantes de color y estilo</h4>
+                  <p>Prueba varios estilos con tu nombre y compara. Genera también con variaciones del texto (nombre completo, username, nombre + apellido) para ver cuál produce el resultado más atractivo y representativo.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepContent}>
+                  <h4>Verifica legibilidad a 32×32px (favicon)</h4>
+                  <p>Usa la sección "Vista en diferentes usos" para confirmar que tu avatar sigue siendo reconocible en tamaño miniatura. Si el detalle desaparece a 32px, elige un estilo con menos elementos o mayor contraste.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>5</div>
+                <div className={styles.stepContent}>
+                  <h4>Exporta en PNG con fondo transparente</h4>
+                  <p>Descarga el avatar en formato PNG, que preserva la transparencia. Esto te permite colocarlo sobre cualquier fondo (claro, oscuro, de color) sin que aparezca un recuadro blanco antiestético.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>6</div>
+                <div className={styles.stepContent}>
+                  <h4>Crea versión circular y cuadrada</h4>
+                  <p>Guarda el avatar en ambas variantes. Las plataformas como Twitter y LinkedIn recortan en círculo; otras muestran el cuadrado completo. Comprueba que el recorte circular no elimina elementos importantes del diseño.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>7</div>
+                <div className={styles.stepContent}>
+                  <h4>Guarda en alta resolución para usos futuros</h4>
+                  <p>Exporta siempre en el tamaño máximo disponible (512×512px o superior). Los usos futuros pueden requerir versiones más grandes (tarjetas de presentación, banners). Es más fácil reducir que ampliar sin perder calidad.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Mejores Prácticas */}
+          <section className={styles.guideSection}>
+            <h2>Mejores prácticas para avatares efectivos</h2>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📐</span>
+                <h4>Tamaño mínimo 400×400px</h4>
+                <p>Por debajo de 400×400 píxeles el avatar se pixela en plataformas que lo muestran ampliado. Genera siempre en 512×512 como mínimo.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🖼️</span>
+                <h4>PNG transparente = máxima versatilidad</h4>
+                <p>El fondo transparente permite usar el avatar sobre cualquier color sin crear un recuadro antiestético. Es el estándar para avatares profesionales.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📅</span>
+                <h4>Mantén el avatar 6-12 meses mínimo</h4>
+                <p>El reconocimiento de marca se construye con consistencia temporal. Cambiar de avatar con frecuencia confunde a tu audiencia y dificulta que te identifiquen.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🔄</span>
+                <h4>Crea versión con y sin fondo</h4>
+                <p>Tener ambas versiones te da flexibilidad para diferentes contextos: fondo blanco para documentos, transparente para redes sociales.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🌓</span>
+                <h4>Prueba en fondo claro y oscuro</h4>
+                <p>Las plataformas tienen modo claro y oscuro. Verifica que tu avatar tiene suficiente contraste y es visible en ambos fondos antes de publicarlo.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🎭</span>
+                <h4>Adapta el estilo al tono de la plataforma</h4>
+                <p>LinkedIn requiere un tono profesional (foto real o avatar sobrio). Twitter admite más creatividad. Discord y Twitch premian los avatares llamativos y únicos.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Warning Box */}
+          <section className={styles.guideSection}>
+            <div className={styles.warningBox}>
+              <div className={styles.warningHeader}>
+                <span className={styles.warningIcon}>⚠️</span>
+                <h3>Errores frecuentes que debes evitar</h3>
+              </div>
+              <ul className={styles.warningList}>
+                <li>Usar una foto de baja resolución que se pixela al ampliarse en pantallas de alta densidad.</li>
+                <li>Cambiar de avatar constantemente: daña el reconocimiento de marca y confunde a seguidores y contactos.</li>
+                <li>Usar una imagen con derechos de autor sin licencia apropiada, lo que puede generar reclamaciones legales.</li>
+                <li>No verificar que el avatar se ve bien en formato circular: LinkedIn y Twitter recortan en círculo y pueden cortar elementos clave del diseño.</li>
+                <li>Usar un avatar muy oscuro en plataformas con fondo oscuro (modo noche): el avatar puede volverse invisible o perder contraste.</li>
+                <li>No guardar el archivo original en alta resolución: si en el futuro necesitas una versión más grande, perderás calidad al ampliar.</li>
+              </ul>
+            </div>
+          </section>
         </div>
       </EducationalSection>
 

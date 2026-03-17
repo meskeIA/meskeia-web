@@ -846,6 +846,449 @@ export default function GeneradorIconosPage() {
             <p>🤖 <a href="https://developer.chrome.com/docs/android/trusted-web-activity/integration-guide" target="_blank" rel="noopener">Google - PWA en Android</a></p>
           </div>
         </section>
+
+        {/* ── SECCIÓN 1: Tabla Comparativa de formatos ── */}
+        <section>
+          <h2 className={styles.sectionTitle}>Comparativa de Formatos de Icono</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Formato</th>
+                  <th>Escalabilidad</th>
+                  <th>Peso típico</th>
+                  <th>Soporte navegadores</th>
+                  <th>Uso recomendado</th>
+                  <th>Accesibilidad</th>
+                  <th>Edición posterior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>SVG</strong></td>
+                  <td>Infinita (vectorial)</td>
+                  <td>1–10 KB</td>
+                  <td>Todos los modernos</td>
+                  <td>Iconos UI, logos, ilustraciones</td>
+                  <td>Excelente (aria-label nativo)</td>
+                  <td>Sí (código XML editable)</td>
+                </tr>
+                <tr>
+                  <td><strong>PNG</strong></td>
+                  <td>Fija (se pixela en retina)</td>
+                  <td>5–50 KB</td>
+                  <td>Universal</td>
+                  <td>Iconos con transparencia, favicons</td>
+                  <td>Buena (alt en img)</td>
+                  <td>No (rasterizado)</td>
+                </tr>
+                <tr>
+                  <td><strong>ICO</strong></td>
+                  <td>Fija (multi-resolución)</td>
+                  <td>10–100 KB</td>
+                  <td>Universal (incluso IE)</td>
+                  <td>Favicon tradicional (favicon.ico)</td>
+                  <td>Limitada</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td><strong>WebP</strong></td>
+                  <td>Fija</td>
+                  <td>3–30 KB</td>
+                  <td>Chrome, Firefox, Safari 14+</td>
+                  <td>Iconos modernos, PWA</td>
+                  <td>Buena (alt en img)</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td><strong>AVIF</strong></td>
+                  <td>Fija</td>
+                  <td>2–20 KB</td>
+                  <td>Chrome 85+, Firefox 93+</td>
+                  <td>Iconos de alto detalle, futuro</td>
+                  <td>Buena (alt en img)</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td><strong>Font Icon</strong></td>
+                  <td>Infinita (tipografía)</td>
+                  <td>10–80 KB (fuente)</td>
+                  <td>Universal</td>
+                  <td>Sets de iconos (Font Awesome, Material)</td>
+                  <td>Requiere aria-hidden + span oculto</td>
+                  <td>Solo color/tamaño vía CSS</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section>
+          <h2 className={styles.sectionTitle}>Casos de Uso Habituales</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍💻</span>
+                <h3>Desarrollador web</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Crea iconos de navegación para una app React o Vue. Necesita SVG
+                inline para poder controlar el color con <code>currentColor</code> y
+                garantizar escalabilidad en pantallas retina.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: exporta los SVG optimizados con SVGO y úsalos como
+                componentes React para máxima reutilización.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎨</span>
+                <h3>Diseñador UI</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Construye un sistema de iconos consistente para un producto digital.
+                Necesita definir un estilo visual único (outline, filled o duotone)
+                y mantener un grosor de trazo uniforme en todos los iconos.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: diseña sobre una cuadrícula de 24×24px con zona segura de
+                2px en los bordes para que los iconos luzcan equilibrados a cualquier tamaño.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🚀</span>
+                <h3>Emprendedor</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Crea el favicon e iconos de instalación para su web o PWA. Necesita
+                múltiples tamaños PNG (16, 32, 180, 192, 512px) y el archivo
+                <code>manifest.json</code> para que la app sea instalable en móvil.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: usa el preset &quot;PWA Completo&quot; de esta herramienta
+                para generar todos los tamaños de una sola vez.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
+                <h3>Creador de contenido</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                Necesita iconos para presentaciones de PowerPoint o infografías en
+                Canva. Requiere PNG de alta resolución (mínimo 256×256px) con fondo
+                transparente para superponerlos sobre cualquier diseño.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: exporta siempre en PNG a 512px y redimensiona en la
+                herramienta de diseño; así mantienes la calidad máxima.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section>
+          <h2 className={styles.sectionTitle}>Preguntas Frecuentes sobre Iconos Digitales</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Qué formato es mejor para iconos web, SVG o PNG?</h4>
+              <p>
+                SVG es superior para iconos de interfaz porque es vectorial (se escala sin pixelarse),
+                pesa menos (1–10 KB), soporta animaciones CSS y permite cambiar color con
+                <code>currentColor</code>. PNG es preferible cuando el icono tiene gradientes complejos
+                o efectos fotorrealistas que SVG no puede representar eficientemente.
+              </p>
+              <p className={styles.faqTip}>
+                Regla práctica: SVG para iconos de UI, PNG para imágenes complejas o favicons.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué tamaños necesito para el favicon de mi web?</h4>
+              <p>
+                El mínimo moderno son tres tamaños: <strong>16×16px</strong> (pestaña del navegador),
+                <strong>32×32px</strong> (barra de favoritos y marcadores) y <strong>180×180px</strong>
+                (Apple Touch Icon para iOS). Para PWA completa añade 192×192px y 512×512px.
+              </p>
+              <p className={styles.faqTip}>
+                El archivo <code>favicon.ico</code> puede contener los tres primeros tamaños en un
+                único fichero multi-resolución.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cómo hago que un icono sea accesible para lectores de pantalla?</h4>
+              <p>
+                Depende del uso: si el icono es <strong>decorativo</strong> (acompaña texto visible),
+                añade <code>aria-hidden=&quot;true&quot;</code>. Si el icono <strong>transmite información</strong>
+                o es interactivo (botón sin texto), añade <code>aria-label=&quot;descripción&quot;</code>
+                al elemento o usa un <code>&lt;span&gt;</code> visualmente oculto dentro del botón.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Puedo usar iconos de Font Awesome en proyectos comerciales?</h4>
+              <p>
+                La versión <strong>gratuita</strong> de Font Awesome (versión 5/6 Free) se distribuye bajo
+                licencia CC BY 4.0 para los SVG/PNG y SIL OFL para las fuentes, ambas permiten uso
+                comercial. Sin embargo, debes revisar la licencia específica de cada icon set que uses,
+                ya que algunos sets de terceros tienen restricciones comerciales distintas.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué es un sprite de iconos y cuándo usarlo?</h4>
+              <p>
+                Un sprite SVG es un único fichero <code>.svg</code> que contiene múltiples iconos
+                definidos con <code>&lt;symbol&gt;</code>. Se incluye una vez en el HTML y se referencia
+                cada icono con <code>&lt;use href=&quot;#nombre-icono&quot; /&gt;</code>. Úsalo cuando
+                tengas más de 20 iconos en la misma página: reduce las peticiones HTTP y mejora el
+                rendimiento de carga.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cuántos tamaños de icono necesito para una PWA?</h4>
+              <p>
+                El mínimo exigido por la especificación es <strong>192×192px</strong> y
+                <strong>512×512px</strong>. Para cobertura completa se recomienda además:
+                48px (Android launcher antiguo), 72px, 96px, 144px, 152px (iPad),
+                167px (iPad Pro) y 180px (iOS). El preset &quot;PWA Completo&quot; de esta
+                herramienta genera todos estos tamaños automáticamente.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cómo creo un icon font personalizado?</h4>
+              <p>
+                El proceso tiene tres pasos: (1) diseña tus iconos como SVG con trazados simples y
+                cerrados; (2) usa una herramienta como <strong>IcoMoon</strong> o <strong>Fontello</strong>
+                para convertir los SVG en una fuente TTF/WOFF2; (3) incluye la fuente en tu CSS con
+                <code>@font-face</code> y asigna un carácter Unicode a cada icono. Es la técnica
+                habitual para sets de iconos corporativos.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿SVG inline vs. SVG como imagen, cuál es mejor?</h4>
+              <p>
+                <strong>SVG inline</strong> (pegado en el HTML) permite estilizado completo con CSS,
+                animaciones y cambio de color dinámico, pero engrosa el HTML. <strong>SVG como
+                imagen</strong> (<code>&lt;img src=&quot;icon.svg&quot;&gt;</code>) es más limpio,
+                cacheado por el navegador y más fácil de mantener, pero no puede manipularse con CSS
+                ni JavaScript. Usa inline para iconos de UI que cambian de estado; usa como imagen
+                para logos e ilustraciones estáticas.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso (diseño de iconos) ── */}
+        <section>
+          <h2 className={styles.sectionTitle}>Cómo Diseñar un Set de Iconos desde Cero</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">1</div>
+              <div className={styles.stepContent}>
+                <h4>Definir el estilo visual</h4>
+                <p>
+                  Elige entre <strong>outline</strong> (trazos sin relleno, aspecto ligero),
+                  <strong>filled</strong> (formas sólidas, mayor contraste) o
+                  <strong>duotone</strong> (dos colores, mayor expresividad).
+                  Mantén el mismo estilo en todos los iconos del set para garantizar coherencia visual.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">2</div>
+              <div className={styles.stepContent}>
+                <h4>Establecer el tamaño base</h4>
+                <p>
+                  El estándar de la industria es <strong>24×24px</strong>. Este tamaño es legible
+                  en pantalla, escalable a 48px para touch y reducible a 16px para favicon sin
+                  perder reconocibilidad.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">3</div>
+              <div className={styles.stepContent}>
+                <h4>Diseñar en cuadrícula de 24px con zona segura</h4>
+                <p>
+                  Usa una cuadrícula de 24×24px y deja una <strong>zona segura de 2px</strong> en
+                  cada borde. Esto garantiza que los iconos no queden cortados y luzcan equilibrados
+                  al aplicar padding en los contenedores.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">4</div>
+              <div className={styles.stepContent}>
+                <h4>Simplificar los trazados al mínimo</h4>
+                <p>
+                  Elimina nodos innecesarios, convierte curvas complejas en formas simples y evita
+                  detalles que desaparecen a tamaños pequeños. Un buen icono debe ser reconocible
+                  a 16px.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">5</div>
+              <div className={styles.stepContent}>
+                <h4>Exportar como SVG optimizado</h4>
+                <p>
+                  Exporta el SVG sin metadatos de la aplicación de diseño (sin
+                  <code>xmlns:dc</code>, <code>sodipodi</code> ni capas vacías). Usa
+                  <strong>SVGO</strong> para reducir el peso hasta un 70% sin pérdida visual.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">6</div>
+              <div className={styles.stepContent}>
+                <h4>Crear variantes de tamaño</h4>
+                <p>
+                  Genera versiones en <strong>16, 24, 32 y 48px</strong>. A partir de 32px el
+                  icono puede incluir más detalle; a 16px debe ser la versión más simplificada.
+                  Para favicons y PWA genera también 192px y 512px con esta herramienta.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">7</div>
+              <div className={styles.stepContent}>
+                <h4>Añadir atributos de accesibilidad</h4>
+                <p>
+                  Si el icono es <strong>decorativo</strong>, añade <code>aria-hidden=&quot;true&quot;</code>
+                  al SVG. Si <strong>transmite información</strong> o es el único contenido de un
+                  botón, añade <code>aria-label=&quot;descripción clara&quot;</code> al elemento
+                  interactivo o un <code>role=&quot;img&quot;</code> con <code>title</code> en el SVG.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section>
+          <h2 className={styles.sectionTitle}>Mejores Prácticas para Iconos Web</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
+              <h4>SVG para web</h4>
+              <p>
+                Usa SVG siempre que sea posible para iconos de interfaz. Son vectoriales,
+                escalables infinitamente y pesan entre 1 y 10 KB, frente a los 20–50 KB
+                de un PNG equivalente.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">✏️</span>
+              <h4>Grosor de trazo consistente</h4>
+              <p>
+                Mantén el mismo grosor de trazo (stroke-width) en todos los iconos del set.
+                El valor más habitual es <strong>1.5px o 2px</strong>. Mezclar grosores
+                distintos rompe la coherencia visual del producto.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎨</span>
+              <h4>Usa currentColor en SVG</h4>
+              <p>
+                Establece <code>fill=&quot;currentColor&quot;</code> o
+                <code>stroke=&quot;currentColor&quot;</code> en el SVG para que el icono
+                herede el color del texto CSS. Así funciona automáticamente en dark mode
+                sin necesidad de duplicar estilos.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">♿</span>
+              <h4>aria-hidden para decorativos</h4>
+              <p>
+                Añade <code>aria-hidden=&quot;true&quot;</code> a los iconos que solo
+                son decorativos (acompañan a texto). Los lectores de pantalla los ignorarán
+                y la experiencia de usuario mejora notablemente.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">👆</span>
+              <h4>Tamaño táctil mínimo 44×44px</h4>
+              <p>
+                Aunque el icono sea de 24px, el área táctil del botón debe ser al menos
+                <strong>44×44px</strong> según las pautas WCAG 2.5.5. Usa padding para
+                ampliar el área de toque sin cambiar el tamaño visual del icono.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
+              <h4>Optimizar SVG con SVGO</h4>
+              <p>
+                Los SVG exportados desde Figma o Illustrator incluyen metadatos innecesarios
+                que pueden representar el 50–70% del peso final. Ejecuta <strong>SVGO</strong>
+                antes de pasar a producción para reducir el tamaño sin pérdida de calidad.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section>
+          <div className={styles.warningBox} role="alert">
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>Errores frecuentes al trabajar con iconos</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Usar PNG para iconos escalables:</strong> los PNG se pixelan en pantallas
+                retina y de alta densidad. Usa SVG siempre que necesites escalabilidad.
+              </li>
+              <li>
+                <strong>favicon.ico insuficiente para PWA:</strong> el archivo .ico solo cubre
+                navegadores de escritorio. Las PWA necesitan múltiples tamaños PNG declarados
+                en el <code>manifest.json</code>.
+              </li>
+              <li>
+                <strong>Iconos sin texto alternativo:</strong> los iconos interactivos sin
+                <code>aria-label</code> son inaccesibles para usuarios de lectores de pantalla y
+                pueden generar incumplimientos de WCAG.
+              </li>
+              <li>
+                <strong>Ignorar la licencia comercial:</strong> muchos sets de iconos gratuitos
+                prohíben el uso comercial o exigen atribución. Verifica siempre la licencia antes
+                de incluirlos en un producto de pago.
+              </li>
+              <li>
+                <strong>SVG sin optimizar en producción:</strong> los SVG exportados directamente
+                desde herramientas de diseño pueden ser 10× más pesados de lo necesario. Ejecuta
+                SVGO antes de desplegar.
+              </li>
+              <li>
+                <strong>Mezclar estilos de icono:</strong> combinar iconos outline con filled o de
+                distintas familias (Material Icons + Font Awesome) genera incoherencia visual y
+                transmite falta de cuidado en el producto.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-iconos')} />

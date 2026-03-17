@@ -1268,6 +1268,274 @@ export default function GeneradorOGImagesPage() {
               <li>⚠️ No dependas solo de texto pequeño (puede no verse bien en móvil)</li>
             </ul>
           </section>
+
+          {/* Tabla comparativa por plataforma */}
+          <section className={styles.eduSection}>
+            <h3>Comparativa por plataforma</h3>
+            <p>Cada red social gestiona las OG images de forma diferente. Esta tabla resume los parámetros clave para optimizar tus previsualizaciones.</p>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Plataforma</th>
+                    <th>Tamaño recomendado</th>
+                    <th>Ratio aspecto</th>
+                    <th>Tamaño máx. archivo</th>
+                    <th>Texto visible</th>
+                    <th>Recorte automático</th>
+                    <th>Importancia SEO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Facebook / LinkedIn</strong></td>
+                    <td>1200 × 630 px</td>
+                    <td>1.91:1</td>
+                    <td>8 MB</td>
+                    <td>Completo</td>
+                    <td>Mínimo</td>
+                    <td>Alta</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Twitter / X</strong></td>
+                    <td>1200 × 628 px</td>
+                    <td>1.91:1</td>
+                    <td>5 MB</td>
+                    <td>Completo</td>
+                    <td>Lateral leve</td>
+                    <td>Alta</td>
+                  </tr>
+                  <tr>
+                    <td><strong>WhatsApp</strong></td>
+                    <td>1200 × 630 px</td>
+                    <td>1.91:1</td>
+                    <td>5 MB</td>
+                    <td>Reducido</td>
+                    <td>Sí (móvil)</td>
+                    <td>Media</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Slack</strong></td>
+                    <td>1200 × 630 px</td>
+                    <td>1.91:1</td>
+                    <td>10 MB</td>
+                    <td>Completo</td>
+                    <td>No</td>
+                    <td>Baja</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Discord</strong></td>
+                    <td>1200 × 630 px</td>
+                    <td>1.91:1</td>
+                    <td>8 MB</td>
+                    <td>Completo</td>
+                    <td>No</td>
+                    <td>Baja</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Google Search</strong></td>
+                    <td>1200 × 630 px</td>
+                    <td>1.91:1</td>
+                    <td>—</td>
+                    <td>No aplica</td>
+                    <td>No</td>
+                    <td>Muy alta</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* Casos de uso */}
+          <section className={styles.eduSection}>
+            <h3>Casos de uso habituales</h3>
+            <p>Las OG images aportan valor diferente según el tipo de proyecto. Aquí los escenarios más frecuentes.</p>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>📰</span>
+                  <h4>Blog / medio digital</h4>
+                </div>
+                <p className={styles.escenarioExample}>Cada artículo lleva una OG image personalizada con el titular del post y la imagen destacada, maximizando el CTR en redes sociales.</p>
+                <p className={styles.escenarioTip}>Crea una plantilla base y personaliza solo el título y la imagen de fondo para cada entrada.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🛍️</span>
+                  <h4>E-commerce</h4>
+                </div>
+                <p className={styles.escenarioExample}>Las fichas de producto se comparten con imagen optimizada que muestra el artículo, nombre y precio, incentivando la compra directa desde el preview.</p>
+                <p className={styles.escenarioTip}>Incluye siempre el nombre del producto en texto sobre la imagen para mayor legibilidad.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🚀</span>
+                  <h4>SaaS / Startup</h4>
+                </div>
+                <p className={styles.escenarioExample}>Las landing pages refuerzan la identidad de marca al compartirse, con logo, propuesta de valor y colores corporativos bien visibles.</p>
+                <p className={styles.escenarioTip}>Mantén coherencia visual entre la OG image y la página de destino para no generar confusión.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>📢</span>
+                  <h4>Agencia de marketing</h4>
+                </div>
+                <p className={styles.escenarioExample}>Las agencias crean plantillas personalizadas para cada cliente, con branding consistente en todas las campañas y canales.</p>
+                <p className={styles.escenarioTip}>Documenta las especificaciones de OG image en el manual de marca de cada cliente para su reutilización.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className={styles.eduSection}>
+            <h3>Preguntas frecuentes</h3>
+            <div className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <h4>¿Qué es una OG image y por qué importa?</h4>
+                <p>Una OG image (Open Graph image) es la imagen que aparece cuando alguien comparte una URL en redes sociales o aplicaciones de mensajería. Sin ella, la plataforma elige cualquier imagen de tu página o muestra un preview vacío, reduciendo drásticamente el CTR.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Cuál es el tamaño universal recomendado?</h4>
+                <p><strong>1200 × 630 px</strong> (ratio 1.91:1) es el estándar que funciona correctamente en Facebook, LinkedIn, Twitter/X, WhatsApp, Slack y Discord sin recortes significativos.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Cómo compruebo cómo se verá mi OG image antes de publicar?</h4>
+                <p>Usa el <strong>Facebook Sharing Debugger</strong> (developers.facebook.com/tools/debug) y el <strong>Twitter Card Validator</strong> (cards-dev.twitter.com/validator). Ambos muestran exactamente cómo quedará el preview en sus plataformas.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Cada página debe tener su propia OG image?</h4>
+                <p>Idealmente sí. Una OG image específica para cada página (especialmente artículos, productos y landing pages) aumenta el CTR porque el contenido visual es relevante para ese enlace concreto. La imagen genérica de la home no transmite contexto.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Las OG images afectan al SEO?</h4>
+                <p>No directamente, ya que Google no indexa la meta <code>og:image</code> para el ranking. Sin embargo, <strong>sí afectan indirectamente</strong>: una buena OG image aumenta el CTR en redes sociales, genera más tráfico y señales de engagement que Google sí valora.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Con qué frecuencia actualiza la caché LinkedIn y Facebook?</h4>
+                <p>Facebook cachea las OG images entre <strong>24 y 30 días</strong>. LinkedIn puede tardar hasta <strong>7 días</strong> en refrescar automáticamente. Si cambias la imagen, usa el Facebook Debugger (botón "Scrape Again") para forzar la actualización inmediata.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Puedo usar la misma OG image para Twitter y LinkedIn?</h4>
+                <p>Sí, el tamaño 1200 × 630 px es compatible con ambas plataformas. Solo necesitarías imágenes distintas si Twitter usa el formato cuadrado (<code>twitter:card=summary</code>), pero con <code>summary_large_image</code> el mismo archivo funciona en las dos redes.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>¿Qué pasa si no tengo OG image configurada?</h4>
+                <p>La plataforma intentará extraer automáticamente la primera imagen que encuentre en tu página. El resultado suele ser impredecible: logos pequeños, imágenes de iconos o previews en blanco. Esto reduce la credibilidad y el CTR de tus enlaces compartidos.</p>
+                <p className={styles.faqTip}>Configura siempre al menos una OG image por defecto a nivel de dominio como fallback.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Guía paso a paso */}
+          <section className={styles.eduSection}>
+            <h3>Guía paso a paso: crear e implementar tu OG image</h3>
+            <div className={styles.stepGuide}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <h4>Definir dimensiones</h4>
+                  <p>Usa <strong>1200 × 630 px</strong> como base universal. Este tamaño garantiza compatibilidad con todas las plataformas principales sin recortes.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <h4>Crear el diseño con branding</h4>
+                  <p>Incorpora el logo, los colores corporativos y la tipografía de marca. La imagen debe ser reconocible al instante como parte de tu identidad visual.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <h4>Añadir título y descripción legibles</h4>
+                  <p>El texto principal debe ser legible a distancia. Usa un tamaño mínimo de 40 px para el título y asegúrate de que haya suficiente contraste con el fondo.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepContent}>
+                  <h4>Exportar en el formato correcto</h4>
+                  <p>Exporta en <strong>JPG con calidad 85%</strong> para fotos (menor peso) o <strong>PNG</strong> para diseños con transparencia o iconos nítidos. El objetivo es mantener el archivo por debajo de 300 KB.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>5</div>
+                <div className={styles.stepContent}>
+                  <h4>Subir al servidor o CDN</h4>
+                  <p>Aloja la imagen en una URL pública y permanente. Si usas una CDN, asegúrate de que la imagen sea accesible sin autenticación para que los scrapers de redes sociales puedan leerla.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>6</div>
+                <div className={styles.stepContent}>
+                  <h4>Añadir las meta tags en el <code>&lt;head&gt;</code></h4>
+                  <p>Incluye <code>og:image</code>, <code>og:image:width</code>, <code>og:image:height</code> y también <code>twitter:image</code> para cobertura completa en todas las plataformas.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>7</div>
+                <div className={styles.stepContent}>
+                  <h4>Validar con las herramientas oficiales</h4>
+                  <p>Comprueba el resultado con <strong>Facebook Sharing Debugger</strong> y <strong>Twitter Card Validator</strong> antes de publicar o compartir el enlace.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Mejores prácticas */}
+          <section className={styles.eduSection}>
+            <h3>Mejores prácticas de diseño</h3>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📐</span>
+                <h4>Tamaño estándar universal</h4>
+                <p>Usa siempre <strong>1200 × 630 px</strong> como base. Es el único tamaño que funciona correctamente en todas las plataformas principales sin ajustes adicionales.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>⚖️</span>
+                <h4>Peso máximo del archivo</h4>
+                <p>Mantén el archivo por debajo de <strong>1 MB</strong> (idealmente menos de 300 KB). Archivos pesados ralentizan la carga del preview y pueden ser rechazados por algunas plataformas.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🔤</span>
+                <h4>Texto grande y legible</h4>
+                <p>El título debe tener <strong>mínimo 40 px</strong> de tamaño. Recuerda que el preview en móvil es pequeño: lo que parece legible en pantalla grande puede ser ilegible en el feed.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🏷️</span>
+                <h4>Logo en esquina</h4>
+                <p>Incluye siempre el logo en una esquina visible (preferiblemente superior izquierda o inferior derecha). Refuerza el reconocimiento de marca incluso cuando el usuario no hace clic.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🎨</span>
+                <h4>Contraste suficiente</h4>
+                <p>Asegúrate de que el fondo y el texto tengan un ratio de contraste mínimo de 4.5:1. Fondos oscuros con texto blanco o fondos claros con texto oscuro son las combinaciones más seguras.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🔗</span>
+                <h4>Misma imagen para og:image y twitter:image</h4>
+                <p>Salvo que uses formatos distintos (cuadrado para Twitter), reutiliza la misma imagen 1200 × 630 px en ambas meta tags para simplificar el mantenimiento.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Warning Box */}
+          <section className={styles.eduSection}>
+            <div className={styles.warningBox}>
+              <div className={styles.warningHeader}>
+                <span className={styles.warningIcon}>⚠️</span>
+                <h4>Errores comunes que debes evitar</h4>
+              </div>
+              <ul className={styles.warningList}>
+                <li><strong>No añadir las meta tags <code>og:image</code> en el HTML</strong>: La imagen no aparecerá aunque esté subida al servidor. Las meta tags son obligatorias.</li>
+                <li><strong>Usar imágenes menores de 600 × 315 px</strong>: Se expandirán con baja calidad y pixelación visible en previews de alta resolución.</li>
+                <li><strong>Poner demasiado texto pequeño</strong>: Ilegible en el preview comprimido de cualquier red social. Menos texto, más grande, mayor impacto.</li>
+                <li><strong>Olvidar limpiar la caché en Facebook Debugger</strong>: Tras cambiar la imagen, debes forzar el re-scraping o el preview antiguo seguirá apareciendo durante semanas.</li>
+                <li><strong>Usar PNG con transparencia</strong>: Algunos contextos (especialmente modo oscuro en ciertas apps) rellenan el fondo transparente con negro, arruinando el diseño.</li>
+                <li><strong>No personalizar la OG image por página</strong>: Usar siempre la misma imagen genérica transmite falta de cuidado y reduce el CTR de todos tus enlaces.</li>
+              </ul>
+            </div>
+          </section>
         </div>
       </EducationalSection>
 

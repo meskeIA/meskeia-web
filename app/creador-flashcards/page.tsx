@@ -785,6 +785,316 @@ export default function CreadorFlashcardsPage() {
             </div>
           </div>
         </section>
+
+        {/* Sección 1: Tabla Comparativa de Técnicas de Estudio */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de Técnicas de Estudio</h2>
+          <p className={styles.introParagraph}>
+            No todas las técnicas de estudio son igual de eficaces. La evidencia científica muestra
+            diferencias significativas en la retención a largo plazo según el método utilizado.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Técnica</th>
+                  <th>Eficacia científica</th>
+                  <th>Preparación</th>
+                  <th>Repaso</th>
+                  <th>Ideal para</th>
+                  <th>Retención largo plazo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Flashcards + repetición espaciada</strong></td>
+                  <td>⭐⭐⭐⭐⭐ Muy alta</td>
+                  <td>Media (30-60 min)</td>
+                  <td>Baja (15-20 min/día)</td>
+                  <td>Vocabulario, conceptos, datos</td>
+                  <td>85-95% al mes</td>
+                </tr>
+                <tr>
+                  <td>Mapas mentales</td>
+                  <td>⭐⭐⭐⭐ Alta</td>
+                  <td>Alta (60-90 min)</td>
+                  <td>Media (30 min)</td>
+                  <td>Conceptos interconectados</td>
+                  <td>70-80% al mes</td>
+                </tr>
+                <tr>
+                  <td>Resúmenes propios</td>
+                  <td>⭐⭐⭐ Media</td>
+                  <td>Alta (45-90 min)</td>
+                  <td>Alta (releer todo)</td>
+                  <td>Comprensión global</td>
+                  <td>50-65% al mes</td>
+                </tr>
+                <tr>
+                  <td>Subrayado</td>
+                  <td>⭐⭐ Baja</td>
+                  <td>Baja (10-15 min)</td>
+                  <td>Alta (releer)</td>
+                  <td>Primera lectura</td>
+                  <td>30-45% al mes</td>
+                </tr>
+                <tr>
+                  <td>Relectura</td>
+                  <td>⭐ Muy baja</td>
+                  <td>Ninguna</td>
+                  <td>Muy alta</td>
+                  <td>Familiarización inicial</td>
+                  <td>20-30% al mes</td>
+                </tr>
+                <tr>
+                  <td>Método Pomodoro</td>
+                  <td>⭐⭐⭐ Media</td>
+                  <td>Ninguna</td>
+                  <td>Variable</td>
+                  <td>Gestión del tiempo</td>
+                  <td>Depende del método combinado</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Sección 2: Casos de Uso */}
+        <section className={styles.guideSection}>
+          <h2>¿Quién usa flashcards y para qué?</h2>
+          <p className={styles.introParagraph}>
+            Las flashcards son una herramienta versátil que se adapta a perfiles de estudio muy distintos.
+            Aquí algunos ejemplos reales de uso eficaz.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>⚖️</span>
+                <h4>Opositor</h4>
+              </div>
+              <p>Memoriza conceptos legales, artículos de ley, procedimientos administrativos y temarios extensos de acceso a la función pública.</p>
+              <p className={styles.escenarioExample}><strong>Ejemplo:</strong> «Artículo 47 CE» → «Derecho a una vivienda digna y adecuada»</p>
+              <p className={styles.escenarioTip}>Crea un mazo por tema del temario y repasa 20 tarjetas cada mañana.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🌍</span>
+                <h4>Aprendiz de idiomas</h4>
+              </div>
+              <p>Amplía vocabulario, estudia conjugaciones verbales, aprende expresiones idiomáticas y reglas gramaticales de cualquier idioma.</p>
+              <p className={styles.escenarioExample}><strong>Ejemplo:</strong> «to procrastinate» → «postergar, dejar para después»</p>
+              <p className={styles.escenarioTip}>Añade 10 palabras nuevas al día y repasa las anteriores antes de dormir.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🩺</span>
+                <h4>Estudiante universitario</h4>
+              </div>
+              <p>Domina la terminología médica, jurídica o científica de carreras con alta carga memorística como Medicina, Derecho o Farmacia.</p>
+              <p className={styles.escenarioExample}><strong>Ejemplo:</strong> «Hipertensión arterial» → «PA sistólica ≥ 140 mmHg o diastólica ≥ 90 mmHg»</p>
+              <p className={styles.escenarioTip}>Combina flashcards con esquemas para preparar exámenes tipo test.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💼</span>
+                <h4>Profesional en formación</h4>
+              </div>
+              <p>Aprende terminología técnica de nuevas áreas, acrónimos del sector, protocolos de empresa o conceptos de certificaciones profesionales.</p>
+              <p className={styles.escenarioExample}><strong>Ejemplo:</strong> «KPI» → «Key Performance Indicator — indicador clave de rendimiento»</p>
+              <p className={styles.escenarioTip}>Dedica 10 minutos durante el desplazamiento al trabajo para repasar.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 3: FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre flashcards</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es la repetición espaciada y por qué funciona?</h4>
+              <p>
+                La repetición espaciada es una técnica que consiste en revisar la información en intervalos crecientes
+                justo antes de que la olvides. Se basa en la curva del olvido de Ebbinghaus (1885): sin repaso,
+                olvidamos el 70% de lo aprendido en 24 horas. Al repasar en el momento óptimo, el cerebro consolida
+                la información en la memoria a largo plazo de forma mucho más eficiente que la relectura repetida.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuántas flashcards debo estudiar al día?</h4>
+              <p>
+                Para principiantes, entre 15 y 30 tarjetas al día es un ritmo sostenible. Lo más importante es la
+                constancia: es mejor 20 tarjetas cada día que 200 tarjetas el fin de semana. A medida que tu colección
+                crezca, el sistema de repetición espaciada distribuirá los repasos automáticamente para que no te
+                sobrepases.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Es mejor crear tus propias flashcards o usar las de otros?</h4>
+              <p>
+                Crear las tuyas propias es significativamente más efectivo. El proceso de formular la pregunta y
+                escribir la respuesta ya es en sí mismo un acto de aprendizaje (efecto de generación). Las tarjetas
+                propias además están redactadas en tu vocabulario y conectadas a tus experiencias, lo que facilita
+                la recuperación posterior.
+              </p>
+              <p className={styles.faqTip}>Si usas tarjetas de otros, edítalas para adaptarlas a tu lenguaje.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuánto texto debe tener cada flashcard?</h4>
+              <p>
+                Lo mínimo posible. La regla general es: una pregunta concreta en el frente, una respuesta de 1 a 3
+                frases en el reverso. Si necesitas más texto, divide la tarjeta en dos. Tarjetas largas son difíciles
+                de recordar y desmotivan el repaso.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Las imágenes mejoran la memorización en flashcards?</h4>
+              <p>
+                Sí. El principio de codificación dual de Paivio indica que la información procesada tanto visualmente
+                como verbalmente se recuerda mejor. Si puedes añadir un diagrama, una fotografía o incluso un dibujo
+                esquemático al frente de la tarjeta, la retención mejora notablemente, especialmente para conceptos
+                espaciales o procesos.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuándo debo repasar una flashcard «difícil»?</h4>
+              <p>
+                En sistemas de repetición espaciada, las tarjetas marcadas como «difícil» se programan para revisarse
+                al día siguiente o en pocas horas. Las marcadas como «fácil» pueden esperar varios días o semanas.
+                Si no usas un sistema automatizado, repasa manualmente las tarjetas difíciles al menos cada 1-2 días
+                hasta dominarlas.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Es mejor estudiar en papel o en digital?</h4>
+              <p>
+                Ambos formatos son eficaces. El papel favorece la escritura a mano (que mejora la codificación) y
+                elimina las distracciones digitales. El formato digital permite mayor volumen de tarjetas, búsqueda
+                rápida, copias de seguridad y estudio en cualquier lugar desde el móvil. Para la mayoría de los
+                estudiantes, lo digital resulta más práctico a largo plazo.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo organizo las flashcards por materia?</h4>
+              <p>
+                Crea un mazo por asignatura o tema principal. Dentro de cada mazo, puedes añadir el contexto en la
+                propia tarjeta (ej: «[Farmacología] Mecanismo de acción del ibuprofeno»). Evita mezclar materias muy
+                distintas en el mismo mazo: la interferencia entre temas puede dificultar la recuperación. Un mazo
+                bien delimitado de 50-150 tarjetas es más manejable que uno de 500.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 4: Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo crear flashcards efectivas: guía paso a paso</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Identifica el concepto clave (1 idea por tarjeta)</h4>
+                <p>Antes de crear una tarjeta, pregúntate: ¿qué es exactamente lo que quiero recordar? Si el concepto tiene varias partes, divide en múltiples tarjetas. Una tarjeta bien enfocada es más efectiva que una tarjeta completa.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Formula una pregunta clara y concreta</h4>
+                <p>El frente de la tarjeta debe ser una pregunta que tenga una respuesta precisa y verificable. Evita preguntas ambiguas como «¿Qué es la fotosíntesis?» y prefiere «¿Cuál es la ecuación global de la fotosíntesis?»</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Escribe la respuesta breve (1-3 frases máximo)</h4>
+                <p>El reverso debe responder directamente a la pregunta del frente. Si necesitas más de 3 frases para responder, es señal de que la tarjeta cubre demasiado contenido y debes dividirla.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Añade imagen o ejemplo si ayuda</h4>
+                <p>Para conceptos abstractos, incluir un ejemplo concreto en el reverso mejora enormemente la memorización. Los ejemplos conectan la teoría con situaciones reales y facilitan la recuperación posterior.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Organiza por categorías y temas</h4>
+                <p>Agrupa las tarjetas en mazos temáticos. Una buena organización permite sesiones de estudio enfocadas, facilita identificar las áreas más débiles y hace más manejable el volumen total de tarjetas.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Establece sesiones de repaso diarias (15-20 min)</h4>
+                <p>La constancia es más importante que la duración. Sesiones cortas y frecuentes son mucho más efectivas que maratones de estudio ocasionales. Elige un momento fijo del día para repasar tus tarjetas.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Usa sistema de calificación (fácil/difícil) para repetición espaciada</h4>
+                <p>Al repasar, clasifica cada tarjeta según tu dificultad. Las tarjetas fáciles las revisarás con menos frecuencia; las difíciles, más a menudo. Este mecanismo de retroalimentación es el núcleo de la repetición espaciada.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 5: Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas para maximizar tu aprendizaje</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <h4>Una sola idea por tarjeta (regla de oro)</h4>
+              <p>La regla más importante del método flashcard. Cada tarjeta debe cubrir exactamente un concepto, un dato o una relación. Si intentas meter más, la tarjeta se vuelve difícil de responder y la memorización falla.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>❓</span>
+              <h4>Preguntas activas, no definiciones pasivas</h4>
+              <p>En lugar de «Fotosíntesis: proceso por el cual...», escribe «¿Qué proceso usan las plantas para convertir luz en energía?». La formulación activa obliga al cerebro a recuperar la información, no solo a reconocerla.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📈</span>
+              <h4>Repasar justo antes de olvidar (curva de Ebbinghaus)</h4>
+              <p>El momento óptimo de repaso es justo antes de que empieces a olvidar la información. Repasar demasiado pronto desperdicia tiempo; repasar demasiado tarde obliga a reaprender desde cero.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✍️</span>
+              <h4>Crear las tarjetas tú mismo (el proceso enseña)</h4>
+              <p>El acto de formular una pregunta, sintetizar la respuesta y escribirla ya es aprendizaje activo. Cuando creas tus propias tarjetas, procesas la información con más profundidad que al releer un apunte.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⏱️</span>
+              <h4>Sesiones cortas y frecuentes mejor que largas y espaciadas</h4>
+              <p>20 minutos al día durante 7 días es mucho más eficaz que 2 horas y media el domingo. La distribución temporal del aprendizaje (efecto de espaciado) es uno de los hallazgos más sólidos de la psicología cognitiva.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <h4>Revisar las tarjetas «difíciles» más a menudo</h4>
+              <p>No todas las tarjetas son igual de difíciles. Presta atención especial a las que te cuestan más: son las que necesitan más repeticiones para consolidarse. No pases página sin haber respondido correctamente.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección 6: Warning Box — Errores comunes */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Errores frecuentes que reducen la efectividad</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>Poner demasiada información en una sola tarjeta — la sobrecarga cognitiva impide la memorización eficiente.</li>
+              <li>Estudiar siempre en el mismo orden — el cerebro memoriza la secuencia, no el contenido. Mezcla las tarjetas antes de cada sesión.</li>
+              <li>No repasar hasta el día del examen — la repetición espaciada requiere semanas o meses, no horas de preparación.</li>
+              <li>Usar solo definiciones sin aplicación práctica — añade ejemplos y contextos reales para anclar los conceptos.</li>
+              <li>Crear demasiadas tarjetas sin repasar las anteriores — acumular tarjetas sin repasar genera estrés y no produce aprendizaje.</li>
+              <li>Confundir reconocimiento con recuerdo activo — sentir que «reconoces» la respuesta al verla no significa que podrás recuperarla en un examen.</li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps

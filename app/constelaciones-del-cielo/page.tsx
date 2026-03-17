@@ -549,6 +549,275 @@ export default function ConstelacionesDelCieloPage() {
             </div>
           </div>
         </section>
+
+        {/* ── SECCIONES v2.0 ── */}
+
+        {/* 1. Tabla Comparativa */}
+        <section>
+          <h3>🌟 Constelaciones Principales Visibles desde España</h3>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Constelación</th>
+                  <th>Mejor mes</th>
+                  <th>Estrella más brillante</th>
+                  <th>Hemisferio</th>
+                  <th>Dificultad (1-5)</th>
+                  <th>Mitología principal</th>
+                  <th>Objeto Messier destacado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Orión</strong></td>
+                  <td>Enero</td>
+                  <td>Rigel (0,13)</td>
+                  <td>Ecuatorial</td>
+                  <td>1 — Muy fácil</td>
+                  <td>Cazador gigante de la mitología griega</td>
+                  <td>M42 — Nebulosa de Orión</td>
+                </tr>
+                <tr>
+                  <td><strong>Osa Mayor</strong></td>
+                  <td>Abril</td>
+                  <td>Alioth (1,76)</td>
+                  <td>Norte</td>
+                  <td>1 — Muy fácil</td>
+                  <td>Calisto transformada en osa por Zeus</td>
+                  <td>M81/M82 — Galaxias de Bode</td>
+                </tr>
+                <tr>
+                  <td><strong>Casiopea</strong></td>
+                  <td>Noviembre</td>
+                  <td>Schedar (2,24)</td>
+                  <td>Norte</td>
+                  <td>1 — Muy fácil</td>
+                  <td>Reina etíope vanidosa castigada por Poseidón</td>
+                  <td>M52 — Cúmulo abierto</td>
+                </tr>
+                <tr>
+                  <td><strong>Escorpio</strong></td>
+                  <td>Julio</td>
+                  <td>Antares (1,06)</td>
+                  <td>Sur</td>
+                  <td>2 — Fácil</td>
+                  <td>Escorpión enviado por Gea para matar a Orión</td>
+                  <td>M6/M7 — Cúmulos de la Mariposa</td>
+                </tr>
+                <tr>
+                  <td><strong>Leo</strong></td>
+                  <td>Abril</td>
+                  <td>Régulo (1,35)</td>
+                  <td>Norte/Ecuatorial</td>
+                  <td>2 — Fácil</td>
+                  <td>León de Nemea vencido por Hércules</td>
+                  <td>M65/M66 — Galaxias del Trío de Leo</td>
+                </tr>
+                <tr>
+                  <td><strong>Centauro / Cruz del Sur</strong></td>
+                  <td>Mayo</td>
+                  <td>Alfa Centauri (-0,27)</td>
+                  <td>Sur</td>
+                  <td>3 — Moderado (baja en el horizonte)</td>
+                  <td>Quirón, sabio centauro tutor de héroes</td>
+                  <td>Omega Centauri (NGC 5139)</td>
+                </tr>
+                <tr>
+                  <td><strong>Virgo</strong></td>
+                  <td>Mayo</td>
+                  <td>Spica (0,97)</td>
+                  <td>Ecuatorial</td>
+                  <td>3 — Moderado</td>
+                  <td>Deméter, diosa de la cosecha</td>
+                  <td>M87 — Galaxia con agujero negro fotografiado</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* 2. Casos de Uso */}
+        <section>
+          <h3>🎯 ¿Quién Usa esta Herramienta y Para Qué?</h3>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcon}>🔭</span>
+              <div className={styles.escenarioHeader}>Astrónomo aficionado</div>
+              <p className={styles.escenarioExample}>Aprendiendo a orientarse en el cielo nocturno por primera vez, identificando las constelaciones circumpolares visibles todo el año desde su localidad.</p>
+              <p className={styles.escenarioTip}>Empieza con la Osa Mayor y Casiopea: son circum­polares desde España y visibles cualquier noche despejada.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcon}>👩‍🏫</span>
+              <div className={styles.escenarioHeader}>Profesor de ciencias</div>
+              <p className={styles.escenarioExample}>Preparando una actividad práctica de astronomía para alumnos de secundaria, con fichas de cada constelación, su mitología y estrellas principales.</p>
+              <p className={styles.escenarioTip}>Combina la tabla de magnitudes con la sección mitológica: aprenden astronomía y cultura clásica al mismo tiempo.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcon}>🧭</span>
+              <div className={styles.escenarioHeader}>Senderista o navegante</div>
+              <p className={styles.escenarioExample}>Usando las estrellas como referencia de orientación en rutas nocturnas o en travesías marítimas sin GPS disponible.</p>
+              <p className={styles.escenarioTip}>La Estrella Polar (Polaris) indica el norte con precisión de menos de 1°. Localízala desde la Osa Mayor en menos de 30 segundos.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <span className={styles.escenarioIcon}>📷</span>
+              <div className={styles.escenarioHeader}>Fotógrafo de astrofotografía</div>
+              <p className={styles.escenarioExample}>Buscando composiciones para fotografiar el cielo nocturno: identificar qué constelaciones estarán visibles en su ventana de disparo y qué objetos Messier contienen.</p>
+              <p className={styles.escenarioTip}>Orión en invierno y el Escorpión en verano ofrecen las nebulosas más fotogénicas desde España con equipos de entrada.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. FAQ */}
+        <section>
+          <h3>❓ Preguntas Frecuentes: Observación de Constelaciones</h3>
+          <div className={styles.faqList}>
+            <details className={styles.faqItem}>
+              <summary>¿Cuántas constelaciones hay reconocidas oficialmente?</summary>
+              <p>La Unión Astronómica Internacional (UAI) reconoce exactamente <strong>88 constelaciones</strong> desde 1930. Cubren la totalidad del cielo: desde el polo norte celeste hasta el polo sur, sin dejar ninguna zona sin asignar. Sus límites son líneas rectas en coordenadas ecuatoriales de la época 1875.</p>
+              <p className={styles.faqTip}>Dato curioso: de las 88, solo 48 vienen de la antigüedad grecolatina. Las otras 40 fueron añadidas en los siglos XVII y XVIII por astrónomos europeos para cartografiar el cielo austral.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Por qué las constelaciones cambian según la estación?</summary>
+              <p>La Tierra orbita alrededor del Sol, por lo que la zona de cielo nocturno que «miramos» cambia mes a mes. En invierno, la Tierra queda orientada hacia Orión; en verano, hacia el Escorpión. Las <strong>constelaciones circumpolares</strong> (como la Osa Mayor desde España) son visibles todo el año porque están cerca del polo celeste.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Cómo encuentro la Estrella Polar desde España?</summary>
+              <p>Localiza las dos estrellas del borde del «cazo» de la Osa Mayor (Dubhe y Merak, las más alejadas del mango). Traza una línea recta desde Merak pasando por Dubhe y prolóngala unas <strong>5 veces esa distancia</strong>: llegarás a Polaris, la Estrella Polar, que siempre indica el norte geográfico con menos de 1° de error.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Qué diferencia hay entre constelación y asterismo?</summary>
+              <p>Una <strong>constelación</strong> es una de las 88 regiones oficiales del cielo definidas por la UAI, con límites precisos. Un <strong>asterismo</strong> es un patrón de estrellas reconocible pero no oficial: el Cinturón de Orión (3 estrellas), el Carro (parte de la Osa Mayor) o las Pléyades son asterismos. Todo asterismo está dentro de una o varias constelaciones.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Las constelaciones se ven igual desde todo el mundo?</summary>
+              <p>No exactamente. La forma de las constelaciones es la misma desde cualquier punto de la Tierra, pero <strong>la visibilidad cambia con la latitud</strong>. Desde España (40°N) ves bien todas las constelaciones boreales y parte de las australes. La Cruz del Sur, perfectamente visible en Argentina o Australia, apenas asoma por el horizonte desde el sur de España en mayo.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Qué es la eclíptica y las constelaciones del zodíaco?</summary>
+              <p>La <strong>eclíptica</strong> es el camino aparente que el Sol traza en el cielo a lo largo del año. Las constelaciones por las que pasa esta línea son las <strong>zodiacales</strong>: actualmente son 13 (incluyendo Ofiuco, ignorado por la astrología tradicional). Cada mes el Sol aparece proyectado sobre una de ellas, lo que en la antigüedad dio origen al calendario y a los signos astrológicos.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Cuál es la constelación más grande del cielo?</summary>
+              <p><strong>Hydra (La Hidra)</strong> es la constelación más extensa con 1.303 grados cuadrados, ocupando el 3,16% del cielo total. Se extiende unos 100° en longitud. Sin embargo, a pesar de su gran tamaño, no contiene ninguna estrella especialmente brillante, lo que la hace difícil de reconocer. La más pequeña es Crux (Cruz del Sur) con solo 68 grados cuadrados.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Qué necesito para observar constelaciones?</summary>
+              <p>¡Nada especial! Las constelaciones se observan <strong>a simple vista</strong>. Lo que necesitas es: alejarte de la contaminación lumínica (al menos 20-30 km de ciudad), esperar 20 minutos para adaptar la vista a la oscuridad, y una noche despejada sin luna llena. Los prismáticos 7×50 o 10×50 son un complemento excelente para ver cúmulos y nebulosas dentro de las constelaciones.</p>
+            </details>
+          </div>
+        </section>
+
+        {/* 4. Guía Paso a Paso */}
+        <section>
+          <h3>📋 Cómo Preparar tu Primera Sesión de Observación</h3>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Aléjate de la contaminación lumínica</strong>
+                <p>Desplázate al menos 20-30 km de un núcleo urbano. Usa mapas de contaminación lumínica (lightpollutionmap.info) para encontrar zonas con cielo oscuro cerca de tu ubicación. La diferencia entre ver 200 estrellas y 3.000 está en la oscuridad del lugar.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Espera 20-30 minutos para adaptar la vista a la oscuridad</strong>
+                <p>La rodopsina, el pigmento que permite la visión nocturna, tarda hasta 30 minutos en alcanzar su máxima sensibilidad. Evita cualquier luz blanca durante este período. Si necesitas iluminación, usa una linterna con filtro rojo.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Identifica los puntos cardinales</strong>
+                <p>Usa la brújula del móvil (en modo avión para no arruinar la adaptación) o consulta previamente la orientación del lugar. Saber dónde está el norte te permite ubicar correctamente las constelaciones en el cielo según los mapas estelares.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Localiza constelaciones circumpolares (visibles todo el año)</strong>
+                <p>Desde España, la Osa Mayor, Osa Menor, Casiopea, Cefeo y el Dragón son circum­polares: nunca se ponen bajo el horizonte. Son tu referencia permanente en el cielo norte y los mejores puntos de partida para orientarte.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Usa la Osa Mayor para encontrar la Estrella Polar</strong>
+                <p>Las dos estrellas del borde del cazo (Dubhe y Merak) apuntan hacia Polaris. Una vez localizada, tienes el norte exacto. Desde la Polar puedes trazar líneas hacia otras constelaciones: Casiopea está al otro lado, a la misma distancia.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Identifica constelaciones estacionales</strong>
+                <p>Según el mes, busca las constelaciones de temporada: Orión en invierno (enero), Leo en primavera (abril), el Triángulo de Verano (Vega, Deneb, Altair) en julio-agosto, y el Cuadrado de Pegaso en otoño (octubre).</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Usa una app o carta estelar para guiarte</strong>
+                <p>Stellarium Mobile, SkySafari o Star Walk muestran las constelaciones en tiempo real apuntando con el teléfono. Activa el modo nocturno (pantalla roja) para no perder la adaptación a la oscuridad. Una carta estelar impresa es la alternativa sin pantalla.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. Mejores Prácticas */}
+        <section>
+          <h3>💡 Mejores Prácticas para Observar el Cielo Nocturno</h3>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔴</span>
+              <h4>Luz roja para preservar la visión nocturna</h4>
+              <p>La luz roja (longitud de onda larga) no activa los conos ni destruye la rodopsina. Usa una linterna con filtro rojo o cinta roja sobre la frontal. Nunca uses luz blanca ni mires el móvil en brillo normal durante la sesión.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🌑</span>
+              <h4>Noches sin luna para mayor visibilidad</h4>
+              <p>La Luna llena puede iluminar el cielo tanto como el crepúsculo, ocultando estrellas débiles y la Vía Láctea. Planifica tus sesiones en los 5-7 días alrededor de la luna nueva para maximizar el número de estrellas visibles.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏙️</span>
+              <h4>Alejarse al menos 30 km del núcleo urbano</h4>
+              <p>La contaminación lumínica cae de forma exponencial con la distancia. A 30 km de una ciudad media española ya puedes ver la Vía Láctea. A 60-80 km, el cielo se vuelve verdaderamente oscuro con magnitudes límite de 6,5 a simple vista.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🛌</span>
+              <h4>Tumbarse en el suelo mirando al cielo</h4>
+              <p>Observar de pie con el cuello hacia atrás es incómodo y cansa en minutos. Usa una esterilla, silla reclinable o tumbona para mantener la cabeza hacia arriba. La comodidad alarga la sesión y mejora la concentración en el cielo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔭</span>
+              <h4>Binoculares antes que telescopio para aprender</h4>
+              <p>Un telescopio magnifica tanto que solo ves una pequeña porción del cielo, perdiendo el contexto. Los prismáticos 7×50 o 10×50 revelan cúmulos estelares, las Pléyades con detalle y la Vía Láctea resuelta en estrellas, manteniendo el campo visual necesario para aprender.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>❄️</span>
+              <h4>El invierno ofrece el cielo más claro y oscuro</h4>
+              <p>Las noches de invierno son más largas, el aire frío y seco produce menos turbulencias atmosféricas («seeing» excelente) y la Vía Láctea no está de frente. Orión, Géminis, Tauro y el Can Mayor son espectaculares de diciembre a febrero. Abrígate bien: el frío nocturno es mayor de lo esperado.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 6. Warning Box v2.0 */}
+        <section>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <strong>6 errores que arruinan la observación de constelaciones</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li><strong>Mirar el móvil en modo brillante</strong>: Destruye instantáneamente la adaptación a la oscuridad que has tardado 20-30 minutos en conseguir. Activa siempre el modo nocturno (pantalla roja) o pon el brillo al mínimo.</li>
+              <li><strong>Confiar en que hay poca contaminación lumínica sin verificarlo</strong>: Lo que parece «campo» a la vista puede tener un índice Bortle 5-6 por ciudades cercanas. Verifica siempre en lightpollutionmap.info antes de desplazarte.</li>
+              <li><strong>Ir sin ropa de abrigo suficiente</strong>: El frío nocturno bajo cielos despejados es mucho mayor de lo esperado. El cielo despejado irradia calor hacia el espacio: aunque de día hiciera 15°C, a medianoche en campo abierto puedes tener 2-4°C.</li>
+              <li><strong>No verificar el pronóstico meteorológico y la fase lunar</strong>: Nubes o luna llena arruinan completamente la sesión. Consulta la cobertura nubosa horaria (Meteoblue es excelente) y el calendario lunar con antelación.</li>
+              <li><strong>Confundir planetas brillantes con estrellas</strong>: Venus, Júpiter o Marte pueden ser los objetos más brillantes del cielo nocturno. La diferencia: los planetas brillan con luz estable (no parpadean) y se mueven respecto a las estrellas de fondo a lo largo de los días.</li>
+              <li><strong>Intentar ver «todos los objetos» la primera vez</strong>: La sobrecarga de información frustra a los principiantes. Empieza solo con 3-4 constelaciones sencillas (Osa Mayor, Orión, Casiopea, Cruz del Sur si va al sur) y domínalas antes de ampliar.</li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('constelaciones-del-cielo')} />

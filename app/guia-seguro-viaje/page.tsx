@@ -504,6 +504,334 @@ export default function GuiaSeguroViaje() {
               <li><strong>MAEC:</strong> Ministerio de Asuntos Exteriores. Publica alertas y recomendaciones de viaje por países.</li>
             </ul>
           </section>
+
+          {/* ── Tabla comparativa de coberturas ── */}
+          <section>
+            <h2>Tabla comparativa de coberturas principales</h2>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Cobertura</th>
+                    <th>Qué cubre</th>
+                    <th>Límite póliza básica</th>
+                    <th>Cuándo es imprescindible</th>
+                    <th>Excluido habitualmente</th>
+                    <th>Coste añadido aprox.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Cancelación del viaje</strong></td>
+                    <td>Reembolso de gastos no recuperables si cancelas por causas cubiertas</td>
+                    <td>Hasta el coste total del viaje</td>
+                    <td>Viajes caros, destinos de riesgo, estancias largas</td>
+                    <td>Cancelación por miedo, cambios laborales voluntarios, pandemias declaradas</td>
+                    <td>+15–30 € por viaje</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Asistencia médica en viaje</strong></td>
+                    <td>Hospitalización, urgencias, cirugía y medicación en el destino</td>
+                    <td>30.000–50.000 €</td>
+                    <td>Viajes fuera de la UE, especialmente EE.UU., Canadá o Japón</td>
+                    <td>Enfermedades preexistentes no declaradas, tratamientos estéticos</td>
+                    <td>Incluida en la mayoría de pólizas básicas</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Equipaje y pertenencias</strong></td>
+                    <td>Pérdida, robo o daño del equipaje facturado y objetos personales</td>
+                    <td>600–1.500 €</td>
+                    <td>Viajes largos, equipamiento tecnológico o deportivo valioso</td>
+                    <td>Dinero en efectivo, joyas, objetos dejados sin vigilancia</td>
+                    <td>+5–15 € por viaje</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Responsabilidad civil</strong></td>
+                    <td>Daños accidentales a terceras personas o propiedades durante el viaje</td>
+                    <td>150.000–300.000 €</td>
+                    <td>Deportes de riesgo, alquiler de vehículos, estancias largas</td>
+                    <td>Daños intencionados, actividades profesionales, vehículos propios</td>
+                    <td>+5–10 € por viaje</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Repatriación</strong></td>
+                    <td>Traslado médico en ambulancia aérea al país de origen en caso grave</td>
+                    <td>Sin límite habitual en pólizas completas</td>
+                    <td>Cualquier viaje fuera de la UE; muy recomendable en Europa también</td>
+                    <td>Traslados no médicamente necesarios, viajes de regreso normales</td>
+                    <td>Incluida en la mayoría de pólizas básicas</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Accidentes personales</strong></td>
+                    <td>Indemnización por muerte o invalidez permanente por accidente en viaje</td>
+                    <td>6.000–30.000 €</td>
+                    <td>Deportes de aventura, viajes de negocios frecuentes</td>
+                    <td>Enfermedades (no accidentes), autolesiones, actividades excluidas</td>
+                    <td>+5–20 € por viaje</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* ── Casos de uso ── */}
+          <section>
+            <h2>Casos de uso más habituales</h2>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧‍👦</span>
+                  <strong>Familia viajando a EE.UU. o Canadá</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Una visita hospitalaria de urgencias en Estados Unidos puede superar fácilmente los 10.000 $ por noche.
+                  Sin seguro médico, una familia puede quedar expuesta a deudas millonarias.
+                </p>
+                <p className={styles.escenarioTip}>
+                  Imprescindible: cobertura médica mínima de 500.000 € por persona, repatriación en avión medicalizado
+                  y asistencia 24h en español. No viajes a Norteamérica sin seguro completo.
+                </p>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎒</span>
+                  <strong>Mochilero con viaje largo de 3+ meses</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Un viaje de varios meses por Asia, América Latina u Oceanía combina múltiples destinos,
+                  actividades de aventura y riesgo de enfermedades tropicales.
+                </p>
+                <p className={styles.escenarioTip}>
+                  Busca pólizas específicas para backpackers con cobertura de actividades de aventura,
+                  enfermedades tropicales y posibilidad de ampliar el seguro sin volver a España.
+                </p>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
+                  <strong>Viajero de negocios con vuelos frecuentes</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  Viajes frecuentes a múltiples destinos con equipamiento tecnológico valioso (portátil,
+                  cámara, dispositivos) y agenda apretada donde cualquier retraso supone coste económico.
+                </p>
+                <p className={styles.escenarioTip}>
+                  Un seguro anual multiviaje resulta más económico. Prioriza cobertura de equipaje con
+                  sublímite alto para electrónica, asistencia jurídica y retrasos de vuelo con indemnización.
+                </p>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🇪🇺</span>
+                  <strong>Viajero europeo dentro de la UE</strong>
+                </div>
+                <p className={styles.escenarioExample}>
+                  La Tarjeta Sanitaria Europea (TSJE) cubre urgencias en la sanidad pública de cualquier
+                  país de la UE y el EEE, lo que reduce significativamente el riesgo médico básico.
+                </p>
+                <p className={styles.escenarioTip}>
+                  Con la TSJE, una póliza básica de cancelación y equipaje puede ser suficiente para
+                  turismo europeo estándar. Añade cobertura médica privada si buscas más comodidad o viajas con frecuencia.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* ── FAQ ── */}
+          <section>
+            <h2>Preguntas frecuentes sobre seguros de viaje</h2>
+            <dl className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <dt><strong>¿La Tarjeta Sanitaria Europea cubre todos los gastos médicos?</strong></dt>
+                <dd>
+                  No. La TSJE cubre únicamente la asistencia sanitaria pública de urgencias en países de la UE,
+                  EEE y Suiza. No cubre clínicas privadas, repatriación, países fuera de la UE ni cancelación
+                  del viaje. Es un complemento útil, pero no un sustituto del seguro de viaje.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt><strong>¿Qué seguro necesito para viajar a EE.UU.?</strong></dt>
+                <dd>
+                  Una cobertura médica mínima de 500.000 € por persona (recomendable superar esa cifra),
+                  repatriación en avión medicalizado y asistencia 24h. Los costes hospitalarios en EE.UU.
+                  pueden ser devastadores sin seguro: una noche en UCI puede superar los 50.000 $.
+                  <span className={styles.faqTip}>Algunas visas de EE.UU. exigen demostrar seguro médico suficiente.</span>
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt><strong>¿El seguro del banco o tarjeta de crédito cubre el viaje?</strong></dt>
+                <dd>
+                  Depende del tipo de tarjeta. Las tarjetas Gold y premium suelen incluir cobertura básica
+                  de accidentes y equipaje, pero los límites son bajos y las exclusiones, abundantes.
+                  Revisa las condiciones generales de tu tarjeta antes de asumir que estás cubierto.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt><strong>¿Qué pasa si tengo una enfermedad preexistente?</strong></dt>
+                <dd>
+                  Debes declararla al contratar el seguro. Si no lo haces y sufres una complicación
+                  relacionada con esa enfermedad, la aseguradora puede negarse a pagar. Muchas pólizas
+                  ofrecen cobertura con declaración previa, aunque el precio puede ser mayor.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt><strong>¿Cuándo debo contratar el seguro de viaje?</strong></dt>
+                <dd>
+                  Nada más reservar el vuelo o la primera parte del viaje. Si lo contratas en ese momento,
+                  la cobertura de cancelación entra en vigor desde el primer día. Si esperas a días antes
+                  de salir, no estarás cubierto si surgen imprevistos antes de la salida.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt><strong>¿Cubre el seguro si cancelo por miedo al COVID o una pandemia?</strong></dt>
+                <dd>
+                  En general, no. El miedo no es una causa de cancelación cubierta. La cancelación por
+                  COVID solo está cubierta si tú mismo (o un familiar directo) es diagnosticado y no puede
+                  viajar. Los seguros de "cancelación por cualquier motivo" son más caros pero más flexibles.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt><strong>¿Qué documentación necesito para reclamar al seguro?</strong></dt>
+                <dd>
+                  Guarda todos los tickets y facturas médicas originales, el informe médico en el idioma
+                  local (si es posible, con traducción), el número de referencia del siniestro que te
+                  facilite la central de asistencia y cualquier denuncia policial en caso de robo o pérdida.
+                </dd>
+              </div>
+              <div className={styles.faqItem}>
+                <dt><strong>¿Merece la pena el seguro para un viaje dentro de España?</strong></dt>
+                <dd>
+                  Para viajes nacionales la cobertura sanitaria pública española es suficiente para urgencias
+                  médicas. Sin embargo, un seguro de cancelación puede ser útil si tienes vuelos y hoteles
+                  no reembolsables. Valora el coste del seguro frente al importe no recuperable del viaje.
+                </dd>
+              </div>
+            </dl>
+          </section>
+
+          {/* ── Guía paso a paso ── */}
+          <section>
+            <h2>Cómo elegir tu seguro de viaje: guía paso a paso</h2>
+            <ol className={styles.stepGuide}>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">1</span>
+                <div className={styles.stepContent}>
+                  <strong>Identifica el destino y la duración del viaje</strong>
+                  <p>El país de destino y el número de días determinan el tipo de póliza y los límites mínimos recomendados. Un fin de semana en Portugal no requiere lo mismo que tres semanas en Japón.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">2</span>
+                <div className={styles.stepContent}>
+                  <strong>Comprueba si la TSJE cubre el destino</strong>
+                  <p>Si viajas dentro de la UE, el EEE o Suiza, solicita tu Tarjeta Sanitaria Europea gratis en el INSS o la app Carpeta Ciudadana. Recuerda que no cubre repatriación ni clínicas privadas.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">3</span>
+                <div className={styles.stepContent}>
+                  <strong>Evalúa la cobertura médica necesaria según el destino</strong>
+                  <p>Para EE.UU. y Canadá, el mínimo recomendado es 500.000 € por persona. Para el resto del mundo fuera de la UE, 50.000–150.000 €. Para Europa con TSJE, un complemento de 30.000 € puede ser suficiente.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">4</span>
+                <div className={styles.stepContent}>
+                  <strong>Revisa si tu tarjeta de crédito incluye cobertura</strong>
+                  <p>Las tarjetas Gold y premium incluyen a veces cobertura básica de equipaje y accidentes. Consulta las condiciones y evita pagar dos veces por coberturas que ya tienes.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">5</span>
+                <div className={styles.stepContent}>
+                  <strong>Compara al menos 3 pólizas de diferentes aseguradoras</strong>
+                  <p>Usa comparadores especializados (Acierto, Rastreator, iSEGURO) y compara no solo el precio, sino los límites de cobertura, la franquicia y la calidad del servicio de asistencia 24h.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">6</span>
+                <div className={styles.stepContent}>
+                  <strong>Lee las exclusiones detalladamente</strong>
+                  <p>Presta especial atención a deportes excluidos, enfermedades preexistentes, zonas geográficas no cubiertas y causas de cancelación. Las exclusiones son donde más difieren las pólizas.</p>
+                </div>
+              </li>
+              <li className={styles.step}>
+                <span className={styles.stepNumber} aria-hidden="true">7</span>
+                <div className={styles.stepContent}>
+                  <strong>Contrata antes de salir y guarda copia en el móvil</strong>
+                  <p>Una vez contratado, guarda el número de asistencia 24h en el móvil y en papel, y envía una copia de la póliza a un familiar. En urgencias, llama a la central de asistencia antes de ir al hospital.</p>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          {/* ── Mejores prácticas ── */}
+          <section>
+            <h2>Consejos para sacar el máximo partido a tu seguro</h2>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">📅</span>
+                <div>
+                  <strong>Contrata nada más reservar el vuelo</strong>
+                  <p>La cobertura de cancelación solo protege eventos ocurridos después de contratar el seguro. Si esperas, quedas expuesto desde el momento de la reserva hasta la contratación.</p>
+                </div>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">📱</span>
+                <div>
+                  <strong>Guarda el número de emergencias en el móvil</strong>
+                  <p>El número internacional de asistencia 24h debe estar en tus contactos antes de salir. En una urgencia real no tendrás tiempo de buscar la póliza impresa.</p>
+                </div>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">📸</span>
+                <div>
+                  <strong>Haz fotos del equipaje antes de facturar</strong>
+                  <p>Una fotografía del contenido de la maleta y del equipaje cerrado es la mejor prueba documental en caso de reclamación por pérdida o daño. Guárdala en la nube.</p>
+                </div>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">📋</span>
+                <div>
+                  <strong>Declara las enfermedades preexistentes</strong>
+                  <p>No declararlas puede anular toda la póliza ante un siniestro relacionado. La mayoría de aseguradoras ofrecen cobertura si se declara al contratar, aunque el precio puede ser algo mayor.</p>
+                </div>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">🧾</span>
+                <div>
+                  <strong>Conserva todos los tickets y facturas médicas</strong>
+                  <p>Sin documentación no hay reclamación. Guarda todos los justificantes médicos, facturas, informes y denuncias policiales en caso de robo. Solicita copia de todo en el hospital.</p>
+                </div>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
+                <div>
+                  <strong>Verifica que la cobertura médica sea suficiente</strong>
+                  <p>Para destinos lejanos como EE.UU., Asia o África, comprueba que la cobertura médica sea mínimo 300.000 €. Para EE.UU. específicamente, los expertos recomiendan 500.000 € o más.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ── Warning Box ── */}
+          <div className={styles.warningBox} role="note">
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <strong>Errores frecuentes que pueden dejarte sin cobertura</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li><strong>Asumir que la TSJE cubre todos los países:</strong> la Tarjeta Sanitaria Europea solo es válida en la UE y el Espacio Económico Europeo. Fuera de esos territorios no tiene ninguna validez.</li>
+              <li><strong>Contratar el seguro después de un incidente:</strong> si ya ha ocurrido el problema (enfermedad, cancelación, accidente), la póliza no cubrirá ese evento aunque lo contrates el mismo día.</li>
+              <li><strong>No leer las exclusiones:</strong> las actividades de aventura (esquí, buceo, senderismo de montaña, quad) suelen estar excluidas en las pólizas básicas. Comprueba el listado exacto antes de firmar.</li>
+              <li><strong>Confiar solo en el seguro de la tarjeta de crédito:</strong> los seguros incluidos en tarjetas suelen tener límites muy bajos y numerosas exclusiones. Verifica siempre las coberturas reales antes de asumir que estás protegido.</li>
+              <li><strong>No declarar enfermedades previas:</strong> ocultar condiciones médicas al contratar no solo puede invalidar esa cobertura concreta, sino anular toda la póliza si la aseguradora acredita mala fe.</li>
+              <li><strong>Esperar a llegar al destino para contratar:</strong> si ocurre un incidente en el vuelo de ida (pérdida de equipaje, accidente en tránsito, cancelación de vuelo), no estarás cubierto si aún no habías contratado el seguro.</li>
+            </ul>
+          </div>
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('guia-seguro-viaje')} />

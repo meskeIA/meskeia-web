@@ -1045,6 +1045,422 @@ export default function GeneradorHorariosPage() {
             </div>
           </div>
         </section>
+
+        {/* Tabla Comparativa de Perfiles */}
+        <section className={styles.guideSection}>
+          <h2>Perfiles de Estudiante: Horas y Estrategias</h2>
+          <p className={styles.introParagraph}>
+            Cada tipo de estudiante tiene necesidades distintas. Identifica tu perfil
+            y aplica las recomendaciones más adecuadas a tu situación.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Perfil</th>
+                  <th>Horas diarias</th>
+                  <th>Distribución sesiones</th>
+                  <th>Descansos</th>
+                  <th>Técnica más efectiva</th>
+                  <th>Riesgo principal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Opositor a tiempo completo</strong></td>
+                  <td>8–10 h</td>
+                  <td>4–5 bloques de 90 min</td>
+                  <td>20 min cada bloque + 1 h a mediodía</td>
+                  <td>Bloques intensivos + repaso activo</td>
+                  <td>Burnout y abandono por exceso</td>
+                </tr>
+                <tr>
+                  <td><strong>Universitario con trabajo</strong></td>
+                  <td>3–5 h</td>
+                  <td>2–3 bloques de 60–90 min</td>
+                  <td>15 min entre bloques</td>
+                  <td>Pomodoro para fragmentar tiempo</td>
+                  <td>Acumulación de materia sin repasar</td>
+                </tr>
+                <tr>
+                  <td><strong>Estudiante de bachillerato</strong></td>
+                  <td>4–6 h</td>
+                  <td>3–4 bloques de 50 min</td>
+                  <td>10–15 min entre bloques</td>
+                  <td>Intercalado de materias distintas</td>
+                  <td>Dedicar todo el tiempo a una sola asignatura</td>
+                </tr>
+                <tr>
+                  <td><strong>Preparador de idiomas</strong></td>
+                  <td>2–3 h</td>
+                  <td>2 bloques de 60 min</td>
+                  <td>15 min de descanso activo</td>
+                  <td>Práctica espaciada diaria</td>
+                  <td>Estudiar solo cuando "hay ganas"</td>
+                </tr>
+                <tr>
+                  <td><strong>Estudiante de FP</strong></td>
+                  <td>3–4 h</td>
+                  <td>2–3 bloques de 60 min</td>
+                  <td>15 min entre bloques</td>
+                  <td>Práctica activa + proyectos</td>
+                  <td>Dejar prácticas para la última semana</td>
+                </tr>
+                <tr>
+                  <td><strong>Autodidacta</strong></td>
+                  <td>1–3 h</td>
+                  <td>1–2 bloques de 45–60 min</td>
+                  <td>10 min entre bloques</td>
+                  <td>Objetivos semanales concretos</td>
+                  <td>Falta de estructura y compromiso externo</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de Uso */}
+        <section className={styles.guideSection}>
+          <h2>Casos de Uso Reales</h2>
+          <p className={styles.introParagraph}>
+            Situaciones concretas en las que esta herramienta puede ayudarte a organizar
+            tu estudio de forma eficiente.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏛️</span>
+                <h4>Opositor con 8 meses para el examen</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Necesitas organizar un temario extenso de forma progresiva, asegurándote
+                de cubrir todos los bloques temáticos antes de la fecha del examen.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Consejo:</strong> Divide el temario en bloques mensuales y usa la sección
+                de entregas para marcar fechas de repaso parcial cada 3–4 semanas.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📚</span>
+                <h4>Universitario con exámenes en 3 semanas</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Tienes varias asignaturas con fechas distintas y necesitas distribuir
+                el tiempo de preparación sin descuidar ninguna materia.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Consejo:</strong> Asigna mayor prioridad y horas semanales a las asignaturas
+                con examen más próximo, y añade todas las fechas en la sección de entregas.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🌍</span>
+                <h4>Estudiante de idiomas con trabajo y academia</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Compatibilizas el trabajo a jornada completa con clases de idiomas
+                por las tardes y necesitas aprovechar al máximo los huecos disponibles.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Consejo:</strong> Marca solo los slots reales de disponibilidad (noches y
+                fines de semana) y configura sesiones cortas de 25–50 minutos para no sobrecargar.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎓</span>
+                <h4>Adolescente de bachillerato con 8 asignaturas</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Gestionas simultáneamente 8 materias con entregas, trabajos y exámenes
+                distribuidos a lo largo del trimestre.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Consejo:</strong> Añade todas las asignaturas con su peso real y usa la
+                sección de entregas para no olvidar ninguna fecha importante del trimestre.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre Horarios de Estudio</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Cuántas horas al día es lo máximo que se puede estudiar eficientemente?</h4>
+              <p>
+                La mayoría de los expertos en neurociencia del aprendizaje sitúan el límite
+                en torno a 6 horas de estudio real y concentrado. A partir de la 5ª hora
+                consecutiva, el rendimiento cae significativamente. Lo importante no es el
+                número de horas, sino la calidad de la concentración en cada sesión.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Es mejor estudiar por las mañanas o por las noches?</h4>
+              <p>
+                Depende de tu cronotipo personal, pero en general las mañanas favorecen la
+                memorización y el aprendizaje de contenido nuevo, ya que el cerebro está
+                más descansado. Las noches son útiles para repasar y consolidar lo ya
+                estudiado. Estudiar de madrugada sacrificando sueño siempre es
+                contraproducente.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuánto tiempo de descanso debo tomar entre sesiones de estudio?</h4>
+              <p>
+                Para sesiones de 25 min (Pomodoro): 5 min de pausa. Para sesiones de
+                50 min: 10–15 min. Para bloques de 90 min: 20–25 min. Cada 3–4 horas
+                de estudio, toma un descanso más largo de 30–60 minutos para que el
+                cerebro consolide la información adquirida.
+              </p>
+              <p className={styles.faqTip}>
+                Usa el descanso de forma activa: camina, estira, toma agua. Evita las pantallas
+                durante los descansos cortos.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo distribuyo el tiempo entre asignaturas difíciles y fáciles?</h4>
+              <p>
+                Dedica más tiempo a las asignaturas difíciles o con mayor peso en la
+                calificación final, pero no abandones las fáciles. Una regla práctica:
+                asigna el doble de horas a las materias que te cuestan más. Empieza siempre
+                la sesión de estudio con la asignatura más exigente, cuando la mente
+                está más fresca.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es la técnica Pomodoro y funciona de verdad?</h4>
+              <p>
+                La técnica Pomodoro consiste en estudiar en bloques de 25 minutos de
+                concentración total, seguidos de 5 minutos de descanso. Cada 4 bloques
+                se toma un descanso largo de 15–30 minutos. Está respaldada por la
+                psicología cognitiva: reduce la procrastinación, mejora el enfoque y
+                evita la fatiga mental al dividir el trabajo en partes manejables.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Debo estudiar los fines de semana?</h4>
+              <p>
+                Sí, pero con moderación. Los fines de semana son ideales para repasar
+                lo estudiado durante la semana y planificar la semana siguiente. Reservar
+                al menos un día de descanso mental completo mejora el rendimiento del
+                resto de la semana y previene el agotamiento a largo plazo.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo recupero el horario si me atraso?</h4>
+              <p>
+                No intentes recuperar todo el tiempo perdido de golpe, ya que agrava el
+                problema. Reedita el horario: reduce las horas de las asignaturas en las
+                que estás al día y redistributiye ese tiempo a las que están atrasadas.
+                Acepta que puede ser necesario reajustar los objetivos semanales.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuántos días antes del examen debo empezar a repasar?</h4>
+              <p>
+                Para un examen parcial normal: 7–10 días de repaso activo. Para un examen
+                final importante: 2–3 semanas. El error más común es dejar el repaso para
+                los últimos 2 días. La memoria a largo plazo se consolida con repasos
+                distribuidos en el tiempo, no con atracones de estudio de última hora.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo Crear tu Horario de Estudio Paso a Paso</h2>
+          <p className={styles.introParagraph}>
+            Sigue esta secuencia para construir un plan de estudio sólido y realista
+            que puedas cumplir semana a semana.
+          </p>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Lista todas las materias y sus fechas de examen</h4>
+                <p>
+                  Antes de planificar nada, reúne toda la información: asignaturas,
+                  peso en la nota, fecha del examen o entrega y nivel de dificultad
+                  percibido. Añádelas en la sección de entregas del generador.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Calcula las horas disponibles por semana</h4>
+                <p>
+                  Identifica con honestidad qué franjas horarias tienes realmente libres
+                  y con energía para estudiar. Marca tu disponibilidad en la rejilla
+                  del generador, siendo realista sobre las semanas de mayor carga.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Prioriza las asignaturas por dificultad y peso</h4>
+                <p>
+                  Asigna mayor prioridad (4–5 estrellas) a las materias más difíciles
+                  o con mayor peso en la calificación. El generador distribuirá más
+                  sesiones a las asignaturas con mayor prioridad.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Asigna bloques de 45–90 min con descansos de 15 min</h4>
+                <p>
+                  Genera el horario y revisa que las sesiones estén distribuidas de forma
+                  equilibrada entre los días. Evita poner más de 3 bloques seguidos sin
+                  un descanso significativo.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Reserva un 20% del tiempo para imprevistos</h4>
+                <p>
+                  No llenes al 100% tu disponibilidad horaria. Deja siempre un margen
+                  para enfermedad, compromisos inesperados o días en los que la concentración
+                  simplemente no acompaña.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Establece un repaso semanal de lo estudiado</h4>
+                <p>
+                  Dedica una sesión semanal (preferiblemente el fin de semana) a repasar
+                  brevemente todo lo trabajado en la semana. Este repaso de consolidación
+                  es fundamental para retener la información a largo plazo.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Ajusta el horario según el avance real cada semana</h4>
+                <p>
+                  Al inicio de cada semana, revisa el plan: ¿cumpliste los objetivos?
+                  ¿Necesitas más horas en alguna asignatura? Un buen horario es un
+                  documento vivo que se actualiza según la realidad, no un contrato inamovible.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores Prácticas para Estudiar Eficientemente</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>⏱️</div>
+              <h4>Sesiones de 45–90 min</h4>
+              <p>
+                Es el rango óptimo de duración para el máximo rendimiento cognitivo.
+                Sesiones más cortas no permiten entrar en estado de flujo; sesiones
+                más largas acaban con el rendimiento cayendo drásticamente.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>🧠</div>
+              <h4>La materia difícil, con la mente descansada</h4>
+              <p>
+                Estudia siempre la asignatura más exigente al inicio de la sesión,
+                cuando la capacidad de concentración y la memoria de trabajo están
+                en su punto más alto.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>🔀</div>
+              <h4>Alterna asignaturas distintas</h4>
+              <p>
+                Cambiar de materia entre sesiones reduce la fatiga mental y mejora
+                la retención. No estudies la misma asignatura durante más de 2 horas
+                seguidas sin un cambio de tema.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>🔁</div>
+              <h4>10 minutos de repaso inicial</h4>
+              <p>
+                Comienza cada sesión repasando brevemente lo estudiado el día anterior.
+                Este micro-repaso activa la memoria a largo plazo y facilita la conexión
+                con el nuevo contenido.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>😴</div>
+              <h4>Duerme mínimo 7–8 horas</h4>
+              <p>
+                El sueño es cuando el cerebro consolida la memoria. Dormir menos para
+                estudiar más es siempre contraproducente: reduce la capacidad de retención
+                y el rendimiento cognitivo del día siguiente.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <div className={styles.tipIcon}>📆</div>
+              <h4>Deja días libres para imprevistos</h4>
+              <p>
+                Un horario sin margen es un horario que se incumple en la primera
+                semana. Reserva al menos un día sin estudio planificado para descanso
+                mental y para absorber contratiempos.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Errores frecuentes que arruinan el horario de estudio</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Estudiar más de 6 horas seguidas sin descanso</strong> — El rendimiento
+                cae al 40% a partir de la 5ª hora. Más tiempo no significa más aprendizaje.
+              </li>
+              <li>
+                <strong>Crear un horario perfecto que nunca se cumple</strong> — Un plan demasiado
+                ambicioso genera frustración y abandono. Es mejor un horario modesto que se cumpla
+                al 90% que uno ideal que se abandona en 3 días.
+              </li>
+              <li>
+                <strong>Estudiar de madrugada sacrificando horas de sueño</strong> — El sueño no
+                es tiempo perdido: es cuando el cerebro graba la información en la memoria a largo
+                plazo. Sin dormir, el estudio nocturno es prácticamente inútil.
+              </li>
+              <li>
+                <strong>No reservar tiempo para repasos</strong> — Estudiar contenido nuevo sin
+                revisar lo anterior genera una acumulación de materia olvidada que se convierte
+                en una deuda imposible de pagar antes del examen.
+              </li>
+              <li>
+                <strong>Estudiar solo cuando se tiene ganas</strong> — Esperar a la motivación
+                para empezar garantiza el fracaso. La consistencia diaria, aunque sea en sesiones
+                cortas, supera siempre a los maratones esporádicos.
+              </li>
+              <li>
+                <strong>Dejar todo para la última semana</strong> — La memoria necesita tiempo y
+                repetición para consolidarse. Estudiar de golpe antes del examen solo permite
+                retención a corto plazo que desaparece en días.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps

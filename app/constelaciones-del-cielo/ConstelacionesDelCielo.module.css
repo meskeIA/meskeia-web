@@ -903,3 +903,417 @@
     gap: 0.75rem;
   }
 }
+
+/* =============================================
+   SECCIONES v2.0 — Patrón profesional
+   ============================================= */
+
+/* 1. Tabla Comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  vertical-align: top;
+  color: var(--text-secondary, #666666);
+  font-size: 0.88rem;
+}
+
+.comparativaTable td strong {
+  color: var(--text-primary, #1a1a1a);
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.comparativaTable tr:hover td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: var(--primary);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary, #b0b0b0);
+}
+
+[data-theme='dark'] .comparativaTable td strong {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* 2. Casos de Uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.escenarioCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.15);
+}
+
+.escenarioIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.escenarioHeader {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.escenarioExample {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.5;
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 6px 6px 0;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card, #2a2a2a);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .escenarioTip {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+/* 3. FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.faqItem {
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.faqItem[open] {
+  border-color: var(--primary);
+}
+
+.faqItem summary {
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #1a1a1a);
+  transition: background 0.15s ease;
+}
+
+.faqItem summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem summary::before {
+  content: '▶';
+  font-size: 0.7rem;
+  color: var(--primary);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.faqItem[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.faqItem summary:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.faqItem p {
+  padding: 0 1.25rem 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary, #666666);
+  background: var(--bg-card, #ffffff);
+  margin: 0;
+}
+
+.faqItem p + p {
+  padding-top: 0;
+}
+
+.faqItem p:last-child {
+  padding-bottom: 1rem;
+}
+
+.faqTip {
+  font-style: italic;
+  padding: 0.5rem 1.25rem 1rem !important;
+  color: var(--text-muted, #999999) !important;
+  background: rgba(46, 134, 171, 0.04) !important;
+  border-top: 1px solid var(--border, #e5e7eb);
+  font-size: 0.85rem !important;
+}
+
+[data-theme='dark'] .faqItem summary,
+[data-theme='dark'] .faqItem p {
+  background: var(--bg-card, #2a2a2a);
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .faqItem {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .faqItem[open] {
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.1) !important;
+  color: var(--text-muted, #999999) !important;
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 4. Guía Paso a Paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.stepNumber {
+  background: var(--primary);
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.stepContent strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-primary, #1a1a1a);
+  font-size: 0.95rem;
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card, #2a2a2a);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .stepContent strong {
+  color: var(--text-primary, #e5e5e5);
+}
+
+/* 5. Mejores Prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.tipCard {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-left: 4px solid var(--secondary, #48A9A6);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.tipCard h4 {
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card, #2a2a2a);
+  border-color: rgba(255, 255, 255, 0.1);
+  border-left-color: var(--secondary, #48A9A6);
+}
+
+[data-theme='dark'] .tipCard h4 {
+  color: var(--text-primary, #e5e5e5);
+}
+
+/* 6. Warning Box */
+.warningBox {
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.warningHeader strong {
+  color: #92400e;
+  font-size: 1rem;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+}
+
+.warningList li strong {
+  color: var(--text-primary, #1a1a1a);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+[data-theme='dark'] .warningHeader strong {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: var(--text-primary, #e5e5e5);
+}
+
+/* Responsive v2.0 */
+@media (max-width: 900px) {
+  .tipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .comparativaTable {
+    font-size: 0.8rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .escenarioCard {
+    transition: none;
+  }
+}
