@@ -706,7 +706,7 @@ grep -rl "\.warningBox" app/*/ --include="*.module.css" | wc -l
 1. Abrir `PENDIENTEPROFESIONALIZAR.md`
 2. Seleccionar **5 apps** de la misma prioridad (preferiblemente de la misma categoría para contexto similar)
 3. Criterio de selección por sesión:
-   - **Lote estándar**: 5 apps, procesadas secuencialmente (una tras otra)
+   - **Lote estándar**: 5 apps, lanzadas **en paralelo** (Plan Max — sin límite de tokens)
    - **Apps complejas** (>1000 líneas page.tsx): reducir a 3-4 por lote
    - **Evitar mezclar** ALTA + BAJA en el mismo lote (el agente pierde contexto)
 
@@ -720,14 +720,13 @@ Antes de lanzar agentes, leer los `page.tsx` de las apps seleccionadas para conf
 #### FASE 3: Lanzamiento de Agentes
 
 ```
-Lanzar 1 agente general-purpose por app, de forma SECUENCIAL.
-Lote recomendado: 5 apps por sesión, una tras otra.
+Lanzar 1 agente general-purpose por app, todos EN PARALELO (Plan Max).
+Lote recomendado: 5 apps por sesión, lanzadas simultáneamente.
 ```
 
-> **⚠️ IMPORTANTE — Rate Limit**: Lanzar agentes en paralelo consume tokens a 5× la velocidad normal
-> y agota el límite por ventana temporal antes de completar el lote, cortando el trabajo a mitad.
-> El enfoque SECUENCIAL consume los mismos tokens totales pero repartidos en el tiempo,
-> permitiendo completar más apps por sesión. Velocidad de reloj mayor ≠ más apps completadas.
+> **✅ Plan Max — Agentes en Paralelo**: Con el Plan Max no hay límite de ventana temporal
+> que impida el paralelismo. Lanzar los 5 agentes a la vez reduce el tiempo de reloj del lote
+> de ~60 min a ~15-20 min, sin penalización por consumo de tokens.
 
 **Prompt estándar para el agente** (adaptar por app):
 
@@ -802,24 +801,24 @@ En `PENDIENTEPROFESIONALIZAR.md`:
 
 ### ⚡ Tamaño Óptimo de Lote
 
-**Regla general**: 5 apps por lote, procesadas secuencialmente (una tras otra, no en paralelo).
+**Regla general**: 5 apps por lote, lanzadas **en paralelo** (Plan Max).
 
-| Tipo de app | Apps por lote | Tiempo por app | Tiempo total lote |
-|-------------|:-------------:|:--------------:|:-----------------:|
-| Apps financieras complejas | 3-4 | 15-20 min | ~60-80 min |
-| Apps de salud / ciencia | 5 | 10-15 min | ~60 min |
-| Herramientas técnicas | 5 | 8-12 min | ~50 min |
-| Texto / conversores | 5 | 6-10 min | ~40 min |
+| Tipo de app | Apps por lote | Tiempo por app | Tiempo total lote (paralelo) |
+|-------------|:-------------:|:--------------:|:----------------------------:|
+| Apps financieras complejas | 3-4 | 15-20 min | ~20 min |
+| Apps de salud / ciencia | 5 | 10-15 min | ~15 min |
+| Herramientas técnicas | 5 | 8-12 min | ~12 min |
+| Texto / conversores | 5 | 6-10 min | ~10 min |
 
-> **Ventaja del secuencial**: el rate limit se va "recargando" entre agentes,
-> permitiendo completar lotes completos sin interrupciones.
+> **Ventaja del paralelo (Plan Max)**: todos los agentes trabajan simultáneamente.
+> El tiempo total del lote es el de la app más lenta, no la suma de todas.
 
 ---
 
 ### 🚫 Errores Comunes en el Proceso de Lotes
 
 - **No verificar el estado previo**: Puede duplicar contenido ya existente
-- **Lanzar agentes en paralelo**: Agota el rate limit a 5× la velocidad — menos apps completadas por sesión
+- **No lanzar en paralelo cuando se puede**: Con Plan Max, el modo secuencial es innecesariamente lento
 - **Olvidar actualizar el inventario**: El documento pierde utilidad como fuente de verdad
 - **No hacer build antes del push**: Puede deployar errores TypeScript a producción
 - **Mezclar apps de categorías muy distintas**: El agente pierde contexto y genera contenido menos específico
