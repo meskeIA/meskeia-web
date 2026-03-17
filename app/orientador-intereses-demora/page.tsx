@@ -411,6 +411,426 @@ export default function OrientadorInteresesDemoraPage() {
             No dejes pasar el tiempo antes de reclamar. Con cada comunicación formal al deudor, el plazo se interrumpe.
           </p>
         </section>
+
+        {/* ── Tabla comparativa ──────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de tipos de interés de demora</h2>
+          <p>
+            No todos los intereses de demora se calculan igual. La norma aplicable depende del tipo de relación jurídica
+            y de quiénes son las partes. Esta tabla resume las diferencias clave para 2025:
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>Interés Comercial<br /><small>Ley 3/2004</small></th>
+                  <th>Interés Legal CC<br /><small>Art. 1108 CC</small></th>
+                  <th>Demora Tributario<br /><small>Art. 26 LGT</small></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Quién lo aplica</strong></td>
+                  <td>Empresas y autónomos entre sí</td>
+                  <td>Particulares, deudas civiles sin pacto</td>
+                  <td>Hacienda (AEAT, CCAA)</td>
+                </tr>
+                <tr>
+                  <td><strong>Tipo 2025</strong></td>
+                  <td><strong>11,10%</strong> (1T/2025: BCE 3,10% + 8 pp)</td>
+                  <td><strong>3,25%</strong> anual (prórroga PGE)</td>
+                  <td><strong>4,0625%</strong> anual (LPE 2023 prorrogada)</td>
+                </tr>
+                <tr>
+                  <td><strong>Se aplica automáticamente</strong></td>
+                  <td>Sí, desde el día siguiente al vencimiento</td>
+                  <td>No, requiere reclamación o mora</td>
+                  <td>Sí, desde el fin del período voluntario</td>
+                </tr>
+                <tr>
+                  <td><strong>Plazo máximo de pago</strong></td>
+                  <td>30 días desde factura/entrega</td>
+                  <td>El pactado o el que fije el juez</td>
+                  <td>Fijado por liquidación o acto administrativo</td>
+                </tr>
+                <tr>
+                  <td><strong>Costes adicionales mínimos</strong></td>
+                  <td>40 € por factura (art. 8 Ley 3/2004)</td>
+                  <td>No aplica</td>
+                  <td>Recargo de apremio (5%–20% según fase)</td>
+                </tr>
+                <tr>
+                  <td><strong>Prescripción</strong></td>
+                  <td>3 años (art. 1967 CC)</td>
+                  <td>3–5 años según tipo de acción</td>
+                  <td>4 años (art. 66 LGT)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── Casos de uso ───────────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Casos de uso prácticos</h2>
+          <p>
+            Cuatro situaciones reales que ilustran cuándo y cómo se aplica cada tipo de interés:
+          </p>
+          <div className={styles.escenariosGrid}>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🧾</span>
+                <strong>Autónomo con factura impagada de 3.000 €</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un diseñador freelance emite factura a una empresa el 1 de enero de 2025 con vencimiento 30 de enero.
+                La empresa no paga. Aplica la <strong>Ley 3/2004</strong>: tipo del 11,10% anual + <strong>40 € mínimos</strong> por costes de cobro
+                (independientemente de los intereses calculados). Por cada mes de retraso se generan aprox. 27,75 € de intereses.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: emite la factura de intereses tan pronto como sea posible; los 40 € se reclaman al mismo tiempo.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🤝</span>
+                <strong>Préstamo personal entre particulares sin tipo pactado</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un particular presta 10.000 € a un amigo sin firmar contrato ni fijar intereses. El prestatario no devuelve
+                el dinero al año. Sin pacto expreso, aplica el <strong>interés legal del dinero 2025: 3,25%</strong> anual
+                (art. 1108 CC), pero solo desde que hay mora, es decir, desde la reclamación extrajudicial o judicial.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: envía un burofax reclamando el pago para constituir en mora al deudor y que empiecen a correr los intereses.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏛️</span>
+                <strong>Deuda con Hacienda por declaración complementaria</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un contribuyente presenta en mayo de 2025 una declaración complementaria del IRPF 2023 ingresando
+                3.500 €. Hacienda aplica el <strong>interés de demora tributario del 4,0625%</strong> anual sobre
+                los 3.500 € desde el fin del plazo voluntario (30 junio 2024) hasta la fecha del pago.
+                En este caso, aprox. 119 € adicionales por ~10,5 meses.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: si presentas sin requerimiento previo, solo se aplica interés de demora; con requerimiento, además puede haber recargo o sanción.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🌍</span>
+                <strong>Empresa reclamando a proveedor internacional</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Una empresa española compra materiales a un proveedor alemán. El contrato no especifica el tipo de interés aplicable en caso de impago.
+                La <strong>Ley 3/2004 puede aplicarse</strong> si el contrato se rige por derecho español (art. 3 del Reglamento Roma I),
+                pero si hay cláusula de elección de otro derecho, prevalece ese. Sin pacto, el Reglamento Roma I suele
+                apuntar al país del vendedor.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: incluye siempre en contratos internacionales una cláusula de elección de ley y de tipo de interés aplicable.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── FAQ ────────────────────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes</h2>
+          <dl className={styles.faqList}>
+
+            <div className={styles.faqItem}>
+              <dt>¿Cuándo se aplica la Ley 3/2004 y cuándo el Código Civil?</dt>
+              <dd>
+                La Ley 3/2004 aplica a operaciones comerciales entre empresas y autónomos (B2B). Si alguna de las partes es un
+                consumidor final (particular sin actividad profesional), la ley no aplica y se acude al art. 1108 del Código Civil,
+                que establece el interés legal del dinero (3,25% en 2025) como referencia supletoria.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Los 40 € mínimos se aplican por factura o por deuda total?</dt>
+              <dd>
+                Por cada factura impagada de forma independiente (art. 8 Ley 3/2004). Si tienes 5 facturas impagadas de un mismo
+                cliente, puedes reclamar 5 × 40 € = 200 € en concepto de costes mínimos de cobro, más los intereses de cada una.
+                <span className={styles.faqTip}>Este importe mínimo es compatible con reclamar costes reales superiores si los puedes acreditar.</span>
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Puedo pactar un tipo de interés diferente al legal?</dt>
+              <dd>
+                Sí, con dos límites importantes: (1) en contratos B2B, el tipo pactado no puede ser abusivamente bajo
+                (art. 9 Ley 3/2004 prohíbe cláusulas abusivas para el acreedor); (2) en cualquier contrato, no puede superar
+                el triple del interés legal del dinero sin justificación objetiva, bajo riesgo de usura (art. 1 Ley Azcárate 1908).
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Los intereses de demora tributan en el IRPF?</dt>
+              <dd>
+                Depende del tipo: los intereses de demora que cobras de un deudor comercial o civil tributan como
+                <strong> rendimiento del capital mobiliario</strong> (tipo del ahorro, 19%–28%). Los intereses de demora
+                que abona Hacienda al contribuyente por devoluciones tardías están exentos desde 2015 (STS 3 diciembre 2020).
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Qué pasa si el deudor paga parte de la deuda? ¿Siguen acumulándose intereses?</dt>
+              <dd>
+                Sí. Los intereses siguen acumulándose sobre el <strong>capital pendiente</strong> no pagado. El pago parcial
+                se imputa primero a los gastos de cobro (40 €), luego a los intereses devengados, y por último al principal,
+                salvo pacto distinto entre las partes (art. 1173 CC).
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Cómo reclamo los intereses de demora ante los tribunales?</dt>
+              <dd>
+                Para deudas dinerarias con cuantía determinada, el <strong>proceso monitorio</strong> (art. 812 LEC) es el
+                cauce habitual: no requiere abogado ni procurador si la deuda es inferior a 2.000 €, y abarca hasta 250.000 €.
+                Si el deudor no se opone en 20 días, el juez dicta decreto de ejecución directamente.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Puedo reclamar intereses si no los incluí en la factura original?</dt>
+              <dd>
+                Sí. Los intereses de demora son un derecho legal que nace automáticamente por el solo incumplimiento del plazo.
+                No es necesario haberlos incluido en la factura principal. Puedes emitir una <strong>factura complementaria
+                de intereses</strong> en cualquier momento antes de que prescriba la acción (3 años desde el vencimiento).
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Cuál es el plazo de prescripción para reclamar intereses?</dt>
+              <dd>
+                Para acciones personales sin plazo especial, la prescripción es de <strong>5 años</strong> (art. 1964 CC tras reforma 2015).
+                Para créditos reconocidos judicialmente, 5 años desde la firmeza de la sentencia. Sin embargo, en el ámbito mercantil
+                y para acciones de reclamación de deuda líquida, el plazo habitual citado es <strong>3 años</strong> (art. 1967 CC).
+                Cada comunicación formal al deudor interrumpe el plazo.
+              </dd>
+            </div>
+
+          </dl>
+        </section>
+
+        {/* ── Guía paso a paso ───────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Guía paso a paso: cómo reclamar intereses de demora</h2>
+          <ol className={styles.stepGuide}>
+
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Identifica el tipo de deuda y la norma aplicable</strong>
+                <p>
+                  ¿Es una operación comercial B2B (Ley 3/2004), una deuda civil entre particulares (art. 1108 CC)
+                  o una deuda con la Administración (LGT)? El tipo de interés y los plazos varían significativamente.
+                  Comprueba también si existe un tipo pactado en el contrato que prevalezca sobre el legal supletorio.
+                </p>
+              </div>
+            </li>
+
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Calcula los intereses desde la fecha de vencimiento hasta hoy</strong>
+                <p>
+                  Usa la fórmula: <em>Capital × (Tipo% / 100) × (Días / 365)</em>. Para el interés comercial,
+                  el tipo cambia cada semestre (enero y julio), por lo que si la deuda abarca varios semestres,
+                  debes calcular cada tramo con su tipo correspondiente. Usa esta herramienta para obtener
+                  una estimación orientativa rápida.
+                </p>
+              </div>
+            </li>
+
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Envía reclamación extrajudicial por burofax</strong>
+                <p>
+                  Antes de ir a juicio, envía un burofax con acuse de recibo y certificación de contenido al domicilio
+                  social del deudor. Este acto <strong>interrumpe la prescripción</strong> (art. 1973 CC) y constituye
+                  en mora al deudor, por lo que es el punto de partida oficial para deudas civiles. Conserva el justificante.
+                </p>
+              </div>
+            </li>
+
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Emite la factura de intereses de demora</strong>
+                <p>
+                  Los intereses de demora entre empresas tributan a efectos del IVA de forma diferente:
+                  si son indemnizatorios puros (no vinculados a una operación sujeta), están <strong>exentos de IVA</strong>.
+                  Si son parte de la contraprestación de una operación comercial, puede aplicar IVA. Consulta con tu
+                  asesor fiscal la calificación correcta antes de emitir la factura.
+                </p>
+              </div>
+            </li>
+
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Si no pagan, inicia el proceso monitorio</strong>
+                <p>
+                  El proceso monitorio (art. 812 LEC) es el procedimiento judicial más ágil para reclamar deudas dinerarias
+                  con documentación acreditativa (factura, contrato, albarán). No requiere abogado ni procurador si la
+                  cuantía es inferior a <strong>2.000 €</strong>; para cuantías mayores hasta 250.000 €, sí son necesarios.
+                  Si el deudor no se opone en 20 días hábiles, el juez despacha ejecución directamente.
+                </p>
+              </div>
+            </li>
+
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Ejecución de sentencia para cobrar</strong>
+                <p>
+                  Con el decreto de ejecución, puedes solicitar al juzgado el <strong>embargo preventivo</strong> de cuentas
+                  bancarias, vehículos o bienes inmuebles del deudor. El juzgado puede requerir a entidades financieras para
+                  localizar cuentas. En caso de insolvencia declarada, pasarás a ser acreedor ordinario en el concurso de acreedores.
+                </p>
+              </div>
+            </li>
+
+          </ol>
+        </section>
+
+        {/* ── Mejores prácticas ──────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas para protegerte de la morosidad</h2>
+          <div className={styles.tipsGrid}>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📝</span>
+              <div>
+                <strong>Incluye la cláusula de intereses en tus contratos</strong>
+                <p>
+                  Añade en todos tus presupuestos y contratos: «En caso de impago, se aplicarán los intereses de demora
+                  previstos en la Ley 3/2004 más 40 € por costes de cobro por cada factura impagada». Esto refuerza
+                  tu posición jurídica y actúa como elemento disuasorio.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📧</span>
+              <div>
+                <strong>Envía recordatorio escrito antes del vencimiento</strong>
+                <p>
+                  Un email de recordatorio 5 días antes del vencimiento no solo es buena práctica, sino que constituye
+                  evidencia de que el deudor conocía la fecha de pago. En caso de disputa, demuestra tu diligencia y
+                  buena fe como acreedor.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧮</span>
+              <div>
+                <strong>Calcula los 40 € mínimos por factura, no por cliente</strong>
+                <p>
+                  Un error común es reclamar 40 € por cliente con varias facturas pendientes. La ley los establece
+                  por cada factura impagada individualmente. Si tienes 10 facturas de 100 € cada una, puedes reclamar
+                  hasta 400 € en mínimos además de los intereses calculados sobre los 1.000 €.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <div>
+                <strong>Interrumpe la prescripción con comunicaciones formales</strong>
+                <p>
+                  La acción para reclamar prescribe a los 3 años (o 5 según el tipo de acción). Cada reclamación fehaciente
+                  —burofax, email certificado, acto de conciliación— reinicia el cómputo. Si una deuda es antigua, actúa
+                  antes de que se cumpla el plazo: la prescripción se alega por el deudor, no la aplica el juez de oficio.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🌍</span>
+              <div>
+                <strong>En contratos internacionales, especifica la ley aplicable</strong>
+                <p>
+                  El Reglamento Roma I (CE 593/2008) permite elegir libremente la ley aplicable al contrato. Sin elección
+                  expresa, se aplica la ley del país del prestador del servicio o vendedor del bien, que puede no ser la
+                  española. Incluye siempre: «Este contrato se rige por la ley española y, en caso de mora, por la Ley 3/2004».
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💼</span>
+              <div>
+                <strong>Emite la factura de intereses pronto: tributan en IRPF</strong>
+                <p>
+                  Los intereses que cobres de deudores tributan como rendimiento del capital mobiliario. Si los cobras
+                  en 2025, deben declararse en la renta 2025 (presentada en 2026). Emite la factura de intereses en el
+                  mismo ejercicio fiscal en que se resuelva la deuda para simplificar la gestión tributaria.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── Warning Box ────────────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <strong>Errores frecuentes que pueden costarte el cobro</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Esperar a que el deudor pague espontáneamente.</strong> Los intereses se acumulan a tu favor,
+                pero la prescripción también corre. Si superas los 3–5 años sin reclamar formalmente, puedes perder
+                el derecho a los intereses e incluso al principal.
+              </li>
+              <li>
+                <strong>Aplicar la Ley 3/2004 a relaciones con consumidores finales.</strong> Esta ley solo aplica
+                a operaciones entre empresarios y/o autónomos (B2B). Si tu cliente es un particular, la norma aplicable
+                es el Código Civil, con un tipo de interés mucho más bajo (3,25% en 2025).
+              </li>
+              <li>
+                <strong>No documentar la fecha de entrega de la factura o mercancía.</strong> El plazo de pago de 30 días
+                (Ley 3/2004) comienza desde la recepción de la factura o la entrega del bien/servicio. Sin prueba de esa fecha,
+                el deudor puede alegar que el plazo no ha vencido.
+              </li>
+              <li>
+                <strong>Calcular los intereses sobre el importe con IVA incluido.</strong> Los intereses de demora
+                en operaciones comerciales se calculan sobre la <strong>base imponible</strong>, no sobre el total
+                facturado con IVA (salvo pacto expreso). Aplicar el tipo sobre el precio con IVA inflaría artificialmente
+                los intereses y puede generar conflictos.
+              </li>
+              <li>
+                <strong>Ignorar el plazo de prescripción de 3 años.</strong> Una vez prescrita la acción, el deudor
+                puede alegar la prescripción en juicio y el juzgado no puede entrar en el fondo. La prescripción no
+                la aplica el juez de oficio: debe alegarla el deudor, pero si lo hace, el juicio se pierde.
+              </li>
+              <li>
+                <strong>Pactar intereses superiores al triple del interés legal sin justificación.</strong> El art. 1
+                de la Ley Azcárate (1908) declara nulos los préstamos usurarios. Si el tipo pactado es
+                notablemente superior al normal del dinero y desproporcionado con las circunstancias, un juez puede
+                declarar nulo el interés y aplicar el legal supletorio, o incluso anular todo el contrato.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('orientador-intereses-demora')} />

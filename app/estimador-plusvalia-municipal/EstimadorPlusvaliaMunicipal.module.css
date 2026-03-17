@@ -527,6 +527,425 @@
   color: #B0B0B0;
 }
 
+/* ── Tabla comparativa Objetivo vs Real ──────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0 0.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--border, #E5E5E5);
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: #404040;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 560px;
+}
+
+.comparativaTable th {
+  background: #2E86AB;
+  color: white;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable th:first-child {
+  width: 22%;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border, #E5E5E5);
+  color: var(--text-primary, #1A1A1A);
+  vertical-align: top;
+  line-height: 1.55;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #404040;
+  color: #E5E5E5;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+@media (max-width: 768px) {
+  .comparativaTable {
+    font-size: 0.82rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.7rem;
+  }
+}
+
+/* ── Escenarios / Casos de uso ────────────────────────── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.escenarioCard {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: #2A2A2A;
+  border-color: #404040;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-primary, #1A1A1A);
+}
+
+[data-theme='dark'] .escenarioHeader {
+  color: #E5E5E5;
+}
+
+.escenarioIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  color: var(--text-secondary, #555);
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: rgba(46, 134, 171, 0.06);
+  border-left: 3px solid #2E86AB;
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: rgba(46, 134, 171, 0.12);
+  color: #B0B0B0;
+}
+
+.escenarioCard ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text-secondary, #444);
+}
+
+[data-theme='dark'] .escenarioCard ul {
+  color: #B0B0B0;
+}
+
+.escenarioCard li {
+  margin-bottom: 0.25rem;
+}
+
+.escenarioTip {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  color: #166534;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .escenarioTip {
+  background: #1a3320;
+  border-color: #4ade80;
+  color: #a7f3d0;
+}
+
+/* ── FAQ ──────────────────────────────────────────────── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-top: 0.75rem;
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--border, #E5E5E5);
+  padding: 1rem 0;
+}
+
+[data-theme='dark'] .faqItem {
+  border-color: #404040;
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqItem dt {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+}
+
+.faqItem dd {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary, #444);
+}
+
+[data-theme='dark'] .faqItem dd {
+  color: #B0B0B0;
+}
+
+.faqTip {
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  color: #48A9A6;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .faqItem dt {
+    font-size: 0.9rem;
+  }
+
+  .faqItem dd {
+    font-size: 0.86rem;
+  }
+}
+
+/* ── Guía paso a paso ─────────────────────────────────── */
+.stepGuide {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border, #E5E5E5);
+}
+
+[data-theme='dark'] .step {
+  border-color: #404040;
+}
+
+.stepGuide li:last-child {
+  border-bottom: none;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  background: #2E86AB;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-top: 0.1rem;
+}
+
+.stepContent {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-secondary, #444);
+}
+
+[data-theme='dark'] .stepContent {
+  color: #B0B0B0;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 0.3rem;
+}
+
+[data-theme='dark'] .stepContent strong {
+  color: #E5E5E5;
+}
+
+.stepContent p {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .stepNumber {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.82rem;
+  }
+
+  .stepContent {
+    font-size: 0.86rem;
+  }
+}
+
+/* ── Tips / Mejores prácticas ─────────────────────────── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .tipCard {
+  background: #2A2A2A;
+  border-color: #404040;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.tipCard div {
+  flex: 1;
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 0.25rem;
+}
+
+[data-theme='dark'] .tipCard strong {
+  color: #E5E5E5;
+}
+
+.tipCard p {
+  margin: 0;
+  color: var(--text-secondary, #555);
+  font-size: 0.85rem;
+}
+
+[data-theme='dark'] .tipCard p {
+  color: #B0B0B0;
+}
+
+/* ── Warning box ──────────────────────────────────────── */
+.warningBox {
+  background: #fff8e7;
+  border: 2px solid #f59e0b;
+  border-radius: 14px;
+  padding: 1.5rem 1.75rem;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2010;
+  border-color: #f59e0b;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #92400e;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #fbbf24;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: #78350f;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fde68a;
+}
+
+@media (max-width: 768px) {
+  .warningBox {
+    padding: 1.1rem 1.1rem;
+  }
+
+  .warningList li {
+    font-size: 0.86rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   :global(*), :global(*::before), :global(*::after) {
     animation-duration: 0.01ms !important;

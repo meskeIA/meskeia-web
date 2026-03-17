@@ -728,6 +728,486 @@ export default function EstimadorImpuestoSucesionesPage() {
             </div>
           </div>
         </section>
+
+        {/* ── Sección 1: Tabla comparativa de grupos ────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de los 4 grupos de parentesco</h2>
+          <p>
+            El grupo de parentesco es el factor que más condiciona la carga fiscal. La diferencia entre
+            un hijo y un sobrino puede suponer pagar el 0% o más del 30% de la herencia.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Grupo</th>
+                  <th>Reducción estatal base</th>
+                  <th>Coeficiente multiplicador*</th>
+                  <th>Bonificación autonómica típica</th>
+                  <th>Situación típica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Grupo I</strong><br /><small>Descendiente &lt;21 a. / cónyuge</small></td>
+                  <td>15.956,87 € + 3.990,72 € por año &lt;21 (máx. 47.858,59 €)</td>
+                  <td>1,0000 (patrimonio &lt;402.678 €)</td>
+                  <td>99%–100% en Madrid, Canarias, Galicia, Andalucía</td>
+                  <td>Hijo menor de 21 años hereda la vivienda familiar</td>
+                </tr>
+                <tr>
+                  <td><strong>Grupo II</strong><br /><small>Descendiente ≥21 a. / ascendiente</small></td>
+                  <td>15.956,87 €</td>
+                  <td>1,0000 (patrimonio &lt;402.678 €)</td>
+                  <td>99%–100% en Madrid, Canarias; 0% en Asturias</td>
+                  <td>Hijo adulto o padre hereda bienes del fallecido</td>
+                </tr>
+                <tr>
+                  <td><strong>Grupo III</strong><br /><small>Hermanos, tíos, sobrinos</small></td>
+                  <td>7.993,46 €</td>
+                  <td>1,5882 (patrimonio &lt;402.678 €)</td>
+                  <td>Escasa o nula en la mayoría de CCAA</td>
+                  <td>Sobrino hereda de tía sin hijos</td>
+                </tr>
+                <tr>
+                  <td><strong>Grupo IV</strong><br /><small>Primos, parientes lejanos, extraños</small></td>
+                  <td>0 €</td>
+                  <td>2,0000 (patrimonio &lt;402.678 €)</td>
+                  <td>Generalmente sin bonificación</td>
+                  <td>Amigo o pareja no registrada hereda bienes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className={styles.helper}>* Coeficientes para el régimen estatal (tarifa de 2025). Cataluña tiene coeficientes propios.</p>
+        </section>
+
+        {/* ── Sección 2: Casos de uso ───────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Casos de uso reales: 4 perfiles</h2>
+          <p>
+            Estos escenarios ilustran cómo varía el impuesto según la CCAA, el parentesco y el tipo
+            de bien heredado. Los importes son aproximados y orientativos.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏠</span>
+                <div>
+                  <strong>Hijo adulto hereda piso</strong>
+                  <small>Madrid — Grupo II — 200.000 €</small>
+                </div>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p>
+                  Base imponible: 200.000 € (piso) + 6.000 € (ajuar 3%) = <strong>206.000 €</strong>.
+                  Reducción por parentesco: 15.956,87 €. Reducción vivienda habitual (95%):
+                  mín(190.000 × 0,95; 122.606 €) = <strong>122.606 €</strong>.
+                  Base liquidable: 67.437 €. Cuota íntegra (tarifa estatal): ~6.100 €.
+                  Bonificación Madrid (99%): –6.039 €.
+                </p>
+                <p><strong>Cuota final estimada: ~61 €</strong></p>
+              </div>
+              <div className={styles.escenarioTip}>
+                Madrid tiene bonificación del 99% para Grupos I y II. Un hijo paga prácticamente cero.
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💳</span>
+                <div>
+                  <strong>Sobrino hereda cuenta bancaria</strong>
+                  <small>Asturias — Grupo III — 80.000 €</small>
+                </div>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p>
+                  Base imponible: 80.000 € + 2.400 € (ajuar) = <strong>82.400 €</strong>.
+                  Reducción por parentesco (Grupo III): 7.993,46 €. Base liquidable: 74.407 €.
+                  Cuota íntegra: ~10.860 €. Coeficiente multiplicador (Grupo III): × 1,5882 → <strong>17.237 €</strong>.
+                  Asturias no tiene bonificación en cuota para Grupo III.
+                </p>
+                <p><strong>Cuota final estimada: ~17.200 €</strong> (21,5% del valor heredado)</p>
+              </div>
+              <div className={styles.escenarioTip}>
+                Asturias es la CCAA más onerosa del régimen común para colaterales.
+                Un sobrino puede pagar más del 20% de lo heredado.
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏢</span>
+                <div>
+                  <strong>Viuda hereda empresa familiar</strong>
+                  <small>Cataluña — Grupo I-cónyuge — 500.000 €</small>
+                </div>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p>
+                  Cataluña aplica tarifa propia (7%–32%) y coeficientes propios.
+                  La empresa familiar puede tener reducción del 95% si cumple requisitos
+                  (art. 20.2.c Ley 29/1987 y normativa catalana). Sin esa reducción:
+                  base liquidable aprox. 484.043 €. Cuota catalana: ~67.000 €.
+                  Coeficiente cónyuge catalán: 1,0000.
+                </p>
+                <p><strong>Con reducción empresa familiar: cuota puede reducirse a ~3.350 €</strong></p>
+              </div>
+              <div className={styles.escenarioTip}>
+                La reducción por empresa familiar (95%) requiere que el causante ejerciera
+                funciones de dirección y que la familia mantenga los bienes 10 años.
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👶</span>
+                <div>
+                  <strong>Hijo menor con discapacidad</strong>
+                  <small>País Vasco — Grupo I — 300.000 €</small>
+                </div>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p>
+                  País Vasco tiene normativa foral propia (Álava, Bizkaia, Gipuzkoa con pequeñas
+                  diferencias). Para descendientes directos con discapacidad ≥33%, la reducción
+                  adicional es de 55.000 €–65.000 € según territorio. La bonificación para
+                  familiares directos es del 95%–100% en la mayoría de supuestos.
+                </p>
+                <p><strong>Cuota efectiva generalmente cercana a 0 €</strong></p>
+              </div>
+              <div className={styles.escenarioTip}>
+                País Vasco, Navarra y Cataluña tienen sus propias reducciones por discapacidad,
+                a menudo más generosas que la estatal (47.858,59 € al 65%).
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Sección 3: FAQ ────────────────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre el Impuesto de Sucesiones</h2>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt>¿Tengo que pagar si heredo en Madrid o Canarias?</dt>
+              <dd>
+                En la práctica, casi nunca. Madrid aplica una bonificación del 99% para los Grupos I y II
+                (cónyuge, descendientes, ascendientes). Canarias aplica el 99,9% para los mismos grupos.
+                La cuota resultante es de céntimos. Sin embargo, <strong>sí estás obligado a autoliquidar
+                aunque la cuota sea cero</strong>, presentando el modelo 650 en el plazo de 6 meses.
+                <div className={styles.faqTip}>Presentar aunque la cuota sea 0 evita sanciones por extemporaneidad.</div>
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Qué pasa si el inmueble vale más que el valor catastral?</dt>
+              <dd>
+                Para el ISD, los inmuebles se declaran por el <strong>valor de referencia del Catastro</strong>
+                (desde 2022, conforme a la Ley 11/2021). Si ese valor no existe o el contribuyente lo
+                impugna, se usa el valor de mercado. Si declaras por debajo del valor de referencia,
+                Hacienda puede iniciar una comprobación de valores y girar una liquidación complementaria
+                con intereses de demora (actualmente al 4,0625% anual).
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Puedo aplazar el pago si no tengo liquidez?</dt>
+              <dd>
+                Sí. El art. 65 LGT permite solicitar aplazamiento o fraccionamiento. Para el ISD
+                existe además la posibilidad de aplazamiento especial cuando en la herencia hay bienes
+                inmuebles y el heredero no tiene liquidez suficiente. El aplazamiento ordinario
+                conlleva intereses de demora. En algunos casos, la CCAA puede aceptar el pago
+                mediante adjudicación de bienes (dación en pago).
+                <div className={styles.faqTip}>Solicitar el aplazamiento ANTES de que venza el plazo. Si presentas fuera de plazo, pagas recargo además.</div>
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Qué es el coeficiente multiplicador?</dt>
+              <dd>
+                Es un factor que incrementa la cuota íntegra según el grupo de parentesco y el
+                patrimonio preexistente del heredero. Un hijo con menos de 402.678 € de patrimonio
+                usa el coeficiente 1,0000 (sin incremento). Un sobrino (Grupo III) con el mismo
+                patrimonio usa 1,5882, por lo que paga un 58,82% más que la cuota íntegra base.
+                Con patrimonio preexistente superior a 4.020.770 €, el coeficiente llega a 2,4 en
+                el Grupo IV.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Cómo afecta la discapacidad a las reducciones?</dt>
+              <dd>
+                La normativa estatal establece dos tramos: discapacidad entre el 33% y el 64%
+                da derecho a una reducción adicional de <strong>47.858,59 €</strong>; discapacidad
+                del 65% o superior da derecho a <strong>150.253,03 €</strong>. Estas reducciones
+                se suman a las de parentesco. Algunas CCAA (Andalucía, Valencia, Cataluña) amplían
+                estos importes. El grado de discapacidad debe estar reconocido oficialmente antes
+                del devengo del impuesto.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Qué pasa si presento fuera de plazo?</dt>
+              <dd>
+                Si presentas antes de que Hacienda te requiera, se aplica el recargo por extemporaneidad
+                espontánea: <strong>5% si tardas hasta 3 meses</strong>, 10% hasta 6 meses, 15% hasta
+                12 meses, y 20% a partir de 12 meses. Además se exigen intereses de demora a partir
+                del mes 12. Si Hacienda actúa primero (liquidación de oficio), se aplican sanciones
+                que pueden llegar al 150% de la deuda.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Puedo deducir las deudas del causante?</dt>
+              <dd>
+                Sí. Las deudas acreditadas del fallecido (hipotecas, préstamos, facturas pendientes)
+                minoran la masa hereditaria. También son deducibles los <strong>gastos de última
+                enfermedad</strong> y los gastos de sepelio (entierro y funeral) en cuantía razonable.
+                No son deducibles las deudas contraídas con herederos, ni las garantizadas con cláusula
+                de reserva de dominio.
+              </dd>
+            </div>
+
+            <div className={styles.faqItem}>
+              <dt>¿Qué diferencia hay entre reducción y bonificación?</dt>
+              <dd>
+                Son mecanismos distintos que actúan en fases diferentes del cálculo:
+                <ul>
+                  <li><strong>Reducción</strong>: Resta de la base imponible antes de aplicar la tarifa.
+                  Ejemplo: reducción por parentesco de 15.956,87 € en Grupo II.</li>
+                  <li><strong>Bonificación</strong>: Porcentaje que se aplica sobre la cuota tributaria
+                  ya calculada. Ejemplo: Madrid bonifica el 99% de la cuota para Grupo II.</li>
+                </ul>
+                Una reducción de 15.956 € ahorra entre ~1.200 € y ~3.700 € dependiendo del tramo.
+                Una bonificación del 99% sobre una cuota de 10.000 € ahorra 9.900 €.
+                <div className={styles.faqTip}>Las bonificaciones autonómicas son en general mucho más potentes que las reducciones estatales.</div>
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        {/* ── Sección 4: Guía paso a paso ──────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Guía paso a paso: del fallecimiento al pago del impuesto</h2>
+          <p>
+            Desde el fallecimiento hasta la inscripción de los bienes, el proceso tiene 7 etapas
+            claramente definidas. El plazo para liquidar el impuesto es de <strong>6 meses</strong>,
+            pero la tramitación completa puede llevar 1–2 años.
+          </p>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Obtener el certificado de defunción</strong>
+                <p>
+                  Se solicita en el Registro Civil del municipio donde ocurrió el fallecimiento.
+                  Plazo recomendado: dentro de las 24 horas. Es gratuito. Necesario para todos
+                  los trámites posteriores.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Solicitar el certificado de últimas voluntades</strong>
+                <p>
+                  Acredita si el fallecido otorgó testamento y ante qué notario. Se solicita al
+                  Ministerio de Justicia (presencialmente o por correo) con el certificado de
+                  defunción. <strong>Plazo mínimo: 15 días hábiles</strong> desde el fallecimiento.
+                  Coste: 3,78 €.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Obtener el testamento o iniciar declaración de herederos</strong>
+                <p>
+                  Si hay testamento: la notaría que lo otorgó entrega copia autorizada.
+                  Si no hay testamento (abintestato): se inicia ante notaría el acta de declaración
+                  de herederos, que puede tardar 2–4 meses. Sin este documento no se puede
+                  inventariar ni adjudicar la herencia.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Calcular la masa hereditaria neta</strong>
+                <p>
+                  Inventariar todos los bienes (cuentas, inmuebles, vehículos, fondos, seguros) y
+                  restar las deudas acreditadas. El ajuar doméstico se presume en el 3% salvo
+                  prueba en contrario. Obtener certificados de saldos bancarios a la fecha de
+                  fallecimiento y tasaciones de inmuebles si es necesario.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Aplicar reducciones y calcular la cuota</strong>
+                <p>
+                  Aplicar las reducciones según parentesco, edad, discapacidad y tipo de bien.
+                  Aplicar la tarifa correspondiente (estatal o autonómica) sobre la base liquidable.
+                  Multiplicar por el coeficiente según grupo y patrimonio. Aplicar la bonificación
+                  autonómica si corresponde.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Autoliquidar con el modelo 650 en la CCAA competente</strong>
+                <p>
+                  La CCAA competente es donde residía el causante (fallecido) de forma habitual
+                  durante los 5 años anteriores al fallecimiento. Plazo: <strong>6 meses</strong>
+                  desde el fallecimiento. Se puede solicitar prórroga de 6 meses adicionales
+                  antes de que expiren los primeros 5 meses. El modelo 650 se presenta online
+                  en el portal tributario de la CCAA correspondiente.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Inscribir bienes y adjudicar la herencia</strong>
+                <p>
+                  Una vez pagado el impuesto (o acreditado que la cuota es cero), se firma la
+                  escritura de aceptación y adjudicación de herencia ante notario. Los inmuebles
+                  se inscriben en el Registro de la Propiedad presentando la escritura junto con
+                  el justificante de pago del ISD. Plazo registral: 15 días hábiles habitual.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── Sección 5: Mejores prácticas ─────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>6 acciones clave para optimizar el impuesto legalmente</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⏰</span>
+              <div>
+                <strong>Solicita la prórroga antes del mes 5</strong>
+                <p>
+                  Si no tienes tiempo de tramitar la herencia en 6 meses, solicita la prórroga
+                  antes de que expiren los primeros 5 meses. La prórroga es de 6 meses adicionales
+                  y no genera intereses ni recargo si se solicita en plazo.
+                </p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📋</span>
+              <div>
+                <strong>Valora la aceptación a beneficio de inventario</strong>
+                <p>
+                  Si el causante podría tener deudas desconocidas, acepta la herencia a beneficio
+                  de inventario. Así solo respondes con los bienes heredados, no con tu patrimonio
+                  personal. El plazo para optar es de 30 días hábiles desde que conoces la herencia.
+                </p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏷️</span>
+              <div>
+                <strong>Verifica el método de valoración del inmueble</strong>
+                <p>
+                  Desde 2022, los inmuebles se declaran por el valor de referencia catastral.
+                  Si es mayor que el valor de mercado, puedes impugnarlo ante la Dirección General
+                  del Catastro aportando tasación pericial. Una reducción del 10% en la valoración
+                  de un piso de 300.000 € puede ahorrar 1.000–4.000 € en ISD.
+                </p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🪑</span>
+              <div>
+                <strong>Declara el ajuar doméstico correctamente</strong>
+                <p>
+                  Hacienda presume el 3% del valor de la masa hereditaria neta como ajuar doméstico.
+                  Si los muebles, ropa y enseres valen menos, puedes impugnar esta presunción
+                  aportando inventario valorado. En una herencia de 400.000 €, el ajuar presunto
+                  es de 12.000 €, lo que supone ~600–2.000 € adicionales de impuesto.
+                </p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏠</span>
+              <div>
+                <strong>Aplica la reducción por vivienda habitual</strong>
+                <p>
+                  Si heredas la vivienda habitual del causante, aplica la reducción del 95%
+                  sobre su valor (con el límite estatal de 122.606,47 € por heredero). Cónyuge,
+                  descendientes y ascendientes pueden aplicarla. Solo en Cataluña aplica un régimen
+                  distinto. Requisito: mantener la vivienda 10 años (o 3 en algunas CCAA).
+                </p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📤</span>
+              <div>
+                <strong>Liquida aunque la cuota sea cero</strong>
+                <p>
+                  En CCAA con bonificación del 99%–100% (Madrid, Canarias, Galicia), la cuota
+                  resultante es prácticamente cero pero la obligación de presentar el modelo 650
+                  subsiste. No presentar conlleva sanción por infracción formal de entre 200 € y
+                  400 € y puede complicar la inscripción de los bienes.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Sección 6: Warning box — errores comunes ─────────────── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h2>6 errores que pueden costarte caro</h2>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>No declarar en plazo.</strong> El recargo por extemporaneidad espontánea
+                va del 5% (hasta 3 meses de retraso) al 20% (más de 12 meses), más intereses de
+                demora desde el mes 12. Una cuota de 10.000 € presentada con 8 meses de retraso
+                generará un recargo de 1.500 € adicionales.
+              </li>
+              <li>
+                <strong>Confundir la CCAA competente.</strong> El impuesto se presenta en la CCAA
+                donde residía habitualmente el causante durante los últimos 5 años, <em>no</em> donde
+                está el heredero ni donde están los bienes. Presentar en la CCAA incorrecta no
+                interrumpe el plazo: Hacienda puede exigirte el impuesto en la CCAA correcta con
+                los recargos correspondientes.
+              </li>
+              <li>
+                <strong>No solicitar prórroga en tiempo.</strong> La prórroga de 6 meses solo puede
+                pedirse antes de que expiren los primeros 5 meses. Si esperas al mes 6, ya no es
+                posible: el plazo ha vencido y cualquier presentación fuera de plazo genera recargo.
+              </li>
+              <li>
+                <strong>Ignorar el ajuar doméstico.</strong> Hacienda presume automáticamente el
+                3% del valor neto como ajuar. Si lo omites en tu declaración, la oficina gestora
+                puede practicar una liquidación paralela incluyendo ese 3% más intereses de demora.
+              </li>
+              <li>
+                <strong>Aceptar la herencia sin inventario cuando hay deudas.</strong> Si el causante
+                tenía deudas desconocidas (tarjetas, avales, impuestos pendientes), aceptar la
+                herencia pura y simplemente hace que respondas con todo tu patrimonio. La aceptación
+                a beneficio de inventario limita tu responsabilidad a los bienes heredados.
+              </li>
+              <li>
+                <strong>Olvidar los seguros de vida.</strong> Los seguros de vida contratados por
+                el causante con beneficiarios nominados no forman parte de la herencia civil, pero
+                <em>sí tributan por ISD</em> por su normativa específica. El beneficiario debe
+                declararlos en el modelo 650 dentro del mismo plazo de 6 meses, con independencia
+                de la herencia. La reducción estatal máxima es de 9.195,49 € para cónyuge,
+                descendientes y ascendientes.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('estimador-impuesto-sucesiones')} />

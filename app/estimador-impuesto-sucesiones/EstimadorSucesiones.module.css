@@ -443,7 +443,416 @@
   color: var(--primary);
 }
 
-/* Responsive */
+/* ─── Tabla comparativa ─────────────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+  min-width: 600px;
+}
+
+.comparativaTable thead {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+}
+
+.comparativaTable th {
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.comparativaTable td {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.comparativaTable td small {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 0.15rem;
+}
+
+.comparativaTable tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {
+  background: rgba(72, 169, 166, 0.06);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+/* ─── Escenarios / casos de uso ─────────────────────────────────────────── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin: 1.25rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.escenarioCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.escenarioIcon {
+  font-size: 1.75rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.escenarioHeader div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.escenarioHeader strong {
+  font-size: 0.97rem;
+  color: var(--text-primary);
+}
+
+.escenarioHeader small {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.escenarioExample {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  background: rgba(46, 134, 171, 0.04);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.escenarioExample p {
+  margin: 0 0 0.4rem;
+}
+
+.escenarioExample p:last-child {
+  margin-bottom: 0;
+}
+
+.escenarioExample strong {
+  color: var(--text-primary);
+}
+
+.escenarioTip {
+  font-size: 0.82rem;
+  color: var(--primary);
+  border-left: 3px solid var(--primary);
+  padding-left: 0.65rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .escenarioCard {
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .escenarioCard:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 4px 16px rgba(72, 169, 166, 0.15);
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: rgba(72, 169, 166, 0.06);
+}
+
+/* ─── FAQ ────────────────────────────────────────────────────────────────── */
+.faqList {
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--border);
+  padding: 1.1rem 0;
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqItem dt {
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.6rem;
+  cursor: default;
+}
+
+.faqItem dd {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.faqItem dd ul {
+  margin: 0.5rem 0;
+  padding-left: 1.2rem;
+}
+
+.faqItem dd li {
+  margin-bottom: 0.25rem;
+}
+
+.faqTip {
+  margin-top: 0.6rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--secondary);
+  background: rgba(72, 169, 166, 0.08);
+  border-radius: 6px;
+  padding: 0.45rem 0.7rem;
+}
+
+[data-theme='dark'] .faqItem dt {
+  color: var(--secondary);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.12);
+  color: #7dd3d0;
+}
+
+/* ─── Guía paso a paso ───────────────────────────────────────────────────── */
+.stepGuide {
+  list-style: none;
+  margin: 1.25rem 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-left: 3px solid var(--border);
+  padding-left: 0;
+  margin-left: 1rem;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 0 1rem 1.25rem;
+  position: relative;
+}
+
+.step::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 1.4rem;
+  width: 3px;
+  height: 100%;
+  background: var(--border);
+}
+
+.step:last-child::before {
+  display: none;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  position: relative;
+  left: calc(-1.25rem - 1rem);
+  margin-right: calc(-1.25rem - 1rem);
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.97rem;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+[data-theme='dark'] .stepGuide {
+  border-left-color: var(--border);
+}
+
+/* ─── Tips / mejores prácticas ──────────────────────────────────────────── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.tipCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tipCard:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 3px 12px rgba(72, 169, 166, 0.1);
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.tipCard div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.tipCard strong {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .tipCard {
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .tipCard:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 3px 12px rgba(72, 169, 166, 0.15);
+}
+
+/* ─── Warning box ────────────────────────────────────────────────────────── */
+.warningBox {
+  background: var(--warning-bg);
+  border: 2px solid var(--warning-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+}
+
+.warningHeader h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.warningIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+}
+
+[data-theme='dark'] .warningHeader h2 {
+  color: var(--text-primary);
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .mainContent {
     grid-template-columns: 1fr;
@@ -455,6 +864,45 @@
 
   .conceptGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable {
+    font-size: 0.82rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.55rem 0.65rem;
+  }
+
+  .stepGuide {
+    margin-left: 0.5rem;
+  }
+
+  .step {
+    padding-left: 1rem;
+  }
+
+  .warningBox {
+    padding: 1.1rem;
+  }
+
+  .warningHeader h2 {
+    font-size: 0.97rem;
+  }
+
+  .faqItem dt {
+    font-size: 0.92rem;
   }
 }
 
