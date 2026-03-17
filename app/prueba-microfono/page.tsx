@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './PruebaMicrofono.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface MicrophoneInfo {
@@ -572,6 +572,293 @@ export default function PruebaMicrofonoPage() {
           </div>
         </div>
       </div>
+
+      <EducationalSection
+        title="¿Quieres saber más sobre micrófonos y audio?"
+        subtitle="Tipos de micrófono, casos de uso habituales, preguntas frecuentes y guía paso a paso para una prueba exitosa"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section className={styles.guideSection}>
+          <h2>Tipos de micrófono: comparativa rápida</h2>
+          <p>
+            No todos los micrófonos ofrecen la misma calidad ni se adaptan igual a cada situación.
+            Elige el que mejor encaje con tu uso habitual.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Calidad de audio</th>
+                  <th>Ruido ambiente</th>
+                  <th>Uso recomendado</th>
+                  <th>Precio aproximado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>💻 Micrófono integrado portátil</td>
+                  <td>Básica</td>
+                  <td>Capta mucho ruido</td>
+                  <td>Uso ocasional, emergencias</td>
+                  <td>Incluido</td>
+                </tr>
+                <tr>
+                  <td>🎧 Auriculares con micro</td>
+                  <td>Media-buena</td>
+                  <td>Moderado (micro cerca)</td>
+                  <td>Videollamadas diarias, gaming</td>
+                  <td>10 – 80 €</td>
+                </tr>
+                <tr>
+                  <td>🎙️ Micro USB externo</td>
+                  <td>Buena</td>
+                  <td>Bajo (cardioide)</td>
+                  <td>Podcasts, streaming, teletrabajo</td>
+                  <td>40 – 150 €</td>
+                </tr>
+                <tr>
+                  <td>🏆 Micro XLR profesional</td>
+                  <td>Excelente</td>
+                  <td>Muy bajo</td>
+                  <td>Grabación profesional, radio</td>
+                  <td>100 – 500 €+</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>Cuándo usar esta herramienta</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📹</span>
+                <h4>Antes de una videollamada o reunión online</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Comprueba que tu micrófono funciona correctamente y que el nivel de audio
+                es adecuado antes de entrar a una reunión importante.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: haz la prueba con al menos 5 minutos de antelación para tener
+                tiempo de solucionar cualquier problema.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔊</span>
+                <h4>Diagnosticar eco o ruido de fondo</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Si los demás te dicen que escuchan eco o ruido en tus llamadas, usa el
+                visualizador para identificar si el problema es el micrófono o el entorno.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: activa la grabación, reproduce y escucha. Si suena bien aquí
+                pero mal en Teams o Zoom, el problema es la configuración de esa app.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔒</span>
+                <h4>Comprobar permisos de micrófono en el navegador</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Si el navegador no detecta el micrófono, es probable que los permisos
+                estén bloqueados. Esta herramienta te ayuda a confirmarlo y solucionarlo.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: busca el icono de candado o cámara en la barra de direcciones
+                para gestionar los permisos de este sitio.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre el micrófono</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Por qué no detecta mi micrófono?</summary>
+                <p>
+                  Las causas más habituales son: permisos bloqueados en el navegador,
+                  otra aplicación usando el micrófono en exclusiva (Teams, Zoom, Discord),
+                  o un driver desactualizado. Revisa primero los permisos del navegador
+                  en la barra de direcciones y cierra otras apps de comunicación.
+                </p>
+                <p className={styles.faqTip}>
+                  En Windows: Configuración → Privacidad → Micrófono → activa el acceso
+                  para el navegador que uses.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cómo elimino el eco en videollamadas?</summary>
+                <p>
+                  El eco aparece cuando el micro capta el audio de los altavoces y lo
+                  reenvía al resto de participantes. La solución más sencilla es usar
+                  auriculares: el audio va directo a tu oído y no llega al micrófono.
+                  Si no puedes usar auriculares, baja el volumen de los altavoces o
+                  activa la cancelación de eco de tu aplicación de videollamada.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cómo doy permisos al micrófono en el navegador?</summary>
+                <p>
+                  En Chrome y Edge: haz clic en el icono de candado a la izquierda de
+                  la URL → Micrófono → Permitir. En Firefox: haz clic en el icono de
+                  escudo o candado → más información → permisos → micrófono. En Safari:
+                  Preferencias → Sitios web → Micrófono → Permitir para este sitio.
+                  Después recarga la página.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Por qué el micro funciona aquí pero no en Teams/Zoom?</summary>
+                <p>
+                  Cada aplicación gestiona el micrófono de forma independiente. Puede
+                  que Teams o Zoom tengan seleccionado un dispositivo diferente, o que
+                  sus propios permisos estén bloqueados. Ve a Configuración dentro de
+                  la app de videollamada → Audio → y selecciona el mismo micrófono que
+                  funciona en esta prueba. También verifica que el sistema operativo
+                  les da acceso al micrófono.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Cómo hacer una prueba de micrófono correcta</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Permite el acceso al micrófono cuando el navegador lo solicite</strong>
+                <p>
+                  Al pulsar &quot;Iniciar Micrófono&quot;, el navegador pedirá permiso. Acepta
+                  para que la herramienta pueda acceder al dispositivo de audio.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Habla y verifica que se mueve el indicador de nivel</strong>
+                <p>
+                  Habla a una distancia normal (20-30 cm) y comprueba que la barra de
+                  volumen sube. El nivel óptimo está entre el 30 % y el 70 %.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Comprueba que no hay ruido de fondo excesivo</strong>
+                <p>
+                  Quédate en silencio unos segundos y observa el medidor. Si sube por
+                  encima del 10-15 % sin que hables, hay ruido de fondo que conviene
+                  reducir antes de tu reunión.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Si no funciona, revisa permisos y que ninguna app lo bloquea</strong>
+                <p>
+                  Cierra Teams, Zoom, Discord u otras apps de comunicación. Revisa los
+                  permisos del navegador y vuelve a intentarlo. Si persiste, reinicia
+                  el navegador.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas para un audio de calidad</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">💨</span>
+              <h4>Aléjate del ventilador o aire acondicionado</h4>
+              <p>
+                El ruido del ventilador es constante y se cuela fácilmente en el
+                micrófono. Mueve el equipo o apaga el climatizador durante la llamada.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎧</span>
+              <h4>Usa auriculares con micro para evitar el eco</h4>
+              <p>
+                Es la medida más eficaz contra el eco. Los auriculares impiden que el
+                audio de los altavoces llegue al micrófono y se retroalimente.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📵</span>
+              <h4>Cierra otras apps que usen el micrófono</h4>
+              <p>
+                Teams, Zoom, Discord o Skype pueden bloquear el acceso al micrófono
+                en exclusiva. Ciérralas antes de la prueba para evitar conflictos.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🗓️</span>
+              <h4>Prueba siempre antes de reuniones importantes</h4>
+              <p>
+                Hacer esta prueba 5 minutos antes de una entrevista o reunión clave
+                te da margen para resolver cualquier problema sin prisas ni estrés.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores habituales con el micrófono</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Otra app usando el micrófono simultáneamente.</strong> Teams,
+                Zoom o Discord pueden ocupar el micrófono en exclusiva e impedir que
+                esta herramienta (u otras apps) accedan a él. Ciérralas primero.
+              </li>
+              <li>
+                <strong>No comprobar antes de reuniones o entrevistas online.</strong>{' '}
+                Un micrófono que no funciona justo al empezar una reunión importante
+                genera una impresión muy negativa. Dedica 2 minutos a probarlo antes.
+              </li>
+              <li>
+                <strong>Ignorar el eco (molesta mucho a los demás participantes).</strong>{' '}
+                El eco dificulta la comunicación y distrae a todos. Si te lo dicen,
+                actúa: usa auriculares o baja el volumen de los altavoces.
+              </li>
+              <li>
+                <strong>Hablar muy lejos del micrófono (audio inaudible).</strong>{' '}
+                A más de 50 cm el audio pierde calidad notablemente. Mantén una
+                distancia de 15-30 cm para un nivel de voz claro y natural.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('prueba-microfono')} />
 

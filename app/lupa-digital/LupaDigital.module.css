@@ -393,7 +393,338 @@
   text-align: center;
 }
 
-/* Responsive */
+/* ── EducationalSection: Tabla Comparativa ── */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-top: 16px;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 520px;
+}
+
+.comparativaTable th {
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 2px solid rgba(46, 134, 171, 0.25);
+}
+
+.comparativaTable td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover td {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+/* ── EducationalSection: Casos de Uso ── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.escenarioHeader h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.escenarioTip {
+  font-size: 0.82rem;
+  color: #2E86AB;
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid #2E86AB;
+  padding: 8px 10px;
+  border-radius: 0 6px 6px 0;
+  margin: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .escenarioTip {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+/* ── EducationalSection: FAQ ── */
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faqItem {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.faqItem details {
+  padding: 0;
+}
+
+.faqItem details summary {
+  padding: 14px 16px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faqItem details summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem details summary::after {
+  content: '＋';
+  font-size: 1rem;
+  color: #2E86AB;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.faqItem details[open] summary::after {
+  content: '－';
+}
+
+.faqItem details p {
+  padding: 0 16px 14px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.faqTip {
+  font-size: 0.82rem !important;
+  color: #48A9A6 !important;
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid #48A9A6;
+  padding: 8px 10px !important;
+  border-radius: 0 6px 6px 0;
+  margin-top: 8px !important;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+/* ── EducationalSection: Guía Paso a Paso ── */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.stepContent p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+}
+
+/* ── EducationalSection: Tips Grid ── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tipCard h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+}
+
+/* ── EducationalSection: Warning Box ── */
+.warningBox {
+  background: rgba(245, 158, 11, 0.07);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  padding: 20px 22px;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.warningHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  padding-left: 18px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.warningList li {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.09);
+  border-color: rgba(245, 158, 11, 0.28);
+}
+
+/* ── Responsive ── */
 @media (max-width: 600px) {
   .container {
     padding: 15px 10px;
@@ -422,5 +753,21 @@
 
   .zoomPresets {
     flex-wrap: wrap;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable {
+    font-size: 0.8rem;
+  }
+
+  .step {
+    flex-direction: row;
   }
 }

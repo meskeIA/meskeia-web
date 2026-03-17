@@ -556,6 +556,194 @@ export default function NivelBurbujaPage() {
             </div>
           </div>
         </section>
+
+        {/* Tabla comparativa de usos */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de usos del nivel de burbuja</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Uso</th>
+                  <th>Precisión necesaria</th>
+                  <th>Herramienta recomendada</th>
+                  <th>Tolerancia de error</th>
+                  <th>Consecuencia si está torcido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Colgar cuadros</td>
+                  <td>Baja</td>
+                  <td>Nivel de móvil</td>
+                  <td>±2°</td>
+                  <td>Cuadro visiblemente inclinado</td>
+                </tr>
+                <tr>
+                  <td>Instalar muebles/estanterías</td>
+                  <td>Media</td>
+                  <td>Nivel de burbuja o móvil</td>
+                  <td>±0,5°</td>
+                  <td>Objetos que resbalan o puertas que no cierran</td>
+                </tr>
+                <tr>
+                  <td>Colocar electrodomésticos</td>
+                  <td>Media-Alta</td>
+                  <td>Nivel profesional o móvil calibrado</td>
+                  <td>±0,3°</td>
+                  <td>Vibraciones, mal funcionamiento o averías</td>
+                </tr>
+                <tr>
+                  <td>Obra y construcción</td>
+                  <td>Alta</td>
+                  <td>Nivel láser o de burbuja profesional</td>
+                  <td>±0,1°</td>
+                  <td>Problemas estructurales graves y costosos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.guideSection}>
+          <h2>¿Cuándo usar el nivel de burbuja del móvil?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🖼️</span>
+                <h4>Bricolaje doméstico</h4>
+              </div>
+              <p className={styles.escenarioExample}>Colgar estantes y cuadros perfectamente rectos sin necesidad de herramientas adicionales.</p>
+              <p className={styles.escenarioTip}>Usa el modo burbuja y bloquea el eje Y para nivelar solo en horizontal.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🪑</span>
+                <h4>Instalación de muebles</h4>
+              </div>
+              <p className={styles.escenarioExample}>Asegurarte de que los muebles de cocina o baño quedan nivelados antes de fijarlos definitivamente.</p>
+              <p className={styles.escenarioTip}>Apoya el móvil sobre la superficie del mueble y ajusta las patas regulables hasta centrar la burbuja.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏃</span>
+                <h4>Verificación rápida</h4>
+              </div>
+              <p className={styles.escenarioExample}>Comprobar si algo está nivelado cuando no tienes a mano un nivel físico.</p>
+              <p className={styles.escenarioTip}>Ideal como solución de urgencia; para trabajos importantes, confirma siempre con un nivel profesional.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <h4>¿Es tan preciso como un nivel físico?</h4>
+              <p>No exactamente. Los acelerómetros de los móviles tienen una precisión de ±0,5° a ±1°, similar a un nivel de burbuja básico. Un nivel de burbuja profesional puede alcanzar ±0,1°. Para bricolaje doméstico la diferencia es imperceptible, pero en obra se nota.</p>
+              <p className={styles.faqTip}>Para colgar cuadros y montar muebles, la precisión del móvil es más que suficiente.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <h4>¿Cómo calibro el nivel del móvil?</h4>
+              <p>Coloca el teléfono sobre una superficie que sepas que es perfectamente plana (como un azulejo recién colocado o el cristal de una mesa de nivel). Pulsa el botón &quot;Calibrar&quot; para establecer esa posición como referencia 0°. Repite la calibración cada vez que cambies de superficie.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <h4>¿Funciona en todas las posiciones del teléfono?</h4>
+              <p>Sí. El sensor detecta la orientación independientemente de si el teléfono está en posición horizontal (apoyado en una superficie) o vertical (apoyado de canto). El modo burbuja es ideal para posición horizontal y el inclinómetro para mediciones verticales.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <h4>¿Para qué trabajos NO es suficiente el nivel del móvil?</h4>
+              <p>No es adecuado para: instalación de ventanas y puertas (requieren ±0,1°), solado de terrazo o parqué (necesita nivel láser), nivelación de maquinaria industrial, trabajos de construcción donde la tolerancia sea inferior a 1 mm por metro.</p>
+              <p className={styles.faqTip}>En caso de duda, usa siempre un nivel profesional calibrado.</p>
+            </li>
+          </ul>
+        </section>
+
+        {/* Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo usar el nivel paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <h4>Calibrar el teléfono en superficie plana</h4>
+                <p>Antes de empezar, apoya el teléfono en una superficie que sepas que está nivelada. Pulsa &quot;Iniciar&quot; y después &quot;Calibrar&quot; para fijar el punto de referencia 0°.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <h4>Apoyar el teléfono sobre el objeto a nivelar</h4>
+                <p>Coloca el teléfono directamente sobre la superficie o objeto que quieres nivelar. Asegúrate de que descansa de forma estable y sin vibrar.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <h4>Ajustar hasta que la burbuja quede centrada</h4>
+                <p>Mueve o ajusta el objeto (por ejemplo, girando las patas regulables de un mueble) hasta que la burbuja quede en el centro y el indicador muestre ✅ Nivelado.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <h4>Fijar el objeto antes de retirar el teléfono</h4>
+                <p>Una vez nivelado, fija o atornilla el objeto sin moverlo. Comprueba de nuevo con el nivel después de fijar para verificar que no se ha desplazado durante el proceso.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas para mayor precisión</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <div>
+                <h4>Calibrar siempre antes de usar</h4>
+                <p>Un sensor sin calibrar puede acumular desviaciones de hasta 2°. Calibra sobre una superficie de referencia fiable cada vez que vayas a usar la herramienta.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📱</span>
+              <div>
+                <h4>Usa funda plana para mayor precisión</h4>
+                <p>Las fundas con relieve, textura o bordes curvos elevan el teléfono de forma irregular y desplazan el sensor. Una funda fina y plana minimiza el error.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <div>
+                <h4>Verifica en dos ejes</h4>
+                <p>No basta con nivelar solo en horizontal. Gira el teléfono 90° y comprueba también el eje perpendicular para garantizar una nivelación completa.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔧</span>
+              <div>
+                <h4>Confirma con nivel profesional en obras</h4>
+                <p>Para reformas, alicatados o cualquier trabajo donde el error acumulado pueda ser costoso, usa el móvil solo como guía y confirma con un nivel de burbuja o láser profesional.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>Errores frecuentes que debes evitar</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>No calibrar antes de usar:</strong> el sensor puede estar desviado y darte lecturas incorrectas desde el primer momento.</li>
+            <li><strong>Usar en superficies con vibración:</strong> la lavadora en marcha, el tráfico en la calle o el aire acondicionado pueden hacer oscilar la burbuja y dar resultados inestables.</li>
+            <li><strong>Confiar en el nivel del móvil para trabajos de construcción precisos:</strong> la tolerancia del sensor no es suficiente para obra; usa siempre herramientas profesionales calibradas.</li>
+            <li><strong>Usar con funda gruesa o curva:</strong> desplaza físicamente el sensor respecto a la superficie y añade un error sistemático que la calibración no puede corregir.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('nivel-burbuja')} />

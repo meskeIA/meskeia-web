@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './LupaDigital.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type FiltroTipo = 'ninguno' | 'alto-contraste' | 'invertir' | 'escala-grises' | 'sepia';
@@ -327,6 +327,306 @@ export default function LupaDigitalPage() {
           <div className={styles.usoItem}>♿ Accesibilidad</div>
         </div>
       </div>
+
+      {/* Contenido educativo colapsable */}
+      <EducationalSection
+        title="¿Quieres aprender más sobre la Lupa Digital?"
+        subtitle="Niveles de zoom, casos de uso, preguntas frecuentes y consejos prácticos"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section>
+          <h2>Niveles de zoom: ¿cuál usar en cada situación?</h2>
+          <p>
+            La calidad de imagen varía según el zoom aplicado. Elige el nivel adecuado
+            para cada tarea para obtener el mejor resultado posible.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Nivel de zoom</th>
+                  <th>Campo visual</th>
+                  <th>Uso recomendado</th>
+                  <th>Detalle visible</th>
+                  <th>Limitación principal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🔍 2x</td>
+                  <td>Amplio</td>
+                  <td>Leer etiquetas y texto normal</td>
+                  <td>Letras de 6–8 pt</td>
+                  <td>Poco útil para detalles muy finos</td>
+                </tr>
+                <tr>
+                  <td>🔍 4x</td>
+                  <td>Medio</td>
+                  <td>Manuales, mapas, prospectos</td>
+                  <td>Letras de 4–5 pt, líneas finas</td>
+                  <td>Pulso leve causa desenfoque</td>
+                </tr>
+                <tr>
+                  <td>🔍 8x</td>
+                  <td>Reducido</td>
+                  <td>Componentes electrónicos, marcas pequeñas</td>
+                  <td>Detalles de 1–2 mm</td>
+                  <td>Requiere apoyo del teléfono para estabilidad</td>
+                </tr>
+                <tr>
+                  <td>🔍 16x</td>
+                  <td>Muy reducido</td>
+                  <td>Trabajos de precisión, grabados</td>
+                  <td>Detalles sub-milimétricos</td>
+                  <td>Pixelado notable, solo con buena iluminación</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section>
+          <h2>¿Para quién es útil la lupa digital?</h2>
+          <p>
+            Cualquier persona puede beneficiarse, pero estos son los tres perfiles que
+            más la usan en el día a día.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">👴</span>
+                <h4>Persona mayor con letra pequeña</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Necesita leer las instrucciones de un medicamento, la fecha de caducidad
+                de un producto o el texto de un contrato impreso en cuerpo 8.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: usa el zoom 3x–4x con brillo al 130 % para leer etiquetas
+                de supermercado sin esfuerzo visual.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🗺️</span>
+                <h4>Leer texto fino en mapas o manuales</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Mapas de papel, planos de montaje, instrucciones de electrodomésticos
+                o la letra pequeña de un contrato impreso a doble cara.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: activa el filtro de alto contraste para que el texto negro
+                sobre fondo claro sea más legible con zoom alto.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🖼️</span>
+                <h4>Ver detalles en fotos o documentos</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Ampliar una fotografía impresa, revisar la firma en un documento, o
+                examinar el detalle de una pintura sin necesidad de escáner.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: congela la imagen con el botón de pausa y tómate el tiempo
+                que necesites para leer sin mover el teléfono.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section>
+          <h2>Preguntas frecuentes</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿La lupa digital tiene la misma calidad que una lupa física?</summary>
+                <p>
+                  No exactamente. Una lupa óptica de calidad ofrece imagen nítida sin
+                  degradación. La lupa digital amplía mediante software, por lo que a
+                  partir de cierto zoom (normalmente 5x–8x) la imagen puede pixelarse.
+                  Para usos cotidianos (leer etiquetas, manuales) la calidad es más que
+                  suficiente y tiene la ventaja de añadir filtros, congelar imagen y
+                  ajustar el brillo.
+                </p>
+                <p className={styles.faqTip}>
+                  Dato: los smartphones modernos con zoom óptico integrado obtienen
+                  resultados significativamente mejores que el zoom digital puro.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Puedo tomar fotos con la lupa activa?</summary>
+                <p>
+                  Sí, aunque esta herramienta está orientada a la visualización en tiempo
+                  real. Para capturar la imagen ampliada puedes hacer una captura de
+                  pantalla del dispositivo mientras la lupa está activa. Así conservas
+                  el nivel de zoom y los filtros aplicados en ese momento.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Funciona sin conexión a internet?</summary>
+                <p>
+                  Sí. La lupa digital utiliza únicamente la cámara de tu dispositivo y
+                  procesa todo localmente en el navegador. No envía imágenes a ningún
+                  servidor. Solo necesitas conexión para cargar la página por primera vez.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Consume mucha batería usar la cámara como lupa?</summary>
+                <p>
+                  El uso continuado de la cámara consume batería de forma moderada,
+                  similar a grabar un vídeo. Para sesiones cortas (leer una etiqueta o
+                  un documento) el consumo es mínimo. Si vas a usarla durante varios
+                  minutos seguidos, conecta el cargador o activa el modo congelado, que
+                  detiene la cámara y reduce el consumo.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section>
+          <h2>Cómo usar la lupa digital: 4 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Apuntar la cámara al texto u objeto</strong>
+                <p>
+                  Coloca el teléfono a unos 15–20 cm del objeto. La cámara trasera
+                  ofrece mejor resolución. Activa la lupa y enfoca el área que quieres
+                  leer o examinar.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Ajustar el zoom hasta ver claramente</strong>
+                <p>
+                  Usa el deslizador o los botones de preajuste para encontrar el nivel
+                  de zoom adecuado. Empieza siempre por el zoom más bajo y sube
+                  gradualmente para no perder el contexto.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Congelar la imagen si necesitas leer sin mover el teléfono</strong>
+                <p>
+                  El modo congelado captura el fotograma actual y te permite leer con
+                  calma sin mantener el pulso. Ideal para texto largo o cuando necesitas
+                  comparar varias zonas del documento.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Aumentar brillo si la iluminación es baja</strong>
+                <p>
+                  En entornos con poca luz, sube el brillo al 140–160 % y activa la
+                  linterna integrada si tu dispositivo la soporta. El filtro de alto
+                  contraste también ayuda a distinguir texto en superficies oscuras.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section>
+          <h2>4 consejos para obtener la mejor imagen</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">💡</span>
+              <h4>Buena iluminación mejora mucho la claridad</h4>
+              <p>
+                La calidad de imagen a zoom alto depende casi por completo de la luz
+                disponible. Acércate a una ventana o usa la linterna integrada para
+                iluminar el objeto directamente.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⏸️</span>
+              <h4>Usa el modo congelado para leer sin pulso</h4>
+              <p>
+                El movimiento involuntario de la mano hace que la imagen se mueva a
+                zoom alto. Congela el fotograma cuando el texto esté bien enfocado y
+                lee sin prisa.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
+              <h4>Apoya el teléfono para mayor estabilidad</h4>
+              <p>
+                Apoya el codo en la mesa o coloca el teléfono sobre un libro para
+                mantenerlo firme. A partir de 4x, cualquier movimiento reduce
+                notablemente la nitidez de la imagen.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔦</span>
+              <h4>Limpia la lente de la cámara antes de usar</h4>
+              <p>
+                Una lente sucia con huellas o polvo deteriora la imagen incluso a
+                zoom bajo. Limpia suavemente con un paño de microfibra antes de
+                usar la lupa para obtener la máxima nitidez.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>4 errores habituales al usar la lupa digital</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Usar en entornos muy oscuros sin linterna.</strong> Con poca
+                luz el sensor eleva el ISO automáticamente, lo que produce imagen
+                granulada e ilegible. Activa la linterna o busca mejor iluminación
+                antes de aumentar el zoom.
+              </li>
+              <li>
+                <strong>Aplicar zoom excesivo para la cámara del dispositivo.</strong>{' '}
+                Por encima del zoom óptico disponible, la imagen pierde calidad y
+                nitidez rápidamente. Busca el nivel donde el texto es legible sin
+                forzar más el zoom.
+              </li>
+              <li>
+                <strong>No limpiar la lente antes de usar.</strong> Las huellas
+                dactilares crean halos y borrosidad que ningún ajuste de software
+                puede corregir. Un paño limpio tarda cinco segundos y marca una
+                diferencia notable.
+              </li>
+              <li>
+                <strong>Depender exclusivamente de la lupa para tareas de seguridad.</strong>{' '}
+                La lupa digital es una ayuda de accesibilidad, no un instrumento de
+                precisión certificado. Para conductores, trabajadores de seguridad
+                o tareas críticas, utiliza la óptica adecuada certificada para ese uso.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('lupa-digital')} />
       <ShareCard appName="lupa-digital" />

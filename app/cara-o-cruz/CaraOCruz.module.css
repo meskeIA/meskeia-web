@@ -573,3 +573,360 @@
     font-size: 1rem;
   }
 }
+
+/* =============================================
+   SECCIONES EDUCATIVAS v2.0
+   ============================================= */
+
+/* --- Tabla Comparativa --- */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: var(--bg-card);
+}
+
+.comparativaTable thead tr {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.comparativaTable th {
+  padding: var(--spacing-md) var(--spacing-lg);
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover td {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .comparativaTable {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover td {
+  background: var(--hover);
+}
+
+/* --- Escenarios Grid --- */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.escenarioCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.escenarioIcon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.escenarioHeader h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.escenarioExample {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.escenarioTip {
+  font-size: 0.82rem;
+  color: var(--secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+/* --- FAQ --- */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.faqItem h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.faqItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-xs);
+  line-height: 1.6;
+}
+
+.faqItem p:last-child {
+  margin-bottom: 0;
+}
+
+.faqTip {
+  color: var(--secondary) !important;
+  font-style: italic;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: var(--border);
+  border-left-color: var(--primary);
+}
+
+/* --- Step Guide --- */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepContent h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-xs);
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+/* --- Tips Grid --- */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  transition: box-shadow 0.2s ease;
+}
+
+.tipCard:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+}
+
+.tipCard h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.tipCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+/* --- Warning Box --- */
+.warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-left: 4px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.warningHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: #92400E;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #FCD34D;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.warningList li {
+  padding-left: var(--spacing-lg);
+  position: relative;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.warningList li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: #F59E0B;
+  font-weight: bold;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* --- Responsive nuevas secciones --- */
+@media (max-width: 1024px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .step {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Respeto por movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .escenarioCard,
+  .tipCard,
+  .stepNumber {
+    transition: none;
+  }
+}

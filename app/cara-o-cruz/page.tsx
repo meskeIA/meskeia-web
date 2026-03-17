@@ -321,6 +321,242 @@ export default function CaraOCruzPage() {
             <li><strong>Educación:</strong> Enseñar probabilidad de forma práctica</li>
           </ul>
         </section>
+
+        {/* Tabla Comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Métodos de decisión aleatoria</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Método</th>
+                  <th>N.º opciones</th>
+                  <th>Equidad</th>
+                  <th>Velocidad</th>
+                  <th>Ideal para</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🪙 Moneda</td>
+                  <td>2</td>
+                  <td>Alta (50/50)</td>
+                  <td>Inmediata</td>
+                  <td>Desempates rápidos entre dos partes</td>
+                </tr>
+                <tr>
+                  <td>🎲 Dado</td>
+                  <td>2 – 6</td>
+                  <td>Alta (1/N)</td>
+                  <td>Inmediata</td>
+                  <td>Seleccionar entre varios candidatos</td>
+                </tr>
+                <tr>
+                  <td>🎡 Ruleta</td>
+                  <td>Ilimitadas</td>
+                  <td>Alta si bien configurada</td>
+                  <td>Media</td>
+                  <td>Sorteos con muchas opciones</td>
+                </tr>
+                <tr>
+                  <td>📋 Lista aleatoria</td>
+                  <td>Ilimitadas</td>
+                  <td>Alta</td>
+                  <td>Media</td>
+                  <td>Ordenar grupos o asignar turnos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de Uso */}
+        <section className={styles.guideSection}>
+          <h2>Cuándo usar cara o cruz</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>⚖️</span>
+                <h4>Resolver un empate</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Dos personas quieren la misma pizza y nadie cede. Un lanzamiento justo
+                resuelve el conflicto en segundos sin rencores.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: acuerda el significado de cara y cruz antes de lanzar.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💬</span>
+                <h4>Decisión trivial sin discusión</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                ¿Vemos película A o película B? En lugar de debatir 20 minutos,
+                lanzar la moneda ahorra tiempo y energía.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: reserva este método para decisiones donde ambas opciones sean aceptables.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🧒</span>
+                <h4>Ejercicio de probabilidad con niños</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Lanzar 20 veces y registrar resultados enseña de forma práctica
+                que la probabilidad teórica (50%) puede diferir de la observada.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: usa el historial de esta app para visualizar la ley de grandes números.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Es realmente 50/50 la probabilidad?</h4>
+              <p>
+                Para una moneda perfectamente simétrica y lanzada sin sesgo, sí: P(cara) = P(cruz) = 0,5.
+                En la práctica, las monedas físicas tienen ligeras imperfecciones que pueden introducir
+                un sesgo mínimo (inferior al 1 %), pero estadísticamente irrelevante para el uso cotidiano.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Puede salir cara 10 veces seguidas?</h4>
+              <p>
+                Sí. La probabilidad es (0,5)¹⁰ = 1/1024, es decir, aproximadamente un 0,1 %.
+                Es poco probable pero perfectamente posible. Cada lanzamiento es independiente,
+                así que la racha anterior no influye en el siguiente resultado.
+              </p>
+              <p className={styles.faqTip}>
+                Dato curioso: si lanzas 1.024 veces, es estadísticamente esperable que una vez salga cara 10 seguidas.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es la falacia del jugador?</h4>
+              <p>
+                Es el error de creer que, tras una racha de caras, «toca» que salga cruz para compensar.
+                La moneda no tiene memoria: la probabilidad sigue siendo 50/50 en cada lanzamiento
+                independientemente de lo ocurrido antes.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Las monedas físicas son perfectamente equitativas?</h4>
+              <p>
+                No del todo. Estudios de la Universidad de Stanford demuestran que las monedas físicas
+                pueden caer con un ligero sesgo hacia el lado que estaba boca arriba al inicio del lanzamiento
+                (sesgo de Diaconis, ~51/49). Para usos cotidianos, la diferencia es irrelevante.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo usar cara o cruz correctamente</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <h4>Acuerda el significado antes de lanzar</h4>
+                <p>
+                  Define explícitamente qué opción corresponde a cara y cuál a cruz.
+                  Hacerlo después del lanzamiento es trampa y genera conflicto.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <h4>Lanza sin «mejores de 3»</h4>
+                <p>
+                  Un único lanzamiento es suficiente. Proponer repetir hasta 3 anula
+                  la aleatoriedad y convierte el método en una negociación encubierta.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <h4>Acepta el resultado tal cual</h4>
+                <p>
+                  El valor del método reside en su carácter vinculante. Si ya sabes
+                  que no aceptarás el resultado, no uses la moneda.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <h4>Si no hay acuerdo, busca otro método</h4>
+                <p>
+                  Si alguna parte no acepta las condiciones o el resultado, la moneda
+                  no es el método adecuado. Considera mediación o votación razonada.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Buenas prácticas</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Define antes de lanzar</h4>
+              <p>Establece qué significa cara y qué significa cruz antes de ver el resultado.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Acepta el primer resultado</h4>
+              <p>No repitas el lanzamiento. Un resultado válido no se anula por no gustar.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✅</span>
+              <h4>Úsalo para decisiones irrelevantes</h4>
+              <p>Perfecta para trivialidades donde ambas opciones son igualmente aceptables.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⛔</span>
+              <h4>No para decisiones importantes</h4>
+              <p>Evita usarlo en decisiones irreversibles o con consecuencias significativas.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Errores comunes al lanzar la moneda</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li>
+              <strong>Repetir hasta obtener el resultado deseado.</strong> Invalida completamente
+              la aleatoriedad y convierte el método en una ilusión de imparcialidad.
+            </li>
+            <li>
+              <strong>Usarlo para decisiones importantes o irreversibles.</strong> La moneda es
+              apropiada para trivialidades; no para compromisos económicos, legales o personales relevantes.
+            </li>
+            <li>
+              <strong>Creer que «toca» el resultado contrario tras una racha.</strong> Esta es
+              la falacia del jugador: cada lanzamiento es independiente y la probabilidad siempre es 50/50.
+            </li>
+            <li>
+              <strong>No acordar el significado antes de lanzar.</strong> Definir cara y cruz
+              después del resultado genera desconfianza y conflicto entre las partes.
+            </li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('cara-o-cruz')} />
