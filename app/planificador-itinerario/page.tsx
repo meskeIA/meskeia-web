@@ -518,6 +518,305 @@ export default function PlanificadorItinerario() {
           Descarga tu itinerario en formato texto (.txt) para compartirlo fácilmente por WhatsApp,
           correo o imprimirlo. Toda la información se procesa en tu navegador: ningún dato sale de tu dispositivo.
         </p>
+
+        {/* ── SECCIÓN 1: Tabla comparativa de ritmos de viaje ── */}
+        <h3>Tipos de viaje según ritmo</h3>
+        <p>El ritmo del viaje determina cuánto ves y cuánto disfrutas. Elige el que mejor encaje con tu perfil y destino.</p>
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Ritmo</th>
+                <th>Actividades/día</th>
+                <th>Pros</th>
+                <th>Contras</th>
+                <th>Perfil ideal</th>
+                <th>Coste relativo</th>
+                <th>Fatiga</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Intensivo</strong></td>
+                <td>8–10</td>
+                <td>Máximo aprovechamiento, ver mucho en poco tiempo</td>
+                <td>Agotamiento físico, poco tiempo para improvisar</td>
+                <td>Primera visita a una ciudad icónica, viajeros jóvenes</td>
+                <td>Alto (más entradas, más transporte)</td>
+                <td>Muy alta</td>
+              </tr>
+              <tr>
+                <td><strong>Equilibrado</strong></td>
+                <td>4–6</td>
+                <td>Combina visitas planificadas con tiempo libre</td>
+                <td>Puede quedarse corto en destinos grandes</td>
+                <td>Parejas, grupos mixtos, viajes de 5–10 días</td>
+                <td>Moderado</td>
+                <td>Media</td>
+              </tr>
+              <tr>
+                <td><strong>Relajado</strong></td>
+                <td>2–3</td>
+                <td>Profundiza en cada lugar, sin estrés</td>
+                <td>Ves menos atracciones del destino</td>
+                <td>Familias con niños, mayores, segunda visita</td>
+                <td>Bajo-moderado</td>
+                <td>Baja</td>
+              </tr>
+              <tr>
+                <td><strong>Slow travel</strong></td>
+                <td>1–2</td>
+                <td>Integración cultural real, gastos mínimos de transporte</td>
+                <td>Requiere estancias largas (1–2 semanas por ciudad)</td>
+                <td>Nómadas digitales, jubilados, viajes de 1+ mes</td>
+                <td>Bajo (alquiler mensual más barato)</td>
+                <td>Muy baja</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* ── SECCIÓN 2: Casos de uso — 4 perfiles ── */}
+        <h3>Casos de uso reales</h3>
+        <p>Cómo planificarían su viaje cuatro perfiles diferentes con esta herramienta:</p>
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>💑</span>
+              <strong>Pareja en Roma · 3 días</strong>
+            </div>
+            <p className={styles.escenarioExample}>
+              Ritmo equilibrado (5 actividades/día). Día 1: Vaticano (mañana, 3h mínimo) + Castel Sant&apos;Angelo + cena en Trastevere.
+              Día 2: Coliseo + Foro Romano (4h combinado) + Palatino. Día 3: Piazza Navona + Panteón + Fontana di Trevi + compras.
+              Desplazamientos en metro (1,50 €/viaje) o a pie — Roma centro es muy caminable.
+            </p>
+            <p className={styles.escenarioTip}>Reservar Vaticano y Coliseo con al menos 2 semanas de antelación; las entradas online se agotan.</p>
+          </div>
+
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+              <strong>Familia con niños en París · 5 días</strong>
+            </div>
+            <p className={styles.escenarioExample}>
+              Ritmo relajado (3 actividades/día). El Louvre necesita mínimo 3h y agota a los niños pequeños; mejor dedicarle una mañana
+              entera y terminar en el jardín. Incluir Disneyland París (1 día completo) + Torre Eiffel (reservar turno de subida).
+              Metro París: billete suelto 2,15 €/viaje vs. día completo 8,65 € — con familia, el bono día sale rentable.
+            </p>
+            <p className={styles.escenarioTip}>Evitar lunes en el Louvre (cerrado) y martes en el Museo d&apos;Orsay (cerrado).</p>
+          </div>
+
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎒</span>
+              <strong>Mochilero en Japón · 15 días</strong>
+            </div>
+            <p className={styles.escenarioExample}>
+              Itinerario en bloques geográficos: Tokio (5 días) → Kioto/Nara (4 días) → Osaka/Hiroshima (3 días) → Hakone (2 días) →
+              vuelta a Tokio (1 día). Japan Rail Pass (21.100 ¥ ≈ 130 €) cubre casi todos los shinkansen.
+              Ritmo intensivo los primeros días, relajado al final para absorber el choque cultural.
+            </p>
+            <p className={styles.escenarioTip}>Descargar Google Maps offline de cada región antes de salir del hotel; el wifi en zonas rurales es limitado.</p>
+          </div>
+
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>💼</span>
+              <strong>Viajero de negocios · Turismo añadido</strong>
+            </div>
+            <p className={styles.escenarioExample}>
+              Conferencia en Berlín (lunes-miércoles). Extender vuelta al viernes y añadir 2 días de turismo.
+              Jueves: Museo de Pérgamo (mañana, cerrado martes) + Muro de Berlín + Alexanderplatz. Viernes: Palacio de Charlottenburg +
+              mercado de Mauerpark. El hotel de la empresa suele estar en el centro: aprovechar ubicación para ir a pie.
+            </p>
+            <p className={styles.escenarioTip}>Añadir en el planificador los horarios de reuniones como actividades de &quot;transporte/trabajo&quot; para ver el tiempo real disponible.</p>
+          </div>
+        </div>
+
+        {/* ── SECCIÓN 3: FAQ — 8 preguntas ── */}
+        <h3>Preguntas frecuentes sobre planificación de viajes</h3>
+        <dl className={styles.faqList}>
+          <div className={styles.faqItem}>
+            <dt>¿Cuántas actividades por día es razonable?</dt>
+            <dd>
+              Depende del tipo de visita. 4–6 es el rango cómodo para la mayoría. Considera que una visita a un museo grande
+              (Prado, Louvre, British Museum) consume 3–4h por sí sola. Si incluyes traslados y comidas, 3 visitas culturales
+              importantes ya suponen un día completo sin holgura.
+            </dd>
+          </div>
+          <div className={styles.faqItem}>
+            <dt>¿Cómo gestionar los tiempos de desplazamiento?</dt>
+            <dd>
+              Añádelos como actividades de tipo &quot;Transporte&quot; en el planificador. Usa Google Maps en modo tránsito para estimar tiempos reales:
+              en ciudades como Londres o Ciudad de México, un trayecto de 5 km puede llevar 45 minutos en hora punta.
+              La regla práctica: suma un 30% al tiempo estimado de Maps si viajas en hora punta.
+            </dd>
+          </div>
+          <div className={styles.faqItem}>
+            <dt>¿Vale la pena el city pass o tarjeta turística?</dt>
+            <dd>
+              Rentable si visitas 4+ atracciones de pago en el mismo día. Ejemplo: Paris Museum Pass (2 días, 55 €) incluye
+              Louvre (22 €), Versalles (20 €), D&apos;Orsay (16 €) y Pompidou (15 €) — ahorro de 18 € y sin colas de taquilla.
+              No rentable si tu estilo es pasear y entrar solo a 1–2 museos.
+            </dd>
+          </div>
+          <div className={styles.faqItem}>
+            <dt>¿Qué aplicaciones usar para organizar el itinerario?</dt>
+            <dd>
+              Este planificador para la estructura día a día. Complementar con: Google Maps (guardado de lugares y rutas offline),
+              TripIt o TravelSpend para gastos, Airalo para eSIM local barata, y la app de la aerolínea para el boarding pass.
+              Exporta el .txt de aquí y compártelo con el grupo por WhatsApp antes de salir.
+            </dd>
+          </div>
+          <div className={styles.faqItem}>
+            <dt>¿Cómo priorizar si no hay tiempo para todo?</dt>
+            <dd>
+              Clasifica cada atracción en tres niveles: imprescindible (reservar antelación), deseable (si hay tiempo) y bonus
+              (si llueve o hay un hueco). Los imprescindibles van en el planificador con hora fija; los otros quedan como notas
+              sin hora asignada. Así, si se cae una actividad, tienes alternativas preparadas.
+            </dd>
+          </div>
+          <div className={styles.faqItem}>
+            <dt>¿Cuándo reservar con antelación y qué dejar para improvisación?</dt>
+            <dd>
+              Reservar siempre: vuelos, alojamiento, atracciones con aforo limitado (Capilla Sixtina, Sagrada Família, cenas en
+              restaurantes con estrella Michelin). Dejar libre: restaurantes informales, paseos por barrios, mercados, tiendas.
+              La regla: si cierra si no reservas, resérvalo. Si puedes entrar cuando quieras, impróvisalo.
+            </dd>
+          </div>
+          <div className={styles.faqItem}>
+            <dt>¿Cómo estructurar un itinerario por zonas geográficas?</dt>
+            <dd>
+              Antes de planificar, pinta en Google Maps todos los puntos que quieres visitar. Los que queden cerca forman un
+              bloque para el mismo día. En Roma: día Vaticano (oeste), día Coliseo/Foro (sureste), día Centro Histórico (norte).
+              Cada día se puede hacer casi todo a pie. Mezclar zonas lejanas en el mismo día es el error más común que dispara
+              el cansancio y el gasto en transporte.
+            </dd>
+          </div>
+          <div className={styles.faqItem}>
+            <dt>¿Qué hacer si falla una actividad reservada?</dt>
+            <dd>
+              Ten siempre un plan B en las notas de cada día. Si un museo cierra por festivo imprevisto, sustituye por el parque
+              o barrio más cercano. Guarda los números de teléfono de las atracciones reservadas en el planificador — muchas
+              permiten cancelación gratuita hasta 24h antes. Contratar seguro de viaje con cobertura de cancelación cubre vuelos y hoteles.
+            </dd>
+          </div>
+        </dl>
+        <p className={styles.faqTip}>Consejo: exporta el itinerario como .txt y guárdalo en la nube (Google Drive, iCloud) antes de salir. Así tienes acceso offline sin depender del wifi del destino.</p>
+
+        {/* ── SECCIÓN 4: Guía paso a paso — 7 pasos ── */}
+        <h3>Guía paso a paso: cómo planificar un itinerario óptimo</h3>
+        <ol className={styles.stepGuide}>
+          <li className={styles.step}>
+            <span className={styles.stepNumber}>1</span>
+            <div className={styles.stepContent}>
+              <strong>Define el marco del viaje</strong>
+              <p>Fechas exactas, número de viajeros, presupuesto total y tipo de viaje (cultural, naturaleza, descanso, mezcla).
+              Con esto claro, el resto de decisiones son más fáciles. Anota el nombre del viaje en el planificador desde el principio.</p>
+            </div>
+          </li>
+          <li className={styles.step}>
+            <span className={styles.stepNumber}>2</span>
+            <div className={styles.stepContent}>
+              <strong>Investiga el destino y crea una lista larga</strong>
+              <p>Apunta todo lo que quieres ver sin filtrar (Google Maps, guías Lonely Planet, TripAdvisor, blogs locales).
+              En esta fase la cantidad es buena — ya filtrarás. Para una ciudad de 5 días, una lista de 30–40 puntos es normal.</p>
+            </div>
+          </li>
+          <li className={styles.step}>
+            <span className={styles.stepNumber}>3</span>
+            <div className={styles.stepContent}>
+              <strong>Verifica horarios y días de cierre</strong>
+              <p>Antes de poner nada en el planificador, comprueba horarios oficiales. El Museo del Prado cierra lunes; la Sagrada Família
+              tiene aforo por franjas horarias; muchos mercados solo abren sábados. Esta información va en las Notas de cada actividad.</p>
+            </div>
+          </li>
+          <li className={styles.step}>
+            <span className={styles.stepNumber}>4</span>
+            <div className={styles.stepContent}>
+              <strong>Agrupa por zonas y asigna días</strong>
+              <p>Visualiza el mapa y agrupa atracciones cercanas en el mismo día (ver FAQ sobre zonas geográficas).
+              Asigna cada grupo a un día teniendo en cuenta que los días de llegada y salida tienen tiempo recortado.</p>
+            </div>
+          </li>
+          <li className={styles.step}>
+            <span className={styles.stepNumber}>5</span>
+            <div className={styles.stepContent}>
+              <strong>Ordena cada día cronológicamente</strong>
+              <p>Empieza por lo que abre antes (museos populares: llegar 15 min antes de apertura para evitar colas).
+              Coloca comidas y descansos de forma realista. Las visitas exigentes (museos grandes, excursiones) mejor por la mañana;
+              las relajadas (paseos, compras, terrazas) por la tarde.</p>
+            </div>
+          </li>
+          <li className={styles.step}>
+            <span className={styles.stepNumber}>6</span>
+            <div className={styles.stepContent}>
+              <strong>Reserva lo imprescindible</strong>
+              <p>Con el itinerario estructurado, ya sabes exactamente qué días necesitas cada entrada. Reserva con al menos
+              2–4 semanas de antelación en temporada alta. Guarda los códigos de reserva en las Notas de cada actividad.</p>
+            </div>
+          </li>
+          <li className={styles.step}>
+            <span className={styles.stepNumber}>7</span>
+            <div className={styles.stepContent}>
+              <strong>Descarga y prepara el día a día</strong>
+              <p>Exporta el .txt, descarga Google Maps offline de cada zona, guarda las entradas en Google Wallet o Apple Wallet.
+              La noche anterior, revisa el plan del día siguiente: ajusta si hay cambios de clima o imprevistos. La flexibilidad
+              dentro de la estructura es la clave de los buenos viajeros.</p>
+            </div>
+          </li>
+        </ol>
+
+        {/* ── SECCIÓN 5: Mejores prácticas — 6 tips ── */}
+        <h3>Mejores prácticas para itinerarios perfectos</h3>
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🗺️</span>
+            <strong>Agrupa por zonas</strong>
+            <p>Planifica cada día en un área geográfica concreta. Cruzar la ciudad dos veces al día es el mayor ladrón de tiempo y energía en un viaje.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🎟️</span>
+            <strong>Reserva solo lo imprescindible</strong>
+            <p>Sobrereservar crea rigidez. Solo bloquea con anticipación lo que tiene aforo limitado o lo que se agota (Alhambra de Granada: entradas 3 meses antes).</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>⏰</span>
+            <strong>Deja tiempo libre real</strong>
+            <p>Incluye al menos 1,5–2h de margen por día sin actividad asignada. Los mejores momentos de un viaje suelen ser los no planificados.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🔍</span>
+            <strong>Investiga horarios antes de ir</strong>
+            <p>Comprueba siempre la web oficial del lugar. Los horarios de Google Maps se desactualizan. Festivos locales pueden cerrar toda una zona un día entero.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>📵</span>
+            <strong>Google Maps offline es obligatorio</strong>
+            <p>Descarga el mapa de cada ciudad antes de llegar. El roaming en países fuera de la UE puede costar 10–30 €/día; una eSIM local (Airalo) suele ser 5–8 € por semana.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcon}>🌅</span>
+            <strong>Llega temprano a las atracciones icónicas</strong>
+            <p>Los 30 primeros minutos tras la apertura tienen un 60–70% menos de gente que a media mañana. En la Fontana di Trevi o el Coliseo, la diferencia es abismal.</p>
+          </div>
+        </div>
+
+        {/* ── SECCIÓN 6: Warning Box — 6 errores ── */}
+        <div className={styles.warningBox} role="alert">
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <strong>6 errores que arruinan un viaje</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Sobrecargar el itinerario.</strong> Planificar 10+ actividades al día es una garantía de llegar al hotel agotado y sin haber disfrutado ninguna. Menos es más.</li>
+            <li><strong>Ignorar los tiempos de desplazamiento.</strong> En ciudades grandes (Londres, Tokio, Ciudad de México) moverse entre puntos puede consumir 1–2h al día. Añádelos siempre al planificador.</li>
+            <li><strong>Reservar todo sin margen de flexibilidad.</strong> Un horario de 15 minutos en quince actividades encadenadas se desmorona al primer retraso. Deja siempre hueco entre bloques.</li>
+            <li><strong>Ignorar cierres por festivos o mantenimiento.</strong> El Louvre cierra los martes; la Capilla Sixtina cierra varios domingos al mes; muchos monumentos cierran en enero. Verificar antes es obligatorio.</li>
+            <li><strong>No descargar mapas offline.</strong> Quedarse sin conexión en un barrio desconocido, sin mapa y con la batería al 20%, es la pesadilla del viajero moderno. Siempre mapas offline antes de salir del alojamiento.</li>
+            <li><strong>No tener plan B para actividades reservadas.</strong> Las cancelaciones de última hora existen: huelgas, mal tiempo, obras. Sin alternativa preparada, perderás horas buscando qué hacer en el momento.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('planificador-itinerario')} />

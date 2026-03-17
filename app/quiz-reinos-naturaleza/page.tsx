@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback } from 'react';
 import styles from './QuizReinosNaturaleza.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { organismosNaturaleza, OrganismoNaturaleza } from '@/data/organismos-naturaleza';
 
@@ -328,6 +328,259 @@ export default function QuizReinosNaturalezaPage() {
           </div>
         </div>
       )}
+
+      {/* ── SECCIÓN EDUCATIVA ── */}
+      <EducationalSection
+        title="Guía completa: Los Reinos de la Naturaleza"
+        subtitle="Clasificación biológica, diferencias clave y cómo no confundirte en el examen"
+        icon="🔬"
+      >
+        {/* 1. TABLA COMPARATIVA */}
+        <section aria-labelledby="edu-tabla">
+          <h4 id="edu-tabla">🗂️ Los 6 Reinos: Tabla Comparativa</h4>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Reino</th>
+                  <th>Tipo celular</th>
+                  <th>Nutrición</th>
+                  <th>Reproducción</th>
+                  <th>Ejemplos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Animalia</strong></td>
+                  <td>Eucariota</td>
+                  <td>Heterótrofa (ingestión)</td>
+                  <td>Sexual (mayoritariamente)</td>
+                  <td>Perro, ballena, coral, esponja</td>
+                </tr>
+                <tr>
+                  <td><strong>Plantae</strong></td>
+                  <td>Eucariota</td>
+                  <td>Autótrofa (fotosíntesis)</td>
+                  <td>Sexual y asexual</td>
+                  <td>Roble, helecho, musgo, trigo</td>
+                </tr>
+                <tr>
+                  <td><strong>Fungi</strong></td>
+                  <td>Eucariota</td>
+                  <td>Heterótrofa (absorción)</td>
+                  <td>Esporas (sexual/asexual)</td>
+                  <td>Champiñón, moho, levadura, trufa</td>
+                </tr>
+                <tr>
+                  <td><strong>Protista</strong></td>
+                  <td>Eucariota</td>
+                  <td>Autótrofa/Heterótrofa</td>
+                  <td>Sexual y asexual</td>
+                  <td>Algas, ameba, plasmodio, kelp</td>
+                </tr>
+                <tr>
+                  <td><strong>Bacteria (Eubacteria)</strong></td>
+                  <td>Procariota</td>
+                  <td>Autótrofa/Heterótrofa</td>
+                  <td>Fisión binaria (asexual)</td>
+                  <td>E. coli, lactobacillus, cianobacteria</td>
+                </tr>
+                <tr>
+                  <td><strong>Archaea</strong></td>
+                  <td>Procariota</td>
+                  <td>Autótrofa/Heterótrofa</td>
+                  <td>Fisión binaria (asexual)</td>
+                  <td>Metanógenos, halófilos, termófilos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* 2. CASOS DE USO */}
+        <section aria-labelledby="edu-escenarios">
+          <h4 id="edu-escenarios">👤 ¿Para quién es este quiz?</h4>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎒</span>
+                <strong>Estudiante de ESO (3.º-4.º)</strong>
+              </div>
+              <p className={styles.escenarioExample}>Preparando el examen de Biología y Geología. Necesitas saber los reinos básicos y los organismos más comunes.</p>
+              <p className={styles.escenarioTip}>Empieza con el nivel <strong>Básico</strong> y céntrate en los 20 organismos contraintuitivos.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📖</span>
+                <strong>Estudiante de Bachillerato / Selectividad</strong>
+              </div>
+              <p className={styles.escenarioExample}>La EvAU puede incluir preguntas sobre Archaea, Protista y diferencias pro/eucariota. Cada punto cuenta.</p>
+              <p className={styles.escenarioTip}>Practica en modo <strong>Todos</strong> y revisa las curiosidades científicas de cada feedback.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌿</span>
+                <strong>Aficionado a la naturaleza</strong>
+              </div>
+              <p className={styles.escenarioExample}>Quieres clasificar correctamente los organismos que encuentras en excursiones o en fotografía de naturaleza.</p>
+              <p className={styles.escenarioTip}>Presta atención a las categorías <strong>Fungi</strong> y <strong>Protista</strong>, que más sorprenden en campo.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏫</span>
+                <strong>Docente de Biología</strong>
+              </div>
+              <p className={styles.escenarioExample}>Buscas material dinámico para explicar taxonomía en clase o como actividad de repaso gamificada.</p>
+              <p className={styles.escenarioTip}>El nivel <strong>Avanzado</strong> con los microorganismos es ideal para alumnos de Biología de 2.º de Bach.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. FAQ */}
+        <section aria-labelledby="edu-faq">
+          <h4 id="edu-faq">❓ Preguntas Frecuentes sobre los Reinos</h4>
+          <dl className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <dt>¿Cuántos reinos hay actualmente en biología?</dt>
+              <dd>Depende del sistema de clasificación. El sistema de <strong>6 reinos</strong> (Animalia, Plantae, Fungi, Protista, Eubacteria, Archaea) es el más usado en la educación secundaria española. En investigación moderna se usa el sistema de 3 dominios (Bacteria, Archaea, Eukarya), que agrupa los primeros cuatro reinos bajo Eukarya.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Por qué los hongos no son plantas?</dt>
+              <dd>Porque no realizan la fotosíntesis. Los hongos son <strong>heterótrofos por absorción</strong>: secretan enzimas digestivas al exterior y absorben los nutrientes del medio. Además, su pared celular está hecha de <strong>quitina</strong> (como el exoesqueleto de los insectos), no de celulosa como las plantas.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Cuál es la diferencia entre bacteria y archaea?</dt>
+              <dd>Ambas son organismos <strong>procariotas</strong> (sin núcleo definido), pero difieren en su bioquímica. Las Archaea tienen lípidos de membrana únicos (éteres en lugar de ésteres), una maquinaria genética más parecida a los eucariotas y suelen vivir en ambientes extremos (termófilos, halófilos, metanógenos). Las bacterias tienen peptidoglicano en la pared celular; las Archaea no.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Los virus pertenecen a algún reino?</dt>
+              <dd><strong>No.</strong> Los virus no están incluidos en ningún reino de la clasificación biológica estándar porque no cumplen los criterios de ser seres vivos de forma autónoma: carecen de metabolismo propio, no tienen células y solo se reproducen dentro de un huésped. Son entidades biológicas al margen de la clasificación de los seres vivos.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Qué es la taxonomía de Linneo?</dt>
+              <dd>Carl von Linné (siglo XVIII) creó el sistema de <strong>nomenclatura binomial</strong>: cada especie recibe un nombre en dos palabras latinas (género + especie), por ejemplo <em>Homo sapiens</em>. También estableció la jerarquía taxonómica: Reino → Filo → Clase → Orden → Familia → Género → Especie. Es la base de la clasificación biológica moderna.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Qué diferencia hay entre procariontes y eucariontes?</dt>
+              <dd>Los <strong>procariontes</strong> (Bacteria y Archaea) no tienen núcleo celular delimitado por membrana; su material genético flota en el citoplasma. Los <strong>eucariontes</strong> (Animalia, Plantae, Fungi y Protista) tienen núcleo verdadero rodeado de membrana nuclear, además de orgánulos membranosos como mitocondrias y (en plantas) cloroplastos.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿A qué reino pertenecen las algas?</dt>
+              <dd>La mayoría de las algas (macroalgas y microalgas como la <em>Chlorella</em>) pertenecen al reino <strong>Protista</strong>, no a Plantae. Solo los briófitos y plantas vasculares forman el reino Plantae. Las algas verdes (<em>Chlorophyta</em>) son el grupo más relacionado filogenéticamente con las plantas terrestres, pero taxonómicamente siguen siendo Protistas.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Cómo ha evolucionado la clasificación de los reinos a lo largo de la historia?</dt>
+              <dd>Aristóteles (siglo IV a.C.) dividió los seres vivos en solo 2 grupos: animales y plantas. En 1866, Haeckel añadió el reino Protista para los unicelulares. En 1969, Whittaker propuso el sistema de <strong>5 reinos</strong> (Monera, Protista, Fungi, Plantae, Animalia). En 1977, Carl Woese descubrió las Archaea mediante análisis del ARNr 16S, dando lugar al sistema de 6 reinos y más tarde a la clasificación en 3 dominios.</dd>
+            </div>
+          </dl>
+        </section>
+
+        {/* 4. GUÍA PASO A PASO */}
+        <section aria-labelledby="edu-guia">
+          <h4 id="edu-guia">🔍 Cómo Clasificar un Organismo Desconocido (7 pasos)</h4>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>¿Tiene células?</strong>
+                <p>Si no tiene estructura celular propia (por ejemplo, un virus), no pertenece a ningún reino. Si tiene células, continúa.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>¿Es procariota o eucariota?</strong>
+                <p>Observa si tiene núcleo celular definido. Si carece de núcleo → <strong>Bacteria o Archaea</strong>. Si tiene núcleo → sigue al paso 3.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>¿Procariota: qué tipo?</strong>
+                <p>Analiza su bioquímica: si tiene peptidoglicano en la pared celular → <strong>Bacteria (Eubacteria)</strong>. Si tiene lípidos de membrana tipo éter y vive en ambientes extremos → <strong>Archaea</strong>.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Eucariota: ¿es unicelular o pluricelular?</strong>
+                <p>Si es unicelular o forma colonias simples sin diferenciación de tejidos → muy probablemente <strong>Protista</strong>. Si es pluricelular con tejidos diferenciados → pasa al paso 5.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Eucariota pluricelular: ¿realiza fotosíntesis?</strong>
+                <p>Si tiene cloroplastos y realiza fotosíntesis → <strong>Plantae</strong>. Si no realiza fotosíntesis → continúa.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Sin fotosíntesis: ¿cómo se nutre?</strong>
+                <p>Si se nutre por <strong>absorción</strong> (secreta enzimas al exterior) → <strong>Fungi</strong>. Si se nutre por <strong>ingestión</strong> (ingiere alimento) → <strong>Animalia</strong>.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Verifica con características adicionales</strong>
+                <p>Confirma con otros rasgos: ¿tiene pared celular de celulosa (Plantae), quitina (Fungi) o carece de pared celular (Animalia)? ¿Se reproduce por esporas (Fungi), semillas (Plantae) o huevos/parto (Animalia)?</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* 5. MEJORES PRÁCTICAS */}
+        <section aria-labelledby="edu-tips">
+          <h4 id="edu-tips">💡 Consejos para Memorizar los Reinos</h4>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
+              <p><strong>Aprende las características exclusivas</strong> de cada reino, no las compartidas. Lo que diferencia es lo que debes recordar: quitina (Fungi), celulosa (Plantae), ingestión (Animalia).</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⚠️</span>
+              <p><strong>Estudia los organismos trampa:</strong> hongos que parecen plantas (setas), algas que parecen plantas (kelp), animales que no se mueven (esponjas, corales). Son los favoritos del examen.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🌳</span>
+              <p><strong>Usa árboles filogenéticos visuales.</strong> Ver la relación evolutiva entre reinos (Archaea → Eukarya) ayuda a recordar por qué los hongos están más relacionados con animales que con plantas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
+              <p><strong>Estudia por contraste de reinos opuestos:</strong> compara Animalia vs. Plantae, Bacteria vs. Archaea, Fungi vs. Plantae. El método comparativo fija mejor que memorizar cada reino por separado.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
+              <p><strong>Crea una tabla de elaboración propia</strong> con los 6 reinos y 5 columnas (célula, nutrición, pared, reproducción, ejemplos). El proceso de crear la tabla ya es un repaso activo eficaz.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔬</span>
+              <p><strong>Relaciona los reinos con la historia de la ciencia:</strong> recordar que Haeckel añadió Protista (1866) y Woese descubrió Archaea (1977) da contexto y hace la información más memorable.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 6. WARNING BOX */}
+        <section aria-labelledby="edu-errores">
+          <h4 id="edu-errores">🚫 Errores Más Comunes en Biología</h4>
+          <div className={styles.warningBox} role="alert">
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <strong>Confusiones frecuentes que penalizan en el examen</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li><strong>Clasificar los hongos como plantas:</strong> los hongos NO realizan fotosíntesis y su pared celular es de quitina, no de celulosa. Son más parecidos a los animales que a las plantas en términos evolutivos.</li>
+              <li><strong>Pensar que los virus son un reino:</strong> los virus no están clasificados en ningún reino porque no son seres vivos según los criterios biológicos estándar (no tienen metabolismo ni estructura celular propia).</li>
+              <li><strong>Confundir algas con plantas:</strong> la mayoría de las algas (kelp, alga verde unicelular, diatomeas) pertenecen al reino Protista, no a Plantae. Solo las plantas terrestres (briófitos, helechos, gimnospermas, angiospermas) son Plantae.</li>
+              <li><strong>Creer que bacteria y archaea son lo mismo:</strong> ambas son procariotas, pero son grupos completamente distintos con bioquímica diferente. Las Archaea están más relacionadas con los eucariotas que con las bacterias.</li>
+              <li><strong>Ignorar que Protista es un reino &quot;cajón de sastre&quot;:</strong> Protista agrupa organismos eucariotas que no encajan en Animalia, Plantae ni Fungi. Es un grupo artificial muy diverso que en la taxonomía moderna se divide en múltiples linajes.</li>
+              <li><strong>Asumir que todos los unicelulares son bacterias:</strong> existen eucariotas unicelulares (Protistas como la ameba, el paramecio o la euglena) y procariotas unicelulares (bacterias y arqueas). El tamaño de la célula y la presencia de núcleo son claves para distinguirlos.</li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('quiz-reinos-naturaleza')} />
       <ShareCard appName="quiz-reinos-naturaleza" />

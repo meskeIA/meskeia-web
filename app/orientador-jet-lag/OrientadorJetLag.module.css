@@ -495,6 +495,325 @@
   line-height: 1.6;
 }
 
+/* ═══════════════════════════════════════════════
+   SECCIONES EDUCATIVAS PROFESIONALES (v2.0)
+   ═══════════════════════════════════════════════ */
+
+/* ── Tabla Comparativa ── */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  min-width: 640px;
+}
+
+.comparativaTable th {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 600;
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.comparativaTable tr:hover td {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: linear-gradient(135deg, #1e6a8a 0%, #2d7d7a 100%);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+/* ── Escenarios / Casos de Uso ── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.escenarioIcon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--border);
+}
+
+/* ── FAQ ── */
+.faqList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.faqItem {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  margin: 0 0 0.3rem 0;
+}
+
+.faqTip {
+  font-size: 0.82rem !important;
+  color: var(--text-secondary) !important;
+  font-style: italic;
+  margin-top: 0.3rem !important;
+}
+
+/* ── Guía Paso a Paso ── */
+.stepGuide {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  counter-reset: none;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.step:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.stepNumber {
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.stepContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.stepContent p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Tips Grid ── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.tipCard strong {
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+
+.tipCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--border);
+}
+
+/* ── Warning Box ── */
+.warningBox {
+  background: rgba(229, 62, 62, 0.06);
+  border: 1px solid rgba(229, 62, 62, 0.35);
+  border-left: 4px solid #E53E3E;
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #C53030;
+}
+
+.warningIcon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  padding-left: 1.1rem;
+  position: relative;
+}
+
+.warningList li::before {
+  content: '✕';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #E53E3E;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.warningList li strong {
+  color: #C53030;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(229, 62, 62, 0.1);
+  border-color: rgba(229, 62, 62, 0.4);
+  border-left-color: #FC8181;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #FC8181;
+}
+
+[data-theme='dark'] .warningList li::before {
+  color: #FC8181;
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: #FC8181;
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════ */
+
 /* Responsive */
 @media (max-width: 768px) {
   .hero {
@@ -517,10 +836,30 @@
   .sectionGrid {
     grid-template-columns: 1fr;
   }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .comparativaTable {
+    min-width: 560px;
+  }
+
+  .warningBox {
+    padding: 1rem 1.1rem;
+  }
 }
 
 @media (max-width: 480px) {
   .statsGrid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
   }
 }

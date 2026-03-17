@@ -593,6 +593,289 @@ export default function PaisesDelMundoPage() {
             </div>
           </div>
         </section>
+
+        {/* ── SECCIÓN 1: Tabla Comparativa Continentes (patrón v2.0) ── */}
+        <section>
+          <h3>📊 Los 5 Continentes: Ficha Comparativa Completa</h3>
+          <p>Comparativa detallada de los cinco continentes habitados, con récords, países destacados y datos de curiosidad:</p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Continente</th>
+                  <th>N.º países</th>
+                  <th>Superficie total</th>
+                  <th>Población (2024)</th>
+                  <th>País más grande</th>
+                  <th>País más pequeño</th>
+                  <th>Dato curioso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>🌍 Europa</strong></td>
+                  <td>44</td>
+                  <td>10,5 M km²</td>
+                  <td>745 millones</td>
+                  <td>Rusia (17,1 M km²)</td>
+                  <td>Vaticano (0,44 km²)</td>
+                  <td>La UE agrupa 27 países con moneda y fronteras comunes</td>
+                </tr>
+                <tr>
+                  <td><strong>🌏 Asia</strong></td>
+                  <td>49</td>
+                  <td>44,6 M km²</td>
+                  <td>4.750 millones</td>
+                  <td>Rusia (parte asiática)</td>
+                  <td>Maldivas (298 km²)</td>
+                  <td>El 60 % de la humanidad vive aquí; alberga 7 de las 10 ciudades más pobladas</td>
+                </tr>
+                <tr>
+                  <td><strong>🌎 América</strong></td>
+                  <td>35</td>
+                  <td>42,5 M km²</td>
+                  <td>1.040 millones</td>
+                  <td>Canadá (10 M km²)</td>
+                  <td>San Cristóbal y Nieves (261 km²)</td>
+                  <td>El español es el idioma más hablado en todo el continente</td>
+                </tr>
+                <tr>
+                  <td><strong>🌍 África</strong></td>
+                  <td>54</td>
+                  <td>30,4 M km²</td>
+                  <td>1.460 millones</td>
+                  <td>Argelia (2,4 M km²)</td>
+                  <td>Seychelles (455 km²)</td>
+                  <td>Tiene el mayor número de países del mundo; Nigeria superará a EE.UU. en población antes de 2050</td>
+                </tr>
+                <tr>
+                  <td><strong>🌏 Oceanía</strong></td>
+                  <td>14</td>
+                  <td>8,5 M km²</td>
+                  <td>46 millones</td>
+                  <td>Australia (7,7 M km²)</td>
+                  <td>Nauru (21 km²)</td>
+                  <td>Australia ocupa el 92 % del área continental; Nauru es el estado insular más pequeño del mundo</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso — 4 perfiles (patrón v2.0) ── */}
+        <section>
+          <h3>🎯 ¿Quién Usa el Buscador de Países del Mundo?</h3>
+          <p>Cuatro perfiles que sacan el máximo partido a esta herramienta:</p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎓</span>
+                <h4>Estudiante — Preparando examen de geografía</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Examen de geografía mundial en 2 semanas. Necesita repasar las 195 capitales, identificar banderas y conocer datos básicos por continente.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Cómo usarlo:</strong> Filtra por continente, haz clic en cada país para ver capital, prefijo y moneda. Repasa en grupos de 10 países hasta cubrir el mapa completo.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>✈️</span>
+                <h4>Viajero — Investigando destinos antes del viaje</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Planea un viaje por el Sudeste Asiático. Necesita saber la moneda local, el prefijo telefónico, la zona horaria y el dominio de internet de cada país.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Cómo usarlo:</strong> Busca cada país en el buscador y consulta en segundos prefijo (+66 Tailandia), moneda (Baht, ฿), zona horaria (UTC+7) y dominio .th para SIMs locales.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📰</span>
+                <h4>Periodista — Contextualizando noticias internacionales</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Redacta una noticia sobre un conflicto en un país del que recibe pocas búsquedas. Necesita datos básicos para contextualizar a sus lectores.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Cómo usarlo:</strong> Busca el país, obtén superficie, población, capital y continente en segundos. Usa el enlace «Ver en mapa» para capturar la ubicación geográfica exacta.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏆</span>
+                <h4>Concursante de trivial — Mejorar cultura general</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Participa en un concurso de cultura general y suele fallar preguntas de geografía: capitales poco conocidas, banderas similares y datos de países pequeños.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Cómo usarlo:</strong> Practica con los países menos conocidos (Surinam, Bután, Yibuti, Vanuatu). Memoriza sus capitales y banderas. Los países con nombres confusos son los más frecuentes en trivial.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ — 8 preguntas (patrón v2.0) ── */}
+        <section>
+          <h3>❓ Preguntas Frecuentes: Récords y Curiosidades Mundiales</h3>
+          <div className={styles.faqList}>
+            <details className={styles.faqItem}>
+              <summary>¿Cuántos países hay exactamente en el mundo?</summary>
+              <p>Hay <strong>195 países reconocidos</strong>: 193 miembros de pleno derecho de la ONU más 2 estados observadores permanentes (Ciudad del Vaticano y Palestina). La cifra varía según la fuente: algunos atlas cuentan 196 añadiendo Kosovo, otros solo cuentan 193. Sudán del Sur (2011) es el estado reconocido más recientemente por la ONU.</p>
+              <p className={styles.faqTip}>Dato extra: en 1945, la ONU se fundó con solo 51 estados miembros.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Cuál es el país más grande del mundo?</summary>
+              <p><strong>Rusia</strong>, con 17,1 millones de km² — el 11 % de la superficie terrestre del planeta. Es tan grande que abarca 11 zonas horarias distintas. El segundo más grande es Canadá (10 M km²) y el tercero EE.UU. (9,8 M km²). Si Rusia fuera un continente, sería el más grande después de Asia.</p>
+              <p className={styles.faqTip}>Dato extra: el lago Baikal, en Siberia (Rusia), contiene el 20 % del agua dulce superficial del planeta.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Cuál es el país más pequeño del mundo?</summary>
+              <p><strong>Ciudad del Vaticano</strong>, con apenas 0,44 km² dentro de Roma. Es tan pequeño que cabe 11 veces en el Parque del Retiro de Madrid. El segundo más pequeño es Mónaco (2,02 km²) y el tercero San Marino (61 km²). El Vaticano tiene su propio estado, gobierno, banco, correos y radiodifusora.</p>
+              <p className={styles.faqTip}>Dato extra: el Vaticano es el único estado del mundo donde el latín es idioma oficial de trabajo.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Qué países tienen más idiomas oficiales?</summary>
+              <p><strong>Bolivia lidera con 37 idiomas co-oficiales</strong> (español + 36 lenguas indígenas). Zimbabwe tiene 16, Sudáfrica 11 (incluido el zulú y el xhosa), India 22 y Suiza 4 (alemán, francés, italiano y romanche). España no tiene idiomas co-oficiales a nivel nacional, aunque el catalán, euskera y gallego tienen estatus oficial en sus respectivas comunidades.</p>
+              <p className={styles.faqTip}>Dato extra: Papua Nueva Guinea tiene más de 800 lenguas habladas, aunque no todas son oficiales.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Cuál es la ciudad más poblada del mundo?</summary>
+              <p><strong>Tokio (Japón)</strong> es la aglomeración urbana más grande, con ~37 millones de habitantes en su área metropolitana. Le siguen Delhi (India, ~33 M), Shanghái (China, ~29 M) y Dhaka (Bangladés, ~22 M). Por ciudad administrativa estricta, Chongqing (China) puede superar esas cifras según cómo se delimiten sus fronteras municipales.</p>
+              <p className={styles.faqTip}>Dato extra: Lagos (Nigeria) podría superar a Tokio como ciudad más poblada antes de 2100 si se mantienen las tasas de crecimiento actuales.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Qué países no pertenecen a la ONU?</summary>
+              <p>Solo <strong>2 estados soberanos reconocidos no son miembros de pleno derecho de la ONU</strong>: Ciudad del Vaticano y Palestina (ambos son estados observadores). Taiwán fue expulsado en 1971 cuando la República Popular China ocupó su asiento. Kosovo, reconocido por más de 100 países, no es miembro por el veto de Rusia y China en el Consejo de Seguridad.</p>
+              <p className={styles.faqTip}>Dato extra: las Islas Cook y Niue son estados soberanos que tampoco son miembros de la ONU, aunque participan en agencias especializadas.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Cuál es el país más visitado turísticamente?</summary>
+              <p><strong>Francia</strong> ha encabezado el ranking de turismo internacional durante décadas, con ~90 millones de visitantes en 2023. Le siguen España (~85 M), EE.UU. (~77 M) y Turquía (~57 M). España es el segundo destino mundial pero el primero en ingresos por turista. El Mediterráneo concentra 6 de los 10 países más visitados del mundo.</p>
+              <p className={styles.faqTip}>Dato extra: Tailandia (~28 M visitantes) es el país más visitado de Asia y una de las economías más dependientes del turismo del mundo.</p>
+            </details>
+            <details className={styles.faqItem}>
+              <summary>¿Qué países tienen 2 o más capitales?</summary>
+              <p>Varios países dividen sus funciones de capital entre ciudades: <strong>Sudáfrica tiene 3</strong> (Pretoria ejecutiva, Ciudad del Cabo legislativa, Bloemfontein judicial). Bolivia tiene 2 (Sucre constitucional, La Paz gubernamental). Países Bajos: Ámsterdam es la capital constitucional pero La Haya es la sede del gobierno y el parlamento. En Malasia, Kuala Lumpur es la capital oficial pero Putrajaya alberga el gobierno federal desde 1999.</p>
+              <p className={styles.faqTip}>Dato extra: Nauru es el único país del mundo que no tiene una capital oficial designada; Yaren actúa como capital de facto.</p>
+            </details>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso — 7 pasos (patrón v2.0) ── */}
+        <section>
+          <h3>📋 Método para Aprender la Geografía Mundial en 4-8 Semanas</h3>
+          <p>Sigue este método sistemático por continente para memorizar los 195 países y sus capitales de forma duradera:</p>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Semana 1 — Europa (44 países): empieza por lo más familiar</strong>
+                <p>Europa es el continente con más reconocimiento previo para los hispanohablantes. Divide en 4 grupos: Europa occidental (8), Europa del norte (5), Europa del este (10), Balcanes y mediterráneo (21). Memoriza primero los países del G-7 europeo (Alemania, Francia, Italia, España, Países Bajos, Bélgica, Suecia) y luego expande.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Semana 2 — América (35 países): del norte al sur por la costa</strong>
+                <p>Sigue el eje norte-sur: EE.UU. y Canadá → México → Centroamérica (7 países) → Caribe (13 estados insulares) → América del Sur (12 países). Los países caribeños son los más difíciles: aprende sus capitales agrupándolos por isla grande (Cuba-Haití-República Dominicana en La Española, por ejemplo).</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Semana 3 — África (54 países): el continente más complejo</strong>
+                <p>Divide en 5 regiones: Norte (5), Oeste (16), Centro (8), Este (13), Sur (13). El norte es el más conocido (Marruecos, Egipto, Libia, Argelia, Túnez). Empieza por ahí y avanza hacia el sur. Usa el río Congo, el lago Victoria y la cordillera del Rift como referencia geográfica para ubicar los países del centro y este.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Semana 4-5 — Asia (49 países): el continente más diverso</strong>
+                <p>Divide en regiones: Oriente Medio (16), Asia Central (5 «-istanes»), Asia del Sur (8), Asia del Sudeste (11), Asia del Este (6). Los 5 «-istanes» de Asia Central (Kazajistán, Uzbekistán, Turkmenistán, Kirguistán, Tayikistán) son los más confundidos: aprende que todos tienen «Astana/Nur-Sultan, Tashkent, Ashgabat, Bishkek, Dushanbe» como capitales.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Semana 6 — Oceanía (14 países): islas del Pacífico</strong>
+                <p>Australia y Nueva Zelanda son los más conocidos. Para los 12 estados insulares del Pacífico (Fiyi, Tonga, Samoa, Vanuatu, Kiribati...), agrúpalos por proximidad geográfica: Melanesia (sur), Micronesia (norte ecuatorial) y Polinesia (este). Las capitales más difíciles: Funafuti (Tuvalu), Yaren (Nauru), Tarawa (Kiribati).</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Semana 7 — Repaso con mapas mudos</strong>
+                <p>Imprime o usa en línea mapas mudos de cada continente y escribe los nombres de los países sin ayuda. Identifica los errores: esos son los países en los que debes insistir. Repite el ejercicio hasta alcanzar un 90 % de aciertos por continente. Los mapas mudos son el sistema de repaso más eficaz demostrado por la psicología del aprendizaje (práctica de recuperación activa).</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Semana 8 — Consolidación: relaciona cada país con un evento actual</strong>
+                <p>Lee una noticia internacional y localiza en el mapa cada país mencionado. Conectar geografía con actualidad convierte el conocimiento abstracto en comprensión contextual duradera. A partir de aquí, la lectura habitual de prensa internacional mantiene y refuerza el mapa mental de forma natural.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas — 6 tips (patrón v2.0) ── */}
+        <section>
+          <h3>💡 6 Técnicas para Memorizar Países y Capitales</h3>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏠</span>
+              <h4>Empieza por tu continente</h4>
+              <p>El aprendizaje parte de lo conocido. Si eres de España, dominas Europa antes que África o Asia. Ese éxito inicial genera motivación para continuar. Reserva los continentes más complejos (África, Asia) para cuando tengas el método consolidado.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🗺️</span>
+              <h4>Aprende los países por sus fronteras comunes</h4>
+              <p>Los países se memorizan mejor en grupo que de forma aislada. Si sabes que Uganda limita con Kenia, Tanzania, Ruanda, RDC y Sudán del Sur, ubicas automáticamente a 5 países con un solo esfuerzo. Estudia siempre los países limítrofes juntos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏛️</span>
+              <h4>Asocia capitales con características únicas</h4>
+              <p>Nairobi (Kenia) = «La ciudad safari de África». Reikiavik (Islandia) = «La capital más septentrional del mundo». Canberra (Australia) = «No es ni Sídney ni Melbourne, es la capital de compromiso». Las historias y anécdotas fijan los datos mejor que la repetición pura.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✏️</span>
+              <h4>Usa mapas mudos para práctica activa</h4>
+              <p>Escribir activa la memoria mucho más que leer o escuchar. Imprime mapas mudos por continente e intenta completarlos sin mirar. Este sistema, llamado «práctica de recuperación activa», es el método de estudio con más evidencia científica para la retención a largo plazo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📰</span>
+              <h4>Relaciona países con eventos históricos recientes</h4>
+              <p>Sudán del Sur (independencia 2011), Kosovo (independencia 2008), Timor-Leste (independencia 2002). Los países más jóvenes tienen historias de independencia recientes que los hacen fácilmente memorables. Conectar geografía con historia convierte datos en narrativas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎮</span>
+              <h4>Practica con apps y juegos de geografía</h4>
+              <p>La gamificación acelera el aprendizaje. Juegos como GeoGuessr o quizzes de capitales en línea consolidan la memoria de forma lúdica. Dedica 10 minutos diarios a estos juegos durante 30 días: el efecto acumulado supera sesiones intensivas esporádicas.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box — confusiones frecuentes (patrón v2.0) ── */}
+        <section>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <strong>6 Confusiones Geográficas Muy Frecuentes</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li><strong>Austria ≠ Australia</strong>: Austria (Österreich) es un país sin litoral en el centro de Europa (capital: Viena). Australia es un continente-país en Oceanía (capital: Canberra). El error es tan común en inglés que existe el término «Kangaroo Office» para cuando correos de uno llegan al otro por confusión.</li>
+              <li><strong>República Checa ≠ Eslovaquia</strong>: Fueron un único país (Checoslovaquia) hasta 1993, cuando se separaron pacíficamente. República Checa (capital: Praga) está al oeste; Eslovaquia (capital: Bratislava) al este. Ambas son miembros de la UE pero Eslovaquia usa el euro y República Checa, la corona checa.</li>
+              <li><strong>Nicaragua ≠ Honduras</strong>: Dos países vecinos de Centroamérica con nombre y geografía que se confunden fácilmente. Nicaragua (capital: Managua) es el mayor de Centroamérica. Honduras (capital: Tegucigalpa) limita al norte con Guatemala y Belice. Un truco: Tegucigalpa es una de las capitales más difíciles de pronunciar del mundo, lo que la hace memorable.</li>
+              <li><strong>La capital no siempre es la ciudad más grande</strong>: En Australia, la capital es Canberra (no Sídney, no Melbourne). En EE.UU., Washington D.C. (no Nueva York). En Brasil, Brasilia (no São Paulo ni Río de Janeiro). En Sudáfrica hay tres capitales distintas según la función. Las capitales «diseñadas» suelen ser más pequeñas que las ciudades históricamente dominantes.</li>
+              <li><strong>Irlanda ≠ Irlanda del Norte</strong>: Irlanda (Éire) es un estado independiente y miembro de la UE (capital: Dublín). Irlanda del Norte es una de las cuatro naciones constituyentes del Reino Unido (capital administrativa: Belfast). Son vecinas en la misma isla pero pertenecen a países diferentes.</li>
+              <li><strong>Guinea, Guinea-Bisáu, Guinea Ecuatorial y Papua Nueva Guinea</strong>: Cuatro países distintos en diferentes partes del mundo. Guinea y Guinea-Bisáu están en África Occidental. Guinea Ecuatorial está en África Central (a pesar de su nombre, no toca el ecuador). Papua Nueva Guinea está en Oceanía, a miles de kilómetros. El nombre «Guinea» viene de la palabra bereber para designar el territorio «de los hombres negros» y fue adoptado de forma independiente en distintas regiones.</li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('paises-del-mundo')} />
