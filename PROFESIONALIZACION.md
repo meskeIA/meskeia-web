@@ -652,7 +652,7 @@ FASE 4: VERIFICACIÓN
 
 **Última actualización**: 2026-03-17 (100% apps profesionalizadas. Patrón integrado en flujo de nueva app)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
-**Versión**: 2.1
+**Patrón**: v2.0
 **Estado**: 100% — todas las apps tienen patrón v2.0 (excepto Cursos y Guías, excluidos por diseño)
 
 ---
