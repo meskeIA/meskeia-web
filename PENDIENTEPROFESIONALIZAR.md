@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~201 | **Pendientes**: ~49
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~209 | **Pendientes**: ~41
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -215,7 +215,7 @@ Apps de uso frecuente con buen potencial educativo.
 
 ### Referencia y Cultura General
 
-- [ ] `/paises-del-mundo/` — Buscador países: banderas, capitales, monedas, idiomas
+- [x] `/paises-del-mundo/` — Buscador países: banderas, capitales, monedas, idiomas ✅ lote B13
 - [ ] `/minerales-del-mundo/` — Guía de 50 minerales
 - [ ] `/constelaciones-del-cielo/` — Guía de 32 constelaciones
 
@@ -259,14 +259,14 @@ Apps de uso frecuente con buen potencial educativo.
 
 ### Nuevas Apps (2026-02-23)
 
-- [ ] `/checklist-documentos-viaje/` — Checklist documentos: España, Europa, internacional
-- [ ] `/orientador-jet-lag/` — Calculadora jet lag: diferencia horaria, adaptación
-- [ ] `/quiz-paises-capitales/` — Quiz geografía: capitales, banderas
-- [ ] `/quiz-verbos-irregulares/` — Quiz verbos irregulares inglés (75 verbos A1-B2)
-- [ ] `/quiz-figuras-retoricas/` — Quiz figuras retóricas ESO/Bach/Selectividad
-- [ ] `/quiz-reinos-naturaleza/` — Quiz Reinos de la Naturaleza (43 organismos)
+- [x] `/checklist-documentos-viaje/` — Checklist documentos: España, Europa, internacional ✅ lote B13
+- [x] `/orientador-jet-lag/` — Calculadora jet lag: diferencia horaria, adaptación ✅ lote B13
+- [x] `/quiz-paises-capitales/` — Quiz geografía: capitales, banderas ✅ lote B13
+- [x] `/quiz-verbos-irregulares/` — Quiz verbos irregulares inglés (75 verbos A1-B2) ✅ lote B13
+- [x] `/quiz-figuras-retoricas/` — Quiz figuras retóricas ESO/Bach/Selectividad ✅ lote B13
+- [x] `/quiz-reinos-naturaleza/` — Quiz Reinos de la Naturaleza (43 organismos) ✅ lote B13
 - [ ] `/guia-seguro-viaje/` — Coberturas recomendadas por destino + checklist
-- [ ] `/planificador-itinerario/` — Organiza días y actividades de viaje
+- [x] `/planificador-itinerario/` — Organiza días y actividades de viaje ✅ lote B13
 
 ---
 
@@ -339,6 +339,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote B13 | 2026-03-17 | `checklist-documentos-viaje`, `orientador-jet-lag`, `planificador-itinerario`, `quiz-paises-capitales`, `quiz-verbos-irregulares`, `quiz-figuras-retoricas`, `quiz-reinos-naturaleza`, `paises-del-mundo` | `e0b7f2d` |
 | Lote B12 | 2026-03-17 | `calculadora-mcd-mcm`, `calculadora-probabilidad`, `calculadora-estadistica`, `calculadora-matematica`, `calculadora-trigonometria`, `calculadora-teoria-numeros`, `calculadora-aspectos`, `comparador-coste-vida` | `3565779` |
 | Lote B11 | 2026-03-17 | `calculadora-propinas`, `calculadora-regla-de-tres`, `calculadora-cocina`, `lista-compras`, `conversor-tallas`, `calculadora-edad-mascotas`, `planificador-boda`, `calculadora-huella-carbono` | `d297204` |
 | Lote B10 | 2026-03-17 | `adaptacion-hogar`, `residencia-vs-cuidado-en-casa`, `estimador-riesgo-osteoporosis`, `test-fragilidad`, `orientador-grado-dependencia`, `estimador-legitimas`, `optimizador-rentas-60` | `f8e2021` |
