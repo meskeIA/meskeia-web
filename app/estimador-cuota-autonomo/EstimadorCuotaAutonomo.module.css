@@ -666,6 +666,487 @@
   background: var(--bg-card);
 }
 
+/* ============================================
+   TABLA COMPARATIVA 15 TRAMOS RETA
+   ============================================ */
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 560px;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.comparativaTable th {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.comparativaTable td {
+  color: var(--text-secondary);
+}
+
+.comparativaTable td:first-child {
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================
+   ESCENARIOS / CASOS DE USO
+   ============================================ */
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+}
+
+.escenarioHeader > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.escenarioHeader strong {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.escenarioHeader span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.escenarioIcon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.escenarioExample {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.escenarioExample p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.escenarioExample strong {
+  color: var(--text-primary);
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: 0;
+}
+
+/* ============================================
+   FAQ
+   ============================================ */
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+}
+
+.faqItem h4 {
+  font-size: 1rem;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: 1.4;
+}
+
+.faqItem p {
+  margin: var(--spacing-xs) 0 0 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.faqItem strong {
+  color: var(--text-primary);
+}
+
+.faqTip {
+  margin-top: var(--spacing-sm) !important;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(46, 134, 171, 0.07);
+  border-radius: var(--radius);
+  font-style: italic;
+  font-size: 0.85rem !important;
+  color: var(--text-muted) !important;
+}
+
+/* ============================================
+   GUÍA PASO A PASO
+   ============================================ */
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  position: relative;
+}
+
+.stepGuide::before {
+  content: '';
+  position: absolute;
+  left: 21px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  opacity: 0.25;
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  position: relative;
+}
+
+.stepNumber {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.3);
+}
+
+.stepContent {
+  flex: 1;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  padding-top: var(--spacing-md);
+}
+
+.stepContent h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: 1.4;
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.stepContent strong {
+  color: var(--text-primary);
+}
+
+.stepContent em {
+  font-style: italic;
+}
+
+/* ============================================
+   MEJORES PRÁCTICAS — TIPS GRID
+   ============================================ */
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tipCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg, 0 8px 24px rgba(0,0,0,0.12));
+}
+
+.tipIcon {
+  font-size: 1.8rem;
+}
+
+.tipCard h4 {
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.tipCard p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.tipCard strong {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   WARNING BOX — ERRORES COMUNES
+   ============================================ */
+
+.warningBox {
+  background: #fff8e1;
+  border: 2px solid #f59e0b;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.warningIcon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.warningHeader h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.warningList li {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.warningList strong {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   DARK MODE — NUEVAS SECCIONES
+   ============================================ */
+
+[data-theme='dark'] .comparativaTable td {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .escenarioTip {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--text-muted) !important;
+}
+
+[data-theme='dark'] .stepContent {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+/* ============================================
+   RESPONSIVE — NUEVAS SECCIONES (≤768px)
+   ============================================ */
+
+@media (max-width: 768px) {
+  .tableWrapper {
+    border-radius: 0;
+    margin-left: calc(-1 * var(--spacing-lg));
+    margin-right: calc(-1 * var(--spacing-lg));
+    border-left: none;
+    border-right: none;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .escenarioCard {
+    padding: var(--spacing-md);
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipCard {
+    padding: var(--spacing-md);
+  }
+
+  .stepGuide::before {
+    left: 19px;
+  }
+
+  .stepNumber {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .step {
+    gap: var(--spacing-md);
+  }
+
+  .stepContent {
+    padding: var(--spacing-md);
+  }
+
+  .warningBox {
+    padding: var(--spacing-lg);
+  }
+
+  .warningList {
+    padding-left: var(--spacing-lg);
+  }
+
+  .faqItem {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ============================================
+   RESPONSIVE — NUEVAS SECCIONES (≤1024px)
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .tipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   RESPONSIVE ORIGINAL (mantener al final)
+   ============================================ */
+
 /* Responsive */
 @media (max-width: 1024px) {
   .inputGrid {

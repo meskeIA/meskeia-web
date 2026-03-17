@@ -432,6 +432,315 @@ export default function EstimadorPlusvalidasIRPFPage() {
             </tbody>
           </table>
         </section>
+
+        {/* ── 1. Tabla Comparativa ─────────────────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa por tipo de activo</h2>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-md)' }}>
+            No todos los activos tributan igual. Esta tabla resume las diferencias clave para 2025.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Activo</th>
+                  <th>Plazo para base del ahorro</th>
+                  <th>Gastos deducibles</th>
+                  <th>Exenciones principales</th>
+                  <th>Retención en origen</th>
+                  <th>Complejidad declaración</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Inmueble</strong></td>
+                  <td>&gt; 1 año desde escritura</td>
+                  <td>ITP/AJD, notaría, registro, gestoría, reformas que aumentan valor, comisión agencia, plusvalía municipal</td>
+                  <td>Reinversión en vivienda habitual, mayores de 65 años, dación en pago</td>
+                  <td>No aplica (el comprador no retiene)</td>
+                  <td>Alta — muchos gastos y posibles exenciones</td>
+                </tr>
+                <tr>
+                  <td><strong>Fondos de inversión</strong></td>
+                  <td>&gt; 1 año desde suscripción</td>
+                  <td>Comisiones de suscripción y reembolso</td>
+                  <td>Régimen de traspasos entre fondos domiciliados en España/UE (no tributa hasta reembolso final)</td>
+                  <td>19% retención automática</td>
+                  <td>Media — la gestora informa en el certificado fiscal</td>
+                </tr>
+                <tr>
+                  <td><strong>Acciones / ETFs</strong></td>
+                  <td>&gt; 1 año desde fecha de compra</td>
+                  <td>Comisiones de compra y venta del bróker</td>
+                  <td>Ninguna específica (regla wash sale invalida pérdidas si recompra en 2 meses)</td>
+                  <td>19% retención automática (acciones españolas)</td>
+                  <td>Media-alta — FIFO obligatorio con múltiples compras</td>
+                </tr>
+                <tr>
+                  <td><strong>Criptomonedas</strong></td>
+                  <td>&gt; 1 año (cada unidad por separado)</td>
+                  <td>Comisiones del exchange por compra y venta</td>
+                  <td>Sin exenciones específicas en 2025</td>
+                  <td>No aplica (sin retención en origen)</td>
+                  <td>Muy alta — cada swap/intercambio es hecho imponible independiente</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── 2. Casos de Uso ──────────────────────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Casos de uso reales</h2>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-md)' }}>
+            Ejemplos concretos con números para que entiendas cómo se aplican las reglas en la práctica.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
+                <h4>Venta de piso comprado en 2015</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                Compra en 2015 por 150.000 € (+ 13.500 € gastos ITP y notaría). Venta en 2024 por 230.000 € (− 10.000 € comisión inmobiliaria y plusvalía municipal).<br /><br />
+                Valor adquisición: <strong>163.500 €</strong><br />
+                Valor transmisión: <strong>220.000 €</strong><br />
+                Ganancia patrimonial: <strong>56.500 €</strong><br />
+                Cuota aprox. (base ahorro): <strong>~10.665 €</strong><br />
+                <em>(6.000 × 19% + 44.000 × 21% + 6.500 × 23%)</em>
+              </div>
+              <p className={styles.escenarioTip}>
+                Tenencia &gt; 1 año: tributa en base del ahorro (19–30%). Si fuera vivienda habitual y reinviertes en otra, la ganancia queda exenta.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
+                <h4>Traspaso entre fondos de inversión</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                Tienes 30.000 € en el Fondo A (ganancia latente de 8.000 €). Traspassas al Fondo B domiciliado en España.<br /><br />
+                Resultado fiscal: <strong>0 € a pagar en el año del traspaso</strong><br />
+                El valor de adquisición del Fondo B hereda el coste original del Fondo A. La ganancia tributa cuando hagas el reembolso final.
+              </div>
+              <p className={styles.escenarioTip}>
+                Atención: esta ventaja NO aplica a ETFs ni a fondos domiciliados fuera de la UE. Un traspaso de Fondo A a un ETF sí genera hecho imponible inmediato.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
+                <h4>Acciones con pérdidas que compensan ganancias</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                Venta de acciones de empresa A: +4.000 € de ganancia.<br />
+                Venta de acciones de empresa B: −2.500 € de pérdida.<br /><br />
+                Base imponible neta: <strong>1.500 €</strong><br />
+                IRPF a pagar: <strong>285 € (19% sobre 1.500 €)</strong><br /><br />
+                Si la pérdida hubiera sido mayor que la ganancia, el exceso puede compensarse en los 4 años siguientes.
+              </div>
+              <p className={styles.escenarioTip}>
+                Regla wash sale: si recompras las acciones de empresa B en los 2 meses siguientes a la venta, la pérdida de 2.500 € queda invalidada para compensar.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🪙</span>
+                <h4>Criptomonedas: el intercambio BTC→ETH tributa</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                Compraste 1 BTC en enero 2024 por 35.000 €. En agosto 2024 lo intercambiaste por 20 ETH (valor de mercado en ese momento: 52.000 €).<br /><br />
+                Ganancia realizada: <strong>17.000 €</strong><br />
+                Tenencia &lt; 1 año → <strong>base general</strong> (tipo marginal, hasta 47%).<br />
+                Si la operación se hubiera hecho en febrero 2025, base del ahorro (19–30%).
+              </div>
+              <p className={styles.escenarioTip}>
+                Cada intercambio crypto→crypto es una transmisión. No hace falta convertir a euros para que se genere el hecho imponible. Exporta el CSV del exchange para cada año.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 3. FAQ ───────────────────────────────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo puedo reducir la ganancia con gastos de compra y venta?</h4>
+              <p>
+                El valor de adquisición incluye el precio pagado más todos los gastos e impuestos directamente vinculados: ITP o IVA, notaría, registro de la propiedad, gestoría y comisiones del bróker. El valor de transmisión es el precio de venta menos los gastos de la operación: comisión de la agencia inmobiliaria, plusvalía municipal (IIVTNU), notaría y gestoría de la venta. Cuanto más detallados sean tus justificantes, menor será la ganancia declarada.
+              </p>
+              <span className={styles.faqTip}>Guarda todas las facturas relacionadas con la operación</span>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Las pérdidas de un año pueden compensarse en años siguientes?</h4>
+              <p>
+                Sí. Las pérdidas patrimoniales pendientes de compensar pueden aplicarse durante los 4 ejercicios siguientes. En primer lugar se compensan con ganancias del mismo tipo (base del ahorro con base del ahorro). Si quedan pérdidas sin compensar en la base del ahorro, pueden aplicarse hasta el 25% de los rendimientos de capital mobiliario positivos del mismo año. La compensación cruzada entre base general y base del ahorro también está limitada al 25% desde 2021.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué es la exención por reinversión en vivienda habitual y cómo funciona?</h4>
+              <p>
+                Si vendes tu vivienda habitual con ganancia y reinviertes el importe obtenido en la adquisición de una nueva vivienda habitual en un plazo de 2 años (antes o después de la venta), la ganancia queda exenta en proporción a lo reinvertido. Si solo reinviertes parte del importe, la exención es parcial. Condición clave: el vendedor debe haber residido en la vivienda de forma continuada al menos 3 años, salvo causas justificadas.
+              </p>
+              <span className={styles.faqTip}>Válido también si adquiriste la nueva vivienda hasta 2 años antes de vender la anterior</span>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cómo tributan las donaciones de acciones o fondos?</h4>
+              <p>
+                Cuando donas acciones o fondos, el donante no tributa por IRPF en ese momento (el donante no tiene ganancia patrimonial). Sin embargo, el receptor hereda el valor de adquisición original del donante. Cuando el receptor venda en el futuro, tributará por la diferencia entre el valor de mercado en la fecha de la donación y el precio de venta. La donación en sí tributa por el Impuesto de Donaciones (a cargo del donatario).
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Las plusvalías de fondos de pensiones tributan igual que las de fondos de inversión?</h4>
+              <p>
+                No. Los fondos de pensiones no generan ganancia patrimonial: las aportaciones son deducibles en la base general del IRPF (hasta 1.500 €/año) y las prestaciones tributan como rendimientos del trabajo al rescate, no como ganancias patrimoniales en la base del ahorro. En cambio, los fondos de inversión (SICAV, FI) sí generan ganancias patrimoniales al reembolso, con los tipos de la base del ahorro (19–30%).
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Tengo que declarar una venta de acciones aunque haya perdido dinero?</h4>
+              <p>
+                Técnicamente, si el importe total de transmisiones con retención supera los 1.600 € en el año, o si el conjunto de ganancias y pérdidas supera 500 €, existe obligación de declarar. En la práctica, si has vendido acciones a través de un bróker español, ya habrán practicado retención y te informarán en el certificado fiscal. Aunque la operación genere pérdida, interesa declararla para poder compensarla con futuras ganancias en los 4 años siguientes.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué es la regla de los dos meses (wash sale) para compensar pérdidas?</h4>
+              <p>
+                En España, si vendes valores con pérdida y adquieres los mismos valores (o valores homogéneos) en los 2 meses anteriores o posteriores a la venta, la pérdida no puede compensarse en ese ejercicio: queda diferida hasta que vendas los valores recomprados. Esta norma antiabuso está en el art. 33.5 LIRPF y aplica tanto a acciones como a participaciones en IIC (fondos y ETFs con la misma política de inversión).
+              </p>
+              <span className={styles.faqTip}>Para fondos de inversión, el plazo ampliado es de 2 meses antes y después</span>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cómo calculo el valor de adquisición de acciones compradas en varias veces (FIFO)?</h4>
+              <p>
+                La normativa española obliga a usar el método FIFO (First In, First Out): cuando vendas, se considera que vendes primero las acciones más antiguas. Por ejemplo, si compraste 100 acciones en 2020 a 10 € y 100 en 2022 a 15 €, y vendes 100 en 2025, el coste asignado es 10 € por acción (las de 2020). Esto afecta al periodo de tenencia y al tipo impositivo aplicable. Tu bróker debe informarte del coste FIFO en el certificado fiscal anual.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 4. Guía Paso a Paso ──────────────────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Cómo declarar plusvalías: 6 pasos</h2>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-md)' }}>
+            Proceso completo desde que recopilas los datos hasta que cumplimentas el modelo 100.
+          </p>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Recopilar todas las ventas del año</h4>
+                <p>Obtén el extracto de operaciones de cada bróker, el certificado fiscal de la gestora de fondos, las escrituras de transmisión de inmuebles y los CSV de los exchanges de criptomonedas. Necesitas la fecha, el precio de compra, el precio de venta y las comisiones de cada operación.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Calcular el valor de adquisición con todos los gastos</h4>
+                <p>Suma al precio de compra: ITP o IVA pagado, notaría, registro de la propiedad, gestoría, comisiones del bróker o agencia. En el caso de inmuebles heredados, el valor de adquisición es el declarado en el Impuesto de Sucesiones (IS), no el precio original del fallecido.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Calcular el valor de transmisión neto de gastos</h4>
+                <p>Al precio de venta réstale: la comisión de la agencia inmobiliaria (habitualmente 3–5%), la plusvalía municipal abonada (IIVTNU), los honorarios de notaría y gestoría de la venta, y las comisiones del bróker. Cada euro deducido reduce directamente la ganancia patrimonial.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Aplicar el método FIFO si tienes acciones o fondos con múltiples compras</h4>
+                <p>Ordena tus compras de más antigua a más reciente. Asigna las ventas empezando por las acciones o participaciones más antiguas. Esto determina tanto el coste de adquisición como el periodo de tenencia de cada unidad vendida, lo que puede cambiar si tributa en base del ahorro o base general.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Compensar ganancias y pérdidas</h4>
+                <p>Primero compensa las pérdidas de la base del ahorro con las ganancias de la base del ahorro. Si hay pérdidas excedentes, aplícalas sobre los rendimientos de capital mobiliario positivos (dividendos, intereses) hasta el límite del 25%. Las pérdidas no compensadas en el año se arrastran hasta 4 ejercicios.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Incluir en el modelo 100 (Declaración de la Renta)</h4>
+                <p>Las ganancias y pérdidas de la base del ahorro se declaran en las casillas de «Ganancias y pérdidas patrimoniales derivadas de transmisiones» (aproximadamente casillas 1624–1789 según el tipo de activo). Las operaciones con retención ya aparecen precargadas; revisa que los valores coincidan con tu certificado fiscal y añade las que falten (criptomonedas, inmuebles, etc.).</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5. Mejores Prácticas ─────────────────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas para optimizar la tributación</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⏳</span>
+              <p><strong>Espera al año en activos con ganancia</strong> si la fecha del año natural se acerca. Pasar de base general (hasta 47%) a base del ahorro (19–30%) puede suponer un ahorro de hasta 10 puntos porcentuales sobre la ganancia. Con una ganancia de 20.000 €, el ahorro puede ser superior a 2.000 €.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📉</span>
+              <p><strong>Aprovecha las pérdidas latentes antes de fin de año</strong> para compensar ganancias ya realizadas. Si tienes acciones en pérdida y no esperas que se recuperen, venderlas antes del 31 de diciembre reduce la base imponible del ejercicio. Recuerda respetar la regla de los 2 meses.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🧾</span>
+              <p><strong>Deduce todos los gastos de adquisición en inmuebles:</strong> ITP/AJD (6–10% del precio), notaría (~0,5–1%), registro de la propiedad (~0,3–0,5%), gestoría (~300–600 €) y reformas que aumenten la superficie o mejoren la habitabilidad. Estos gastos pueden sumar fácilmente 10.000–20.000 € en un piso de 200.000 €.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
+              <p><strong>En inmuebles heredados, el valor de adquisición es el declarado en el IS,</strong> no el precio original del fallecido. Si el inmueble se valoró en la herencia por debajo de mercado, la ganancia patrimonial al vender será mayor. Considera consultar con un asesor antes de aceptar una herencia con inmuebles.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔨</span>
+              <p><strong>Guarda el justificante de obras y mejoras del inmueble.</strong> Las mejoras que aumenten el valor del bien (cambio de instalación eléctrica, reforma integral, ampliación de superficie) se añaden al valor de adquisición y reducen la ganancia. Las reparaciones de mantenimiento no son deducibles.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🪙</span>
+              <p><strong>Para criptomonedas, exporta el historial completo del exchange</strong> al finalizar el año y calcula el precio medio FIFO de cada criptomoneda. Herramientas como Koinly o CoinTracking automatizan el cálculo. La falta de declaración es detectada por Hacienda mediante el modelo 721 (saldos en exchanges extranjeros &gt;50.000 €).</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 6. Warning Box ───────────────────────────────────────────────── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>Errores frecuentes que cuestan dinero (o multas)</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Olvidar las comisiones del bróker</strong> en el valor de adquisición y transmisión. Cada comisión reduce la ganancia computable. En operaciones frecuentes, pueden suponer cientos de euros deducibles que se pierden por no incluirlos.
+              </li>
+              <li>
+                <strong>Creer que un traspaso entre fondos nunca tributa.</strong> El régimen de traspasos aplica solo a fondos de inversión domiciliados en España o en la UE con convenio. Los ETFs y fondos extranjeros fuera del régimen sí generan ganancia patrimonial inmediata al traspaso.
+              </li>
+              <li>
+                <strong>Compensar pérdidas de acciones recomprando los mismos títulos en los 2 meses siguientes.</strong> La Agencia Tributaria invalida la compensación de esa pérdida, que queda diferida hasta la venta definitiva. El plazo es 2 meses tanto antes como después de la venta con pérdida.
+              </li>
+              <li>
+                <strong>Confundir base del ahorro con base general.</strong> Activos con tenencia inferior a 1 año tributan al tipo marginal de la escala general (hasta 47%), no a los tipos de la base del ahorro (19–30%). Esta diferencia puede ser enorme: una ganancia de 30.000 € puede costar 9.000 € más si tributa en base general.
+              </li>
+              <li>
+                <strong>No declarar la venta de un inmueble aunque genere pérdida.</strong> Hacienda detecta las transmisiones inmobiliarias a través del Registro de la Propiedad y del modelo 600 (ITP). La omisión puede dar lugar a una liquidación paralela con recargo e intereses de demora.
+              </li>
+              <li>
+                <strong>Ignorar la tributación de criptomonedas en intercambios entre monedas.</strong> Cada swap BTC→ETH, cada uso de criptomonedas para pagar bienes o servicios, y cada conversión a stablecoins es una transmisión que genera ganancia o pérdida. No hace falta convertir a euros para que nazca la obligación fiscal.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('estimador-plusvalias-irpf')} />

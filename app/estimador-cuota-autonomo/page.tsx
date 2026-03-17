@@ -568,6 +568,443 @@ export default function EstimadorCuotaAutonomoPage() {
             </div>
           </div>
         </section>
+
+        {/* ============================================ */}
+        {/* SECCIÓN 1: TABLA COMPARATIVA 15 TRAMOS RETA */}
+        {/* ============================================ */}
+        <section className={styles.guideSection}>
+          <h2>Tabla Comparativa: 15 Tramos RETA 2025</h2>
+          <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-lg)', fontSize: '0.95rem' }}>
+            Sistema vigente desde 2023 — cotización por ingresos reales. Cuotas calculadas al tipo del 31,30% sobre la base mínima.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tramo</th>
+                  <th>Rendimiento neto mensual</th>
+                  <th>Base mín. cotización</th>
+                  <th>Base máx. cotización</th>
+                  <th>Cuota mín. mensual</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>≤ 670 €</td><td>735,29 €</td><td>1.166,70 €</td><td>~244 €</td></tr>
+                <tr><td>2</td><td>670 – 900 €</td><td>816,98 €</td><td>1.166,70 €</td><td>~272 €</td></tr>
+                <tr><td>3</td><td>900 – 1.166,70 €</td><td>872,55 €</td><td>1.166,70 €</td><td>~290 €</td></tr>
+                <tr><td>4</td><td>1.166,70 – 1.300 €</td><td>950,98 €</td><td>1.300 €</td><td>~316 €</td></tr>
+                <tr><td>5</td><td>1.300 – 1.500 €</td><td>960,78 €</td><td>1.500 €</td><td>~319 €</td></tr>
+                <tr><td>6</td><td>1.500 – 1.700 €</td><td>960,78 €</td><td>1.700 €</td><td>~319 €</td></tr>
+                <tr><td>7</td><td>1.700 – 1.850 €</td><td>1.013,07 €</td><td>1.850 €</td><td>~337 €</td></tr>
+                <tr><td>8</td><td>1.850 – 2.030 €</td><td>1.013,07 €</td><td>2.030 €</td><td>~337 €</td></tr>
+                <tr><td>9</td><td>2.030 – 2.330 €</td><td>1.029,41 €</td><td>2.330 €</td><td>~342 €</td></tr>
+                <tr><td>10</td><td>2.330 – 2.760 €</td><td>1.045,75 €</td><td>2.760 €</td><td>~348 €</td></tr>
+                <tr><td>11</td><td>2.760 – 3.190 €</td><td>1.078,43 €</td><td>3.190 €</td><td>~358 €</td></tr>
+                <tr><td>12</td><td>3.190 – 3.620 €</td><td>1.111,11 €</td><td>3.620 €</td><td>~369 €</td></tr>
+                <tr><td>13</td><td>3.620 – 4.050 €</td><td>1.176,47 €</td><td>4.050 €</td><td>~391 €</td></tr>
+                <tr><td>14</td><td>4.050 – 6.000 €</td><td>1.176,47 €</td><td>6.000 €</td><td>~391 €</td></tr>
+                <tr><td>15</td><td>&gt; 6.000 €</td><td>1.225,90 €</td><td>4.139,40 €</td><td>~407 €</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 'var(--spacing-sm)' }}>
+            * Tramos 1–3: tabla reducida (rendimientos inferiores al SMI mensual). Tramos 4–15: tabla general.
+            Cuota incluye el MEI (0,70%) desde enero 2023. Fuente: TGSS / Real Decreto-ley 13/2022.
+          </p>
+        </section>
+
+        {/* ============================================ */}
+        {/* SECCIÓN 2: CASOS DE USO — 4 PERFILES REALES  */}
+        {/* ============================================ */}
+        <section className={styles.guideSection}>
+          <h2>Casos de Uso: 4 Perfiles Reales</h2>
+          <div className={styles.escenariosGrid}>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎨</span>
+                <div>
+                  <strong>Freelance diseñador gráfico</strong>
+                  <span>18.000 € rendimiento neto/año</span>
+                </div>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Rendimiento mensual:</strong> 1.500 €/mes</p>
+                <p><strong>Tramo aplicable:</strong> Tramo 6 (1.500 – 1.700 €)</p>
+                <p><strong>Base mínima:</strong> 960,78 €</p>
+                <p><strong>Cuota mensual:</strong> ~319 €/mes · ~3.828 €/año</p>
+              </div>
+              <p className={styles.escenarioTip}>
+                💡 Si anticipa que sus ingresos bajarán en verano, puede reducir la base al tramo 5 hasta septiembre y ajustarla después — ahorrando hasta 240 € en esos meses.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💼</span>
+                <div>
+                  <strong>Consultora independiente</strong>
+                  <span>48.000 € rendimiento neto/año</span>
+                </div>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Rendimiento mensual:</strong> 4.000 €/mes</p>
+                <p><strong>Tramo aplicable:</strong> Tramo 14 (4.050 – 6.000 €)</p>
+                <p><strong>Base mínima:</strong> 1.176,47 €</p>
+                <p><strong>Cuota mensual:</strong> ~391 €/mes · ~4.692 €/año</p>
+              </div>
+              <p className={styles.escenarioTip}>
+                💡 Con ingresos altos y estables puede valorar subir la base hacia 2.000 €/mes: la cuota sube a ~626 €, pero la prestación por IT o maternidad se multiplica.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏢</span>
+                <div>
+                  <strong>Autónomo societario</strong>
+                  <span>&gt; 6.000 €/mes rendimiento neto</span>
+                </div>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Rendimiento mensual:</strong> &gt; 6.000 €</p>
+                <p><strong>Tramo aplicable:</strong> Tramo 15 (máximo)</p>
+                <p><strong>Base mínima:</strong> 1.225,90 €</p>
+                <p><strong>Cuota mínima:</strong> ~407 €/mes · ~4.884 €/año</p>
+              </div>
+              <p className={styles.escenarioTip}>
+                💡 Los autónomos societarios tributan por los rendimientos del trabajo percibidos de la sociedad, no por los beneficios de la empresa. El tramo se calcula sobre el salario declarado.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🆕</span>
+                <div>
+                  <strong>Nuevo autónomo con tarifa plana</strong>
+                  <span>Primer alta en el RETA</span>
+                </div>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Cuota durante 12 meses:</strong> 80 €/mes</p>
+                <p><strong>Ahorro vs. tramo 6:</strong> 239 €/mes · 2.868 €/año</p>
+                <p><strong>Prórroga 12 meses adicionales:</strong> si ingresos anuales ≤ SMI (~15.876 €)</p>
+                <p><strong>Requisito:</strong> sin alta en RETA en los últimos 2 años</p>
+              </div>
+              <p className={styles.escenarioTip}>
+                💡 Si cumples los requisitos, la tarifa plana es la medida de mayor impacto en los primeros 2 años. Ahorro total potencial si se extiende: hasta 5.736 € en 24 meses.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* SECCIÓN 3: FAQ — 8 PREGUNTAS FRECUENTES      */}
+        {/* ============================================ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre la Cotización de Autónomos</h2>
+          <div className={styles.faqList}>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el rendimiento neto y cómo lo calculo para el RETA?</h4>
+              <p>
+                El rendimiento neto es el resultado de restar a tus ingresos brutos todos los gastos deducibles de la actividad:
+                material, suministros, cuotas profesionales, seguros, amortizaciones, etc. Para actividades en estimación directa,
+                es el resultado del modelo 130 (pagos fraccionados IRPF). Para módulos, se aplica una fórmula simplificada basada en índices.
+                <strong> La cuota de autónomo del propio ejercicio también es gasto deducible</strong>, lo que reduce ligeramente el rendimiento final.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Puedo cambiar de tramo si mis ingresos bajan inesperadamente?</h4>
+              <p>
+                Sí. Puedes modificar tu base de cotización hasta <strong>6 veces al año</strong> a través del sistema
+                RED de la Seguridad Social o la sede electrónica. Los cambios tienen efecto el primer día del mes siguiente
+                a la solicitud. Si prevés que tus ingresos van a caer de forma significativa (por ejemplo, al perder un cliente
+                importante), solicita el cambio cuanto antes para evitar cotizar de más y acumular deuda de regularización inversa.
+              </p>
+              <p className={styles.faqTip}>Plazos de cambio: enero, marzo, mayo, julio, septiembre, noviembre (6 ventanas anuales).</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué pasa en la regularización anual si cotizé de más?</h4>
+              <p>
+                La Agencia Tributaria comunica a la TGSS tus rendimientos netos reales tras la Renta (modelo 100, presentada
+                entre abril y junio). Si cotizaste por un tramo superior al que corresponde, la Seguridad Social te
+                <strong> devuelve la diferencia</strong> antes del 31 de diciembre del año siguiente. Si cotizaste por menos,
+                te reclaman el importe. No hay penalización si la diferencia se paga en el plazo indicado.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿La tarifa plana de 80 € se aplica a todos los nuevos autónomos?</h4>
+              <p>
+                No. La tarifa plana requiere: (1) no haber estado dado de alta en el RETA en los últimos 2 años
+                (3 años si ya disfrutaste de tarifa plana anteriormente), y (2) ser el primer alta o haber transcurrido
+                el periodo de carencia. Los autónomos colaboradores (familiares contratados) tienen condiciones distintas.
+                La tarifa es de <strong>80 €/mes durante 12 meses</strong>, prorrogable otros 12 meses si los rendimientos
+                netos anuales no superan el SMI (~15.876 € en 2025).
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cómo afecta la cotización a mi futura pensión de jubilación?</h4>
+              <p>
+                La pensión de jubilación se calcula sobre las bases cotizadas durante los últimos 25 años (ampliándose
+                progresivamente hasta toda la vida laboral). Cotizar por la base mínima del tramo genera una pensión más baja.
+                Por ejemplo, cotizar por 1.000 €/mes durante 25 años genera una pensión aproximada de <strong>~700–750 €/mes</strong>,
+                mientras que hacerlo por 2.000 €/mes puede doblarla. Si tienes más de 45 años o planeas jubilarte en menos
+                de 20 años, puede valer la pena subir la base progresivamente.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Tengo derecho a paro si soy autónomo y cierro el negocio?</h4>
+              <p>
+                Los autónomos no tienen acceso al desempleo como los trabajadores por cuenta ajena. Sin embargo, existe la
+                <strong> prestación por cese de actividad</strong> (conocida popularmente como «paro de autónomos»), equivalente
+                al 70% de la base reguladora, durante un período proporcional a los meses cotizados por esta contingencia
+                (mínimo 12 meses cotizados para tener derecho). Cotizar por cese es <strong>voluntario</strong>, aunque desde
+                2019 viene incluido en el tipo ordinario.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el cese de actividad y cuándo puedo solicitarlo?</h4>
+              <p>
+                El cese de actividad es la prestación equivalente al paro para autónomos. Puedes solicitarlo cuando se produce
+                el cierre definitivo de la actividad por: pérdidas acumuladas superiores al 10% de los ingresos en un año
+                (o al 20% en dos años consecutivos), ejecución judicial de deuda, pérdida de licencia, violencia de género,
+                divorcio o separación con cese forzado, o declaración de concurso. El trámite se realiza en la mutua
+                colaboradora correspondiente en un plazo de <strong>15 días hábiles</strong> tras el cese.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cuándo conviene cotizar por una base mayor que la mínima del tramo?</h4>
+              <p>
+                Subir la base tiene sentido en estos escenarios concretos: (1) <strong>maternidad o paternidad próxima</strong>
+                —la prestación es proporcional a la base cotizada en los 6 meses anteriores—; (2) <strong>baja por IT</strong>
+                de larga duración prevista —misma regla—; (3) <strong>autónomos mayores de 50 años</strong> que quieran
+                mejorar la pensión en los últimos tramos de su carrera; (4) <strong>ingresos variables con picos altos</strong>
+                en los que la regularización podría ser elevada de todas formas. El coste adicional por subir 200 €
+                la base es de aproximadamente <strong>62,60 €/mes</strong> adicionales (31,30%).
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* SECCIÓN 4: GUÍA PASO A PASO — 6 PASOS        */}
+        {/* ============================================ */}
+        <section className={styles.guideSection}>
+          <h2>Guía Paso a Paso: Gestiona tu Cotización</h2>
+          <div className={styles.stepGuide}>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Estima tus rendimientos netos para el año</h4>
+                <p>
+                  Suma todos los ingresos previstos (sin IVA) y réstalos los gastos deducibles de la actividad:
+                  material, alquiler de espacio, suministros proporcionales, cuotas de colegios o asociaciones,
+                  seguros de responsabilidad civil, amortizaciones, etc. El resultado es tu <strong>rendimiento neto anual previsto</strong>.
+                  Divídelo entre 12 para obtener el mensual y localiza tu tramo en la tabla de 15 tramos RETA 2025.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Identifica tu tramo y la base mínima correspondiente</h4>
+                <p>
+                  Con el rendimiento neto mensual calculado, localiza en qué tramo (1 al 15) estás encuadrado.
+                  La <strong>base mínima del tramo</strong> es el punto de partida de tu cuota. Recuerda que puedes
+                  elegir cualquier base entre la mínima y la máxima del tramo. Si no tienes claro cuánto vas a ingresar,
+                  empieza con la mínima y ajusta trimestralmente.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Alta en el RETA — modelo TA.0521 o sede electrónica</h4>
+                <p>
+                  El alta se puede tramitar en la sede electrónica de la Seguridad Social (import.seg-social.gob.es)
+                  o presencialmente en la oficina de la TGSS. El alta tiene <strong>efecto desde el primer día del mes</strong>
+                  si se solicita antes del día 1; si se solicita durante el mes, surte efecto desde el día de solicitud.
+                  Es fundamental darse de alta <em>antes</em> de iniciar la actividad —no retroactúa, pero Hacienda puede
+                  detectar actividad anterior y sancionar.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Monitoriza trimestralmente y ajusta la base si es necesario</h4>
+                <p>
+                  Cada vez que presentes el modelo 130 (pago fraccionado del IRPF, trimestral), aprovecha para revisar
+                  si tus rendimientos reales se están alejando de la previsión. Si han subido, solicita cambio de tramo
+                  antes de fin del trimestre para evitar regularización alta. Si han bajado, redúcela para no pagar de más.
+                  Recuerda: <strong>hasta 6 cambios anuales</strong> con efectividad el día 1 del mes siguiente.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Declara en la Renta con los ingresos y gastos reales</h4>
+                <p>
+                  En el modelo 100 (IRPF, entre abril y junio del año siguiente) declararás todos los ingresos y gastos
+                  reales de tu actividad. La cuota de autónomo pagada es <strong>gasto deducible en el IRPF</strong>,
+                  lo que reduce tu base imponible. Una vez presentada la Renta, la AEAT comunica los datos a la TGSS
+                  para iniciar el proceso de regularización.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Espera la regularización anual (devolución o cobro)</h4>
+                <p>
+                  La TGSS comunicará el resultado de la regularización normalmente entre julio y diciembre del año
+                  siguiente a la presentación de la Renta. Si cotizaste de más, recibirás una <strong>devolución
+                  automática</strong> en la cuenta bancaria asociada. Si cotizaste de menos, recibirás un cargo
+                  (normalmente domiciliado). No hay recargo si se paga en el plazo indicado. El importe puede oscilar
+                  entre decenas y varios miles de euros según la desviación.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* SECCIÓN 5: MEJORES PRÁCTICAS — 6 TIPS        */}
+        {/* ============================================ */}
+        <section className={styles.guideSection}>
+          <h2>Mejores Prácticas para Gestionar tu Cotización</h2>
+          <div className={styles.tipsGrid}>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <h4>Lleva contabilidad mensual</h4>
+              <p>
+                Registra ingresos y gastos cada mes, no al final del año. Así puedes ajustar la base a tiempo
+                —hasta 6 cambios/año— y evitar sorpresas en la regularización. Un Excel básico o una app
+                de facturación sirve para empezar.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⏰</span>
+              <h4>No esperes a diciembre para ajustar</h4>
+              <p>
+                Si en octubre ves que has ingresado el doble de lo previsto, ajusta la base en noviembre.
+                La regularización se calcula sobre todo el año, y cotizar muy por debajo puede suponer
+                un cobro de <strong>más de 1.000 € en un solo recibo</strong> al año siguiente.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧾</span>
+              <h4>Guarda todas las facturas de gastos</h4>
+              <p>
+                Los gastos deducibles reducen el rendimiento neto y, por tanto, el tramo de cotización.
+                Una factura de 200 € en material puede reducir tu cuota mensual en varios euros al año siguiente.
+                Digitaliza y archiva con herramientas como Holded, Quipu o simplemente Google Drive.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>👶</span>
+              <h4>Sube la base antes de pedir maternidad/paternidad</h4>
+              <p>
+                La prestación por nacimiento se calcula sobre la <strong>base reguladora de los 6 meses anteriores</strong>.
+                Si la subes con antelación suficiente, la prestación (que puede durar hasta 20 semanas) será más alta.
+                Por ejemplo, pasar de base 960 € a 1.500 €/mes supone cobrar ~240 € más a la semana durante el permiso.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔍</span>
+              <h4>Consulta tu historial en la sede de la SS</h4>
+              <p>
+                En <strong>sede.seg-social.gob.es</strong> puedes consultar tu vida laboral, bases cotizadas históricas
+                y el resultado de regularizaciones anteriores. Antes de subir o bajar la base, revisa tus datos reales
+                para no cometer errores de cálculo.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <h4>Si tienes pluriactividad, revisa la bonificación</h4>
+              <p>
+                Si cotizas al mismo tiempo como asalariado y como autónomo, puede aplicar la
+                <strong> bonificación por pluriactividad</strong>: devolución de entre el 25% y el 50% de las cuotas
+                de autónomo cuando la suma de bases supera cierto tope (en 2025, ~15.266 €/año). Solicítala
+                a través de la TGSS antes del 30 de abril del año siguiente.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* SECCIÓN 6: WARNING BOX — 6 ERRORES COMUNES   */}
+        {/* ============================================ */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>6 Errores que Cuestan Dinero a los Autónomos</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>No ajustar la base cuando los ingresos suben.</strong> Si facturas 3.000 €/mes y sigues
+                cotizando por el tramo 6 (960 €/mes), la regularización anual puede superar <strong>1.200 €</strong>
+                de golpe. Monitoriza cada trimestre y ajusta preventivamente.
+              </li>
+              <li>
+                <strong>Olvidar que los gastos deducibles reducen el tramo.</strong> Muchos autónomos cotizan
+                por un tramo superior al necesario porque no tienen en cuenta que los gastos (gestoría, material,
+                suministros, cuota propia) reducen el rendimiento neto. Revisa tu base con los gastos reales incluidos.
+              </li>
+              <li>
+                <strong>Darse de alta tarde en el RETA.</strong> La Seguridad Social no retroactúa el alta,
+                pero Hacienda sí puede detectar actividad con facturas emitidas o ingresos previos. La sanción
+                por inicio de actividad sin alta puede llegar al <strong>doble de las cuotas no ingresadas</strong>
+                más recargos e intereses.
+              </li>
+              <li>
+                <strong>Confundir base de cotización con cuota.</strong> La base es la cantidad sobre la que
+                se aplica el tipo (31,30%). La cuota es el resultado: base × 31,30%. Por ejemplo, base 1.000 € →
+                cuota ~313 €. Base 2.000 € → cuota ~626 €. El MEI (0,70%) ya está incluido en el tipo desde 2023.
+              </li>
+              <li>
+                <strong>No solicitar el cese de actividad al cerrar.</strong> Si te das de baja en Hacienda
+                (modelo 036/037) pero no te das de baja también en el RETA, los recibos de la cuota mensual
+                seguirán cargándose en tu cuenta. La baja en el RETA debe tramitarse en los <strong>3 días naturales</strong>
+                siguientes al cese real de la actividad.
+              </li>
+              <li>
+                <strong>Ignorar el MEI (0,70%) en el cálculo.</strong> Desde enero de 2023, el tipo de cotización
+                incluye la Aportación al Mecanismo de Equidad Intergeneracional (MEI): 0,70% sobre la base de
+                cotización. No es separado —viene integrado en el recibo— pero sí afecta al cálculo real de la cuota.
+                Para una base de 1.000 €, representa <strong>7 €/mes adicionales</strong> que algunos autónomos
+                no contabilizan.
+              </li>
+            </ul>
+          </div>
+        </section>
+
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('estimador-cuota-autonomo')} />

@@ -219,9 +219,365 @@
 .guideCard p, .guideCard ul { font-size: 0.9rem; line-height: 1.6; margin: 0; }
 .guideCard ul { padding-left: 1.2rem; }
 
+/* ── Tabla Comparativa ───────────────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-lg);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 600px;
+}
+
+.comparativaTable thead tr {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.comparativaTable th {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: var(--border);
+}
+
+/* ── Escenarios / Casos de Uso ───────────────────────────────────────────── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  border-top: 3px solid var(--primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.escenarioHeader h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.4;
+}
+
+.escenarioIcon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.escenarioExample p {
+  margin: 0 0 0.4rem;
+}
+
+.escenarioExample p:last-child {
+  margin-bottom: 0;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--secondary);
+  margin: 0;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border);
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .escenarioTip {
+  color: #6ececa;
+}
+
+/* ── FAQ ─────────────────────────────────────────────────────────────────── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--border);
+  padding: var(--spacing-md) 0;
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqItem dt {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.6rem;
+  line-height: 1.4;
+}
+
+.faqItem dd {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .faqItem dt {
+  color: #7ec8e3;
+}
+
+.faqTip {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ── Guía Paso a Paso ────────────────────────────────────────────────────── */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-md) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  align-items: flex-start;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 800;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .stepContent p {
+  color: var(--text-secondary);
+}
+
+/* ── Mejores Prácticas ───────────────────────────────────────────────────── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-left: 4px solid var(--secondary);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+  border-left-color: var(--secondary);
+}
+
+.tipCard h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  display: block;
+}
+
+/* ── Warning Box ─────────────────────────────────────────────────────────── */
+.warningBox {
+  background: #fff8e6;
+  border: 2px solid #f59e0b;
+  border-radius: var(--radius);
+  padding: var(--spacing-xl);
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2010;
+  border-color: #d97706;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.warningHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #b45309;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #fbbf24;
+}
+
+.warningIcon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningList li {
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  border-left: 3px solid #f59e0b;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  background: rgba(245, 158, 11, 0.06);
+  border-radius: 0 6px 6px 0;
+}
+
+[data-theme='dark'] .warningList li {
+  background: rgba(245, 158, 11, 0.08);
+  border-left-color: #d97706;
+  color: var(--text-primary);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .comparativaGrid { grid-template-columns: 1fr; }
   .configGrid { grid-template-columns: 1fr; }
+  .escenariosGrid { grid-template-columns: 1fr; }
+  .tipsGrid { grid-template-columns: 1fr; }
+  .step { flex-direction: column; gap: var(--spacing-md); }
+  .stepNumber { width: 2rem; height: 2rem; min-width: 2rem; font-size: 1rem; }
+  .comparativaTable { font-size: 0.82rem; }
+  .comparativaTable th,
+  .comparativaTable td { padding: 0.6rem 0.75rem; }
+  .warningHeader { align-items: flex-start; }
+  .escenarioHeader { align-items: flex-start; }
 }
 
 @media (prefers-reduced-motion: reduce) {

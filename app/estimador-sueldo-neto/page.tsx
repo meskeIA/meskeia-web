@@ -619,6 +619,417 @@ export default function EstimadorSueldoNetoPage() {
             </p>
           </div>
         </section>
+
+        {/* SECCIÓN 1: Tabla comparativa 12 vs 14 pagas */}
+        <section className={styles.guideSection}>
+          <h2>12 pagas vs 14 pagas vs extras prorrateadas: ¿cuál te conviene?</h2>
+          <p>
+            El número de pagas no cambia tu neto anual total, pero sí afecta a cuánto ingresas cada
+            mes. Estos son los tres escenarios para un sueldo bruto de 30.000 € anuales:
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Concepto</th>
+                  <th>12 pagas</th>
+                  <th>14 pagas</th>
+                  <th>12 + extras prorrateadas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Bruto mensual</td>
+                  <td>2.500 €</td>
+                  <td>2.143 € (ordinaria)</td>
+                  <td>2.500 € (ya incluye extra)</td>
+                </tr>
+                <tr>
+                  <td>Paga extra</td>
+                  <td>No (0 €)</td>
+                  <td>2.143 € × 2 (jun/dic)</td>
+                  <td>Incluida en mensual</td>
+                </tr>
+                <tr>
+                  <td>Neto mensual estimado</td>
+                  <td>~1.985 €</td>
+                  <td>~1.701 € + 2 extras de ~1.701 €</td>
+                  <td>~1.985 €</td>
+                </tr>
+                <tr>
+                  <td>Retención mensual IRPF</td>
+                  <td>~375 €</td>
+                  <td>~320 € (base menor)</td>
+                  <td>~375 €</td>
+                </tr>
+                <tr>
+                  <td>Neto anual total</td>
+                  <td>~23.820 €</td>
+                  <td>~23.814 €</td>
+                  <td>~23.820 €</td>
+                </tr>
+                <tr>
+                  <td>Ventaja principal</td>
+                  <td>Flujo mensual estable</td>
+                  <td>Inyección de liquidez 2×/año</td>
+                  <td>Previsibilidad total</td>
+                </tr>
+                <tr>
+                  <td>Inconveniente</td>
+                  <td>Sin extra para gastos grandes</td>
+                  <td>Mensualidad menor, peor para hipoteca</td>
+                  <td>Sin "sorpresa" de dinero extra</td>
+                </tr>
+                <tr>
+                  <td>Quién lo prefiere</td>
+                  <td>Freelancers habituados a ciclos irregulares</td>
+                  <td>Familias con gastos concentrados (vuelta al cole, Navidad)</td>
+                  <td>Personas con hipoteca o alquiler fijo</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* SECCIÓN 2: Casos de uso con perfiles reales */}
+        <section className={styles.guideSection}>
+          <h2>Casos de uso: 4 perfiles con números reales</h2>
+          <p>
+            Cada situación personal genera un neto diferente aunque el bruto sea el mismo.
+            Aquí tienes cuatro ejemplos concretos calculados con los tramos IRPF 2025:
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎓</span>
+                <h4>Recién graduado</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Perfil:</strong> 22.000 € brutos, soltero/a, sin hijos</p>
+                <ul>
+                  <li>SS trabajador (6,47%): <strong>1.423 €/año</strong></li>
+                  <li>Base imponible IRPF: <strong>20.577 €</strong></li>
+                  <li>IRPF anual (mínimo 5.550 €): <strong>~2.790 €</strong></li>
+                  <li>Retención efectiva: <strong>~12,7%</strong></li>
+                  <li>Neto anual: <strong>~17.787 €</strong></li>
+                  <li>Neto mensual (12 pagas): <strong>~1.482 €</strong></li>
+                </ul>
+              </div>
+              <div className={styles.escenarioTip}>
+                Consejo: Con ingresos inferiores a 22.000 € con un único pagador no estás obligado a declarar la renta.
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+                <h4>Técnico medio con familia</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Perfil:</strong> 35.000 € brutos, casado/a (dos ingresos), 1 hijo</p>
+                <ul>
+                  <li>SS trabajador (6,47%): <strong>2.265 €/año</strong></li>
+                  <li>Mínimo personal + hijo 1 (5.550 + 2.400): <strong>7.950 €</strong></li>
+                  <li>IRPF anual: <strong>~5.835 €</strong></li>
+                  <li>Retención efectiva: <strong>~16,7%</strong></li>
+                  <li>Neto anual: <strong>~26.900 €</strong></li>
+                  <li>Impacto del mínimo familiar: ahorra ~456 €/año en IRPF vs soltero</li>
+                </ul>
+              </div>
+              <div className={styles.escenarioTip}>
+                Consejo: Actualizar el modelo 145 al tener un hijo puede reducir tu retención mensual unos 38 €.
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💼</span>
+                <h4>Directivo DINK</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Perfil:</strong> 80.000 € brutos, casado/a (dos ingresos), sin hijos</p>
+                <ul>
+                  <li>SS trabajador (base máx. 4.909 €/mes): <strong>~3.814 €/año</strong></li>
+                  <li>Base imponible IRPF: <strong>~76.186 €</strong></li>
+                  <li>IRPF anual: <strong>~22.750 €</strong></li>
+                  <li>Tipo efectivo real: <strong>~28,4%</strong></li>
+                  <li>Neto anual: <strong>~53.436 €</strong></li>
+                  <li>Neto mensual (12 pagas): <strong>~4.453 €</strong></li>
+                </ul>
+              </div>
+              <div className={styles.escenarioTip}>
+                Consejo: Aportar al plan de pensiones reduce directamente la base imponible — cada 1.000 € aportados ahorras ~370 € en IRPF a este nivel de ingresos.
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👩‍👧</span>
+                <h4>Trabajadora a tiempo parcial</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p><strong>Perfil:</strong> 14.000 € brutos, reducción por cuidado de hijos (50%)</p>
+                <ul>
+                  <li>SS trabajador (6,47%): <strong>906 €/año</strong></li>
+                  <li>Base imponible IRPF: <strong>13.094 €</strong></li>
+                  <li>Mínimo personal + familia monoparental: <strong>~7.700 €</strong></li>
+                  <li>IRPF anual: <strong>~1.028 €</strong></li>
+                  <li>Retención efectiva: <strong>~7,3%</strong></li>
+                  <li>Neto anual: <strong>~12.066 €</strong></li>
+                </ul>
+              </div>
+              <div className={styles.escenarioTip}>
+                Consejo: Si tienes reducción de jornada por cuidado de hijos, comunícalo en el modelo 145 — podrías tener derecho a la deducción por maternidad de hasta 1.200 €/año.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 3: FAQ adicionales (8 preguntas nuevas) */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes avanzadas</h2>
+          <div className={styles.faqListPro}>
+            <div className={styles.faqItemPro}>
+              <h4>¿Qué es el MEI (Mecanismo de Equidad Intergeneracional) y cuánto me descuentan?</h4>
+              <p>
+                El MEI es una cotización adicional a la Seguridad Social creada por la reforma de pensiones de 2023 para financiar el Fondo de Reserva. En 2025, el trabajador paga el <strong>0,12%</strong> y la empresa el <strong>0,58%</strong> sobre la base de cotización. Para un sueldo de 30.000 € brutos esto representa <strong>~29 € anuales a cargo del trabajador</strong>. Su tipo irá incrementándose gradualmente hasta 2032.
+              </p>
+            </div>
+
+            <div className={styles.faqItemPro}>
+              <h4>¿Mi empresa puede pagarme menos del salario mínimo interprofesional?</h4>
+              <p>
+                No. El <strong>SMI 2025 es de 1.184 €/mes en 14 pagas</strong> (16.576 € brutos anuales). Ningún convenio colectivo ni contrato puede establecer un salario inferior. Si tu empresa te paga menos, puedes reclamar ante la Inspección de Trabajo. Ojo: el SMI es la retribución bruta, antes de IRPF y SS.
+              </p>
+              <div className={styles.faqTipPro}>Referencia: RD 145/2025, publicado en el BOE de 11 de febrero de 2025.</div>
+            </div>
+
+            <div className={styles.faqItemPro}>
+              <h4>¿Qué ocurre con el IRPF si cambio de empresa a mitad de año?</h4>
+              <p>
+                Al cambiar de empresa, la nueva no conoce tus ingresos anteriores y puede aplicar una retención incorrecta (generalmente menor). Debes <strong>comunicar al nuevo empleador tu salario acumulado del año</strong> mediante el certificado de retenciones de la empresa anterior. Si no lo haces, en la declaración de la renta es probable que te salga a pagar.
+              </p>
+            </div>
+
+            <div className={styles.faqItemPro}>
+              <h4>¿Los cheques comida y tickets guardería reducen mi IRPF?</h4>
+              <p>
+                Sí, son retribución en especie con límites exentos de IRPF. Los <strong>cheques restaurante</strong> están exentos hasta <strong>11 €/día</strong> de uso efectivo (límite anual ~2.640 € aprox.). Los <strong>cheques guardería</strong> están exentos sin límite de importe, siempre que el hijo sea menor de 3 años. Ambos sí cotizan a la Seguridad Social (incluyen en la base de cotización).
+              </p>
+            </div>
+
+            <div className={styles.faqItemPro}>
+              <h4>¿Cuánto es el SMI 2025 y cómo afecta a mi neto?</h4>
+              <p>
+                El SMI 2025 es <strong>1.184 €/mes en 14 pagas = 16.576 € brutos anuales</strong>. Aplicando las deducciones estándar (soltero/a, sin hijos), el neto mensual estimado es de <strong>~1.050 €</strong>. Es importante saber que trabajadores con salarios de hasta el SMI que tengan rendimientos del trabajo por debajo de 22.000 € no están obligados a presentar la declaración de la renta (con un único pagador).
+              </p>
+            </div>
+
+            <div className={styles.faqItemPro}>
+              <h4>¿Qué diferencia hay entre contingencias comunes y profesionales?</h4>
+              <p>
+                Las <strong>contingencias comunes</strong> (4,70% trabajador) cubren enfermedad común, maternidad, paternidad y jubilación. Las <strong>contingencias profesionales</strong> (variable, cotiza solo la empresa, entre 0,90% y 7,15% según actividad) cubren accidentes de trabajo y enfermedades profesionales. El trabajador no paga directamente por contingencias profesionales; es un coste exclusivamente empresarial.
+              </p>
+            </div>
+
+            <div className={styles.faqItemPro}>
+              <h4>¿Cuánto cotizo si tengo dos empleos simultáneos?</h4>
+              <p>
+                Si tienes dos contratos simultáneos, cotizas a la SS en ambos por separado, pero existe una <strong>base de cotización máxima conjunta</strong> de <strong>4.909,50 €/mes en 2025</strong>. Si la suma de tus bases supera ese límite, puedes solicitar la <strong>devolución del exceso cotizado</strong> a la Tesorería General de la SS tras finalizar el año. En IRPF, ambos empleadores retienen de forma independiente, lo que suele generar una retención insuficiente y una deuda en la renta.
+              </p>
+            </div>
+
+            <div className={styles.faqItemPro}>
+              <h4>¿Puedo negociar que me suban el bruto sin que suba el neto?</h4>
+              <p>
+                No exactamente, pero sí puedes negociar <strong>retribución en especie</strong> (seguro médico, guardería, transporte, formación) que aumenta tu retribución total sin tributar (dentro de los límites legales). También puedes negociar <strong>aportaciones de la empresa a tu plan de pensiones de empleo</strong>: no tributan como renta del trabajo en el momento del cobro, aunque sí lo harán cuando retires el dinero.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 4: Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Guía paso a paso: cómo optimizar tu salario neto</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Pide a RRHH el desglose completo de tu nómina</h4>
+                <p>
+                  Solicita el detalle de <strong>base + complementos + pagas extras + retribución en especie</strong>.
+                  Muchos trabajadores desconocen que conceptos como plus de transporte, tickets comida o seguro médico
+                  forman parte de su retribución total. Verifica también qué cotiza y qué está exento.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Revisa tu modelo 145 (situación familiar en Hacienda)</h4>
+                <p>
+                  El <strong>modelo 145</strong> es la declaración que entregas a tu empresa con tu situación personal
+                  (hijos, discapacidad, ascendientes a cargo, etc.) para que calcule correctamente tu retención.
+                  Debes actualizarlo cada vez que cambie tu situación: nuevo hijo, matrimonio, separación, cónyuge
+                  que deja de trabajar. Si no lo actualizas, tu retención puede ser errónea y causarte problemas en la renta.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Calcula si te conviene retribución en especie</h4>
+                <p>
+                  Conceptos como <strong>seguro médico privado (hasta 500 €/año por persona asegurada, exento de IRPF)</strong>,
+                  guardería (exenta sin límite para menores de 3 años), tarjeta transporte (hasta 1.500 €/año) o
+                  cheques restaurante (hasta 11 €/día) pueden reducir significativamente tu base imponible sin reducir
+                  tu retribución real. Un seguro médico familiar de 1.500 €/año puede suponer un ahorro de
+                  ~380 € en IRPF para un contribuyente en el tramo del 30%.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Valora aportar al plan de pensiones de empresa si hay matching</h4>
+                <p>
+                  Algunos empleadores aportan al plan de pensiones de empleo una cantidad equivalente a la que
+                  aporta el trabajador (matching). Si tu empresa hace esto, es dinero gratis: contribuye hasta el
+                  límite del matching. El límite conjunto empresa + trabajador es de <strong>10.000 €/año</strong>
+                  (o 8.500 € si solo aporta la empresa). Estas aportaciones reducen tu base imponible del IRPF.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Solicita certificado de retenciones a tu empresa en enero</h4>
+                <p>
+                  Antes de presentar la declaración de la renta (abril-junio), solicita a tu empresa el
+                  <strong> certificado de retenciones e ingresos</strong>. Este documento recoge el total de
+                  lo cobrado y lo retenido durante el año. Es imprescindible para hacer la declaración y
+                  detectar posibles errores de retención que puedas reclamar.
+                </p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Compara con el convenio colectivo de tu sector</h4>
+                <p>
+                  Los convenios colectivos establecen <strong>salarios mínimos por categoría profesional</strong>
+                  en cada sector. Puedes consultar el convenio aplicable en el Registro de Convenios Colectivos
+                  del MITES (mites.gob.es). Si tu salario está por debajo del mínimo convencional para tu
+                  categoría, tienes derecho a reclamar la diferencia, con retroactividad de hasta 1 año.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 5: Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas para gestionar tu retención</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
+              <p>
+                <strong>Actualiza el modelo 145</strong> cada vez que cambie tu situación familiar
+                (nuevo hijo, matrimonio, separación, cónyuge que deja de trabajar). Una retención
+                incorrecta puede suponerte pagar cientos de euros de más en la renta de abril.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🏥</span>
+              <p>
+                <strong>Solicita retribución flexible:</strong> hasta 1.500 € en seguro médico están
+                exentos de IRPF por persona asegurada (tú + cónyuge + hijos). Para una familia de
+                4 personas, el límite exento es de 6.000 €/año — un ahorro notable en el tramo del 30%.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🏠</span>
+              <p>
+                <strong>El teletrabajo no reduce automáticamente tu retención</strong> aunque tengas
+                gastos adicionales (electricidad, conexión, material). Solo existe una deducción
+                específica para trabajadores autónomos. Como asalariado, necesitarías un acuerdo
+                de teletrabajo con compensación económica explícita.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
+              <p>
+                <strong>Si cambias de empresa</strong>, comunica tu salario acumulado del año anterior
+                mediante el certificado de retenciones. Sin este dato, la nueva empresa calculará tu
+                retención solo sobre tu nuevo sueldo, lo que habitualmente resulta en retención
+                insuficiente y una factura en la declaración de la renta.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">💶</span>
+              <p>
+                <strong>SMI 2025: 1.184 €/mes en 14 pagas</strong> (16.576 € brutos anuales).
+                Ningún contrato puede pactarse por debajo. Los trabajadores con ingresos hasta 22.000 €
+                con un único pagador no están obligados a presentar declaración de la renta, aunque
+                pueden hacerlo si el borrador les sale a devolver.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
+              <p>
+                <strong>Rendimientos del trabajo superiores a 22.000 €</strong> con un solo pagador
+                están obligados a declarar la renta. Con dos o más pagadores, el límite baja a
+                15.000 € si el segundo pagador supera los 1.500 € anuales. No presentar la declaración
+                cuando estás obligado conlleva una sanción mínima de 200 €.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 6: Warning Box */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>6 errores frecuentes que cuestan dinero real</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>No actualizar el modelo 145 tras cambios familiares.</strong> Si tienes un hijo
+                y no lo comunicas a RRHH, seguirás pagando retención como si fueras soltero/a.
+                La diferencia puede superar los 400 €/año.
+              </li>
+              <li>
+                <strong>Confundir salario bruto con coste empresa total.</strong> El coste real para
+                la empresa es el bruto <em>más</em> aproximadamente un 30% adicional en cotizaciones
+                empresariales. Para un sueldo de 30.000 € brutos, la empresa paga ~9.000 € más en SS.
+                Saberlo es útil al negociar una subida.
+              </li>
+              <li>
+                <strong>Pedir una subida de sueldo sin tener en cuenta el salto de tramo IRPF.</strong>
+                Un aumento de 1.000 € brutos en el tramo del 37% solo se traduce en ~630 € netos más.
+                Valora si es más interesante negociar retribución en especie exenta.
+              </li>
+              <li>
+                <strong>Aceptar solo retribución variable sin base garantizada.</strong> La base de
+                cotización a la SS se calcula sobre la retribución garantizada. Una base baja implica
+                menor prestación por desempleo, baja por enfermedad o prestación por jubilación.
+              </li>
+              <li>
+                <strong>Olvidar que las dietas por encima del límite legal tributan como salario.</strong>
+                Los límites exentos son 26,67 €/día sin pernocta (53,34 € con pernocta en España;
+                91,35 € en el extranjero). Todo lo que supere ese importe se suma a tu base imponible
+                del IRPF.
+              </li>
+              <li>
+                <strong>No pedir el finiquito desglosado al dejar la empresa.</strong> El finiquito
+                debe incluir: salario pendiente del mes en curso, pagas proporcionales, vacaciones
+                no disfrutadas y cualquier complemento pendiente. Pide el desglose por escrito y
+                compáralo con tu nómina antes de firmar.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('estimador-sueldo-neto')} />
