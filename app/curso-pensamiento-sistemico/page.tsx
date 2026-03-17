@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import styles from './CursoPensamientoSistemico.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { useCourse, COURSE_MODULES } from './CourseContext';
 
 const MODULE_ICONS: Record<string, string> = {
@@ -195,6 +196,7 @@ export default function CursoPensamientoSistemicoPage() {
         </div>
       </section>
 
+      <RelatedApps apps={getRelatedApps('curso-pensamiento-sistemico')} />
       <ShareCard appName="curso-pensamiento-sistemico" />
       <Footer appName="curso-pensamiento-sistemico" />
     </div>

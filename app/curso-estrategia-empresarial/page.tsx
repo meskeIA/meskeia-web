@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import styles from './CursoEstrategiaEmpresarial.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { useCourse, COURSE_MODULES } from './CourseContext';
 
 const MODULE_ICONS: Record<string, string> = {
@@ -202,6 +203,7 @@ export default function CursoEstrategiaEmpresarialPage() {
         </div>
       </section>
 
+      <RelatedApps apps={getRelatedApps('curso-estrategia-empresarial')} />
       <ShareCard appName="curso-estrategia-empresarial" />
       <Footer appName="curso-estrategia-empresarial" />
     </div>

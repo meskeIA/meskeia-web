@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaComprarCoche.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para comprar un coche
@@ -294,6 +294,7 @@ export default function GuiaComprarCochePage() {
       </section>
 
       <RelatedApps apps={getRelatedApps('guia-comprar-coche')} />
+      <ShareCard appName="guia-comprar-coche" />
       <Footer appName="guia-comprar-coche" />
     </div>
   );

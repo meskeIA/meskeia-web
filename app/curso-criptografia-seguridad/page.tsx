@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import styles from './CursoCriptografiaSeguridad.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { useCourse } from './CourseContext';
 
 // Iconos y colores por módulo
@@ -236,6 +237,7 @@ export default function CursoCriptografiaSeguridadPage() {
         </div>
       </section>
 
+      <RelatedApps apps={getRelatedApps('curso-criptografia-seguridad')} />
       <ShareCard appName="curso-criptografia-seguridad" />
       <Footer appName="curso-criptografia-seguridad" />
     </div>

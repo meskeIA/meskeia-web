@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaAccesibilidad.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Etapas del journey de accesibilidad
@@ -354,6 +354,7 @@ export default function GuiaAccesibilidadPage() {
       </section>
 
       <RelatedApps apps={getRelatedApps('guia-accesibilidad')} />
+      <ShareCard appName="guia-accesibilidad" />
       <Footer appName="guia-accesibilidad" />
     </div>
   );

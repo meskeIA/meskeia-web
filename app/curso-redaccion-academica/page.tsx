@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import styles from './CursoRedaccionAcademica.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { useCourse } from './CourseContext';
 
 const MODULE_ICONS: Record<string, string> = {
@@ -223,6 +224,7 @@ export default function CursoRedaccionAcademicaPage() {
         </div>
       </section>
 
+      <RelatedApps apps={getRelatedApps('curso-redaccion-academica')} />
       <ShareCard appName="curso-redaccion-academica" />
       <Footer appName="curso-redaccion-academica" />
     </div>

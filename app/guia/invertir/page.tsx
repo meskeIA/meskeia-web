@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaInvertir.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para inversión
@@ -287,6 +287,7 @@ export default function GuiaInvertirPage() {
       </section>
 
       <RelatedApps apps={getRelatedApps('guia-invertir')} />
+      <ShareCard appName="guia-invertir" />
       <Footer appName="guia-invertir" />
     </div>
   );

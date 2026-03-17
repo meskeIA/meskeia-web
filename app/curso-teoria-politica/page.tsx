@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import styles from './CursoTeoriaPolitica.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import {
   MODULES,
   CHAPTERS,
@@ -229,6 +230,7 @@ export default function CursoTeoriaPoliticaPage() {
         </Link>
       </section>
 
+      <RelatedApps apps={getRelatedApps('curso-teoria-politica')} />
       <ShareCard appName="curso-teoria-politica" />
       <Footer appName="curso-teoria-politica" />
     </div>

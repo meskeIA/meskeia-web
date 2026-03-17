@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaComprarCasa.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para compra de vivienda
@@ -297,6 +297,7 @@ export default function GuiaComprarCasaPage() {
       </section>
 
       <RelatedApps apps={getRelatedApps('guia-comprar-casa')} />
+      <ShareCard appName="guia-comprar-casa" />
       <Footer appName="guia-comprar-casa" />
     </div>
   );

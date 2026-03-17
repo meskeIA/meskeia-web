@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaMontarNegocio.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para montar un negocio
@@ -321,6 +321,7 @@ export default function GuiaMontarNegocioPage() {
       </section>
 
       <RelatedApps apps={getRelatedApps('guia-montar-negocio')} />
+      <ShareCard appName="guia-montar-negocio" />
       <Footer appName="guia-montar-negocio" />
     </div>
   );
