@@ -395,6 +395,270 @@ export default function GeneradorNombresEmpresaPage() {
             <li><strong>5. Registrar marca:</strong> Si el negocio es serio, registra la marca (desde 150€)</li>
           </ul>
         </section>
+
+        {/* SECCIÓN 1: Tabla comparativa de tipos de nombre */}
+        <section className={styles.guideSection}>
+          <h2>Tipos de Nombre Empresarial: Comparativa</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo de nombre</th>
+                  <th>Ejemplos conocidos</th>
+                  <th>Facilidad registro</th>
+                  <th>Memorabilidad</th>
+                  <th>Escalabilidad int.</th>
+                  <th>Posicionamiento</th>
+                  <th>SEO inicial</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Nombre fundador</strong></td>
+                  <td>Zara, Ford, Ferrero</td>
+                  <td>⭐⭐⭐⭐</td>
+                  <td>⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐</td>
+                  <td>Largo plazo</td>
+                  <td>⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>Descriptivo</strong></td>
+                  <td>General Electric, Burger King</td>
+                  <td>⭐⭐</td>
+                  <td>⭐⭐⭐</td>
+                  <td>⭐⭐</td>
+                  <td>Medio plazo</td>
+                  <td>⭐⭐⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>Acrónimo</strong></td>
+                  <td>IBM, SEAT, IKEA</td>
+                  <td>⭐⭐⭐⭐⭐</td>
+                  <td>⭐⭐</td>
+                  <td>⭐⭐⭐⭐⭐</td>
+                  <td>Muy largo plazo</td>
+                  <td>⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>Inventado / Neologismo</strong></td>
+                  <td>Google, Spotify, Kodak</td>
+                  <td>⭐⭐⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐⭐</td>
+                  <td>Muy largo plazo</td>
+                  <td>⭐⭐⭐⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>Metafórico</strong></td>
+                  <td>Apple, Amazon, Oracle</td>
+                  <td>⭐⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐⭐</td>
+                  <td>⭐⭐⭐⭐</td>
+                  <td>Largo plazo</td>
+                  <td>⭐⭐⭐</td>
+                </tr>
+                <tr>
+                  <td><strong>Geográfico</strong></td>
+                  <td>Banca March, Rioja, Extremadura</td>
+                  <td>⭐⭐⭐</td>
+                  <td>⭐⭐⭐</td>
+                  <td>⭐</td>
+                  <td>Corto plazo (local)</td>
+                  <td>⭐⭐⭐</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* SECCIÓN 2: Casos de uso */}
+        <section className={styles.guideSection}>
+          <h2>¿Para Quién es Cada Estrategia?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">👤</span>
+                <h4>Autónomo creando su marca personal</h4>
+              </div>
+              <p>Cuando comienzas como freelance, usar tu nombre y apellido genera confianza inmediata. Sin embargo, si planeas escalar o contratar, una marca independiente te da más flexibilidad futura.</p>
+              <p className={styles.escenarioTip}>💡 Consejo: Reserva ambas opciones (dominio con tu nombre y con marca) desde el principio.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🚀</span>
+                <h4>Startup tech buscando nombre escalable</h4>
+              </div>
+              <p>Para una startup tecnológica con vocación internacional, los nombres inventados o metafóricos son la mejor opción. Evita términos que limiten el sector o la geografía desde el principio.</p>
+              <p className={styles.escenarioExample}>Ejemplo: en lugar de &quot;MadridApp&quot;, algo como &quot;Nexara&quot; o &quot;Vexio&quot; escala sin fricción.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏪</span>
+                <h4>Comercio local con identidad de barrio</h4>
+              </div>
+              <p>Un negocio local puede beneficiarse de un nombre geográfico o descriptivo. La comunidad lo asocia rápidamente al lugar, lo que genera fidelización y SEO local orgánico.</p>
+              <p className={styles.escenarioTip}>💡 Consejo: Incluye el barrio o ciudad en el nombre solo si no planeas abrir más ubicaciones.</p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
+                <h4>Empresa de servicios profesionales</h4>
+              </div>
+              <p>Asesorías, consultorías y despachos profesionales suelen optar por el nombre del fundador o un nombre descriptivo para transmitir credibilidad y seriedad desde el primer contacto.</p>
+              <p className={styles.escenarioExample}>Ejemplo: &quot;García & Asociados Consultoría&quot; transmite experiencia y solvencia.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 3: FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre Nombres de Empresa</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Cómo compruebo si un nombre está disponible en España?</h4>
+              <p>Debes verificar en tres registros: la OEPM (Oficina Española de Patentes y Marcas) para marcas, el Registro Mercantil Central para denominaciones sociales, y los registros de dominio web (.es en Red.es, .com en registradores internacionales).</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el BORME y cómo afecta al nombre?</h4>
+              <p>El BORME (Boletín Oficial del Registro Mercantil) publica todas las denominaciones sociales registradas en España. Antes de constituir una sociedad, el Registro Mercantil Central comprueba que no existe otra empresa con el mismo nombre o uno muy similar.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Debo registrar la marca antes de crear la empresa?</h4>
+              <p>No es obligatorio, pero sí muy recomendable. Registrar la marca en la OEPM (desde 150 € por clase) te protege legalmente y evita que terceros usen tu nombre comercial antes de que puedas defenderte. Puedes registrar la empresa y la marca simultáneamente.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué diferencia hay entre denominación social y nombre comercial?</h4>
+              <p>La denominación social es el nombre legal de la empresa (el que aparece en el Registro Mercantil). El nombre comercial es el que usas para hacer negocio y puede ser diferente. Ambos pueden coexistir y se protegen de forma independiente.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Puede coincidir el nombre con el dominio web?</h4>
+              <p>Idealmente sí, pero no es obligatorio. Lo ideal es que el nombre de empresa, la marca y el dominio web sean idénticos o muy similares para coherencia de marca y facilidad de búsqueda. Sin embargo, a veces el dominio exacto no está disponible y hay que adaptarse.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Cuánto cuesta registrar una marca en España?</h4>
+              <p>El registro de marca ante la OEPM cuesta 143,47 € para la primera clase de productos o servicios (tarifa oficial 2025). Cada clase adicional tiene un coste adicional. El proceso dura aproximadamente 4-6 meses y la protección es válida por 10 años (renovable).</p>
+              <p className={styles.faqTip}>Nota: Esta cifra puede variar. Consulta siempre las tarifas oficiales actualizadas en la web de la OEPM (oepm.es).</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué pasa si mi nombre se parece al de otra empresa?</h4>
+              <p>Si el nombre es confusamente similar a una marca registrada en la misma clase de actividad, el titular puede interponer una oposición ante la OEPM o una demanda por infracción de marca. Esto puede obligarte a cambiar el nombre y acarrear sanciones económicas.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Puede usar el mismo nombre una SL y un autónomo?</h4>
+              <p>Un autónomo no tiene denominación social registrada; opera bajo su nombre y apellidos o un nombre comercial. Una SL sí requiere denominación social única. Por tanto, un autónomo puede usar un nombre comercial idéntico al de una SL si no está registrado como marca, aunque esto puede generar conflictos.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 4: Guía paso a paso */}
+        <section className={styles.guideSection}>
+          <h2>Guía Paso a Paso para Elegir tu Nombre</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <h4>Define valores y público objetivo</h4>
+                <p>Antes de generar nombres, ten claro qué transmite tu empresa y a quién se dirige. Un nombre para un despacho jurídico debe inspirar seriedad; uno para una app de ocio, dinamismo.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <h4>Haz brainstorming de 20+ nombres</h4>
+                <p>Usa este generador, diccionarios, sinónimos y referencias del sector. Cuantas más opciones tengas al inicio, más probabilidad de encontrar un nombre excelente después del filtrado.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <h4>Filtra por pronunciabilidad y memorabilidad</h4>
+                <p>Di los nombres en voz alta. Díselos a alguien sin contexto y comprueba si los recuerda 10 minutos después. Elimina los que son difíciles de pronunciar o escribir.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <h4>Comprueba disponibilidad en OEPM (marcas)</h4>
+                <p>Accede al buscador de marcas de la OEPM (oepm.es) y busca en la clase de actividad correspondiente. Descarta los nombres con conflictos o variaciones muy similares ya registradas.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <h4>Verifica dominio .es y .com disponibles</h4>
+                <p>Usa registradores como Namecheap, GoDaddy o IONOS para verificar disponibilidad. Si el .com no está disponible, considera variaciones con guion o sufijos alternativos (.io, .co).</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <h4>Busca en el Registro Mercantil Central</h4>
+                <p>Si constituirás una sociedad (SL, SA...), consulta el Registro Mercantil Central (rmc.es) para verificar que la denominación no esté ocupada y solicita una certificación negativa de denominación.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <h4>Registra marca y reserva dominio</h4>
+                <p>Una vez decidido el nombre, actúa rápido: registra la solicitud de marca en la OEPM y compra el dominio el mismo día. Antes de invertir en branding, asegura estos dos activos fundamentales.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 5: Mejores prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores Prácticas de Naming Empresarial</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔤</span>
+              <h4>Máximo 2-3 sílabas</h4>
+              <p>Los nombres cortos se recuerdan mejor, se pronuncian más rápido y funcionan mejor en el branding visual. Nike, Zara, Apple: todos tienen menos de 3 sílabas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🌱</span>
+              <h4>Evita nombres que limiten tu crecimiento</h4>
+              <p>Un nombre como &quot;Pizzería Barrio&quot; te ata a un producto y una zona. Si en el futuro diversificas, el nombre quedará obsoleto. Piensa en la empresa que quieres ser en 10 años.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🌍</span>
+              <h4>Prueba pronunciación con no-nativos</h4>
+              <p>Si planeas internacionalizar, comprueba que el nombre se puede pronunciar con facilidad en inglés, francés y alemán. Muchos negocios han cambiado de nombre por este motivo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
+              <h4>Verifica significado en otros idiomas</h4>
+              <p>Algunos nombres tienen connotaciones negativas, ofensivas o ridículas en otros idiomas. Busca siempre el nombre en inglés, francés y el idioma del mercado principal al que te diriges.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🌐</span>
+              <h4>Asegura coherencia con el dominio web</h4>
+              <p>Nombre de empresa, nombre comercial, dominio web y usuario en redes sociales deben ser idénticos o muy similares. La coherencia de marca reduce confusión y refuerza el posicionamiento.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">👥</span>
+              <h4>Testea con 10 personas de tu público</h4>
+              <p>Antes de decidirte, muestra los 3-5 finalistas a personas reales de tu público objetivo. Pregunta qué les transmite, si lo recuerdan y si lo asocian con tu sector. Los datos valen más que la intuición.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 6: Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+            <h3>Errores Graves al Elegir Nombre de Empresa</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Usar el mismo nombre que una marca registrada:</strong> puede acarrear una sanción económica y la obligación de cambiar toda tu identidad corporativa, con el coste que eso implica.</li>
+            <li><strong>No verificar el dominio antes de registrar la empresa:</strong> si el dominio ya está ocupado tendrás que usar un nombre de web diferente al de tu empresa, dañando la coherencia de marca.</li>
+            <li><strong>Elegir un nombre demasiado genérico:</strong> palabras como &quot;calidad&quot;, &quot;servicios&quot; o &quot;soluciones&quot; son casi imposibles de posicionar en Google y no te diferencian de la competencia.</li>
+            <li><strong>Nombre con caracteres especiales (ñ, acentos):</strong> complican la dirección de correo electrónico, el dominio web y la memorización por parte de clientes internacionales.</li>
+            <li><strong>No registrar la marca antes de invertir en branding:</strong> si has gastado en logo, web y materiales antes de proteger el nombre, un tercero podría registrarlo y obligarte a empezar desde cero.</li>
+            <li><strong>Nombre que confunde con competidores:</strong> además del riesgo legal por infracción de marca, genera confusión en el mercado y puede redirigir clientes potenciales hacia tu competencia.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-nombres-empresa')} />

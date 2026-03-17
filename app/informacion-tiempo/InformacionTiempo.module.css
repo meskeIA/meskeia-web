@@ -478,3 +478,433 @@
   border-color: rgba(239, 68, 68, 0.3);
   color: #fca5a5;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   SECCIÓN EDUCATIVA — guideSection contenedor base
+───────────────────────────────────────────────────────────── */
+.guideSection {
+  margin-bottom: 2rem;
+}
+
+.guideSection h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+}
+
+.guideSection > p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TABLA COMPARATIVA
+───────────────────────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 700px;
+}
+
+.comparativaTable thead tr {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.comparativaTable th {
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.comparativaTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover {
+  background: var(--focus, rgba(46, 134, 171, 0.05));
+}
+
+.comparativaTable td {
+  padding: 11px 14px;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ESCENARIOS / CASOS DE USO
+───────────────────────────────────────────────────────────── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 0.5rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.escenarioHeader h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0;
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+  border-left: 3px solid var(--secondary);
+  padding-left: 10px;
+  margin: 0;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FAQ
+───────────────────────────────────────────────────────────── */
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.faqItem details {
+  padding: 0;
+}
+
+.faqItem details summary {
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.faqItem details summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem details summary::after {
+  content: '+';
+  font-size: 1.2rem;
+  color: var(--primary);
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+.faqItem details[open] summary::after {
+  content: '−';
+}
+
+.faqItem details summary:hover {
+  background: var(--focus, rgba(46, 134, 171, 0.05));
+}
+
+.faqItem details p {
+  padding: 0 18px 14px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+
+.faqItem details p:first-of-type {
+  padding-top: 4px;
+}
+
+.faqTip {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  font-style: italic;
+  background: var(--bg-primary);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 0 18px 14px;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   GUÍA PASO A PASO
+───────────────────────────────────────────────────────────── */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stepContent strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TIPS GRID (MEJORES PRÁCTICAS)
+───────────────────────────────────────────────────────────── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 0.5rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+}
+
+.tipCard h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0;
+}
+
+.tipCard p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   WARNING BOX
+───────────────────────────────────────────────────────────── */
+.warningBox {
+  background: #fff8e6;
+  border: 1px solid #f6c844;
+  border-radius: 12px;
+  padding: 22px 24px;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.warningHeader h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #92610a;
+  margin: 0;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  color: #7a5010;
+  line-height: 1.55;
+  padding-left: 20px;
+  position: relative;
+}
+
+.warningList li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: #f6c844;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(246, 200, 68, 0.07);
+  border-color: rgba(246, 200, 68, 0.3);
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #f6c844;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #d4aa50;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE — Sección educativa
+───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .comparativaTable {
+    font-size: 0.82rem;
+  }
+
+  .step {
+    padding: 14px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .warningBox {
+    padding: 16px;
+  }
+
+  .faqItem details summary {
+    font-size: 0.9rem;
+    padding: 12px 14px;
+  }
+}

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorCodigosBarras.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCodigoBarras = 'EAN13' | 'EAN8' | 'UPCA' | 'CODE128' | 'CODE39' | 'ITF14';
@@ -557,6 +557,452 @@ export default function GeneradorCodigosBarrasPage() {
           </div>
         </div>
       </div>
+
+      {/* Contenido educativo colapsable */}
+      <EducationalSection
+        title="¿Quieres aprender más sobre Códigos de Barras?"
+        subtitle="Tipos, estándares, casos de uso y buenas prácticas para imprimir y escanear códigos"
+      >
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de tipos de código de barras</h2>
+          <p>
+            Cada estándar de código de barras está diseñado para un caso de uso específico.
+            Elegir el correcto mejora la legibilidad, reduce errores y cumple con los requisitos del sector.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Dimensiones</th>
+                  <th>Capacidad de datos</th>
+                  <th>Sectores de uso</th>
+                  <th>Legibilidad</th>
+                  <th>Ventajas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>EAN-13</strong></td>
+                  <td>1D (lineal)</td>
+                  <td>13 dígitos numéricos</td>
+                  <td>Comercio minorista, supermercados</td>
+                  <td>Lectores láser y cámara</td>
+                  <td>Estándar global GS1, amplia compatibilidad</td>
+                </tr>
+                <tr>
+                  <td><strong>EAN-8</strong></td>
+                  <td>1D (lineal)</td>
+                  <td>8 dígitos numéricos</td>
+                  <td>Productos pequeños, cosmética</td>
+                  <td>Lectores láser y cámara</td>
+                  <td>Compacto para envases pequeños</td>
+                </tr>
+                <tr>
+                  <td><strong>Code 128</strong></td>
+                  <td>1D (lineal)</td>
+                  <td>Alfanumérico, hasta 48 caracteres</td>
+                  <td>Logística, paquetería, almacén</td>
+                  <td>Lectores láser y cámara</td>
+                  <td>Alta densidad, soporta mayúsculas y minúsculas</td>
+                </tr>
+                <tr>
+                  <td><strong>QR Code</strong></td>
+                  <td>2D (matricial)</td>
+                  <td>Hasta 4.296 caracteres alfanuméricos</td>
+                  <td>Marketing, hostelería, pagos, webs</td>
+                  <td>Cámara smartphone</td>
+                  <td>Corrección de errores, se puede escanear con daño</td>
+                </tr>
+                <tr>
+                  <td><strong>DataMatrix</strong></td>
+                  <td>2D (matricial)</td>
+                  <td>Hasta 2.335 caracteres</td>
+                  <td>Farmacia, electrónica, aeronáutica</td>
+                  <td>Escáner industrial y cámara</td>
+                  <td>Muy compacto, trazabilidad de componentes</td>
+                </tr>
+                <tr>
+                  <td><strong>PDF417</strong></td>
+                  <td>2D (apilado)</td>
+                  <td>Hasta 1.850 caracteres</td>
+                  <td>DNI, boarding pass, documentos legales</td>
+                  <td>Escáner láser 2D y cámara</td>
+                  <td>Alta capacidad de datos en formato alargado</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>Casos de uso por sector</h2>
+          <p>
+            El código de barras adecuado depende del sector y del flujo de trabajo.
+            Estos cuatro escenarios cubren los casos más frecuentes en España.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
+                <h4>Tienda minorista</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Una tienda de alimentación necesita etiquetar 500 productos para venderlos en
+                supermercados. Usa EAN-13 registrado en GS1 España para que los lectores de caja
+                lo reconozcan en cualquier punto de venta.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: registra tu prefijo de empresa en GS1 España antes de imprimir etiquetas
+                para venta en grandes superficies. Sin registro, el código puede ser rechazado.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📦</span>
+                <h4>Logística y paquetería</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Una empresa de envíos etiqueta sus paquetes con Code 128 para registrar el número
+                de seguimiento, destino y fecha de envío. El código se escanea en cada punto del
+                trayecto desde el almacén hasta la entrega.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: usa Code 128 o ITF-14 para logística interna. Son los más compatibles
+                con escáneres de almacén y no requieren registro en GS1.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🍽️</span>
+                <h4>Hostelería y restaurantes</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un restaurante reemplaza la carta física por un menú digital. Coloca un QR en cada
+                mesa que abre directamente la carta en el móvil del cliente, sin necesidad de app.
+                También usa QR para pagos con Bizum.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: el QR es el formato más versátil para hostelería porque cualquier smartphone
+                lo lee sin necesidad de instalar nada. Imprímelo con zona tranquila suficiente.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">💊</span>
+                <h4>Farmacia y medicamentos</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                La normativa europea obliga a incluir DataMatrix en todos los medicamentos de
+                prescripción para garantizar la trazabilidad desde el fabricante hasta el paciente.
+                El escáner verifica autenticidad y fecha de caducidad en tiempo real.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: el DataMatrix es obligatorio en medicamentos según el Reglamento Delegado
+                UE 2016/161. Su pequeño tamaño es ideal para envases de medicamentos.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre códigos de barras</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué diferencia hay entre código de barras 1D y 2D?</summary>
+                <p>
+                  Los códigos 1D (lineales) como EAN-13 o Code 128 almacenan información solo en
+                  sentido horizontal mediante barras de diferentes anchuras. Los códigos 2D como
+                  QR o DataMatrix almacenan datos en dos dimensiones (filas y columnas), lo que
+                  permite guardar mucha más información en el mismo espacio y mantener legibilidad
+                  aunque parte del código esté dañado.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuántos dígitos tiene un EAN-13?</summary>
+                <p>
+                  13 dígitos en total: los 3 primeros identifican el país (prefijo GS1), los
+                  siguientes 4-9 identifican la empresa, los siguientes identifican el producto
+                  específico, y el último es el dígito de control calculado automáticamente.
+                  Por eso al introducir 12 dígitos en esta herramienta, el dígito 13 se calcula solo.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cómo se calcula el dígito de control?</summary>
+                <p>
+                  Para EAN-13: suma los dígitos en posiciones pares multiplicados por 3, más los
+                  dígitos en posiciones impares sin multiplicar. Toma el resultado módulo 10 y
+                  réstalo de 10 (si el resultado es 10, el dígito de control es 0). Esta herramienta
+                  lo calcula automáticamente cuando introduces los 12 primeros dígitos.
+                </p>
+                <p className={styles.faqTip}>
+                  Ejemplo: para &quot;590000001014&quot;, el dígito de control es 8, resultando en &quot;5900000010148&quot;.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Puedo usar mis propios códigos o debo registrarlos?</summary>
+                <p>
+                  Depende del uso. Para uso interno (inventario, almacén, etiquetas propias) puedes
+                  usar cualquier número sin registrar. Para venta en tiendas físicas o en plataformas
+                  de comercio electrónico como Amazon, necesitas códigos EAN registrados oficialmente
+                  en GS1 España (gs1es.org). Los códigos falsos o generados aleatoriamente pueden
+                  ser rechazados o colisionar con productos de otra empresa.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Qué resolución mínima necesita un código impreso?</summary>
+                <p>
+                  Para impresión en papel se recomienda mínimo 300 dpi (puntos por pulgada). Para
+                  etiquetas de alta calidad o tamaños muy pequeños, usa 600 dpi o más. Si imprimes
+                  a baja resolución, las barras quedan borrosas y el lector puede no reconocer el
+                  código. El formato SVG (vectorial) es ideal porque escala sin pérdida de calidad.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Puede un smartphone leer todos los tipos?</summary>
+                <p>
+                  La mayoría de smartphones modernos leen QR y DataMatrix sin app adicional.
+                  Para códigos 1D como EAN-13 o Code 128 generalmente necesitas una app de
+                  escaneo (como Google Lens, Barcode Scanner o similares). Los lectores industriales
+                  de mano leen prácticamente todos los formatos. En supermercados se usan
+                  lectores láser especializados.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuántos datos caben en un QR?</summary>
+                <p>
+                  Un QR puede almacenar hasta 7.089 caracteres numéricos, 4.296 alfanuméricos o
+                  2.953 bytes en binario. El tamaño del QR aumenta con más datos. Para URLs cortas
+                  el QR es pequeño y fácil de escanear; para URLs largas es recomendable usar
+                  un acortador de URL para que el código sea más compacto y legible.
+                </p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>¿Cuál es la diferencia entre QR y DataMatrix?</summary>
+                <p>
+                  Ambos son códigos 2D pero con usos distintos: el QR es cuadrado, diseñado para
+                  ser leído por consumidores con smartphones, muy usado en marketing, pagos y webs.
+                  DataMatrix es más compacto, puede ser rectangular, y está diseñado para entornos
+                  industriales donde el espacio es muy reducido (componentes electrónicos,
+                  medicamentos, piezas de maquinaria). Ambos tienen corrección de errores integrada.
+                </p>
+              </details>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Cómo generar e imprimir un código de barras: 7 pasos</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Elige el tipo según el uso</strong>
+                <p>
+                  EAN-13 para productos de venta al público, Code 128 para logística interna,
+                  QR para URLs y menús digitales, DataMatrix para medicamentos o electrónica.
+                  El tipo incorrecto puede ser rechazado por los lectores del sector.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Introduce los datos del código</strong>
+                <p>
+                  Escribe el número o texto que quieres codificar. Para EAN-13, introduce
+                  los 12 primeros dígitos y el generador calcula el dígito de control
+                  automáticamente. Para Code 128 puedes usar texto alfanumérico.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Verifica el dígito de control</strong>
+                <p>
+                  El generador calcula el dígito de control al instante. Comprueba que el
+                  código generado en pantalla coincide con el número que esperabas. Un dígito
+                  incorrecto hace que el código sea inválido.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Ajusta el tamaño (mínimo 2,5 cm de ancho para EAN-13)</strong>
+                <p>
+                  Los estándares GS1 indican un ancho mínimo de 2,5 cm para EAN-13 en
+                  impresión. Tamaños menores aumentan los errores de lectura. Usa el
+                  selector de ancho de barras para ajustar la escala.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>Elige el formato de imagen (SVG recomendado)</strong>
+                <p>
+                  SVG es un formato vectorial que escala sin pérdida de calidad, ideal para
+                  cualquier tamaño de impresión. PNG es válido para impresión digital si
+                  la resolución es de 300 dpi o superior. Evita JPEG por la compresión con pérdida.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">6</span>
+              <div className={styles.stepContent}>
+                <strong>Prueba con un lector antes de imprimir en masa</strong>
+                <p>
+                  Escanea el código con un lector físico o con el smartphone antes de imprimir
+                  miles de etiquetas. Verifica que el valor leído coincide exactamente con el
+                  dato original. Un error detectado a tiempo ahorra costes.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">7</span>
+              <div className={styles.stepContent}>
+                <strong>Registra en GS1 si es para venta comercial</strong>
+                <p>
+                  Si el producto va a venderse en tiendas físicas, grandes superficies o
+                  marketplaces (Amazon, El Corte Inglés, Carrefour), necesitas un prefijo
+                  de empresa GS1 España. Sin él, el código puede generar conflictos con
+                  otros productos y ser rechazado por el sistema del distribuidor.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>6 buenas prácticas para códigos de barras</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🖨️</span>
+              <h4>Usa SVG para impresión escalable</h4>
+              <p>
+                El formato SVG (vectorial) no pierde calidad al ampliar. Es el formato
+                recomendado para etiquetas de cualquier tamaño, desde pequeños envases
+                hasta carteles de almacén.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎨</span>
+              <h4>Contraste mínimo del 70%</h4>
+              <p>
+                Las barras deben ser oscuras sobre fondo claro. El negro sobre blanco es
+                el estándar. Evita colores que reduzcan el contraste: amarillo, naranja o
+                rojo sobre fondos similares causan errores de lectura.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
+              <h4>Zona tranquila (quiet zone) obligatoria</h4>
+              <p>
+                La zona tranquila es el espacio en blanco alrededor del código que permite
+                al lector detectar dónde empieza y termina. Para EAN-13 es de al menos
+                3 mm a cada lado. Sin ella, el código puede no leerse correctamente.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
+              <h4>No distorsionar proporciones</h4>
+              <p>
+                Estirar o comprimir un código de barras cambia la relación entre el ancho
+                de las barras y los espacios, haciendo que sea ilegible. Siempre mantén
+                las proporciones originales al redimensionar.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📱</span>
+              <h4>Prueba en múltiples lectores</h4>
+              <p>
+                Verifica el código con distintos dispositivos: lector de mano, smartphone
+                con Google Lens y, si tienes acceso, con el lector del punto de venta real.
+                Lo que funciona en pantalla puede fallar en papel con baja resolución.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
+              <h4>EAN de GS1 para grandes superficies</h4>
+              <p>
+                Si distribuyes en supermercados, hipermercados o vía Amazon España, el
+                código EAN debe estar registrado en GS1. Un código no registrado puede
+                coincidir con otro producto y causar errores en el sistema del distribuidor.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h3>6 errores habituales al crear códigos de barras</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Imprimir sin zona tranquila.</strong> El espacio en blanco alrededor
+                del código es parte del estándar. Sin él, los lectores no detectan los límites
+                del código y falla la lectura. Nunca recortes el código hasta el borde de las barras.
+              </li>
+              <li>
+                <strong>Usar resolución menor a 300 dpi para impresión.</strong> Las barras
+                quedan borrosas o con bordes irregulares. El lector no puede distinguir barras
+                de espacios correctamente. Usa siempre 300 dpi mínimo o, mejor, formato SVG vectorial.
+              </li>
+              <li>
+                <strong>Invertir colores (barras blancas sobre negro).</strong> Los lectores
+                láser están calibrados para leer barras negras sobre fondo blanco. La inversión
+                de colores hace que muchos lectores fallen o sean incapaces de leer el código.
+              </li>
+              <li>
+                <strong>Crear códigos EAN sin registrar en GS1 para venta comercial.</strong>{' '}
+                Un EAN generado aleatoriamente puede colisionar con el código de otro fabricante
+                registrado. Los distribuidores pueden rechazar el producto o confundirlo con otro
+                en sus sistemas.
+              </li>
+              <li>
+                <strong>Estirar el código cambiando proporciones.</strong> Modificar el ancho o
+                alto de forma no proporcional altera la relación entre barras y espacios que el
+                lector necesita para decodificar. El resultado es un código visualmente similar
+                pero ilegible.
+              </li>
+              <li>
+                <strong>No verificar el dígito de control.</strong> Un código con el dígito de
+                control incorrecto es técnicamente inválido aunque parezca correcto visualmente.
+                Siempre comprueba que el dígito calculado coincide con el esperado antes de
+                imprimir etiquetas en masa.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-codigos-barras')} />
 

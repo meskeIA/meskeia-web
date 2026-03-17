@@ -272,6 +272,285 @@ export default function EnchufesPais() {
             puertos USB incorporados. Son compactos, cubren 150+ países y permiten cargar varios dispositivos
             simultáneamente. Presupuesto: entre 10€ y 30€.
           </p>
+
+          {/* ── SECCIÓN 1: Tabla comparativa ── */}
+          <h3>Comparativa de tipos de enchufe más comunes</h3>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Países principales</th>
+                  <th>Voltaje</th>
+                  <th>Frecuencia</th>
+                  <th>Forma</th>
+                  <th>¿Adaptador desde España?</th>
+                  <th>Compatibilidad con dispositivos europeos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Tipo A</strong></td>
+                  <td>EE.UU., Canadá, México, Japón</td>
+                  <td>100-127 V</td>
+                  <td>60 Hz</td>
+                  <td>2 clavijas planas paralelas</td>
+                  <td>Sí, obligatorio</td>
+                  <td>Solo si el dispositivo es 100-240V</td>
+                </tr>
+                <tr>
+                  <td><strong>Tipo B</strong></td>
+                  <td>EE.UU., Canadá, México</td>
+                  <td>120 V</td>
+                  <td>60 Hz</td>
+                  <td>2 planas + 1 redonda (tierra)</td>
+                  <td>Sí, obligatorio</td>
+                  <td>Solo si el dispositivo es 100-240V</td>
+                </tr>
+                <tr>
+                  <td><strong>Tipo C</strong></td>
+                  <td>Europa continental, Sudamérica, Asia</td>
+                  <td>220-240 V</td>
+                  <td>50 Hz</td>
+                  <td>2 clavijas redondas delgadas</td>
+                  <td>No (es el español)</td>
+                  <td>Alta — formato nativo europeo</td>
+                </tr>
+                <tr>
+                  <td><strong>Tipo E/F</strong></td>
+                  <td>Alemania, Francia, España, Países Bajos</td>
+                  <td>220-240 V</td>
+                  <td>50 Hz</td>
+                  <td>2 redondas + tierra (Schuko)</td>
+                  <td>No (compatible con C/F español)</td>
+                  <td>Muy alta — estándar europeo</td>
+                </tr>
+                <tr>
+                  <td><strong>Tipo G</strong></td>
+                  <td>Reino Unido, Irlanda, Malasia, Singapur</td>
+                  <td>220-240 V</td>
+                  <td>50 Hz</td>
+                  <td>3 clavijas rectangulares</td>
+                  <td>Sí, necesario</td>
+                  <td>Alta — mismo voltaje, diferente forma</td>
+                </tr>
+                <tr>
+                  <td><strong>Tipo I</strong></td>
+                  <td>Australia, Nueva Zelanda, Argentina</td>
+                  <td>220-240 V</td>
+                  <td>50 Hz</td>
+                  <td>3 clavijas en Y inclinadas</td>
+                  <td>Sí, necesario</td>
+                  <td>Alta — mismo voltaje, diferente forma</td>
+                </tr>
+                <tr>
+                  <td><strong>Tipo L</strong></td>
+                  <td>Italia, Chile</td>
+                  <td>220-240 V</td>
+                  <td>50 Hz</td>
+                  <td>3 clavijas en línea horizontal</td>
+                  <td>Sí, recomendable</td>
+                  <td>Alta — mismo voltaje, diferente forma</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* ── SECCIÓN 2: Casos de uso ── */}
+          <h3>Casos de uso frecuentes para viajeros españoles</h3>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎒</span>
+                <strong>Mochilero en Sudeste Asiático</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Tailandia, Vietnam, Indonesia, Singapur y Malasia usan hasta 4 tipos de enchufe distintos en la misma región.
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 Un adaptador universal es imprescindible. Evita comprar uno por país.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
+                <strong>Viajero de negocios a EE.UU./Canadá</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                El enchufe europeo Tipo C no encaja en las tomas americanas Tipo A/B. Además, el voltaje baja de 230V a 120V.
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 Comprueba que tu portátil y cargadores son 100-240V. Si es así, solo necesitas adaptador de forma.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧‍👦</span>
+                <strong>Familia en viaje largo</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Móviles, tablets, cámaras, portátiles... cargar todo simultáneamente requiere varias tomas o regletas.
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 Lleva una regleta española + un solo adaptador al destino. Más económico y práctico que varios adaptadores.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
+                <strong>Nómada digital</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Portátil, monitor portátil, hub USB-C, micrófono... el nómada digital necesita múltiples tomas en cualquier país.
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 Adaptador universal con puertos USB-C integrados + regleta pequeña. Ideal para cualquier destino de trabajo.
+              </p>
+            </div>
+          </div>
+
+          {/* ── SECCIÓN 3: FAQ ── */}
+          <h3>Preguntas frecuentes sobre enchufes y voltaje</h3>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <strong>¿Cuál es la diferencia entre adaptador y transformador de voltaje?</strong>
+              <p>El <em>adaptador</em> solo cambia la forma del enchufe — no transforma el voltaje. El <em>transformador</em> convierte el voltaje (p. ej., de 230V a 110V). Si tu dispositivo ya es universal (100-240V), solo necesitas adaptador.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <strong>¿Los cargadores de móvil funcionan en todo el mundo?</strong>
+              <p>En su mayoría sí. La etiqueta del cargador suele poner &quot;Input: 100-240V, 50-60Hz&quot;. Si lo pone, solo necesitas un adaptador de forma. Si pone solo &quot;230V&quot;, no lo uses en países de 110-120V sin transformador.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <strong>¿Qué ocurre si conecto un aparato de 220V a una toma de 110V?</strong>
+              <p>El aparato recibirá la mitad del voltaje necesario. En la mayoría de casos simplemente no funcionará bien (motor lento, calefactor sin potencia). Puede dañarse con el tiempo si se usa así habitualmente.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <strong>¿Un adaptador universal sirve para absolutamente todos los países?</strong>
+              <p>Cubre la inmensa mayoría (más de 150 países), pero algunos tipos muy específicos como el Tipo J suizo o el Tipo H israelí pueden tener limitaciones. Lee las especificaciones del adaptador antes de comprar.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <strong>¿Por qué EE.UU. usa 110V y Europa 220V?</strong>
+              <p>Son dos estándares históricos que se desarrollaron por separado. Edison promovió 110V en EE.UU. en los años 1880. Europa adoptó 220-240V más tarde porque permite transmitir más potencia con menos pérdidas en cables más largos.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <strong>¿Qué es el &quot;grounding&quot; o toma de tierra?</strong>
+              <p>Es una conexión de seguridad eléctrica que dirige la corriente a tierra en caso de cortocircuito, protegiendo al usuario. Los enchufes Tipo B (EE.UU.), F (Schuko europeo) y G (UK) incluyen toma de tierra. El Tipo A y C no la tienen.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <strong>¿Necesito adaptador viajando dentro de Europa?</strong>
+              <p>Generalmente no, si viajas por Europa continental (España, Francia, Alemania, Italia, Portugal...). La excepción notable es <strong>Reino Unido e Irlanda</strong> (Tipo G) y <strong>Suiza</strong> (Tipo J nativo). Siempre comprueba el país de destino.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <strong>¿Puedo usar mi secador de pelo en el extranjero?</strong>
+              <p>Depende. La mayoría de secadores domésticos españoles son solo 220-240V. Si viajas a un país con 110-120V (EE.UU., Canadá, Japón), necesitarás un transformador de voltaje — y los de alta potencia (1500-2000W) son voluminosos y pesados. Lo más práctico es comprar un secador de viaje universal.</p>
+              <p className={styles.faqTip}>Tip: los hoteles de categoría media-alta suelen tener secador en la habitación.</p>
+            </div>
+          </div>
+
+          {/* ── SECCIÓN 4: Guía paso a paso ── */}
+          <h3>Cómo preparar los enchufes antes de tu viaje (7 pasos)</h3>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Identifica todos tus destinos</strong>
+                <p>Si haces escala o visitas varios países, cada uno puede tener un tipo de enchufe diferente. Anótalos todos.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Consulta el tipo de enchufe de cada país</strong>
+                <p>Usa esta herramienta o la base de datos IEC. Anota los tipos A-N que necesitarás.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Revisa la etiqueta de cada dispositivo que llevarás</strong>
+                <p>Busca el texto &quot;Input:&quot; en la parte trasera o inferior. Apunta el rango de voltaje admitido.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Si pone &quot;100-240V&quot;: solo necesitas adaptador de forma</strong>
+                <p>El dispositivo es universal. Un simple adaptador de clavijas es suficiente — no necesitas transformador.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Si pone solo &quot;220-240V&quot;: necesitas transformador de voltaje</strong>
+                <p>No conectes ese dispositivo directamente en países de 110V. Usa un transformador de potencia adecuada o déjalo en casa.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Compra el adaptador adecuado (o uno universal)</strong>
+                <p>Si son varios países con tipos distintos, un adaptador universal es más económico que comprar uno por tipo. Presupuesto: 10-30€ en tiendas de viaje o Amazon.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Considera llevar una regleta española + un adaptador</strong>
+                <p>Una regleta con varios enchufes españoles + un solo adaptador al destino permite cargar múltiples dispositivos simultáneamente sin comprar varios adaptadores.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── SECCIÓN 5: Mejores prácticas ── */}
+          <h3>Mejores prácticas para gestionar enchufes en viajes</h3>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔌</span>
+              <strong>Adaptador universal con USB-C</strong>
+              <p>Elige uno con puertos USB-A y USB-C integrados. Cargarás móvil y tablet sin ocupar las tomas del adaptador.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
+              <strong>Comprueba &quot;Input: 100-240V&quot;</strong>
+              <p>Antes de hacer la maleta, revisa la etiqueta trasera de cada dispositivo. Es la única forma de saber si necesitas transformador.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⚠️</span>
+              <strong>Secadores y planchas: cuidado en 110V</strong>
+              <p>Estos aparatos de alta potencia rara vez son universales. Sin transformador en un país de 110V, pueden dañarse o ser peligrosos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">👨‍👩‍👧</span>
+              <strong>Un adaptador por familia, no por persona</strong>
+              <p>Combínalo con una regleta española. Ahorra dinero, espacio y peso en el equipaje.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
+              <strong>Prioriza cargadores con base plana</strong>
+              <p>Los adaptadores universales encajan mejor con cargadores de base plana (tipo bloque). Los de perfil ancho pueden no caber o bloquear la toma vecina.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
+              <strong>Prepáralo 2 semanas antes</strong>
+              <p>Comprar el adaptador con tiempo evita pagar 3-4 veces más en tiendas de aeropuerto o en destino. Pide online con antelación.</p>
+            </div>
+          </div>
+
+          {/* ── SECCIÓN 6: Warning Box ── */}
+          <div className={styles.warningBox} role="alert">
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚡</span>
+              <strong>Errores frecuentes que pueden dañar tus dispositivos</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li>Conectar aparatos de 220V a una toma de 110V sin transformador — puede causar daño inmediato o acortar la vida útil del dispositivo.</li>
+              <li>Comprar el adaptador en el aeropuerto — el precio puede ser 3 veces mayor que en tiendas online o de electrónica.</li>
+              <li>Confundir adaptador con transformador de voltaje — el adaptador solo cambia la forma del enchufe, no convierte el voltaje.</li>
+              <li>Asumir que toda Europa usa el mismo enchufe — <strong>Reino Unido usa Tipo G</strong>, incompatible con el Tipo C/F español sin adaptador.</li>
+              <li>Olvidar verificar el voltaje del secador de pelo — casi ningún secador doméstico es universal. Puede quemarse o ser peligroso en países de 110V.</li>
+              <li>No comprobar que el adaptador aguanta la potencia del dispositivo — los adaptadores baratos pueden no soportar aparatos de alta potencia (secadores, hervidores, planchas). Verifica el vataje máximo del adaptador.</li>
+            </ul>
+          </div>
         </EducationalSection>
 
         <RelatedApps apps={getRelatedApps('enchufes-por-pais')} />

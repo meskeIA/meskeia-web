@@ -666,6 +666,303 @@ export default function GeneradorUTMPage() {
           </div>
         </section>
 
+        {/* ====== SECCIÓN V2.0 — TABLA COMPARATIVA EXTENDIDA ====== */}
+        <section className={styles.tableWrapper}>
+          <h2>📋 Referencia rápida: los 5 parámetros UTM</h2>
+          <div style={{ overflowX: 'auto' }}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Descripción</th>
+                  <th>Valores habituales</th>
+                  <th>Obligatorio</th>
+                  <th>Ejemplo real</th>
+                  <th>Qué analiza en GA4</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>utm_source</code></td>
+                  <td>Quién envía el tráfico</td>
+                  <td>google, newsletter, instagram</td>
+                  <td><span className={styles.badgeYes}>✅ Sí</span></td>
+                  <td><code>utm_source=google</code></td>
+                  <td>Columna &quot;Origen&quot; en Adquisición</td>
+                </tr>
+                <tr>
+                  <td><code>utm_medium</code></td>
+                  <td>Canal o tipo de marketing</td>
+                  <td>cpc, email, social, organic</td>
+                  <td><span className={styles.badgeYes}>✅ Sí</span></td>
+                  <td><code>utm_medium=cpc</code></td>
+                  <td>Columna &quot;Medio&quot; en Adquisición</td>
+                </tr>
+                <tr>
+                  <td><code>utm_campaign</code></td>
+                  <td>Nombre identificador de la campaña</td>
+                  <td>black-friday, verano2025, rebajas</td>
+                  <td><span className={styles.badgeYes}>✅ Sí</span></td>
+                  <td><code>utm_campaign=verano2025</code></td>
+                  <td>Columna &quot;Campaña&quot; en Adquisición</td>
+                </tr>
+                <tr>
+                  <td><code>utm_term</code></td>
+                  <td>Palabra clave de pago (SEM)</td>
+                  <td>zapatillas running, seguro coche</td>
+                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><code>utm_term=zapatillas-running</code></td>
+                  <td>&quot;Término de búsqueda&quot; en informes de campaña</td>
+                </tr>
+                <tr>
+                  <td><code>utm_content</code></td>
+                  <td>Diferencia variantes del mismo anuncio</td>
+                  <td>banner-azul, cta-comprar, imagen-v2</td>
+                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><code>utm_content=banner-azul</code></td>
+                  <td>&quot;Contenido del anuncio&quot; en informes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ====== SECCIÓN V2.0 — CASOS DE USO / ESCENARIOS ====== */}
+        <section>
+          <h2>🎯 Quién usa los UTM y para qué</h2>
+          <div className={styles.escenariosGrid}>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📊</span>
+                <h3>Responsable de marketing — ROI de email</h3>
+              </div>
+              <p>Mide el retorno de cada campaña de email marketing comparando aperturas, clics y conversiones por campaña desde GA4.</p>
+              <div className={styles.escenarioExample}>
+                <code>utm_source=mailchimp &amp; utm_medium=email &amp; utm_campaign=promo-marzo</code>
+              </div>
+              <p className={styles.escenarioTip}>Resultado: identifica qué asuntos de email generan más ventas.</p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📱</span>
+                <h3>Community manager — Rendimiento por red social</h3>
+              </div>
+              <p>Compara el tráfico orgánico de Instagram, TikTok y LinkedIn con el mismo utm_campaign para ver qué red convierte mejor.</p>
+              <div className={styles.escenarioExample}>
+                <code>utm_source=tiktok &amp; utm_medium=social &amp; utm_campaign=lanzamiento-producto</code>
+              </div>
+              <p className={styles.escenarioTip}>Resultado: descubre que LinkedIn convierte 4× más aunque TikTok trae más volumen.</p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🔗</span>
+                <h3>Afiliado — Rastreo de conversiones por fuente</h3>
+              </div>
+              <p>Un afiliado que promociona el mismo producto en varias webs y foros usa utm_source distinto en cada enlace para saber qué fuente genera más comisiones.</p>
+              <div className={styles.escenarioExample}>
+                <code>utm_source=foro-cocina &amp; utm_medium=affiliate &amp; utm_campaign=verano2025</code>
+              </div>
+              <p className={styles.escenarioTip}>Resultado: el foro especializado convierte 8× más que el blog generalista.</p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏢</span>
+                <h3>Agencia digital — Reporting a cliente</h3>
+              </div>
+              <p>La agencia usa utm_campaign con el nombre del cliente y utm_content para diferenciar creatividades. El cliente ve en GA4 exactamente qué campaña generó cada resultado.</p>
+              <div className={styles.escenarioExample}>
+                <code>utm_source=google &amp; utm_medium=cpc &amp; utm_campaign=cliente-xyz-q1 &amp; utm_content=anuncio-v2</code>
+              </div>
+              <p className={styles.escenarioTip}>Resultado: reporting transparente sin necesidad de exportar datos manualmente.</p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ====== SECCIÓN V2.0 — FAQ ====== */}
+        <section>
+          <h2>❓ Preguntas frecuentes (ampliadas)</h2>
+          <div className={styles.faqList}>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Los parámetros UTM afectan al SEO?</h3>
+              <p className={styles.faqAnswer}>No directamente. Google ignora los parámetros UTM al indexar, siempre que la URL canónica apunte a la versión limpia (sin UTMs). Configura la etiqueta <code>canonical</code> para evitar confusión y nunca uses UTMs como URL principal en tu sitemap.</p>
+              <p className={styles.faqTip}>Consejo: en Google Search Console añade un parámetro de URL para que Googlebot los ignore explícitamente.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Debo usar UTM en links internos de mi web?</h3>
+              <p className={styles.faqAnswer}>No. Usar UTMs en la navegación interna sobreescribe el origen de sesión del usuario. Si alguien llega desde Google Ads y hace clic en un menú con UTM de email, GA4 registrará el origen como email, perdiendo el dato de la campaña de pago.</p>
+              <p className={styles.faqTip}>Regla: UTMs solo en enlaces externos (emails, anuncios, redes sociales, afiliados).</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Distingue GA4 entre mayúsculas y minúsculas en UTM?</h3>
+              <p className={styles.faqAnswer}>Sí. GA4 es case-sensitive: <code>utm_source=Google</code> y <code>utm_source=google</code> son dos fuentes distintas en los informes. Esto fragmenta los datos y complica el análisis.</p>
+              <p className={styles.faqTip}>Solución: usar siempre minúsculas. Este generador los convierte automáticamente.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Qué pasa si el usuario comparte mi URL con UTM en redes sociales?</h3>
+              <p className={styles.faqAnswer}>Los UTMs se propagan. Otros usuarios que accedan a esa URL compartida serán atribuidos a tu campaña original en lugar de a &quot;social&quot; orgánico. Esto puede inflar artificialmente los resultados de una campaña.</p>
+              <p className={styles.faqTip}>Solución: usa un acortador de URLs (bit.ly, short.io) que oculta los parámetros en el enlace compartido.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Puedo usar UTM en anuncios de Google Ads?</h3>
+              <p className={styles.faqAnswer}>Sí, pero Google Ads tiene su propio sistema de auto-etiquetado (gclid) que es más preciso. Si combinas ambos, los UTMs pueden sobrescribir el gclid. La recomendación es usar el auto-etiquetado de Google Ads y reservar los UTMs para otros canales.</p>
+              <p className={styles.faqTip}>Excepción: si necesitas datos en herramientas externas a GA4, los UTMs en Google Ads son válidos.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Cuánto tiempo guarda GA4 los datos de UTM?</h3>
+              <p className={styles.faqAnswer}>GA4 retiene los datos de sesión (incluyendo UTMs) durante el tiempo que tengas configurado en la propiedad: por defecto 14 meses, ampliable a 26 meses en cuentas de pago. Los datos agregados en informes estándar están disponibles hasta 2 años.</p>
+              <p className={styles.faqTip}>Para análisis históricos más largos, exporta a BigQuery con la integración gratuita de GA4.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Qué es utm_id y para qué sirve?</h3>
+              <p className={styles.faqAnswer}><code>utm_id</code> es un parámetro adicional (no estándar en Universal Analytics pero sí en GA4) que permite asociar el tráfico con un ID de campaña externo, como el ID de tu CRM o plataforma de publicidad. Útil para cruzar datos entre GA4 y herramientas como HubSpot o Salesforce.</p>
+              <p className={styles.faqTip}>No es obligatorio ni habitual en campañas básicas, pero sí útil en integraciones avanzadas.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Los UTM funcionan con Universal Analytics y GA4?</h3>
+              <p className={styles.faqAnswer}>Los 5 parámetros estándar (source, medium, campaign, term, content) funcionan en ambas plataformas. Universal Analytics fue retirado en julio de 2023, por lo que si tienes una propiedad activa es GA4. La diferencia está en dónde encontrar los datos: en GA4 ve a Adquisición &gt; Tráfico &gt; Origen del tráfico.</p>
+              <p className={styles.faqTip}>GA4 también soporta utm_id, utm_source_platform y utm_creative_format como parámetros adicionales.</p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ====== SECCIÓN V2.0 — GUÍA PASO A PASO ====== */}
+        <section>
+          <h2>🗺️ Cómo crear un sistema UTM profesional (paso a paso)</h2>
+          <div className={styles.stepGuide}>
+
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <h4>Define una nomenclatura interna clara</h4>
+                <p>Antes de crear el primer enlace, decide las reglas: siempre minúsculas, guiones en lugar de espacios, sin acentos ni caracteres especiales. Documenta los valores permitidos para source y medium en una wiki o hoja compartida.</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <h4>Identifica la fuente (utm_source)</h4>
+                <p>¿Quién va a distribuir el enlace? Si es Google, usa <code>google</code>. Si es tu newsletter, usa <code>newsletter</code> o el nombre de tu ESP (mailchimp, mailerlite). Si es Instagram, usa <code>instagram</code>.</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <h4>Define el medio (utm_medium)</h4>
+                <p>¿Cómo llega el usuario? Anuncio de pago: <code>cpc</code>. Correo electrónico: <code>email</code>. Publicación en redes sin pago: <code>social</code>. Tráfico de búsqueda orgánica: <code>organic</code>.</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <h4>Nombra la campaña (utm_campaign)</h4>
+                <p>Usa un nombre descriptivo y consistente: <code>verano2025</code>, <code>black-friday</code>, <code>lanzamiento-app</code>. Si lanzas en varios canales el mismo día, usa exactamente el mismo nombre en todos para poder ver el total en un solo informe.</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <h4>Añade utm_term si es una campaña SEM</h4>
+                <p>Solo para campañas de búsqueda de pago con palabras clave explícitas. Usa el término de búsqueda exacto o el grupo de anuncios: <code>zapatillas-running</code>, <code>seguro-hogar-madrid</code>. En el resto de canales omite este parámetro.</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <h4>Añade utm_content si hay variantes A/B</h4>
+                <p>Cuando tienes dos versiones del mismo anuncio o enlace diferenciado por posición, usa utm_content para distinguirlos: <code>banner-superior</code>, <code>banner-inferior</code>, <code>imagen-v1</code>, <code>imagen-v2</code>.</p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <h4>Genera la URL y acórtala si es necesaria</h4>
+                <p>Usa este generador para crear la URL final. Si la URL resultante es muy larga (habitual en campañas con muchos parámetros), acórtala con bit.ly o short.io antes de publicarla en redes sociales o mensajes de texto donde el espacio importa.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ====== SECCIÓN V2.0 — MEJORES PRÁCTICAS ====== */}
+        <section>
+          <h2>✅ Mejores prácticas para un tracking limpio</h2>
+          <div className={styles.tipsGrid}>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔡</span>
+              <h4>Siempre en minúsculas y sin espacios</h4>
+              <p>Usa guiones (<code>-</code>) o guiones bajos (<code>_</code>) para separar palabras. Los espacios se codifican como <code>%20</code> y ensucian las URLs y los informes.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📖</span>
+              <h4>Crea una guía de nomenclatura para el equipo</h4>
+              <p>Un documento con los valores permitidos de source y medium evita que cada persona use convenciones distintas, lo que fragmente los datos de GA4.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🚫</span>
+              <h4>Nunca uses UTM en links internos</h4>
+              <p>Los UTMs en la navegación interna de tu web contaminan los datos de sesión y sobreescriben el origen real del usuario, falsificando tus informes de adquisición.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>✂️</span>
+              <h4>Acorta las URLs largas para redes sociales</h4>
+              <p>Una URL con 5 parámetros UTM puede superar los 200 caracteres. Usa bit.ly o short.io para compartir un enlace limpio que preserve el tracking interno.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧪</span>
+              <h4>Usa utm_content para tests A/B de creatividades</h4>
+              <p>Cuando pruebas dos versiones del mismo anuncio o posición del CTA, utm_content te permite comparar cuál convierte mejor sin crear campañas separadas.</p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <h4>Documenta todas las campañas en una hoja compartida</h4>
+              <p>Mantén un registro con URL, canal, fecha de lanzamiento y resultado esperado. Imprescindible cuando varias personas del equipo crean enlaces UTM.</p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ====== SECCIÓN V2.0 — WARNING BOX ====== */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon}>⚠️</span>
+            <h3>Errores frecuentes que arruinan tus datos en GA4</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Mezclar mayúsculas y minúsculas:</strong> <code>google</code> y <code>Google</code> son dos fuentes distintas en GA4. Tus informes quedarán fragmentados y perderás visión global.</li>
+            <li><strong>Usar UTM en la navegación interna:</strong> cada clic interno con UTM infla el tráfico directo artificialmente y sobreescribe el origen real de la sesión del usuario.</li>
+            <li><strong>No tener nomenclatura consensuada en el equipo:</strong> si cada persona usa sus propias convenciones, los datos de GA4 serán inconsistentes e imposibles de agregar correctamente.</li>
+            <li><strong>Poner espacios en los valores:</strong> los espacios se codifican como <code>%20</code> y ensucian los informes. Usa siempre guiones o guiones bajos como separadores.</li>
+            <li><strong>Olvidar añadir UTM a campañas de pago:</strong> sin UTMs en tus anuncios de Meta o LinkedIn, el tráfico de pago aparece como &quot;directo&quot; en GA4 y pierdes toda la trazabilidad del ROI.</li>
+            <li><strong>Usar el mismo utm_campaign para campañas distintas:</strong> si reutilizas el nombre de una campaña anterior, los datos históricos y los nuevos se mezclan, imposibilitando cualquier comparación entre períodos.</li>
+          </ul>
+        </div>
+
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-utm')} />
