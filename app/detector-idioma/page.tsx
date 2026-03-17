@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './DetectorIdioma.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Patrones de palabras frecuentes por idioma
@@ -224,6 +224,187 @@ export default function DetectorIdiomaPage() {
           ))}
         </div>
       </section>
+
+      <EducationalSection
+        title="Guía de Detección de Idiomas"
+        subtitle="Cómo funciona el análisis automático de lenguas y sus aplicaciones"
+        icon="🌍"
+      >
+        {/* 1. TABLA COMPARATIVA — familias de idiomas */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Familia Lingüística</th>
+                <th>Idiomas principales</th>
+                <th>Hablantes nativos</th>
+                <th>Características distintivas</th>
+                <th>Facilidad de detección</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Indoeuropea (Romance)</td><td>Español, Francés, Italiano, Portugués</td><td>~900M</td><td>Artículos, conjugaciones, vocales abiertas</td><td>✅ Alta</td></tr>
+              <tr><td>Indoeuropea (Germánica)</td><td>Inglés, Alemán, Holandés, Sueco</td><td>~500M</td><td>Compuestos, consonantes, th/sch</td><td>✅ Alta</td></tr>
+              <tr><td>Sino-Tibetana</td><td>Chino mandarín, Cantonés</td><td>~1.200M</td><td>Tonal, caracteres, sin espacios</td><td>✅ Muy alta (script único)</td></tr>
+              <tr><td>Semítica</td><td>Árabe, Hebreo</td><td>~400M</td><td>RTL, consonántica, raíces trilíteras</td><td>✅ Muy alta (script único)</td></tr>
+              <tr><td>Altaica / Urálica</td><td>Turco, Finés, Húngaro</td><td>~200M</td><td>Aglutinante, armonía vocálica</td><td>🟡 Media</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* 2. CASOS DE USO */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🌐</span>
+              <strong>Desarrollador Web</strong>
+            </div>
+            <p>Detecta el idioma del contenido enviado por usuarios para redirigir automáticamente a la versión localizada del sitio o aplicar el diccionario de corrección correcto.</p>
+            <div className={styles.escenarioTip}>Tip: Combina detección automática con el header HTTP Accept-Language como señal de respaldo.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>📚</span>
+              <strong>Docente / Investigador</strong>
+            </div>
+            <p>Analiza corpus de textos multilingüe para clasificar documentos, identificar mezclas de idiomas (code-switching) o verificar la coherencia lingüística de traducciones.</p>
+            <div className={styles.escenarioTip}>Tip: Textos de al menos 50 palabras dan resultados de detección mucho más fiables que frases cortas.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>💬</span>
+              <strong>Community Manager</strong>
+            </div>
+            <p>Clasifica comentarios y menciones en redes sociales por idioma para derivarlos al equipo de atención al cliente correcto o gestionar campañas segmentadas geográficamente.</p>
+            <div className={styles.escenarioTip}>Tip: El emoji y los hashtags no aportan señal de idioma; filtra el texto puro antes de detectar.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🔍</span>
+              <strong>Analista de Datos</strong>
+            </div>
+            <p>Preprocesa datasets de texto para etiquetarlos por idioma antes de aplicar modelos de NLP específicos (sentiment analysis, NER) que requieren un idioma concreto.</p>
+            <div className={styles.escenarioTip}>Tip: El n-gram a nivel de carácter (trigramas) es el método más robusto para detección en textos cortos y ruidosos.</div>
+          </div>
+        </div>
+
+        {/* 3. FAQ */}
+        <details className={styles.faqList}>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Detección de Idiomas</summary>
+          <div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cuántos caracteres son necesarios para detectar el idioma con fiabilidad?</div>
+              <div className={styles.faqRespuesta}>Con 20-30 caracteres los algoritmos de n-gram ya obtienen resultados razonables. Por debajo de 10 caracteres el margen de error aumenta significativamente. Para máxima fiabilidad, usar párrafos completos de al menos 100 caracteres.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Por qué se confunde el español con el portugués o el italiano?</div>
+              <div className={styles.faqRespuesta}>Son lenguas romances muy próximas con vocabulario y gramática similares. Los algoritmos necesitan buscar palabras función (artículos, preposiciones, conjunciones) que difieren entre ellas, como &quot;el/la/los&quot; (español), &quot;o/a/os&quot; (portugués) o &quot;il/la/gli&quot; (italiano).</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Funciona la detección con textos que mezclan varios idiomas?</div>
+              <div className={styles.faqRespuesta}>Depende del algoritmo. Los basados en n-gram detectan el idioma mayoritario. Para textos con code-switching real (mezcla intencional) se necesitan modelos de detección por segmentos como LangDetect multilabel o modelos Transformer especializados.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Los textos con muchos errores ortográficos afectan la detección?</div>
+              <div className={styles.faqRespuesta}>Los errores tipográficos menores afectan poco, pero los textos con errores masivos o transliteraciones (árabe en letras latinas) pueden reducir la precisión. Los algoritmos robustos como fastText mantienen hasta 95% de precisión con un 30% de errores.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué diferencia hay entre detección de idioma y detección de dialecto?</div>
+              <div className={styles.faqRespuesta}>La detección de idioma distingue lenguas diferentes (español vs portugués). La detección de dialecto es mucho más difícil y distingue variantes de una misma lengua (español de España vs México vs Argentina). Requiere modelos entrenados específicamente con datos dialectales.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cómo se detectan idiomas con scripts no latinos (chino, árabe, japonés)?</div>
+              <div className={styles.faqRespuesta}>Los scripts únicos son triviales de detectar por rangos Unicode: árabe (U+0600–U+06FF), chino (U+4E00–U+9FFF), japonés (hiragana U+3040–U+309F, katakana U+30A0–U+30FF). La complejidad aparece al distinguir chino simplificado de tradicional o japonés de chino.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cuál es el método más preciso de detección de idioma?</div>
+              <div className={styles.faqRespuesta}>Los modelos basados en Transformers (como xlm-roberta o fastText de Meta) logran &gt;99% de precisión en 176+ idiomas. Para uso ligero en cliente/servidor sin GPU, los algoritmos de trigramas (CLD3 de Google, langdetect) logran 95-98% con mínimo coste computacional.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Puede detectarse el idioma de programación (código fuente)?</div>
+              <div className={styles.faqRespuesta}>No es lo mismo que detectar lengua natural, pero sí existe. Herramientas como Linguist (GitHub), highlight.js o Pygments identifican el lenguaje de programación por sintaxis y palabras reservadas. Los algoritmos de lengua natural pueden confundir código con idiomas inventados.</div>
+            </div>
+          </div>
+        </details>
+
+        {/* 4. GUÍA PASO A PASO */}
+        <ol className={styles.pasosList}>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>1</span>
+            <div><strong>Prepara el texto</strong> — Elimina elementos que puedan confundir el detector: URLs, emojis, menciones (@usuario), hashtags y código HTML. Cuanto más limpio sea el texto, mayor precisión.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>2</span>
+            <div><strong>Pega el texto en el detector</strong> — Usa al menos 3-4 oraciones completas para obtener un resultado fiable. Textos de una sola palabra o acrónimos tienen alta tasa de error.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>3</span>
+            <div><strong>Revisa el idioma detectado y la confianza</strong> — Un nivel de confianza por debajo del 70% indica que el texto es ambiguo, muy corto o mezcla idiomas. Considera revisar manualmente.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>4</span>
+            <div><strong>Verifica los idiomas alternativos</strong> — Los buenos detectores muestran los 3-5 idiomas más probables con su probabilidad. Si el idioma correcto no está primero pero sí en el top-3, el texto puede tener características ambiguas.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>5</span>
+            <div><strong>Aplica el resultado</strong> — Usa el código ISO 639-1 devuelto (es, en, fr, de...) para configurar correctores ortográficos, aplicar el traductor adecuado o etiquetar el documento en tu sistema.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>6</span>
+            <div><strong>Documenta los casos de baja confianza</strong> — Si usas la detección en un proceso automatizado, registra los casos con confianza &lt;80% para revisión humana o para mejorar el preprocesado del texto.</div>
+          </li>
+        </ol>
+
+        {/* 5. TIPS GRID */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>📏</span>
+            <strong>Longitud mínima</strong>
+            <p>Para resultados fiables usa siempre textos de más de 50 palabras. Con menos de 20 palabras el margen de error se multiplica.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🧹</span>
+            <strong>Limpia antes de detectar</strong>
+            <p>Elimina URLs, código, emojis y caracteres especiales. El texto limpio mejora la precisión hasta un 15% en textos cortos.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔢</span>
+            <strong>Los números no ayudan</strong>
+            <p>Los dígitos y cifras no aportan señal de idioma. Textos muy numéricos (tablas, datos) son difíciles de detectar correctamente.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🌐</span>
+            <strong>Nombres propios</strong>
+            <p>Los nombres de personas y lugares pueden &quot;contaminar&quot; la detección. Un texto en alemán con muchos nombres en español puede confundir el algoritmo.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔤</span>
+            <strong>Mayúsculas y minúsculas</strong>
+            <p>Los algoritmos modernos son case-insensitive, pero el uso de ALL CAPS reduce la información morfológica disponible para la detección.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🎯</span>
+            <strong>Umbral de confianza</strong>
+            <p>En automatizaciones, establece un umbral mínimo de confianza del 85% antes de actuar. Por debajo, deriva a revisión manual.</p>
+          </div>
+        </div>
+
+        {/* 6. WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcono}>⚠️</span>
+            <strong>Limitaciones importantes de la detección automática</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Textos muy cortos (&lt;20 palabras)</strong> — La precisión cae drásticamente. Una frase corta en español puede detectarse como italiano o portugués.</li>
+            <li><strong>Nombres propios y código mezclado</strong> — Los nombres en otro idioma, URLs o fragmentos de código pueden sesgar el resultado hacia el idioma equivocado.</li>
+            <li><strong>Idiomas minoritarios o dialectos</strong> — El vasco, el gallego o el asturiano pueden confundirse con español. Los modelos con menos datos de entrenamiento son menos precisos.</li>
+            <li><strong>Transliteraciones</strong> — El árabe o el chino escrito en caracteres latinos (romanización) no se detecta correctamente como árabe o chino.</li>
+            <li><strong>Confianza ≠ Certeza</strong> — Un 99% de confianza no significa que sea correcto. Es una probabilidad estimada, no una garantía.</li>
+            <li><strong>Uso en decisiones automáticas críticas</strong> — No uses la detección automática sin revisión humana en contextos donde un error tenga consecuencias importantes (documentos legales, comunicaciones médicas).</li>
+          </ul>
+        </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('detector-idioma')} />
 

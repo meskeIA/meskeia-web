@@ -696,6 +696,135 @@
   line-height: 1.7;
 }
 
+/* ===== EDUCATIONAL SECTION ===== */
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparativaTable th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+}
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+.comparativaTable tr:nth-child(even) td {
+  background: #f9fafb;
+}
+[data-theme='dark'] .comparativaTable td { border-color: #374151; }
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td { background: #1f2937; }
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+[data-theme='dark'] .escenarioCard { border-color: #374151; }
+.escenarioHeader { display: flex; align-items: center; gap: 0.5rem; }
+.escenarioIcon { font-size: 1.5rem; }
+.escenarioTip {
+  font-size: 0.82rem;
+  color: var(--primary);
+  background: rgba(46,134,171,0.07);
+  border-left: 3px solid var(--primary);
+  padding: 0.4rem 0.75rem;
+  border-radius: 0 6px 6px 0;
+  margin-top: auto;
+}
+
+.pasosList {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.paso {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+[data-theme='dark'] .paso { border-color: #374151; }
+.pasoNum {
+  background: var(--primary);
+  color: #fff;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+[data-theme='dark'] .tipCard { border-color: #374151; }
+.tipIcono { font-size: 1.5rem; }
+
+.warningBox {
+  background: #fff8e1;
+  border: 1px solid #f59e0b;
+  border-left: 4px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+}
+[data-theme='dark'] .warningBox { background: #292218; border-color: #92400e; }
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+.warningIcono { font-size: 1.3rem; }
+.warningList {
+  list-style: disc;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
 /* Empty State */
 .emptyState {
   text-align: center;
@@ -725,6 +854,15 @@
   .simuladorGrid {
     grid-template-columns: 1fr;
   }
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid { grid-template-columns: 1fr; }
+  .tipsGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .tipsGrid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {

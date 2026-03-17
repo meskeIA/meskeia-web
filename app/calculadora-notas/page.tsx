@@ -848,283 +848,184 @@ export default function CalculadoraNotasPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="¿Quieres saber más sobre el sistema de calificaciones?"
-        subtitle="Aprende sobre ECTS, EvAU y equivalencias internacionales"
+        title="Guía para Calcular tu Media de Notas"
+        subtitle="Entiende los sistemas de calificación y optimiza tu rendimiento académico"
+        icon="🎓"
       >
+        {/* 1. TABLA COMPARATIVA — sistemas de calificación */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Sistema</th>
+                <th>Escala</th>
+                <th>Aprobado</th>
+                <th>Matrícula / Máximo</th>
+                <th>Contexto de uso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>España (ESO/Bach)</td><td>0 – 10</td><td>5,0</td><td>9,0 – 10</td><td>Educación obligatoria y bachillerato</td></tr>
+              <tr><td>Universidad española</td><td>0 – 10</td><td>5,0</td><td>MH (9+, limitada al 5% del grupo)</td><td>Grados y másteres oficiales</td></tr>
+              <tr><td>Sistema anglosajón (GPA)</td><td>0,0 – 4,0</td><td>2,0 (C)</td><td>4,0 (A+)</td><td>EEUU, Reino Unido, Latinoamérica</td></tr>
+              <tr><td>Sistema francés</td><td>0 – 20</td><td>10</td><td>18 – 20</td><td>Francia, Marruecos, países francófonos</td></tr>
+              <tr><td>Sistema alemán</td><td>1 – 6 (inverso)</td><td>4</td><td>1 (Sehr gut)</td><td>Alemania, Austria, Suiza</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-        {/* ── TABLA COMPARATIVA ── */}
-        <section className={styles.guideSection}>
-          <h2>Sistemas de Calificación en España: Comparativa</h2>
-          <p className={styles.introParagraph}>
-            Cada etapa educativa en España tiene sus propias reglas. Esta tabla resume las diferencias clave
-            para que sepas qué esperar y cómo se calcula tu nota en cada nivel.
-          </p>
-          <div className={styles.tableWrapper}>
-            <table className={styles.tablaComparativa}>
-              <thead>
-                <tr>
-                  <th>Criterio</th>
-                  <th>ESO / Bachillerato</th>
-                  <th>FP Grado Medio/Superior</th>
-                  <th>Grado Universitario</th>
-                  <th>Máster / Posgrado</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Escala de notas</td>
-                  <td>0 – 10</td>
-                  <td>0 – 10</td>
-                  <td>0 – 10 (+ ECTS)</td>
-                  <td>0 – 10 (+ ECTS)</td>
-                </tr>
-                <tr>
-                  <td>Nota mínima para aprobar</td>
-                  <td>5 / 10</td>
-                  <td>5 / 10</td>
-                  <td>5 / 10</td>
-                  <td>5 / 10</td>
-                </tr>
-                <tr>
-                  <td>Sistema de créditos</td>
-                  <td>Por asignatura (igual peso)</td>
-                  <td>Horas por módulo</td>
-                  <td>ECTS (60 por año)</td>
-                  <td>ECTS (60–120 total)</td>
-                </tr>
-                <tr>
-                  <td>Matrícula de Honor</td>
-                  <td>Sí (nota 10)</td>
-                  <td>Sí (nota 10)</td>
-                  <td>Sí (nota 10, máx 5% del grupo)</td>
-                  <td>Sí (según centro)</td>
-                </tr>
-                <tr>
-                  <td>Acceso a siguiente etapa</td>
-                  <td>Bachiller → EvAU</td>
-                  <td>FP Superior → acceso directo a Grado</td>
-                  <td>Acceso a Máster oficial</td>
-                  <td>Acceso a Doctorado</td>
-                </tr>
-                <tr>
-                  <td>Ideal para…</td>
-                  <td>Educación obligatoria y preuniversitaria</td>
-                  <td>Formación profesional específica</td>
-                  <td>Formación superior (3–4 años)</td>
-                  <td>Especialización y posgrado</td>
-                </tr>
-              </tbody>
-            </table>
+        {/* 2. CASOS DE USO */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>📚</span>
+              <strong>Estudiante de Bachillerato</strong>
+            </div>
+            <p>Calcula tu nota media ponderada de todos los trimestres para saber si alcanzas el aprobado o si necesitas mejorar en asignaturas específicas antes de los exámenes finales.</p>
+            <div className={styles.escenarioTip}>Tip: Las asignaturas con más créditos o horas semanales suelen tener mayor peso en la nota final media.</div>
           </div>
-        </section>
-
-        {/* ── CASOS DE USO ── */}
-        <section className={styles.guideSection}>
-          <h2>¿Cuál es tu situación? Casos de Uso</h2>
-          <div className={styles.casosGrid}>
-            <div className={styles.casoCard}>
-              <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>🏫</span>
-                <span className={styles.casoNivel}>ESO / Bachillerato</span>
-              </div>
-              <p>
-                En ESO y Bachillerato todas las asignaturas tienen el <strong>mismo peso</strong> en la nota media.
-                Introduce cada nota con créditos iguales (por ejemplo, 1) para obtener la media aritmética estándar.
-              </p>
-              <span className={styles.casoTip}>→ Pestaña &quot;Media Ponderada&quot;, todos los créditos a 1</span>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎓</span>
+              <strong>Universitario</strong>
             </div>
-
-            <div className={styles.casoCard}>
-              <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>📝</span>
-                <span className={styles.casoNivel}>Aspirante a EvAU</span>
-              </div>
-              <p>
-                Calcula tu <strong>nota de acceso</strong> (60% Bachillerato + 40% fase general) y tu{' '}
-                <strong>nota de admisión</strong> añadiendo la fase específica para la carrera que quieres.
-                La nota máxima posible es 14 puntos.
-              </p>
-              <span className={styles.casoTip}>→ Pestaña &quot;EvAU / Selectividad&quot;</span>
-            </div>
-
-            <div className={styles.casoCard}>
-              <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>🎓</span>
-                <span className={styles.casoNivel}>Universitario con ECTS</span>
-              </div>
-              <p>
-                Tu expediente académico usa <strong>créditos ECTS</strong>: una asignatura de 12 créditos
-                pesa el doble que una de 6 en tu media. Introduce cada asignatura con sus créditos reales
-                para obtener la media ponderada correcta de tu expediente.
-              </p>
-              <span className={styles.casoTip}>→ Pestaña &quot;Media Ponderada&quot;, créditos = ECTS reales</span>
-            </div>
-
-            <div className={styles.casoCard}>
-              <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>✈️</span>
-                <span className={styles.casoNivel}>Erasmus / Internacional</span>
-              </div>
-              <p>
-                Convierte tu nota española a <strong>GPA</strong> (sistema estadounidense), calificación por
-                letras (A, B, C…) o escala ECTS europea para solicitudes de becas o universidades extranjeras.
-              </p>
-              <span className={styles.casoTip}>→ Pestaña &quot;Conversor de Escalas&quot;</span>
-            </div>
+            <p>Calcula tu expediente académico (media ponderada por créditos ECTS) para valorar si optas a una beca, un máster competitivo o unas prácticas con requisito de nota mínima.</p>
+            <div className={styles.escenarioTip}>Tip: En la universidad, la media se pondera por ECTS. Una asignatura de 9 créditos pesa el triple que una de 3.</div>
           </div>
-        </section>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🧮</span>
+              <strong>Preparando oposiciones</strong>
+            </div>
+            <p>Muchas oposiciones tienen baremos que incluyen el expediente académico. Conoce tu nota exacta para saber cuántos puntos aporta tu expediente al total de la oposición.</p>
+            <div className={styles.escenarioTip}>Tip: En oposiciones docentes, el expediente puede valer hasta 8 puntos sobre 10 en el baremo de méritos.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>📋</span>
+              <strong>Padres / Tutores</strong>
+            </div>
+            <p>Supervisa el rendimiento académico de tus hijos calculando la media trimestral y anual por asignatura para identificar materias que necesitan refuerzo antes de las evaluaciones.</p>
+            <div className={styles.escenarioTip}>Tip: Compara la evolución trimestre a trimestre, no solo la nota final, para detectar tendencias de mejora o declive.</div>
+          </div>
+        </div>
 
-        {/* ── FAQ ── */}
-        <section className={styles.guideSection}>
-          <h2>Preguntas Frecuentes</h2>
-          <div className={styles.faqList}>
+        {/* 3. FAQ */}
+        <details className={styles.faqList}>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Calificaciones y Medias</summary>
+          <div>
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Cómo se calcula la nota media ponderada?</p>
-              <p className={styles.faqRespuesta}>
-                Multiplica la nota de cada asignatura por sus créditos, suma todos esos productos y divide
-                entre el total de créditos. Fórmula: <strong>(Σ nota × créditos) ÷ Σ créditos</strong>.
-                Una asignatura de 12 ECTS con un 9 contribuye más a la media que una de 6 ECTS con el mismo 9.
-              </p>
+              <div className={styles.faqPregunta}>¿Cómo se calcula la media ponderada?</div>
+              <div className={styles.faqRespuesta}>Se multiplica cada nota por su peso (créditos, horas o porcentaje), se suman todos los productos y se divide entre la suma total de los pesos. Por ejemplo: (7×6 + 5×3) / (6+3) = (42+15)/9 = 6,33. Es diferente a la media aritmética simple.</div>
             </div>
-
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Qué diferencia hay entre media aritmética y media ponderada?</p>
-              <p className={styles.faqRespuesta}>
-                La <strong>media aritmética</strong> suma todas las notas y divide entre el número de
-                asignaturas (todas pesan igual). La <strong>media ponderada</strong> da más importancia a
-                las asignaturas con más créditos. En la universidad, el expediente académico siempre usa
-                la media ponderada por ECTS.
-              </p>
+              <div className={styles.faqPregunta}>¿Qué nota necesito en el examen final para aprobar la asignatura?</div>
+              <div className={styles.faqRespuesta}>Depende del sistema de evaluación del profesor. Si el examen final vale un 60% y tienes un 4 en la evaluación continua (40%), necesitas: (nota_final × 0,6 + 4 × 0,4) ≥ 5 → nota_final ≥ (5 - 1,6) / 0,6 = 5,67. La calculadora puede resolver este cálculo automáticamente.</div>
             </div>
-
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Qué es la Matrícula de Honor y cómo se consigue?</p>
-              <p className={styles.faqRespuesta}>
-                Es la calificación máxima del sistema universitario español (nota 10). Solo puede otorgarse
-                a un máximo del <strong>5% de los alumnos matriculados</strong> en cada asignatura. Como
-                recompensa, da derecho a matrícula gratuita en una asignatura del curso siguiente de igual
-                o menor número de créditos.
-              </p>
+              <div className={styles.faqPregunta}>¿Qué es la Matrícula de Honor y cuándo se concede?</div>
+              <div className={styles.faqRespuesta}>Es la máxima calificación universitaria española, reservada a notas de 9,0 o superior. Tiene un límite cuantitativo: no puede concederse a más del 5% de los alumnos matriculados en la asignatura. Si el 5% da menos de 1 alumno, puede concederse a 1 como máximo.</div>
             </div>
-
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Cómo funciona el cálculo de la nota EvAU paso a paso?</p>
-              <p className={styles.faqRespuesta}>
-                <strong>1. Nota de acceso</strong> = 60% nota de Bachillerato + 40% media de la fase general
-                (4 exámenes obligatorios). Máximo: 10 puntos.{' '}
-                <strong>2. Nota de admisión</strong> = Nota de acceso + hasta 4 puntos de la fase específica
-                (las 2 mejores notas voluntarias ≥ 5, multiplicadas por 0,1 o 0,2 según la ponderación
-                de cada grado). Máximo total: 14 puntos.
-              </p>
+              <div className={styles.faqPregunta}>¿Cómo se convierte una nota española al sistema GPA americano?</div>
+              <div className={styles.faqRespuesta}>La conversión más usada: 9-10 → 4,0 (A), 7-8,9 → 3,0-3,9 (B), 5-6,9 → 2,0-2,9 (C), 3-4,9 → 1,0-1,9 (D), 0-2,9 → 0,0 (F). Sin embargo, no existe una fórmula oficial; cada institución americana puede aplicar su propia escala de conversión.</div>
             </div>
-
             <div className={styles.faqItem}>
-              <p className={styles.faqPregunta}>¿Qué nota de expediente necesito para acceder a un Máster?</p>
-              <p className={styles.faqRespuesta}>
-                Los Másteres oficiales exigen tener un título de Grado o equivalente. La nota de corte varía
-                según máster y universidad: los más demandados pueden requerir una media de expediente de{' '}
-                <strong>7,0 o superior</strong>. Además del expediente, muchos valoran carta de motivación,
-                experiencia profesional o entrevista personal.
-              </p>
+              <div className={styles.faqPregunta}>¿Las asignaturas suspensas cuentan en la media del expediente universitario?</div>
+              <div className={styles.faqRespuesta}>Según el RD 1125/2003 (Espacio Europeo de Educación Superior), solo se incluyen las asignaturas superadas en el cálculo del expediente oficial. Sin embargo, algunas universidades calculan una &quot;media bruta&quot; que sí incluye los suspensos. Consulta el reglamento de tu universidad.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué nota mínima exigen los másteres más competitivos en España?</div>
+              <div className={styles.faqRespuesta}>Los másteres de alta demanda (MBA de escuelas de negocios, másteres en IA, Derecho en universidades top) suelen pedir entre 7,0 y 8,0 de expediente. Los másteres habilitantes (Medicina, Arquitectura) pueden bajar a 6,5. Siempre consulta los requisitos específicos de cada programa.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cómo funciona la nota de acceso a la universidad (EVAU/Selectividad)?</div>
+              <div className={styles.faqRespuesta}>La nota de acceso = 0,6 × nota media de Bachillerato + 0,4 × nota de la EVAU. La nota de admisión puede subir hasta 14 puntos incluyendo las dos materias de fase específica (máximo +2 por materia con coeficiente ponderador). No todas las carreras usan las mismas materias de ponderación.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cuánto afecta una asignatura suspensa a la nota media final?</div>
+              <div className={styles.faqRespuesta}>En bachillerato, una asignatura suspensa (por ejemplo un 4) en una materia de 4 horas semanales, frente a una media de 7 en el resto, puede bajar la media total entre 0,3 y 0,6 puntos dependiendo del número de asignaturas. La ponderación y el número total de materias determinan el impacto real.</div>
             </div>
           </div>
-        </section>
+        </details>
 
-        {/* ── CONTENIDO PREVIO: ECTS, EvAU, Equivalencias ── */}
-        <section className={styles.guideSection}>
-          <h2>Sistema de Créditos ECTS</h2>
-          <p className={styles.introParagraph}>
-            El Sistema Europeo de Transferencia y Acumulación de Créditos (ECTS) es el estándar
-            adoptado por todas las universidades del Espacio Europeo de Educación Superior para
-            homogeneizar los estudios universitarios.
-          </p>
+        {/* 4. GUÍA PASO A PASO */}
+        <ol className={styles.pasosList}>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>1</span>
+            <div><strong>Reúne todas tus notas</strong> — Anota la calificación de cada asignatura o evaluación y su peso correspondiente (créditos ECTS, horas semanales o porcentaje asignado por el profesor).</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>2</span>
+            <div><strong>Introduce cada nota y su peso</strong> — Usa el formato correcto: nota en escala 0-10. Si tienes notas en otros sistemas (GPA, escala francesa), conviértelas antes de introducirlas.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>3</span>
+            <div><strong>Verifica los pesos totales</strong> — La suma de todos los pesos debe tener sentido (ej: el total de créditos ECTS de tu curso). Un error en los pesos distorsiona completamente la media.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>4</span>
+            <div><strong>Calcula la media ponderada</strong> — La calculadora hace el cálculo automáticamente. Comprueba que el resultado es coherente: debe estar entre la nota más baja y la más alta que introdujiste.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>5</span>
+            <div><strong>Identifica las asignaturas más influyentes</strong> — Las materias con mayor peso son las que más afectan a tu media. Subir un punto en una asignatura de 9 ECTS equivale a subir 3 puntos en una de 3 ECTS.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>6</span>
+            <div><strong>Simula escenarios futuros</strong> — Introduce notas hipotéticas para saber qué necesitas en los exámenes pendientes para alcanzar tu objetivo de nota final.</div>
+          </li>
+        </ol>
 
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>¿Qué es un crédito ECTS?</h4>
-              <p>
-                Un crédito ECTS equivale a 25-30 horas de trabajo del estudiante, incluyendo
-                clases presenciales, estudio personal, trabajos y exámenes. Un curso académico
-                completo son 60 ECTS.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Media Ponderada</h4>
-              <p>
-                La media ponderada tiene en cuenta los créditos de cada asignatura. Una nota en
-                una asignatura de 12 ECTS &quot;pesa&quot; el doble que una de 6 ECTS en tu expediente.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Matrícula de Honor</h4>
-              <p>
-                Con un 10 puedes optar a Matrícula de Honor (MH). Se concede a un máximo del 5%
-                de los alumnos y supone matrícula gratuita en una asignatura del siguiente curso.
-              </p>
-            </div>
+        {/* 5. TIPS GRID */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>⚖️</span>
+            <strong>Peso ≠ Dificultad</strong>
+            <p>Una asignatura difícil pero con pocos créditos impacta menos en tu media que una fácil con muchos. Enfoca el esfuerzo donde el retorno es mayor.</p>
           </div>
-        </section>
-
-        <section className={styles.guideSection}>
-          <h2>La Prueba EvAU (Selectividad)</h2>
-          <p className={styles.introParagraph}>
-            La Evaluación para el Acceso a la Universidad (EvAU) es la prueba que deben realizar
-            los estudiantes de Bachillerato para acceder a estudios universitarios en España.
-          </p>
-
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>Fase General (Obligatoria)</h4>
-              <p>
-                4 exámenes obligatorios: Lengua, Historia, Idioma extranjero y una materia troncal
-                de modalidad. La media de esta fase supone el 40% de la nota de acceso.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Fase Específica (Voluntaria)</h4>
-              <p>
-                Hasta 4 exámenes adicionales para subir nota. Las 2 mejores notas (≥5) se multiplican
-                por 0.1 o 0.2 según la ponderación de cada grado universitario.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Nota de Admisión</h4>
-              <p>
-                La nota máxima es 14 puntos: 10 de la nota de acceso + hasta 4 puntos de la fase
-                específica. Cada grado tiene su propia nota de corte.
-              </p>
-            </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>📈</span>
+            <strong>Mejora incremental</strong>
+            <p>Subir de 6 a 7 en una asignatura de 6 ECTS mejora tu media en +0,25 puntos (en un año de 24 ECTS). Cada décima cuenta en expedientes competitivos.</p>
           </div>
-        </section>
-
-        <section className={styles.guideSection}>
-          <h2>Equivalencias Internacionales</h2>
-          <div className={styles.contentGrid}>
-            <div className={styles.contentCard}>
-              <h4>Sistema GPA (Estados Unidos)</h4>
-              <p>
-                El Grade Point Average va de 0 a 4. Un GPA de 3.0 o superior se considera bueno
-                para acceder a universidades estadounidenses. La conversión no es exacta y puede
-                variar entre instituciones.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Sistema de Letras</h4>
-              <p>
-                Las calificaciones por letras (A, B, C, D, F) son comunes en países anglosajones.
-                Cada letra puede tener modificadores (+ o -) para mayor precisión.
-              </p>
-            </div>
-            <div className={styles.contentCard}>
-              <h4>Escala ECTS Europea</h4>
-              <p>
-                La escala ECTS (A-F) facilita la movilidad internacional de estudiantes. Se basa
-                en la distribución estadística de notas, no en rangos fijos, aunque existe una
-                correspondencia aproximada.
-              </p>
-            </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🎯</span>
+            <strong>Nota objetivo</strong>
+            <p>Define tu nota objetivo antes de empezar el curso (ej: 7,0 para beca, 8,5 para máster). Calcula qué nota necesitas en cada asignatura para alcanzarla.</p>
           </div>
-        </section>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>📅</span>
+            <strong>Seguimiento trimestral</strong>
+            <p>No esperes al final del año para calcular tu media. Calcula la media parcial tras cada evaluación para detectar y corregir desviaciones a tiempo.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔄</span>
+            <strong>Recuperaciones</strong>
+            <p>En muchos centros, una recuperación aprobada con un 5 cuenta como 5 aunque el original fuera un 3. Considera si compensa el esfuerzo en función del peso de la asignatura.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>📋</span>
+            <strong>Guarda tu expediente</strong>
+            <p>Anota todas las notas en una hoja de cálculo personal. Muchas universidades tardan meses en actualizar el expediente oficial y puedes necesitar la media antes.</p>
+          </div>
+        </div>
+
+        {/* 6. WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcono}>⚠️</span>
+            <strong>Errores frecuentes al calcular medias académicas</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Usar media aritmética en lugar de ponderada</strong> — Si las asignaturas tienen distinto número de créditos, la media simple es incorrecta. Siempre usa la media ponderada por ECTS o por horas.</li>
+            <li><strong>No verificar el sistema de calificación</strong> — Asegúrate de usar la escala correcta. En el sistema alemán el 1 es sobresaliente y el 4 es el aprobado; introducir una nota alemana en una calculadora de escala española da resultados erróneos.</li>
+            <li><strong>Incluir asignaturas no superadas en la media universitaria</strong> — El expediente oficial español solo incluye asignaturas aprobadas (salvo que la normativa de tu universidad indique lo contrario).</li>
+            <li><strong>Confundir la nota de acceso a la universidad con el expediente de bachillerato</strong> — Son cálculos diferentes. La nota de acceso incluye la EVAU; el expediente de bachillerato solo considera las calificaciones del centro.</li>
+            <li><strong>No redondear correctamente</strong> — El expediente universitario oficial se expresa con dos decimales. El redondeo se hace en el resultado final, no en cada nota intermedia.</li>
+            <li><strong>Asumir que la media es igual en todos los centros</strong> — El criterio de ponderación puede variar entre universidades. Consulta siempre el reglamento de evaluación de tu facultad.</li>
+          </ul>
+        </div>
       </EducationalSection>
 
       <RelatedApps

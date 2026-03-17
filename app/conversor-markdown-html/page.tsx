@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import styles from './ConversorMarkdown.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Ejemplos predefinidos
@@ -566,6 +566,188 @@ console.log('Hola mundo');
           </div>
         </div>
       </div>
+
+      <EducationalSection
+        title="Guía de Markdown y HTML"
+        subtitle="Todo lo que necesitas saber para escribir y convertir Markdown profesionalmente"
+        icon="📝"
+      >
+        {/* 1. TABLA COMPARATIVA — sintaxis Markdown vs HTML equivalente */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Elemento</th>
+                <th>Sintaxis Markdown</th>
+                <th>HTML equivalente</th>
+                <th>Renderizado</th>
+                <th>Compatibilidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Encabezado H1</td><td><code># Título</code></td><td><code>&lt;h1&gt;Título&lt;/h1&gt;</code></td><td>Título grande</td><td>✅ Universal</td></tr>
+              <tr><td>Negrita</td><td><code>**texto**</code></td><td><code>&lt;strong&gt;texto&lt;/strong&gt;</code></td><td><strong>texto</strong></td><td>✅ Universal</td></tr>
+              <tr><td>Enlace</td><td><code>[texto](url)</code></td><td><code>&lt;a href=&quot;url&quot;&gt;texto&lt;/a&gt;</code></td><td>Enlace clicable</td><td>✅ Universal</td></tr>
+              <tr><td>Código inline</td><td><code>`código`</code></td><td><code>&lt;code&gt;código&lt;/code&gt;</code></td><td><code>código</code></td><td>✅ Universal</td></tr>
+              <tr><td>Lista ordenada</td><td><code>1. item</code></td><td><code>&lt;ol&gt;&lt;li&gt;item&lt;/li&gt;&lt;/ol&gt;</code></td><td>1. item</td><td>✅ Universal</td></tr>
+              <tr><td>Tabla</td><td><code>| col | col |</code></td><td><code>&lt;table&gt;...&lt;/table&gt;</code></td><td>Tabla HTML</td><td>🟡 GFM (GitHub Flavored)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* 2. CASOS DE USO */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>👨‍💻</span>
+              <strong>Desarrollador</strong>
+            </div>
+            <p>Convierte README.md de proyectos GitHub a HTML para mostrarlos en webs corporativas o wikis internas. También útil para previsualizar documentación técnica antes de publicarla.</p>
+            <div className={styles.escenarioTip}>Tip: Activa la extensión GFM (GitHub Flavored Markdown) para soportar tablas, tachado y listas de tareas.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>✍️</span>
+              <strong>Escritor / Blogger</strong>
+            </div>
+            <p>Redacta en Markdown (más rápido y limpio que HTML) y convierte al formato requerido por WordPress, Ghost o cualquier CMS que acepte HTML como input.</p>
+            <div className={styles.escenarioTip}>Tip: Markdown es especialmente productivo en combinación con editores como Typora o Obsidian para escritura de larga duración.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>📧</span>
+              <strong>Marketing / Comunicación</strong>
+            </div>
+            <p>Genera el HTML de newsletters y correos HTML desde Markdown. Muchas plataformas de email (Mailchimp, SendGrid) aceptan HTML directo que puedes generar aquí.</p>
+            <div className={styles.escenarioTip}>Tip: Los clientes de correo tienen soporte HTML limitado; evita CSS externo y usa estilos inline en el HTML final.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>📊</span>
+              <strong>Analista / Investigador</strong>
+            </div>
+            <p>Transforma informes y notas en Markdown a HTML listo para incrustar en dashboards internos, Notion, Confluence o cualquier herramienta de gestión del conocimiento.</p>
+            <div className={styles.escenarioTip}>Tip: Las tablas Markdown son mucho más legibles para editar que las tablas HTML; usa Markdown como fuente y HTML como output final.</div>
+          </div>
+        </div>
+
+        {/* 3. FAQ */}
+        <details className={styles.faqList}>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Markdown y HTML</summary>
+          <div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Quién inventó Markdown y por qué?</div>
+              <div className={styles.faqRespuesta}>John Gruber creó Markdown en 2004 con el objetivo de permitir escribir texto con formato usando una sintaxis fácil de leer sin procesar. La idea era que el texto plano Markdown fuera legible por humanos tal como está, a diferencia del HTML. Aaron Swartz colaboró en el diseño inicial.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cuál es la diferencia entre CommonMark y GFM?</div>
+              <div className={styles.faqRespuesta}>CommonMark es la especificación estándar y estricta de Markdown (commonmark.org). GitHub Flavored Markdown (GFM) es un superconjunto que añade tablas, listas de tareas, tachado con ~~texto~~ y bloques de código con resaltado de sintaxis. La mayoría de herramientas modernas implementan GFM o una variante próxima.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Se puede usar HTML dentro de Markdown?</div>
+              <div className={styles.faqRespuesta}>Sí, en la mayoría de implementaciones. El HTML inline dentro de Markdown se pasa tal cual al output. Sin embargo, algunos procesadores (por seguridad) sanitizan o eliminan ciertos tags. Es útil para casos que Markdown no cubre, como <code>&lt;details&gt;</code>, <code>&lt;kbd&gt;</code> o atributos personalizados.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Por qué mi lista de Markdown no se convierte bien a HTML?</div>
+              <div className={styles.faqRespuesta}>El problema más común es la indentación. Markdown requiere exactamente 4 espacios (o 1 tabulador) para sublistas. Además, debe haber una línea en blanco antes de una lista si va precedida de un párrafo. Los mezclados de espacios y tabuladores también causan problemas.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿El HTML generado es seguro para incrustar en una web?</div>
+              <div className={styles.faqRespuesta}>Depende del origen del Markdown. Si el Markdown viene de usuarios no confiables, el HTML puede contener scripts maliciosos. Siempre sanitiza el HTML con una librería como DOMPurify antes de insertarlo con innerHTML. Si el Markdown es tuyo propio, el riesgo es mínimo.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Puedo añadir clases CSS o IDs a elementos Markdown?</div>
+              <div className={styles.faqRespuesta}>El Markdown estándar no tiene sintaxis para eso. Algunas extensiones como &quot;Attributes&quot; (pandoc, markdown-it-attrs) permiten escribir <code>{'{.clase #id}'}</code>. Alternativamente, usa HTML inline dentro del Markdown para los elementos que necesiten clases específicas.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cuál es la mejor librería JavaScript para convertir Markdown a HTML?</div>
+              <div className={styles.faqRespuesta}>Las más populares son: <strong>marked</strong> (muy rápida, GFM, 30kb), <strong>markdown-it</strong> (extensible, estricta con CommonMark, excelente ecosistema de plugins) y <strong>remark</strong> (basada en AST, ideal para pipelines de transformación). Para uso simple en el cliente, marked es la más sencilla de usar.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Markdown funciona bien para documentación técnica extensa?</div>
+              <div className={styles.faqRespuesta}>Sí, es el estándar de facto. Herramientas como MkDocs, Docusaurus, GitBook y VitePress usan Markdown como fuente. Para documentación muy compleja con referencias cruzadas, variables o includes, considera MDX (Markdown + JSX) o AsciiDoc que tienen más funcionalidades.</div>
+            </div>
+          </div>
+        </details>
+
+        {/* 4. GUÍA PASO A PASO */}
+        <ol className={styles.pasosList}>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>1</span>
+            <div><strong>Escribe o pega tu Markdown</strong> — Usa la sintaxis estándar: # para encabezados, ** para negrita, * para cursiva, [texto](url) para enlaces y ``` para bloques de código.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>2</span>
+            <div><strong>Activa las extensiones necesarias</strong> — Si necesitas tablas o listas de tareas, asegúrate de que GFM esté activado. Para documentos académicos, activa soporte de LaTeX si está disponible.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>3</span>
+            <div><strong>Previsualiza el resultado</strong> — Comprueba que el HTML renderizado corresponde a lo esperado: jerarquía de encabezados correcta, enlaces funcionales, código con resaltado de sintaxis.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>4</span>
+            <div><strong>Copia el HTML generado</strong> — Obtén el código HTML limpio. Si lo vas a insertar en una web, copia solo el contenido del <code>&lt;body&gt;</code>, no el documento completo.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>5</span>
+            <div><strong>Sanitiza si el origen no es de confianza</strong> — Si el Markdown viene de usuarios externos, pasa el HTML resultante por un sanitizador (DOMPurify) antes de insertarlo en el DOM para evitar XSS.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>6</span>
+            <div><strong>Aplica estilos CSS</strong> — El HTML generado tiene semántica pero no estilos. Aplica una hoja de estilos para tipografía, espaciado y colores. Puedes usar una librería como github-markdown-css para un aspecto estilo GitHub de forma inmediata.</div>
+          </li>
+        </ol>
+
+        {/* 5. TIPS GRID */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>⚡</span>
+            <strong>Atajos de teclado</strong>
+            <p>En editores Markdown: Ctrl+B (negrita), Ctrl+I (cursiva), Ctrl+K (enlace). Aprende los atajos del editor que uses para multiplicar tu velocidad.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>📐</span>
+            <strong>Líneas en blanco</strong>
+            <p>Una línea en blanco separa párrafos. Dos espacios al final de una línea crean un salto de línea sin nuevo párrafo. Esta es la fuente del 80% de los problemas de formato.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔗</span>
+            <strong>Referencias de enlace</strong>
+            <p>Para texto con muchos enlaces, usa la sintaxis de referencia: <code>[texto][1]</code> y al final del documento <code>[1]: https://url</code>. Más limpio y mantenible.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>💻</span>
+            <strong>Bloques de código</strong>
+            <p>Especifica el lenguaje después de las triple comillas: <code>```javascript</code>. Esto activa el resaltado de sintaxis en la mayoría de renderizadores.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔄</span>
+            <strong>Flujo de trabajo</strong>
+            <p>Escribe en Markdown → previsualiza en tiempo real → exporta a HTML cuando necesites. Mantén siempre el Markdown como fuente de verdad, no el HTML.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🛡️</span>
+            <strong>Seguridad primero</strong>
+            <p>Nunca insertes HTML de Markdown no confiable directamente con innerHTML. Usa siempre DOMPurify o una librería equivalente en producción.</p>
+          </div>
+        </div>
+
+        {/* 6. WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcono}>⚠️</span>
+            <strong>Errores frecuentes al trabajar con Markdown y HTML</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Insertar HTML de usuario sin sanitizar</strong> — El HTML generado desde Markdown de terceros puede contener scripts XSS. Usa siempre DOMPurify antes de inyectar en el DOM.</li>
+            <li><strong>Mezclar espacios y tabuladores en indentación</strong> — Markdown es muy sensible al tipo de espacio en blanco usado para indentación. Usa solo espacios o solo tabuladores, nunca ambos.</li>
+            <li><strong>Olvidar la línea en blanco antes de listas</strong> — Si una lista sigue inmediatamente a un párrafo sin línea en blanco, algunos procesadores no la reconocen como lista HTML, sino como texto plano.</li>
+            <li><strong>Asumir compatibilidad universal de GFM</strong> — Las tablas y casillas de verificación son extensiones GFM, no Markdown estándar. No todos los procesadores las soportan sin configuración adicional.</li>
+            <li><strong>Usar Markdown para diseño complejo</strong> — Markdown es para contenido semántico, no para diseño. Para layouts complejos, columnas o componentes interactivos, usa HTML/CSS directamente.</li>
+            <li><strong>Guardar solo el HTML, no el Markdown fuente</strong> — El HTML es difícil de editar. Guarda siempre el Markdown original como fuente y regenera el HTML cuando necesites actualizarlo.</li>
+          </ul>
+        </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('conversor-markdown-html')} />
 

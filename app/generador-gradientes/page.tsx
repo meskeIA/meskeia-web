@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import styles from './GeneradorGradientes.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type GradientType = 'linear' | 'radial' | 'conic';
@@ -375,6 +375,187 @@ export default function GeneradorGradientesPage() {
           </div>
         </div>
       </div>
+
+      <EducationalSection
+        title="Guía de Gradientes CSS"
+        subtitle="Todo lo que necesitas saber para crear gradientes profesionales"
+        icon="🎨"
+      >
+        {/* 1. TABLA COMPARATIVA — tipos de gradiente */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Tipo de Gradiente</th>
+                <th>Sintaxis CSS</th>
+                <th>Dirección</th>
+                <th>Mejor uso</th>
+                <th>Compatibilidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Linear</td><td>linear-gradient()</td><td>Línea recta</td><td>Fondos, botones, separadores</td><td>✅ Todos los navegadores</td></tr>
+              <tr><td>Radial</td><td>radial-gradient()</td><td>Desde un punto central</td><td>Efectos de luz, spotlight</td><td>✅ Todos los navegadores</td></tr>
+              <tr><td>Cónico</td><td>conic-gradient()</td><td>Alrededor de un punto</td><td>Gráficos circulares, ruedas de color</td><td>✅ Chrome 69+, Firefox 83+</td></tr>
+              <tr><td>Repetitivo linear</td><td>repeating-linear-gradient()</td><td>Líneas repetidas</td><td>Patrones, rayas, zebra</td><td>✅ Todos los navegadores</td></tr>
+              <tr><td>Repetitivo radial</td><td>repeating-radial-gradient()</td><td>Anillos concéntricos</td><td>Efectos de onda, diana</td><td>✅ Todos los navegadores</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* 2. CASOS DE USO */}
+        <div className={styles.escenariosGrid}>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🖥️</span>
+              <strong>Diseñador Web</strong>
+            </div>
+            <p>Crea gradientes para fondos de hero sections, botones call-to-action y separadores de secciones que combinen con la paleta de marca.</p>
+            <div className={styles.escenarioTip}>Tip: Para hero sections usa ángulos de 135° con colores de marca al 80% de opacidad.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>📱</span>
+              <strong>Desarrollador Frontend</strong>
+            </div>
+            <p>Genera código CSS listo para copiar y pegar en proyectos React, Vue o Angular. Compatibilidad garantizada con navegadores modernos.</p>
+            <div className={styles.escenarioTip}>Tip: Usa variables CSS (--color-primary) en lugar de colores hardcodeados para gradientes reutilizables.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🎓</span>
+              <strong>Estudiante de Diseño</strong>
+            </div>
+            <p>Experimenta con teoría del color y transiciones para entender cómo los gradientes afectan la percepción visual y la jerarquía de la información.</p>
+            <div className={styles.escenarioTip}>Tip: Los gradientes análogos (colores adyacentes en la rueda) crean transiciones más suaves y naturales.</div>
+          </div>
+          <div className={styles.escenarioCard}>
+            <div className={styles.escenarioHeader}>
+              <span className={styles.escenarioIcon}>🛍️</span>
+              <strong>Emprendedor / Marketing</strong>
+            </div>
+            <p>Diseña gradientes para banners de redes sociales, fondos de presentaciones y materiales de marca con aspecto profesional sin contratar diseñador.</p>
+            <div className={styles.escenarioTip}>Tip: Los gradientes de morado a rosa funcionan excepcionalmente bien en Instagram y redes sociales.</div>
+          </div>
+        </div>
+
+        {/* 3. FAQ */}
+        <details className={styles.faqList}>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Gradientes CSS</summary>
+          <div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cuántos colores se pueden usar en un gradiente?</div>
+              <div className={styles.faqRespuesta}>No hay límite técnico. Se pueden usar tantos color stops como se necesiten. Sin embargo, más de 4-5 colores suele crear gradientes caóticos. Lo más efectivo es usar 2-3 colores bien elegidos con buen contraste entre ellos.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué diferencia hay entre linear-gradient y background-image con gradiente?</div>
+              <div className={styles.faqRespuesta}>Son lo mismo. <code>linear-gradient()</code> es una función de imagen CSS, por lo que se asigna a <code>background-image</code> o <code>background</code>. No se puede usar en <code>background-color</code>.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cómo se añade transparencia a un gradiente?</div>
+              <div className={styles.faqRespuesta}>Usando colores con canal alfa: <code>rgba(255, 0, 0, 0.5)</code> o la notación moderna <code>#FF000080</code> (HEX con alpha). También puedes usar <code>transparent</code> para transición a transparente.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Por qué mi gradiente se ve gris en el medio entre dos colores saturados?</div>
+              <div className={styles.faqRespuesta}>Es el &quot;problema del gris&quot; en interpolación RGB. Los colores complementarios pasan por gris al mezclarse linealmente. La solución es añadir un color intermedio vibrante o usar interpolación en el espacio de color oklch con <code>in oklch</code>.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Los gradientes CSS afectan al rendimiento de la página?</div>
+              <div className={styles.faqRespuesta}>Mínimamente. Son más eficientes que imágenes rasterizadas porque el navegador los renderiza en GPU. Sin embargo, gradientes muy complejos en elementos que cambian frecuentemente (como animaciones) sí pueden impactar el rendimiento.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Se pueden animar gradientes CSS?</div>
+              <div className={styles.faqRespuesta}>Directamente no, porque CSS no interpola gradientes con <code>transition</code>. La técnica más común es animar <code>background-position</code> en un gradiente de fondo más grande (background-size: 200%), o usar @keyframes con custom properties.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué es un color stop y cómo funciona?</div>
+              <div className={styles.faqRespuesta}>Un color stop define dónde empieza o termina un color en el gradiente. Por ejemplo, <code>linear-gradient(red 20%, blue 80%)</code> indica que el rojo ocupa hasta el 20% y el azul comienza en el 80%, con transición entre ambos puntos.</div>
+            </div>
+            <div className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Cómo crear un gradiente con efecto de &quot;glassmorphism&quot;?</div>
+              <div className={styles.faqRespuesta}>El glassmorphism combina <code>background: rgba(255,255,255,0.1)</code> con <code>backdrop-filter: blur(10px)</code> y un borde semitransparente. El gradiente en este contexto se aplica al fondo del contenedor padre, no al elemento glass.</div>
+            </div>
+          </div>
+        </details>
+
+        {/* 4. GUÍA PASO A PASO */}
+        <ol className={styles.pasosList}>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>1</span>
+            <div><strong>Define el propósito del gradiente</strong> — ¿Es un fondo de página, un botón, una barra de progreso? El contexto determina qué tipo (linear, radial, cónico) y qué intensidad de contraste es apropiada.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>2</span>
+            <div><strong>Elige los colores base</strong> — Parte de la paleta de tu marca o usa teoría del color: análogos para suavidad, complementarios para contraste, triádicos para dinamismo.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>3</span>
+            <div><strong>Selecciona el ángulo o dirección</strong> — 0° es vertical hacia arriba, 90° es horizontal hacia la derecha, 135° es diagonal. Los ángulos diagonales (45°, 135°) suelen dar mayor dinamismo.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>4</span>
+            <div><strong>Ajusta los color stops</strong> — Experimenta con la posición de cada color. Un stop al 30% concentra el primer color y da transición más brusca. Al 70% da más espacio al primer color.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>5</span>
+            <div><strong>Verifica la accesibilidad</strong> — Comprueba el contraste de cualquier texto sobre el gradiente. El contraste mínimo WCAG AA es 4.5:1 para texto normal. Usa una herramienta de contraste con el color más claro del gradiente.</div>
+          </li>
+          <li className={styles.paso}>
+            <span className={styles.pasoNum}>6</span>
+            <div><strong>Copia el código CSS generado</strong> — El código incluye los prefijos necesarios. Pégalo en tu hoja de estilos en la propiedad <code>background</code> o <code>background-image</code>.</div>
+          </li>
+        </ol>
+
+        {/* 5. TIPS GRID */}
+        <div className={styles.tipsGrid}>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🎯</span>
+            <strong>Regla 60-30-10</strong>
+            <p>Aplica el color dominante al 60%, el secundario al 30% y el de acento al 10%. Esta proporción crea gradientes equilibrados.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🌡️</span>
+            <strong>Temperatura de color</strong>
+            <p>Los gradientes cálidos (naranja→amarillo) transmiten energía y urgencia. Los fríos (azul→violeta) comunican calma y profesionalidad.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>📐</span>
+            <strong>Ángulos que funcionan</strong>
+            <p>Los ángulos 45°, 135° y 160° son los más usados en diseño profesional. Evita 0° y 90° exactos salvo en diseños muy geométricos.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🔁</span>
+            <strong>Gradientes repetitivos</strong>
+            <p>Con <code>repeating-linear-gradient</code> puedes crear patrones de rayas sin imágenes. Ideal para texturas de fondo sutiles.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>🌓</span>
+            <strong>Dark mode</strong>
+            <p>Los gradientes oscuros deben tener menos saturación que sus equivalentes en modo claro. Un azul vibrante en claro se convierte en un azul apagado en oscuro.</p>
+          </div>
+          <div className={styles.tipCard}>
+            <span className={styles.tipIcono}>💾</span>
+            <strong>Variables CSS</strong>
+            <p>Define tus colores de gradiente como custom properties: <code>--grad-start</code> y <code>--grad-end</code>. Así puedes cambiar el tema sin reescribir todos los gradientes.</p>
+          </div>
+        </div>
+
+        {/* 6. WARNING BOX */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcono}>⚠️</span>
+            <strong>Errores comunes con gradientes CSS</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Texto sobre gradiente sin verificar contraste</strong> — El contraste varía a lo largo del gradiente; compruébalo en el punto más desfavorable.</li>
+            <li><strong>Demasiados colores</strong> — Más de 4 color stops suele producir resultados confusos. Simplifica y usa transiciones suaves.</li>
+            <li><strong>Copiar sin prefijos de navegador</strong> — Para compatibilidad con Safari antiguo, algunos gradientes requieren <code>-webkit-</code>. Verifica siempre en varios navegadores.</li>
+            <li><strong>Gradientes en background-color</strong> — <code>background-color</code> solo acepta colores sólidos. Los gradientes van en <code>background</code> o <code>background-image</code>.</li>
+            <li><strong>Olvidar el fallback</strong> — Añade un <code>background-color</code> sólido antes del gradiente como fallback para navegadores muy antiguos.</li>
+            <li><strong>Gradiente sin relación con la marca</strong> — Un gradiente genérico &quot;bonito&quot; que no respeta la paleta de marca daña la coherencia visual. Usa siempre colores de la identidad corporativa.</li>
+          </ul>
+        </div>
+      </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('generador-gradientes')} />
 
