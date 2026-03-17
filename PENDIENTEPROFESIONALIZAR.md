@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-16 | **Total profesionalizadas**: ~154 | **Pendientes**: ~96
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~159 | **Pendientes**: ~91
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -69,12 +69,12 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 - [ ] `/comparador-formas-juridicas/` — Comparador Formas Jurídicas: autónomo, SL, cooperativa, CB
 - [ ] `/asistente-constitucion-sociedad/` — Asistente Constitución SL/SLU/SA: checklist 20 trámites + costes _(creada 2026-03-14)_
 - [ ] `/asistente-constitucion-asociacion/` — Asistente Constitución Asociación: acta fundacional + estatutos
-- [ ] `/estimador-impuesto-sucesiones/` — Estimador Impuesto Sucesiones: 17 CCAA + regímenes forales _(creada 2026-03-14)_
-- [ ] `/estimador-impuesto-donaciones/` — Estimador Impuesto Donaciones: 17 CCAA + bonificaciones autonómicas _(creada 2026-03-14)_
-- [ ] `/orientacion-tramitacion-herencias/` — Orientación Tramitación Herencias: checklist personalizado + timeline 9 pasos _(creada 2026-03-15)_
+- [x] `/estimador-impuesto-sucesiones/` — Estimador Impuesto Sucesiones: 17 CCAA + regímenes forales ✅ lote B6
+- [x] `/estimador-impuesto-donaciones/` — Estimador Impuesto Donaciones: 17 CCAA + bonificaciones autonómicas ✅ lote B6
+- [x] `/orientacion-tramitacion-herencias/` — Orientación Tramitación Herencias: checklist personalizado + timeline 9 pasos ✅ lote B6
 - [ ] `/plazos-legales/` — Guía Plazos Legales: prescripción, caducidad, garantías, laboral, fiscal
-- [ ] `/estimador-plusvalia-municipal/` — Estimador Plusvalía Municipal (IIVTNU): método objetivo y real, coeficientes 2025 _(creada 2026-03-15)_
-- [ ] `/orientador-intereses-demora/` — Orientador Intereses de Demora: comercial (Ley 3/2004) + legal (CC) por semestres _(creado 2026-03-15)_
+- [x] `/estimador-plusvalia-municipal/` — Estimador Plusvalía Municipal (IIVTNU): método objetivo y real, coeficientes 2025 ✅ lote B6
+- [x] `/orientador-intereses-demora/` — Orientador Intereses de Demora: comercial (Ley 3/2004) + legal (CC) por semestres ✅ lote B6
 
 ### Salud y Bienestar
 
@@ -339,6 +339,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote B6 | 2026-03-17 | `estimador-impuesto-sucesiones`, `estimador-impuesto-donaciones`, `orientacion-tramitacion-herencias`, `estimador-plusvalia-municipal`, `orientador-intereses-demora` | `611bc11` |
 | Lote B5 | 2026-03-17 | `generador-sombras`, `algebra-ecuaciones`, `metronomo`, `mi-ip` | `001ecff` |
 | Lote B4 | 2026-03-17 | `generador-gradientes`, `detector-idioma`, `conversor-markdown-html`, `calculadora-notas` | `ef83181` |
 | Lote B3 | 2026-03-16 | `comparador-textos`, `conversor-imagenes`, `test-habitos-saludables` | `b9ba48b` |
