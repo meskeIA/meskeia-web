@@ -1077,6 +1077,392 @@ export default function CalendarioFiscalPage() {
             </div>
           </div>
         </section>
+
+        {/* ── 1. TABLA COMPARATIVA DE MODELOS ── */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de Modelos Fiscales</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Modelo</th>
+                  <th>¿Quién lo presenta?</th>
+                  <th>Periodicidad</th>
+                  <th>Plazo</th>
+                  <th>Importe aprox.</th>
+                  <th>Si no presentas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>303</strong> — IVA</td>
+                  <td>Autónomos y sociedades con actividad sujeta a IVA</td>
+                  <td>Trimestral</td>
+                  <td>1T-3T: hasta el 20; 4T: hasta el 30 de enero</td>
+                  <td>IVA repercutido − IVA soportado</td>
+                  <td>Sanción formal + recargo del 1 % mensual</td>
+                </tr>
+                <tr>
+                  <td><strong>130</strong> — Pago fracc. IRPF</td>
+                  <td>Autónomos en estimación directa (normal o simplificada)</td>
+                  <td>Trimestral</td>
+                  <td>Hasta el 20 de abril, julio, octubre y enero</td>
+                  <td>20 % del beneficio acumulado − retenciones</td>
+                  <td>Sanción formal 200 € aunque el resultado sea cero</td>
+                </tr>
+                <tr>
+                  <td><strong>111</strong> — Retenciones IRPF</td>
+                  <td>Autónomos/SL con empleados o que pagan a profesionales con retención</td>
+                  <td>Trimestral</td>
+                  <td>Hasta el 20 (4T: hasta el 20 de enero)</td>
+                  <td>Retenciones practicadas en nóminas y facturas</td>
+                  <td>Recargo + sanción por ingreso fuera de plazo</td>
+                </tr>
+                <tr>
+                  <td><strong>115</strong> — Retenciones alquiler</td>
+                  <td>Quien paga alquiler de local afecto a actividad</td>
+                  <td>Trimestral</td>
+                  <td>Hasta el 20 (4T: hasta el 20 de enero)</td>
+                  <td>19 % de la renta del alquiler</td>
+                  <td>Sanción + intereses de demora al arrendador</td>
+                </tr>
+                <tr>
+                  <td><strong>390</strong> — Resumen anual IVA</td>
+                  <td>Todos los que presentan el 303</td>
+                  <td>Anual</td>
+                  <td>Hasta el 30 de enero del año siguiente</td>
+                  <td>Solo informativo (no implica pago adicional)</td>
+                  <td>Sanción formal de 200 € por no presentar</td>
+                </tr>
+                <tr>
+                  <td><strong>347</strong> — Operaciones con terceros</td>
+                  <td>Autónomos y SL con operaciones {">"} 3.005,06 € anuales con un mismo tercero</td>
+                  <td>Anual</td>
+                  <td>Hasta el último día de febrero</td>
+                  <td>Solo informativo</td>
+                  <td>Sanción de 20 € por dato omitido (mínimo 300 €)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── 2. CASOS DE USO / PERFILES ── */}
+        <section className={styles.guideSection}>
+          <h2>Casos de Uso: ¿Qué modelos me corresponden?</h2>
+          <div className={styles.escenariosGrid}>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💼</span>
+                <h4>Autónomo en estimación directa, sin empleados, con alquiler de local</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                <strong>Trimestrales:</strong>
+                <ul>
+                  <li><strong>303</strong> — IVA (hasta el 20 o 30 de enero en 4T)</li>
+                  <li><strong>130</strong> — Pago fraccionado IRPF (hasta el 20)</li>
+                  <li><strong>115</strong> — Retención por alquiler del local (hasta el 20)</li>
+                </ul>
+                <strong>Anuales:</strong>
+                <ul>
+                  <li><strong>390</strong> — Resumen IVA (hasta 30 enero)</li>
+                  <li><strong>180</strong> — Resumen retenciones alquiler (hasta 31 enero)</li>
+                  <li><strong>100</strong> — Renta IRPF (hasta 1 julio)</li>
+                </ul>
+              </div>
+              <p className={styles.escenarioTip}>
+                Si el 347 supera 3.005,06 € con algún cliente o proveedor, también presentas ese modelo en febrero.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👥</span>
+                <h4>Autónomo con 2 empleados</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                <strong>Además de los modelos anteriores, añade:</strong>
+                <ul>
+                  <li><strong>111</strong> — Retenciones nóminas y profesionales (trimestral, hasta el 20)</li>
+                  <li><strong>190</strong> — Resumen anual retenciones (hasta 31 enero)</li>
+                </ul>
+                <strong>Resumen trimestral completo:</strong> 303 + 130 + 111 (+ 115 si hay local en alquiler)
+              </div>
+              <p className={styles.escenarioTip}>
+                El modelo 111 se presenta aunque los importes sean bajos; nunca se puede omitir si has practicado retenciones ese trimestre.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏢</span>
+                <h4>SL unipersonal con administrador autónomo</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                <strong>La sociedad presenta:</strong>
+                <ul>
+                  <li><strong>303</strong> — IVA trimestral</li>
+                  <li><strong>202</strong> — Pago fraccionado IS (abril, octubre, diciembre)</li>
+                  <li><strong>111</strong> — Retenciones sobre la nómina/retribución del administrador</li>
+                  <li><strong>390</strong> — Resumen IVA anual</li>
+                  <li><strong>200</strong> — IS anual (hasta 25 julio)</li>
+                </ul>
+              </div>
+              <p className={styles.escenarioTip}>
+                La SL no presenta el modelo 130 (ese es exclusivo de autónomos personas físicas). El administrador, como persona física, presenta su propia renta (100) si tiene otros ingresos.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🩺</span>
+                <h4>Freelance exento de IVA (psicólogo, médico, profesor)</h4>
+              </div>
+              <div className={styles.escenarioExample}>
+                <strong>Solo presenta:</strong>
+                <ul>
+                  <li><strong>130</strong> — Pago fraccionado IRPF trimestral</li>
+                  <li><strong>100</strong> — Renta anual (hasta 1 julio)</li>
+                </ul>
+                <strong>No presenta:</strong> 303 ni 390 (actividad exenta de IVA por ley)
+              </div>
+              <p className={styles.escenarioTip}>
+                Si además alquilas consulta o tienes empleados, sí deberás presentar 115 y/o 111. La exención de IVA no exime de retenciones.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── 3. FAQ ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre Obligaciones Fiscales</h2>
+          <div className={styles.faqList}>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué pasa si presento el modelo 303 un día tarde?</h4>
+              <p>
+                Si lo presentas <strong>sin requerimiento previo de la AEAT</strong>, se aplica un recargo por presentación extemporánea: 1 % + 1 % adicional por cada mes completo de retraso, hasta un máximo del 15 % a partir del mes 12. A partir de ese punto, se aplica una sanción del 50 % más intereses de demora. Si la AEAT te lo ha requerido antes, la sanción mínima asciende al 50 % de la cuota.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Puedo presentar a cero el modelo 303 si no he facturado nada en el trimestre?</h4>
+              <p>
+                Sí. Si has estado dado de alta como autónomo durante ese trimestre y tu actividad está sujeta a IVA, debes presentar el 303 aunque el resultado sea cero. No presentarlo te expone a una sanción formal de 200 €. Solo puedes evitar la presentación si solicitaste previamente la baja en el Censo de Empresarios (modelo 036) antes de que comenzara el trimestre.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿El modelo 347 es obligatorio si facturo menos de 3.005 € a un cliente?</h4>
+              <p>
+                No. El modelo 347 solo es obligatorio cuando el volumen de operaciones con un mismo cliente o proveedor <strong>supera los 3.005,06 € en el año natural</strong>. Si todas tus operaciones individuales se quedan por debajo de ese umbral, no tienes obligación de presentarlo. Eso sí, debes tener controlado el acumulado de cada tercero durante el año.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Tengo que presentar el modelo 130 si tengo retenciones suficientes del 15 %?</h4>
+              <p>
+                Hay una <strong>exoneración</strong>: puedes no presentar el 130 si en el año anterior más del 70 % de tus ingresos procedió de clientes que te aplicaron retención del 15 % (retención de profesionales). En ese caso, marcas la casilla de exoneración en el modelo 036/037. No obstante, si en algún trimestre la situación cambia y tienes ingresos sin retención, deberás presentarlo. Consulta con tu gestor si puedes aplicar esta exoneración.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué es el régimen de módulos y quién puede acogerse?</h4>
+              <p>
+                El régimen de <strong>estimación objetiva (módulos)</strong> permite calcular el beneficio —y por tanto el IRPF a pagar— en función de parámetros objetivos (metros del local, empleados, potencia instalada, etc.) en lugar del beneficio real. Solo pueden acogerse actividades incluidas en la Orden de Módulos vigente y que no superen ciertos límites de facturación (en general, 250.000 € de ingresos y 250.000 € de compras). Los autónomos en módulos presentan el modelo 131 (no el 130).
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Puedo aplazar el pago del IRPF si no tengo liquidez?</h4>
+              <p>
+                Sí. La AEAT permite solicitar aplazamiento o fraccionamiento de deudas tributarias (incluido el 130) mediante la Sede Electrónica. Para deudas inferiores a 30.000 € no se exige garantía. Si la deuda es superior, puede exigirse aval bancario o garantía hipotecaria. Los aplazamientos devengan intereses de demora (actualmente el 4,0625 % anual). El aplazamiento debe solicitarse dentro del plazo voluntario de presentación.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cómo afecta el SII (Suministro Inmediato de Información) a mis obligaciones?</h4>
+              <p>
+                El <strong>SII</strong> obliga a llevar los libros de IVA de forma electrónica a través de la Sede AEAT, enviando cada factura emitida y recibida en un plazo máximo de 4 días hábiles. Están obligados quienes facturen más de 6.010.121,04 € anuales, los grupos de IVA y quienes opten voluntariamente. Si estás en SII, quedas exonerado de presentar los modelos 347, 340 y 390.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué diferencia hay entre estimación directa normal y simplificada?</h4>
+              <p>
+                La <strong>estimación directa normal</strong> exige contabilidad completa ajustada al Código de Comercio. La <strong>simplificada</strong> aplica a autónomos con facturación inferior a 600.000 € y permite llevar solo libros registro de ventas, compras y bienes de inversión. En ambas, el beneficio es ingresos menos gastos reales deducibles. La principal diferencia práctica es la amortización: en simplificada se aplican tablas simplificadas con porcentajes fijos.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── 4. GUÍA PASO A PASO ── */}
+        <section className={styles.guideSection}>
+          <h2>Guía Paso a Paso: Cómo No Perder Ningún Plazo Fiscal</h2>
+          <div className={styles.stepGuide}>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Identifica tus modelos obligatorios</h4>
+                <p>
+                  Revisa tu situación: ¿eres autónomo o SL? ¿Tienes empleados? ¿Alquilas local? ¿Tu actividad está exenta de IVA? Con esas cuatro preguntas puedes determinar qué modelos debes presentar cada trimestre. Anótalos en una lista y consúltala cada vez que empiece un período.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Crea un calendario fiscal personalizado con alertas</h4>
+                <p>
+                  Añade todas las fechas límite a Google Calendar, Outlook o cualquier herramienta que uses. Configura recordatorios con <strong>15 días de antelación</strong> para tener margen real de reacción. Usa eventos recurrentes para los trimestrales y anuales — así no tienes que crearlos cada año.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Mantén contabilidad mensual</h4>
+                <p>
+                  No esperes al fin del trimestre para revisar facturas y gastos. Dedica una hora al mes a cuadrar tus registros: facturas emitidas, facturas recibidas y extracto bancario. Al llegar la declaración trimestral, tendrás los datos listos en minutos en lugar de días.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Revisa las liquidaciones con tu gestor 5 días antes del plazo</h4>
+                <p>
+                  Envía a tu asesor fiscal toda la documentación del trimestre con al menos 5 días hábiles de margen. Esto permite revisar errores, incluir facturas olvidadas y corregir discrepancias antes de presentar. Un error en el borrador presentado requiere una declaración complementaria — evítalo con revisión previa.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Domicilia los pagos en cuenta bancaria</h4>
+                <p>
+                  La AEAT permite domiciliar el pago de la mayoría de modelos. La domiciliación evita que olvides transferir el importe el día límite y garantiza que el cargo se efectúa en la fecha correcta. Asegúrate de tener saldo suficiente en la cuenta domiciliada antes del cargo.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Guarda copia con número de referencia de cada presentación</h4>
+                <p>
+                  Tras cada presentación, descarga el justificante con número de referencia o CSV (Código Seguro de Verificación). Guárdalos organizados por año y modelo en una carpeta en la nube. Ese justificante es la prueba de que presentaste en plazo si la AEAT te reclama posteriormente.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h4>Cierra el ejercicio anual en enero</h4>
+                <p>
+                  En enero debes presentar el 303 del 4T (hasta el 30), el 390 (hasta el 30), el 111 y 115 del 4T (hasta el 20) y el 190/180 (hasta el 31). Además, verifica si tienes operación con terceros superior a 3.005,06 € para preparar el modelo 347 (hasta finales de febrero). Enero es el mes fiscal más intenso del año — planifícalo con antelación.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── 5. MEJORES PRÁCTICAS ── */}
+        <section className={styles.guideSection}>
+          <h2>Mejores Prácticas para Gestionar tus Impuestos</h2>
+          <div className={styles.tipsGrid}>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <p>
+                El pago del modelo 303 puede domiciliarse hasta el día anterior al fin del plazo: 19 de abril, 19 de julio, 19 de octubre y 29 de enero. No esperes al último día para iniciar la presentación.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>↩️</span>
+              <p>
+                Si el resultado del 303 es <strong>negativo</strong> (más IVA soportado que repercutido), tienes dos opciones: pedir devolución en el 4T o compensar el saldo en los trimestres siguientes. La compensación es más rápida, pero la devolución puede ser conveniente si el importe es elevado.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🧮</span>
+              <p>
+                El modelo 130 en estimación directa simplificada se calcula sobre el <strong>beneficio acumulado desde el 1 de enero</strong> al trimestre correspondiente, aplicando el 20 %, y restando lo ya pagado en trimestres anteriores. No se calcula sobre el beneficio del trimestre aislado.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💻</span>
+              <p>
+                Pide a tu gestor acceso al sistema <strong>Cl@ve PIN</strong> o activa tu certificado digital para consultar tus presentaciones en la Sede Electrónica de la AEAT. Así puedes verificar en cualquier momento si todas tus declaraciones están registradas correctamente.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📬</span>
+              <p>
+                Las notificaciones de Hacienda llegan por <strong>Dirección Electrónica Habilitada (DEH)</strong>. Actívala y revísala cada semana. Si una notificación electrónica no se abre en 10 días, se da por recibida automáticamente — con las consecuencias legales que ello conlleva.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏦</span>
+              <p>
+                Reserva el <strong>25-30 % de cada cobro</strong> en una cuenta separada destinada exclusivamente al pago de impuestos. Nunca uses ese dinero para gastos corrientes. Esta práctica elimina la angustia al llegar los trimestres y evita problemas de liquidez.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── 6. WARNING BOX — ERRORES COMUNES ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Errores Frecuentes que Generan Sanciones</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Presentar el 303 sin incluir todas las facturas del trimestre.</strong>{' '}
+                Si Hacienda detecta la discrepancia mediante cruce de datos con proveedores, aplicará sanción más intereses sobre la diferencia no declarada.
+              </li>
+              <li>
+                <strong>No presentar el modelo 130 aunque el resultado sea cero.</strong>{' '}
+                La obligación formal existe independientemente del importe. Omitir la presentación, aunque no haya cuota a ingresar, supone una sanción formal de 200 €.
+              </li>
+              <li>
+                <strong>Olvidar incluir en el modelo 347 a clientes o proveedores que superan 3.005,06 €.</strong>{' '}
+                La sanción es de 20 € por cada dato o conjunto de datos omitido, con un mínimo de 300 € y un máximo del 2 % del volumen de operaciones declarado.
+              </li>
+              <li>
+                <strong>Compensar IVA negativo sin solicitarlo correctamente.</strong>{' '}
+                El saldo negativo de IVA no se traslada automáticamente al siguiente trimestre: debes marcarlo expresamente en la casilla de compensación del 303. Si no lo haces, el saldo se pierde para ese período.
+              </li>
+              <li>
+                <strong>No actualizar el domicilio fiscal cuando cambias de dirección.</strong>{' '}
+                Las notificaciones de la AEAT se envían al domicilio fiscal declarado. Si no las recibes porque está desactualizado, se dan por notificadas igualmente, y los plazos para recurrir corren desde esa fecha.
+              </li>
+              <li>
+                <strong>Presentar el IVA del 4T fuera de plazo (31 de enero).</strong>{' '}
+                Este plazo es el menos conocido y el más olvidado: mientras los trimestres 1T-3T vencen el día 20 del mes siguiente, el 4T vence el <strong>30 de enero</strong>. Perdérselo es el error más frecuente entre autónomos que gestionan sus impuestos sin asesor.
+              </li>
+            </ul>
+          </div>
+        </section>
+
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('calendario-fiscal-emprendedor')} />

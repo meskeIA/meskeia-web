@@ -1132,6 +1132,401 @@ export default function AsistenteAltaAutonomoPage() {
             </details>
           </div>
         </section>
+
+        {/* ── SECCIÓN 1: Tabla Comparativa ── */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa de regímenes: ¿cuál te corresponde?</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Aspecto</th>
+                  <th>Autónomo régimen común</th>
+                  <th>Autónomo societario</th>
+                  <th>Pluriactividad (asalariado + autónomo)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cuota mínima mensual</td>
+                  <td>Desde 200 €/mes (rendimientos bajos)</td>
+                  <td>Desde 310 €/mes (base mínima RETA admin.)</td>
+                  <td>Posible reducción del 50 % el 1.º año</td>
+                </tr>
+                <tr>
+                  <td>Tarifa plana 80 €</td>
+                  <td>✅ Sí (primeras altas o sin alta en 2 años)</td>
+                  <td>❌ No disponible</td>
+                  <td>✅ Sí si es primera alta como autónomo</td>
+                </tr>
+                <tr>
+                  <td>Obligaciones fiscales</td>
+                  <td>IRPF (mod. 130) + IVA (mod. 303)</td>
+                  <td>Impuesto Sociedades (mod. 200) + nómina administrador</td>
+                  <td>IRPF (mod. 130) + IVA (mod. 303) + IRPF cuenta ajena</td>
+                </tr>
+                <tr>
+                  <td>Cotización SS</td>
+                  <td>RETA según rendimientos netos reales</td>
+                  <td>RETA como administrador (base obligatoria)</td>
+                  <td>RETA + Régimen General; devolución exceso si supera tope</td>
+                </tr>
+                <tr>
+                  <td>Complejidad administrativa</td>
+                  <td>Baja-media</td>
+                  <td>Alta (contabilidad mercantil, depósito cuentas)</td>
+                  <td>Media (dos regímenes a gestionar)</td>
+                </tr>
+                <tr>
+                  <td>Cuándo aplica</td>
+                  <td>Actividad habitual por cuenta propia, persona física</td>
+                  <td>Socio o administrador con &gt;25 % del capital social</td>
+                  <td>Contrato laboral activo + actividad propia simultánea</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de Uso ── */}
+        <section className={styles.guideSection}>
+          <h2>Casos de uso: 4 perfiles reales</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👨‍💻</span>
+                <h4>Joven de 30 años que deja su trabajo para negocio digital</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Pedro trabajaba por cuenta ajena y decide montar una agencia de marketing digital.
+                Se da de alta el <strong>1 de marzo</strong>, solicita la tarifa plana de <strong>80 €/mes</strong> durante
+                12 meses (y 12 meses más si su comunidad tiene extensión). Presenta el <strong>modelo 037</strong> en
+                Hacienda el mismo día del alta en SS. Elige el epígrafe IAE <em>763 — Publicidad y RRPP</em>.
+                Declara el domicilio fiscal en su vivienda habitual y emite facturas con IVA 21 %.
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 Al no tener empleados ni local arrendado, el modelo 037 es suficiente. Ahorra ~1.800 € en cuotas SS durante el primer año.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>⚖️</span>
+                <h4>Profesional liberal (abogado, psicólogo) con consultas privadas</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Laura trabaja en una empresa a jornada parcial y también atiende clientes privados.
+                Su situación es de <strong>pluriactividad</strong>: cotiza en el Régimen General por su
+                empleo y en el RETA por las consultas. Puede acogerse a una <strong>bonificación del 50 %
+                en la cuota RETA durante el primer año</strong>. Tributa en IRPF por ambas fuentes de renta
+                y presenta el 130 trimestralmente por los rendimientos de actividad.
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 Si la suma de bases de cotización supera el tope máximo anual, puede solicitar devolución del exceso a la SS.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏢</span>
+                <h4>Persona en desempleo que crea su propia empresa</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Carlos cobra el paro y quiere emprender. Tiene dos opciones: <strong>compatibilizar</strong> el
+                desempleo con el alta como autónomo (cobrando el 100 % de la prestación y pagando la cuota) o
+                <strong> capitalizar</strong> el paro de golpe para financiar el negocio (al menos el 60 % de la
+                prestación pendiente). Debe comunicar el alta al SEPE <strong>antes de iniciar la actividad</strong>.
+                La tarifa plana es compatible con ambas modalidades.
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 La capitalización permite invertir hasta el 100 % si se crea una sociedad o se contrata a otra persona.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🌍</span>
+                <h4>Extranjero residente en España que quiere ser autónomo</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Ahmed tiene residencia legal en España y quiere trabajar por cuenta propia. Necesita:
+                <strong> NIE</strong> (Número de Identificación de Extranjero) como identificador fiscal,
+                <strong> NIF</strong> asignado por Hacienda al darse de alta, <strong>cuenta bancaria española</strong>
+                (para domiciliar la cuota SS y recibir pagos), y en caso de no ser UE,
+                <strong> autorización de trabajo por cuenta propia</strong> del Ministerio de Interior.
+                El resto del proceso es idéntico al de cualquier ciudadano español.
+              </p>
+              <p className={styles.escenarioTip}>
+                💡 Los ciudadanos de la UE no necesitan autorización de trabajo adicional; con el NIE es suficiente.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ adicionales (8 preguntas nuevas) ── */}
+        <section className={styles.guideSection}>
+          <h2>Más preguntas frecuentes</h2>
+          <div className={styles.faqListPro}>
+            <details className={styles.faqItemPro}>
+              <summary>¿Cuándo es obligatorio darse de alta como autónomo?</summary>
+              <p>
+                El alta es obligatoria cuando existe <strong>habitualidad</strong> en la actividad económica.
+                La jurisprudencia del Tribunal Supremo indica que se presume habitualidad cuando los ingresos
+                suponen el <strong>Salario Mínimo Interprofesional (SMI)</strong> en cómputo anual (~15.876 € en 2025).
+                Por debajo de ese umbral puede discutirse, pero Hacienda puede igualmente exigir el alta si detecta
+                facturación recurrente. Ante la duda, consúltalo con un asesor.
+              </p>
+            </details>
+            <details className={styles.faqItemPro}>
+              <summary>¿Puedo darme de alta y baja varias veces en el año?</summary>
+              <p>
+                Sí, pero con consecuencias. Desde 2023 se puede causar baja hasta <strong>3 veces al año</strong> en el
+                RETA sin perder la tarifa plana (si el período entre alta y baja es suficiente). Sin embargo, altas
+                y bajas frecuentes pueden llamar la atención de Hacienda, que podría iniciar un procedimiento para
+                verificar que realmente cesó la actividad en cada baja. Guarda siempre documentación que acredite
+                el cese (cierre de contratos, fin de facturación, etc.).
+              </p>
+            </details>
+            <details className={styles.faqItemPro}>
+              <summary>¿Qué es la tarifa plana y cuáles son sus condiciones exactas?</summary>
+              <p>
+                La <strong>tarifa plana</strong> es una bonificación de la cuota RETA que la reduce a <strong>80 €/mes
+                durante los primeros 12 meses</strong> (prorrogables otros 12 si los rendimientos netos siguen por debajo
+                del SMI). Condiciones: (1) ser persona física (no societario); (2) no haber estado dado de alta en el
+                RETA en los <strong>2 años anteriores</strong> (3 años si ya disfrutaste la tarifa plana antes);
+                (3) solicitarla <strong>en el mismo momento del alta</strong>; (4) no tener deudas con SS ni Hacienda.
+              </p>
+            </details>
+            <details className={styles.faqItemPro}>
+              <summary>¿El alta tiene efectos desde el día que la solicito o desde el primero del mes?</summary>
+              <p>
+                Los efectos del alta en el RETA son desde el <strong>día en que se realiza la actividad</strong>,
+                pero la cuota se paga por mes completo. Si te das de alta el día 15, pagas la cuota completa del mes.
+                Por eso, conviene darse de alta <strong>el día 1 del mes</strong> para no pagar días sin actividad.
+                El alta en Hacienda (modelo 036/037) debe presentarse <strong>antes del inicio de la actividad</strong>.
+              </p>
+            </details>
+            <details className={styles.faqItemPro}>
+              <summary>¿Tengo que darme de alta en el IAE? ¿Cuánto cuesta?</summary>
+              <p>
+                El alta en el <strong>IAE (Impuesto de Actividades Económicas)</strong> se realiza automáticamente
+                al presentar el modelo 036 o 037. Todos los autónomos están <strong>exentos de pago</strong> mientras
+                su cifra de negocios no supere <strong>1.000.000 € anuales</strong>. El epígrafe IAE que elijas
+                determina el tipo de IVA aplicable y las deducciones disponibles; es importante elegirlo correctamente
+                desde el inicio, ya que cambiarlo requiere presentar una modificación censal.
+              </p>
+            </details>
+            <details className={styles.faqItemPro}>
+              <summary>¿Qué diferencia hay entre el modelo 036 y el 037?</summary>
+              <p>
+                El <strong>modelo 037</strong> es la versión simplificada y solo está disponible para personas
+                físicas que cumplan todos estos requisitos: residencia fiscal en España, sin empleados, sin local
+                arrendado, sin actividades con IVA especial (recargo de equivalencia, régimen simplificado) y sin
+                operaciones intracomunitarias. El <strong>modelo 036</strong> es la versión completa, obligatoria
+                para el resto de casos y para sociedades. Si tienes dudas, el 036 siempre es válido; el 037 es
+                solo una simplificación.
+              </p>
+            </details>
+            <details className={styles.faqItemPro}>
+              <summary>¿Puedo usar mi domicilio como sede de la actividad?</summary>
+              <p>
+                Sí, es perfectamente legal y muy habitual. Basta con declararlo como domicilio fiscal y lugar de
+                ejercicio de la actividad en el 036/037. Ventajas: puedes deducir parcialmente los gastos de
+                suministros del hogar (luz, internet, teléfono) e incluso parte del alquiler, en proporción al
+                porcentaje del inmueble dedicado a la actividad. Exige llevar un registro riguroso para justificar
+                la deducción ante una posible inspección.
+              </p>
+            </details>
+            <details className={styles.faqItemPro}>
+              <summary>¿Cuándo debo tener cuenta bancaria separada para la actividad?</summary>
+              <p>
+                No existe <strong>obligación legal</strong> de tener una cuenta bancaria separada para autónomos
+                persona física (sí para sociedades). Sin embargo, Hacienda y los tribunales recomiendan encarecidamente
+                separar las finanzas personales de las profesionales. Una cuenta separada simplifica enormemente la
+                contabilidad, facilita la deducción de gastos y es fundamental en caso de inspección para demostrar
+                que los movimientos bancarios corresponden a la actividad económica.
+              </p>
+            </details>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Proceso de alta paso a paso</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Alta en Hacienda — modelo 037 o 036</strong>
+                <p>
+                  Presenta el <strong>modelo 037</strong> si eres persona física sin empleados, sin local arrendado
+                  y sin IVA especial. En cualquier otro caso, usa el <strong>modelo 036</strong>. Debe presentarse
+                  <strong> antes de iniciar la actividad</strong>, idealmente el mismo día del alta en SS.
+                  Puedes hacerlo online con certificado digital en la Sede Electrónica de la AEAT.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Alta en el RETA — Seguridad Social</strong>
+                <p>
+                  Trámite en la <strong>Sede Electrónica de la SS</strong> o en un Punto de Atención al Emprendedor
+                  (PAE). Dispones de <strong>60 días naturales</strong> desde el inicio de la actividad para darte
+                  de alta, aunque las cotizaciones se devengan desde el día 1. Aquí es donde solicitas la tarifa
+                  plana si te corresponde.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Alta en el IAE (Impuesto Actividades Económicas)</strong>
+                <p>
+                  Incluida automáticamente en el modelo 036/037. Estás <strong>exento de pago</strong> si tu
+                  facturación anual es inferior a 1.000.000 €. Elige bien el epígrafe: determina el tipo de IVA
+                  que aplicas y las deducciones permitidas.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Apertura de cuenta bancaria profesional</strong>
+                <p>
+                  No es obligatoria legalmente, pero <strong>muy recomendable</strong>. Separar las finanzas
+                  personales de las profesionales simplifica la contabilidad, facilita deducciones ante Hacienda
+                  y te protege en una posible inspección.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Registro de libros contables</strong>
+                <p>
+                  En estimación directa (normal o simplificada) estás obligado a llevar el
+                  <strong> libro registro de facturas emitidas</strong> y el de <strong>facturas recibidas</strong>.
+                  También el libro de bienes de inversión si adquieres activos. Puedes usar software de facturación
+                  o una hoja de cálculo, siempre que esté actualizado y disponible ante requerimiento.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Contratar seguros obligatorios según sector</strong>
+                <p>
+                  Algunos sectores exigen <strong>seguro de Responsabilidad Civil</strong> (arquitectos, abogados,
+                  sanitarios) o de accidentes para empleados (si los hay). Aunque no sea obligatorio en tu sector,
+                  el seguro de RC es altamente recomendable para cubrir daños a terceros derivados de tu actividad.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Primera declaración trimestral</strong>
+                <p>
+                  En el trimestre correspondiente al inicio de la actividad presenta el <strong>modelo 303 (IVA)</strong>
+                  y el <strong>modelo 130 (pago fraccionado IRPF)</strong>. Los plazos son: 1.º trimestre en abril,
+                  2.º en julio, 3.º en octubre, 4.º en enero del año siguiente (20 días naturales tras el fin del
+                  trimestre).
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores Prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>6 consejos para empezar con buen pie</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <div>
+                <strong>Darte de alta el día 1 del mes</strong>
+                <p>La cuota RETA se paga por mes completo. Darte de alta el día 2 supone pagar el mes entero sin haber cotizado el primer día. Planifica la fecha de alta siempre a principio de mes.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎯</span>
+              <div>
+                <strong>Solicitar la tarifa plana el día del alta</strong>
+                <p>La tarifa plana de 80 €/mes solo puede solicitarse en el momento del alta en el RETA. No se puede pedir retroactivamente. Si te olvidas, pierdes los 12 meses de bonificación.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📋</span>
+              <div>
+                <strong>Elegir bien el epígrafe IAE</strong>
+                <p>El epígrafe determina el tipo de IVA que aplicas (21 %, 10 %, exento) y las deducciones disponibles. Un epígrafe incorrecto puede obligarte a corregir facturas emitidas y generar regularizaciones.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🏦</span>
+              <div>
+                <strong>Abrir cuenta bancaria separada desde el primer día</strong>
+                <p>Aunque no es obligatorio, separar las finanzas personales de las profesionales simplifica enormemente la contabilidad y evita problemas en una eventual inspección de Hacienda.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📎</span>
+              <div>
+                <strong>Guardar el justificante de alta</strong>
+                <p>Conserva el resguardo del modelo 036/037 y el certificado de alta en SS. Son la prueba oficial de cuándo iniciaste la actividad; necesarios para deducciones, subvenciones y posibles inspecciones.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🗺️</span>
+              <div>
+                <strong>Informarte de las bonificaciones autonómicas</strong>
+                <p>Algunas Comunidades Autónomas ofrecen hasta 6 meses adicionales de cuota cero o subvenciones directas al emprendimiento. Consulta la web de tu comunidad o un PAE antes de iniciar el alta.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning Box — Errores comunes ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>6 errores frecuentes que debes evitar</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Empezar a facturar antes del alta:</strong> Hacienda puede detectar facturas emitidas
+                antes de la fecha de alta censal y reclamar cuotas no ingresadas más sanciones económicas.
+              </li>
+              <li>
+                <strong>No darse de baja cuando cesas la actividad:</strong> La SS sigue cobrando la cuota
+                mensual mientras estés dado de alta, independientemente de si facturas o no. La baja debe
+                tramitarse dentro del mes en que se cesa la actividad.
+              </li>
+              <li>
+                <strong>Elegir mal el epígrafe IAE:</strong> Un epígrafe incorrecto puede obligarte a aplicar
+                IVA cuando estabas exento (o viceversa), generando regularizaciones y posibles sanciones. Consulta
+                con un asesor antes de elegirlo.
+              </li>
+              <li>
+                <strong>Olvidar el alta en Hacienda antes del alta en SS:</strong> El alta en Hacienda (036/037)
+                debe preceder al alta en RETA. Si el orden es inverso, Hacienda puede denegar deducciones del
+                período anterior y cuestionar el inicio real de la actividad.
+              </li>
+              <li>
+                <strong>No solicitar la tarifa plana en el momento del alta:</strong> Es el error más costoso.
+                La tarifa plana solo puede obtenerse al tramitar el alta en el RETA. Perder esta bonificación
+                supone pagar más de 1.500 € adicionales en el primer año.
+              </li>
+              <li>
+                <strong>Ignorar el plazo de 60 días para el alta en SS:</strong> Aunque legalmente tienes 60 días
+                naturales desde el inicio de la actividad, las cotizaciones se devengan desde el día 1. Un alta
+                tardía genera recargo del 20 % más intereses de demora sobre las cuotas atrasadas.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('asistente-alta-autonomo')} />

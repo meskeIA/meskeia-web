@@ -861,6 +861,435 @@ export default function ComparadorFormasJuridicasPage() {
             </div>
           </div>
         </section>
+
+        {/* Tabla Comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Tabla Comparativa: Las 5 Formas Jurídicas</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Criterio</th>
+                  <th>💼 Autónomo</th>
+                  <th>🏢 SL / SLU</th>
+                  <th>🤝 Cooperativa</th>
+                  <th>👥 CB</th>
+                  <th>🎗️ Asociación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Capital mínimo</strong></td>
+                  <td>Sin mínimo</td>
+                  <td>1 € (recomendado 3.000 €)</td>
+                  <td>3.000 €</td>
+                  <td>Sin mínimo</td>
+                  <td>Sin mínimo</td>
+                </tr>
+                <tr>
+                  <td><strong>Responsabilidad</strong></td>
+                  <td>Ilimitada (patrimonio personal)</td>
+                  <td>Limitada al capital social</td>
+                  <td>Limitada a las aportaciones</td>
+                  <td>Ilimitada y solidaria</td>
+                  <td>Limitada al patrimonio asociativo</td>
+                </tr>
+                <tr>
+                  <td><strong>Tipo impositivo</strong></td>
+                  <td>IRPF 19 %–47 %</td>
+                  <td>IS 25 % (23 % pymes)</td>
+                  <td>IS 20 % (coop. protegida)</td>
+                  <td>IRPF 19 %–47 % (cada comunero)</td>
+                  <td>IS 25 % con exenciones</td>
+                </tr>
+                <tr>
+                  <td><strong>Socios mínimos</strong></td>
+                  <td>1</td>
+                  <td>1</td>
+                  <td>3</td>
+                  <td>2</td>
+                  <td>3</td>
+                </tr>
+                <tr>
+                  <td><strong>Coste anual gestión</strong></td>
+                  <td>500–1.500 €/año</td>
+                  <td>2.000–5.000 €/año</td>
+                  <td>2.500–5.500 €/año</td>
+                  <td>500–1.500 €/año</td>
+                  <td>300–1.000 €/año</td>
+                </tr>
+                <tr>
+                  <td><strong>Complejidad</strong></td>
+                  <td>Baja</td>
+                  <td>Media-alta</td>
+                  <td>Alta</td>
+                  <td>Baja</td>
+                  <td>Media</td>
+                </tr>
+                <tr>
+                  <td><strong>Ideal para</strong></td>
+                  <td>Freelancers, profesionales liberales</td>
+                  <td>Empresas con riesgo patrimonial o inversores</td>
+                  <td>Grupos igualitarios, economía social</td>
+                  <td>Pequeños negocios entre 2 personas</td>
+                  <td>Proyectos sin ánimo de lucro</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Casos de Uso */}
+        <section className={styles.guideSection}>
+          <h2>Casos de Uso: 4 Perfiles Reales</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👩‍🎨</span>
+                <h4>Diseñadora independiente · 25.000 €/año</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Con 25.000 € netos anuales, la carga fiscal como autónoma es aproximadamente <strong>5.500 € de IRPF</strong> (tramo 24 %).
+                Constituir una SL añadiría ~3.000 €/año en costes de gestoría, cuentas anuales y Registro Mercantil, anulando cualquier
+                ahorro fiscal.
+              </p>
+              <p className={styles.escenarioTip}>Recomendación: autónomo. Sencillo, barato y fiscalmente eficiente a este nivel de ingresos.</p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>💻</span>
+                <h4>Dos socios que montan una agencia digital</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Dos socios implican responsabilidad compartida. Una <strong>SL</strong> protege el patrimonio personal de cada uno,
+                permite definir participaciones y porcentajes de voto de forma clara en los estatutos, y facilita la entrada de un
+                tercer inversor en el futuro.
+              </p>
+              <p className={styles.escenarioTip}>Recomendación: SL con reparto 50/50 de participaciones y pacto de socios complementario.</p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🧵</span>
+                <h4>5 artesanos que quieren vender juntos</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Con 5 promotores, la <strong>cooperativa de trabajo asociado</strong> ofrece tipo de IS del 20 %, gestión
+                democrática (1 socio = 1 voto) y acceso preferente a subvenciones de economía social de la CCAA y el
+                Ministerio de Trabajo.
+              </p>
+              <p className={styles.escenarioTip}>Recomendación: cooperativa fiscalmente protegida; revisar normativa autonómica específica.</p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎭</span>
+                <h4>ONG de barrio para actividades culturales</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Una <strong>asociación sin ánimo de lucro</strong> permite recibir subvenciones públicas, donaciones
+                con deducción para el donante (Ley 49/2002), contratar voluntarios y organizar actividades con exenciones
+                fiscales, siempre que los beneficios se reinviertan en los fines estatutarios.
+              </p>
+              <p className={styles.escenarioTip}>Recomendación: asociación; solicitar la declaración de utilidad pública para maximizar beneficios fiscales.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes (FAQ)</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Qué es una Comunidad de Bienes y cuándo conviene?</h4>
+              <p>
+                Una Comunidad de Bienes (CB) es un contrato por el que dos o más personas ponen en común bienes o derechos para
+                desarrollar una actividad económica. No tiene personalidad jurídica propia. Conviene cuando los socios tienen bajo
+                riesgo patrimonial, la actividad es temporal o de pequeña envergadura y se quiere evitar la complejidad de una SL.
+                Cada comunero tributa en IRPF por su parte proporcional de los beneficios.
+              </p>
+              <p className={styles.faqTip}>Atención: la responsabilidad es ilimitada y solidaria — un acreedor puede reclamar la deuda total a cualquiera de los comuneros.</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Puedo transformar mi actividad de autónomo en SL sin liquidar la empresa?</h4>
+              <p>
+                Sí. El proceso se llama <strong>aportación de rama de actividad</strong> o constitución de SL con aportaciones no dinerarias.
+                El autónomo aporta a la SL los activos de su negocio (cartera de clientes, contratos, equipos) a cambio de participaciones.
+                Es necesario un asesor fiscal para evitar tributación en el traspaso y asegurar la continuidad de contratos y empleados.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Una cooperativa puede tener trabajadores que no sean socios?</h4>
+              <p>
+                Sí, pero con limitaciones según la normativa autonómica. En general, el número de horas trabajadas por empleados
+                no socios no puede superar el 30 % de las horas trabajadas por los socios trabajadores. Superar ese límite puede
+                hacer perder la condición de cooperativa fiscalmente protegida y el tipo reducido del 20 %.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cuál es la diferencia entre SL, SLU y SRL?</h4>
+              <p>
+                Las tres denominaciones se refieren a la misma figura jurídica: la <strong>Sociedad de Responsabilidad Limitada</strong>.
+                La SLU (Sociedad Limitada Unipersonal) tiene un único socio, lo que obliga a inscribir la unipersonalidad en el Registro
+                Mercantil y a incluirlo en toda la documentación. SRL es simplemente otra abreviatura de la misma forma, menos usada en España.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué es una Sociedad Civil Profesional y para qué sirve?</h4>
+              <p>
+                La <strong>Sociedad Civil Profesional</strong> (SCP), regulada por la Ley 2/2007, agrupa a dos o más profesionales
+                colegiados para ejercer conjuntamente su actividad (abogados, médicos, arquitectos…). Tiene personalidad jurídica propia,
+                aunque los socios mantienen responsabilidad personal por los actos profesionales propios. Requiere inscripción en el
+                Registro Mercantil y en el colegio profesional correspondiente.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Puede una asociación contratar empleados y tener ingresos?</h4>
+              <p>
+                Sí. Una asociación puede contratar trabajadores por cuenta ajena (Régimen General de la SS) y realizar actividades
+                económicas para financiar sus fines estatutarios. Los ingresos de actividades accesorias tributan en IS, aunque con
+                exenciones relevantes. Lo que está prohibido es repartir esos beneficios entre los socios o asociados; deben reinvertirse
+                en los fines de la entidad.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué ventajas fiscales tiene una cooperativa frente a una SL?</h4>
+              <p>
+                Las cooperativas fiscalmente protegidas tributan al <strong>20 % en IS</strong> (frente al 25 % general o 23 % de pymes).
+                Además pueden aplicar una bonificación del 50 % en la cuota del IS para las cooperativas especialmente protegidas.
+                También acceden a bonificaciones en cotizaciones de la Seguridad Social y a ayudas y subvenciones específicas del
+                Ministerio de Trabajo y de las CCAA.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué pasa si constituyo una SL y luego quiero cerrarla?</h4>
+              <p>
+                Disolver y liquidar una SL requiere: acuerdo en junta general, nombramiento de un liquidador, pago de todas las deudas,
+                distribución del activo remanente entre socios, escritura pública de liquidación y cancelación en el Registro Mercantil.
+                El proceso puede durar 3-12 meses y cuesta entre 500-1.500 € en honorarios. Si hay deudas pendientes, el administrador
+                puede responder personalmente por ellas si no inició el proceso de disolución a tiempo.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Guía Paso a Paso: Elige la Forma Jurídica Correcta</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Define el número de socios y el reparto de control</h4>
+                <p>
+                  ¿Emprendes solo o con otros? Si vas solo, la elección se reduce a autónomo vs SLU. Con más personas,
+                  es fundamental decidir quién toma decisiones, en qué porcentaje participa cada socio y cómo se
+                  resuelven los conflictos antes de constituir nada. Un pacto de socios firmado antes de la escritura
+                  previene el 80 % de los litigios societarios.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Estima tus beneficios anuales netos esperados</h4>
+                <p>
+                  El umbral orientativo para valorar el salto de autónomo a SL está entre <strong>40.000 y 60.000 € de beneficio neto anual</strong>.
+                  Por debajo, el ahorro fiscal de la SL no compensa sus costes fijos (gestoría, Registro Mercantil,
+                  cuentas anuales). Por encima, el IS (25 %) resulta más ventajoso que el IRPF marginal (45–47 %).
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Evalúa el riesgo patrimonial de tu actividad</h4>
+                <p>
+                  ¿Tu actividad puede generar deudas superiores a tu capital inicial? Si gestionas stock, tienes empleados,
+                  alquilas un local o contratas proveedores con pagos aplazados, la responsabilidad ilimitada del autónomo
+                  o la CB puede poner en riesgo tu casa, coche o ahorros. En ese caso, la SL o la cooperativa protegen tu
+                  patrimonio personal independientemente del nivel de ingresos.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Calcula los costes fijos anuales de cada opción</h4>
+                <p>
+                  El coste real de mantenimiento anual varía mucho: autónomo y CB (~500-1.500 €), asociación (~300-1.000 €),
+                  SL y cooperativa (~2.000-5.500 €). Incluye gestoría mensual, presentación de cuentas anuales, legalización
+                  de libros, seguros de responsabilidad civil y posibles minutas notariales. Asegúrate de que el ahorro fiscal
+                  cubre holgadamente estos costes antes de elegir la forma más compleja.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Consulta con un asesor fiscal/mercantil los 2-3 mejores escenarios</h4>
+                <p>
+                  Este comparador es orientativo. Antes de decidir, pide a un asesor que calcule tu carga fiscal real en
+                  los 2-3 escenarios que más te convencen, considerando tu CCAA (hay bonificaciones autonómicas en IS,
+                  IRPF y cotizaciones), tu situación familiar y tus expectativas de crecimiento. Una sesión de 1-2 horas
+                  con un gestor cuesta 100-200 € y puede ahorrarte miles en impuestos o errores de constitución.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Decide y formaliza</h4>
+                <p>
+                  Para <strong>autónomo</strong>: alta en Hacienda (modelo 036/037) y en el RETA, proceso que dura 1-3 días y
+                  tiene coste prácticamente nulo. Para <strong>SL o cooperativa</strong>: certificación de denominación social,
+                  estatutos, escritura ante notario, inscripción en Registro Mercantil y alta en Hacienda — proceso de 2-6
+                  semanas y coste de 400-1.500 €. El portal <strong>PAE (Punto de Atención al Emprendedor)</strong> permite
+                  tramitar la constitución de SL de forma telemática en menos de 48 horas.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores Prácticas al Elegir tu Forma Jurídica</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>💡</span>
+              <div>
+                <h4>No constituyas SL solo por imagen</h4>
+                <p>
+                  Los costes fijos anuales de una SL (gestoría, Registro Mercantil, cuentas anuales) oscilan entre
+                  <strong> 5.000–7.000 €/año</strong>. Ese gasto debe quedar sobradamente cubierto por el ahorro fiscal
+                  respecto al IRPF. Si no es así, el autónomo o la CB son más eficientes.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🚀</span>
+              <div>
+                <h4>Empieza como autónomo si tienes dudas</h4>
+                <p>
+                  Si estás en la zona gris de 30.000–50.000 € de beneficio, empieza como autónomo. Puedes transformarlo
+                  en SL mediante aportación de rama de actividad cuando superes claramente el umbral de rentabilidad.
+                  No hay prisa — el salto en cualquier momento del ejercicio tiene solución fiscal.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🤝</span>
+              <div>
+                <h4>Verifica el tipo reducido del IS en cooperativas</h4>
+                <p>
+                  No todas las cooperativas tributan al 20 %. Solo las <strong>fiscalmente protegidas</strong> (deben cumplir
+                  requisitos de la Ley 20/1990). Las <strong>especialmente protegidas</strong> (trabajo asociado, explotación
+                  comunitaria de la tierra, mar y algunas de consumo) aplican además una bonificación del 50 % en la cuota.
+                  Comprueba con tu gestor si tu cooperativa cumple los requisitos antes de dar por hecho el ahorro fiscal.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⚠️</span>
+              <div>
+                <h4>Las CB funcionan mejor con acuerdo escrito</h4>
+                <p>
+                  La Comunidad de Bienes requiere el acuerdo unánime de todos los comuneros para decisiones importantes:
+                  contratar empleados, firmar contratos, repartir beneficios. Sin un contrato escrito que regule estos
+                  aspectos, el conflicto entre comuneros es la principal causa de disolución prematura. Redacta siempre
+                  un acuerdo de comuneros ante notario.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⚖️</span>
+              <div>
+                <h4>Sociedades profesionales: Ley 2/2007</h4>
+                <p>
+                  Si eres abogado, médico, arquitecto, economista u otro profesional colegiado y quieres ejercer en
+                  sociedad, la <strong>Ley 2/2007 de Sociedades Profesionales</strong> exige inscripción específica en
+                  el Registro Mercantil y en el colegio profesional. No basta con constituir una SL ordinaria — la sociedad
+                  debe cumplir requisitos especiales de composición y responsabilidad.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📋</span>
+              <div>
+                <h4>Usa el informe CIRCE antes de decidir</h4>
+                <p>
+                  El portal <strong>CIRCE</strong> (Centro de Información y Red de Creación de Empresas) del Ministerio
+                  de Industria permite identificar todos los trámites necesarios y las ayudas disponibles por CCAA para
+                  crear tu empresa. Es gratuito y puede revelarte subvenciones o bonificaciones a las que tienes derecho
+                  según tu sector y comunidad autónoma.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>🚨</span>
+              <h3>Errores Comunes que Debes Evitar</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Constituir SL para ahorrar impuestos sin calcular los costes fijos reales.</strong> Gestoría,
+                notaría y Registro Mercantil suman 5.000–7.000 €/año. Si el ahorro fiscal no supera esa cifra, estás
+                pagando más, no menos.
+              </li>
+              <li>
+                <strong>Crear Comunidad de Bienes entre familiares sin acuerdo escrito.</strong> La confianza no sustituye
+                al contrato. Sin un documento que regule el reparto de beneficios, la toma de decisiones y la salida de
+                comuneros, los conflictos son casi inevitables.
+              </li>
+              <li>
+                <strong>Montar una asociación que en realidad tiene ánimo de lucro.</strong> Si la actividad principal
+                es económica y los promotores se retribuyen por ella de forma habitual, Hacienda puede recalificar la
+                asociación como sociedad mercantil y exigir el IS sin exenciones más intereses de demora.
+              </li>
+              <li>
+                <strong>Ignorar la responsabilidad personal del administrador de la SL.</strong> El administrador puede
+                responder con su patrimonio personal por deudas tributarias (artículo 43 LGT), por no convocar junta
+                cuando la SL está en causa de disolución, o por negligencia grave en la gestión de la sociedad.
+              </li>
+              <li>
+                <strong>No distinguir entre Sociedad Civil y Comunidad de Bienes.</strong> Desde la reforma fiscal de
+                2016, las Sociedades Civiles con objeto mercantil tributan en IS (como una SL), mientras que las CB
+                siguen tributando en IRPF a través de sus comuneros. Usar una u otra tiene consecuencias fiscales muy
+                distintas que muchos emprendedores desconocen.
+              </li>
+              <li>
+                <strong>Disolver la SL sin liquidar correctamente.</strong> Cerrar sin seguir el proceso legal (disolución,
+                liquidación, escritura pública y cancelación registral) genera responsabilidad del administrador por
+                deudas pendientes y puede impedir la cancelación de las obligaciones fiscales y de SS ante Hacienda y
+                la Tesorería.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('comparador-formas-juridicas')} />

@@ -1577,6 +1577,434 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
           </div>
         </section>
+
+        {/* ===== TABLA COMPARATIVA ===== */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa: Asociación vs otras formas jurídicas sin ánimo de lucro</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Característica</th>
+                  <th>Asociación</th>
+                  <th>Fundación</th>
+                  <th>Cooperativa</th>
+                  <th>SL sin ánimo de lucro</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Capital mínimo</td>
+                  <td>Sin mínimo legal</td>
+                  <td>Variable según CCAA (habitualmente 30.000 €)</td>
+                  <td>3.000 € (variable por CCAA)</td>
+                  <td>3.000 € (capital social SL)</td>
+                </tr>
+                <tr>
+                  <td>Socios / fundadores</td>
+                  <td>Mínimo 3 personas</td>
+                  <td>1 o más fundadores (personas físicas o jurídicas)</td>
+                  <td>Mínimo 3 socios cooperativistas</td>
+                  <td>1 o más socios</td>
+                </tr>
+                <tr>
+                  <td>Ánimo de lucro</td>
+                  <td>No — beneficios reinvertidos</td>
+                  <td>No — patrimonio afectado a fines</td>
+                  <td>Parcial — reparto limitado entre socios</td>
+                  <td>Formalmente sí, aunque sin reparto real</td>
+                </tr>
+                <tr>
+                  <td>Tipo IS general</td>
+                  <td>10 % (Ley 49/2002) o 25 %</td>
+                  <td>10 % (Ley 49/2002) o 25 %</td>
+                  <td>20 % (cooperativas protegidas)</td>
+                  <td>25 % (tipo general)</td>
+                </tr>
+                <tr>
+                  <td>Deducción para donantes</td>
+                  <td>Sí, con Ley 49/2002</td>
+                  <td>Sí, con Ley 49/2002</td>
+                  <td>No</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td>Obligaciones contables</td>
+                  <td>Simplificadas (ingresos &lt; 150.000 €)</td>
+                  <td>Completas y auditoría si supera umbrales</td>
+                  <td>Plan Contable de Cooperativas</td>
+                  <td>Plan General Contable (PGC)</td>
+                </tr>
+                <tr>
+                  <td>Complejidad administrativa</td>
+                  <td>Baja</td>
+                  <td>Alta (Protectorado + Registro)</td>
+                  <td>Media</td>
+                  <td>Media-alta</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ===== CASOS DE USO ===== */}
+        <section className={styles.guideSection}>
+          <h2>Casos de uso: ¿cuándo elegir una asociación?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏘️</span>
+                <h4>Asociación cultural de vecinos</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un grupo de 3 vecinos quiere crear una asociación cultural para organizar eventos en el barrio.
+                Con 3 fundadores es suficiente. Los estatutos pueden ser sencillos. Se registra en el Registro
+                de Asociaciones de la CCAA. Se financia con cuotas de socios y subvenciones municipales,
+                que están exentas del IS si se destinan a los fines propios.
+              </p>
+              <div className={styles.escenarioTip}>
+                Registro: CCAA correspondiente — Plazo estimado: 1 a 3 meses
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🌍</span>
+                <h4>ONG de ayuda humanitaria (Ley 49/2002)</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Una ONG que quiere que sus donantes puedan deducirse el 80 % de los primeros 250 € y el
+                40-45 % del resto debe solicitar la acreditación del Ministerio de Hacienda. Obligaciones:
+                presentar memoria de actividades, destinar al menos el 70 % de rentas a fines,
+                transparencia en la web y presentar el modelo 182 con los donantes.
+              </p>
+              <div className={styles.escenarioTip}>
+                Requiere acreditación Hacienda — Muy recomendable para captar donaciones
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>⚽</span>
+                <h4>Club deportivo amateur</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un club de fútbol sala amateur se registra como asociación deportiva ante la federación
+                autonómica. Necesita seguros de responsabilidad civil y de accidentes para los participantes.
+                Las licencias federativas son obligatorias para competir. El modelo fiscal es simplificado
+                si los ingresos anuales no superan los 150.000 €.
+              </p>
+              <div className={styles.escenarioTip}>
+                Registro adicional: Federación deportiva autonómica o nacional
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🩺</span>
+                <h4>Asociación profesional (médicos, ingenieros)</h4>
+              </div>
+              <p className={styles.escenarioExample}>
+                Una asociación con objeto representativo de una profesión puede inscribirse en el Registro
+                Nacional. Las cuotas que pagan los socios por la defensa de sus intereses profesionales
+                pueden ser deducibles como gasto en el IRPF del asociado (hasta 500 € anuales por cuotas
+                a sindicatos y colegios profesionales). El objeto estatutario debe ser claro y representativo.
+              </p>
+              <div className={styles.escenarioTip}>
+                Cuotas deducibles en IRPF como gasto del trabajo — Hasta 500 € anuales
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== FAQ ===== */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Puede una asociación sin ánimo de lucro vender productos o servicios?</h4>
+              <p>
+                Sí, pero con matices importantes. Puede realizar actividades económicas siempre que el
+                beneficio se destine a los fines estatutarios y no se reparta entre los socios. Las rentas
+                derivadas de actividades relacionadas con los fines propios pueden estar exentas en el IS.
+                Las actividades ajenas a los fines tributan al tipo general (25 %).
+              </p>
+              <span className={styles.faqTip}>Clave: separar contablemente actividades exentas y no exentas</span>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Los miembros de la junta directiva pueden cobrar por su trabajo?</h4>
+              <p>
+                Los cargos directivos son gratuitos por defecto. Los estatutos pueden prever retribución,
+                pero en ese caso la asociación pierde la posibilidad de acogerse a Ley 49/2002 (que exige
+                gratuidad de los cargos). Sí es posible contratar laboralmente a socios para tareas distintas
+                de las funciones directivas, con contrato, nómina y cotización a la Seguridad Social.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué obligaciones fiscales tiene una asociación?</h4>
+              <p>
+                Toda asociación debe presentar el Impuesto sobre Sociedades (modelo 200) aunque el resultado
+                sea cero. Si tiene trabajadores, debe gestionar retenciones (IRPF) y cuotas a la Seguridad
+                Social. Si realiza actividades sujetas a IVA, debe presentar los modelos 303 y 390.
+                Las entidades acogidas a Ley 49/2002 presentan además el modelo 182 si reciben donaciones.
+              </p>
+              <span className={styles.faqTip}>Sanción formal por no presentar IS aunque sea a cero: 200 €</span>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cómo se acoge una asociación a la Ley 49/2002 para obtener más beneficios fiscales?</h4>
+              <p>
+                Debe reunir los requisitos del artículo 3 de la Ley 49/2002: fines de interés general,
+                gratuidad de los cargos directivos, destino del 70 % de rentas a los fines, no distribución
+                del patrimonio entre socios, y no desarrollar explotaciones económicas ajenas a los fines.
+                Se comunica mediante el modelo 036 marcando la casilla correspondiente. Hacienda puede
+                verificar el cumplimiento.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Puede una asociación recibir subvenciones públicas?</h4>
+              <p>
+                Sí, y es una de las fuentes de financiación más habituales. Las subvenciones están exentas
+                del IS si se destinan a los fines propios. Requieren justificación documental exhaustiva:
+                facturas, contratos, memorias de actividad y declaración de otros ingresos. La Intervención
+                General puede auditar la cuenta justificativa con posterioridad.
+              </p>
+              <span className={styles.faqTip}>Guarda todos los justificantes durante al menos 5 años</span>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Qué pasa si una asociación genera beneficios económicos?</h4>
+              <p>
+                Los beneficios (superávit) no pueden repartirse entre los socios. Deben reinvertirse en los
+                fines de la asociación o constituir reservas. Si el superávit persiste y se destina a
+                actividades distintas a los fines, puede tributar en IS. Una asociación que sistemáticamente
+                genera y distribuye beneficios encubiertos puede ser investigada por Hacienda por simulación.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cómo se disuelve una asociación y qué pasa con sus bienes?</h4>
+              <p>
+                La disolución se acuerda en asamblea general extraordinaria (con quórum estatutario) o por
+                resolución judicial. El patrimonio remanente no puede entregarse a los socios: los estatutos
+                deben prever su destino a entidades de interés general. Si los estatutos están acogidos a
+                Ley 49/2002, el destino debe ser obligatoriamente otra entidad acogida a dicha ley. Se
+                inscribe la disolución en el Registro.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>¿Cuánto tarda inscribir una asociación en el registro?</h4>
+              <p>
+                Los plazos legales son de 3 meses (Registro Nacional) o variables por CCAA (generalmente
+                entre 1 y 3 meses). En la práctica, la Comunidad de Madrid suele resolverlo en 4-8 semanas,
+                otras CCAA pueden tardar más. El silencio administrativo positivo opera a los 3 meses: si no
+                hay resolución, la asociación se considera inscrita. Durante la tramitación puede operar con
+                el NIF provisional obtenido en Hacienda.
+              </p>
+              <span className={styles.faqTip}>Silencio positivo a los 3 meses — puedes operar con NIF provisional</span>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== GUÍA PASO A PASO ===== */}
+        <section className={styles.guideSection}>
+          <h2>Guía paso a paso: constituir tu asociación</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Reunión de fundadores y acta fundacional</h4>
+                <p>
+                  Convoca a los mínimo 3 fundadores (personas físicas mayores de edad o jurídicas). En la reunión
+                  constitutiva se aprueba la denominación, el domicilio social, los fines y se firma el acta
+                  fundacional. Todos los fundadores deben firmar el acta con sus datos identificativos completos
+                  (nombre, DNI/NIE, domicilio) y el cargo que asumen en la junta directiva provisional.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Redacción de estatutos</h4>
+                <p>
+                  Los estatutos son el documento constitutivo más importante. Deben contener: denominación y
+                  domicilio, objeto y actividades, ámbito territorial, condiciones de socios y causas de
+                  expulsión, órganos de gobierno (asamblea general y junta directiva), régimen económico,
+                  procedimiento de modificación de estatutos y causas y procedimiento de disolución.
+                  Este asistente genera estatutos adaptados a tu caso.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Presentación en el Registro correspondiente</h4>
+                <p>
+                  Si el ámbito es autonómico o inferior, dirígete al Registro de Asociaciones de tu Comunidad
+                  Autónoma. Si el ámbito es nacional (actividad en más de una CCAA), al Registro Nacional de
+                  Asociaciones del Ministerio del Interior. Documentos a presentar: solicitud, acta fundacional,
+                  estatutos y fotocopia del DNI de los fundadores. La mayoría de CCAA admite presentación
+                  telemática.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Obtención del NIF provisional en Hacienda (modelo 036)</h4>
+                <p>
+                  Antes o simultáneamente al registro, presenta el modelo 036 en la AEAT para obtener el NIF
+                  provisional de la asociación. Necesitarás: acta fundacional firmada, estatutos y fotocopia del
+                  DNI del representante (presidente). El NIF provisional permite abrir cuenta bancaria y operar
+                  durante la tramitación del registro. Una vez inscrita, se obtiene el NIF definitivo.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Apertura de cuenta bancaria a nombre de la asociación</h4>
+                <p>
+                  Con el acta fundacional y el NIF provisional puedes abrir una cuenta corriente a nombre de la
+                  asociación en cualquier entidad bancaria. Algunos bancos piden también los estatutos y el
+                  acuerdo de apertura de cuenta firmado por la junta directiva. La cuenta debe estar a nombre
+                  de la asociación (no de ningún socio a título personal) para garantizar la separación patrimonial.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h4>Alta en censos fiscales y obligaciones contables</h4>
+                <p>
+                  Una vez inscrita, actualiza el modelo 036 con el NIF definitivo. Si tienes trabajadores, alta en
+                  Seguridad Social como empresa. Las obligaciones contables dependen del volumen: si los ingresos
+                  anuales son inferiores a 150.000 € y el activo no supera 150.000 €, puedes llevar contabilidad
+                  simplificada. Si superas esos umbrales, debes llevar contabilidad según el Plan de Contabilidad
+                  para Entidades sin Fines Lucrativos.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== MEJORES PRÁCTICAS ===== */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas para gestionar tu asociación</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📝</span>
+              <p>
+                <strong>Define el objeto social de forma amplia pero coherente.</strong> Los cambios
+                posteriores en el objeto o la denominación requieren asamblea extraordinaria, modificación
+                de estatutos y nuevo trámite registral. Pensar bien los fines desde el inicio ahorra
+                tiempo y coste.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <p>
+                <strong>Separa contablemente las actividades exentas de las no exentas.</strong> Las
+                actividades relacionadas con los fines propios pueden estar exentas en el IS; las
+                actividades económicas ajenas tributan al 25 %. Una contabilidad analítica clara es
+                fundamental para demostrar la separación ante Hacienda.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📋</span>
+              <p>
+                <strong>Lleva actas de todas las asambleas y reuniones de junta directiva.</strong> Es
+                obligatorio y además protege a los directivos: los acuerdos adoptados deben poder
+                acreditarse en caso de controversia o inspección. El secretario firma las actas y las
+                custodia en el libro de actas.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📁</span>
+              <p>
+                <strong>Si recibes subvenciones, prepárate para la justificación documental.</strong>
+                Guarda facturas, contratos, hojas de asistencia, fotografías de eventos y cualquier
+                documento acreditativo. La cuenta justificativa debe presentarse en el plazo fijado
+                por la entidad concedente, y la Intervención puede auditar durante 5 años.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⭐</span>
+              <p>
+                <strong>Para acceder a Ley 49/2002 necesitas acreditación del Ministerio de Hacienda.</strong>
+                Comunícalo en el modelo 036. Hacienda puede comprobar el cumplimiento de todos los
+                requisitos (gratuidad de cargos, destino del 70 % de rentas, etc.). La acreditación
+                permite ofrecer a tus donantes las mayores deducciones fiscales.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <p>
+                <strong>Renueva los cargos directivos dentro de los plazos estatutarios.</strong> Los
+                estatutos fijan la duración del mandato (habitualmente 2-4 años). Los actos realizados
+                por directivos con mandato caducado pueden ser impugnables. Convoca la asamblea con
+                suficiente antelación para garantizar continuidad.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== WARNING BOX ===== */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Errores frecuentes que debes evitar</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Actuar como empresa bajo forma de asociación.</strong> Un objeto lucrativo encubierto
+                (vender servicios con ánimo de lucro real para los socios) puede llevar a Hacienda a recalificar
+                la entidad como sociedad mercantil y aplicar sanciones por las diferencias tributarias.
+              </li>
+              <li>
+                <strong>No presentar el modelo 182</strong> (declaración informativa de donantes) si recibes
+                donaciones acogidas a Ley 49/2002. Es obligatorio antes del 31 de enero del año siguiente y
+                su omisión conlleva sanción proporcional al importe de las donaciones no declaradas.
+              </li>
+              <li>
+                <strong>Olvidar presentar el Impuesto sobre Sociedades</strong> aunque el resultado sea cero
+                o negativo. La sanción formal por no presentar el modelo 200 es de 200 €, independientemente
+                de que no haya cuota a ingresar.
+              </li>
+              <li>
+                <strong>No renovar los cargos directivos en plazo.</strong> Los actos realizados por cargos
+                con mandato caducado (compras, contratos, representación ante terceros) pueden ser impugnables
+                por los socios o por la contraparte afectada.
+              </li>
+              <li>
+                <strong>Usar el patrimonio de la asociación para beneficio personal</strong> de socios o
+                directivos. Esto puede generar responsabilidad civil por daños a la entidad y, en casos
+                graves, responsabilidad penal por apropiación indebida o administración desleal.
+              </li>
+              <li>
+                <strong>No distinguir entre cuotas de socios y servicios a terceros.</strong> Las cuotas de
+                socios destinadas a los fines propios están exentas de IVA e IS. Sin embargo, los servicios
+                prestados a no socios o las cuotas con contraprestación directa están sujetos a IVA (21 %)
+                e IS al tipo correspondiente.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('asistente-constitucion-asociacion')} />

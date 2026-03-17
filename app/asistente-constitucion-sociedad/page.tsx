@@ -685,6 +685,305 @@ export default function AsistenteConstitucionSociedadPage() {
             ))}
           </div>
         </section>
+
+        {/* ── SECCIÓN 1: Tabla comparativa ampliada ── */}
+        <section className={styles.guideSection}>
+          <h2>Comparativa completa: SL, SL formación sucesiva, SLU y SA</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Característica</th>
+                  <th>SL estándar</th>
+                  <th>SL formación sucesiva (1 €)</th>
+                  <th>SLU (unipersonal)</th>
+                  <th>SA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Capital mínimo</td>
+                  <td>3.000 €</td>
+                  <td>Desde 1 €</td>
+                  <td>3.000 €</td>
+                  <td>60.000 €</td>
+                </tr>
+                <tr>
+                  <td>Número de socios</td>
+                  <td>1 o más</td>
+                  <td>1 o más</td>
+                  <td>Solo 1</td>
+                  <td>1 o más</td>
+                </tr>
+                <tr>
+                  <td>Responsabilidad durante formación</td>
+                  <td>Limitada al capital</td>
+                  <td>Personal del administrador hasta alcanzar 3.000 €</td>
+                  <td>Limitada al capital</td>
+                  <td>Limitada al capital (25% desembolsado)</td>
+                </tr>
+                <tr>
+                  <td>Distribución de beneficios</td>
+                  <td>Libre entre socios</td>
+                  <td>20% a reservas obligatorias hasta 3.000 €</td>
+                  <td>Al único socio</td>
+                  <td>Dividendos proporcionales a acciones</td>
+                </tr>
+                <tr>
+                  <td>Cotización en bolsa</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>Sí (si cumple requisitos)</td>
+                </tr>
+                <tr>
+                  <td>Tiempo de constitución</td>
+                  <td>1–3 semanas</td>
+                  <td>1–3 semanas</td>
+                  <td>1–3 semanas</td>
+                  <td>2–4 semanas</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: Casos de uso ── */}
+        <section className={styles.guideSection}>
+          <h2>¿Qué forma jurídica encaja con tu situación?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🚀</span>
+                <strong>Startup tecnológica de 2 socios</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Forma recomendada:</strong> SL estándar con 3.000 € (reparto 50/50).
+                Incluye en los estatutos un <em>derecho de tanteo</em> para que ningún socio pueda vender
+                su participación a un tercero sin ofrecérsela antes al otro.
+              </p>
+              <p className={styles.escenarioTip}>
+                Redacta también un pacto de socios privado que regule la salida, el vesting y las
+                decisiones estratégicas — es el documento más importante que firmarás.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">💡</span>
+                <strong>Emprendedor solo con poco capital</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Forma recomendada:</strong> SLU con capital 1 € (formación sucesiva).
+                Puedes empezar con capital mínimo, pero el administrador responde personalmente
+                mientras el patrimonio neto sea inferior a 3.000 €.
+              </p>
+              <p className={styles.escenarioTip}>
+                Obligación especial: destinar el 20% de cada ejercicio con beneficios a reservas
+                hasta llegar a los 3.000 €. Puedes no repartir dividendos hasta entonces.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
+                <strong>Empresa familiar</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Forma recomendada:</strong> SL con pacto de socios para evitar conflictos
+                sucesorios. Define con claridad qué pasa cuando un socio fallece, se divorcia o quiere
+                salir: ¿a qué precio? ¿con qué plazo?
+              </p>
+              <p className={styles.escenarioTip}>
+                Considera incluir una cláusula de <em>tag-along</em> (los socios menores pueden
+                vender en las mismas condiciones que el mayoritario) y <em>drag-along</em>
+                (el mayoritario puede arrastrar a los demás en una venta).
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
+                <strong>Empresa que quiere escalar e incorporar inversores</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Forma recomendada:</strong> SL convertible a SA. Empieza como SL (más
+                ágil y barata), e incluye en los estatutos la posibilidad de ampliar capital
+                mediante rondas de inversión y de transformarte en SA si llegas a necesitar
+                cotizar en bolsa.
+              </p>
+              <p className={styles.escenarioTip}>
+                Define desde el inicio las condiciones de <em>dilución preferente</em> y el
+                <em>derecho de asistencia</em> para inversores. Algunos business angels lo exigen
+                antes de firmar el term sheet.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ ampliada ── */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes (ampliado)</h2>
+          <ul className={styles.faqListPro}>
+            {[
+              {
+                p: '¿Cuánto tiempo tarda realmente constituir una SL paso a paso?',
+                r: 'El proceso completo dura entre 10 y 20 días hábiles en condiciones normales. El desglose es: 1-5 días para la certificación negativa del nombre; 1 día para la firma notarial; 5-15 días para la inscripción en el Registro Mercantil provincial. Con CIRCE/PAE telemático puede comprimirse a 24-48 horas en casos simples.',
+              },
+              {
+                p: '¿Puedo constituir una SL de forma telemática sin ir al notario?',
+                r: 'Sí, pero con matices. La plataforma CIRCE permite tramitar la constitución íntegramente online si usas estatutos tipo del Ministerio. Sin embargo, si necesitas estatutos personalizados o hay socios extranjeros sin certificado digital español, la comparecencia presencial ante notario sigue siendo necesaria.',
+              },
+              {
+                p: '¿Qué son los estatutos sociales y qué deben incluir obligatoriamente?',
+                r: 'Los estatutos son la "constitución interna" de la empresa. Por ley deben incluir: denominación social, objeto social, domicilio, capital social y participaciones, órgano de administración y sus facultades, y el sistema de toma de decisiones en la junta de socios. Todo lo demás (derechos especiales, restricciones de transmisión, etc.) es opcional pero muy recomendable.',
+              },
+              {
+                p: '¿Cuándo es mejor optar por SLU frente a SL con socios?',
+                r: 'La SLU es adecuada cuando eres el único propietario del negocio y no prevés incorporar socios en el corto plazo. Las ventajas son gestión más ágil y sin necesidad de convocar juntas formales. El inconveniente: toda la responsabilidad (y el capital) recae en ti, y debes inscribir la condición unipersonal en el Registro si la situación cambia.',
+              },
+              {
+                p: '¿Qué es el pacto de socios y por qué es tan importante?',
+                r: 'El pacto de socios es un contrato privado entre los socios (no inscrito en el Registro) que regula materias sensibles: reparto de beneficios, procedimiento de salida, penalizaciones por incumplimiento, vesting de participaciones, toma de decisiones estratégicas y resolución de conflictos. No es obligatorio, pero su ausencia es la causa número uno de conflictos societarios que acaban en disolución.',
+              },
+              {
+                p: '¿Puedo ser administrador y cobrar si soy el único socio?',
+                r: 'Sí. El administrador único puede percibir retribución si así lo establecen los estatutos o lo aprueba la junta. En la práctica, la forma más habitual es la "nómina de administrador" o el contrato mercantil. Si además trabajas para la empresa de forma habitual y eres socio con más del 25% del capital, debes darte de alta en el RETA (autónomos) independientemente de si cobras nómina.',
+              },
+              {
+                p: '¿Qué pasa si la empresa no genera beneficios el primer año?',
+                r: 'Nada especial desde el punto de vista societario: una sociedad puede tener pérdidas. Deberás presentar igualmente el Impuesto de Sociedades (IS) con base imponible negativa o cero, y depositar las Cuentas Anuales en el Registro Mercantil antes del 30 de julio del año siguiente. Las pérdidas pueden compensarse con beneficios futuros durante los 15 años siguientes.',
+              },
+              {
+                p: '¿Cómo se cierra o disuelve una SL si no funciona?',
+                r: 'El proceso de disolución y liquidación requiere: acuerdo de la junta de socios, nombramiento de liquidadores, pago de todas las deudas, distribución del remanente entre socios, escritura de extinción ante notario e inscripción en el Registro Mercantil. Si hay deudas pendientes, los socios no pueden repartir nada. El proceso completo puede durar entre 3 y 12 meses.',
+              },
+            ].map(({ p, r }, i) => (
+              <li key={i} className={styles.faqItemPro}>
+                <strong>{p}</strong>
+                <span>{r}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* ── SECCIÓN 4: Guía paso a paso ── */}
+        <section className={styles.guideSection}>
+          <h2>Guía paso a paso: cómo constituir una SL en España</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Certificación negativa del nombre</strong>
+                <span>Solicitar en el Registro Mercantil Central (RMC) que el nombre elegido no coincide con ninguna sociedad ya inscrita. Coste: <strong>13,52 €</strong>. Plazo: <strong>1–5 días hábiles</strong>. Válida 6 meses.</span>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Redacción de estatutos sociales</strong>
+                <span>Puedes usar los <em>estatutos tipo</em> del Ministerio de Justicia — son gratuitos y válidos para la mayoría de pymes. Si necesitas cláusulas especiales (derechos de socios, restricciones de transmisión, etc.), el notario o un abogado mercantilista puede redactarlos a medida (~400–800 €).</span>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Apertura de cuenta bancaria y depósito del capital social</strong>
+                <span>Abrir una cuenta a nombre de «[Nombre], S.L. en constitución» y depositar el capital: <strong>3.000 €</strong> (SL estándar / SLU) o <strong>desde 1 €</strong> (formación sucesiva) o <strong>15.000 € mínimo</strong> (SA, con 25% del total). El banco emite un certificado del depósito que debes llevar al notario.</span>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Escritura de constitución ante notario</strong>
+                <span>Todos los socios firman la escritura en la notaría. Coste estimado: <strong>600–900 €</strong> (varía según capital y número de socios). Duración: <strong>1 día</strong>. Pide varias copias simples además de la copia autorizada.</span>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Autoliquidación ITP-AJD — operaciones societarias</strong>
+                <span>Desde 2010 las constituciones de sociedades están <strong>exentas</strong> del ITP-AJD, pero es obligatorio presentar el modelo correspondiente (modelo 600 o el de cada CCAA) con cuota cero. Plazo: 30 días hábiles desde la escritura.</span>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Inscripción en el Registro Mercantil provincial</strong>
+                <span>Presentar la escritura en el Registro de la provincia del domicilio social. Coste estimado: <strong>300–400 €</strong>. Plazo: <strong>5–15 días hábiles</strong>. La inscripción otorga personalidad jurídica plena a la sociedad.</span>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>NIF definitivo + alta en Hacienda + RETA (si procede)</strong>
+                <span>Una vez inscrita, solicitar el NIF definitivo en la AEAT presentando la escritura y el modelo 036. Si el administrador es socio con &gt;25% y trabaja para la sociedad, debe darse de alta en el <strong>RETA</strong> (autónomos) en Seguridad Social. También debes darte de alta en el epígrafe del IAE correspondiente si la facturación prevista supera 1 M€.</span>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: Mejores prácticas ── */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas al constituir tu sociedad</h2>
+          <div className={styles.tipsGrid}>
+            {[
+              { icon: '📄', tip: 'Usa los estatutos tipo del Ministerio de Justicia si no tienes necesidades especiales. Son gratuitos, están actualizados y puedes ahorrarte ~400 € en honorarios de redacción.' },
+              { icon: '🤝', tip: 'Redacta un pacto de socios privado para temas sensibles: reparto de beneficios, cláusulas de salida, bloqueo de decisiones críticas y procedimiento en caso de desacuerdo. No es público pero es vinculante entre socios.' },
+              { icon: '💶', tip: 'El capital social de 3.000 € no queda bloqueado: puede utilizarse desde el primer día para cubrir gastos de la empresa (alquiler, herramientas, salarios). No es un depósito intocable.' },
+              { icon: '⚡', tip: 'Usa la vía telemática CIRCE/PAE si necesitas velocidad. En casos simples (estatutos tipo, socios residentes en España con certificado digital) el proceso puede completarse en 24–48 horas.' },
+              { icon: '🎯', tip: 'Redacta el objeto social de forma amplia. Un objeto demasiado restringido obliga a modificar los estatutos (notaría + Registro) si cambias o amplías tu actividad, con el coste y tiempo que eso implica.' },
+              { icon: '™️', tip: 'Registra la marca en la OEPM antes de constituir la sociedad. El nombre puede estar disponible en el Registro Mercantil y sin embargo estar registrado como marca. Compruébalo en la base de datos TMview antes de invertir.' },
+            ].map(({ icon, tip }, i) => (
+              <div key={i} className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">{icon}</span>
+                <p>{tip}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: Warning — errores comunes ── */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <strong>Errores comunes al constituir una sociedad</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Constituir con capital 1 € sin entender las obligaciones:</strong> debes
+                destinar el 20% de los beneficios a reservas hasta llegar a 3.000 €, y el
+                administrador responde personalmente con su patrimonio mientras el capital neto sea
+                inferior a ese umbral.
+              </li>
+              <li>
+                <strong>No firmar un pacto de socios desde el inicio:</strong> los conflictos entre
+                socios son la causa número uno de cierre de pymes en España. Un pacto claro desde el
+                día 1 previene litigios costosos y rupturas destructivas.
+              </li>
+              <li>
+                <strong>Olvidar que el NIF provisional no sirve para todo:</strong> con el NIF
+                provisional no puedes facturar a clientes internacionales ni operar con normalidad en
+                la AEAT. Obtén el NIF definitivo en cuanto se inscriba la sociedad.
+              </li>
+              <li>
+                <strong>No depositar las Cuentas Anuales a tiempo:</strong> deben depositarse en el
+                Registro Mercantil antes del 30 de julio (6 meses después del cierre del ejercicio).
+                El incumplimiento conlleva una sanción de entre 1.200 € y 60.000 €, además del
+                cierre registral.
+              </li>
+              <li>
+                <strong>Mezclar cuentas personales y de empresa desde el primer mes:</strong> invalida
+                deducciones fiscales, complica la contabilidad y puede generar responsabilidad personal.
+                Abre una cuenta corporativa desde el primer día.
+              </li>
+              <li>
+                <strong>Nombrar administrador sin revisar el alta en RETA:</strong> si el administrador
+                posee más del 25% de las participaciones y trabaja habitualmente para la sociedad, está
+                obligado a darse de alta en el RETA. No hacerlo genera deudas con la Seguridad Social
+                con recargo e intereses.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <ShareCard appName="asistente-constitucion-sociedad" />
