@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-16 | **Total profesionalizadas**: ~146 | **Pendientes**: ~104
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-16 | **Total profesionalizadas**: ~150 | **Pendientes**: ~100
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -159,10 +159,10 @@ Apps de uso frecuente con buen potencial educativo.
 - [x] `/contador-silabas/` — Separar y contar sílabas en español ✅ tabla fenómenos fonéticos, 4 casos uso, 8 FAQs, guía análisis métrico, 6 tips, warning *(2026-03-16 commit fee8755)*
 - [x] `/conversor-texto/` — Conversor de texto ✅ lote 26
 - [x] `/comparador-textos/` — Comparador de textos ✅ tabla 5 tipos comparación, 4 casos uso, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-16 commit b9ba48b)*
-- [ ] `/conversor-markdown-html/` — Markdown a HTML
+- [x] `/conversor-markdown-html/` — Markdown a HTML ✅ tabla sintaxis MD/HTML, 4 perfiles, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit ef83181)*
 - [x] `/conversor-morse/` — Código morse ✅ lote 26
 - [x] `/conversor-numeros-romanos/` — Números romanos ✅ lote 26
-- [ ] `/detector-idioma/` — Detector de idioma automático
+- [x] `/detector-idioma/` — Detector de idioma automático ✅ tabla familias lingüísticas, 4 perfiles, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit ef83181)*
 - [x] `/conversor-binario/` — Conversión binaria ✅ lote 26
 - [x] `/conversor-braille/` — Sistema Braille ✅ lote 26
 - [x] `/generador-anagramas/` — Generador de anagramas ✅ lote 27
@@ -189,7 +189,7 @@ Apps de uso frecuente con buen potencial educativo.
 
 ### Creatividad y Diseño
 
-- [ ] `/generador-gradientes/` — Generador de gradientes CSS
+- [x] `/generador-gradientes/` — Generador de gradientes CSS ✅ tabla tipos gradiente, 4 perfiles, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit ef83181)*
 - [ ] `/generador-sombras/` — Generador de sombras CSS
 - [x] `/generador-tipografias/` — Generador y comparador de tipografías ✅ tabla 5 familias tipográficas, 4 casos uso, 8 FAQs, guía elección, 6 principios, warning *(2026-03-16 commit fee8755)*
 - [ ] `/creador-thumbnails/` — Thumbnails para YouTube
@@ -205,7 +205,7 @@ Apps de uso frecuente con buen potencial educativo.
 
 ### Campus Digital
 
-- [ ] `/calculadora-notas/` — Calculadora de notas académicas
+- [x] `/calculadora-notas/` — Calculadora de notas académicas ✅ tabla sistemas calificación, 4 perfiles, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit ef83181)*
 - [ ] `/creador-flashcards/` — Creador de tarjetas de estudio
 - [ ] `/generador-horarios-estudio/` — Planificador de horarios de estudio
 - [ ] `/curso-emprendimiento/` — Curso de emprendimiento
@@ -339,6 +339,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote B4 | 2026-03-17 | `generador-gradientes`, `detector-idioma`, `conversor-markdown-html`, `calculadora-notas` | `ef83181` |
 | Lote B3 | 2026-03-16 | `comparador-textos`, `conversor-imagenes`, `test-habitos-saludables` | `b9ba48b` |
 | Lote B2 | 2026-03-16 | `contador-silabas`, `test-velocidad-escritura`, `generador-tipografias` | `fee8755` |
 | Lote B1 | 2026-03-16 | `generador-tonos` (individual) | `ba8c9f5` |
