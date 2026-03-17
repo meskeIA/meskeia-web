@@ -126,17 +126,30 @@ Las Guías son **landing pages** que agrupan herramientas para un **proceso de d
 }
 ```
 
-### 2. Checklist al crear nueva app
+### 2. Ciclo de creación de nueva app (2 fases obligatorias)
 
+Las nuevas apps se crean **siempre en dos fases**. La fase 2 es inmediata, no opcional.
+
+**Fase 1 — App funcional** (skill `/nueva-app-meskeia`):
 ```
 [ ] 1. Crear carpeta app/[nombre-app]/ (usar template: templates/app-base/)
 [ ] 2. Añadir entrada en data/applications.ts (suites + contexts)
 [ ] 3. Añadir URL en data/implemented-apps.ts
 [ ] 4. Añadir relaciones en data/app-relations.ts
 [ ] 5. Actualizar public/ai-index.json
-[ ] 6. Ejecutar npm run build
-[ ] 7. Commit y push a GitHub
+[ ] 6. Ejecutar npm run build (exit code 0)
 ```
+
+**Fase 2 — Profesionalización v2.0** (inmediatamente después del build):
+```
+[ ] 7. Añadir bloque educativo completo dentro de <EducationalSection>
+[ ] 8. Verificar clase .warningBox en CSS Module (indicador de v2.0 completo)
+[ ] 9. Build final, commit y push a GitHub
+```
+
+**Excepción**: Cursos (`/curso-*`) y Guías (`/guia/*`) están excluidos del patrón v2.0 por tener estructura propia.
+
+**Instrucciones técnicas completas del patrón v2.0**: `PROFESIONALIZACION.md`
 
 ---
 

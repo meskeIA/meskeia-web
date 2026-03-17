@@ -630,22 +630,12 @@ FASE 4: VERIFICACIÓN
 2. **Apps implementadas**: Ver carpetas mencionadas en sección "Apps Implementadas"
 3. **CLAUDE.md**: Reglas generales de desarrollo meskeIA (este documento las complementa)
 
-### Próximos Pasos Sugeridos
+### Cuándo aplicar el patrón v2.0
 
-Si quieres profesionalizar más apps:
-
-**Candidatos prioritarios** (máximo impacto):
-1. Generador Facturas (exportable, legal)
-2. Calculadora Seguro Vida (financiero, decisión importante)
-3. Calculadora FIRE (financiero, planificación largo plazo)
-4. Generador Meta Descripciones (ya tiene v1.0, migrar a v2.0)
-5. Comparador Tipos Seguros (financiero, decisión importante)
-
-**Criterio de priorización**:
-- Alto tráfico de usuarios
-- Contexto profesional/empresarial
-- Output exportable
-- Decisiones con implicaciones económicas/legales
+- **Nueva app**: siempre, inmediatamente después del build exitoso (Fase 2 del flujo `/nueva-app-meskeia`)
+- **Excepción Cursos** (`/curso-*`): tienen estructura educativa propia con capítulos, no aplica
+- **Excepción Guías** (`/guia/*`): tienen estructura de journey propia, no aplica
+- **Apps de ocio/juegos**: usar patrón lite (3 casos, 4 FAQ, 4 pasos, 4 tips, 4 errores)
 
 ---
 
@@ -660,10 +650,10 @@ Si quieres profesionalizar más apps:
   20. Calculadora ROI Marketing (app/calculadora-roi-marketing/) - 6 secciones profesionales con CSS prefijado 'edu' para evitar conflictos con tablaWrapper/tablaComparativa existentes (Tabla Comparativa 6 canales × 7 criterios ROI/ROAS/CPL/horizonte, Casos de Uso 4 perfiles ecommerce/SaaS B2B/local/infoproductos, FAQ 8 preguntas atribución/CAC/CLV/gestión, Guía 7 pasos optimizar mix, Tips 6 reglas marketing rentable, Warning 6 errores que destruyen ROI)
   21. Calculadora Coste Vivienda (app/calculadora-coste-vivienda/) - 6 secciones profesionales + eliminado disclaimer duplicado (Tabla Comparativa 5 tipos vivienda × 7 criterios, Casos de Uso 4 perfiles joven/familia/segunda residencia/inversor, FAQ 8 preguntas adquisición/regla 30%/alquilar vs comprar/derramas, Guía 7 pasos auditar y reducir costes, Tips 6 hábitos propietario inteligente, Warning 6 errores que disparan el coste)
 
-**Última actualización**: 2026-03-10 (Sesión: inventario PENDIENTEPROFESIONALIZAR.md + 5 apps verificadas → 90 apps v2.0)
+**Última actualización**: 2026-03-17 (100% apps profesionalizadas. Patrón integrado en flujo de nueva app)
 **Autor**: Claude Code + Usuario (Sesión profesionalización)
-**Versión**: 2.0
-**Apps implementadas**: 90 (85 con .warningBox en CSS + 5 verificadas con clases edu-xxx)
+**Versión**: 2.1
+**Estado**: 100% — todas las apps tienen patrón v2.0 (excepto Cursos y Guías, excluidos por diseño)
 
 ---
 
@@ -677,7 +667,6 @@ Este procedimiento describe el flujo estándar para profesionalizar apps en lote
 
 | Archivo | Propósito |
 |---------|-----------|
-| `PENDIENTEPROFESIONALIZAR.md` | Inventario de pendientes con prioridad y estado |
 | `PROFESIONALIZACION.md` | Documentación técnica del patrón v2.0 (este archivo) |
 | `templates/app-base/` | Plantillas de referencia |
 
@@ -703,12 +692,11 @@ grep -rl "\.warningBox" app/*/ --include="*.module.css" | wc -l
 
 #### FASE 1: Selección de Apps
 
-1. Abrir `PENDIENTEPROFESIONALIZAR.md`
-2. Seleccionar **5 apps** de la misma prioridad (preferiblemente de la misma categoría para contexto similar)
-3. Criterio de selección por sesión:
+1. Identificar la app recién creada (o apps pendientes detectadas con `grep -rl "warningBox" app/*/`)
+2. Criterio de selección por sesión:
    - **Lote estándar**: 5 apps, lanzadas **en paralelo** (Plan Max — sin límite de tokens)
    - **Apps complejas** (>1000 líneas page.tsx): reducir a 3-4 por lote
-   - **Evitar mezclar** ALTA + BAJA en el mismo lote (el agente pierde contexto)
+   - **Evitar mezclar** tipos muy distintos en el mismo lote (el agente pierde contexto)
 
 #### FASE 2: Verificación Previa
 
@@ -788,14 +776,6 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 
 git push origin main
 ```
-
-#### FASE 7: Actualizar Inventario
-
-En `PENDIENTEPROFESIONALIZAR.md`:
-1. Marcar cada app completada: `[ ]` → `[x]`
-2. Actualizar el contador del header: `Total profesionalizadas: N → N+X`
-3. Actualizar `Pendientes: ~Y → ~Y-X`
-4. Añadir fila en la tabla "Historial de Lotes" con fecha, apps y hash del commit
 
 ---
 
