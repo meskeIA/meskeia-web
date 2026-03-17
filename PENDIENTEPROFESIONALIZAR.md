@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-16 | **Total profesionalizadas**: ~150 | **Pendientes**: ~100
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-16 | **Total profesionalizadas**: ~154 | **Pendientes**: ~96
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -148,9 +148,9 @@ Apps de uso frecuente con buen potencial educativo.
 - [ ] `/comparador-coste-vida/` — Coste de vida en 55+ ciudades
 - [x] `/generador-actas/` — Actas de reunión profesionales ✅ lote 33
 - [ ] `/sonometro/` — Medidor de nivel de ruido en dB
-- [ ] `/metronomo/` — Metrónomo online con tap tempo
+- [x] `/metronomo/` — Metrónomo online con tap tempo ✅ tabla tempos/BPM, 4 perfiles instrumento, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit 001ecff)*
 - [x] `/generador-tonos/` — Generador de frecuencias de audio ✅ tabla 8 rangos frecuencia, 4 casos uso, 8 FAQs, guía test audición, 6 tips, warning *(2026-03-16 commit ba8c9f5)*
-- [ ] `/mi-ip/` — IP pública, geolocalización, ISP
+- [x] `/mi-ip/` — IP pública, geolocalización, ISP ✅ tabla IPv4/IPv6/pública/privada, 4 perfiles, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit 001ecff)*
 
 ### Texto y Documentos
 
@@ -190,7 +190,7 @@ Apps de uso frecuente con buen potencial educativo.
 ### Creatividad y Diseño
 
 - [x] `/generador-gradientes/` — Generador de gradientes CSS ✅ tabla tipos gradiente, 4 perfiles, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit ef83181)*
-- [ ] `/generador-sombras/` — Generador de sombras CSS
+- [x] `/generador-sombras/` — Generador de sombras CSS ✅ tabla propiedades shadow, 4 perfiles, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit 001ecff)*
 - [x] `/generador-tipografias/` — Generador y comparador de tipografías ✅ tabla 5 familias tipográficas, 4 casos uso, 8 FAQs, guía elección, 6 principios, warning *(2026-03-16 commit fee8755)*
 - [ ] `/creador-thumbnails/` — Thumbnails para YouTube
 - [ ] `/generador-og-images/` — Imágenes OG para redes sociales
@@ -227,7 +227,7 @@ Apps de uso frecuente con buen potencial educativo.
 
 ### Matemáticas Básicas
 
-- [ ] `/algebra-ecuaciones/` — Calculadora de ecuaciones
+- [x] `/algebra-ecuaciones/` — Calculadora de ecuaciones ✅ tabla 6 tipos ecuación, 4 perfiles, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit 001ecff)*
 - [ ] `/calculadora-mcd-mcm/` — MCD y MCM
 - [ ] `/calculadora-probabilidad/` — Probabilidad
 - [ ] `/calculadora-estadistica/` — Estadística básica
@@ -339,6 +339,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote B5 | 2026-03-17 | `generador-sombras`, `algebra-ecuaciones`, `metronomo`, `mi-ip` | `001ecff` |
 | Lote B4 | 2026-03-17 | `generador-gradientes`, `detector-idioma`, `conversor-markdown-html`, `calculadora-notas` | `ef83181` |
 | Lote B3 | 2026-03-16 | `comparador-textos`, `conversor-imagenes`, `test-habitos-saludables` | `b9ba48b` |
 | Lote B2 | 2026-03-16 | `contador-silabas`, `test-velocidad-escritura`, `generador-tipografias` | `fee8755` |
