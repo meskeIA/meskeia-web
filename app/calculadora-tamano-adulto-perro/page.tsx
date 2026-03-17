@@ -426,6 +426,299 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             </details>
           </div>
         </section>
+
+        {/* SECCIÓN 1 — Tabla Comparativa */}
+        <section className={styles.guideSection}>
+          <h2>📊 Clasificación de Perros por Tamaño Adulto</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th>Peso adulto</th>
+                  <th>Ejemplos de razas</th>
+                  <th>Esp. de vida</th>
+                  <th>Madurez</th>
+                  <th>Cambio a adulto</th>
+                  <th>Ejercicio diario</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Toy / Mini</strong></td>
+                  <td>&lt; 4 kg</td>
+                  <td>Chihuahua, Yorkshire, Pomerania</td>
+                  <td>14-16 años</td>
+                  <td>8-10 meses</td>
+                  <td>9-10 meses</td>
+                  <td>30 min</td>
+                </tr>
+                <tr>
+                  <td><strong>Pequeño</strong></td>
+                  <td>4-10 kg</td>
+                  <td>Jack Russell, Shih Tzu, Bichón</td>
+                  <td>12-15 años</td>
+                  <td>10-12 meses</td>
+                  <td>12 meses</td>
+                  <td>45 min</td>
+                </tr>
+                <tr>
+                  <td><strong>Mediano</strong></td>
+                  <td>10-25 kg</td>
+                  <td>Beagle, Border Collie, Cocker</td>
+                  <td>10-13 años</td>
+                  <td>12-15 meses</td>
+                  <td>12-15 meses</td>
+                  <td>60-90 min</td>
+                </tr>
+                <tr>
+                  <td><strong>Grande</strong></td>
+                  <td>25-45 kg</td>
+                  <td>Labrador, Pastor Alemán, Golden</td>
+                  <td>9-11 años</td>
+                  <td>18-24 meses</td>
+                  <td>15-18 meses</td>
+                  <td>90-120 min</td>
+                </tr>
+                <tr>
+                  <td><strong>Gigante</strong></td>
+                  <td>&gt; 45 kg</td>
+                  <td>Gran Danés, Mastín, San Bernardo</td>
+                  <td>7-9 años</td>
+                  <td>24-36 meses</td>
+                  <td>18-24 meses</td>
+                  <td>60-90 min*</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className={styles.faqTip}>* Los perros gigantes necesitan ejercicio moderado para proteger sus articulaciones durante el crecimiento.</p>
+        </section>
+
+        {/* SECCIÓN 2 — Casos de Uso */}
+        <section className={styles.guideSection}>
+          <h2>👤 ¿Para quién es esta calculadora?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
+                <strong>Adoptante con mestizo</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Has adoptado un cachorro mestizo de 3 meses y quieres saber si cabrá en tu piso de 60 m².
+              </p>
+              <p className={styles.escenarioTip}>
+                Introduce su peso actual, selecciona el tamaño más probable según su morfología y obtén un rango estimado para planificar espacio y equipamiento.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🐾</span>
+                <strong>Criador que evalúa una camada</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Tienes una camada de 8 semanas y quieres comprobar si el desarrollo de cada cachorro está dentro del rango esperado para la raza.
+              </p>
+              <p className={styles.escenarioTip}>
+                Pesa a cada cachorro y compara con la estimación. Una desviación superior al 20% del rango puede indicar problemas de salud o nutrición.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🩺</span>
+                <strong>Veterinario que ajusta dosis</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Necesitas calcular la dosis de un antiparasitario preventivo para un cachorro de 10 semanas en función de su peso adulto estimado.
+              </p>
+              <p className={styles.escenarioTip}>
+                La calculadora proporciona el rango de peso adulto probable, útil para planificar protocolos de desparasitación y vacunación adaptados al tamaño final.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
+                <strong>Familia que elige raza</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Estás entre un Labrador y un Cocker Spaniel y quieres entender la diferencia real de tamaño adulto y sus implicaciones prácticas.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consulta la tabla comparativa para ver diferencias en peso, esperanza de vida, ejercicio y momento de cambio de pienso antes de tomar la decisión.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 3 — FAQ ampliada */}
+        <section className={styles.guideSection}>
+          <h2>❓ Preguntas Frecuentes (v2)</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <strong>¿A qué edad deja de crecer un perro?</strong>
+              <p>Depende del tamaño: los perros mini terminan de crecer hacia los 8-10 meses, los medianos hacia los 12-15 meses y los gigantes pueden no alcanzar su tamaño adulto completo hasta los 3 años.</p>
+              <p className={styles.faqTip}>Regla práctica: cuanto mayor es el perro, más tarde madura.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo predigo el tamaño adulto de un mestizo?</strong>
+              <p>Si conoces las razas parentales, promedia sus pesos adultos típicos. Si no las conoces, el tamaño de las patas y la morfología del cráneo dan pistas, aunque con menos precisión que la genética conocida.</p>
+              <p className={styles.faqTip}>Un test de ADN canino puede identificar las razas predominantes y mejorar la estimación.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Influye la alimentación en el tamaño final?</strong>
+              <p>La alimentación no puede hacer que un perro supere su potencial genético, pero una dieta deficiente sí puede impedir que lo alcance. La sobrealimentación en cachorros de razas grandes es especialmente perjudicial para el desarrollo óseo.</p>
+              <p className={styles.faqTip}>El objetivo no es maximizar el crecimiento, sino que sea gradual y constante.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cuándo cambiar de pienso junior a adulto?</strong>
+              <p>Cuando el cachorro alcanza aproximadamente el 80-90% de su tamaño adulto estimado. Para razas mini, hacia los 9-10 meses; para razas grandes, entre los 15-18 meses; para gigantes, no antes de los 18-24 meses.</p>
+              <p className={styles.faqTip}>Cambia de forma gradual (7-10 días mezclando ambos piensos) para evitar problemas digestivos.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Los perros grandes envejecen antes?</strong>
+              <p>Sí. Los perros de razas gigantes tienen una esperanza de vida de 7-9 años frente a los 14-16 años de las razas toy. Se consideran geriátricos a partir de los 5-6 años, mientras que un chihuahua no entra en esa categoría hasta los 10-11 años.</p>
+              <p className={styles.faqTip}>Esto tiene implicaciones directas en cuándo iniciar revisiones geriátricas y ajustar la dieta a &quot;senior&quot;.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Qué razas crecen más de lo esperado?</strong>
+              <p>El Teckel puede variar entre 7-15 kg según su variedad (estándar o miniatura). El Husky Siberiano y el Malamute pueden confundirse en la etapa cachorro. Los mestizos con genes de razas gigantes a menudo sorprenden superando las expectativas iniciales.</p>
+              <p className={styles.faqTip}>Si el cachorro supera el rango estimado, consulta con el veterinario para ajustar la alimentación.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo afecta la esterilización temprana al crecimiento?</strong>
+              <p>La esterilización antes de la madurez sexual elimina las hormonas que señalizan el cierre de las placas de crecimiento. El resultado puede ser un perro ligeramente más alto pero con huesos menos densos, lo que aumenta el riesgo de displasia en razas grandes.</p>
+              <p className={styles.faqTip}>En razas grandes y gigantes se recomienda esperar a que el perro haya alcanzado la madurez sexual antes de esterilizar.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cuándo está un perro completamente desarrollado?</strong>
+              <p>El desarrollo físico (tamaño) se completa antes que el desarrollo mental (comportamiento). Un Pastor Alemán puede tener tamaño adulto a los 18 meses pero seguir con comportamiento de cachorro hasta los 2-3 años. El desarrollo cognitivo completo se alcanza entre los 2-4 años según la raza.</p>
+              <p className={styles.faqTip}>No confundas madurez física con madurez conductual: el adiestramiento debe adaptarse a ambas.</p>
+            </li>
+          </ul>
+        </section>
+
+        {/* SECCIÓN 4 — Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>🗺️ Cómo estimar el tamaño adulto y adaptar los cuidados</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Pesa al cachorro con precisión</strong>
+                <p>Usa una báscula de cocina o pediátrica para cachorros pequeños (&lt; 5 kg). Para cachorros más grandes, pésate tú primero con el cachorro en brazos y luego solo, y resta la diferencia. Registra el peso junto con la fecha.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Determina la edad exacta en semanas</strong>
+                <p>Si tienes la fecha de nacimiento, calcula las semanas exactas. Si es un mestizo adoptado sin historial, el veterinario puede estimar la edad por el estado de la dentición y el desarrollo general.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Selecciona la categoría de tamaño correcta</strong>
+                <p>Si conoces la raza, consulta la tabla de razas de referencia. Para mestizos, usa el tamaño de los padres si los conoces, o la categoría que mejor se corresponda con la morfología actual (tamaño de cabeza, longitud de patas, anchura de tórax).</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Interpreta el rango estimado</strong>
+                <p>El resultado muestra un peso central estimado y un rango de ±15%. Considera el extremo superior si la raza tiene alta variabilidad genética o si el cachorro ya está en el percentil alto de su camada.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Ajusta la alimentación a la etapa actual</strong>
+                <p>Usa el peso adulto estimado (no el actual) para calcular la ración diaria con pienso de cachorro. Esto evita la sobrealimentación en razas grandes, que puede provocar un crecimiento demasiado rápido y problemas articulares.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Planifica el ejercicio según el tamaño</strong>
+                <p>Antes de los 12-18 meses (razas grandes) o 18-24 meses (gigantes), evita saltos, carreras largas y superficies duras. Las placas de crecimiento son cartilaginosas y vulnerables a lesiones por sobrecarga.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Haz un seguimiento mensual</strong>
+                <p>Pesa al cachorro cada 2-4 semanas y recalcula la estimación. Una curva de crecimiento uniforme es señal de buen desarrollo. Crecimientos muy rápidos o estancamientos merecen consulta veterinaria.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* SECCIÓN 5 — Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>✅ Mejores Prácticas en el Seguimiento del Crecimiento</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
+              <strong>Pesa con regularidad</strong>
+              <p>Hasta los 4 meses, pesa al cachorro cada 2 semanas. Después, una vez al mes hasta alcanzar el tamaño adulto. Anota siempre el peso y la fecha para detectar cambios bruscos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🍖</span>
+              <strong>Alimenta según el peso adulto estimado</strong>
+              <p>Los fabricantes de pienso indican las raciones en función del peso adulto previsto, no del peso actual. Usar el peso actual lleva a subalimentación o sobrealimentación según la etapa.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🏋️</span>
+              <strong>Pienso específico para razas gigantes</strong>
+              <p>Las razas de más de 45 kg necesitan pienso con niveles más bajos de calcio y fósforo que promueven un crecimiento más lento y controlado. El exceso de calcio en cachorros gigantes está asociado a displasia de cadera y codo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🚶</span>
+              <strong>Ejercicio proporcional a la edad</strong>
+              <p>Una regla práctica: 5 minutos de ejercicio por mes de vida, dos veces al día, hasta la madurez física. Un cachorro de 4 meses soporta bien 20 minutos de paseo suave, pero no carreras ni saltos repetidos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
+              <strong>No adelantes el cambio a pienso adulto</strong>
+              <p>El pienso de cachorro tiene más energía y nutrientes para el crecimiento activo. Cambiar demasiado pronto, especialmente en razas grandes, priva al perro de nutrientes clave justo cuando más los necesita.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🩺</span>
+              <strong>Controles veterinarios cada 3-4 meses</strong>
+              <p>Durante el crecimiento activo, las revisiones frecuentes permiten detectar problemas de desarrollo óseo, parasitosis que afecten a la absorción de nutrientes y ajustar el calendario de vacunaciones y desparasitaciones.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 6 — Warning Box */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <strong>Errores frecuentes que afectan al desarrollo del cachorro</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Sobrealimentar pensando que &quot;engordará bien&quot;:</strong> Un cachorro gordo no es un cachorro sano. El exceso de peso durante el crecimiento ejerce presión sobre articulaciones y placas de crecimiento, aumentando el riesgo de displasia y osteoartritis prematura.
+              </li>
+              <li>
+                <strong>Cambiar a pienso adulto demasiado pronto en razas grandes:</strong> Los cachorros de razas grandes y gigantes necesitan la formulación específica de cachorro durante más tiempo (hasta 15-24 meses). Un cambio prematuro puede resultar en déficits nutricionales en la fase de mayor demanda.
+              </li>
+              <li>
+                <strong>Ejercicio excesivo en cachorros de razas gigantes antes de los 18 meses:</strong> Las placas de crecimiento (epífisis) no se cierran hasta los 18-24 meses en razas grandes y hasta los 36 meses en algunas gigantes. Correr en superficies duras, saltar vallas o hacer senderismo de larga distancia puede causar microfracturas y deformidades óseas permanentes.
+              </li>
+              <li>
+                <strong>No ajustar la ración cuando alcanza el peso adulto:</strong> Una vez que el perro deja de crecer, sus necesidades calóricas disminuyen. Mantener la ración de cachorro lleva a obesidad. La transición a pienso adulto debe ir acompañada de una reducción de la cantidad diaria.
+              </li>
+              <li>
+                <strong>Usar la misma tabla de referencia para mestizos que para razas puras:</strong> Los mestizos tienen mayor variabilidad genética. Una estimación de tamaño basada únicamente en el peso a las 8 semanas puede tener un margen de error del 30-40% en mestizos frente al 10-15% en razas puras.
+              </li>
+              <li>
+                <strong>Ignorar un crecimiento asimétrico:</strong> Si un cachorro crece de forma desigual (una pata más que otra, un lado del cuerpo más desarrollado), no lo atribuyas a &quot;la postura&quot;. Puede ser señal de displasia, luxación de rótula o deformidades angulares que requieren intervención temprana.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <ShareCard appName="calculadora-tamano-adulto-perro" />

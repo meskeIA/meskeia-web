@@ -368,237 +368,274 @@ export default function ConversorBase64Page() {
         subtitle="Historia, estándares y aplicaciones prácticas de la codificación Base64 en desarrollo web"
         icon="🔐"
       >
-        {/* Tabla Comparativa */}
-        <div className="edu-table-wrapper">
-          <h3 className="edu-section-title">📊 Comparativa de Esquemas de Codificación</h3>
-          <div className="edu-table-scroll">
-            <table className="edu-table">
+        {/* 1. Tabla Comparativa */}
+        <div className={styles.tableWrapper}>
+          <h3 className={styles.eduSectionTitle}>📊 Comparativa de Variantes de Base64 y Esquemas Relacionados</h3>
+          <div className={styles.comparativaTable}>
+            <table>
               <thead>
                 <tr>
                   <th>Esquema</th>
-                  <th>Alfabeto</th>
+                  <th>Caracteres usados</th>
                   <th>Overhead</th>
-                  <th>Uso principal</th>
+                  <th>Casos de uso</th>
                   <th>Padding</th>
+                  <th>Limitaciones</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Base64</strong></td>
+                  <td><strong>Base64 estándar (RFC 4648)</strong></td>
                   <td>A–Z, a–z, 0–9, +, /</td>
                   <td>+33%</td>
-                  <td>Email (MIME), datos generales</td>
+                  <td>Email MIME, adjuntos, datos binarios generales</td>
                   <td>= (obligatorio)</td>
+                  <td>+ y / rompen URLs; no válido en nombres de archivo</td>
                 </tr>
                 <tr>
-                  <td><strong>Base64url</strong></td>
+                  <td><strong>Base64 URL-safe</strong></td>
                   <td>A–Z, a–z, 0–9, -, _</td>
                   <td>+33%</td>
-                  <td>JWT, URLs, cookies</td>
-                  <td>= (opcional)</td>
+                  <td>JWT, parámetros URL, cookies, OAuth tokens</td>
+                  <td>= (opcional, suele omitirse)</td>
+                  <td>Incompatible con decodificadores estándar sin conversión previa</td>
+                </tr>
+                <tr>
+                  <td><strong>Base64 MIME/email</strong></td>
+                  <td>A–Z, a–z, 0–9, +, /</td>
+                  <td>+33%</td>
+                  <td>Adjuntos de correo, Content-Transfer-Encoding</td>
+                  <td>= (obligatorio) + saltos de línea cada 76 chars</td>
+                  <td>Saltos de línea obligatorios; mayor tamaño real en email</td>
                 </tr>
                 <tr>
                   <td><strong>Base32</strong></td>
-                  <td>A–Z, 2–7</td>
+                  <td>A–Z, 2–7 (32 caracteres)</td>
                   <td>+60%</td>
-                  <td>TOTP (2FA), códigos legibles</td>
+                  <td>TOTP/2FA, códigos que el usuario transcribe en voz alta</td>
                   <td>= (obligatorio)</td>
+                  <td>Overhead muy alto; solo útil cuando la legibilidad humana importa</td>
                 </tr>
                 <tr>
-                  <td><strong>Base58</strong></td>
-                  <td>Sin 0, O, I, l</td>
+                  <td><strong>Base58 (Bitcoin)</strong></td>
+                  <td>Sin 0, O, I, l (para evitar confusiones)</td>
                   <td>+37%</td>
-                  <td>Bitcoin, IPFS</td>
+                  <td>Direcciones Bitcoin, hashes IPFS, identificadores legibles</td>
                   <td>No tiene</td>
-                </tr>
-                <tr>
-                  <td><strong>Hexadecimal</strong></td>
-                  <td>0–9, A–F</td>
-                  <td>+100%</td>
-                  <td>Hashes, colores, depuración</td>
-                  <td>No tiene</td>
+                  <td>No estándar RFC; implementaciones propietarias; sin padding</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Casos de Uso */}
-        <div className="edu-escenarios-section">
-          <h3 className="edu-section-title">🎯 ¿Cuándo usarás Base64?</h3>
-          <div className="edu-escenarios-grid">
-            <div className="edu-escenario-card">
-              <span className="edu-escenario-icon">🔑</span>
-              <h4>JWT Tokens</h4>
-              <p>Los JSON Web Tokens usan Base64url para codificar header y payload. Al decodificar un JWT puedes ver los datos del usuario sin necesidad de clave privada (¡recuerda que NO es cifrado!).</p>
+        {/* 2. Casos de Uso — 4 perfiles */}
+        <div className={styles.escenariosGrid}>
+          <h3 className={styles.eduSectionTitle}>🎯 ¿Quién usa Base64 y para qué?</h3>
+          <div className={styles.escenariosGridInner}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌐</span>
+                <h4>Desarrollador web — Data URLs</h4>
+              </div>
+              <p>Incrusta iconos pequeños (&lt;5 KB) directamente en CSS/HTML como Data URLs para eliminar peticiones HTTP adicionales. Ideal para el logo del favicon o iconos SVG críticos above-the-fold.</p>
+              <p className={styles.escenarioExample}><code>background: url(&apos;data:image/svg+xml;base64,...&apos;)</code></p>
+              <p className={styles.escenarioTip}>Tip: Por encima de 5 KB, un archivo externo cacheado siempre será más eficiente.</p>
             </div>
-            <div className="edu-escenario-card">
-              <span className="edu-escenario-icon">🖼️</span>
-              <h4>Imágenes inline en CSS</h4>
-              <p>Los Data URIs (data:image/png;base64,...) permiten incrustar iconos pequeños directamente en CSS o HTML, eliminando una petición HTTP. Ideal para iconos SVG y sprites pequeños.</p>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔑</span>
+                <h4>Backend — Tokens JWT para APIs</h4>
+              </div>
+              <p>Codifica el header y el payload de los JWT en Base64url para que puedan viajar de forma segura en cabeceras HTTP Authorization, parámetros de URL y cookies sin necesidad de percent-encoding.</p>
+              <p className={styles.escenarioExample}><code>Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...</code></p>
+              <p className={styles.escenarioTip}>Recuerda: Base64url NO es cifrado. Cualquiera puede decodificar el payload; la seguridad la da la firma HMAC.</p>
             </div>
-            <div className="edu-escenario-card">
-              <span className="edu-escenario-icon">📧</span>
-              <h4>Adjuntos de email (MIME)</h4>
-              <p>El estándar MIME usa Base64 para enviar archivos binarios por email. Los PDFs, imágenes y documentos adjuntos en tu correo viajan como texto Base64 dentro del protocolo SMTP.</p>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🖥️</span>
+                <h4>Sysadmin — Transferencia de binarios</h4>
+              </div>
+              <p>Transfiere archivos binarios (certificados, claves, configuraciones) a través de protocolos que solo aceptan texto (SMTP, XML, variables de entorno en CI/CD, secretos de Kubernetes).</p>
+              <p className={styles.escenarioExample}><code>base64 certificado.pem | kubectl create secret generic...</code></p>
+              <p className={styles.escenarioTip}>En pipelines CI/CD, los secretos binarios como certificados TLS se almacenan habitualmente como Base64 en variables de entorno.</p>
             </div>
-            <div className="edu-escenario-card">
-              <span className="edu-escenario-icon">🌐</span>
-              <h4>APIs REST con archivos</h4>
-              <p>Cuando una API necesita enviar o recibir archivos en JSON (que solo acepta texto), Base64 es la solución estándar. Por ejemplo, APIs de visión artificial que aceptan imágenes en base64.</p>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">📱</span>
+                <h4>Móvil — Serialización para APIs REST</h4>
+              </div>
+              <p>Serializa imágenes de perfil, firmas digitales o documentos escaneados dentro de payloads JSON para APIs REST que no admiten multipart. Habitual en apps de banca móvil y OCR.</p>
+              <p className={styles.escenarioExample}><code>{`{ "foto": "data:image/jpeg;base64,/9j/4AAQ..." }`}</code></p>
+              <p className={styles.escenarioTip}>Para imágenes grandes (&gt;100 KB), valora subir el archivo a un bucket (S3/R2) y enviar solo la URL en el JSON.</p>
             </div>
           </div>
         </div>
 
-        {/* FAQ */}
-        <div className="edu-faq-section">
-          <h3 className="edu-section-title">❓ Preguntas Frecuentes</h3>
-          <div className="edu-faq-list">
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Base64 es cifrado? ¿Es seguro para contraseñas?</summary>
-              <div className="edu-faq-answer">
-                <p>NO. Base64 es una codificación, no cifrado. Cualquiera puede decodificarlo instantáneamente sin necesitar clave. Nunca almacenes contraseñas en Base64; usa bcrypt, Argon2 o PBKDF2. Base64 solo garantiza que los datos viajen correctamente como texto ASCII, no que sean privados.</p>
+        {/* 3. FAQ — 8 preguntas */}
+        <div className={styles.faqList}>
+          <h3 className={styles.eduSectionTitle}>❓ Preguntas Frecuentes sobre Base64</h3>
+          <div className={styles.faqListInner}>
+            <details className={styles.faqItem}>
+              <summary>¿Qué es Base64 y para qué sirve exactamente?</summary>
+              <div>
+                <p>Base64 es un sistema de codificación que convierte datos binarios arbitrarios en una cadena de caracteres ASCII imprimibles. Su utilidad principal es permitir que datos binarios (imágenes, PDFs, claves) puedan viajar por canales que solo admiten texto, como el protocolo SMTP del correo electrónico, atributos HTML o cuerpos JSON.</p>
+                <p className={styles.faqTip}>Creado en los años 80 para el protocolo MIME, sigue siendo el estándar universal para incrustar binarios en texto.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Por qué Base64 aumenta el tamaño en un 33%?</summary>
-              <div className="edu-faq-answer">
-                <p>Base64 agrupa los bytes de 3 en 3 (24 bits) y los convierte en 4 caracteres ASCII de 6 bits cada uno. Por tanto, 3 bytes originales se convierten en 4 caracteres: 3→4, es decir, un incremento del 33,3%. Además, puede haber hasta 2 caracteres de padding (=) para completar grupos de 4.</p>
+            <details className={styles.faqItem}>
+              <summary>¿Base64 es cifrado? ¿Protege mis datos?</summary>
+              <div>
+                <p>No. Base64 es una codificación reversible que cualquiera puede deshacer en milisegundos sin necesitar ninguna clave. No añade ninguna capa de seguridad o privacidad. Para proteger datos usa cifrado real (AES-256, RSA) o hashing con sal (bcrypt, Argon2) según el caso.</p>
+                <p className={styles.faqTip}>Un error muy frecuente: ocultar datos sensibles en Base64 creyendo que están &quot;codificados&quot;. No lo están; solo están ofuscados.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Qué es el padding y qué significa el signo igual (=)?</summary>
-              <div className="edu-faq-answer">
-                <p>Base64 necesita grupos de 3 bytes. Si los datos no son múltiplos de 3, se añaden bytes nulos y se indica con = al final. Un = significa que el último grupo tenía 2 bytes originales; == significa que tenía solo 1 byte. El padding permite al decodificador saber exactamente cuántos bytes originales había.</p>
+            <details className={styles.faqItem}>
+              <summary>¿Cuánto aumenta el tamaño al codificar en Base64?</summary>
+              <div>
+                <p>Exactamente un 33,33%. Base64 convierte cada 3 bytes originales en 4 caracteres ASCII (cada carácter representa 6 bits, no 8). Además, puede añadir 1 o 2 caracteres = de padding si los datos no son múltiplos de 3 bytes. En archivos reales el overhead real es siempre entre 33% y 37%.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Cuál es la diferencia entre Base64 estándar y Base64url?</summary>
-              <div className="edu-faq-answer">
-                <p>Base64 estándar usa + y / en su alfabeto, que tienen significados especiales en URLs. Base64url los reemplaza por - y _ para que el resultado sea seguro en URLs y nombres de archivo sin necesidad de percent-encoding. JWT y muchas APIs modernas usan Base64url. El padding (=) suele omitirse en Base64url.</p>
+            <details className={styles.faqItem}>
+              <summary>¿Cuándo usar Base64 vs URL encoding (%20, %2F...)?</summary>
+              <div>
+                <p>Usa <strong>Base64url</strong> cuando necesites codificar datos binarios (como un hash o un token de 32 bytes) en una URL. Usa <strong>URL encoding</strong> cuando necesites escapar texto plano con caracteres especiales (espacios, tildes) en una URL. Son herramientas para propósitos distintos: Base64 convierte binario a texto; URL encoding escapa caracteres especiales en texto ya legible.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Qué es un Data URI y cuándo debo usarlo?</summary>
-              <div className="edu-faq-answer">
-                <p>Un Data URI tiene el formato data:[mediatype];base64,[datos]. Permite incrustar archivos directamente en HTML/CSS. Úsalo para iconos pequeños (&lt;2KB) donde quieras evitar peticiones HTTP. No lo uses para imágenes grandes: aumenta el tamaño del HTML/CSS, no se puede cachear por separado y ralentiza el parsing inicial de la página.</p>
+            <details className={styles.faqItem}>
+              <summary>¿Qué es un JWT y cómo usa Base64?</summary>
+              <div>
+                <p>Un JSON Web Token (JWT) tiene tres partes separadas por puntos: <code>header.payload.signature</code>. Tanto el header como el payload son objetos JSON codificados en Base64url (no cifrados). La firma es un HMAC o RSA calculado sobre las dos primeras partes. Puedes decodificar el payload sin clave —es público— pero solo el servidor con la clave secreta puede generar y verificar la firma.</p>
+                <p className={styles.faqTip}>Decodifica el payload de un JWT con esta misma herramienta: copia la segunda parte (entre los dos puntos) y haz clic en &quot;Decodificar Base64&quot;.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Cuándo NO debería usar Base64?</summary>
-              <div className="edu-faq-answer">
-                <p>Evita Base64 cuando: (1) el archivo sea grande (usa multipart/form-data en formularios), (2) necesites caching eficiente de imágenes (mejor servir archivos estáticos), (3) los datos ya son texto (codificar texto UTF-8 en Base64 es redundante y más grande), (4) el rendimiento es crítico (parsear Base64 consume CPU).</p>
+            <details className={styles.faqItem}>
+              <summary>¿Por qué Base64 URL-safe elimina los caracteres + y /?</summary>
+              <div>
+                <p>En las URLs, el carácter + se interpreta como espacio y el / como separador de segmentos de ruta. Si un token Base64 estándar contiene estos caracteres y se incluye en una URL sin escapar, el servidor lo interpretará incorrectamente. Base64url los reemplaza por - y _ respectivamente, que no tienen significado especial en URLs y no necesitan percent-encoding.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Qué es MIME y cómo se relaciona con Base64?</summary>
-              <div className="edu-faq-answer">
-                <p>MIME (Multipurpose Internet Mail Extensions) es el estándar que permite enviar contenido no-ASCII por protocolos de texto como SMTP (email) y HTTP. Define tipos de contenido (text/html, image/png, application/pdf) y usa Base64 como mecanismo de transferencia para datos binarios. Los &quot;Content-Type&quot; y &quot;Content-Transfer-Encoding: base64&quot; que ves en emails crudos son MIME.</p>
+            <details className={styles.faqItem}>
+              <summary>¿Se puede usar Base64 para almacenar passwords?</summary>
+              <div>
+                <p>Nunca. Almacenar contraseñas en Base64 es un error de seguridad gravísimo. Como Base64 es 100% reversible, cualquier atacante que acceda a tu base de datos obtendrá las contraseñas en texto plano al instante. Las contraseñas deben procesarse con funciones de hashing específicas y lentas: bcrypt, Argon2id o PBKDF2 con un número de iteraciones alto y un salt único por usuario.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Cuál es la diferencia entre btoa/atob y Buffer en Node.js?</summary>
-              <div className="edu-faq-answer">
-                <p>btoa() y atob() son funciones del navegador (y Node.js 16+) que solo manejan strings de caracteres Latin-1 (0-255). Para texto Unicode o datos binarios arbitrarios en Node.js, usa Buffer.from(data).toString(&apos;base64&apos;) para codificar y Buffer.from(b64, &apos;base64&apos;) para decodificar. Buffer es más robusto y maneja cualquier tipo de dato.</p>
+            <details className={styles.faqItem}>
+              <summary>¿Cuándo NO usar Base64?</summary>
+              <div>
+                <p>Evita Base64 cuando: (1) el archivo supera 10–20 KB (usa multipart/form-data o URLs de objeto en almacenamiento en la nube), (2) los datos ya son texto legible (codificar UTF-8 normal en Base64 es redundante y ocupa más), (3) necesitas caching eficiente (un Data URI no se puede cachear por separado del documento), (4) el rendimiento es crítico (codificar/decodificar Base64 consume CPU adicional), (5) los datos son contraseñas o secretos (ver pregunta anterior).</p>
               </div>
             </details>
           </div>
         </div>
 
-        {/* Guía Paso a Paso */}
-        <div className="edu-guide-section">
-          <h3 className="edu-section-title">📋 Guía: Cuándo y cómo usar Base64 en desarrollo web</h3>
-          <ol className="edu-steps-list">
-            <li className="edu-step-item">
-              <div className="edu-step-number">1</div>
-              <div className="edu-step-content">
-                <strong>Evalúa si Base64 es necesario</strong>
-                <span>Solo úsalo cuando necesites transportar datos binarios por un canal que solo acepta texto (JSON, HTML, email SMTP). Si puedes enviar el archivo directamente, es mejor.</span>
+        {/* 4. Guía Paso a Paso — 7 pasos */}
+        <div className={styles.stepGuide}>
+          <h3 className={styles.eduSectionTitle}>📋 Guía: Cómo usar Base64 correctamente en una aplicación web</h3>
+          <ol>
+            <li className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">1</div>
+              <div className={styles.stepContent}>
+                <strong>Evalúa si Base64 es realmente necesario</strong>
+                <span>Úsalo solo cuando el canal de destino no admita datos binarios: JSON, XML, atributos HTML, variables de entorno o email SMTP. Si puedes enviar el archivo directamente (formulario multipart, almacenamiento en la nube), es una mejor opción.</span>
               </div>
             </li>
-            <li className="edu-step-item">
-              <div className="edu-step-number">2</div>
-              <div className="edu-step-content">
-                <strong>Elige el variant correcto</strong>
-                <span>Base64 estándar para MIME/email. Base64url para JWT y URLs. Base32 para códigos 2FA que el usuario leerá en voz alta. El variant importa para interoperabilidad.</span>
+            <li className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">2</div>
+              <div className={styles.stepContent}>
+                <strong>Elige la variante correcta según el destino</strong>
+                <span>Base64 estándar para MIME/email. Base64url (sin + ni /) para JWT y parámetros de URL. Base32 para códigos OTP que el usuario transcribirá. La elección incorrecta provoca errores difíciles de depurar.</span>
               </div>
             </li>
-            <li className="edu-step-item">
-              <div className="edu-step-number">3</div>
-              <div className="edu-step-content">
-                <strong>Codifica los datos</strong>
-                <span>En el navegador: btoa(texto) para texto simple. Para imágenes: usa FileReader.readAsDataURL() que ya devuelve el Data URI completo con el prefijo correcto.</span>
+            <li className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">3</div>
+              <div className={styles.stepContent}>
+                <strong>Codifica los datos con la API adecuada</strong>
+                <span>En el navegador: <code>btoa(texto)</code> para texto Latin-1. Para texto Unicode (tildes, emojis): <code>btoa(unescape(encodeURIComponent(texto)))</code>. En Node.js: <code>Buffer.from(datos).toString(&apos;base64&apos;)</code> para cualquier tipo de dato.</span>
               </div>
             </li>
-            <li className="edu-step-item">
-              <div className="edu-step-number">4</div>
-              <div className="edu-step-content">
-                <strong>Incluye el tipo MIME si es Data URI</strong>
-                <span>El formato completo es data:image/png;base64,iVBORw0... No olvides el prefijo o el navegador no sabrá cómo interpretar los datos.</span>
+            <li className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">4</div>
+              <div className={styles.stepContent}>
+                <strong>Para imágenes, usa FileReader.readAsDataURL()</strong>
+                <span>Este método devuelve directamente el Data URI completo con el prefijo MIME correcto: <code>data:image/png;base64,iVBORw0KGgo...</code>. Puedes asignarlo directamente a <code>src</code> de una imagen o a <code>background-image</code> en CSS.</span>
               </div>
             </li>
-            <li className="edu-step-item">
-              <div className="edu-step-number">5</div>
-              <div className="edu-step-content">
-                <strong>Verifica con DevTools</strong>
-                <span>En Chrome/Firefox, en la pestaña Network puedes ver los payloads Base64 en las peticiones. En Sources puedes inspeccionar Data URIs de imágenes directamente.</span>
+            <li className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">5</div>
+              <div className={styles.stepContent}>
+                <strong>Incluye siempre el prefijo MIME en Data URIs</strong>
+                <span>El formato completo es <code>data:[tipo-mime];base64,[datos]</code>. Si omites el prefijo, el navegador no sabrá cómo interpretar los datos. El tipo MIME correcto es esencial para imágenes, PDFs y cualquier otro tipo de archivo.</span>
               </div>
             </li>
-            <li className="edu-step-item">
-              <div className="edu-step-number">6</div>
-              <div className="edu-step-content">
-                <strong>Considera alternativas para archivos grandes</strong>
-                <span>Para formularios con archivos: multipart/form-data. Para APIs: Blob Storage (S3, R2) y URLs firmadas. Para imágenes en web: &lt;img src=&quot;/ruta/imagen.png&quot;&gt; con CDN es siempre más eficiente.</span>
+            <li className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">6</div>
+              <div className={styles.stepContent}>
+                <strong>Valida y sanitiza antes de decodificar en el servidor</strong>
+                <span>Nunca decodifiques Base64 de usuarios sin validar primero: verifica que la cadena tenga caracteres válidos del alfabeto Base64, comprueba los magic bytes del archivo decodificado para confirmar el tipo MIME real, y aplica un límite de tamaño máximo para prevenir ataques de denegación de servicio.</span>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <div className={styles.stepNumber} aria-hidden="true">7</div>
+              <div className={styles.stepContent}>
+                <strong>Verifica el resultado con DevTools</strong>
+                <span>En Chrome/Firefox, la pestaña Network muestra los payloads Base64 en las peticiones. En la pestaña Sources puedes inspeccionar Data URIs. Para depurar JWTs, copia el payload (segunda sección entre puntos) y decodifícalo directamente en esta herramienta.</span>
               </div>
             </li>
           </ol>
         </div>
 
-        {/* Tips Grid */}
-        <div className="edu-tips-section">
-          <h3 className="edu-section-title">💡 Consejos para Usar Base64 Eficientemente</h3>
-          <div className="edu-tips-grid">
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon">🔗</span>
-              <h4>URLs: usa Base64url</h4>
-              <p>El + y / del Base64 estándar se codifican como %2B y %2F en URLs, rompen rutas. Usa siempre la variante url-safe (- y _) para tokens en URLs.</p>
+        {/* 5. Mejores Prácticas — 6 tips */}
+        <div className={styles.tipsGrid}>
+          <h3 className={styles.eduSectionTitle}>💡 Mejores Prácticas para Usar Base64</h3>
+          <div className={styles.tipsGridInner}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔗</span>
+              <h4>Usa siempre Base64url en URLs</h4>
+              <p>El + y / del Base64 estándar se interpretan como espacio y separador de ruta en URLs. Para tokens, hashes o cualquier dato en parámetros de URL, cookies o cabeceras HTTP usa la variante url-safe (- y _) para evitar errores silenciosos.</p>
             </div>
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon">📦</span>
-              <h4>Evita Base64 para datos grandes</h4>
-              <p>Por encima de 10KB, considera multipart/form-data o URLs de objeto (URL.createObjectURL). El 33% de overhead más el CPU de codificación/decodificación impacta el rendimiento.</p>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
+              <h4>Limita Data URLs a imágenes menores de 5 KB</h4>
+              <p>Por debajo de 5 KB, un Data URI puede ahorrar una petición HTTP. Por encima, el incremento del 33% de tamaño, la imposibilidad de cachear el recurso por separado y el impacto en el parsing del HTML hacen que un archivo estático servido por CDN sea siempre más eficiente.</p>
             </div>
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon">🔍</span>
-              <h4>Inspecciona JWTs fácilmente</h4>
-              <p>Un JWT es header.payload.firma en Base64url. Decodifica solo el payload (segunda parte) para ver los claims. Nunca confíes en el payload sin verificar la firma.</p>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
+              <h4>Documenta explícitamente las cadenas Base64</h4>
+              <p>Una cadena Base64 en el código fuente sin comentario es indistinguible de texto aleatorio. Añade siempre un comentario indicando qué tipo de dato contiene, cuándo se generó y con qué variante. Esto ahorra horas de depuración a futuros colaboradores.</p>
             </div>
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon">🎨</span>
-              <h4>SVGs inline: mejor sin Base64</h4>
-              <p>Los SVGs son XML (texto), por lo que pueden incluirse directamente en HTML/CSS con URL encoding (%3C, %3E...) sin Base64. Es más compacto y legible para SVGs simples.</p>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
+              <h4>Verifica magic bytes, no solo el tipo MIME declarado</h4>
+              <p>El tipo MIME en un Data URI es declarativo: cualquier usuario puede poner <code>data:image/png;base64,</code> seguido de un ejecutable. Tras decodificar en el servidor, verifica los primeros bytes del archivo para confirmar el tipo real antes de procesarlo o almacenarlo.</p>
             </div>
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon">⚡</span>
-              <h4>Cache: archivos externos ganan</h4>
-              <p>Un Data URI no puede cachearse separadamente del documento HTML/CSS. Un archivo externo se cachea en el navegador y se reutiliza en múltiples páginas. Prefiere archivos estáticos.</p>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
+              <h4>Prefiere archivos estáticos para imágenes con caché</h4>
+              <p>Un archivo <code>.png</code> externo se cachea en el navegador con su propio TTL y se reutiliza en múltiples páginas. Un Data URI se descarga de nuevo con cada documento que lo incluye. Para imágenes que aparecen en varias páginas, el archivo externo es siempre la mejor opción.</p>
             </div>
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon">🛡️</span>
-              <h4>Sanitiza antes de usar</h4>
-              <p>Si recibes Base64 de usuarios, valida el tipo MIME antes de usarlo. No confíes en el prefijo declarado; verifica los magic bytes reales para evitar ataques de tipo MIME sniffing.</p>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
+              <h4>Nunca uses Base64 como sustituto de cifrado</h4>
+              <p>Base64 no oculta, no protege ni asegura nada. Si un dato es sensible (contraseñas, claves API, datos personales), aplica cifrado real (AES-256-GCM) o hashing seguro (bcrypt, Argon2id). Base64 es transporte, no seguridad.</p>
             </div>
           </div>
         </div>
 
-        {/* Warning Box */}
-        <div className="edu-warning-box">
-          <h4 className="edu-warning-title">⚠️ Advertencias importantes sobre Base64</h4>
-          <ul className="edu-warning-list">
-            <li><strong>Base64 NO es seguridad</strong>: Codificar datos en Base64 no los protege. Cualquiera puede decodificarlos al instante. Para seguridad real usa cifrado (AES, RSA) o hashing (bcrypt).</li>
-            <li><strong>Incremento de tamaño obligatorio</strong>: Siempre aumenta el peso un ~33%. En producción, evalúa si el coste en bytes justifica la comodidad de transporte en texto.</li>
-            <li><strong>No uses Base64 para contraseñas</strong>: Es un error de seguridad grave muy común. Las contraseñas deben hashearse con algoritmos específicos (bcrypt, Argon2, PBKDF2), nunca codificarse.</li>
-            <li><strong>Texto Unicode y btoa()</strong>: btoa() falla con caracteres fuera del rango Latin-1 (tildes, chino, emojis). Usa encodeURIComponent() + btoa() o Buffer en Node.js para texto Unicode.</li>
+        {/* 6. Warning Box — 6 errores críticos */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+            <h4>Errores críticos que debes evitar con Base64</h4>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Confundir Base64 con cifrado o seguridad:</strong> Es el error más peligroso y el más común. Base64 es completamente reversible sin clave. Nunca lo uses para &quot;proteger&quot; datos; usa AES-256, RSA o bcrypt según el caso.</li>
+            <li><strong>Usar Base64 estándar en URLs sin escapar:</strong> Los caracteres + y / del Base64 estándar tienen significado especial en URLs. Si incluyes un token Base64 estándar en una URL sin convertirlo a Base64url, obtendrás errores intermitentes difíciles de reproducir.</li>
+            <li><strong>Intentar comprimir datos antes de codificar esperando menos tamaño:</strong> La compresión (gzip, deflate) produce datos binarios con alta entropía que Base64 codifica sin reducción alguna. Base64 de datos comprimidos sigue siendo un 33% más grande que los datos originales comprimidos.</li>
+            <li><strong>Decodificar Base64 de usuarios sin validar el contenido:</strong> Siempre valida el alfabeto, aplica un límite de tamaño y verifica los magic bytes del resultado. Un payload malformado o malicioso puede causar errores en el servidor o explotar vulnerabilidades en bibliotecas de procesamiento de imágenes.</li>
+            <li><strong>Almacenar contraseñas o claves en Base64:</strong> Una base de datos comprometida con contraseñas en Base64 expone todas las contraseñas en texto plano. Usa bcrypt (factor 12+), Argon2id o PBKDF2 con mínimo 600.000 iteraciones para contraseñas.</li>
+            <li><strong>Usar Data URIs para imágenes grandes en producción:</strong> Un Data URI de 200 KB incrustado en el CSS bloquea el rendering de la página entera hasta que se descarga el CSS. Además no puede cachearse por separado. Por encima de 5 KB, usa siempre un archivo externo servido desde CDN.</li>
           </ul>
         </div>
       </EducationalSection>

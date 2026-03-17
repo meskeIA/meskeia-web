@@ -377,6 +377,285 @@ export default function PlanificadorMenuPage() {
             <li><strong>Lista estructurada</strong>: Organiza la lista por secciones del supermercado: frescos (frutas/verduras → carnes/pescados → lácteos) + secos/conservas. Reduce tiempo y compras impulsivas.</li>
           </ul>
         </section>
+
+        {/* SECCIÓN 1: Tabla Comparativa */}
+        <section>
+          <h4>Comparativa de tipos de planificación de menú</h4>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Tiempo preparación</th>
+                  <th>Ahorro estimado</th>
+                  <th>Variedad</th>
+                  <th>Facilidad compra</th>
+                  <th>Ideal para</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Semanal estándar</strong></td>
+                  <td>30–45 min/semana</td>
+                  <td>15–25 €/semana</td>
+                  <td>Alta</td>
+                  <td>Muy fácil</td>
+                  <td>Familias con rutina estable</td>
+                </tr>
+                <tr>
+                  <td><strong>Batch cooking</strong></td>
+                  <td>2–3 h un día</td>
+                  <td>20–35 €/semana</td>
+                  <td>Media</td>
+                  <td>Fácil (lista única)</td>
+                  <td>Personas ocupadas entre semana</td>
+                </tr>
+                <tr>
+                  <td><strong>Dieta específica</strong></td>
+                  <td>45–60 min/semana</td>
+                  <td>10–20 €/semana</td>
+                  <td>Media</td>
+                  <td>Requiere más atención</td>
+                  <td>Control de macros, intolerancias</td>
+                </tr>
+                <tr>
+                  <td><strong>Familia con niños</strong></td>
+                  <td>45 min/semana</td>
+                  <td>20–30 €/semana</td>
+                  <td>Alta</td>
+                  <td>Fácil con plantilla fija</td>
+                  <td>Hogares con menores</td>
+                </tr>
+                <tr>
+                  <td><strong>Deportista</strong></td>
+                  <td>60–90 min/semana</td>
+                  <td>15–25 €/semana</td>
+                  <td>Media</td>
+                  <td>Moderada</td>
+                  <td>Personas con objetivos físicos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* SECCIÓN 2: Casos de Uso */}
+        <section>
+          <h4>Casos de uso: 4 perfiles reales</h4>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧‍👦</span>
+                <strong>Familia con dos adultos y dos niños</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Cocinan los domingos en familia: los niños ayudan a elegir platos del menú, lo que reduce rechazos a la hora de cenar. Preparan en lote las legumbres y los cereales para toda la semana.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Clave:</strong> Tener 2–3 platos que gusten a todos para los días de más agobio.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🍳</span>
+                <strong>Persona que hace batch cooking</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Dedica 2,5 horas cada domingo: cuece legumbres, asa verduras, prepara proteínas marinadas y congela raciones individuales. Entre semana solo ensambla y calienta.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Clave:</strong> Cocinar bases versátiles (arroz, lentejas, pechuga) que sirvan para varios platos distintos.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏋️</span>
+                <strong>Deportista que ajusta macros</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Planifica cada comida según el día de entrenamiento: más carbohidratos antes y después del ejercicio, más proteína en días de fuerza, cenas ligeras en días de descanso.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Clave:</strong> Calcular las raciones por peso corporal (1,6–2,2 g proteína/kg) y ajustar semanalmente según objetivos.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧓</span>
+                <strong>Persona mayor que cocina para uno o dos</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Planifica menús con porciones pequeñas pero completas nutricionalmente. Aprovecha los guisos para hacer el doble y congelar. Prioriza alimentos blandos y fáciles de masticar.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Clave:</strong> Las conservas de calidad (sardinillas, atún al natural, legumbres) son aliadas perfectas para cocinar para uno.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 3: FAQ */}
+        <section>
+          <h4>Preguntas frecuentes sobre planificación de menú</h4>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <strong>¿Cuánto se ahorra planificando el menú semanal?</strong>
+              <p>Entre 15 y 35 euros semanales de media, según el tamaño del hogar. El ahorro viene de comprar solo lo necesario, reducir el desperdicio (los españoles tiramos unos 31 kg de alimentos por persona al año) y evitar compras impulsivas o pedidos a domicilio de urgencia.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Qué es el batch cooking?</strong>
+              <p>Consiste en dedicar 2–3 horas un día a la semana (normalmente el domingo) para cocinar en lote las bases de todas las comidas: cereales, legumbres, proteínas marinadas y verduras asadas. El resto de la semana solo ensamblas los platos en 10 minutos.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo evitar el desperdicio de alimentos?</strong>
+              <p>Primero revisa siempre la nevera y despensa antes de planificar, para usar lo que ya tienes. Planifica los alimentos más perecederos (pescado fresco, hoja verde) para los primeros días de la semana, y los más duraderos (huevos, conservas, congelados) para el final.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo planificar menús variados sin repetir?</strong>
+              <p>Aplica la regla de rotación: un día legumbre, un día pescado azul, un día aves, un día huevos, un día pescado blanco, un día carne magra. Cambia la técnica de cocción (plancha, horno, vapor, guiso) para que el mismo ingrediente resulte diferente.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Qué alimentos duran más en la nevera una vez cocinados?</strong>
+              <p>Las legumbres cocidas aguantan 4–5 días. Los cereales (arroz, quinoa, pasta) 3–4 días. Las carnes y pescados cocinados, 2–3 días. Las sopas y cremas, 3–4 días. Para todo lo demás, el congelador a –18 °C mantiene la calidad hasta 3 meses.</p>
+              <p className={styles.faqTip}>Consejo: etiqueta siempre los tuppers con la fecha de preparación.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo planificar menús saludables con poco presupuesto?</strong>
+              <p>Las legumbres son la proteína más económica (menos de 1 €/ración). Los huevos, el atún en lata y el pollo congelado también son opciones baratas y nutritivas. Compra fruta y verdura de temporada y en mercado, donde es entre un 30 y 50 % más barata que en grandes superficies.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cuántas raciones preparar de cada plato?</strong>
+              <p>Para batch cooking de una persona: 3–4 raciones de cada preparación base. Para una familia de cuatro: duplica siempre las recetas. Una olla de legumbres (400 g en seco) da aproximadamente 8 raciones de guarnición o 6 de plato principal.</p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo adaptar el menú a intolerancias?</strong>
+              <p>Identifica primero los grupos problemáticos (gluten, lactosa, frutos secos, huevo) y sus alternativas equivalentes. El arroz, la quinoa y las patatas sustituyen al trigo. Las bebidas vegetales y el yogur de coco sustituyen a los lácteos. Prepara siempre las versiones sin alérgeno antes de las versiones con alérgeno para evitar contaminación cruzada.</p>
+            </li>
+          </ul>
+        </section>
+
+        {/* SECCIÓN 4: Guía Paso a Paso */}
+        <section>
+          <h4>Cómo planificar el menú semanal: guía paso a paso</h4>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Revisa nevera y despensa</strong>
+                <p>Antes de planificar nada, comprueba qué tienes. Usa primero los alimentos próximos a caducar o los más perecederos. Anota lo que falta de básicos (aceite, especias, conservas).</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Consulta el calendario de la semana</strong>
+                <p>¿Hay días con poco tiempo para cocinar? ¿Alguna cena fuera de casa? ¿Niños con actividades extraescolares? Asigna platos rápidos (&lt;20 min) a los días más ocupados y platos elaborados al fin de semana.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Elige los platos principales de almuerzo</strong>
+                <p>Aplica la rotación semanal: legumbre, pescado azul, aves, huevos, pescado blanco, carne magra, libre. Busca variedad de colores y técnicas de cocción para garantizar diversidad nutricional.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Planifica las cenas (ligeras y complementarias)</strong>
+                <p>Si el almuerzo fue de carne, cena verduras o pescado. Si el almuerzo fue contundente, opta por una crema de verduras o una ensalada proteica. Las cenas deben equilibrar, no repetir, el almuerzo.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Completa los desayunos</strong>
+                <p>Planifica 2–3 opciones de desayuno que rotes durante la semana. No es necesario variar cada día: simplificar los desayunos reduce la carga mental y facilita la compra.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Identifica qué puedes cocinar en lote</strong>
+                <p>Marca los platos que se prestan a batch cooking: legumbres, cereales, caldos, salsas base, verduras asadas. Planifica cocinarlos en una sesión el fin de semana para ganar tiempo entre semana.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Genera la lista de compra optimizada</strong>
+                <p>Agrupa los ingredientes por categorías: frutas y verduras, carnes y pescados, lácteos y huevos, legumbres y cereales, conservas y básicos. Verifica cantidades exactas para evitar comprar de más o de menos.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* SECCIÓN 5: Mejores Prácticas */}
+        <section>
+          <h4>6 claves para una planificación eficaz</h4>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🥬</span>
+              <strong>Planifica los perecederos primero</strong>
+              <p>Asigna el pescado fresco, la hoja verde y los lácteos naturales a los primeros días de la semana. Deja los congelados, huevos y conservas para el jueves y viernes.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🍚</span>
+              <strong>Prepara bases versátiles</strong>
+              <p>Un lote de arroz integral, lentejas cocidas y garbanzos puede transformarse en ensalada, guiso, wrap o salteado según el día. La versatilidad reduce el aburrimiento sin aumentar el trabajo.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🧊</span>
+              <strong>Usa el congelador estratégicamente</strong>
+              <p>Congela en raciones individuales: porciones de caldo, guisos listos, proteínas marinadas y frutas maduras para batidos. El congelador es tu seguro contra días caóticos y contra el desperdicio.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
+              <strong>Mantén recetas comodín rápidas</strong>
+              <p>Ten siempre en mente 3–4 recetas que se hacen en menos de 15 minutos: tortilla, atún con ensalada, sardinas con tostada, huevos revueltos con champiñones. Son tu salvavidas para los días imprevistos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🛒</span>
+              <strong>Compra una vez a la semana</strong>
+              <p>La compra semanal única reduce el gasto impulsivo hasta un 30 %. Si necesitas reposición, limítala a frescos imprescindibles (pan, fruta) y evita pasillos que no estaban en tu lista.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📱</span>
+              <strong>Guarda tu menú favorito</strong>
+              <p>Cuando encuentres una combinación que funcione bien para tu familia, guárdala como plantilla. Rotarla cada 3–4 semanas te ahorra tiempo de planificación y garantiza aceptación en casa.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 6: Warning Box */}
+        <section>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <strong>6 errores que generan desperdicio y gasto extra</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Planificar sin revisar la nevera primero.</strong> Comprar ingredientes que ya tienes o que están a punto de caducar es la causa número uno de desperdicio. Dedica 5 minutos a revisar antes de empezar.
+              </li>
+              <li>
+                <strong>No tener en cuenta las cenas fuera de casa.</strong> Si no anotas que el miércoles cenas fuera, acabas comprando ingredientes que no se usan y se estropean. Consulta el calendario antes de planificar.
+              </li>
+              <li>
+                <strong>Cocinar demasiado de platos que no se congelan bien.</strong> Las ensaladas, las patatas cocidas, los platos con mayonesa y las salsas emulsionadas pierden textura al congelar. Calcula solo las raciones que se van a consumir en fresco.
+              </li>
+              <li>
+                <strong>Ignorar las promociones del supermercado.</strong> Planificar sin mirar los folletos de oferta hace que pierdas ahorros del 20–40 % en proteínas y conservas. Ajusta el menú a las ofertas de proteínas una vez a la semana.
+              </li>
+              <li>
+                <strong>Planificar platos demasiado elaborados para los días laborables.</strong> Un menú ambicioso que no se ejecuta es peor que uno sencillo que sí se cumple. Reserva las recetas complejas para el fin de semana.
+              </li>
+              <li>
+                <strong>No contar los desayunos ni las meriendas en la lista de compra.</strong> Olvidar estos momentos del día lleva a compras de urgencia (más caras) o a recurrir a ultraprocesados por falta de opciones saludables disponibles.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       {/* Disclaimer - SIEMPRE VISIBLE */}

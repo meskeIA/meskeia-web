@@ -983,6 +983,506 @@ export default function PlanificadorTurnosPage() {
             aplicable y la legislación vigente.
           </p>
         </section>
+
+        {/* Sección 1: Tabla Comparativa de tipos de turno */}
+        <section className={styles.guideSection}>
+          <h2>Tipos de turno laboral en España: comparativa completa</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Tipo de turno</th>
+                  <th>Horario</th>
+                  <th>Plus económico típico</th>
+                  <th>Sectores principales</th>
+                  <th>Descanso recomendado</th>
+                  <th>Regulación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Mañana</strong></td>
+                  <td>06:00 – 14:00</td>
+                  <td>Sin plus específico</td>
+                  <td>Hostelería, manufactura, comercio</td>
+                  <td>8 horas antes del siguiente turno</td>
+                  <td>ET art. 34; convenio colectivo</td>
+                </tr>
+                <tr>
+                  <td><strong>Tarde</strong></td>
+                  <td>14:00 – 22:00</td>
+                  <td>5–15 % s/salario base (convenio)</td>
+                  <td>Comercio, atención al cliente, logística</td>
+                  <td>12 horas de descanso mínimo</td>
+                  <td>ET art. 34; convenio colectivo</td>
+                </tr>
+                <tr>
+                  <td><strong>Noche</strong></td>
+                  <td>22:00 – 06:00</td>
+                  <td>25–40 % s/salario base (ET mínimo)</td>
+                  <td>Sanidad, seguridad, transporte, industria</td>
+                  <td>12 horas + límite 8h/día nocturnas</td>
+                  <td>ET art. 36.2; máx. 8h/día promedio</td>
+                </tr>
+                <tr>
+                  <td><strong>Rotativo</strong></td>
+                  <td>Ciclos semana a semana</td>
+                  <td>Plus rotatividad (convenio variable)</td>
+                  <td>Sanidad, fábricas, servicios 24h</td>
+                  <td>12h; adaptación biológica en rotación</td>
+                  <td>ET art. 36.3; prioridad a trabajadores nocturnos voluntarios</td>
+                </tr>
+                <tr>
+                  <td><strong>Partido</strong></td>
+                  <td>Mañana + tarde (ej. 9-13 / 16-20)</td>
+                  <td>Sin plus legal; posible en convenio</td>
+                  <td>Comercio, hostelería, servicios</td>
+                  <td>Descanso mínimo 1h entre partes</td>
+                  <td>ET art. 34; acuerdo empresa–trabajador</td>
+                </tr>
+                <tr>
+                  <td><strong>Guardia 12h</strong></td>
+                  <td>12 horas continuas (ej. 8-20)</td>
+                  <td>Plus guardia o complemento específico</td>
+                  <td>Sanidad, seguridad, emergencias</td>
+                  <td>12h de descanso obligatorio post-guardia</td>
+                  <td>ET art. 34; estatuto sanitario para personal sanitario</td>
+                </tr>
+                <tr>
+                  <td><strong>Guardia 24h</strong></td>
+                  <td>24 horas continuas</td>
+                  <td>Plus guardia; días libres compensatorios</td>
+                  <td>Sanidad rural, policía, bomberos</td>
+                  <td>24h descanso post-guardia (mínimo legal)</td>
+                  <td>ET art. 34 + convenio específico de sector</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Sección 2: Casos de uso — 4 perfiles */}
+        <section className={styles.guideSection}>
+          <h2>¿Quién usa el planificador de turnos? Casos reales</h2>
+          <div className={styles.escenariosGrid}>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏥</span>
+                <h3>Enfermero/a con turnos rotativos de 12h</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> María trabaja en urgencias con ciclos de 3 turnos de día
+                (7-19h) y 3 turnos de noche (19-7h), seguidos de 6 días libres. Necesita visualizar
+                semanas completas y verificar que no supera las 8h nocturnas de promedio.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Cómo ayuda la herramienta:</strong> Configura dos franjas (día 07:00-19:00 y
+                noche 19:00-07:00), añade a todos los enfermeros del servicio y usa la generación
+                automática para distribuir turnos equilibradamente. Las alertas avisarán si alguien
+                supera su máximo semanal.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏭</span>
+                <h3>Trabajador de fábrica con turno fijo de noche</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Carlos trabaja siempre de 22:00 a 06:00 en una planta
+                de producción. Su empresa necesita planificar las coberturas de los 15 operarios
+                del turno nocturno para evitar huecos en la cadena de montaje.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Cómo ayuda la herramienta:</strong> Crea una única franja nocturna (22:00-06:00),
+                añade a todos los operarios y marca las disponibilidades. El planificador genera el
+                cuadrante respetando el límite de 40h semanales y muestra las coberturas por día.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🛍️</span>
+                <h3>Empleado de comercio con turno partido</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Ana trabaja en una tienda con jornada partida:
+                10:00-14:00 y 17:00-21:00. Algunos días tiene solo un tramo. Necesita que el
+                responsable vea de un vistazo qué tramos están cubiertos cada día de la semana.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Cómo ayuda la herramienta:</strong> Define dos franjas (Mañana 10-14 y
+                Tarde 17-21). Configura disponibilidad diferente por franja para cada empleado.
+                El cuadro semanal muestra cada tramo como celda independiente, facilitando
+                la gestión visual del cuadrante.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>📋</span>
+                <h3>Responsable de RRHH con 20 personas</h3>
+              </div>
+              <p className={styles.escenarioExample}>
+                <strong>Situación:</strong> Javier gestiona el cuadrante semanal de un call center
+                con 20 agentes repartidos en 3 turnos (mañana, tarde, noche). Debe garantizar
+                cobertura mínima de 6 personas por turno y respetar las preferencias individuales.
+              </p>
+              <p className={styles.escenarioTip}>
+                <strong>Cómo ayuda la herramienta:</strong> Añade los 20 agentes con sus horas
+                máximas y disponibilidades. Usa "Generar automático" como punto de partida y ajusta
+                manualmente. La barra de progreso de cada empleado y las alertas de exceso de horas
+                evitan errores legales antes de publicar el cuadrante.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Sección 3: FAQ */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre turnos laborales en España</h2>
+          <div className={styles.faqList}>
+
+            <div className={styles.faqItem}>
+              <h3>¿Cuánto es el plus de nocturnidad en España?</h3>
+              <p>
+                No existe un porcentaje legalmente fijado a nivel estatal. El Estatuto de los
+                Trabajadores (art. 36.2) reconoce el derecho a una retribución específica por
+                trabajo nocturno, pero remite a la negociación colectiva. La mayoría de convenios
+                establecen un plus de entre el 25 % y el 40 % del salario base por hora nocturna
+                trabajada (22:00 a 06:00). Algunos convenios optan por días libres compensatorios
+                en lugar de plus económico.
+              </p>
+              <p className={styles.faqTip}>
+                Consulta tu convenio colectivo sectorial o de empresa para conocer el porcentaje exacto aplicable.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Cuántas horas de descanso son obligatorias entre turnos?</h3>
+              <p>
+                El ET (art. 34.3) establece un descanso mínimo de <strong>12 horas</strong> entre
+                el final de una jornada y el inicio de la siguiente. Este es el mínimo legal
+                inderogable; algunos convenios amplían este período a 12–16 horas, especialmente
+                en sanidad y trabajos de especial penosidad. Reducir este descanso sin amparo
+                convencional constituye una infracción grave (LISOS art. 7).
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Qué derechos tiene un trabajador con turno rotativo?</h3>
+              <p>
+                El ET (art. 36.3) reconoce a los trabajadores a turnos el derecho a: conocer el
+                calendario de turnos con antelación suficiente, solicitar el cambio a turno fijo
+                cuando exista vacante y el trabajador lleve más de 18 meses en turno nocturno,
+                recibir la misma protección en materia de prevención de riesgos que el resto de
+                la plantilla, y a que se tenga en cuenta su situación en la distribución de
+                vacaciones. Los menores de 18 años tienen prohibido el trabajo nocturno.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Cómo afecta el turno de noche a la salud?</h3>
+              <p>
+                El trabajo nocturno continuado puede provocar trastornos del sueño (insomnio,
+                somnolencia diurna), alteraciones metabólicas y mayor riesgo cardiovascular a
+                largo plazo. La OMS clasifica el trabajo nocturno por turnos como probable
+                carcinógeno (Grupo 2A). Para mitigar el impacto: mantener rotaciones en sentido
+                horario (mañana → tarde → noche), garantizar al menos 48h de recuperación tras
+                una serie de noches, y evitar más de 3–4 noches consecutivas cuando sea posible.
+              </p>
+              <p className={styles.faqTip}>
+                El servicio de prevención de la empresa debe evaluar los riesgos específicos del trabajo nocturno (RD 39/1997).
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Puede el empleador cambiar el turno unilateralmente?</h3>
+              <p>
+                No sin limitaciones. Un cambio de turno que altere las condiciones sustanciales
+                del contrato (ej. pasar de turno fijo a rotativo, o de diurno a nocturno) requiere
+                seguir el procedimiento de modificación sustancial de condiciones de trabajo del
+                ET (art. 41): preaviso de 15 días, posibilidad de impugnación judicial y, si el
+                trabajador no acepta, derecho a rescisión indemnizada (20 días/año, máx. 9 meses).
+                Los pequeños ajustes horarios dentro del mismo turno sí pueden realizarse con
+                el poder de dirección ordinario.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Qué es el trabajo a turnos según el Estatuto de los Trabajadores?</h3>
+              <p>
+                El ET (art. 36.3) define el trabajo a turnos como "toda forma de organización
+                del trabajo en equipo según la cual los trabajadores ocupan sucesivamente los
+                mismos puestos de trabajo, según un cierto ritmo, continuo o discontinuo,
+                implicando para el trabajador la necesidad de prestar sus servicios en horas
+                diferentes en un período determinado de días o de semanas". Requiere que distintas
+                personas cubran el mismo puesto en horarios diferentes, no se aplica a cambios
+                de horario individuales esporádicos.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Cuántos festivos se compensan en turno de noche?</h3>
+              <p>
+                Los festivos trabajados en turno de noche generan dos obligaciones independientes:
+                la compensación por festivo trabajado (descanso compensatorio o plus económico
+                equivalente según convenio, sobre la base del ET art. 37) y el plus de nocturnidad
+                (ET art. 36.2). Ambos conceptos son acumulables salvo que el convenio los haya
+                unificado en un único complemento. La mayoría de convenios establecen un recargo
+                del 50–100 % sobre la hora ordinaria para festivos nocturnos.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3>¿Cómo calcular el plus de festivo trabajado?</h3>
+              <p>
+                La fórmula habitual es: <strong>valor hora ordinaria × (1 + % plus festivo)</strong>.
+                Si el salario bruto mensual es 1.800 € y la jornada es 40h/semana (173,33h/mes),
+                el valor hora ordinaria es 1.800 / 173,33 = 10,38 €/h. Con un convenio que
+                establece el 75 % de plus: 10,38 × 1,75 = <strong>18,17 €/h</strong> en festivo.
+                Si además es nocturna, se suma el plus de nocturnidad del convenio sobre el
+                valor de la hora ordinaria (no sobre la hora festiva ya incrementada, salvo que
+                el convenio lo indique expresamente).
+              </p>
+              <p className={styles.faqTip}>
+                Verifica siempre si tu convenio usa base salarial fija o salario real para el cálculo.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Sección 4: Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo planificar un cuadrante de turnos justo y legal: guía paso a paso</h2>
+          <div className={styles.stepGuide}>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h3>Define la estructura de turnos necesaria</h3>
+                <p>
+                  Antes de asignar personas, determina cuántos turnos necesitas cubrir cada día
+                  (mañana, tarde, noche…), las horas de cada franja y el nivel mínimo de cobertura
+                  por turno. Este análisis de necesidades operativas es la base de cualquier
+                  cuadrante legal y eficiente.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h3>Recoge las disponibilidades y restricciones del equipo</h3>
+                <p>
+                  Antes de generar el cuadrante, obtén por escrito las disponibilidades de cada
+                  trabajador, las restricciones médicas documentadas y las peticiones de libre
+                  preestablecidas (vacaciones, asuntos propios). Guarda estos registros: son clave
+                  en caso de conflicto laboral.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h3>Configura el planificador con todos los datos</h3>
+                <p>
+                  Añade a cada empleado con su jornada máxima semanal (según contrato y convenio)
+                  y marca su disponibilidad por franja y día. Define todas las franjas con horas
+                  de inicio y fin exactas para que el cálculo de horas sea automático y preciso.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h3>Genera el cuadrante inicial y revisa las alertas</h3>
+                <p>
+                  Usa la función de generación automática como punto de partida. El sistema
+                  asigna priorizando a quien tiene menos horas acumuladas. Revisa las alertas
+                  de exceso de horas y ajusta manualmente los casos donde la asignación
+                  automática no sea óptima.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h3>Verifica el cumplimiento legal antes de publicar</h3>
+                <p>
+                  Comprueba que ningún trabajador supera las 40h semanales de media, que los
+                  descansos entre jornadas son de al menos 12 horas (ET art. 34.3), que el
+                  descanso semanal es de día y medio ininterrumpido y que la distribución de
+                  festivos es equitativa entre la plantilla según el convenio aplicable.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>6</div>
+              <div className={styles.stepContent}>
+                <h3>Publica el cuadrante con al menos 5 días de antelación</h3>
+                <p>
+                  La comunicación anticipada es clave para la conciliación. Publica el horario
+                  de la semana siguiente antes del miércoles de la semana anterior como mínimo.
+                  Muchos convenios exigen plazos mayores (1–2 semanas). Usa un canal oficial y
+                  guarda constancia del envío.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>7</div>
+              <div className={styles.stepContent}>
+                <h3>Registra la jornada y archiva los cuadrantes</h3>
+                <p>
+                  Desde mayo de 2019 el registro diario de jornada es obligatorio para todas
+                  las empresas (ET art. 34.9, reforma RDL 8/2019). Conserva los registros
+                  durante 4 años. El incumplimiento puede suponer multas de hasta 6.250 €
+                  por infracción grave (LISOS art. 7.5).
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Sección 5: Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas para gestionar cuadrantes de turnos</h2>
+          <div className={styles.tipsGrid}>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📅</span>
+              <h3>Publica con 5+ días de antelación</h3>
+              <p>
+                Publicar el cuadrante con al menos 5 días de antelación permite a los empleados
+                organizar su vida personal y reduce las peticiones de cambio de última hora.
+                Los convenios de hostelería, sanidad y comercio suelen exigir entre 7 y 15 días.
+                Establece una fecha fija semanal para la publicación (ej. cada miércoles para
+                la semana siguiente).
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⏱️</span>
+              <h3>Respeta siempre las 12h de descanso mínimo</h3>
+              <p>
+                El descanso entre jornadas (ET art. 34.3) es un derecho inderogable. No asignes
+                un turno de mañana (ej. 07:00) inmediatamente después de un turno de noche que
+                finalice a las 23:00 del día anterior. Usa las alertas del planificador como
+                segunda verificación, pero haz siempre la comprobación visual antes de publicar.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎉</span>
+              <h3>Distribuye festivos de forma equitativa</h3>
+              <p>
+                Lleva un registro acumulado anual de festivos trabajados por cada empleado y
+                úsalo como criterio principal de asignación. Una diferencia de más de 2 festivos
+                entre compañeros con el mismo contrato puede generar conflictos o reclamaciones.
+                El convenio suele marcar el procedimiento de adjudicación de festivos preferentes
+                (Navidades, Semana Santa).
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎨</span>
+              <h3>Usa colores por tipo de turno</h3>
+              <p>
+                Asigna colores distintivos a cada franja horaria: verde para mañana, naranja para
+                tarde, azul oscuro para noche y rojo para guardia. Esto permite detectar de un
+                vistazo desequilibrios en la distribución o semanas con excesiva carga nocturna
+                para un mismo trabajador. El planificador asigna automáticamente colores por empleado.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🔄</span>
+              <h3>Planifica rotaciones en sentido horario</h3>
+              <p>
+                Desde la perspectiva de la salud laboral, el orden mañana → tarde → noche es
+                menos agresivo para el organismo que el sentido antihorario (noche → tarde → mañana),
+                porque respeta mejor el ciclo circadiano. Aplica este principio siempre que la
+                operativa del negocio lo permita y documéntalo en el protocolo de prevención de riesgos.
+              </p>
+            </div>
+
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <h3>Revisa las estadísticas semanales antes de cerrar</h3>
+              <p>
+                Antes de dar por cerrado el cuadrante, verifica que la cobertura de turnos es
+                del 100 % (sin celdas vacías en turnos críticos), que ningún empleado supera
+                su máximo semanal y que la distribución de horas entre compañeros con la misma
+                categoría no difiere más de un 10–15 %. Pequeños desequilibrios acumulados
+                semana a semana generan agravios comparativos.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Sección 6: Warning Box — errores legales y de gestión */}
+        <section className={styles.guideSection}>
+          <h2>Errores frecuentes al planificar turnos (y cómo evitarlos)</h2>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <h3>Errores legales y de gestión que debes conocer</h3>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>No respetar las 11–12h de descanso entre jornadas.</strong> El ET fija
+                12h de descanso mínimo entre jornadas (art. 34.3). Infringirlo es una falta grave
+                sancionable con multas de 626 a 6.250 € por trabajador afectado (LISOS art. 7).
+                Revisa siempre el cruce de turno de noche con el turno de mañana del día siguiente.
+              </li>
+              <li>
+                <strong>Superar las 9h ordinarias sin amparo en convenio.</strong> El ET (art. 34.3)
+                limita la jornada ordinaria a 9 horas diarias salvo que el convenio colectivo o
+                acuerdo de empresa establezca otra distribución. Programar turnos de 10h sin
+                cobertura convencional expone a la empresa a reclamaciones por horas extraordinarias.
+              </li>
+              <li>
+                <strong>Olvidar compensar los festivos trabajados.</strong> Todo festivo trabajado
+                genera derecho a descanso compensatorio o plus económico (ET art. 37.1–37.2). No
+                registrar ni compensar los festivos es una infracción que puede originar reclamaciones
+                de cantidad y sanciones administrativas en inspección de trabajo.
+              </li>
+              <li>
+                <strong>No llevar registro de jornada — obligatorio desde 2019.</strong> El RDL 8/2019
+                (en vigor desde el 12 de mayo de 2019) obliga a todas las empresas a registrar
+                diariamente el inicio y fin de la jornada de cada trabajador. La ausencia de
+                registro es infracción grave. Conserva los registros 4 años y ponlos a disposición
+                de trabajadores, representantes sindicales e Inspección de Trabajo cuando lo soliciten.
+              </li>
+              <li>
+                <strong>Modificar el turno sin seguir el procedimiento del ET art. 41.</strong>
+                Cambiar las condiciones sustanciales de trabajo (pasar de turno fijo a rotativo,
+                de diurno a nocturno) sin respetar el procedimiento de modificación sustancial —
+                preaviso, consultas, derecho de impugnación — puede declararse nulo por los
+                tribunales laborales y obligar a reintegrar al trabajador en sus condiciones originales.
+              </li>
+              <li>
+                <strong>Publicar el cuadrante con menos de 48h de antelación.</strong> Aunque la
+                ley no fija plazo general, publicar el horario con menos de 2 días de antelación
+                vulnera el principio de buena fe contractual y puede considerarse incumplimiento
+                empresarial. Además, la mayoría de convenios sectoriales establecen plazos de
+                entre 5 y 15 días; incumplirlos puede ser sancionado por la representación legal
+                de los trabajadores o dar lugar a reclamaciones individuales.
+              </li>
+            </ul>
+          </div>
+        </section>
+
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('planificador-turnos')} />

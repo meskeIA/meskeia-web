@@ -577,6 +577,353 @@
   line-height: 1.6;
 }
 
+/* ===== SECCIONES V2.0 ===== */
+
+/* Tabla Comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  min-width: 600px;
+}
+
+.comparativaTable thead tr {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.12) 0%, rgba(72, 169, 166, 0.12) 100%);
+}
+
+.comparativaTable th {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 11px 14px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+/* Escenarios / Casos de Uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.escenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.escenarioHeader strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.escenarioExample {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  font-style: italic;
+  line-height: 1.55;
+  padding-left: 10px;
+  border-left: 3px solid #2E86AB;
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* FAQ v2 */
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faqList .faqItem {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* override the details-based faqItem styles */
+  overflow: visible;
+}
+
+.faqList .faqItem strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  display: block;
+}
+
+.faqList .faqItem p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  padding: 0;
+}
+
+.faqTip {
+  font-size: 0.8rem;
+  color: #2E86AB;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Guía Paso a Paso */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.stepContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stepContent strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Tips / Mejores Prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tipIcon {
+  font-size: 1.8rem;
+}
+
+.tipCard strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.tipCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Warning Box */
+.warningBox {
+  background: rgba(239, 68, 68, 0.06);
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warningHeader strong {
+  font-size: 1rem;
+  color: #b91c1c;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.warningList li {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  padding-left: 16px;
+  border-left: 3px solid rgba(239, 68, 68, 0.4);
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Disclaimer custom list */
+.disclaimerList {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.highlight {
+  margin-top: 10px;
+}
+
+/* ===== DARK MODE V2.0 ===== */
+[data-theme='dark'] .comparativaTable thead tr {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.18) 0%, rgba(72, 169, 166, 0.18) 100%);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqList .faqItem,
+[data-theme='dark'] .step,
+[data-theme='dark'] .tipCard {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+[data-theme='dark'] .warningHeader strong {
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .warningList li {
+  border-left-color: rgba(239, 68, 68, 0.35);
+}
+
+[data-theme='dark'] .faqTip {
+  color: #7FB3D3;
+}
+
+/* ===== RESPONSIVE V2.0 ===== */
+@media (max-width: 768px) {
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 9px 10px;
+    font-size: 0.8rem;
+  }
+
+  .step {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .stepNumber {
+    width: 30px;
+    height: 30px;
+    font-size: 0.875rem;
+  }
+
+  .warningBox {
+    padding: 18px;
+  }
+}
+
 /* Dark Mode */
 [data-theme='dark'] .inputPanel,
 [data-theme='dark'] .resultsPanel,

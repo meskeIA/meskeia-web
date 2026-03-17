@@ -436,6 +436,394 @@ export default function SonometroPage() {
             </div>
           </div>
         </section>
+
+        {/* SECCIÓN 1: Tabla Comparativa de niveles de ruido */}
+        <section className={styles.guideSection}>
+          <h2>Tabla comparativa: niveles de ruido y sus efectos</h2>
+          <p className={styles.introParagraph}>
+            La exposición al ruido afecta la salud de forma acumulativa. Conocer los rangos de decibelios
+            y el tiempo de exposición seguro es clave para proteger la audición y actuar ante contaminación acústica.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Rango (dB)</th>
+                  <th>Fuente típica</th>
+                  <th>Exposición segura</th>
+                  <th>Efectos en salud</th>
+                  <th>Normativa española</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>0–30 dB</strong></td>
+                  <td>Silencio, respiración, estudio nocturno</td>
+                  <td>Ilimitada</td>
+                  <td>Sin riesgo; favorece el descanso y la concentración</td>
+                  <td>Límite interior nocturno recomendado: 30–35 dB</td>
+                </tr>
+                <tr>
+                  <td><strong>30–60 dB</strong></td>
+                  <td>Conversación normal, biblioteca, oficina tranquila</td>
+                  <td>Ilimitada</td>
+                  <td>Sin riesgo auditivo; puede dificultar el sueño cerca del límite superior</td>
+                  <td>Límite interior diurno viviendas: 35–40 dB</td>
+                </tr>
+                <tr>
+                  <td><strong>60–85 dB</strong></td>
+                  <td>Tráfico urbano, restaurante animado, TV alta</td>
+                  <td>Ilimitada (sin daño auditivo), aunque el estrés aumenta</td>
+                  <td>Estrés, dificultad de concentración, posible aumento de tensión arterial</td>
+                  <td>Zonas residenciales exteriores: 55–65 dB (Ley 37/2003)</td>
+                </tr>
+                <tr>
+                  <td><strong>85–100 dB</strong></td>
+                  <td>Maquinaria industrial, concierto, moto</td>
+                  <td>Máx. 2 h/día a 100 dB; máx. 8 h/día a 85 dB</td>
+                  <td>Daño auditivo progresivo; fatiga, irritabilidad, acúfenos</td>
+                  <td>RD 286/2006: obligación de EPIs a partir de 85 dB(A)</td>
+                </tr>
+                <tr>
+                  <td><strong>100–120 dB</strong></td>
+                  <td>Taladro, sirena de ambulancia, avión despegando</td>
+                  <td>Máx. 15 min/día a 100 dB; ninguna a 120 dB sin protección</td>
+                  <td>Umbral del dolor; daño auditivo rápido; riesgo cardiovascular</td>
+                  <td>Nivel de acción superior en el trabajo: 85 dB(A); límite exposición: 87 dB(A)</td>
+                </tr>
+                <tr>
+                  <td><strong>&gt;120 dB</strong></td>
+                  <td>Petardo, motor de avión a reacción</td>
+                  <td>Daño inmediato incluso con exposición brevísima</td>
+                  <td>Perforación del tímpano, pérdida auditiva permanente, barotrauma</td>
+                  <td>Prohibido sin protección auditiva de alto rendimiento</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* SECCIÓN 2: Casos de Uso — 4 perfiles */}
+        <section className={styles.guideSection}>
+          <h2>¿Para qué sirve un sonómetro? Casos de uso reales</h2>
+          <p className={styles.introParagraph}>
+            Medir el ruido no es solo cosa de ingenieros. Cualquier persona puede necesitar documentar
+            niveles sonoros para reclamar, proteger su salud o simplemente tomar mejores decisiones.
+          </p>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🏘️</span>
+                <strong>Vecino afectado por local nocturno</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Quieres reclamar al ayuntamiento que el bar de abajo supera los límites de ruido nocturno.
+                Usas el sonómetro para registrar el nivel en el interior de tu vivienda entre las 22:00 y las 2:00.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: documenta varias noches con capturas de pantalla con fecha y hora.
+                El límite interior nocturno en zonas residenciales suele ser 30–35 dB según la ordenanza municipal.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👷</span>
+                <strong>Trabajador que evalúa riesgo auditivo</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Trabajas en un taller o almacén y quieres saber si necesitas usar protección auditiva.
+                Mides el nivel medio durante tu jornada para comprobarlo antes de hablar con tu empresa.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: si el nivel promedio supera los 80 dB(A), el RD 286/2006 obliga al empresario
+                a informarte y evaluar el riesgo. Por encima de 85 dB(A), los tapones son obligatorios.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>👶</span>
+                <strong>Padre o madre que mide el cuarto del bebé</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Quieres asegurarte de que la habitación del bebé está por debajo de los 35 dB durante
+                las horas de sueño, y verificar si el ruido exterior o el monitor de bebé interfieren.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: la OMS recomienda menos de 30 dB para un sueño saludable infantil.
+                Coloca el móvil a 1 metro de la cuna y mide durante 5 minutos sin moverte por la habitación.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon}>🎸</span>
+                <strong>Músico que controla el volumen en los ensayos</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Ensayas con tu banda en un local y quieres mantener el volumen por debajo de 95 dB
+                para proteger tu audición a largo plazo sin usar tapones que te impidan escuchar bien.
+              </p>
+              <p className={styles.escenarioTip}>
+                Consejo: a 95 dB el tiempo de exposición seguro es de unos 50 minutos según la NIOSH.
+                Toma descansos de 15 minutos cada hora y considera tapones de músico con atenuación plana.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 3: FAQ — 8 preguntas */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas frecuentes sobre ruido y decibelios</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <strong>¿A partir de cuántos dB es peligroso para el oído?</strong>
+              <p>
+                La exposición continuada a partir de 85 dB(A) puede provocar daño auditivo progresivo.
+                A 100 dB el límite seguro es de unos 15 minutos al día, y por encima de 120 dB el daño
+                puede ser inmediato incluso con exposiciones muy breves.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cuál es el límite legal de ruido nocturno en España?</strong>
+              <p>
+                Depende del municipio, pero la Ley 37/2003 del Ruido fija como referencia 45 dB(A) en
+                el exterior de zonas residenciales durante la noche (22:00–7:00) y 30–35 dB en el interior
+                de viviendas. Las ordenanzas municipales pueden ser más restrictivas.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo medir el ruido de un vecino para reclamar?</strong>
+              <p>
+                Mide desde el interior de tu vivienda con puertas y ventanas cerradas.
+                Registra el nivel durante varias sesiones en distintos días y horarios.
+                Documenta con capturas de pantalla con fecha y hora. Para una reclamación formal
+                ante el ayuntamiento se recomienda un informe pericial de un técnico acreditado.
+              </p>
+              <p className={styles.faqTip}>
+                Importante: las mediciones de un sonómetro de móvil no tienen validez legal por sí solas,
+                pero sirven para orientar la denuncia y solicitar una inspección oficial.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Es fiable un sonómetro de móvil comparado con uno profesional?</strong>
+              <p>
+                Un sonómetro de móvil tiene un margen de error de ±3 a ±6 dB respecto a un aparato
+                de clase 1 o 2 homologado. Es útil para tener una orientación, detectar problemas evidentes
+                y documentar tendencias, pero no tiene validez legal ni metrológica para procedimientos oficiales.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Qué es la escala dB(A)?</strong>
+              <p>
+                El dB(A) es una medida ponderada que aproxima la sensibilidad del oído humano,
+                atenuando las frecuencias muy bajas y muy altas. Es el estándar para medir el ruido
+                ambiental, laboral y de tráfico. La mayoría de límites legales en España se expresan en dB(A).
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cuánto tiempo se puede estar expuesto a 85 dB sin sufrir daño?</strong>
+              <p>
+                Según el RD 286/2006 y los criterios de la NIOSH, el límite es de 8 horas/día a 85 dB(A).
+                Por cada 3 dB adicionales, el tiempo máximo se reduce a la mitad: 4 horas a 88 dB,
+                2 horas a 91 dB, 1 hora a 94 dB, y así sucesivamente.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Qué nivel de ruido obliga a usar tapones en el trabajo?</strong>
+              <p>
+                El Real Decreto 286/2006 establece que a partir de 85 dB(A) de nivel de exposición
+                diario o 137 dB(C) de pico, el uso de protección auditiva es obligatorio.
+                Entre 80 y 85 dB(A) el empresario debe poner los EPIs a disposición del trabajador,
+                que puede usarlos voluntariamente.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo afecta el ruido crónico a la salud?</strong>
+              <p>
+                La exposición crónica al ruido (aunque sea de baja intensidad) se asocia con estrés,
+                insomnio, hipertensión, mayor riesgo cardiovascular, deterioro cognitivo y pérdida auditiva
+                gradual. La OMS estima que el ruido ambiental es la segunda causa medioambiental de
+                problemas de salud en Europa, después de la contaminación del aire.
+              </p>
+            </li>
+          </ul>
+        </section>
+
+        {/* SECCIÓN 4: Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Cómo medir correctamente el ruido: guía paso a paso</h2>
+          <p className={styles.introParagraph}>
+            Tanto si quieres documentar una queja vecinal como evaluar el riesgo acústico en tu puesto
+            de trabajo, seguir estos pasos te dará mediciones más fiables y útiles.
+          </p>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>1</span>
+              <div className={styles.stepContent}>
+                <strong>Prepara el entorno</strong>
+                <p>
+                  Cierra puertas y ventanas si mides el interior. Asegúrate de que no hay otras fuentes
+                  de ruido que no sean las que quieres medir (televisión encendida, extractor de cocina, etc.).
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>2</span>
+              <div className={styles.stepContent}>
+                <strong>Coloca el dispositivo correctamente</strong>
+                <p>
+                  Pon el móvil a 1 metro de altura respecto al suelo y a 1–1,5 metros de la fuente de ruido.
+                  No lo cubras con la mano ni lo apoyes en superficies que puedan transmitir vibraciones.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>3</span>
+              <div className={styles.stepContent}>
+                <strong>Inicia la medición y espera</strong>
+                <p>
+                  Pulsa el botón de inicio y espera al menos 30–60 segundos antes de leer el resultado.
+                  El promedio (LAeq) es más representativo que el valor pico. Para una queja formal,
+                  realiza mediciones de al menos 5–10 minutos.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>4</span>
+              <div className={styles.stepContent}>
+                <strong>Toma mediciones en distintos momentos</strong>
+                <p>
+                  El ruido varía a lo largo del día. Para documentar correctamente, mide en el momento
+                  en que el problema es más intenso (noche, hora punta de tráfico, funcionamiento de la maquinaria)
+                  y también en horas tranquilas para poder comparar.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>5</span>
+              <div className={styles.stepContent}>
+                <strong>Registra el ruido de fondo</strong>
+                <p>
+                  Mide el nivel de ruido en ausencia de la fuente problemática (ruido de fondo o residual).
+                  Esto permite calcular la diferencia real que genera la fuente de molestia, que es lo que
+                  valoran las inspecciones municipales.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>6</span>
+              <div className={styles.stepContent}>
+                <strong>Documenta con capturas de pantalla</strong>
+                <p>
+                  Haz capturas de pantalla del sonómetro mientras está midiendo, asegurándote de que
+                  se vea la fecha y la hora del dispositivo. Guarda también el nombre del lugar y la
+                  distancia a la fuente de ruido en un documento o nota de voz.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber}>7</span>
+              <div className={styles.stepContent}>
+                <strong>Interpreta el resultado y actúa</strong>
+                <p>
+                  Compara el valor promedio obtenido con los límites de tu ordenanza municipal
+                  o con los valores de referencia laborales. Si supera los límites, considera presentar
+                  una denuncia en el ayuntamiento o solicitar una medición oficial a un técnico acreditado.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* SECCIÓN 5: Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas para obtener mediciones fiables</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📏</span>
+              <div>
+                <strong>Mide siempre a 1 metro de la fuente</strong>
+                <p>La distancia estándar internacional para comparar niveles sonoros es 1 metro. Cada vez que doblas la distancia, el nivel cae aproximadamente 6 dB.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🕐</span>
+              <div>
+                <strong>Toma mediciones en distintos momentos del día</strong>
+                <p>El ruido del tráfico es muy diferente a las 8:00 que a las 14:00 o las 23:00. Para documentar un problema acústico real, necesitas al menos 3 franjas horarias distintas.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📊</span>
+              <div>
+                <strong>Usa el LAeq, no el valor pico</strong>
+                <p>El nivel equivalente continuo (LAeq) es el promedio energético de la exposición sonora en el tiempo. Es el valor que utilizan las normativas y el que mejor refleja el impacto real en la salud.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🎙️</span>
+              <div>
+                <strong>Calibra o verifica el micrófono del móvil</strong>
+                <p>Los micrófonos de móvil no están calibrados de fábrica para mediciones acústicas. Si necesitas precisión, compara los resultados con una fuente sonora conocida o usa una app con calibración manual.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>📸</span>
+              <div>
+                <strong>Documenta con capturas de pantalla con fecha y hora</strong>
+                <p>Las capturas de pantalla son tu única prueba documental. Asegúrate de que el reloj del dispositivo es visible y correcto. Anota la ubicación, distancia y condiciones de la medición.</p>
+              </div>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>🌬️</span>
+              <div>
+                <strong>Protege el micrófono del viento</strong>
+                <p>El viento genera turbulencias en el micrófono que elevan artificialmente las lecturas. Si mides en exterior, usa una pantalla antiviento o realiza las mediciones en días calmados sin brisa directa.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 6: Warning Box — errores comunes */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <strong>Errores frecuentes al medir ruido con el móvil</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Tapar el micrófono con el dedo.</strong> El micrófono de los smartphones
+                suele estar en el borde inferior o trasero. Comprueba su ubicación exacta antes de medir
+                y sujeta el dispositivo por los laterales.
+              </li>
+              <li>
+                <strong>Medir demasiado cerca de la fuente.</strong> A menos de 30 cm de la fuente las
+                lecturas se disparan por reflexiones y efectos de campo cercano. La distancia mínima
+                recomendada es 1 metro.
+              </li>
+              <li>
+                <strong>Confundir dB con dB(A).</strong> Los decibelios sin ponderar (dB) y los ponderados
+                en frecuencia dB(A) pueden diferir varios puntos. La normativa española usa siempre dB(A)
+                para ruido ambiental y laboral.
+              </li>
+              <li>
+                <strong>No tener en cuenta el ruido de fondo.</strong> Si el ruido de fondo ya es de 50 dB,
+                una fuente que genera 52 dB apenas suma 2 dB al total medido. Sin restar el residual,
+                la medición sobreestima el impacto de la fuente molesta.
+              </li>
+              <li>
+                <strong>Usar el resultado del móvil como prueba legal directa.</strong> Las mediciones de apps
+                de sonómetro no tienen validez metrológica ni legal por sí solas. Para reclamaciones
+                formales se necesita un informe de un técnico acreditado con un equipo homologado (clase 1 o 2).
+              </li>
+              <li>
+                <strong>Leer solo el valor pico y no el promedio.</strong> Un golpe puntual puede disparar
+                la lectura a 90 dB un instante, pero si el nivel medio es de 55 dB, el problema es mucho menor
+                de lo que parece. Siempre evalúa el promedio (LAeq) para comparar con normativa.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('sonometro')} />
