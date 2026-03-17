@@ -813,6 +813,333 @@ export default function ConversorTallasPage() {
             </details>
           </div>
         </section>
+
+        {/* SECCIÓN 1: Tabla Comparativa */}
+        <section className={styles.guideSection}>
+          <h2>Tabla Comparativa: Tallas por Región (Ropa Mujer Adulto)</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>España/EU</th>
+                  <th>UK</th>
+                  <th>US</th>
+                  <th>Italia (IT)</th>
+                  <th>Asia/JP</th>
+                  <th>Busto (cm)</th>
+                  <th>Cintura (cm)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>34</strong></td>
+                  <td>6</td>
+                  <td>2</td>
+                  <td>38</td>
+                  <td>S / 155</td>
+                  <td>80–83</td>
+                  <td>60–63</td>
+                </tr>
+                <tr>
+                  <td><strong>36</strong></td>
+                  <td>8</td>
+                  <td>4</td>
+                  <td>40</td>
+                  <td>S–M / 158</td>
+                  <td>84–87</td>
+                  <td>64–67</td>
+                </tr>
+                <tr className={styles.rowHighlight}>
+                  <td><strong>38</strong></td>
+                  <td>10</td>
+                  <td>6</td>
+                  <td>42</td>
+                  <td>M / 160</td>
+                  <td>88–91</td>
+                  <td>68–71</td>
+                </tr>
+                <tr>
+                  <td><strong>40</strong></td>
+                  <td>12</td>
+                  <td>8</td>
+                  <td>44</td>
+                  <td>M–L / 163</td>
+                  <td>92–95</td>
+                  <td>72–75</td>
+                </tr>
+                <tr>
+                  <td><strong>42</strong></td>
+                  <td>14</td>
+                  <td>10</td>
+                  <td>46</td>
+                  <td>L / 165</td>
+                  <td>96–99</td>
+                  <td>76–79</td>
+                </tr>
+                <tr>
+                  <td><strong>44</strong></td>
+                  <td>16</td>
+                  <td>12</td>
+                  <td>48</td>
+                  <td>XL / 168</td>
+                  <td>100–103</td>
+                  <td>80–83</td>
+                </tr>
+                <tr>
+                  <td><strong>46</strong></td>
+                  <td>18</td>
+                  <td>14</td>
+                  <td>50</td>
+                  <td>XXL / 170</td>
+                  <td>104–107</td>
+                  <td>84–87</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className={styles.tableNote}>
+            Ejemplo clave: una talla <strong>38 ES</strong> equivale a <strong>10 UK</strong>, <strong>6 US</strong>, <strong>42 IT</strong> y aproximadamente <strong>M / 160 en Asia</strong>. Las marcas asiáticas pueden desplazarse 1–2 tallas hacia abajo respecto a este estándar.
+          </p>
+        </section>
+
+        {/* SECCIÓN 2: Casos de Uso */}
+        <section className={styles.guideSection}>
+          <h2>¿Quién Necesita Convertir Tallas?</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
+                <strong>Comprador en tiendas online internacionales</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Amazon UK, ASOS (UK), Shein (Asia), Zara US: cada tienda usa su propio sistema de referencia.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: busca siempre la «Size Guide» de la tienda y compara con tus medidas en cm, no con tu talla de etiqueta.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">✈️</span>
+                <strong>Turista que compra en el extranjero</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                De compras en Londres, Nueva York o Tokio: los probadores no siempre están disponibles y el tiempo es limitado.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: anota tus medidas (busto, cintura, cadera, pie en cm) antes de viajar y lleva una cinta métrica pequeña.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎁</span>
+                <strong>Persona que recibe regalos del exterior</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Un familiar en Estados Unidos quiere regalarte ropa y pregunta tu talla. Tu «38 español» no significa nada para él.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: comparte tus medidas en cm o usa este conversor para indicar tu talla en el sistema del país del remitente.
+              </p>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏷️</span>
+                <strong>Marca que vende en múltiples mercados</strong>
+              </div>
+              <p className={styles.escenarioExample}>
+                Una tienda española que exporta a UK, EEUU y Japón necesita mostrar equivalencias claras en cada ficha de producto.
+              </p>
+              <p className={styles.escenarioTip}>
+                Tip: incluir siempre las medidas en cm además de las tallas locales reduce las devoluciones hasta un 30 %.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 3: FAQ ampliada */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes sobre Tallas Internacionales</h2>
+          <ul className={styles.faqList}>
+            <li className={styles.faqItem}>
+              <strong>¿Por qué las tallas varían tanto entre marcas?</strong>
+              <p>
+                No existe un estándar internacional vinculante. Cada marca define su propio patrón de diseño («grading») según el público objetivo. Una talla M de Zara puede equivaler a una S de otra marca. La única referencia fiable son las medidas corporales en centímetros.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo sé mi talla exacta sin probador?</strong>
+              <p>
+                Mide busto, cintura y cadera con cinta métrica (en cm). Compara esas medidas directamente con la tabla de tallas del fabricante. Es más fiable que usar la talla de otra prenda como referencia.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Hay diferencia entre talla EU y talla española?</strong>
+              <p>
+                En ropa prácticamente no existe diferencia: España usa el sistema EU. En calzado, algunos fabricantes italianos o franceses usan una escala EU ligeramente distinta (medio número de diferencia en casos concretos). Verifica siempre el país de origen de la talla.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Las tallas asiáticas son más pequeñas?</strong>
+              <p>
+                Generalmente sí: las tallas asiáticas (China, Japón, Corea) suelen ser 1–2 tallas más pequeñas que las europeas. Una M europea puede corresponder a una L o XL asiática. Revisa siempre la tabla de medidas en cm del fabricante concreto.
+              </p>
+              <p className={styles.faqTip}>
+                Ejemplo: si en España usas una 38 (M), en una tienda japonesa probablemente necesites una L o incluso XL.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo medir la talla de calzado en casa?</strong>
+              <p>
+                Coloca el pie sobre un folio en blanco, traza el contorno y mide la distancia máxima talón-punta en cm. Repite con el otro pie y usa el mayor. Por la tarde los pies están ligeramente más hinchados, es el mejor momento para medir.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Qué medidas tomar para ropa (busto, cintura, cadera)?</strong>
+              <p>
+                <strong>Busto:</strong> rodea el pecho por la parte más ancha (a la altura de los pezones), paralelo al suelo. <strong>Cintura:</strong> la parte más estrecha del torso, generalmente 2–3 cm por encima del ombligo. <strong>Cadera:</strong> la parte más ancha de las caderas/glúteos. Mantén la cinta horizontal y sin apretar.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Las tallas de ropa de bebé van por edad o por peso?</strong>
+              <p>
+                Los fabricantes usan ambos criterios. Las tallas por edad son orientativas; el peso y la altura son más fiables porque los bebés crecen a ritmos muy distintos. Muchas marcas indican «3 meses / 6 kg / 62 cm»: usa las tres referencias juntas para acertar.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo interpretar XS/S/M/L/XL en diferentes países?</strong>
+              <p>
+                Las letras son iguales en todos los países pero no equivalen al mismo tamaño. Una XL en EEUU puede equivaler a una L europea. Siempre contrasta las letras con la tabla de medidas en cm del vendedor. En Asia, sube al menos una talla respecto a tu talla europea habitual.
+              </p>
+            </li>
+          </ul>
+        </section>
+
+        {/* SECCIÓN 4: Guía Paso a Paso */}
+        <section className={styles.guideSection}>
+          <h2>Guía: Cómo Comprar Ropa Online Internacional sin Equivocarte de Talla</h2>
+          <ol className={styles.stepGuide}>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">1</span>
+              <div className={styles.stepContent}>
+                <strong>Mide tu cuerpo antes de buscar</strong>
+                <p>Anota busto, cintura, cadera y longitud de pie en cm. Son los datos universales que cualquier tienda entiende, independientemente del sistema de tallas.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">2</span>
+              <div className={styles.stepContent}>
+                <strong>Localiza la guía de tallas de la tienda</strong>
+                <p>Busca «Size Guide», «Guía de tallas» o «Chart» en la página del producto o en el pie de la tienda. Si no existe, desconfía o elige una talla más.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">3</span>
+              <div className={styles.stepContent}>
+                <strong>Identifica el sistema de tallas del vendedor</strong>
+                <p>¿Usa EU, UK, US o tallas asiáticas? Confirma el país de origen de la talla para hacer una conversión correcta con esta herramienta.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
+                <strong>Compara tus medidas con las de la tabla del fabricante</strong>
+                <p>No compares tallas de etiqueta entre marcas. Usa siempre tus medidas corporales en cm para encontrar la talla correcta en la tabla del fabricante.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
+              <div className={styles.stepContent}>
+                <strong>Lee reseñas de otros compradores</strong>
+                <p>Busca comentarios que mencionen el tallaje («talla grande», «talla pequeño», «fiel a la talla»). Son la información más actualizada y realista.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">6</span>
+              <div className={styles.stepContent}>
+                <strong>Revisa la política de devolución antes de comprar</strong>
+                <p>Comprueba si las devoluciones son gratuitas y cuántos días tienes. Esto te da margen de maniobra si la talla no es exacta.</p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">7</span>
+              <div className={styles.stepContent}>
+                <strong>Si dudas entre dos tallas, elige la mayor</strong>
+                <p>Es más fácil ajustar una prenda grande que estirar una pequeña. En calzado, considera también el grosor del calcetín o plantilla.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* SECCIÓN 5: Mejores Prácticas */}
+        <section className={styles.guideSection}>
+          <h2>6 Tips para Acertar Siempre con la Talla</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
+              <strong>Mide con cinta métrica, no a ojo</strong>
+              <p>Una diferencia de 2 cm puede suponer una talla entera. Usa siempre cinta métrica flexible y mide por la mañana (menos retención de líquidos).</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">👕</span>
+              <strong>Compara con una prenda propia que te quede bien</strong>
+              <p>Mide el busto, cintura y largo de esa prenda extendida en plano y compáralo con las medidas del producto online. Más fiable que comparar tallas de etiqueta.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
+              <strong>Verifica la política de devolución antes de pagar</strong>
+              <p>Prioriza tiendas con devoluciones gratuitas durante al menos 30 días. Así puedes pedir dos tallas y devolver la que no encaje sin coste adicional.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⬆️</span>
+              <strong>En caso de duda, talla mayor</strong>
+              <p>Para ropa estructurada (chaquetas, pantalones), sube una talla si tus medidas están en el límite superior del rango. Para ropa elástica, tu talla habitual suele funcionar.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🌏</span>
+              <strong>Con marcas asiáticas, sube siempre 1–2 tallas</strong>
+              <p>Como regla general, si en Europa usas una M, pide una L o XL en tiendas chinas, japonesas o coreanas. Confirma siempre con la tabla de medidas en cm.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">⭐</span>
+              <strong>Lee las reseñas con filtro por talla</strong>
+              <p>En Amazon y ASOS puedes filtrar reseñas por talla comprada. Busca compradores con medidas similares a las tuyas para obtener la información más relevante.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN 6: Warning Box — Errores comunes */}
+        <section className={styles.guideSection}>
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <strong>6 Errores que Provocan Devoluciones</strong>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>Confiar en la talla de etiqueta (XL) sin consultar las medidas en cm.</strong> Una XL de una marca puede equivaler a una L de otra. Las letras de talla no son universales.
+              </li>
+              <li>
+                <strong>No revisar la tabla de tallas específica de cada marca.</strong> Incluso dentro del mismo grupo empresarial, marcas diferentes usan patrones distintos.
+              </li>
+              <li>
+                <strong>Asumir que las tallas asiáticas equivalen a las europeas.</strong> Las tallas asiáticas son habitualmente 1–2 tallas más pequeñas. Siempre compara en cm.
+              </li>
+              <li>
+                <strong>Medir encima de la ropa en lugar de sobre el cuerpo.</strong> La cinta debe ir sobre ropa interior o directamente sobre la piel para obtener medidas precisas.
+              </li>
+              <li>
+                <strong>Ignorar las reseñas sobre el tallaje del producto.</strong> Los comentarios de clientes anteriores son la fuente de información más fiable sobre si una prenda talla grande o pequeña.
+              </li>
+              <li>
+                <strong>No comprobar la política de devolución antes de comprar.</strong> Si la devolución es de pago o tiene un plazo muy corto, el error de talla puede salirte caro.
+              </li>
+            </ul>
+          </div>
+        </section>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('conversor-tallas')} />

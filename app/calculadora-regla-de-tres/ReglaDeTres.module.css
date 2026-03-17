@@ -520,3 +520,411 @@
     font-size: 0.9rem;
   }
 }
+
+/* ============================================================
+   SECCIONES EDUCATIVAS v2.0
+   ============================================================ */
+
+/* --- Tabla Comparativa --- */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93rem;
+  background: var(--bg-card);
+}
+
+.comparativaTable thead {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.comparativaTable th {
+  padding: 14px 18px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+.comparativaTable td {
+  padding: 13px 18px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  line-height: 1.5;
+  vertical-align: top;
+}
+
+.comparativaTable td:first-child {
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  white-space: nowrap;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover td {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+[data-theme='dark'] .comparativaTable {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .comparativaTable td:first-child {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover td {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+/* --- Escenarios / Casos de Uso --- */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.escenarioCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.escenarioExample {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.07) 0%, rgba(72, 169, 166, 0.07) 100%);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* --- FAQ --- */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  transition: border-color 0.3s ease;
+}
+
+.faqItem:hover {
+  border-color: var(--secondary);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+}
+
+.faqItem > strong {
+  display: block;
+  color: var(--primary);
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.faqItem p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.faqTip {
+  margin-top: 12px;
+  background: linear-gradient(135deg, rgba(72, 169, 166, 0.1) 0%, rgba(46, 134, 171, 0.1) 100%);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+/* --- Guía Paso a Paso --- */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  transition: box-shadow 0.3s ease;
+}
+
+.step:hover {
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+}
+
+.stepNumber {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent > strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.98rem;
+  margin-bottom: 6px;
+}
+
+.stepContent p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- Tips / Mejores Prácticas --- */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.tipCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--secondary);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+}
+
+.tipIcon {
+  font-size: 1.8rem;
+}
+
+.tipCard > strong {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  font-size: 0.87rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- Warning Box --- */
+.warningBox {
+  background: rgba(220, 53, 69, 0.06);
+  border: 1px solid rgba(220, 53, 69, 0.25);
+  border-radius: 14px;
+  padding: 28px;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.35);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.warningHeader > strong {
+  color: #c0392b;
+  font-size: 1.05rem;
+}
+
+[data-theme='dark'] .warningHeader > strong {
+  color: #e74c3c;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.warningList li {
+  color: var(--text-secondary);
+  font-size: 0.93rem;
+  line-height: 1.65;
+  padding-left: 20px;
+  position: relative;
+}
+
+.warningList li::before {
+  content: '✕';
+  position: absolute;
+  left: 0;
+  color: #dc3545;
+  font-weight: 700;
+  font-size: 0.85rem;
+  top: 2px;
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   RESPONSIVE — Secciones Educativas v2.0
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .step {
+    padding: 16px 18px;
+  }
+
+  .stepNumber {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    font-size: 0.9rem;
+  }
+
+  .escenarioCard {
+    padding: 18px;
+  }
+
+  .faqItem {
+    padding: 16px 18px;
+  }
+
+  .warningBox {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable td:first-child {
+    white-space: normal;
+  }
+
+  .stepGuide {
+    gap: 12px;
+  }
+
+  .warningBox {
+    padding: 16px;
+  }
+}

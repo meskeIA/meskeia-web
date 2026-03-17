@@ -509,6 +509,304 @@ export default function CalculadoraReglaDeTresPage() {
               </li>
             </ul>
           </section>
+
+          {/* SECCIÓN 1: Tabla Comparativa */}
+          <section className={styles.conceptoSection}>
+            <h2>Comparativa: Directa vs Inversa vs Compuesta</h2>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Característica</th>
+                    <th>Simple Directa</th>
+                    <th>Simple Inversa</th>
+                    <th>Compuesta</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Proporcionalidad</strong></td>
+                    <td>Directa: ↑A → ↑B</td>
+                    <td>Inversa: ↑A → ↓B</td>
+                    <td>Mixta (directa e/o inversa)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Fórmula</strong></td>
+                    <td>X = (B × C) / A</td>
+                    <td>X = (A × B) / C</td>
+                    <td>Combina ambas fórmulas</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Número de magnitudes</strong></td>
+                    <td>2 magnitudes</td>
+                    <td>2 magnitudes</td>
+                    <td>3 o más magnitudes</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cuándo usarla</strong></td>
+                    <td>Al aumentar una, la otra crece</td>
+                    <td>Al aumentar una, la otra decrece</td>
+                    <td>Varias variables interrelacionadas</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ejemplo típico</strong></td>
+                    <td>kg ↔ precio, km ↔ litros</td>
+                    <td>trabajadores ↔ días, velocidad ↔ tiempo</td>
+                    <td>máquinas × horas → piezas</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Aplicación habitual</strong></td>
+                    <td>Compras, recetas, escalas</td>
+                    <td>Planificación de recursos</td>
+                    <td>Producción industrial, obras</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* SECCIÓN 2: Casos de Uso por perfil */}
+          <section className={styles.conceptoSection}>
+            <h2>¿Quién usa la regla de tres?</h2>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
+                  <strong>Estudiante ESO/Bachillerato</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <em>Problema:</em> Si un tren recorre 240 km en 3 horas, ¿cuánto tarda en recorrer 400 km a la misma velocidad?
+                  <br /><strong>Solución directa:</strong> X = (3 × 400) / 240 = <strong>5 horas</strong>
+                </div>
+                <div className={styles.escenarioTip}>
+                  Clave: velocidad constante → proporcionalidad directa entre distancia y tiempo.
+                </div>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">👨‍🍳</span>
+                  <strong>Cocinero / Recetas</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <em>Problema:</em> La receta de bizcocho para 4 personas lleva 200 g de harina. ¿Cuánta harina necesito para 10 personas?
+                  <br /><strong>Solución directa:</strong> X = (200 × 10) / 4 = <strong>500 g</strong>
+                </div>
+                <div className={styles.escenarioTip}>
+                  Regla de oro: los ingredientes siempre son directamente proporcionales al número de raciones.
+                </div>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
+                  <strong>Profesional de Compras</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <em>Problema:</em> 500 unidades de un artículo cuestan 1.250 €. ¿Cuánto costarán 1.800 unidades al mismo precio unitario?
+                  <br /><strong>Solución directa:</strong> X = (1.250 × 1.800) / 500 = <strong>4.500 €</strong>
+                </div>
+                <div className={styles.escenarioTip}>
+                  Precio unitario = 1.250 / 500 = 2,50 €/ud. La regla de tres lo calcula directamente sin pasos intermedios.
+                </div>
+              </div>
+
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🗺️</span>
+                  <strong>Cartógrafo / Ingeniero</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  <em>Problema:</em> En un mapa a escala 1:50.000, dos puntos están separados 3,5 cm. ¿Cuál es la distancia real?
+                  <br /><strong>Solución directa:</strong> X = (50.000 × 3,5) / 1 = 175.000 cm = <strong>1,75 km</strong>
+                </div>
+                <div className={styles.escenarioTip}>
+                  La escala es una proporción directa: 1 cm en el mapa equivale siempre a la misma distancia real.
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 3: FAQ */}
+          <section className={styles.conceptoSection}>
+            <h2>Preguntas Frecuentes</h2>
+            <div className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <strong>¿Cuándo es directa y cuándo inversa?</strong>
+                <p>
+                  Es directa cuando al aumentar una magnitud la otra también aumenta (más kg → más precio). Es inversa cuando al aumentar una la otra disminuye (más trabajadores → menos días). Pregúntate: ¿si A sube, B sube o baja?
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Qué es la proporcionalidad compuesta?</strong>
+                <p>
+                  Ocurre cuando el resultado depende de <em>dos o más</em> magnitudes simultáneamente. Ejemplo: las piezas producidas dependen tanto del número de máquinas (directa) como de las horas de trabajo (directa). Cada magnitud adicional añade un factor al numerador o denominador.
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Cómo resuelvo si hay 4 magnitudes?</strong>
+                <p>
+                  Identifica el tipo de proporcionalidad de cada magnitud por separado. Las magnitudes directas van al numerador y las inversas al denominador: X = (B × C₁ × C₂ × …) / (A × D₁ × D₂ × …). Siempre mantén las unidades coherentes.
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Cuál es la diferencia con el tanto por ciento?</strong>
+                <p>
+                  El tanto por ciento es un caso particular de regla de tres directa donde A = 100. Por ejemplo, "¿el 15% de 240?" equivale a: 100 → 240; 15 → X = (240 × 15) / 100 = 36. Toda regla de porcentajes se puede resolver como regla de tres.
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Sirve para calcular el IVA?</strong>
+                <p>
+                  Sí. Si un artículo cuesta 85 € sin IVA y el tipo es el 21%, el IVA a pagar es: 100 → 85; 21 → X = (85 × 21) / 100 = 17,85 €. El precio final es 85 + 17,85 = 102,85 €. También puedes calcular el precio sin IVA desde el precio con IVA.
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Qué es exactamente una proporción?</strong>
+                <p>
+                  Una proporción es la igualdad de dos razones: A/B = C/D (o A:B = C:D). La regla de tres es el proceso para encontrar el término desconocido D cuando conocemos A, B y C. El producto de los extremos iguala el producto de los medios: A × D = B × C.
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Cómo verifico si el resultado es correcto?</strong>
+                <p>
+                  Sustituye X en la proporción original y comprueba que los cocientes son iguales. En directa: A/C debe ser igual a B/X. En inversa: A × B debe ser igual a C × X. Si la igualdad se cumple, el resultado es correcto.
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Se aplica en física y química?</strong>
+                <p>
+                  Ampliamente. En física: distancia-velocidad-tiempo, ley de Ohm (V = I × R). En química: estequiometría (moles y masas molares), diluciones (C₁V₁ = C₂V₂), densidad (m = ρ × V). En todos estos casos la regla de tres permite calcular la variable desconocida sin necesitar más herramientas.
+                </p>
+                <div className={styles.faqTip}>
+                  Ejemplo química: 36 g de H₂O son 2 moles. ¿Cuántos gramos son 5 moles? X = (36 × 5) / 2 = <strong>90 g</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 4: Guía Paso a Paso */}
+          <section className={styles.conceptoSection}>
+            <h2>Guía Paso a Paso: Cómo Resolver Cualquier Regla de Tres</h2>
+            <div className={styles.stepGuide}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <strong>Lee el enunciado e identifica las magnitudes</strong>
+                  <p>Subraya cada cantidad y su unidad. Escribe qué mide cada número: ¿kg?, ¿€?, ¿horas?, ¿personas?</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <strong>Determina cuántas magnitudes intervienen</strong>
+                  <p>Si solo hay dos magnitudes → regla de tres simple. Si hay tres o más → compuesta.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <strong>Clasifica cada relación: directa o inversa</strong>
+                  <p>Para cada par de magnitudes pregunta: "¿Si A aumenta, B aumenta (directa) o disminuye (inversa)?"</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepContent}>
+                  <strong>Plantea la proporción en una tabla</strong>
+                  <p>Escribe los valores conocidos en una tabla de dos columnas y X en la posición que corresponde al incógnito.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>5</div>
+                <div className={styles.stepContent}>
+                  <strong>Aplica la fórmula adecuada</strong>
+                  <p>Directa: X = (B × C) / A. Inversa: X = (A × B) / C. Compuesta: multiplica los factores según el tipo de cada magnitud.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>6</div>
+                <div className={styles.stepContent}>
+                  <strong>Calcula y añade las unidades al resultado</strong>
+                  <p>Realiza la operación aritmética y asegúrate de añadir la unidad correcta al resultado. Un número sin unidad es incompleto.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>7</div>
+                <div className={styles.stepContent}>
+                  <strong>Verifica: comprueba que la proporción se cumple</strong>
+                  <p>Sustituye X por el valor obtenido. En directa: A/C = B/X. En inversa: A × B = C × X. Si la igualdad no se cumple, revisa el paso 3.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 5: Mejores Prácticas */}
+          <section className={styles.conceptoSection}>
+            <h2>6 Consejos Profesionales para No Cometer Errores</h2>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">🎯</span>
+                <strong>Escribe siempre las unidades</strong>
+                <p>Operar sin unidades es la causa principal de errores. "3 kg → 6 €" es más seguro que "3 → 6".</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">🔍</span>
+                <strong>Pregunta el "¿qué pasa si doblo?"</strong>
+                <p>Para identificar el tipo, imagina que la magnitud A se duplica. Si B también se duplica → directa. Si B se reduce a la mitad → inversa.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">📐</span>
+                <strong>Mantén el orden en la tabla</strong>
+                <p>Coloca siempre los valores conocidos en las mismas posiciones (A↔B, C↔X). Intercambiar filas o columnas sin criterio lleva a errores de planteamiento.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">🔢</span>
+                <strong>Convierte unidades antes de calcular</strong>
+                <p>Si mezclas horas con minutos o km con metros, convierte todo a la misma unidad antes de plantear la proporción.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">✅</span>
+                <strong>Verifica con el sentido común</strong>
+                <p>Si en directa obtienes X menor que B cuando C es mayor que A, algo está mal. El resultado debe tener sentido lógico.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">⚠️</span>
+                <strong>En compuesta: analiza cada magnitud por separado</strong>
+                <p>No intentes combinar todo de golpe. Evalúa una a una si cada magnitud es directa o inversa y luego construye la fórmula.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 6: Warning Box — Errores Más Comunes */}
+          <section className={styles.conceptoSection}>
+            <div className={styles.warningBox}>
+              <div className={styles.warningHeader}>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+                <strong>6 Errores Más Comunes — y Cómo Evitarlos</strong>
+              </div>
+              <ul className={styles.warningList}>
+                <li>
+                  <strong>Invertir la proporción:</strong> En directa, X = (B × C) / A. Si pones A en el numerador en lugar de B × C, el resultado es erróneo. Recuerda: el incógnito X siempre está en diagonal respecto a B.
+                </li>
+                <li>
+                  <strong>Confundir directa con inversa:</strong> "Más pintores → más días pintados" parece directa, pero si la pregunta es cuántos días tardan en terminar la misma obra, es inversa. El contexto de la pregunta manda.
+                </li>
+                <li>
+                  <strong>Olvidar las unidades y mezclarlas:</strong> Usar 2 horas y 45 minutos como "2" y "45" en la misma proporción da un resultado absurdo. Convierte primero: 2 horas = 120 minutos.
+                </li>
+                <li>
+                  <strong>Error en la compuesta por no analizar cada magnitud:</strong> Si tienes 3 magnitudes y clasificas mal una sola, el resultado puede ser hasta 100 veces mayor o menor del correcto. Analiza magnitud a magnitud.
+                </li>
+                <li>
+                  <strong>Dividir entre cero:</strong> Si A = 0 o C = 0, la proporción es indefinida. Verifica que ningún valor conocido sea cero antes de calcular.
+                </li>
+                <li>
+                  <strong>No verificar el resultado:</strong> Sustituyendo X en la proporción original puedes detectar cualquier error de cálculo en segundos. Sáltarte este paso es el error más habitual en exámenes.
+                </li>
+              </ul>
+            </div>
+          </section>
         </div>
       </EducationalSection>
 

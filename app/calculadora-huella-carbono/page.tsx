@@ -776,6 +776,345 @@ export default function CalculadoraHuellaCarbono() {
         subtitle="Descubre qué es, cómo se calcula y las mejores estrategias para reducirla"
         icon="🌿"
       >
+        {/* ── SECCIÓN 1: TABLA COMPARATIVA ── */}
+        <section>
+          <h3>📊 Comparativa de Emisiones por Actividad y Categoría</h3>
+          <p>Datos reales para entender qué opciones tienen mayor impacto en tu huella de carbono:</p>
+
+          <h4 style={{ marginTop: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>🚗 Transporte (kg CO₂ por km recorrido)</h4>
+          <div className={styles.eduTableWrapper}>
+            <table className={styles.eduTable}>
+              <thead>
+                <tr>
+                  <th>Medio de transporte</th>
+                  <th>kg CO₂/km</th>
+                  <th>Equivalente anual (15.000 km)</th>
+                  <th>Índice vs. coche gasolina</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>✈️ Avión (corto, &lt;1.500 km)</td>
+                  <td>0,255 kg</td>
+                  <td>3.825 kg</td>
+                  <td>121% más</td>
+                </tr>
+                <tr>
+                  <td>🚗 Coche diésel</td>
+                  <td>0,170 kg</td>
+                  <td>2.550 kg</td>
+                  <td>19% menos</td>
+                </tr>
+                <tr>
+                  <td>🚗 Coche gasolina</td>
+                  <td>0,210 kg</td>
+                  <td>3.150 kg</td>
+                  <td>referencia</td>
+                </tr>
+                <tr>
+                  <td>🚗 Coche híbrido</td>
+                  <td>0,120 kg</td>
+                  <td>1.800 kg</td>
+                  <td>43% menos</td>
+                </tr>
+                <tr>
+                  <td>⚡ Coche eléctrico (mix ES 2024)</td>
+                  <td>0,050 kg</td>
+                  <td>750 kg</td>
+                  <td>76% menos</td>
+                </tr>
+                <tr>
+                  <td>🚌 Autobús interurbano</td>
+                  <td>0,089 kg</td>
+                  <td>1.335 kg</td>
+                  <td>58% menos</td>
+                </tr>
+                <tr>
+                  <td>🚄 Tren AVE/Cercanías</td>
+                  <td>0,041 kg</td>
+                  <td>615 kg</td>
+                  <td>80% menos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4 style={{ marginTop: '1.5rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>🥗 Alimentación (t CO₂ por persona y año)</h4>
+          <div className={styles.eduTableWrapper}>
+            <table className={styles.eduTable}>
+              <thead>
+                <tr>
+                  <th>Tipo de dieta</th>
+                  <th>t CO₂/año</th>
+                  <th>% de la huella media española</th>
+                  <th>Ahorro vs. omnívora alta</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🥩 Omnívora alta en carne roja</td>
+                  <td>3,3 t</td>
+                  <td>44% de 7,5 t</td>
+                  <td>referencia</td>
+                </tr>
+                <tr>
+                  <td>🍽️ Omnívora equilibrada</td>
+                  <td>2,5 t</td>
+                  <td>33%</td>
+                  <td>−24%</td>
+                </tr>
+                <tr>
+                  <td>🐟 Flexitariana (menos carne)</td>
+                  <td>1,7 t</td>
+                  <td>23%</td>
+                  <td>−48%</td>
+                </tr>
+                <tr>
+                  <td>🥦 Vegetariana</td>
+                  <td>1,2 t</td>
+                  <td>16%</td>
+                  <td>−64%</td>
+                </tr>
+                <tr>
+                  <td>🌱 Vegana</td>
+                  <td>0,9 t</td>
+                  <td>12%</td>
+                  <td>−73%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4 style={{ marginTop: '1.5rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>🏠 Calefacción del hogar (kg CO₂ por kWh térmico producido)</h4>
+          <div className={styles.eduTableWrapper}>
+            <table className={styles.eduTable}>
+              <thead>
+                <tr>
+                  <th>Sistema de calefacción</th>
+                  <th>kg CO₂/kWh térmico</th>
+                  <th>Coste energético relativo</th>
+                  <th>Nota</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🔥 Caldera de gas natural</td>
+                  <td>0,202 kg</td>
+                  <td>medio</td>
+                  <td>Rendimiento ~98% (condensación)</td>
+                </tr>
+                <tr>
+                  <td>🛢️ Gasoil / Gasóleo C</td>
+                  <td>0,287 kg</td>
+                  <td>variable (precio petróleo)</td>
+                  <td>En desuso en zonas urbanas</td>
+                </tr>
+                <tr>
+                  <td>⚡ Resistencia eléctrica</td>
+                  <td>0,250 kg</td>
+                  <td>alto (precio kWh)</td>
+                  <td>Rendimiento 100% → COP 1</td>
+                </tr>
+                <tr>
+                  <td>♨️ Bomba de calor aerotérmica</td>
+                  <td>0,062 kg</td>
+                  <td>bajo (COP 3-4)</td>
+                  <td>Por cada kWh eléctrico produce 3-4 kWh calor</td>
+                </tr>
+                <tr>
+                  <td>🌞 Aerotermia + energía solar</td>
+                  <td>~0 kg</td>
+                  <td>mínimo (amortización paneles)</td>
+                  <td>Combinación óptima actual</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 2: CASOS DE USO (4 PERFILES) ── */}
+        <section>
+          <h3>👥 Casos de Uso: 4 Perfiles Reales</h3>
+          <p>Situaciones concretas en las que esta calculadora aporta valor accionable:</p>
+          <div className={styles.eduEscenariosGrid}>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🚗</span>
+              <h4>Familia con dos coches</h4>
+              <p><strong>Situación:</strong> Matrimonio con dos hijos, dos coches de gasolina, 25.000 km/año entre ambos. Quieren reducir su huella.</p>
+              <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted, #999)' }}><strong>Qué descubren:</strong> Cambiar uno de los coches a eléctrico ahorra ~1,6 t CO₂/año. Sustituir un viaje en avión de vacaciones por tren ahorra otras 0,5-0,9 t. Con dos cambios concretos reducen su huella familiar un 20-25%.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>✈️</span>
+              <h4>Profesional viajero</h4>
+              <p><strong>Situación:</strong> Consultor que vuela 8-10 veces/año por trabajo (4 vuelos cortos, 3 medios, 2 largos). Su empresa quiere calcular la huella corporativa.</p>
+              <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted, #999)' }}><strong>Qué descubren:</strong> Solo en vuelos emite ~9,5 t CO₂/año — más que la media española entera. Sustituir 3 vuelos cortos por reuniones telemáticas ahorra ~1 t. Para el resto, compensación con Gold Standard: ~190€/año.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🥗</span>
+              <h4>Persona evaluando cambio de dieta</h4>
+              <p><strong>Situación:</strong> Persona con dieta omnívora alta en carne que considera reducir su consumo por razones medioambientales, sin saber si tiene impacto real.</p>
+              <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted, #999)' }}><strong>Qué descubren:</strong> Pasar de 3,3 t a 1,7 t CO₂/año (dieta flexitariana) ahorra más que no conducir durante 7-8 meses. Eliminar carne de vacuno 4 días/semana ya reduce la huella alimentaria un 35%.</p>
+            </div>
+            <div className={styles.eduEscenarioCard}>
+              <span className={styles.eduEscenarioIcon}>🏢</span>
+              <h4>Empresa buscando compensar</h4>
+              <p><strong>Situación:</strong> Pyme de 15 empleados que quiere calcular su huella corporativa Scope 1+2 para compensarla y comunicarlo a clientes.</p>
+              <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted, #999)' }}><strong>Qué descubren:</strong> Huella media por empleado ~5-8 t. Total empresa: 75-120 t CO₂/año. Compensación certificada: 1.500-3.600€/año. Primero: reducir electricidad con renovables y optimizar desplazamientos (reducción del 30-40% antes de compensar).</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 3: FAQ (8 PREGUNTAS) ── */}
+        <section>
+          <h3>❓ Preguntas Frecuentes (FAQ) — Huella de Carbono</h3>
+          <div className={styles.eduFaqList}>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuál es la huella de carbono media de un español?</summary>
+              <p className={styles.eduFaqAnswer}>La huella media por persona en España es de <strong>7-8 toneladas de CO₂ equivalente al año</strong> (dato 2024, Ministerio para la Transición Ecológica — MITECO). Incluye transporte, hogar, alimentación y consumo. Esta cifra es significativamente superior al objetivo de sostenibilidad climática de 2 t/persona/año marcado por el IPCC para 2050. España se sitúa ligeramente por encima de la media europea (6,4 t), principalmente por el mayor peso del transporte y el turismo.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué actividad individual tiene más impacto en la huella personal?</summary>
+              <p className={styles.eduFaqAnswer}>Para la mayoría de españoles, <strong>el transporte aéreo</strong> es la actividad individual de mayor impacto cuando se realiza. Un solo vuelo Madrid-Nueva York (i/v) emite ~2.500 kg CO₂e — el 33% de la huella anual media. Sin embargo, para quienes no vuelan, <strong>el tipo de dieta</strong> suele ser el factor más relevante: pasar de dieta omnívora alta en carne a flexitariana ahorra 1,6 t/año. El transporte en coche ocupa el tercer lugar en impacto per cápita.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué es la compensación de carbono y realmente funciona?</summary>
+              <p className={styles.eduFaqAnswer}>La <strong>compensación de carbono</strong> (carbon offsetting) consiste en financiar proyectos que capturan o evitan emisiones equivalentes a las que no puedes reducir. Funciona cuando los proyectos son verificados por estándares independientes como <strong>Gold Standard, VCS (Verra) o Plan Vivo</strong>. No funciona bien con proyectos de baja calidad (reforestación de monocultivos, proyectos que habrían ocurrido de todas formas). La secuencia correcta es: primero medir, luego reducir todo lo posible, finalmente compensar lo que no se puede reducir. Compensar sin reducir es greenwashing.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuál es la diferencia entre huella de carbono y huella ecológica?</summary>
+              <p className={styles.eduFaqAnswer}>La <strong>huella de carbono</strong> mide exclusivamente las emisiones de gases de efecto invernadero (GEI), expresadas en kg o toneladas de CO₂ equivalente. La <strong>huella ecológica</strong> es un concepto más amplio que mide cuánta superficie productiva de la Tierra (en hectáreas globales, gha) se necesita para sostener el estilo de vida de una persona, incluyendo uso de agua, suelo, biodiversidad y absorción de residuos. Un español tiene una huella ecológica de ~4,4 gha/persona, cuando solo hay disponibles ~1,6 gha por persona en el planeta.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cómo reduce la huella cambiar a un coche eléctrico en España?</summary>
+              <p className={styles.eduFaqAnswer}>Con el mix eléctrico español de 2024 (intensidad media ~0,25 kg CO₂/kWh), un coche eléctrico emite <strong>unos 50 g CO₂/km</strong>, frente a los ~120-210 g/km de un gasolina compacto. Esto supone una reducción del 60-75% en emisiones de uso. Para 15.000 km/año: pasar de ~3.150 kg CO₂ (gasolina) a ~750 kg CO₂ (eléctrico) = ahorro de 2.400 kg/año. Además, a medida que la red eléctrica española incorpora más renovables (objetivo 81% en 2030), el eléctrico mejora automáticamente sin cambiar el vehículo. La huella de fabricación de la batería (~8-12 t) se amortiza en 3-4 años de uso.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿El avión es siempre más contaminante que el tren?</summary>
+              <p className={styles.eduFaqAnswer}>En prácticamente todos los trayectos con alternativa ferroviaria, <strong>sí</strong>. Madrid-Barcelona: avión ~90 kg CO₂/pasajero vs. AVE ~6 kg (15 veces menos). Madrid-París: avión ~200 kg vs. tren de noche ~45 kg. La diferencia se amplía cuando consideramos el <strong>efecto radiativo de las contrails</strong> (estelas de condensación) del avión, que multiplican su impacto climático ×2-3 a efectos de calentamiento global, aunque esto no siempre se refleja en los cálculos de CO₂ puro. Solo en trayectos sin alternativa ferroviaria viable (más de 6-7 horas de tren) la elección es más difícil.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Qué significa ser &quot;neutro en carbono&quot;?</summary>
+              <p className={styles.eduFaqAnswer}>Una persona, empresa o producto es <strong>neutro en carbono</strong> (carbon neutral) cuando sus emisiones netas de CO₂ equivalente son cero. Esto se puede lograr de dos formas: eliminando completamente todas las emisiones (muy difícil en la práctica) o combinando <strong>reducciones máximas de emisiones</strong> con <strong>compensación certificada del resto</strong>. Existe también el concepto más exigente de <strong>&quot;net zero&quot;</strong> (emisiones netas cero según ISO 14068), que requiere reducir al menos el 90% antes de compensar. &quot;Carbono negativo&quot; significa absorber más CO₂ del que se emite.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Cuántos árboles compensan 1 tonelada de CO₂?</summary>
+              <p className={styles.eduFaqAnswer}>Un árbol adulto en crecimiento activo absorbe entre <strong>10 y 40 kg de CO₂ al año</strong> (dependiendo de especie, clima y suelo). Un pino adulto en España absorbe ~20 kg/año. Para compensar 1 tonelada de CO₂ en 1 año harían falta unos <strong>50 árboles</strong> absorbiendo simultáneamente. Para compensar la huella media española (7,5 t) necesitarías ~375 árboles durante un año completo, o equivalentemente plantar un bosque de ~1.500 m². La reforestación es necesaria pero insuficiente a escala global: no puede absorber el ritmo actual de emisiones, por eso la reducción directa es imprescindible.</p>
+            </details>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 4: GUÍA PASO A PASO (7 PASOS) ── */}
+        <section>
+          <h3>📋 Cómo Reducir tu Huella un 30-50% en 12 Meses (7 Pasos)</h3>
+          <ol className={styles.eduStepsList}>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>1</span>
+              <div>
+                <strong>Calcula tu huella actual (línea de base)</strong>
+                <p>Usa esta calculadora completando todas las secciones honestamente. Anota el resultado desglosado por categoría. Sin línea de base, no puedes medir el progreso. Guarda el PDF o los datos para comparar en 6 y 12 meses.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>2</span>
+              <div>
+                <strong>Identifica tus 2-3 mayores focos de emisión</strong>
+                <p>Usa el gráfico circular de resultados. Para la mayoría de españoles el ranking es: 1.º vuelos (si vuela), 2.º coche, 3.º alimentación. Concentra el esfuerzo donde el impacto es mayor — el 20% de las fuentes explica el 80% de la huella.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>3</span>
+              <div>
+                <strong>Elimina o sustituye el mayor foco (meses 1-3)</strong>
+                <p>Un vuelo menos de larga distancia = −2.500 kg. Cambiar un coche gasolina por eléctrico = −2.400 kg/año. Estos son los cambios de mayor palanca. Si el cambio no es posible inmediatamente, planifícalo (cambio de coche en próxima renovación, alternativa tren en próximas vacaciones).</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>4</span>
+              <div>
+                <strong>Reduce la huella del hogar (meses 2-4)</strong>
+                <p>Cambia a tarifa eléctrica de origen 100% renovable (mismo coste, distinto contrato — busca comercializadoras con Garantía de Origen). Ajusta el termostato: 20°C en invierno y 26°C en verano. Cada grado de diferencia ahorra un 7% de energía. Considera bomba de calor al renovar la caldera.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>5</span>
+              <div>
+                <strong>Ajusta la dieta progresivamente (meses 3-6)</strong>
+                <p>Objetivo mínimo impactante: reducir carne de vacuno a 1-2 veces/semana (en lugar de diaria). Esto solo ya supone −600 a −800 kg CO₂/año. En meses siguientes añade: 3 días sin carne a la semana (dieta flexitariana). No es necesario el veganismo para un impacto significativo.</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>6</span>
+              <div>
+                <strong>Calcula lo que no puedes reducir y compénsalo</strong>
+                <p>Para emisiones inevitables (vuelo laboral ineludible, calefacción en invierno extremo, desplazamientos sin alternativa), calcula el CO₂ equivalente y compénsalo con proyectos certificados. Precio justo: 10-30 €/tonelada. Para 7,5 t/año = 75-225 €/año. Busca: Atmosfair, ClimateTrade, South Pole (todos con certificaciones verificadas).</p>
+              </div>
+            </li>
+            <li className={styles.eduStep}>
+              <span className={styles.eduStepNum}>7</span>
+              <div>
+                <strong>Mide de nuevo y ajusta el plan (mes 12)</strong>
+                <p>Repite el cálculo con los hábitos actuales. Compara con la línea de base. Una reducción del 30-50% en 12 meses es realista si has actuado sobre los dos principales focos. Establece el siguiente objetivo: muchas personas que alcanzan −30% descubren que −50% es posible al año siguiente con cambios adicionales ya normalizados.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        {/* ── SECCIÓN 5: MEJORES PRÁCTICAS (6 TIPS) ── */}
+        <section>
+          <h3>💡 6 Cambios de Alto Impacto (Accionables Hoy)</h3>
+          <div className={styles.eduTipsGrid}>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>✈️</span>
+              <h4>Sustituye vuelos por tren</h4>
+              <p>En trayectos de hasta 4-5 horas, el tren es 10-20 veces menos contaminante. Madrid-Barcelona en AVE: 6 kg CO₂ vs. 90 kg en avión. Madrid-París en tren nocturno: 45 kg vs. 200 kg. Ahorro: 80-90% por viaje.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🥩</span>
+              <h4>Dieta plant-based 3 días/semana</h4>
+              <p>No hace falta ser vegetariano. Solo reducir carne de vacuno a 2 días/semana ya ahorra ~600 kg CO₂/año. 3 días sin carne = dieta flexitariana = −1.600 kg CO₂/año vs. dieta alta en carne. Más impacto que no conducir 4 meses.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🌡️</span>
+              <h4>Ajusta el termostato 1-2°C</h4>
+              <p>Bajar de 22°C a 20°C en invierno reduce el consumo de calefacción un 14%. En verano, subir de 24°C a 26°C ahorra un 14% de aire acondicionado. Con caldera de gas de consumo medio: −120 a −200 kg CO₂/año.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>⚡</span>
+              <h4>Cambia a proveedor de energía verde</h4>
+              <p>Contratar electricidad con Garantía de Origen renovable tiene un coste similar a la tarifa convencional. Reduce la huella eléctrica del hogar hasta un 90%. Busca comercializadoras como Holaluz, Naturgy Verde, Iberdrola con GdO certificado por CNMC.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>🚗</span>
+              <h4>Comparte el coche o usa transporte público</h4>
+              <p>Compartir coche (carpool) con 2 personas divide la huella por 2 sin cambiar de vehículo. Si es factible, transporte público en desplazamientos diarios: el metro emite 33 g CO₂/km vs. 210 g del coche gasolina. Ahorro anual (30 km/día, 220 días): −1.140 kg CO₂.</p>
+            </div>
+            <div className={styles.eduTipCard}>
+              <span className={styles.eduTipIcon}>♻️</span>
+              <h4>Extiende la vida útil de dispositivos</h4>
+              <p>Usar un smartphone 1 año más reduce su huella total un 25% (la fabricación es el 70% de su huella de ciclo de vida). Un portátil dura idealmente 5-7 años. Comprar de segunda mano evita ~300-500 kg CO₂ de huella embebida de fabricación.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECCIÓN 6: WARNING BOX — ERRORES COMUNES ── */}
+        <section>
+          <div className={styles.eduWarningBox}>
+            <span className={styles.eduWarningIcon}>⚠️</span>
+            <div>
+              <strong>6 Errores que Dan una Falsa Sensación de Sostenibilidad</strong>
+              <ul>
+                <li><strong>Calcular la huella sin incluir los vuelos:</strong> Los vuelos pueden representar el 30-60% de la huella personal. Omitirlos da una imagen irreal y lleva a priorizar acciones de mucho menor impacto (reciclaje, bolsas reutilizables) mientras se ignora la fuente principal.</li>
+                <li><strong>Compensar sin reducir primero:</strong> Pagar compensaciones sin haber reducido emisiones es la definición de greenwashing personal. La jerarquía correcta es siempre: medir → reducir al máximo → compensar solo lo residual inevitable.</li>
+                <li><strong>Confundir reciclaje con impacto real en CO₂:</strong> El reciclaje tiene un impacto del 1-5% en la huella total. Es importante, pero no compensa vuelos, dieta cárnica alta o calefacción con gas. Priorizar reciclaje sobre cambios de dieta o transporte es un error de proporciones frecuente.</li>
+                <li><strong>Comprar productos &quot;eco&quot; sin verificar:</strong> El greenwashing existe en todos los sectores. Un producto &quot;neutro en carbono&quot; sin certificación verificable de terceros (Gold Standard, VCS, Carbon Footprint) no garantiza nada. Exige documentación antes de pagar extra por sostenibilidad.</li>
+                <li><strong>Ignorar la huella embebida de los productos:</strong> La calculadora mide emisiones operacionales, no la huella embebida (fabricación de tu ropa, muebles, coche, electrodomésticos). El consumismo —comprar más cosas nuevas innecesarias— tiene un impacto enorme que no aparece en el cálculo de hábitos cotidianos.</li>
+                <li><strong>Pensar que el impacto individual no importa:</strong> El argumento &quot;yo solo no cambio nada&quot; ignora el efecto agregado y la influencia en decisiones de compra, voto y norma social. La descarbonización de la economía requiere tanto cambios sistémicos como cambios en la demanda individual que los impulsa.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* ── CONTENIDO ORIGINAL ── */}
         <section className={styles.guideSection}>
           <h2>¿Qué es la huella de carbono?</h2>
           <p className={styles.introParagraph}>
