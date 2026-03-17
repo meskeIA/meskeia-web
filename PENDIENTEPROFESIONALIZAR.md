@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~193 | **Pendientes**: ~57
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~201 | **Pendientes**: ~49
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -145,7 +145,7 @@ Apps de uso frecuente con buen potencial educativo.
 - [ ] `/informacion-tiempo/` — Información meteorológica
 - [x] `/presupuesto-viaje/` — Presupuesto de viaje con división de gastos ✅ lote 33
 - [ ] `/enchufes-por-pais/` — Qué enchufe y adaptador necesitas (60+ países)
-- [ ] `/comparador-coste-vida/` — Coste de vida en 55+ ciudades
+- [x] `/comparador-coste-vida/` — Coste de vida en 55+ ciudades ✅ lote B12
 - [x] `/generador-actas/` — Actas de reunión profesionales ✅ lote 33
 - [ ] `/sonometro/` — Medidor de nivel de ruido en dB
 - [x] `/metronomo/` — Metrónomo online con tap tempo ✅ tabla tempos/BPM, 4 perfiles instrumento, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit 001ecff)*
@@ -194,7 +194,7 @@ Apps de uso frecuente con buen potencial educativo.
 - [x] `/generador-tipografias/` — Generador y comparador de tipografías ✅ tabla 5 familias tipográficas, 4 casos uso, 8 FAQs, guía elección, 6 principios, warning *(2026-03-16 commit fee8755)*
 - [ ] `/creador-thumbnails/` — Thumbnails para YouTube
 - [ ] `/generador-og-images/` — Imágenes OG para redes sociales
-- [ ] `/calculadora-aspectos/` — Calculadora de relaciones de aspecto
+- [x] `/calculadora-aspectos/` — Calculadora de relaciones de aspecto ✅ lote B12
 - [ ] `/generador-avatares/` — Avatares únicos desde nombre/texto
 - [ ] `/generador-iconos/` — Generador de iconos
 
@@ -228,13 +228,13 @@ Apps de uso frecuente con buen potencial educativo.
 ### Matemáticas Básicas
 
 - [x] `/algebra-ecuaciones/` — Calculadora de ecuaciones ✅ tabla 6 tipos ecuación, 4 perfiles, 8 FAQs, guía 6 pasos, 6 tips, warning *(2026-03-17 commit 001ecff)*
-- [ ] `/calculadora-mcd-mcm/` — MCD y MCM
-- [ ] `/calculadora-probabilidad/` — Probabilidad
-- [ ] `/calculadora-estadistica/` — Estadística básica
-- [ ] `/calculadora-matematica/` — Calculadora matemática general
+- [x] `/calculadora-mcd-mcm/` — MCD y MCM ✅ lote B12
+- [x] `/calculadora-probabilidad/` — Probabilidad ✅ lote B12
+- [x] `/calculadora-estadistica/` — Estadística básica ✅ lote B12
+- [x] `/calculadora-matematica/` — Calculadora matemática general ✅ lote B12
 - [ ] `/calculadora-geometria/` — Geometría plana y sólida
-- [ ] `/calculadora-trigonometria/` — Trigonometría
-- [ ] `/calculadora-teoria-numeros/` — Teoría de números
+- [x] `/calculadora-trigonometria/` — Trigonometría ✅ lote B12
+- [x] `/calculadora-teoria-numeros/` — Teoría de números ✅ lote B12
 
 ### Calculadoras y Utilidades (densidad media)
 
@@ -339,6 +339,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote B12 | 2026-03-17 | `calculadora-mcd-mcm`, `calculadora-probabilidad`, `calculadora-estadistica`, `calculadora-matematica`, `calculadora-trigonometria`, `calculadora-teoria-numeros`, `calculadora-aspectos`, `comparador-coste-vida` | `3565779` |
 | Lote B11 | 2026-03-17 | `calculadora-propinas`, `calculadora-regla-de-tres`, `calculadora-cocina`, `lista-compras`, `conversor-tallas`, `calculadora-edad-mascotas`, `planificador-boda`, `calculadora-huella-carbono` | `d297204` |
 | Lote B10 | 2026-03-17 | `adaptacion-hogar`, `residencia-vs-cuidado-en-casa`, `estimador-riesgo-osteoporosis`, `test-fragilidad`, `orientador-grado-dependencia`, `estimador-legitimas`, `optimizador-rentas-60` | `f8e2021` |
 | Lote B9 | 2026-03-17 | `estimador-pension-publica`, `estimador-pension-viudedad`, `estimador-brecha-jubilacion`, `orientador-jubilacion-anticipada`, `orientador-plan-pensiones`, `estimador-irpf-pensionista`, `orientador-jubilacion-parcial` | `f8e2021` |
