@@ -1,7 +1,7 @@
 # Inventario: Apps Pendientes de Profesionalizar
 
 > **Indicador de profesionalización v2.0**: clase `.warningBox` en CSS Module
-> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~164 | **Pendientes**: ~86
+> **Generado**: 2026-03-10 | **Última actualización**: 2026-03-17 | **Total profesionalizadas**: ~171 | **Pendientes**: ~79
 > **Excluidas del inventario**: Guías (`/guia/xxx/`) — no son candidatas
 > **Nota**: Apps de accesibilidad (lotes 28-30, 2026-03-13) profesionalizadas directamente en creación — no pasaron por pendientes
 
@@ -63,16 +63,16 @@ Apps de alto impacto educativo, complejidad técnica o implicaciones legales/fin
 - [x] `/estimador-sueldo-neto/` — Estimador Sueldo Neto/Bruto: IRPF + Seguridad Social trabajador 2025 ✅ lote B7
 - [x] `/estimador-cuota-autonomo/` — Estimador Cuota RETA: tramos ingresos reales 2025 ✅ lote B7
 - [x] `/comparador-autonomo-vs-sl/` — Comparador Autónomo vs SL: carga fiscal según nivel de ingresos ✅ lote B7
-- [ ] `/orientador-gastos-deducibles/` — Orientador Gastos Deducibles autónomo: IRPF e IVA
-- [ ] `/calendario-fiscal-emprendedor/` — Calendario Fiscal: plazos modelos 303, 130, 111... 2025
-- [ ] `/asistente-alta-autonomo/` — Asistente Alta Autónomo: trámites, tarifa plana, modelos 036/037
-- [ ] `/comparador-formas-juridicas/` — Comparador Formas Jurídicas: autónomo, SL, cooperativa, CB
-- [ ] `/asistente-constitucion-sociedad/` — Asistente Constitución SL/SLU/SA: checklist 20 trámites + costes _(creada 2026-03-14)_
-- [ ] `/asistente-constitucion-asociacion/` — Asistente Constitución Asociación: acta fundacional + estatutos
+- [x] `/orientador-gastos-deducibles/` — Orientador Gastos Deducibles autónomo: IRPF e IVA ✅ lote B8
+- [x] `/calendario-fiscal-emprendedor/` — Calendario Fiscal: plazos modelos 303, 130, 111... 2025 ✅ lote B8
+- [x] `/asistente-alta-autonomo/` — Asistente Alta Autónomo: trámites, tarifa plana, modelos 036/037 ✅ lote B8
+- [x] `/comparador-formas-juridicas/` — Comparador Formas Jurídicas: autónomo, SL, cooperativa, CB ✅ lote B8
+- [x] `/asistente-constitucion-sociedad/` — Asistente Constitución SL/SLU/SA: checklist 20 trámites + costes ✅ lote B8
+- [x] `/asistente-constitucion-asociacion/` — Asistente Constitución Asociación: acta fundacional + estatutos ✅ lote B8
 - [x] `/estimador-impuesto-sucesiones/` — Estimador Impuesto Sucesiones: 17 CCAA + regímenes forales ✅ lote B6
 - [x] `/estimador-impuesto-donaciones/` — Estimador Impuesto Donaciones: 17 CCAA + bonificaciones autonómicas ✅ lote B6
 - [x] `/orientacion-tramitacion-herencias/` — Orientación Tramitación Herencias: checklist personalizado + timeline 9 pasos ✅ lote B6
-- [ ] `/plazos-legales/` — Guía Plazos Legales: prescripción, caducidad, garantías, laboral, fiscal
+- [x] `/plazos-legales/` — Guía Plazos Legales: prescripción, caducidad, garantías, laboral, fiscal ✅ lote B8
 - [x] `/estimador-plusvalia-municipal/` — Estimador Plusvalía Municipal (IIVTNU): método objetivo y real, coeficientes 2025 ✅ lote B6
 - [x] `/orientador-intereses-demora/` — Orientador Intereses de Demora: comercial (Ley 3/2004) + legal (CC) por semestres ✅ lote B6
 
@@ -339,6 +339,7 @@ Herramientas simples o de funcionalidad única. La EducationalSection tendrá me
 
 | Lote | Fecha | Apps profesionalizadas | Commit |
 |------|-------|------------------------|--------|
+| Lote B8 | 2026-03-17 | `orientador-gastos-deducibles`, `calendario-fiscal-emprendedor`, `asistente-alta-autonomo`, `comparador-formas-juridicas`, `asistente-constitucion-sociedad`, `asistente-constitucion-asociacion`, `plazos-legales` | `90c4d4e` |
 | Lote B7 | 2026-03-17 | `estimador-irpf`, `estimador-sueldo-neto`, `estimador-cuota-autonomo`, `comparador-autonomo-vs-sl`, `estimador-plusvalias-irpf` | `b1aeabe` |
 | Lote B6 | 2026-03-17 | `estimador-impuesto-sucesiones`, `estimador-impuesto-donaciones`, `orientacion-tramitacion-herencias`, `estimador-plusvalia-municipal`, `orientador-intereses-demora` | `611bc11` |
 | Lote B5 | 2026-03-17 | `generador-sombras`, `algebra-ecuaciones`, `metronomo`, `mi-ip` | `001ecff` |
