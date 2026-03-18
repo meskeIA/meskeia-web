@@ -352,6 +352,7 @@ export const implementedAppsUrls = [
   "/requisitos-nomada-digital/",            // Orientador elegibilidad Visa Nómada Digital (Ley 28/2022 de Startups)
   "/quiz-simbolos-quimicos/",               // Quiz símbolos químicos — 85 elementos, 3 dificultades, 2 modos
   "/test-burnout-laboral/",                 // Test orientativo burnout laboral — 15 preguntas, 3 dimensiones
+  "/orientador-discapacidad/",              // Orientador grado discapacidad — test funcional RD 888/2022
 ];
 
 /**

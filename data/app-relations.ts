@@ -62,6 +62,7 @@ const saludMayoresApps: RelatedApp[] = [
   { url: '/estimador-riesgo-osteoporosis/', icon: '🦴', name: 'Riesgo de Osteoporosis', description: 'Test de factores de riesgo validados' },
   { url: '/test-fragilidad/', icon: '🧓', name: 'Test de Fragilidad', description: 'Escala FRAIL: detección precoz de fragilidad' },
   { url: '/orientador-grado-dependencia/', icon: '📋', name: 'Grado de Dependencia', description: 'Orientación BVD y prestaciones SAAD' },
+  { url: '/orientador-discapacidad/', icon: '♿', name: 'Grado de Discapacidad', description: '¿Vale la pena solicitarlo? RD 888/2022' },
   { url: '/planificador-chequeos-medicos/', icon: '🏥', name: 'Chequeos Médicos', description: 'Revisiones preventivas por edad' },
 ];
 
@@ -1160,6 +1161,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'orientador-grado-dependencia': [
     ...saludMayoresApps.filter(a => a.url !== '/orientador-grado-dependencia/'),
   ],
+  'orientador-discapacidad': [
+    ...saludMayoresApps.filter(a => a.url !== '/orientador-discapacidad/'),
+  ],
   'estimador-pension-viudedad': [
     ...jubilacionApps.filter(a => a.url !== '/estimador-pension-viudedad/').slice(0, 4),
   ],
@@ -1206,6 +1210,7 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'calculadora-imc': { title: 'Cuida tu salud', icon: '❤️' },
     'calculadora-calorias-ejercicio': { title: 'Herramientas de salud', icon: '❤️' },
     'test-burnout-laboral': { title: 'Más herramientas de bienestar', icon: '🧘' },
+    'orientador-discapacidad': { title: 'Más herramientas de salud y bienestar', icon: '♿' },
 
     // Mascotas
     'planificador-mascota': { title: 'Más herramientas para tu mascota', icon: '🐾' },

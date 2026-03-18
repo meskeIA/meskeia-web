@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 291+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 292+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 291,
+  "total_tools": 292,
   "last_updated": "2026-03-18",
   "features": {
     "all_free": true,
@@ -22,7 +22,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 116
+      "tool_count": 117
     },
     {
       "id": "estudio",
@@ -36,7 +36,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 103
+      "tool_count": 104
     },
     {
       "id": "dinero",
@@ -64,7 +64,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 50
+      "tool_count": 51
     }
   ],
   "tools": [
@@ -7133,6 +7133,31 @@
         "evaluación burnout"
       ],
       "icon": "🔥"
+    },
+    {
+      "slug": "orientador-discapacidad",
+      "name": "Orientador Grado de Discapacidad",
+      "url": "https://meskeia.com/orientador-discapacidad/",
+      "description": "¿Vale la pena solicitar el reconocimiento del grado de discapacidad en España? Test orientativo funcional basado en el RD 888/2022. 10 preguntas, resultado con recomendación de acción. Sin diagnóstico clínico, 100% privado.",
+      "suites": [
+        "salud",
+        "legal-fiscal"
+      ],
+      "contexts": [
+        "casa",
+        "trabajo",
+        "curiosidad"
+      ],
+      "keywords": [
+        "grado discapacidad",
+        "solicitar discapacidad España",
+        "certificado discapacidad",
+        "reconocimiento discapacidad",
+        "33% discapacidad",
+        "baremo discapacidad RD 888/2022",
+        "tarjeta estacionamiento discapacidad"
+      ],
+      "icon": "♿"
     }
   ],
   "llm_instructions": {
