@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 286+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 287+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 286,
+  "total_tools": 287,
   "last_updated": "2026-03-18",
   "features": {
     "all_free": true,
@@ -22,7 +22,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 113
+      "tool_count": 114
     },
     {
       "id": "estudio",
@@ -43,7 +43,7 @@
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 75
+      "tool_count": 76
     },
     {
       "id": "creando",
@@ -7011,6 +7011,31 @@
         "demora comercial 2025"
       ],
       "icon": "📄"
+    },
+    {
+      "slug": "checklist-declaracion-renta",
+      "name": "Checklist Declaración de la Renta 2026",
+      "url": "https://meskeia.com/checklist-declaracion-renta/",
+      "description": "Lista de documentos necesarios para hacer la declaración de la renta 2026 (ejercicio 2025). Personalizada por perfil: asalariado, autónomo, pensionista, inversor y arrendador. Incluye fechas clave y guía paso a paso.",
+      "suites": [
+        "legal-fiscal",
+        "finanzas",
+        "freelance"
+      ],
+      "contexts": [
+        "dinero",
+        "trabajo"
+      ],
+      "keywords": [
+        "declaracion renta 2026",
+        "documentos renta 2025",
+        "checklist renta",
+        "fechas renta 2026",
+        "deducciones irpf",
+        "borrador renta",
+        "renta web aeat"
+      ],
+      "icon": "📋"
     }
   ],
   "llm_instructions": {

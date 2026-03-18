@@ -347,6 +347,7 @@ export const implementedAppsUrls = [
   "/guia/herencias/",                   // Guía landing page: journey hereditario con 4 herramientas
   "/estimador-plusvalia-municipal/",    // Estimador IIVTNU método objetivo y real — RDL 26/2021
   "/orientador-intereses-demora/",      // Orientador interés comercial (Ley 3/2004) e interés legal (CC)
+  "/checklist-declaracion-renta/",     // Checklist documentos declaración renta 2026 por perfil (asalariado/autónomo/pensionista/inversor/arrendador)
 ];
 
 /**

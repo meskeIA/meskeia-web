@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-03-16
-> **Apps totales**: 254 | **Suites**: 13
+> **Última actualización**: 2026-03-18
+> **Apps totales**: 255 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -200,6 +200,18 @@
 
 ---
 
+## ✨ NUEVAS APPS — Tendencias España 2026 (propuestas 2026-03-18)
+
+> Ideas detectadas en análisis de tendencias. Pendiente de priorización.
+
+- [ ] **calculadora-irav-alquiler** — `inmobiliaria` · Calculadora del nuevo índice IRAV para actualizar renta de alquileres (Ley Vivienda). Dato INE actualizable trimestralmente. Diferencial: distingue contratos antes/después mayo 2023 (IPC vs IRAV). Complejidad baja.
+- [ ] **requisitos-nomada-digital** — `freelance`+`viajes` · Checklist de elegibilidad para la Visa Nómada Digital en España + comparativa IRPF general vs régimen Beckham (24% flat). Datos normativos estables. Complejidad baja.
+- [ ] **test-burnout-laboral** — `salud`+`productividad` · Test adaptado Maslach Burnout Inventory (3 dimensiones: agotamiento, despersonalización, realización). Score por dimensión + recomendaciones. DisclaimerCard medical obligatoria. Complejidad baja.
+- [ ] **quiz-simbolos-quimicos** — `juegos`+`estudiantes` · Quiz de símbolos y nombres de elementos (118 elementos). Universo cerrado y verificable. Candidato ya validado en BACKLOG.
+- [ ] **quiz-capitales-europeas** — `juegos`+`cultura` · Complemento a quiz-paises-capitales. Europa con 50 países. Candidato ya validado en BACKLOG.
+
+---
+
 ## ⚪ IDEAS FUTURAS
 
 > Ideas que requieren más investigación o que son para fases posteriores.
@@ -217,6 +229,7 @@
 > Historial de tareas finalizadas con fecha de completado.
 
 ### Apps nuevas
+- [x] **checklist-declaracion-renta** — Checklist declaración de la renta 2026 (ejercicio 2025) con 5 perfiles (asalariado/autónomo/pensionista/inversor/arrendador), fechas clave, EducationalSection completa (tabla, 4 escenarios, 8 FAQs, guía 6 pasos, 6 tips, warning). Suites: legal-fiscal, finanzas, freelance. Build 504 páginas OK. *(2026-03-18)*
 - [x] **planificador-itinerario** — Organiza días, actividades, horarios y notas de viaje. Exporta a .txt. 100% local. *(2026-02-24)*
 - [x] **calculadora-tension-arterial** — Clasificación ESH/ESC 2018 (9 categorías), TAM, presión de pulso, historial localStorage. *(2026-02-24)*
 - [x] **planificador-chequeos-medicos** — Checklist 16 revisiones preventivas filtrado por grupo de edad y sexo. Fuente: Ministerio de Sanidad y SEMFyC. *(2026-02-24)*
