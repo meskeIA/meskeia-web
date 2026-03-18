@@ -12,6 +12,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 import { z } from 'zod';
 import { calcularPropina, obtenerPorcentajePais, PROPINAS_POR_PAIS } from '@/lib/calculadoras/propinas';
+import { calcularPorcentaje, type ModoPorcentaje } from '@/lib/calculadoras/porcentajes';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -99,6 +100,63 @@ function crearServidorMCP(): McpServer {
       return {
         content: [{ type: 'text', text: texto }],
       };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_porcentaje
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_porcentaje',
+    'Realiza cálculos con porcentajes. Cinco modos disponibles: ' +
+    '(1) percentOf: ¿cuánto es el X% de Y?, ' +
+    '(2) whatPercent: ¿qué % es X de Y?, ' +
+    '(3) increase: aumentar X en Y%, ' +
+    '(4) decrease: disminuir X en Y%, ' +
+    '(5) variation: variación porcentual de X a Y.',
+    {
+      modo: z.enum(['percentOf', 'whatPercent', 'increase', 'decrease', 'variation'])
+        .describe(
+          'Tipo de cálculo: ' +
+          'percentOf = ¿cuánto es el X% de Y?, ' +
+          'whatPercent = ¿qué % es X de Y?, ' +
+          'increase = aumentar X en Y%, ' +
+          'decrease = disminuir X en Y%, ' +
+          'variation = variación porcentual de X a Y'
+        ),
+      valor1: z.number().describe(
+        'Primer valor. Según el modo: ' +
+        'percentOf → porcentaje (ej: 15 para 15%), ' +
+        'whatPercent → cantidad parcial, ' +
+        'increase/decrease → valor inicial, ' +
+        'variation → valor inicial'
+      ),
+      valor2: z.number().describe(
+        'Segundo valor. Según el modo: ' +
+        'percentOf → cantidad base, ' +
+        'whatPercent → cantidad total, ' +
+        'increase/decrease → porcentaje a aplicar, ' +
+        'variation → valor final'
+      ),
+    },
+    async ({ modo, valor1, valor2 }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_porcentaje', aiCaller);
+
+      const resultado = calcularPorcentaje({ modo: modo as ModoPorcentaje, valor1, valor2 });
+
+      const iconos: Record<string, string> = {
+        percentOf: '🔢', whatPercent: '❓', increase: '📈', decrease: '📉', variation: '🔄',
+      };
+
+      const texto = [
+        `${iconos[modo]} **${resultado.detalle}**`,
+        resultado.esProcentaje
+          ? `📊 **Resultado:** ${resultado.resultado}%`
+          : `📊 **Resultado:** ${resultado.resultado}`,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: texto }] };
     }
   );
 
