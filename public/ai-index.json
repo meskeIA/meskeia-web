@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 250+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 282,
+  "total_tools": 283,
   "updated": "2026-03-18",
   "features": {
     "all_free": true,
@@ -702,6 +702,19 @@
           "slug": "requisitos-nomada-digital",
           "url": "https://meskeia.com/requisitos-nomada-digital/",
           "description": "Checklist interactivo para comprobar si cumples los requisitos de la Visa Nómada Digital (Ley 28/2022). Perfil empleado o freelancer, ingresos mínimos y documentación necesaria."
+        }
+      ]
+    },
+    {
+      "name": "Estudiantes y Cultura",
+      "description": "Quizzes, juegos educativos y herramientas de aprendizaje",
+      "icon": "🎓",
+      "tools": [
+        {
+          "name": "Quiz Símbolos Químicos",
+          "slug": "quiz-simbolos-quimicos",
+          "url": "https://meskeia.com/quiz-simbolos-quimicos/",
+          "description": "Aprende la tabla periódica jugando: adivina el nombre del elemento por su símbolo o viceversa. 85 elementos, 3 dificultades, 2 modos de juego."
         }
       ]
     },
