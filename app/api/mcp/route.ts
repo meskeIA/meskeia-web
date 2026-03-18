@@ -1,0 +1,125 @@
+/**
+ * Servidor MCP (Model Context Protocol) de meskeIA
+ *
+ * Expone las herramientas de meskeIA como tools MCP consumibles por
+ * Claude, Perplexity, ChatGPT y otros agentes compatibles.
+ *
+ * Endpoint: /api/mcp
+ * Modo: stateless (una instancia por petición, apto para Vercel serverless)
+ */
+
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
+import { z } from 'zod';
+import { calcularPropina, obtenerPorcentajePais, PROPINAS_POR_PAIS } from '@/lib/calculadoras/propinas';
+
+// ---------------------------------------------------------------------------
+// Analytics: reutilizamos el mismo sistema que usan las apps web
+// ---------------------------------------------------------------------------
+async function registrarUsoMCP(tool: string, aiCaller: string): Promise<void> {
+  try {
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3050';
+
+    await fetch(`${baseUrl}/api/analytics/track`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        applicationName: `mcp:${tool}`,
+        source: 'mcp',
+        aiCaller,
+      }),
+    });
+  } catch {
+    // Los errores de analytics no deben interrumpir el cálculo
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Función para crear el servidor MCP con todas sus herramientas
+// ---------------------------------------------------------------------------
+function crearServidorMCP(): McpServer {
+  const servidor = new McpServer({
+    name: 'meskeIA',
+    version: '1.0.0',
+  });
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_propina
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_propina',
+    'Calcula la propina de una cuenta de restaurante y la divide entre varias personas. ' +
+    'Conoce los porcentajes habituales de propina por país (España, EE. UU., Japón, etc.).',
+    {
+      monto: z.number().positive()
+        .describe('Importe total de la cuenta en euros (número positivo)'),
+      porcentaje: z.number().min(0).max(100).optional()
+        .describe('Porcentaje de propina a aplicar, por ejemplo 15 para 15%. ' +
+                  'Si no se indica, se usa el porcentaje habitual del país.'),
+      pais: z.string().optional()
+        .describe('País para aplicar el porcentaje habitual. ' +
+                  'Valores válidos: espana, usa, reino_unido, alemania, francia, italia, japon'),
+      personas: z.number().int().positive().optional()
+        .describe('Número de personas entre las que dividir la cuenta. Por defecto 1.'),
+    },
+    async ({ monto, porcentaje, pais, personas }, extra) => {
+      // Detectar qué IA llama (para analytics)
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_propina', aiCaller);
+
+      // Determinar el porcentaje a usar
+      let pct = porcentaje;
+      if (pct === undefined) {
+        if (pais) {
+          const pctPais = obtenerPorcentajePais(pais);
+          pct = pctPais ?? 10; // fallback a 10% si el país no existe
+        } else {
+          pct = 10; // fallback general
+        }
+      }
+
+      const resultado = calcularPropina({ monto, porcentaje: pct, personas });
+
+      const paisInfo = pais ? PROPINAS_POR_PAIS[pais.toLowerCase()] : null;
+      const notaPais = paisInfo ? `\n📍 ${paisInfo.descripcion}` : '';
+
+      const texto = [
+        `💶 **Cuenta:** ${monto.toFixed(2)} €`,
+        `💰 **Propina (${pct}%):** ${resultado.propina.toFixed(2)} €`,
+        `🧾 **Total con propina:** ${resultado.totalConPropina.toFixed(2)} €`,
+        resultado.personas > 1
+          ? `👥 **Por persona (${resultado.personas}):** ${resultado.totalPorPersona.toFixed(2)} € ` +
+            `(cuenta: ${resultado.montoPorPersonaSinPropina.toFixed(2)} € + propina: ${resultado.propinaPorPersona.toFixed(2)} €)`
+          : '',
+        notaPais,
+      ].filter(Boolean).join('\n');
+
+      return {
+        content: [{ type: 'text', text: texto }],
+      };
+    }
+  );
+
+  return servidor;
+}
+
+// ---------------------------------------------------------------------------
+// Handler Next.js App Router — stateless (una instancia por petición)
+// ---------------------------------------------------------------------------
+async function handler(req: Request): Promise<Response> {
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    sessionIdGenerator: undefined, // stateless: sin gestión de sesión
+    enableJsonResponse: true,      // respuesta JSON simple (sin SSE)
+  });
+
+  const servidor = crearServidorMCP();
+  await servidor.connect(transport);
+
+  return transport.handleRequest(req);
+}
+
+export const GET  = handler;
+export const POST = handler;
+export const DELETE = handler;
