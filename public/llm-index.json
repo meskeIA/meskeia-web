@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 290+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 291+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 290,
+  "total_tools": 291,
   "last_updated": "2026-03-18",
   "features": {
     "all_free": true,
@@ -22,7 +22,7 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 115
+      "tool_count": 116
     },
     {
       "id": "estudio",
@@ -36,7 +36,7 @@
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 102
+      "tool_count": 103
     },
     {
       "id": "dinero",
@@ -64,7 +64,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 49
+      "tool_count": 50
     }
   ],
   "tools": [
@@ -7108,6 +7108,31 @@
         "memorizar tabla periódica"
       ],
       "icon": "⚗️"
+    },
+    {
+      "slug": "test-burnout-laboral",
+      "name": "Test de Burnout Laboral",
+      "url": "https://meskeia.com/test-burnout-laboral/",
+      "description": "Evaluación orientativa del síndrome de desgaste profesional: 15 preguntas en 3 dimensiones (agotamiento emocional, cinismo y realización personal). Resultados por dimensión y nivel general. Sin registro, 100% privado.",
+      "suites": [
+        "salud",
+        "productividad"
+      ],
+      "contexts": [
+        "trabajo",
+        "casa",
+        "curiosidad"
+      ],
+      "keywords": [
+        "test burnout laboral",
+        "síndrome burnout",
+        "agotamiento profesional",
+        "test estrés laboral",
+        "desgaste laboral",
+        "cinismo laboral",
+        "evaluación burnout"
+      ],
+      "icon": "🔥"
     }
   ],
   "llm_instructions": {

@@ -559,6 +559,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'seguimiento-habitos': saludHabitosApps.filter(a => a.url !== '/seguimiento-habitos/'),
   'test-habitos-saludables': saludHabitosApps.filter(a => a.url !== '/test-habitos-saludables/'),
   'calculadora-sueno': saludHabitosApps.filter(a => a.url !== '/calculadora-sueno/'),
+  'test-burnout-laboral': [
+    { url: '/test-habitos-saludables/', icon: '🌟', name: 'Test de Hábitos Saludables', description: 'Evalúa tu bienestar integral' },
+    { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento de Hábitos', description: 'Construye rutinas saludables' },
+    { url: '/calculadora-sueno/', icon: '😴', name: 'Calculadora de Sueño', description: 'Optimiza tu descanso' },
+    { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración Consciente', description: 'Reduce el estrés con respiración' },
+  ],
 
   // MASCOTAS
   'planificador-mascota': [...mascotasApps.filter(a => a.url !== '/planificador-mascota/').slice(0, 3), mascotasExtraApps[1]],
@@ -1199,6 +1205,7 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     // Salud
     'calculadora-imc': { title: 'Cuida tu salud', icon: '❤️' },
     'calculadora-calorias-ejercicio': { title: 'Herramientas de salud', icon: '❤️' },
+    'test-burnout-laboral': { title: 'Más herramientas de bienestar', icon: '🧘' },
 
     // Mascotas
     'planificador-mascota': { title: 'Más herramientas para tu mascota', icon: '🐾' },
