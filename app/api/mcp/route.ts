@@ -20,17 +20,20 @@ import { calcularConsumo, calcularViaje } from '@/lib/calculadoras/combustible';
 // ---------------------------------------------------------------------------
 async function registrarUsoMCP(tool: string, aiCaller: string): Promise<void> {
   try {
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3050';
+    // Usamos el dominio canónico — VERCEL_URL devuelve la URL del deployment, no el custom domain
+    const baseUrl = 'https://meskeia.com';
 
     await fetch(`${baseUrl}/api/analytics/track`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        // User-agent neutro para no ser filtrado por el bloqueo de bots
+        'User-Agent': 'meskeIA-MCP/1.0',
+      },
       body: JSON.stringify({
-        applicationName: `mcp:${tool}`,
-        source: 'mcp',
-        aiCaller,
+        aplicacion: `mcp:${tool}`,   // campo correcto que espera el endpoint
+        modo: 'mcp',
+        datos_adicionales: { aiCaller },
       }),
     });
   } catch {
