@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 250+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 281,
+  "total_tools": 282,
   "updated": "2026-03-18",
   "features": {
     "all_free": true,
@@ -693,6 +693,19 @@
       ]
     },
     {
+      "name": "Freelance y Autónomo",
+      "description": "Herramientas para freelancers, autónomos y trabajadores por cuenta propia",
+      "icon": "💼",
+      "tools": [
+        {
+          "name": "Orientador Visa Nómada Digital",
+          "slug": "requisitos-nomada-digital",
+          "url": "https://meskeia.com/requisitos-nomada-digital/",
+          "description": "Checklist interactivo para comprobar si cumples los requisitos de la Visa Nómada Digital (Ley 28/2022). Perfil empleado o freelancer, ingresos mínimos y documentación necesaria."
+        }
+      ]
+    },
+    {
       "name": "Legal y Fiscal",
       "description": "Impuestos, trámites legales, autónomos, herencias y obligaciones fiscales en España",
       "icon": "⚖️",
@@ -816,6 +829,12 @@
           "slug": "calculadora-actualizacion-alquiler",
           "url": "https://meskeia.com/calculadora-actualizacion-alquiler/",
           "description": "Calcula el nuevo índice IRAV (contratos desde 26/05/2023) o IPC interanual (contratos anteriores) para actualizar la renta de alquiler según la Ley de Vivienda 12/2023."
+        },
+        {
+          "name": "Orientador Visa Nómada Digital",
+          "slug": "requisitos-nomada-digital",
+          "url": "https://meskeia.com/requisitos-nomada-digital/",
+          "description": "Checklist interactivo para comprobar si cumples los requisitos de la Visa Nómada Digital (Ley 28/2022). Perfil empleado o freelancer, ingresos mínimos y documentación necesaria."
         }
       ]
     },

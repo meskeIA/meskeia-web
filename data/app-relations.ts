@@ -1105,6 +1105,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
   ],
+  'requisitos-nomada-digital': [
+    { url: '/asistente-alta-autonomo/', icon: '📋', name: 'Asistente Alta Autónomo', description: 'Trámites para darte de alta' },
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Cuota de Autónomo', description: 'Estima tu cuota RETA mensual' },
+    { url: '/orientador-tarifa-freelance/', icon: '💰', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Gastos Deducibles', description: 'Qué puedes deducir en IRPF e IVA' },
+  ],
 
   // JUBILACIÓN Y PATRIMONIO
   'estimador-pension-publica': [

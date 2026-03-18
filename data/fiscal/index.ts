@@ -20,3 +20,4 @@ export * from './donaciones';
 export * from './intereses';
 export * from './pensiones';
 export * from './alquiler';
+export * from './nomada-digital';

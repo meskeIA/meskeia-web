@@ -349,6 +349,7 @@ export const implementedAppsUrls = [
   "/orientador-intereses-demora/",      // Orientador interés comercial (Ley 3/2004) e interés legal (CC)
   "/checklist-declaracion-renta/",          // Checklist documentos declaración renta 2026 por perfil (asalariado/autónomo/pensionista/inversor/arrendador)
   "/calculadora-actualizacion-alquiler/",   // Calculadora IRAV/IPC para actualización de renta de alquiler según Ley de Vivienda 2023
+  "/requisitos-nomada-digital/",            // Orientador elegibilidad Visa Nómada Digital (Ley 28/2022 de Startups)
 ];
 
 /**
