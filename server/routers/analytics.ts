@@ -105,6 +105,7 @@ export const analyticsRouter = router({
       const registrosResult = await client.execute({ sql, args });
       const registros = registrosResult.rows.map((row) => ({
         ...row,
+        modo: (row.modo as string | null) ?? 'web',
         datos_adicionales: row.datos_adicionales
           ? JSON.parse(row.datos_adicionales as string)
           : null,

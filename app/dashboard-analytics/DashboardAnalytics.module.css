@@ -825,3 +825,72 @@
 [data-theme='dark'] .comparativaTendencia.neutral {
   background: rgba(107, 114, 128, 0.15);
 }
+
+/* ── Filtro Modo (Web / MCP) ─────────────────────────────── */
+.registrosHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filtroModoGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.filtroModoBtn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filtroModoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filtroModoActivo {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.filtroModoActivoMCP {
+  background: #48A9A6;
+  color: #fff;
+  border-color: #48A9A6;
+}
+
+.badgeWeb {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--primary);
+}
+
+.badgeMCP {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  background: rgba(72, 169, 166, 0.15);
+  color: #48A9A6;
+}
+
+.rowMCP {
+  background: rgba(72, 169, 166, 0.04);
+}
+
+[data-theme='dark'] .rowMCP {
+  background: rgba(72, 169, 166, 0.08);
+}

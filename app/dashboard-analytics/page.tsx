@@ -102,6 +102,7 @@ interface EstadisticasData {
     navegador: string | null;
     sistema_operativo: string | null;
     resolucion: string | null;
+    modo: string | null;
     datos_adicionales?: any;
   }>;
 }
@@ -116,6 +117,7 @@ export default function DashboardAnalyticsPage() {
   const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros'>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
+  const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'mcp'>('todos');
 
   // Ref para control de inicialización
   const iniciado = useRef(false);
@@ -1022,38 +1024,72 @@ export default function DashboardAnalyticsPage() {
       {tabActiva === 'registros' && datos && (
         <div className={styles.tabContent}>
           <section className={styles.section}>
-            <h2>📋 Últimos 100 Registros</h2>
+            <div className={styles.registrosHeader}>
+              <h2>📋 Últimos 100 Registros</h2>
+              <div className={styles.filtroModoGroup}>
+                <button
+                  type="button"
+                  className={`${styles.filtroModoBtn} ${filtroModo === 'todos' ? styles.filtroModoActivo : ''}`}
+                  onClick={() => setFiltroModo('todos')}
+                >
+                  Todos ({datos.data.length})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.filtroModoBtn} ${filtroModo === 'web' ? styles.filtroModoActivo : ''}`}
+                  onClick={() => setFiltroModo('web')}
+                >
+                  🌐 Web ({datos.data.filter((r: any) => r.modo !== 'mcp').length})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.filtroModoBtn} ${filtroModo === 'mcp' ? styles.filtroModoActivoMCP : ''}`}
+                  onClick={() => setFiltroModo('mcp')}
+                >
+                  🤖 IA / MCP ({datos.data.filter((r: any) => r.modo === 'mcp').length})
+                </button>
+              </div>
+            </div>
             <div className={styles.tableContainer}>
               <table className={styles.table}>
                 <thead>
                   <tr>
                     <th>ID</th>
                     <th>Aplicación</th>
+                    <th>Origen</th>
                     <th>Fecha/Hora</th>
                     <th>Duración</th>
                     <th>País</th>
-                    <th>Ciudad</th>
                     <th>Dispositivo</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {datos.data.slice(0, 100).map((registro: any) => (
-                    <tr key={registro.id}>
-                      <td>{registro.id}</td>
-                      <td>
-                        <strong>{registro.aplicacion}</strong>
-                      </td>
-                      <td>{registro.timestamp}</td>
-                      <td>
-                        {registro.duracion_segundos
-                          ? `${Math.floor(registro.duracion_segundos / 60)}m ${registro.duracion_segundos % 60}s`
-                          : '-'}
-                      </td>
-                      <td>{registro.pais || '-'}</td>
-                      <td>{registro.ciudad || '-'}</td>
-                      <td>{registro.tipo_dispositivo === 'movil' ? '📱' : '🖥️'}</td>
-                    </tr>
-                  ))}
+                  {datos.data
+                    .filter((r: any) => {
+                      if (filtroModo === 'web') return r.modo !== 'mcp';
+                      if (filtroModo === 'mcp') return r.modo === 'mcp';
+                      return true;
+                    })
+                    .slice(0, 100)
+                    .map((registro: any) => (
+                      <tr key={registro.id} className={registro.modo === 'mcp' ? styles.rowMCP : ''}>
+                        <td>{registro.id}</td>
+                        <td><strong>{registro.aplicacion}</strong></td>
+                        <td>
+                          {registro.modo === 'mcp'
+                            ? <span className={styles.badgeMCP}>🤖 IA</span>
+                            : <span className={styles.badgeWeb}>🌐 Web</span>}
+                        </td>
+                        <td>{registro.timestamp}</td>
+                        <td>
+                          {registro.duracion_segundos
+                            ? `${Math.floor(registro.duracion_segundos / 60)}m ${registro.duracion_segundos % 60}s`
+                            : '-'}
+                        </td>
+                        <td>{registro.pais || '-'}</td>
+                        <td>{registro.tipo_dispositivo === 'movil' ? '📱' : '🖥️'}</td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
