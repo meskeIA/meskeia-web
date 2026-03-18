@@ -136,6 +136,22 @@ export async function POST(request: NextRequest) {
       // Si no hay body, mantener valor por defecto
     }
 
+    // Marcar retroactivamente los registros históricos de la IP anterior como es_propio = 1
+    // Esto preserva el filtrado aunque la IP dinámica haya cambiado
+    const ipAnteriorResult = await client.execute({
+      sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+      args: [],
+    });
+    if (ipAnteriorResult.rows.length > 0) {
+      const ipAnterior = String(ipAnteriorResult.rows[0].valor);
+      if (ipAnterior && ipAnterior !== ipActual) {
+        await client.execute({
+          sql: `UPDATE uso_aplicaciones SET es_propio = 1 WHERE ip_address = ? AND (es_propio IS NULL OR es_propio = 0)`,
+          args: [ipAnterior],
+        });
+      }
+    }
+
     // Guardar o actualizar IP excluida
     await client.execute({
       sql: `INSERT OR REPLACE INTO analytics_config (clave, valor, actualizado)

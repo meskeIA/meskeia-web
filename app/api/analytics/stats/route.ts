@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       args.push(hasta);
     }
     if (ipExcluida) {
-      sql += ' AND (ip_address IS NULL OR ip_address != ?)';
+      sql += ' AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != ?)';
       args.push(ipExcluida);
     }
 
@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
       statsArgs.push(hasta);
     }
     if (ipExcluida) {
-      sqlStats += ' AND (ip_address IS NULL OR ip_address != ?)';
+      sqlStats += ' AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != ?)';
       statsArgs.push(ipExcluida);
     }
 
@@ -161,7 +161,7 @@ export async function GET(request: NextRequest) {
     `;
     const rankingArgs: string[] = [];
     if (ipExcluida) {
-      rankingSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+      rankingSql += ' AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != ?)';
       rankingArgs.push(ipExcluida);
     }
     rankingSql += ' GROUP BY aplicacion ORDER BY total_usos DESC';
@@ -194,7 +194,7 @@ export async function GET(request: NextRequest) {
     `;
     const paisesArgs: string[] = [];
     if (ipExcluida) {
-      paisesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+      paisesSql += ' AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != ?)';
       paisesArgs.push(ipExcluida);
     }
     paisesSql += ' GROUP BY pais ORDER BY total DESC LIMIT 10';
@@ -207,7 +207,7 @@ export async function GET(request: NextRequest) {
     `;
     const ciudadesArgs: string[] = [];
     if (ipExcluida) {
-      ciudadesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+      ciudadesSql += ' AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != ?)';
       ciudadesArgs.push(ipExcluida);
     }
     ciudadesSql += ' GROUP BY ciudad ORDER BY total DESC LIMIT 10';
@@ -224,7 +224,7 @@ export async function GET(request: NextRequest) {
     `;
     const sharesArgs: string[] = [];
     if (ipExcluida) {
-      sharesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+      sharesSql += ' AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != ?)';
       sharesArgs.push(ipExcluida);
     }
     const sharesResult = await client.execute({ sql: sharesSql, args: sharesArgs });
@@ -267,7 +267,7 @@ export async function GET(request: NextRequest) {
       ];
 
       if (ipExcluida) {
-        sqlCount += ' AND (ip_address IS NULL OR ip_address != ?)';
+        sqlCount += ' AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != ?)';
         argsCount.push(ipExcluida);
       }
 

@@ -87,6 +87,16 @@ export async function initializeDatabase() {
     )
   `);
 
+  // Migración: añadir columna es_propio para marcar visitas del propietario
+  // Permite filtrar historial aunque la IP dinámica haya cambiado
+  try {
+    await client.execute(
+      `ALTER TABLE uso_aplicaciones ADD COLUMN es_propio INTEGER DEFAULT 0`
+    );
+  } catch {
+    // Columna ya existe — ignorar
+  }
+
   return true;
 }
 
