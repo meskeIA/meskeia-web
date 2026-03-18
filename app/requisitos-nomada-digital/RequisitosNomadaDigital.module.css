@@ -505,6 +505,17 @@
   color: var(--text-secondary);
 }
 
+.disclaimerResponsabilidad {
+  margin-top: 0.6rem !important;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(133, 100, 4, 0.25);
+  font-size: 0.88rem !important;
+}
+
+[data-theme='dark'] .disclaimerResponsabilidad {
+  border-top-color: rgba(251, 191, 36, 0.2);
+}
+
 /* === EDUCATIONAL SECTION CONTENT === */
 .guideSection {
   margin-bottom: 2rem;

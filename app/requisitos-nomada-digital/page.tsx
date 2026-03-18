@@ -404,6 +404,11 @@ export default function RequisitosNomadaDigitalPage() {
             iniciar cualquier trámite.
           </strong>
         </p>
+        <p className={styles.disclaimerResponsabilidad}>
+          <strong>TÚ ERES RESPONSABLE</strong> de verificar esta información con un abogado
+          especializado <strong>ANTES</strong> de iniciar cualquier trámite migratorio.{' '}
+          meskeIA no se responsabiliza de decisiones tomadas basándose en esta herramienta.
+        </p>
       </div>
 
       {/* Sección educativa v2.0 */}
