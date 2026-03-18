@@ -250,7 +250,7 @@ export default function CalculadoraPropinas() {
           variant="financial"
           severity="medium"
           context="calculadora-propinas"
-          collapsible={true}
+          collapsible={false}
         />
 
         
