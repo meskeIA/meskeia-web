@@ -13,6 +13,7 @@ import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/
 import { z } from 'zod';
 import { calcularPropina, obtenerPorcentajePais, PROPINAS_POR_PAIS } from '@/lib/calculadoras/propinas';
 import { calcularPorcentaje, type ModoPorcentaje } from '@/lib/calculadoras/porcentajes';
+import { calcularConsumo, calcularViaje } from '@/lib/calculadoras/combustible';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -156,6 +157,61 @@ function crearServidorMCP(): McpServer {
           : `📊 **Resultado:** ${resultado.resultado}`,
       ].join('\n');
 
+      return { content: [{ type: 'text', text: texto }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_combustible
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_combustible',
+    'Calculadora de combustible con dos modos: ' +
+    '(1) consumo: dado un trayecto real (km recorridos + litros gastados), calcula el consumo en L/100km, el coste por km y la autonomía con 50€. ' +
+    '(2) viaje: dada la distancia de un trayecto y el consumo medio del vehículo, calcula los litros necesarios y el coste total del viaje.',
+    {
+      modo: z.enum(['consumo', 'viaje'])
+        .describe('consumo = calcular consumo real de un trayecto ya hecho | viaje = estimar coste de un trayecto futuro'),
+      kilometros: z.number().positive().optional()
+        .describe('(Modo consumo) Kilómetros recorridos en el trayecto de referencia'),
+      litros: z.number().positive().optional()
+        .describe('(Modo consumo) Litros gastados en ese trayecto'),
+      distanciaKm: z.number().positive().optional()
+        .describe('(Modo viaje) Distancia del trayecto en kilómetros'),
+      consumoL100km: z.number().positive().optional()
+        .describe('(Modo viaje) Consumo medio del vehículo en litros cada 100 km'),
+      precioCombustible: z.number().positive()
+        .describe('Precio del combustible en €/litro (ej: 1.65 para 1,65 €/L)'),
+    },
+    async ({ modo, kilometros, litros, distanciaKm, consumoL100km, precioCombustible }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_combustible', aiCaller);
+
+      if (modo === 'consumo') {
+        if (!kilometros || !litros) {
+          return { content: [{ type: 'text', text: 'Para el modo consumo necesito: kilómetros recorridos y litros gastados.' }] };
+        }
+        const r = calcularConsumo({ kilometros, litros, precioCombustible });
+        const texto = [
+          `⛽ **Consumo real del vehículo**`,
+          `📊 Consumo: **${r.consumoL100km} L/100km** — ${r.eficiencia}`,
+          `💶 Coste por km: **${r.costePorKm} €/km**`,
+          `🛣️ Con 50 €: puedes recorrer **${r.autonomiaCon50Euros} km**`,
+        ].join('\n');
+        return { content: [{ type: 'text', text: texto }] };
+      }
+
+      // modo viaje
+      if (!distanciaKm || !consumoL100km) {
+        return { content: [{ type: 'text', text: 'Para el modo viaje necesito: distancia en km y consumo medio del vehículo en L/100km.' }] };
+      }
+      const r = calcularViaje({ distanciaKm, consumoL100km, precioCombustible });
+      const texto = [
+        `🗺️ **Coste del viaje (${distanciaKm} km)**`,
+        `⛽ Litros necesarios: **${r.litrosNecesarios} L**`,
+        `💶 Coste total: **${r.costeTotal} €**`,
+        `📍 Coste por km: **${r.costePorKm} €/km**`,
+      ].join('\n');
       return { content: [{ type: 'text', text: texto }] };
     }
   );
