@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import styles from './CalculadoraActualizacionAlquiler.module.css';
+import styles from './EstimadorActualizacionAlquiler.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection, NumberInput, ResultCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection, NumberInput, ResultCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
@@ -53,7 +53,7 @@ const TABLA_IRAV = [
 // ──────────────────────────────────────────
 // COMPONENTE PRINCIPAL
 // ──────────────────────────────────────────
-export default function CalculadoraActualizacionAlquilerPage() {
+export default function EstimadorActualizacionAlquilerPage() {
   const [tipoContrato, setTipoContrato] = useState<TipoContrato>('nuevo');
   const [rentaStr, setRentaStr] = useState('');
   const [mesAniversario, setMesAniversario] = useState<number>(new Date().getMonth() + 1);
@@ -110,9 +110,9 @@ export default function CalculadoraActualizacionAlquilerPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🏠 Calculadora Actualización del Alquiler 2026</h1>
+        <h1 className={styles.title}>🏠 Estimador Actualización del Alquiler 2026</h1>
         <p className={styles.subtitle}>
-          Calcula la subida máxima permitida según tu tipo de contrato — IRAV o IPC
+          Estima la subida máxima permitida según tu tipo de contrato — IRAV o IPC
         </p>
       </header>
 
@@ -257,18 +257,8 @@ export default function CalculadoraActualizacionAlquilerPage() {
         )}
       </div>
 
-      {/* Aviso legal — SIEMPRE VISIBLE */}
-      <div className={styles.avisoLegal} role="note">
-        <strong>⚠️ Aviso importante</strong>
-        <p>
-          Los índices incorporados en esta herramienta son <strong>orientativos</strong> y pueden no reflejar el último valor
-          publicado por el INE. La actualización de la renta está sujeta a lo pactado en el contrato de arrendamiento y
-          a la normativa vigente (LAU y Ley 12/2023 de Vivienda). Verifica siempre el índice aplicable en{' '}
-          <a href="https://www.ine.es" target="_blank" rel="noopener noreferrer" className={styles.enlaceAeat}>ine.es</a>{' '}
-          antes de comunicar la actualización al inquilino o al propietario.
-          Esta calculadora no constituye asesoramiento legal ni económico.
-        </p>
-      </div>
+      {/* Disclaimer financiero — SIEMPRE VISIBLE */}
+      <DisclaimerCard variant="financial" severity="high" />
 
       {/* Sección educativa */}
       <EducationalSection
@@ -619,9 +609,9 @@ export default function CalculadoraActualizacionAlquilerPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-actualizacion-alquiler')} />
-      <ShareCard appName="calculadora-actualizacion-alquiler" />
-      <Footer appName="calculadora-actualizacion-alquiler" />
+      <RelatedApps apps={getRelatedApps('estimador-actualizacion-alquiler')} />
+      <ShareCard appName="estimador-actualizacion-alquiler" />
+      <Footer appName="estimador-actualizacion-alquiler" />
     </div>
   );
 }

@@ -685,9 +685,9 @@
           "description": "Lista de documentos para la declaración de la renta 2026 (ejercicio 2025) personalizada por perfil: asalariado, autónomo, pensionista, inversor o arrendador. Incluye fechas clave y guía paso a paso."
         },
         {
-          "name": "Calculadora Actualización de Alquiler 2026",
-          "slug": "calculadora-actualizacion-alquiler",
-          "url": "https://meskeia.com/calculadora-actualizacion-alquiler/",
+          "name": "Estimador Actualización de Alquiler 2026",
+          "slug": "estimador-actualizacion-alquiler",
+          "url": "https://meskeia.com/estimador-actualizacion-alquiler/",
           "description": "Calcula el nuevo índice IRAV (contratos desde 26/05/2023) o IPC interanual (contratos anteriores) para actualizar la renta de alquiler según la Ley de Vivienda 12/2023."
         }
       ]
@@ -838,9 +838,9 @@
           "description": "Lista de documentos para la declaración de la renta 2026 personalizada por perfil: asalariado, autónomo, pensionista, inversor o arrendador. Fechas clave y guía paso a paso."
         },
         {
-          "name": "Calculadora Actualización de Alquiler 2026",
-          "slug": "calculadora-actualizacion-alquiler",
-          "url": "https://meskeia.com/calculadora-actualizacion-alquiler/",
+          "name": "Estimador Actualización de Alquiler 2026",
+          "slug": "estimador-actualizacion-alquiler",
+          "url": "https://meskeia.com/estimador-actualizacion-alquiler/",
           "description": "Calcula el nuevo índice IRAV (contratos desde 26/05/2023) o IPC interanual (contratos anteriores) para actualizar la renta de alquiler según la Ley de Vivienda 12/2023."
         },
         {

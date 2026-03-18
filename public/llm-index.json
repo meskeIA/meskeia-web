@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 287+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 290+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 287,
+  "total_tools": 290,
   "last_updated": "2026-03-18",
   "features": {
     "all_free": true,
@@ -22,28 +22,28 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 114
+      "tool_count": 115
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 92
+      "tool_count": 93
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 101
+      "tool_count": 102
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 76
+      "tool_count": 78
     },
     {
       "id": "creando",
@@ -64,7 +64,7 @@
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 47
+      "tool_count": 49
     }
   ],
   "tools": [
@@ -7036,6 +7036,78 @@
         "renta web aeat"
       ],
       "icon": "📋"
+    },
+    {
+      "slug": "estimador-actualizacion-alquiler",
+      "name": "Estimador Actualización Alquiler 2026",
+      "url": "https://meskeia.com/estimador-actualizacion-alquiler/",
+      "description": "Calcula cuánto puede subir tu alquiler en 2026. Aplica el índice correcto: IRAV para contratos desde mayo 2023 o IPC interanual para contratos anteriores. Ley de Vivienda actualizada.",
+      "suites": [
+        "inmobiliaria",
+        "legal-fiscal"
+      ],
+      "contexts": [
+        "dinero",
+        "casa"
+      ],
+      "keywords": [
+        "actualización alquiler 2026",
+        "IRAV alquiler",
+        "subida alquiler 2026",
+        "IPC alquiler",
+        "ley vivienda alquiler",
+        "cuanto puede subir el alquiler",
+        "indice actualizacion alquiler"
+      ],
+      "icon": "🏠"
+    },
+    {
+      "slug": "requisitos-nomada-digital",
+      "name": "Orientador Visa Nómada Digital",
+      "url": "https://meskeia.com/requisitos-nomada-digital/",
+      "description": "Comprueba si cumples los requisitos para la Visa Nómada Digital española (Ley de Startups 28/2022). Checklist interactivo con doble perfil: empleado de empresa extranjera o freelancer con clientes internacionales. Incluye cálculo de ingresos mínimos, documentación y guía del proceso.",
+      "suites": [
+        "legal-fiscal",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "dinero",
+        "curiosidad"
+      ],
+      "keywords": [
+        "visa nomada digital",
+        "teletrabajo españa",
+        "ley startups 28/2022",
+        "residencia teletrabajo",
+        "requisitos nomada digital",
+        "trabajar en remoto desde españa",
+        "nómada digital españa 2025"
+      ],
+      "icon": "🌍"
+    },
+    {
+      "slug": "quiz-simbolos-quimicos",
+      "name": "Quiz Símbolos Químicos",
+      "url": "https://meskeia.com/quiz-simbolos-quimicos/",
+      "description": "Pon a prueba tus conocimientos de la tabla periódica: adivina el nombre del elemento por su símbolo o el símbolo por el nombre. 85 elementos, 3 dificultades (fácil/medio/difícil) y 2 modos de juego.",
+      "suites": [
+        "estudiantes",
+        "cultura"
+      ],
+      "contexts": [
+        "estudio",
+        "curiosidad"
+      ],
+      "keywords": [
+        "quiz simbolos quimicos",
+        "tabla periódica juego",
+        "aprender química",
+        "símbolos elementos",
+        "quiz quimica bachillerato",
+        "memorizar tabla periódica"
+      ],
+      "icon": "⚗️"
     }
   ],
   "llm_instructions": {
