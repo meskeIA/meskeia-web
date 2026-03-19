@@ -1,10 +1,11 @@
 // Configuración centralizada de metadata para SEO
 import { Metadata } from 'next';
+import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 
 // Configuración base del sitio
 export const siteConfig = {
   name: 'meskeIA',
-  title: 'Más de 200 aplicaciones web',
+  title: `${TOTAL_IMPLEMENTED_APPS} aplicaciones web gratuitas`,
   description: 'Gratuitas y sin registro',
   url: 'https://meskeia.com',
   ogImage: 'https://meskeia.com/og-image.png',
@@ -268,7 +269,7 @@ export function generateAppJsonLd(options: {
 export function generateToolsMetadata(): Metadata {
   const title = 'Catálogo Completo de Aplicaciones';
   const description =
-    'Explora nuestro catálogo de más de 200 aplicaciones web gratuitas organizadas por categorías: calculadoras financieras, cursos, herramientas de productividad, juegos y más. Todo en español.';
+    `Explora nuestro catálogo de ${TOTAL_IMPLEMENTED_APPS} aplicaciones web gratuitas organizadas por categorías: calculadoras financieras, cursos, herramientas de productividad, juegos y más. Todo en español.`;
 
   return generateBaseMetadata({
     title,
