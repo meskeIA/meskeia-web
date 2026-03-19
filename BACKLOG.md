@@ -200,15 +200,18 @@
 
 ---
 
-## ✨ NUEVAS APPS — Tendencias España 2026 (propuestas 2026-03-18)
+## ✨ NUEVAS APPS — Tendencias España 2026 (propuestas 2026-03-19)
 
-> Ideas detectadas en análisis de tendencias. Pendiente de priorización.
+> Ideas detectadas en análisis de tendencias con WebSearch. Selección aprobada por usuario.
 
-- [ ] **calculadora-irav-alquiler** — `inmobiliaria` · Calculadora del nuevo índice IRAV para actualizar renta de alquileres (Ley Vivienda). Dato INE actualizable trimestralmente. Diferencial: distingue contratos antes/después mayo 2023 (IPC vs IRAV). Complejidad baja.
-- [ ] **requisitos-nomada-digital** — `freelance`+`viajes` · Checklist de elegibilidad para la Visa Nómada Digital en España + comparativa IRPF general vs régimen Beckham (24% flat). Datos normativos estables. Complejidad baja.
-- [ ] **test-burnout-laboral** — `salud`+`productividad` · Test adaptado Maslach Burnout Inventory (3 dimensiones: agotamiento, despersonalización, realización). Score por dimensión + recomendaciones. DisclaimerCard medical obligatoria. Complejidad baja.
-- [ ] **quiz-simbolos-quimicos** — `juegos`+`estudiantes` · Quiz de símbolos y nombres de elementos (118 elementos). Universo cerrado y verificable. Candidato ya validado en BACKLOG.
-- [ ] **quiz-capitales-europeas** — `juegos`+`cultura` · Complemento a quiz-paises-capitales. Europa con 50 países. Candidato ya validado en BACKLOG.
+- [ ] **simulador-bono-joven-alquiler** — `inmobiliaria`+`finanzas` · Comprueba elegibilidad del Bono Joven Alquiler (18-35 años, ingresos ≤ 2× IPREM). Calcula ahorro mensual/total (€250/mes × 24 meses = €6.000). DisclaimerCard `financial` obligatoria. Datos normativos estables. Complejidad baja.
+- [ ] **orientador-aval-ico** — `inmobiliaria`+`finanzas` · Orienta sobre el aval ICO para jóvenes (<35 años) y familias con menores sin el 20% de entrada. Requisitos, proceso, checklist documentación. Sin listar bancos específicos (remite a ico.es para lista actualizada — datos cambian con frecuencia). DisclaimerCard `financial` obligatoria. Complejidad baja.
+- [ ] **calculadora-costes-teletrabajo** — `productividad`+`finanzas` · Ahorro real del teletrabajo vs. oficina: transporte, comidas, ropa, electricidad, internet. Resultado neto mensual y anual. Sin datos normativos. Complejidad baja.
+- [ ] **quiz-historia-espana** — `juegos`+`cultura` · Quiz de historia española: ~80 preguntas verificables desde época íbera/romana hasta la Constitución de 1978. Universo cerrado y sin ambigüedad. Complejidad baja.
+
+### ✨ Tendencias anteriores (2026-03-18) — completadas
+
+> Las 5 propuestas de la sesión anterior ya están implementadas (ver sección ✅).
 
 ---
 

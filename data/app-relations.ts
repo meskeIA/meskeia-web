@@ -1164,6 +1164,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'orientador-discapacidad': [
     ...saludMayoresApps.filter(a => a.url !== '/orientador-discapacidad/'),
   ],
+  'simulador-bono-joven-alquiler': [
+    { url: '/orientador-aval-ico/', icon: '🏡', name: 'Aval ICO Vivienda', description: 'Primera vivienda sin el 20% de entrada' },
+    { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero completo' },
+    { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI si inviertes en un piso' },
+    { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+  ],
+  'orientador-aval-ico': [
+    { url: '/simulador-bono-joven-alquiler/', icon: '🏠', name: 'Bono Joven Alquiler', description: 'Hasta 250 €/mes durante 2 años' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
+    { url: '/orientador-alquiler-vs-compra/', icon: '🔑', name: 'Alquiler vs Compra', description: 'Análisis financiero completo' },
+  ],
+  'calculadora-costes-teletrabajo': [
+    { url: '/requisitos-nomada-digital/', icon: '🌍', name: 'Visa Nómada Digital', description: '¿Puedes trabajar desde España?' },
+    { url: '/calculadora-productividad/', icon: '⚡', name: 'Calculadora Productividad', description: 'Mide tu eficiencia real' },
+    { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Sueldo Neto', description: 'Cuánto cobras después de impuestos' },
+    { url: '/lista-tareas/', icon: '✅', name: 'Lista de Tareas', description: 'Organiza tu trabajo en casa' },
+  ],
+  'quiz-historia-espana': [
+    { url: '/quiz-paises-capitales/', icon: '🌍', name: 'Quiz Países y Capitales', description: 'Pon a prueba tu geografía' },
+    { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Aprende la tabla periódica' },
+    { url: '/quiz-figuras-retoricas/', icon: '✍️', name: 'Quiz Figuras Retóricas', description: 'Recursos literarios en español' },
+    { url: '/quiz-reinos-naturaleza/', icon: '🔬', name: 'Quiz Reinos Naturaleza', description: '43 organismos sorprendentes' },
+  ],
   'estimador-pension-viudedad': [
     ...jubilacionApps.filter(a => a.url !== '/estimador-pension-viudedad/').slice(0, 4),
   ],
@@ -1211,6 +1235,10 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'calculadora-calorias-ejercicio': { title: 'Herramientas de salud', icon: '❤️' },
     'test-burnout-laboral': { title: 'Más herramientas de bienestar', icon: '🧘' },
     'orientador-discapacidad': { title: 'Más herramientas de salud y bienestar', icon: '♿' },
+    'simulador-bono-joven-alquiler': { title: 'Más herramientas de vivienda y finanzas', icon: '🏠' },
+    'orientador-aval-ico': { title: 'Herramientas para comprar tu primera vivienda', icon: '🏡' },
+    'calculadora-costes-teletrabajo': { title: 'Más herramientas de productividad', icon: '💻' },
+    'quiz-historia-espana': { title: 'Más quizzes de cultura general', icon: '🏛️' },
 
     // Mascotas
     'planificador-mascota': { title: 'Más herramientas para tu mascota', icon: '🐾' },

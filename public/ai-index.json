@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 250+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 285,
-  "updated": "2026-03-18",
+  "total_tools": 289,
+  "updated": "2026-03-19",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -1553,6 +1553,30 @@
           "slug": "orientador-discapacidad",
           "url": "https://meskeia.com/orientador-discapacidad/",
           "description": "Test orientativo funcional para saber si vale la pena solicitar el reconocimiento del grado de discapacidad en España. Basado en RD 888/2022."
+        },
+        {
+          "name": "Simulador Bono Joven Alquiler",
+          "slug": "simulador-bono-joven-alquiler",
+          "url": "https://meskeia.com/simulador-bono-joven-alquiler/",
+          "description": "Comprueba si cumples los requisitos del Bono Joven al Alquiler (hasta 250 €/mes, 2 años). Checklist interactivo y cálculo del ahorro real. Real Decreto 42/2022."
+        },
+        {
+          "name": "Orientador Aval ICO Vivienda",
+          "slug": "orientador-aval-ico",
+          "url": "https://meskeia.com/orientador-aval-ico/",
+          "description": "¿Puedes acceder al aval del Estado para comprar tu primera vivienda? Checklist para jóvenes menores de 35 y familias con menores. Guía del proceso con enlace a ico.es."
+        },
+        {
+          "name": "Calculadora Costes Teletrabajo",
+          "slug": "calculadora-costes-teletrabajo",
+          "url": "https://meskeia.com/calculadora-costes-teletrabajo/",
+          "description": "Calcula cuánto ahorras (o gastas) teletrabajando frente a ir a la oficina: transporte, comidas, electricidad y ropa. Resultado mensual y anual desglosado."
+        },
+        {
+          "name": "Quiz Historia de España",
+          "slug": "quiz-historia-espana",
+          "url": "https://meskeia.com/quiz-historia-espana/",
+          "description": "81 preguntas de historia española desde la época prerromana hasta la Constitución de 1978. 3 niveles de dificultad, feedback con explicación y estadísticas finales."
         },
         {
           "name": "Planificador Embarazo y Bebé",

@@ -353,6 +353,10 @@ export const implementedAppsUrls = [
   "/quiz-simbolos-quimicos/",               // Quiz símbolos químicos — 85 elementos, 3 dificultades, 2 modos
   "/test-burnout-laboral/",                 // Test orientativo burnout laboral — 15 preguntas, 3 dimensiones
   "/orientador-discapacidad/",              // Orientador grado discapacidad — test funcional RD 888/2022
+  "/simulador-bono-joven-alquiler/",        // Simulador Bono Joven Alquiler — requisitos + cálculo ahorro
+  "/orientador-aval-ico/",                  // Orientador Aval ICO Vivienda — checklist primera vivienda
+  "/calculadora-costes-teletrabajo/",       // Calculadora Costes Teletrabajo — ahorro vs oficina
+  "/quiz-historia-espana/",                 // Quiz Historia de España — 81 preguntas, 3 niveles
 ];
 
 /**

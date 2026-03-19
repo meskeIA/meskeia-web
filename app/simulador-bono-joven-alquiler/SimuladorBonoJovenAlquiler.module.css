@@ -1,0 +1,286 @@
+/* =============================================
+   Simulador Bono Joven Alquiler — meskeIA v2.0
+   ============================================= */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --color-ok: #10b981;
+  --color-fail: #ef4444;
+  --color-warn: #f59e0b;
+
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --color-ok: #34d399;
+  --color-fail: #f87171;
+  --color-warn: #fbbf24;
+}
+
+.hero {
+  text-align: center;
+  margin: 80px 0 var(--spacing-xl);
+  padding: 2.5rem var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon { font-size: 3rem; margin-bottom: 0.5rem; }
+.title { font-size: 2rem; font-weight: 800; margin: 0 0 0.5rem; }
+.subtitle { font-size: 1.05rem; opacity: 0.9; margin: 0 0 1rem; }
+.heroLaw { font-size: 0.8rem; opacity: 0.75; margin: 0; }
+
+/* Secciones */
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Campo con label */
+.field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+.label { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+.helperText { font-size: 0.8rem; color: var(--text-secondary); }
+
+/* Slider de edad */
+.sliderRow { display: flex; align-items: center; gap: 1rem; }
+.sliderInput { flex: 1; accent-color: var(--primary); height: 4px; }
+.sliderValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  min-width: 3rem;
+  text-align: center;
+}
+
+/* Radio group */
+.radioGroup { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.radioBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+.radioBtn:hover { border-color: var(--primary); }
+.radioBtnActive { border-color: var(--primary); background: rgba(46,134,171,0.08); }
+
+/* Input numérico */
+.inputEuro {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.2s;
+}
+.inputEuro:focus-within { border-color: var(--primary); }
+.inputEuro span { font-weight: 600; color: var(--text-secondary); }
+.inputEuro input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+/* Checklist requisitos */
+.checkGrid { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.checkCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  color: var(--text-primary);
+  width: 100%;
+}
+.checkCard:hover { border-color: var(--primary); }
+.checkCardOk { border-color: var(--color-ok); background: rgba(16,185,129,0.07); }
+.checkCardFail { border-color: var(--color-fail); background: rgba(239,68,68,0.07); }
+
+.checkEstado { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+.checkInfo { flex: 1; }
+.checkPregunta { font-size: 0.9rem; font-weight: 600; margin: 0 0 0.2rem; line-height: 1.4; }
+.checkExplicacion { font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+
+.badgeImprescindible {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  background: rgba(239,68,68,0.12);
+  color: var(--color-fail);
+  border-radius: 10px;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+/* Resultado */
+.resultadoCard {
+  border-radius: var(--radius-large);
+  padding: 2rem;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.resultado-apto { background: rgba(16,185,129,0.1); border: 2px solid var(--color-ok); }
+.resultado-casi { background: rgba(245,158,11,0.1); border: 2px solid var(--color-warn); }
+.resultado-no-apto { background: rgba(239,68,68,0.08); border: 2px solid var(--color-fail); }
+
+.resultadoIcon { font-size: 3rem; margin-bottom: 0.75rem; }
+.resultadoTitulo { font-size: 1.5rem; font-weight: 800; margin: 0 0 0.5rem; }
+.resultadoTexto { font-size: 0.95rem; color: var(--text-secondary); margin: 0 0 1rem; line-height: 1.6; }
+
+/* Panel de ahorro */
+.ahorroPanel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.ahorroCard {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+}
+
+.ahorroValor { font-size: 1.5rem; font-weight: 800; color: var(--color-ok); display: block; }
+.ahorroLabel { font-size: 0.8rem; color: var(--text-secondary); }
+
+/* Próximos pasos */
+.pasosGrid { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.pasoCard {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.pasoNum {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.pasoInfo h3 { font-size: 0.9rem; font-weight: 700; margin: 0 0 0.2rem; }
+.pasoInfo p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+
+.linkIco {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--primary);
+  text-decoration: underline;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Pending state */
+.pendienteMsg {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* ─── EDUCACIÓN ─── */
+.guideSection { margin-bottom: 2rem; }
+.guideSection h2 { font-size: 1.2rem; font-weight: 700; margin: 0 0 1rem; }
+
+.tableWrapper { overflow-x: auto; }
+.compareTable { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.compareTable th { background: var(--primary); color: white; padding: 0.6rem 0.8rem; text-align: left; font-weight: 600; }
+.compareTable td { padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.compareTable tr:nth-child(even) td { background: rgba(46,134,171,0.04); }
+
+.scenariosGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; }
+.scenarioCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+.scenarioIcon { font-size: 1.75rem; display: block; margin-bottom: 0.5rem; }
+.scenarioCard h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; }
+.scenarioCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+
+.faqGrid { display: flex; flex-direction: column; gap: 1rem; }
+.faqItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary); }
+.faqItem p { font-size: 0.88rem; color: var(--text-secondary); margin: 0; line-height: 1.55; }
+
+.stepsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.stepCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+.stepNum { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; margin-bottom: 0.75rem; }
+.stepCard h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; }
+.stepCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+
+.tipsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.tipCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+.tipIcon { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
+.tipCard h3 { font-size: 0.9rem; font-weight: 700; margin: 0 0 0.4rem; }
+.tipCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+
+.warningBox { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius-large); padding: 1.5rem; }
+.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--color-warn); margin: 0 0 1rem; }
+.warningGrid { display: flex; flex-direction: column; gap: 0.75rem; }
+.warningItem { background: var(--bg-card); border-radius: var(--radius); padding: 1rem; }
+.warningItem strong { display: block; font-size: 0.9rem; margin-bottom: 0.35rem; }
+.warningItem p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }

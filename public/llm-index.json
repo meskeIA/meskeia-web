@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 292+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 296+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 292,
-  "last_updated": "2026-03-18",
+  "total_tools": 296,
+  "last_updated": "2026-03-19",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -22,28 +22,28 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 117
+      "tool_count": 118
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 93
+      "tool_count": 94
     },
     {
       "id": "casa",
       "name": "En casa",
       "icon": "🏠",
       "description": "Hogar, cocina y vida doméstica",
-      "tool_count": 104
+      "tool_count": 107
     },
     {
       "id": "dinero",
       "name": "Mi dinero",
       "icon": "💰",
       "description": "Gestiona tus finanzas e impuestos",
-      "tool_count": 78
+      "tool_count": 81
     },
     {
       "id": "creando",
@@ -57,14 +57,14 @@
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 29
+      "tool_count": 30
     },
     {
       "id": "curiosidad",
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 51
+      "tool_count": 54
     }
   ],
   "tools": [
@@ -7158,6 +7158,109 @@
         "tarjeta estacionamiento discapacidad"
       ],
       "icon": "♿"
+    },
+    {
+      "slug": "simulador-bono-joven-alquiler",
+      "name": "Simulador Bono Joven Alquiler",
+      "url": "https://meskeia.com/simulador-bono-joven-alquiler/",
+      "description": "Comprueba si cumples los requisitos para recibir el Bono Joven al Alquiler (hasta 250 €/mes durante 2 años). Checklist interactivo de requisitos, cálculo del ahorro real mensual y anual. Basado en el Real Decreto 42/2022.",
+      "suites": [
+        "inmobiliaria",
+        "finanzas",
+        "legal-fiscal"
+      ],
+      "contexts": [
+        "casa",
+        "dinero",
+        "curiosidad"
+      ],
+      "keywords": [
+        "bono joven alquiler",
+        "ayuda alquiler jóvenes",
+        "250 euros alquiler",
+        "requisitos bono joven",
+        "Plan Estatal Vivienda 2022",
+        "ayuda alquiler estado",
+        "vivienda jóvenes españa"
+      ],
+      "icon": "🏠"
+    },
+    {
+      "slug": "orientador-aval-ico",
+      "name": "Orientador Aval ICO Vivienda",
+      "url": "https://meskeia.com/orientador-aval-ico/",
+      "description": "¿Puedes acceder al aval del Estado para comprar tu primera vivienda? Checklist de requisitos para jóvenes menores de 35 años y familias con hijos menores. Guía del proceso sin listar bancos específicos, enlace oficial a ico.es.",
+      "suites": [
+        "inmobiliaria",
+        "finanzas",
+        "legal-fiscal"
+      ],
+      "contexts": [
+        "casa",
+        "dinero",
+        "curiosidad"
+      ],
+      "keywords": [
+        "aval ico vivienda",
+        "aval estado primera vivienda",
+        "comprar casa sin ahorro",
+        "aval 20% hipoteca",
+        "ico jóvenes hipoteca",
+        "primera vivienda jóvenes",
+        "aval ministerio vivienda"
+      ],
+      "icon": "🏡"
+    },
+    {
+      "slug": "calculadora-costes-teletrabajo",
+      "name": "Calculadora Costes Teletrabajo",
+      "url": "https://meskeia.com/calculadora-costes-teletrabajo/",
+      "description": "Calcula cuánto ahorras (o gastas) con el teletrabajo frente a ir a la oficina. Tiene en cuenta transporte, comidas, electricidad y ropa de trabajo. Resultado mensual y anual con desglose detallado.",
+      "suites": [
+        "productividad",
+        "finanzas",
+        "freelance"
+      ],
+      "contexts": [
+        "trabajo",
+        "casa",
+        "dinero"
+      ],
+      "keywords": [
+        "calculadora teletrabajo",
+        "ahorro teletrabajo",
+        "coste teletrabajo vs oficina",
+        "gastos trabajar desde casa",
+        "teletrabajo electricidad",
+        "transporte trabajo ahorro",
+        "trabajo remoto costes"
+      ],
+      "icon": "💻"
+    },
+    {
+      "slug": "quiz-historia-espana",
+      "name": "Quiz Historia de España",
+      "url": "https://meskeia.com/quiz-historia-espana/",
+      "description": "Pon a prueba tus conocimientos de historia española desde la época prerromana hasta la Constitución de 1978. 81 preguntas con 3 niveles de dificultad, feedback inmediato con explicación y estadísticas al final.",
+      "suites": [
+        "cultura",
+        "estudiantes"
+      ],
+      "contexts": [
+        "estudio",
+        "relax",
+        "curiosidad"
+      ],
+      "keywords": [
+        "quiz historia españa",
+        "test historia españa",
+        "preguntas historia española",
+        "historia spain quiz",
+        "cultura general historia",
+        "oposiciones historia españa",
+        "selectividad historia"
+      ],
+      "icon": "🏛️"
     }
   ],
   "llm_instructions": {
