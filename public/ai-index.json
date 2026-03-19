@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 250+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 289,
+  "total_tools": 291,
   "updated": "2026-03-19",
   "features": {
     "all_free": true,
@@ -1577,6 +1577,18 @@
           "slug": "quiz-historia-espana",
           "url": "https://meskeia.com/quiz-historia-espana/",
           "description": "81 preguntas de historia española desde la época prerromana hasta la Constitución de 1978. 3 niveles de dificultad, feedback con explicación y estadísticas finales."
+        },
+        {
+          "name": "Quiz Geografía de España",
+          "slug": "quiz-geografia-espana",
+          "url": "https://meskeia.com/quiz-geografia-espana/",
+          "description": "75 preguntas sobre geografía española: provincias, capitales, ríos, montañas y comunidades autónomas. 3 niveles de dificultad, ideal para oposiciones y estudiantes."
+        },
+        {
+          "name": "Test Madurez Digital",
+          "slug": "test-madurez-digital",
+          "url": "https://meskeia.com/test-madurez-digital/",
+          "description": "Descubre el nivel de madurez digital de tu empresa: 15 preguntas en 5 dimensiones (herramientas, IA, automatización, cultura digital, datos). Perfil con recomendaciones prácticas."
         },
         {
           "name": "Planificador Embarazo y Bebé",

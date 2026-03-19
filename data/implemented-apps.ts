@@ -357,6 +357,8 @@ export const implementedAppsUrls = [
   "/orientador-aval-ico/",                  // Orientador Aval ICO Vivienda — checklist primera vivienda
   "/calculadora-costes-teletrabajo/",       // Calculadora Costes Teletrabajo — ahorro vs oficina
   "/quiz-historia-espana/",                 // Quiz Historia de España — 81 preguntas, 3 niveles
+  "/quiz-geografia-espana/",               // Quiz Geografía de España — 75 preguntas, provincias, ríos, CCAA
+  "/test-madurez-digital/",                // Test Madurez Digital — 15 preguntas, 5 perfiles, recomendaciones
 ];
 
 /**

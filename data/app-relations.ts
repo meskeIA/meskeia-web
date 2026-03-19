@@ -1183,10 +1183,22 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/lista-tareas/', icon: '✅', name: 'Lista de Tareas', description: 'Organiza tu trabajo en casa' },
   ],
   'quiz-historia-espana': [
-    { url: '/quiz-paises-capitales/', icon: '🌍', name: 'Quiz Países y Capitales', description: 'Pon a prueba tu geografía' },
+    { url: '/quiz-geografia-espana/', icon: '🌍', name: 'Quiz Geografía de España', description: 'Provincias, ríos y montañas' },
+    { url: '/quiz-paises-capitales/', icon: '🗺️', name: 'Quiz Países y Capitales', description: 'Pon a prueba tu geografía' },
     { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Aprende la tabla periódica' },
     { url: '/quiz-figuras-retoricas/', icon: '✍️', name: 'Quiz Figuras Retóricas', description: 'Recursos literarios en español' },
+  ],
+  'quiz-geografia-espana': [
+    { url: '/quiz-historia-espana/', icon: '🏛️', name: 'Quiz Historia de España', description: 'Desde los íberos hasta 1978' },
+    { url: '/quiz-paises-capitales/', icon: '🗺️', name: 'Quiz Países y Capitales', description: 'Geografía mundial' },
+    { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Aprende la tabla periódica' },
     { url: '/quiz-reinos-naturaleza/', icon: '🔬', name: 'Quiz Reinos Naturaleza', description: '43 organismos sorprendentes' },
+  ],
+  'test-madurez-digital': [
+    { url: '/test-burnout-laboral/', icon: '🧘', name: 'Test Burnout Laboral', description: 'Detecta el agotamiento profesional' },
+    { url: '/calculadora-costes-teletrabajo/', icon: '🏠', name: 'Costes Teletrabajo', description: 'Cuánto ahorras trabajando en casa' },
+    { url: '/calculadora-tarifa-hora/', icon: '💼', name: 'Calculadora Tarifa/Hora', description: 'Fija tu precio como freelance' },
+    { url: '/calculadora-roi/', icon: '📈', name: 'Calculadora ROI', description: 'Retorno sobre inversión' },
   ],
   'estimador-pension-viudedad': [
     ...jubilacionApps.filter(a => a.url !== '/estimador-pension-viudedad/').slice(0, 4),
@@ -1239,6 +1251,8 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'orientador-aval-ico': { title: 'Herramientas para comprar tu primera vivienda', icon: '🏡' },
     'calculadora-costes-teletrabajo': { title: 'Más herramientas de productividad', icon: '💻' },
     'quiz-historia-espana': { title: 'Más quizzes de cultura general', icon: '🏛️' },
+    'quiz-geografia-espana': { title: 'Más quizzes de cultura general', icon: '🌍' },
+    'test-madurez-digital': { title: 'Más herramientas para el trabajo', icon: '💻' },
 
     // Mascotas
     'planificador-mascota': { title: 'Más herramientas para tu mascota', icon: '🐾' },
