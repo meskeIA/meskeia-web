@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './PlanificadorMudanzas.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
 
@@ -453,6 +453,13 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="planificador-mudanzas"
+      />
 
       <main className={styles.mainContent}>
         {/* Cabecera con nombre y fecha */}

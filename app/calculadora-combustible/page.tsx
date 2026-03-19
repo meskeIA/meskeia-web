@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraCombustible.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -105,6 +105,13 @@ export default function CalculadoraCombustiblePage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="calculadora-combustible"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

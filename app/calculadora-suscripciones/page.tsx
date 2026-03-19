@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraSuscripciones.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -199,6 +199,13 @@ export default function CalculadoraSuscripcionesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="financial"
+        severity="medium"
+        collapsible={true}
+        context="calculadora-suscripciones"
+      />
 
       <div className={styles.mainContent}>
         {/* Resumen de gastos */}

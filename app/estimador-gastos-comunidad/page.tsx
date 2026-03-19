@@ -9,6 +9,7 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
@@ -162,6 +163,12 @@ export default function CalculadoraGastosComunidadPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        collapsible={false}
+      />
 
       {/* SELECTOR DE MODO */}
       <div className={styles.modeTabs} role="tablist" aria-label="Modo de reparto">

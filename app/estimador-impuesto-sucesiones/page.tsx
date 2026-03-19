@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstimadorSucesiones.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalNotice } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalNotice, DisclaimerCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -368,6 +368,12 @@ export default function EstimadorImpuestoSucesionesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="financial"
+        severity="critical"
+        collapsible={false}
+      />
 
       {/* Disclaimer SIEMPRE VISIBLE */}
       <div className={styles.disclaimerCritico}>
