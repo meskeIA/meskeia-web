@@ -2,12 +2,15 @@
 
 import { useState } from 'react';
 import styles from './OrientadorJubilacionParcial.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_PENSIONES_META,
   REQUISITOS_JUBILACION_PARCIAL,
+  JUBILACION_PARCIAL_META,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -131,6 +134,13 @@ export default function OrientadorJubilacionParcial() {
           <br /><em>meskeIA no se responsabiliza de decisiones basadas en esta orientación.</em>
         </span>
       </DisclaimerCard>
+
+      <DataReference
+        normativa={JUBILACION_PARCIAL_META.fuente}
+        fuente={JUBILACION_PARCIAL_META.fuente}
+        verificado={JUBILACION_PARCIAL_META.verificado}
+        urlOficial={JUBILACION_PARCIAL_META.urlOficial}
+      />
 
       <div className={styles.mainContent}>
         {/* Formulario */}

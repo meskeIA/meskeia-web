@@ -2,7 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import styles from './EstimadorIRPF.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -189,6 +191,13 @@ export default function EstimadorIRPFPage() {
       </header>
 
       <DisclaimerCard variant="financial" severity="critical" />
+
+      <DataReference
+        normativa={FISCAL_IRPF_META.fuente}
+        fuente={FISCAL_IRPF_META.fuente}
+        verificado={FISCAL_IRPF_META.verificado}
+        urlOficial={FISCAL_IRPF_META.urlOficial}
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

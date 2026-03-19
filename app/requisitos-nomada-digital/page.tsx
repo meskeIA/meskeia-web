@@ -11,12 +11,14 @@ import {
   LegalNotice,
   RelatedApps,
   DisclaimerCard,
+  DataReference,
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   MINIMO_INGRESOS_TITULAR_NOMADA,
   MINIMO_INGRESOS_DEPENDIENTE_NOMADA,
+  NOMADA_DIGITAL_META,
 } from '@/data/fiscal';
 
 type Perfil = 'empleado' | 'freelancer' | '';
@@ -204,6 +206,13 @@ export default function RequisitosNomadaDigitalPage() {
         severity="medium"
         collapsible={true}
         context="requisitos-nomada-digital-disclaimer"
+      />
+
+      <DataReference
+        normativa={NOMADA_DIGITAL_META.fuente}
+        fuente={NOMADA_DIGITAL_META.fuente}
+        verificado={NOMADA_DIGITAL_META.verificado}
+        urlOficial={NOMADA_DIGITAL_META.urlOficial}
       />
 
       {/* Selector de perfil */}

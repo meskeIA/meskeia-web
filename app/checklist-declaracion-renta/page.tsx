@@ -254,7 +254,7 @@ export default function ChecklistDeclaracionRentaPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="high"
+        severity="critical"
         collapsible={false}
       />
 

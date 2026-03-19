@@ -538,7 +538,7 @@ export default function AnalizadorEspectroPage() {
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="technical"
-        severity="medium"
+        severity="low"
         context="analizador-espectro"
         collapsible={true}
       />

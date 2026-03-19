@@ -49,7 +49,7 @@ export default function PlazosLegalesPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Buscador */}
       <div className={styles.searchSection}>

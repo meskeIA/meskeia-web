@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './OptimizadorRentas60.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -12,6 +14,7 @@ import {
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
 } from '@/data/fiscal/irpf';
 import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal/inmuebles';
+import { FISCAL_IRPF_META } from '@/data/fiscal';
 
 // ─── Utilidades fiscales ───────────────────────────────────────────────────────
 
@@ -251,6 +254,13 @@ export default function OptimizadorRentas60() {
           <br /><em>meskeIA no se responsabiliza de decisiones fiscales basadas en esta estimación.</em>
         </span>
       </DisclaimerCard>
+
+      <DataReference
+        normativa={FISCAL_IRPF_META.fuente}
+        fuente={FISCAL_IRPF_META.fuente}
+        verificado={FISCAL_IRPF_META.verificado}
+        urlOficial={FISCAL_IRPF_META.urlOficial}
+      />
 
       <div className={styles.mainContent}>
         {/* Formulario de fuentes de renta */}

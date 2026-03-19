@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstimadorCuotaAutonomo.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA } from '@/data/fiscal';
@@ -241,6 +243,13 @@ export default function EstimadorCuotaAutonomoPage() {
       </header>
 
       <DisclaimerCard variant="financial" severity="critical" />
+
+      <DataReference
+        normativa={FISCAL_AUTONOMOS_META.fuente}
+        fuente={FISCAL_AUTONOMOS_META.fuente}
+        verificado={FISCAL_AUTONOMOS_META.verificado}
+        urlOficial={FISCAL_AUTONOMOS_META.urlOficial}
+      />
 
       {/* Referencia Normativa */}
       <div className={styles.normativaBox}>

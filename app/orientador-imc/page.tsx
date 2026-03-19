@@ -646,7 +646,7 @@ export default function CalculadoraIMCPage() {
       {/* Disclaimer Médico - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="medical"
-        severity="critical"
+        severity="high"
         collapsible={false}
         context="orientador-imc"
       >

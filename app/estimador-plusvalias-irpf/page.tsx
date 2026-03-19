@@ -2,7 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import styles from './EstimadorPlusvalias.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -151,6 +153,13 @@ export default function EstimadorPlusvalidasIRPFPage() {
       </header>
 
       <DisclaimerCard variant="financial" severity="critical" />
+
+      <DataReference
+        normativa={FISCAL_INMUEBLES_META.fuente}
+        fuente={FISCAL_INMUEBLES_META.fuente}
+        verificado={FISCAL_INMUEBLES_META.verificado}
+        urlOficial={FISCAL_INMUEBLES_META.urlOficialIRPF}
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

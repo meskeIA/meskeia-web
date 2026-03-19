@@ -345,7 +345,7 @@ export default function GeneradorLoteriaPage() {
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="general"
-        severity="medium"
+        severity="low"
         context="generador-loteria"
         collapsible={true}
       />

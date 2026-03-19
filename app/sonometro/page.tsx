@@ -342,7 +342,7 @@ export default function SonometroPage() {
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="technical"
-        severity="high"
+        severity="low"
         context="sonometro"
         collapsible={true}
       />

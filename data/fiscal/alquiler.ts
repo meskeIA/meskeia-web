@@ -18,6 +18,14 @@
  * ⚠️ Verificar valores con el INE antes de aplicar en un contrato real.
  */
 
+export const ALQUILER_META = {
+  fuente: 'INE — Índice de Referencia de Actualización de Vivienda (IRAV) + IPC Interanual · Ley 12/2023 de Vivienda',
+  verificado: '2026-03-18',
+  vigencia: '2026',
+  urlOficial: 'https://www.ine.es/jaxiT3/Tabla.htm?t=25171',
+  nota: 'El IRAV se publica trimestralmente. Contratos anteriores al 26/05/2023 usan IPC interanual. Verificar índice vigente en el INE.',
+};
+
 /** Fecha de entrada en vigor del IRAV (Ley 12/2023 de Vivienda) */
 export const FECHA_CORTE_LEY_VIVIENDA = '2023-05-26';
 

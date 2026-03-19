@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import styles from './AsistenteAltaAutonomo.module.css';
-import { MeskeiaLogo, Footer, NumberInput, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, RelatedApps, EducationalSection, ShareCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { TIPO_COTIZACION_RETA, TARIFA_PLANA_2025, BASES_RETA_2025 } from '@/data/fiscal/autonomos';
+import { TIPO_COTIZACION_RETA, TARIFA_PLANA_2025, BASES_RETA_2025, FISCAL_AUTONOMOS_META } from '@/data/fiscal/autonomos';
 
 // Tipos
 type TipoActividad = 'profesional' | 'empresarial' | 'artistica';
@@ -436,7 +438,14 @@ export default function AsistenteAltaAutonomoPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="high" />
+      <DisclaimerCard variant="financial" severity="critical" />
+
+      <DataReference
+        normativa={FISCAL_AUTONOMOS_META.fuente}
+        fuente={FISCAL_AUTONOMOS_META.fuente}
+        verificado={FISCAL_AUTONOMOS_META.verificado}
+        urlOficial={FISCAL_AUTONOMOS_META.urlOficial}
+      />
 
       {/* Info rápida */}
       <section className={styles.infoRapida}>

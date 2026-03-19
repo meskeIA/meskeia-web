@@ -2,7 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import styles from './ComparadorAutonomoVsSL.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -170,7 +172,14 @@ export default function ComparadorAutonomoVsSLPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="high" />
+      <DisclaimerCard variant="financial" severity="critical" />
+
+      <DataReference
+        normativa={FISCAL_AUTONOMOS_META.fuente}
+        fuente={FISCAL_AUTONOMOS_META.fuente}
+        verificado={FISCAL_AUTONOMOS_META.verificado}
+        urlOficial={FISCAL_AUTONOMOS_META.urlOficial}
+      />
 
       {/* Configuración */}
       <div className={styles.configSection}>

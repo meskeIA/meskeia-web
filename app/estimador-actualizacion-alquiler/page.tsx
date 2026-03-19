@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './EstimadorActualizacionAlquiler.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection, NumberInput, ResultCard, DisclaimerCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection, NumberInput, ResultCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
@@ -12,6 +14,7 @@ import {
   IPC_INTERANUAL_POR_MES,
   mesATrimestreIRAV,
   mesAnteriorClave,
+  ALQUILER_META,
 } from '@/data/fiscal';
 
 // ──────────────────────────────────────────
@@ -259,6 +262,13 @@ export default function EstimadorActualizacionAlquilerPage() {
 
       {/* Disclaimer financiero — SIEMPRE VISIBLE */}
       <DisclaimerCard variant="financial" severity="critical" />
+
+      <DataReference
+        normativa={ALQUILER_META.fuente}
+        fuente={ALQUILER_META.fuente}
+        verificado={ALQUILER_META.verificado}
+        urlOficial={ALQUILER_META.urlOficial}
+      />
 
       {/* Sección educativa */}
       <EducationalSection

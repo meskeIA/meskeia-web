@@ -2,10 +2,14 @@
 
 import { useState } from 'react';
 import styles from './OrientadorPlanPensiones.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { TRAMOS_IRPF_2025 } from '@/data/fiscal';
+import { TRAMOS_IRPF_2025,
+  FISCAL_PLAN_PENSIONES_META,
+} from '@/data/fiscal';
 import {
   FISCAL_PENSIONES_META,
   LIMITES_PLAN_PENSIONES_2025,
@@ -132,6 +136,13 @@ export default function OrientadorPlanPensiones() {
           <br /><em>meskeIA no se responsabiliza de decisiones basadas en esta orientación.</em>
         </span>
       </DisclaimerCard>
+
+      <DataReference
+        normativa={FISCAL_PLAN_PENSIONES_META.fuente}
+        fuente={FISCAL_PLAN_PENSIONES_META.fuente}
+        verificado={FISCAL_PLAN_PENSIONES_META.verificado}
+        urlOficial={FISCAL_PLAN_PENSIONES_META.urlOficial}
+      />
 
       <div className={styles.mainContent}>
         {/* Formulario */}

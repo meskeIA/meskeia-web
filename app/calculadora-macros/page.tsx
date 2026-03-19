@@ -427,7 +427,7 @@ export default function CalculadoraMacrosPage() {
       {/* Disclaimer Médico - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="medical"
-        severity="critical"
+        severity="high"
         collapsible={false}
         context="calculadora-macros"
       >

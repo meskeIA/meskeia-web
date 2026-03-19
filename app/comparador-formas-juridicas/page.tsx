@@ -495,7 +495,7 @@ export default function ComparadorFormasJuridicasPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="high" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Navegación de vistas */}
       <div className={styles.vistas}>

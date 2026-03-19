@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstimadorSucesiones.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalNotice, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalNotice, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -373,6 +375,13 @@ export default function EstimadorImpuestoSucesionesPage() {
         variant="financial"
         severity="critical"
         collapsible={false}
+      />
+
+      <DataReference
+        normativa={FISCAL_SUCESIONES_META.fuente}
+        fuente={FISCAL_SUCESIONES_META.fuente}
+        verificado={FISCAL_SUCESIONES_META.verificado}
+        urlOficial={FISCAL_SUCESIONES_META.urlOficial}
       />
 
       {/* Disclaimer SIEMPRE VISIBLE */}

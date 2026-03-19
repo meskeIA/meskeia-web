@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstimadorDonaciones.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalNotice, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalNotice, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -224,6 +226,13 @@ export default function EstimadorImpuestoDonacionesPage() {
         variant="financial"
         severity="critical"
         collapsible={false}
+      />
+
+      <DataReference
+        normativa={FISCAL_DONACIONES_META.fuente}
+        fuente={FISCAL_DONACIONES_META.fuente}
+        verificado={FISCAL_DONACIONES_META.verificado}
+        urlOficial={FISCAL_DONACIONES_META.urlOficial}
       />
 
       {/* Disclaimer SIEMPRE VISIBLE */}

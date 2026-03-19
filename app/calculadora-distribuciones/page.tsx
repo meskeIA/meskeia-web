@@ -704,7 +704,7 @@ export default function CalculadoraDistribucionesPage() {
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="educational"
-        severity="medium"
+        severity="low"
         context="calculadora-distribuciones"
         collapsible={true}
       />

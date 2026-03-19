@@ -2,7 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import styles from './EstimadorSueldoNeto.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2025, BASES_SS_2025, MINIMOS_IRPF_2025 } from '@/data/fiscal';
@@ -258,7 +260,14 @@ export default function EstimadorSueldoNetoPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="high" />
+      <DisclaimerCard variant="financial" severity="critical" />
+
+      <DataReference
+        normativa={FISCAL_IRPF_META.fuente}
+        fuente={FISCAL_IRPF_META.fuente}
+        verificado={FISCAL_IRPF_META.verificado}
+        urlOficial={FISCAL_IRPF_META.urlOficial}
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

@@ -498,7 +498,7 @@ export default function LuxometroPage() {
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="technical"
-        severity="medium"
+        severity="low"
         context="luxometro"
         collapsible={true}
       />

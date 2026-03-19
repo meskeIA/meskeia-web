@@ -31,8 +31,9 @@ const modoJSON = process.argv.includes('--json');
 // Nivel por defecto de cada suite
 const SUITE_LEVEL = {
   inmobiliaria: 1,
-  finanzas: 2,     // puede subir a 1 por disparadores
-  salud: 2,        // puede subir a 1 por disparadores
+  'legal-fiscal': 1,  // cualquier contenido fiscal/legal → siempre Level 1
+  finanzas: 2,        // puede subir a 1 por disparadores
+  salud: 2,           // puede subir a 1 por disparadores
   freelance: 2,
   marketing: 3,
   productividad: 3,
@@ -43,6 +44,56 @@ const SUITE_LEVEL = {
   cultura: 4,
   accesibilidad: 3,
   viajes: 3,
+};
+
+// ============================================================
+// EXCEPCIONES REVISADAS MANUALMENTE (DISCLAIMER-POLICY.md)
+// Apps auditadas individualmente — nivel aprobado por revisión
+// ============================================================
+
+// Apps sin disclaimer (contenido informativo puro, sin riesgo)
+const APPS_SIN_DISCLAIMER = new Set([
+  'calculadora-cocina',       // recetas — sin implicación financiera/legal
+  'calculadora-pintura',      // m² de pintura — sin consejo profesional
+  'golden-hour',              // hora dorada fotográfica — herramienta creativa
+  'informacion-tiempo',       // info meteorológica — sin implicaciones
+  'lista-compras',            // lista de compras — sin consejo profesional
+  'mi-ip',                    // muestra dirección IP — técnico puro
+  'conversor-horarios',       // conversor de zonas horarias — sin consejo
+  'temporizador-pomodoro',    // temporizador — sin consejo profesional
+  'temporizador-visual',      // temporizador visual — herramienta accesibilidad
+  'privacidad',               // página legal de privacidad — ES la info legal
+]);
+
+// Apps con nivel aprobado manualmente (distinto del cálculo automático por suites)
+// Formato: slug → nivel aprobado (1-4)
+const NIVEL_MANUAL = {
+  // Herramientas hogar sin implicación financiera real (suite: inmobiliaria)
+  'calculadora-combustible':    3,  // calculadora de coste de combustible
+  'calculadora-gasto-energetico': 3, // estimador gasto energético doméstico
+  'planificador-mudanzas':      3,  // planificador/checklist de mudanza
+  // Herramientas financieras informativas (sin asesoramiento)
+  'calculadora-suscripciones':  3,  // seguimiento de suscripciones personales
+  'conversor-divisas':          3,  // conversor con tipos BCE (orientativo)
+  'presupuesto-viaje':          3,  // planificador de presupuesto de viaje
+  'estimador-gastos-comunidad': 2,  // estimador gastos comunidad (financiero, no fiscal)
+  // Herramientas de productividad/freelance generales (sin consejo profesional)
+  'lista-tareas':               3,
+  'notas':                      3,
+  'matriz-eisenhower':          3,
+  'seguimiento-habitos':        3,
+  'time-tracker':               3,
+  'requisitos-nomada-digital':  3,  // info sobre visa nómada digital
+  // Bienestar/salud educativa (sin orientación clínica)
+  'semaforo-emocional':         3,
+  'orientador-jet-lag':         3,  // recomendaciones de adaptación horaria
+  'lupa-digital':               3,  // herramienta de accesibilidad visual
+  // Contenido educativo (no clínico)
+  'huesos-cuerpo-humano':       3,
+  'simulador-genetica':         3,
+  'vitaminas-minerales':        3,
+  // Fiscal con datos de data/fiscal/ → Level 1 CRÍTICO (override por contenido)
+  'orientador-intereses-demora': 1, // calcula intereses de demora fiscales
 };
 
 // Palabras en URL/nombre que elevan a Nivel 1 CRÍTICO
@@ -123,7 +174,13 @@ function escanearApp(slug) {
   const tieneDataReference = /DataReference/.test(contenido);
 
   // ¿Usa localStorage explícito en contexto de disclaimer?
-  const usaLocalStorage = tieneDisclaimer && /localStorage/.test(contenido);
+  // Detecta solo si el key del DisclaimerCard context aparece en una llamada localStorage
+  // (no cuenta el localStorage propio de la app para guardar datos del usuario)
+  const contextMatch = propsRaw.match(/context=["']([^"']+)["']/);
+  const disclaimerKey = contextMatch ? contextMatch[1] : null;
+  const usaLocalStorage = tieneDisclaimer && disclaimerKey
+    ? new RegExp(`localStorage[^\\n]*${disclaimerKey.replace(/-/g, '[-_]')}`).test(contenido)
+    : false;
 
   return {
     tieneDisclaimer,
@@ -141,6 +198,9 @@ function escanearApp(slug) {
 // ============================================================
 
 function calcularNivelEsperado(slug, suites) {
+  // Nivel revisado manualmente → tiene prioridad absoluta
+  if (NIVEL_MANUAL[slug] !== undefined) return NIVEL_MANUAL[slug];
+
   // Nivel base: máximo de todas las suites
   let nivel = 4;
   for (const suite of suites) {
@@ -148,8 +208,8 @@ function calcularNivelEsperado(slug, suites) {
     if (nivelSuite < nivel) nivel = nivelSuite;
   }
 
-  // Inmobiliaria → siempre 1
-  if (suites.includes('inmobiliaria')) nivel = 1;
+  // Inmobiliaria o legal-fiscal → siempre 1
+  if (suites.includes('inmobiliaria') || suites.includes('legal-fiscal')) nivel = 1;
 
   // Disparadores de crítico por nombre de slug
   const slugLower = slug.toLowerCase();
@@ -169,6 +229,12 @@ function calcularNivelEsperado(slug, suites) {
 
 function analizarApp(slug, appData, scan) {
   const incidencias = [];
+
+  // App revisada manualmente sin disclaimer → sin incidencias
+  if (APPS_SIN_DISCLAIMER.has(slug)) {
+    return { nivel: null, incidencias };
+  }
+
   const nivel = calcularNivelEsperado(slug, appData.suites);
   const severidadEsperada = SEVERITY_ESPERADA[nivel];
 

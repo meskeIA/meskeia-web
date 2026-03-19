@@ -742,7 +742,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Progress Bar */}
       <div className={styles.progressSection}>

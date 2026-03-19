@@ -12,12 +12,14 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
+  DataReference,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   COEFICIENTES_IIVTNU_2025,
   PLUSVALIA_MUNICIPAL_META,
+  FISCAL_INMUEBLES_META,
 } from '@/data/fiscal';
 
 interface ResultadoMetodo {
@@ -389,6 +391,13 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
       {/* DisclaimerCard — siempre visible, fuera de cualquier toggle */}
       <DisclaimerCard variant="financial" severity="critical" />
+
+      <DataReference
+        normativa={FISCAL_INMUEBLES_META.fuente}
+        fuente={FISCAL_INMUEBLES_META.fuente}
+        verificado={FISCAL_INMUEBLES_META.verificado}
+        urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
+      />
 
       {/* Aviso adicional específico IIVTNU */}
       <div className={styles.avisoEspecifico}>

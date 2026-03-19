@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import styles from './EstimadorIrpfPensionista.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+  DataReference,
+} from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -157,6 +159,13 @@ export default function EstimadorIrpfPensionista() {
           <br /><em>meskeIA no se responsabiliza de decisiones basadas en esta estimación.</em>
         </span>
       </DisclaimerCard>
+
+      <DataReference
+        normativa={FISCAL_IRPF_META.fuente}
+        fuente={FISCAL_IRPF_META.fuente}
+        verificado={FISCAL_IRPF_META.verificado}
+        urlOficial={FISCAL_IRPF_META.urlOficial}
+      />
 
       <div className={styles.mainContent}>
         {/* Formulario */}

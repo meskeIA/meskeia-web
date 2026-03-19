@@ -12,6 +12,7 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
+  DataReference,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
@@ -320,6 +321,13 @@ export default function OrientadorInteresesDemoraPage() {
 
       {/* DisclaimerCard — siempre visible */}
       <DisclaimerCard variant="financial" severity="critical" />
+
+      <DataReference
+        normativa={FISCAL_INTERESES_META.fuente}
+        fuente={FISCAL_INTERESES_META.fuente}
+        verificado={FISCAL_INTERESES_META.verificado}
+        urlOficial={FISCAL_INTERESES_META.urlOficialLey3}
+      />
 
       {/* Aviso específico */}
       <div className={styles.avisoEspecifico}>
