@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -90,6 +91,12 @@ export default function CalculadoraCostesTeletrabajoPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="financial"
+        severity="high"
+        collapsible={false}
+      />
 
       {/* Inputs */}
       <div className={styles.mainGrid}>

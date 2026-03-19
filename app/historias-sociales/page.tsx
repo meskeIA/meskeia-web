@@ -9,6 +9,7 @@ import {
   RelatedApps,
   ShareCard,
   EducationalSection,
+  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -453,6 +454,12 @@ export default function HistoriasSocialesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="medical"
+        severity="high"
+        collapsible={false}
+      />
 
       {/* Historias de ejemplo */}
       <section className={styles.seccion}>

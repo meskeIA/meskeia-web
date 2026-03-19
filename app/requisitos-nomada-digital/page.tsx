@@ -8,8 +8,12 @@ import {
   NumberInput,
   EducationalSection,
   ShareCard,
+  LegalNotice,
+  RelatedApps,
+  DisclaimerCard,
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
+import { getRelatedApps } from '@/data/app-relations';
 import {
   MINIMO_INGRESOS_TITULAR_NOMADA,
   MINIMO_INGRESOS_DEPENDIENTE_NOMADA,
@@ -192,6 +196,15 @@ export default function RequisitosNomadaDigitalPage() {
         </p>
         <p className={styles.heroLaw}>Ley 28/2022 de Startups · RD 1008/2023</p>
       </header>
+
+      <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="requisitos-nomada-digital-disclaimer"
+      />
 
       {/* Selector de perfil */}
       <section className={styles.perfilSection}>
@@ -750,6 +763,7 @@ export default function RequisitosNomadaDigitalPage() {
         </section>
       </EducationalSection>
 
+      <RelatedApps apps={getRelatedApps('requisitos-nomada-digital')} />
       <ShareCard appName="requisitos-nomada-digital" />
       <Footer appName="requisitos-nomada-digital" />
     </div>

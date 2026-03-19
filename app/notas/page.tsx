@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './Notas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Categorías disponibles
@@ -202,6 +202,13 @@ export default function NotasPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="notas-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de crear/editar nota */}

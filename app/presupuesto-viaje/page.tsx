@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import { jsonLd } from './metadata';
@@ -182,6 +182,13 @@ export default function PresupuestoViaje() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="presupuesto-viaje-disclaimer"
+      />
 
       <main className={styles.main}>
         {/* Configuración general del viaje */}

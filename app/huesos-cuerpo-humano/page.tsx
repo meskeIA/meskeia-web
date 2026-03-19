@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './HuesosCuerpoHumano.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   BONES,
@@ -80,6 +80,13 @@ export default function HuesosCuerpoHumanoPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="educational"
+        severity="medium"
+        collapsible={true}
+        context="huesos-cuerpo-humano-disclaimer"
+      />
 
       {/* Buscador y filtros */}
       <div className={styles.filtersSection}>

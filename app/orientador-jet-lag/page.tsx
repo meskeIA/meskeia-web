@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './OrientadorJetLag.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Ciudad {
@@ -185,6 +185,13 @@ export default function SimuladorJetLagPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="medical"
+        severity="medium"
+        collapsible={true}
+        context="orientador-jet-lag-disclaimer"
+      />
 
       <div className={styles.mainGrid}>
         {/* Panel selector */}

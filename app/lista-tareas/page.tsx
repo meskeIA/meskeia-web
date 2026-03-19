@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './ListaTareas.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
@@ -175,6 +175,13 @@ export default function ListaTareasPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="lista-tareas-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de añadir tarea */}

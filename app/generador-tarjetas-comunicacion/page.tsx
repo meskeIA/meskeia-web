@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -192,6 +193,12 @@ export default function GeneradorTarjetasPage() {
       <div className={`noPrint`}>
         <LegalNotice />
       </div>
+
+      <DisclaimerCard
+        variant="medical"
+        severity="high"
+        collapsible={false}
+      />
 
       {/* Selector de vista */}
       <div className={`${styles.vistaTabs} noPrint`} role="tablist" aria-label="Vista de la herramienta">

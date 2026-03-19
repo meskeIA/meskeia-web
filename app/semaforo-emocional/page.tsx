@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -149,6 +150,13 @@ export default function SemaforoEmocionalPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="semaforo-emocional-disclaimer"
+      />
 
       {/* ---- SEMÁFORO ---- */}
       <section className={styles.semaforoSection} aria-label="Selector de estado emocional">

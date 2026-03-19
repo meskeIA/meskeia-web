@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './VitaminasMinerales.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   NUTRIENTS,
@@ -75,6 +75,13 @@ export default function VitaminasMineralesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="educational"
+        severity="medium"
+        collapsible={true}
+        context="vitaminas-minerales-disclaimer"
+      />
 
       {/* Buscador y Filtros */}
       <div className={styles.searchSection}>

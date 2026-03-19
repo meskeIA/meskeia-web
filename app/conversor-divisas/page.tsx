@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatNumber } from '@/lib/formatters';
 import { jsonLd } from './metadata';
@@ -103,6 +103,13 @@ export default function ConversionDivisas() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="conversor-divisas-disclaimer"
+      />
 
       <main className={styles.main}>
         {/* Aviso de uso orientativo */}

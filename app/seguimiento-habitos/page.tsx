@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './SeguimientoHabitos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -444,6 +444,13 @@ export default function SeguimientoHabitosPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="seguimiento-habitos-disclaimer"
+      />
 
       {/* Navegación */}
       <div className={styles.navegacion}>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './MatrizEisenhower.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -161,6 +161,13 @@ export default function MatrizEisenhowerPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="matriz-eisenhower-disclaimer"
+      />
 
       {/* Input para nueva tarea */}
       <div className={styles.inputSection}>

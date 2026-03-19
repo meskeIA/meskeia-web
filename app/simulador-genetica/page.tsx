@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './SimuladorGenetica.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   useGeneticSimulation,
@@ -151,6 +151,13 @@ export default function SimuladorGeneticaPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="educational"
+        severity="medium"
+        collapsible={true}
+        context="simulador-genetica-disclaimer"
+      />
 
       {/* Selector de Organismo */}
       <div className={styles.organismSelector}>
