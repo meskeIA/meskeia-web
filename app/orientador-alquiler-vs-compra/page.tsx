@@ -173,7 +173,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
       {/* Disclaimer Legal */}
       <DisclaimerCard
         variant="financial"
-        severity="high"
+        severity="critical"
         collapsible={false}
         context="alquiler-vs-compra"
       >

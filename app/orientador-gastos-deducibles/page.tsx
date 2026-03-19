@@ -185,7 +185,7 @@ export default function OrientadorGastosDeduciblesPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="high" />
 
       {/* Banner informativo */}
       <div className={styles.infoBanner}>

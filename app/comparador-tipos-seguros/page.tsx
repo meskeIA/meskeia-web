@@ -328,7 +328,7 @@ export default function ComparadorTiposSegurosPage() {
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="financial"
-        severity="medium"
+        severity="high"
         context="comparador-tipos-seguros"
       />
 

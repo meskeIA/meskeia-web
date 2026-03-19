@@ -253,7 +253,7 @@ export default function CalculadoraCaloriasPage() {
       <DisclaimerCard
         variant="medical"
         severity="high"
-        collapsible={true}
+        collapsible={false}
         context="calculadora-calorias-ejercicio"
       >
         <p>

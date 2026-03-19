@@ -279,7 +279,7 @@ export default function CalculadoraRoommatesPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="medium"
+        severity="critical"
         context="calculadora-roommates"
         collapsible={false}
       />

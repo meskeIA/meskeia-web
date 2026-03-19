@@ -342,7 +342,7 @@ export default function GeneradorNombresEmpresaPage() {
         variant="financial"
         severity="high"
         context="generador-nombres-empresa"
-        collapsible={true}
+        collapsible={false}
       />
 
       

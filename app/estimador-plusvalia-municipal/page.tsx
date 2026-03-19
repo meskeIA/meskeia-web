@@ -388,7 +388,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
       </div>
 
       {/* DisclaimerCard — siempre visible, fuera de cualquier toggle */}
-      <DisclaimerCard variant="financial" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Aviso adicional específico IIVTNU */}
       <div className={styles.avisoEspecifico}>

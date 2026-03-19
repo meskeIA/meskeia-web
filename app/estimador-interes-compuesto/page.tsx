@@ -119,7 +119,7 @@ export default function InteresCompuestoPage() {
       <DisclaimerCard
         variant="financial"
         severity="high"
-        collapsible={true}
+        collapsible={false}
         context="estimador-interes-compuesto"
       >
         <p>

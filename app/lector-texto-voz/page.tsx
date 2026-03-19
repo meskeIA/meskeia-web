@@ -175,7 +175,7 @@ export default function LectorTextoVozPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="general" severity="low" context="lector-texto-voz">
+      <DisclaimerCard variant="general" severity="high" context="lector-texto-voz">
         Esta herramienta de lectura en voz alta es un <strong>apoyo digital de accesibilidad</strong>. No sustituye a logopedas, terapeutas del lenguaje ni especialistas en comunicación aumentativa. Si usas este lector como soporte para una discapacidad o condición diagnosticada, consulta con tu equipo terapéutico.
       </DisclaimerCard>
 

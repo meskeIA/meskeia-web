@@ -282,7 +282,7 @@ export default function OrientacionTramitacionHerenciasPage() {
       <LegalNotice />
 
       {/* Disclaimer — siempre visible */}
-      <DisclaimerCard variant="financial" severity="high" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* PASO 1: Cuestionario */}
       <section className={styles.seccion}>

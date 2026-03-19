@@ -319,7 +319,7 @@ export default function OrientadorInteresesDemoraPage() {
       </div>
 
       {/* DisclaimerCard — siempre visible */}
-      <DisclaimerCard variant="financial" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Aviso específico */}
       <div className={styles.avisoEspecifico}>

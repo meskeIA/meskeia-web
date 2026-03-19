@@ -763,7 +763,7 @@ export default function CalculadoraHuellaCarbono() {
 
       <DisclaimerCard
         variant="educational"
-        severity="low"
+        severity="critical"
         context="calculadora-huella-carbono"
         collapsible={false}
       >

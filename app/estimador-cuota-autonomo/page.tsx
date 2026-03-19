@@ -240,7 +240,7 @@ export default function EstimadorCuotaAutonomoPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Referencia Normativa */}
       <div className={styles.normativaBox}>

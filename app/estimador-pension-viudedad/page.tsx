@@ -190,7 +190,8 @@ export default function EstimadorPensionViudedad() {
         <p className={styles.subtitle}>Seguridad Social · Cuantía orientativa 2025 · Porcentajes 52% / 60% / 70%</p>
       </header>
 
-      <DisclaimerCard variant="financial">
+      <DisclaimerCard variant="financial"
+        severity="critical">
         <span>
           Esta herramienta es <strong>SOLO orientativa</strong>. El cálculo real de la pensión de viudedad lo realiza el INSS con todos los datos de cotización del causante.
           <br /><strong>Solicita siempre la pensión</strong> en cualquier oficina de la Seguridad Social o a través de Import@SS, aunque no estés seguro de tener derecho: el INSS resolverá oficialmente.

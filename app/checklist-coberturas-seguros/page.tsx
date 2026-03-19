@@ -302,7 +302,7 @@ export default function ChecklistCoberturasSeguroPage() {
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="financial"
-        severity="medium"
+        severity="high"
         context="checklist-coberturas-seguros"
         collapsible={false}
       />

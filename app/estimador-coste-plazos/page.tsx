@@ -325,7 +325,7 @@ export default function CalculadoraCostePlazosPage() {
         variant="financial"
         severity="high"
         context="estimador-coste-plazos"
-        collapsible={true}
+        collapsible={false}
       />
 
 

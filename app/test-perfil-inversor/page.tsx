@@ -355,7 +355,7 @@ export default function TestPerfilInversorPage() {
           variant="financial"
           severity="high"
           context="test-perfil-inversor"
-          collapsible={true}
+          collapsible={false}
         />
 
         <EducationalSection
@@ -1102,7 +1102,7 @@ export default function TestPerfilInversorPage() {
         variant="financial"
         severity="high"
         context="test-perfil-inversor"
-        collapsible={true}
+        collapsible={false}
       />
 
       

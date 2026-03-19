@@ -791,7 +791,7 @@ export default function SimuladorCarteraPage() {
         variant="financial"
         severity="high"
         context="estimador-cartera-inversion"
-        collapsible={true}
+        collapsible={false}
       />
 
       

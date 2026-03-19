@@ -302,7 +302,7 @@ export default function CalculadoraReformasHogar() {
           </p>
         )}
 
-        <DisclaimerCard variant="financial" severity="medium">
+        <DisclaimerCard variant="financial" severity="critical">
           <p>
             Los precios mostrados son <strong>estimaciones orientativas</strong> basadas en rangos
             de mercado en España 2026. El coste real puede variar significativamente según la

@@ -150,7 +150,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

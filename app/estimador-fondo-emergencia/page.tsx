@@ -259,7 +259,7 @@ export default function CalculadoraFondoEmergenciaPage() {
         variant="financial"
         severity="high"
         context="estimador-fondo-emergencia"
-        collapsible={true}
+        collapsible={false}
       />
 
 

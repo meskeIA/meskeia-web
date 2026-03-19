@@ -149,7 +149,8 @@ export default function TestFragilidad() {
         <p className={styles.subtitle}>Escala FRAIL · 5 ítems validados · Orientación preventiva para mayores</p>
       </header>
 
-      <DisclaimerCard variant="medical">
+      <DisclaimerCard variant="medical"
+        severity="critical">
         <span>
           Este test es <strong>SOLO orientativo</strong> basado en la escala FRAIL (Morley et al., 2012), validada internacionalmente para la detección precoz de fragilidad.
           <br /><strong>No sustituye</strong> a una Valoración Geriátrica Integral realizada por un profesional sanitario.

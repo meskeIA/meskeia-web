@@ -1,0 +1,143 @@
+/* DataReference.module.css */
+
+.dataReference {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background: #f0f7fb;
+  border: 1px solid #b8d8e8;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  color: #444;
+}
+
+[data-theme='dark'] .dataReference {
+  background: #1a2832;
+  border-color: #2e5068;
+  color: #b0c4d4;
+}
+
+/* Header */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.titulo {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #2e86ab;
+}
+
+[data-theme='dark'] .titulo {
+  color: #7fb3d3;
+}
+
+/* Body */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.fila {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  line-height: 1.5;
+}
+
+.etiqueta {
+  font-weight: 600;
+  white-space: nowrap;
+  color: #555;
+}
+
+[data-theme='dark'] .etiqueta {
+  color: #8fa8b8;
+}
+
+.valor {
+  color: #333;
+}
+
+[data-theme='dark'] .valor {
+  color: #c8dce8;
+}
+
+/* Enlace fuente oficial */
+
+.enlace {
+  color: #2e86ab;
+  text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.enlace:hover {
+  color: #48a9a6;
+}
+
+.enlace:focus-visible {
+  outline: 2px solid #2e86ab;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+[data-theme='dark'] .enlace {
+  color: #7fb3d3;
+}
+
+[data-theme='dark'] .enlace:hover {
+  color: #48a9a6;
+}
+
+/* Nota aclaratoria */
+
+.nota {
+  margin-top: 0.25rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 6px;
+  font-style: italic;
+  color: #555;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .nota {
+  background: rgba(127, 179, 211, 0.1);
+  color: #8fa8b8;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .dataReference {
+    padding: 0.75rem 1rem;
+  }
+
+  .fila {
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+}
+
+/* Animaciones respetuosas */
+
+@media (prefers-reduced-motion: reduce) {
+  .enlace {
+    transition: none !important;
+  }
+}

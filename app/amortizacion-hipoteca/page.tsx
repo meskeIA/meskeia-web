@@ -327,8 +327,8 @@ export default function AmortizacionHipotecaPage() {
       {/* Disclaimer Legal */}
       <DisclaimerCard
         variant="financial"
-        severity="high"
-        collapsible={true}
+        severity="critical"
+        collapsible={false}
         context="amortizacion-hipoteca"
       >
         <p>

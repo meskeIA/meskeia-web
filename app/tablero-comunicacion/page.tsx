@@ -219,7 +219,7 @@ export default function TableroComunicacionPage() {
 
       <DisclaimerCard
         variant="general"
-        severity="medium"
+        severity="high"
         title="Herramienta de apoyo a la comunicación"
       >
         Este tablero es un recurso de apoyo digital y no sustituye a los sistemas AAC

@@ -181,7 +181,8 @@ export default function OrientadorGradoDependencia() {
         <p className={styles.subtitle}>Baremo BVD orientativo · Ley 39/2006 LAPAD · Prestaciones del SAAD</p>
       </header>
 
-      <DisclaimerCard variant="general">
+      <DisclaimerCard variant="general"
+        severity="critical">
         <span>
           Este orientador es <strong>SOLO indicativo</strong> basado en las actividades evaluadas por el Baremo de Valoración de la Dependencia (BVD, RD 174/2011).
           <br /><strong>El grado oficial</strong> solo puede determinarlo un técnico del IMSERSO o la Comunidad Autónoma mediante una valoración presencial.

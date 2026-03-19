@@ -695,7 +695,7 @@ export default function CalculadoraInversionesPage() {
         variant="financial"
         severity="high"
         context="estimador-inversiones"
-        collapsible={true}
+        collapsible={false}
       />
 
 

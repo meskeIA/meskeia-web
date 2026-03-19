@@ -118,7 +118,8 @@ export default function EstimadorPensionPublica() {
         <p className={styles.subtitle}>Orientación sobre tu pensión de jubilación · Seguridad Social 2025</p>
       </header>
 
-      <DisclaimerCard variant="financial">
+      <DisclaimerCard variant="financial"
+        severity="critical">
         <span>
           Esta herramienta es SOLO orientativa e informativa sobre la pensión pública española.
           <br /><strong>No es</strong> asesoramiento previsional personalizado ni sustituye al simulador oficial de la SS.

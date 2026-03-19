@@ -239,7 +239,7 @@ export default function GuiaRespiracionPage() {
 
       <DisclaimerCard
         variant="medical"
-        severity="medium"
+        severity="high"
         title="Herramienta de bienestar"
       >
         Estas técnicas son ejercicios de bienestar general. Si tienes una condición

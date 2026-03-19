@@ -117,6 +117,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
 
       <DisclaimerCard
         variant="financial"
+        severity="critical"
         collapsible={false}
         context="Bono Joven al Alquiler: la convocatoria, requisitos y cuantías exactas pueden variar según la Comunidad Autónoma y el año de solicitud. Consulta siempre con tu CA antes de tomar decisiones económicas."
       />

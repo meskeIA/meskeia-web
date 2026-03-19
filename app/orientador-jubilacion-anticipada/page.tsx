@@ -135,7 +135,8 @@ export default function OrientadorJubilacionAnticipada() {
         <p className={styles.subtitle}>¿Puedes jubilarte antes? Descubre los requisitos y el impacto en tu pensión · SS 2025</p>
       </header>
 
-      <DisclaimerCard variant="financial">
+      <DisclaimerCard variant="financial"
+        severity="critical">
         <span>
           Esta herramienta es SOLO orientativa. Los datos de la Seguridad Social pueden cambiar con cada reforma legislativa.
           <br /><strong>No es</strong> asesoramiento previsional ni jurídico personalizado.

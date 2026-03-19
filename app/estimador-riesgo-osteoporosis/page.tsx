@@ -126,7 +126,8 @@ export default function EstimadorRiesgoOsteoporosis() {
         <p className={styles.subtitle}>Test de factores de riesgo validados (FRAX/IOF) · Orientación preventiva</p>
       </header>
 
-      <DisclaimerCard variant="medical">
+      <DisclaimerCard variant="medical"
+        severity="critical">
         <span>
           Este test es <strong>SOLO orientativo</strong> basado en factores de riesgo validados internacionalmente (FRAX / IOF One-Minute Test).
           <br /><strong>No es</strong> un diagnóstico médico de osteoporosis. El diagnóstico requiere densitometría ósea (DEXA) interpretada por un médico.

@@ -121,7 +121,8 @@ export default function OrientadorJubilacionParcial() {
         <p className={styles.subtitle}>Trabaja y cobra pensión a la vez · Requisitos y cálculo SS 2025</p>
       </header>
 
-      <DisclaimerCard variant="financial">
+      <DisclaimerCard variant="financial"
+        severity="critical">
         <span>
           Esta herramienta es SOLO orientativa. Los requisitos concretos dependen de tu situación personal, convenio colectivo y acuerdo con el empleador.
           <br /><strong>No es</strong> asesoramiento previsional ni laboral personalizado.

@@ -258,7 +258,7 @@ export default function EstimadorSueldoNetoPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="high" />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

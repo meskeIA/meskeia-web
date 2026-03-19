@@ -183,7 +183,7 @@ export default function CalculadoraProductividadPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="medium"
+        severity="high"
         context="calculadora-productividad"
         collapsible={false}
       />

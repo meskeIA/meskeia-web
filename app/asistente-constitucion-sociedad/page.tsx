@@ -279,7 +279,7 @@ export default function AsistenteConstitucionSociedadPage() {
       </header>
 
       <LegalNotice />
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="high" />
 
       {/* Selector tipo sociedad */}
       <section className={styles.selectorSection}>

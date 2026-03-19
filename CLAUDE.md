@@ -111,6 +111,50 @@ Las Guías son **landing pages** que agrupan herramientas para un **proceso de d
 
 ---
 
+## Política de Disclaimers (OBLIGATORIO)
+
+**Documento completo**: `DISCLAIMER-POLICY.md` — leer SIEMPRE antes de crear una app.
+
+### Resumen ejecutivo
+
+Cada app tiene un **nivel de riesgo** que determina el disclaimer obligatorio:
+
+| Nivel | Cuándo | Colapsable | Severidad |
+|-------|--------|:----------:|:---------:|
+| **1 CRÍTICO** | Fiscal, herencias, hipotecas, orientación médica clínica | ❌ Nunca | `critical` |
+| **2 ALTO** | Financiero general, salud/hábitos, autónomos sin fiscal | ❌ Nunca | `high` |
+| **3 MEDIO** | Planificadores cotidianos, productividad | ✅ sessionStorage | `medium` |
+| **4 INFORMATIVO** | Educativo puro, quizzes, generadores | ✅ localStorage | `low` |
+
+### Regla fiscal — CRÍTICA
+
+> **Cualquier componente fiscal** (IRPF, IVA, IS, plusvalías, retenciones, cuotas SS...) → **Nivel 1 CRÍTICO** obligatorio.
+
+### Regla multi-suite
+
+> Cuando una app pertenece a varias suites → aplicar siempre el **nivel más alto**.
+
+### Componente DataReference (nuevo)
+
+Apps con datos normativos con fecha de caducidad (tipos fiscales, tramos, intereses...) deben incluir `<DataReference>` inmediatamente después del `<DisclaimerCard>`:
+
+```tsx
+import DataReference from '@/components/DataReference';
+import { FISCAL_IRPF_META } from '@/data/fiscal';
+
+<DisclaimerCard variant="financial" severity="critical" />
+<DataReference
+  normativa="IRPF 2025"
+  fuente={FISCAL_IRPF_META.fuente}
+  verificado={FISCAL_IRPF_META.verificado}
+  urlOficial={FISCAL_IRPF_META.urlOficial}
+/>
+```
+
+**Nivel por defecto de cada suite** → ver tabla completa en `DISCLAIMER-POLICY.md`.
+
+---
+
 ## Reglas OBLIGATORIAS al crear nuevas apps
 
 ### 1. Cada app DEBE tener al menos una Suite
@@ -334,6 +378,7 @@ git push origin main
 ## Para instrucciones completas
 
 - **Global**: `~/.claude/CLAUDE.md` (reglas universales)
+- **Disclaimers**: `DISCLAIMER-POLICY.md` (política completa — niveles, textos, colapsabilidad)
 - **Componentes**: `components/README.md`
 - **Templates**: `templates/README.md`
 - **CHANGELOG**: `CHANGELOG.md` (historial completo)
@@ -342,11 +387,11 @@ git push origin main
 
 ## Control de versiones
 
-**Versión actual**: 1.5.0 (2026-02-11) - Stack tRPC
+**Versión actual**: 1.6.0 (2026-03-19) - Política de Disclaimers
 
 **Ver historial completo**: `CHANGELOG.md`
 
 ---
 
-**Última actualización**: 2026-02-16
+**Última actualización**: 2026-03-19
 **Proyecto**: meskeIA Web (https://meskeia.com)

@@ -442,7 +442,7 @@ export default function GuiaReclamarSeguroCochePage() {
         variant="financial"
         severity="high"
         context="guia-reclamar-seguro-coche"
-        collapsible={true}
+        collapsible={false}
       />
 
       

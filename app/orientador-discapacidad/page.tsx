@@ -274,7 +274,7 @@ export default function OrientadorDiscapacidadPage() {
       </header>
 
       {/* DISCLAIMER MÉDICO — SIEMPRE VISIBLE */}
-      <DisclaimerCard variant="medical" severity="high" />
+      <DisclaimerCard variant="medical" severity="critical" />
 
       <LegalNotice />
 

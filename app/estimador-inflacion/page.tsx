@@ -704,7 +704,7 @@ export default function CalculadoraInflacionPage() {
         variant="financial"
         severity="high"
         context="estimador-inflacion"
-        collapsible={true}
+        collapsible={false}
       />
 {/* Contenido educativo */}
       <EducationalSection

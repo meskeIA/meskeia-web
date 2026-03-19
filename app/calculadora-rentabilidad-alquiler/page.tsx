@@ -545,9 +545,9 @@ export default function CalculadoraRentabilidadAlquilerPage() {
       {/* DISCLAIMER FINANCIERO */}
       <DisclaimerCard
         variant="financial"
-        severity="medium"
+        severity="critical"
         context="calculadora-rentabilidad-alquiler"
-        collapsible={true}
+        collapsible={false}
       />
 
       {/* CONTENIDO EDUCATIVO */}

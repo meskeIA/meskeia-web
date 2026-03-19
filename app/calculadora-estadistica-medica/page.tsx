@@ -645,7 +645,7 @@ export default function CalculadoraEstadisticaMedicaPage() {
       </div>
 
 
-      <DisclaimerCard variant="medical" severity="high" collapsible={true} context="calculadora-estadistica-medica">
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} context="calculadora-estadistica-medica">
         <p>Esta calculadora es <strong>exclusivamente educativa</strong> para estudiantes de ciencias de la salud. <strong>Limitaciones críticas:</strong></p>
         <ul className={styles.disclaimerList}>
           <li><strong>NO usar para decisiones clínicas reales</strong>: Los cálculos requieren validación con datos clínicos completos y contexto del paciente</li>

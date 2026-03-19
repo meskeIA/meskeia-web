@@ -693,9 +693,9 @@ export default function ComparadorVehiculosPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="high"
+        severity="critical"
         context="comparador-vehiculos"
-        collapsible={true}
+        collapsible={false}
       />
 
       

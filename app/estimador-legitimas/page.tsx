@@ -265,7 +265,8 @@ export default function EstimadorLegitimas() {
         <p className={styles.subtitle}>Herencia forzosa por régimen civil · Código Civil + Derechos Forales · España 2025</p>
       </header>
 
-      <DisclaimerCard variant="financial">
+      <DisclaimerCard variant="financial"
+        severity="critical">
         <span>
           Este estimador es <strong>SOLO orientativo</strong> para comparar regímenes de legítima según el derecho civil aplicable.
           <br /><strong>No es</strong> asesoramiento jurídico ni fiscal personalizado. La liquidación real de una herencia depende de múltiples factores (bienes concretos, deudas, donaciones previas, impuesto de sucesiones, etc.).

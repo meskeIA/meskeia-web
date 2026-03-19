@@ -129,7 +129,8 @@ export default function AdaptacionHogar() {
         <p className={styles.subtitle}>Checklist de accesibilidad para mayores · Costes orientativos y ayudas públicas</p>
       </header>
 
-      <DisclaimerCard variant="general">
+      <DisclaimerCard variant="general"
+        severity="critical">
         <span>
           Los costes son <strong>estimaciones orientativas</strong> nacionales (2025). Los precios reales varían por zona geográfica, calidades y mano de obra.
           <br />Las ayudas públicas dependen de la comunidad autónoma, municipio y situación personal. Consulta en tu ayuntamiento o servicios sociales.

@@ -436,7 +436,7 @@ export default function AsistenteAltaAutonomoPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="high" />
 
       {/* Info rápida */}
       <section className={styles.infoRapida}>

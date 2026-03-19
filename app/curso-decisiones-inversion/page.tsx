@@ -70,7 +70,7 @@ export default function CursoDecisionesInversionPage() {
         variant="financial"
         severity="high"
         context="curso-decisiones-inversion"
-        collapsible={true}
+        collapsible={false}
       />
 
       

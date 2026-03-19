@@ -20,6 +20,9 @@ export type { RelatedApp } from './RelatedApps';
 export { default as DisclaimerCard } from './DisclaimerCard';
 export type { DisclaimerVariant, DisclaimerSeverity } from './DisclaimerCard';
 
+// Referencia de datos normativos (complementa DisclaimerCard)
+export { default as DataReference } from './DataReference';
+
 // Componente de última actualización
 export { default as LastUpdated } from './LastUpdated';
 

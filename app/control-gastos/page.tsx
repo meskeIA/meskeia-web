@@ -393,7 +393,7 @@ export default function ControlGastosPage() {
         variant="financial"
         severity="high"
         context="control-gastos"
-        collapsible={true}
+        collapsible={false}
       />
 
       

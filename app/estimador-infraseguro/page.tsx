@@ -217,7 +217,7 @@ export default function CalculadoraInfraseguroPage() {
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="financial"
-        severity="high"
+        severity="critical"
         context="estimador-infraseguro"
         collapsible={false}
       />

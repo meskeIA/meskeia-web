@@ -248,7 +248,7 @@ export default function CalculadoraPropinas() {
 
         <DisclaimerCard
           variant="financial"
-          severity="medium"
+          severity="high"
           context="calculadora-propinas"
           collapsible={false}
         />

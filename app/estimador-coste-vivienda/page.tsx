@@ -111,8 +111,8 @@ export default function CalculadoraCosteViviendaPage() {
       {/* Disclaimer Legal */}
       <DisclaimerCard
         variant="financial"
-        severity="medium"
-        collapsible={true}
+        severity="critical"
+        collapsible={false}
         context="coste-vivienda"
       >
         <p>

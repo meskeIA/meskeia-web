@@ -473,8 +473,8 @@ export default function SimuladorPrestamosPage() {
       {/* Disclaimer Legal */}
       <DisclaimerCard
         variant="financial"
-        severity="high"
-        collapsible={true}
+        severity="critical"
+        collapsible={false}
         context="estimador-prestamos"
       >
         <p>

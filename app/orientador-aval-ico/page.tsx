@@ -127,6 +127,7 @@ export default function OrientadorAvalIcoPage() {
 
       <DisclaimerCard
         variant="financial"
+        severity="critical"
         collapsible={false}
         context="El Aval ICO es gestionado por entidades financieras adheridas al programa. Esta herramienta es orientativa: los criterios de aprobación los fija el banco. Consulta siempre con tu entidad financiera y con el ICO (ico.es) antes de tomar decisiones."
       />

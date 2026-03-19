@@ -240,7 +240,7 @@ export default function CalculadoraIvaPage() {
         variant="financial"
         severity="critical"
         context="calculadora-iva"
-        collapsible={true}
+        collapsible={false}
       />
 
       {/* ========== SECCIÓN 1: HTML CODE EXPORTABLE ========== */}

@@ -263,7 +263,7 @@ export default function CalculadoraSuenoPage() {
 
       
 
-      <DisclaimerCard variant="medical" severity="high" collapsible={true} context="calculadora-sueno">
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} context="calculadora-sueno">
         <p>Esta calculadora usa ciclos promedio de 90 minutos. <strong>Limitaciones importantes:</strong></p>
         <ul className={styles.disclaimerList}>
           <li><strong>Los ciclos varían individualmente</strong>: Pueden durar 80-110 minutos según edad, genética y estado de salud</li>

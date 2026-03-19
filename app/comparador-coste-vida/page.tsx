@@ -147,7 +147,7 @@ export default function ComparadorCosteVida() {
       <LegalNotice />
 
       <main className={styles.main}>
-        <DisclaimerCard variant="financial" severity="medium" collapsible={false}>
+        <DisclaimerCard variant="financial" severity="high" collapsible={false}>
           <strong>Datos de referencia 2024-2025.</strong> Las cifras son estimaciones basadas en Numbeo y otras fuentes públicas. Los precios reales varían según barrio, estilo de vida y momento del año. No usar como base única para decisiones de mudanza sin contrastar con fuentes actualizadas.
         </DisclaimerCard>
 

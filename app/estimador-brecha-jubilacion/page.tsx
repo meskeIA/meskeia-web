@@ -105,7 +105,8 @@ export default function EstimadorBrechaJubilacion() {
         <p className={styles.subtitle}>Descubre cuánto perderás al jubilarte y cuánto necesitas ahorrar</p>
       </header>
 
-      <DisclaimerCard variant="financial">
+      <DisclaimerCard variant="financial"
+        severity="critical">
         <span>
           Esta herramienta es SOLO orientativa e informativa.
           <br /><strong>No es</strong> asesoramiento financiero ni previsional personalizado.

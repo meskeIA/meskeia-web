@@ -694,9 +694,9 @@ export default function PlanificadorBodaPage() {
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="general"
-        severity="low"
+        severity="critical"
         context="planificador-boda"
-        collapsible={true}
+        collapsible={false}
       />
 
       

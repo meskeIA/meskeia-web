@@ -153,7 +153,8 @@ export default function ResidenciaVsCuidadoCasa() {
         <p className={styles.subtitle}>Compara costes y factores de las opciones de cuidado para mayores · 2025</p>
       </header>
 
-      <DisclaimerCard variant="financial">
+      <DisclaimerCard variant="financial"
+        severity="high">
         <span>
           Los costes son <strong>estimaciones orientativas</strong> con medias nacionales 2025. Los precios reales varían significativamente por comunidad autónoma, calidad del servicio y situación personal.
           <br /><strong>No es</strong> asesoramiento financiero ni de servicios sociales personalizado.

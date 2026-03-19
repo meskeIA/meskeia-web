@@ -618,7 +618,7 @@ export default function TestHabitosPage() {
 
       
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} context="test-habitos-saludables">
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} context="test-habitos-saludables">
         <p>Este test es una <strong>herramienta de autoevaluación orientativa</strong> sobre hábitos saludables:</p>
         <ul className={styles.disclaimerList}>
           <li><strong>No constituye un diagnóstico médico</strong>: Los resultados son informativos, no diagnósticos</li>

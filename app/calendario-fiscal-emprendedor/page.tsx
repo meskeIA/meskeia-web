@@ -584,7 +584,7 @@ export default function CalendarioFiscalPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Selector de tipo */}
       <div className={styles.selectorTipo}>

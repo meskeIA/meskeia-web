@@ -170,7 +170,7 @@ export default function ComparadorAutonomoVsSLPage() {
         </p>
       </header>
 
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="high" />
 
       {/* Configuración */}
       <div className={styles.configSection}>

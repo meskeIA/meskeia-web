@@ -505,7 +505,7 @@ export default function PlanificadorRutinasPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="general" severity="low" context="planificador-rutinas">
+      <DisclaimerCard variant="general" severity="high" context="planificador-rutinas">
         Este planificador visual es un <strong>apoyo para la organización de rutinas</strong>. No sustituye la intervención de educadores especiales, terapeutas ocupacionales ni psicólogos especializados en TEA, TDAH o discapacidad cognitiva.
       </DisclaimerCard>
 

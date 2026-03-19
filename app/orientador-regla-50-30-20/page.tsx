@@ -286,7 +286,7 @@ export default function CalculadoraRegla503020Page() {
         variant="financial"
         severity="high"
         context="orientador-regla-50-30-20"
-        collapsible={true}
+        collapsible={false}
       />
 
       

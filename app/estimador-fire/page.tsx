@@ -274,7 +274,7 @@ export default function CalculadoraFIREPage() {
         variant="financial"
         severity="high"
         context="estimador-fire"
-        collapsible={true}
+        collapsible={false}
       />
 
 

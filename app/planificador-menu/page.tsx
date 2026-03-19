@@ -661,9 +661,9 @@ export default function PlanificadorMenuPage() {
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
         variant="general"
-        severity="low"
+        severity="critical"
         context="planificador-menu"
-        collapsible={true}
+        collapsible={false}
       />
 
       

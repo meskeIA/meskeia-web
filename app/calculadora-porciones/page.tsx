@@ -351,7 +351,7 @@ export default function CalculadoraPorcionesPage() {
 
       
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} context="calculadora-porciones">
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} context="calculadora-porciones">
         <p>Este método de porciones es una <strong>guía visual orientativa</strong> basada en recomendaciones nutricionales generales:</p>
         <ul className={styles.disclaimerList}>
           <li><strong>Las necesidades varían individualmente</strong>: Según edad, sexo, actividad física y objetivos personales</li>

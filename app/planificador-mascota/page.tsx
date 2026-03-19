@@ -835,7 +835,7 @@ export default function PlanificadorMascotaPage() {
 
       
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} context="planificador-mascota">
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} context="planificador-mascota">
         <p>Este planificador proporciona <strong>información orientativa</strong> basada en recomendaciones generales:</p>
         <ul className={styles.disclaimerList}>
           <li><strong>Cada mascota es única</strong>: El calendario puede variar según raza, edad y condiciones de salud</li>

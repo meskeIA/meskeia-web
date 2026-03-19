@@ -965,9 +965,9 @@ export default function CalculadoraJubilacionPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="high"
+        severity="critical"
         context="estimador-jubilacion"
-        collapsible={true}
+        collapsible={false}
       />
 
       

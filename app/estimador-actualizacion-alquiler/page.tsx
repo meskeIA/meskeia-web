@@ -258,7 +258,7 @@ export default function EstimadorActualizacionAlquilerPage() {
       </div>
 
       {/* Disclaimer financiero — SIEMPRE VISIBLE */}
-      <DisclaimerCard variant="financial" severity="high" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Sección educativa */}
       <EducationalSection

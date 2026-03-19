@@ -409,7 +409,7 @@ export default function GuiaSeguroViaje() {
         </section>
 
         {/* ── Disclaimer ───────────────────────────────────── */}
-        <DisclaimerCard variant="general" severity="medium">
+        <DisclaimerCard variant="general" severity="high">
           <p>
             <strong>Esta guía es orientativa e informativa.</strong> Las recomendaciones se basan
             en criterios generales y pueden no reflejar el contenido exacto de una póliza concreta.

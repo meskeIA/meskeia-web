@@ -177,9 +177,9 @@ export default function CalculadoraDescuentosPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="medium"
+        severity="high"
         context="calculadora-descuentos"
-        collapsible={true}
+        collapsible={false}
       />
 
 

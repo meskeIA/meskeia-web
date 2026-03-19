@@ -13,8 +13,14 @@ interface DisclaimerCardProps {
   title?: string;
   children?: ReactNode;
   showTermsLink?: boolean;
+  /**
+   * Política de disclaimers meskeIA (DISCLAIMER-POLICY.md):
+   * - severity "critical" o "high" → collapsible ignorado, siempre expandido
+   * - severity "medium" → si true, usa sessionStorage (se expande en cada sesión)
+   * - severity "low" → si true, usa localStorage (persiste entre sesiones)
+   */
   collapsible?: boolean;
-  context?: string; // Para identificar en localStorage (ej: 'mortgage-guide')
+  context?: string; // Clave de storage (ej: 'planificador-menu')
 }
 
 const DEFAULT_TITLES: Record<DisclaimerVariant, string> = {
@@ -33,6 +39,9 @@ const DEFAULT_ICONS: Record<DisclaimerVariant, string> = {
   technical: '🔧',
 };
 
+// Severidades que NUNCA pueden ser colapsadas (Niveles 1 y 2 de la política)
+const NON_COLLAPSIBLE_SEVERITIES: DisclaimerSeverity[] = ['critical', 'high'];
+
 export default function DisclaimerCard({
   variant,
   severity = 'high',
@@ -43,36 +52,43 @@ export default function DisclaimerCard({
   context,
 }: DisclaimerCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [hasBeenRead, setHasBeenRead] = useState(false);
 
-  // Cargar estado de localStorage si es collapsible
+  // Determinar si realmente puede ser colapsable según la política
+  const isCollapsibleAllowed = collapsible && !NON_COLLAPSIBLE_SEVERITIES.includes(severity);
+
+  // severity "medium" → sessionStorage | severity "low" → localStorage
+  const useSessionStorage = severity === 'medium';
+
   useEffect(() => {
-    if (collapsible && context) {
-      const storageKey = `disclaimer_read_${context}`;
-      const wasRead = localStorage.getItem(storageKey) === 'true';
-      setHasBeenRead(wasRead);
-      setIsExpanded(!wasRead); // Si ya fue leído, comienza colapsado
+    if (!isCollapsibleAllowed || !context) return;
+
+    const storageKey = `disclaimer_read_${context}`;
+    const storage = useSessionStorage ? sessionStorage : localStorage;
+    const wasRead = storage.getItem(storageKey) === 'true';
+
+    // Solo colapsar automáticamente en nivel "low" (localStorage persiste)
+    // En nivel "medium" (sessionStorage) siempre expandido al iniciar sesión
+    if (!useSessionStorage && wasRead) {
+      setIsExpanded(false);
     }
-  }, [collapsible, context]);
+  }, [isCollapsibleAllowed, context, useSessionStorage]);
 
   const handleToggle = () => {
-    if (collapsible) {
-      const newExpandedState = !isExpanded;
-      setIsExpanded(newExpandedState);
+    if (!isCollapsibleAllowed) return;
 
-      // Marcar como leído cuando se colapsa por primera vez
-      if (!newExpandedState && context && !hasBeenRead) {
-        const storageKey = `disclaimer_read_${context}`;
-        localStorage.setItem(storageKey, 'true');
-        setHasBeenRead(true);
-      }
+    const newExpandedState = !isExpanded;
+    setIsExpanded(newExpandedState);
+
+    if (!newExpandedState && context) {
+      const storageKey = `disclaimer_read_${context}`;
+      const storage = useSessionStorage ? sessionStorage : localStorage;
+      storage.setItem(storageKey, 'true');
     }
   };
 
   const displayTitle = title || DEFAULT_TITLES[variant];
   const icon = DEFAULT_ICONS[variant];
 
-  // Classes dinámicas
   const cardClasses = [
     styles.disclaimerCard,
     styles[`variant-${variant}`],
@@ -84,14 +100,18 @@ export default function DisclaimerCard({
 
   return (
     <div className={cardClasses} role={severity === 'critical' ? 'alert' : 'note'}>
-      <div className={styles.header} onClick={collapsible ? handleToggle : undefined}>
+      <div
+        className={styles.header}
+        onClick={isCollapsibleAllowed ? handleToggle : undefined}
+        style={isCollapsibleAllowed ? { cursor: 'pointer' } : undefined}
+      >
         <div className={styles.titleWrapper}>
           <span className={styles.icon} aria-hidden="true">
             {icon}
           </span>
           <h3 className={styles.title}>{displayTitle}</h3>
         </div>
-        {collapsible && (
+        {isCollapsibleAllowed && (
           <button
             type="button"
             className={styles.toggleButton}
@@ -105,7 +125,7 @@ export default function DisclaimerCard({
 
       {isExpanded && (
         <div className={styles.content}>
-          {children || <DefaultContent variant={variant} />}
+          {children || <DefaultContent variant={variant} severity={severity} />}
 
           {showTermsLink && (
             <p className={styles.termsLink}>
@@ -120,73 +140,96 @@ export default function DisclaimerCard({
   );
 }
 
-// Contenido por defecto según variante
-function DefaultContent({ variant }: { variant: DisclaimerVariant }) {
+// Contenido estándar según variante y severidad (DISCLAIMER-POLICY.md)
+function DefaultContent({
+  variant,
+  severity,
+}: {
+  variant: DisclaimerVariant;
+  severity: DisclaimerSeverity;
+}) {
+  const isCriticalOrHigh = severity === 'critical' || severity === 'high';
+
   switch (variant) {
     case 'financial':
+      if (isCriticalOrHigh) {
+        return (
+          <>
+            <p>
+              Esta herramienta tiene <strong>carácter exclusivamente orientativo</strong> y no
+              constituye asesoramiento financiero, fiscal ni jurídico. Los resultados son
+              estimaciones basadas en los datos introducidos y pueden no reflejar tu situación real.
+            </p>
+            <p>
+              <strong>
+                La fiscalidad y las decisiones financieras de alto impacto requieren la intervención
+                de un profesional cualificado
+              </strong>{' '}
+              (asesor fiscal, gestor, abogado o entidad financiera regulada).
+            </p>
+            <p className={styles.responsibility}>
+              <strong>TÚ ERES RESPONSABLE</strong> de verificar esta información con un profesional
+              antes de tomar cualquier decisión. meskeIA no ejerce actividades reguladas y no se
+              responsabiliza de las consecuencias derivadas del uso de esta herramienta.
+            </p>
+          </>
+        );
+      }
       return (
         <>
           <p>
-            <strong>Esta herramienta es SOLO EDUCATIVA e INFORMATIVA.</strong>
+            Esta herramienta tiene <strong>carácter orientativo</strong>. Los resultados son
+            estimaciones y no constituyen asesoramiento financiero ni fiscal.
           </p>
-          <ul className={styles.list}>
-            <li>
-              <strong>✗ NO es asesoramiento financiero, legal o fiscal</strong> personalizado
-            </li>
-            <li>
-              <strong>✗ NO reemplaza</strong> consultar con profesionales (banco, asesor, notario)
-            </li>
-            <li>
-              <strong>✗ Los resultados son ESTIMACIONES</strong> basadas en los datos que introduces
-            </li>
-          </ul>
-          <p className={styles.highlight}>
-            <strong>Factores que pueden variar según tu caso:</strong>
-          </p>
-          <ul className={styles.list}>
-            <li>Legislación (impuestos cambian por comunidad autónoma)</li>
-            <li>Tipos de interés y comisiones específicas de tu banco</li>
-            <li>Tu situación crediticia y laboral personal</li>
-            <li>Gastos notariales y registrales de tu zona</li>
-          </ul>
-          <p className={styles.responsibility}>
-            <strong>TÚ ERES RESPONSABLE</strong> de verificar esta información con profesionales
-            cualificados ANTES de tomar decisiones financieras importantes.
+          <p>
+            Te recomendamos contrastar los resultados con un profesional cualificado antes de tomar
+            decisiones importantes.
           </p>
           <p className={styles.limitation}>
-            meskeIA no se responsabiliza de decisiones basadas en estas herramientas.
+            meskeIA no se responsabiliza de decisiones basadas en el uso de esta herramienta.
           </p>
         </>
       );
 
     case 'medical':
+      if (isCriticalOrHigh) {
+        return (
+          <>
+            <p>
+              Esta herramienta tiene <strong>carácter exclusivamente orientativo</strong> y no
+              constituye diagnóstico médico, prescripción ni consejo sanitario. Los resultados son
+              estimaciones de referencia y no reemplazan la valoración clínica individualizada.
+            </p>
+            <p>
+              <strong>
+                Cualquier decisión relacionada con tu salud debe tomarse siempre bajo la supervisión
+                de un médico o profesional sanitario cualificado.
+              </strong>
+            </p>
+            <p className={styles.responsibility}>
+              <strong>TÚ ERES RESPONSABLE</strong> de consultar con un profesional antes de actuar
+              sobre esta información. meskeIA no ejerce actividades sanitarias reguladas y no se
+              responsabiliza de las consecuencias derivadas del uso de esta herramienta.
+            </p>
+            <p className={styles.emergency}>
+              <strong>EMERGENCIAS MÉDICAS:</strong> En caso de síntomas graves, contacta
+              inmediatamente con los servicios de emergencia (112 en España).
+            </p>
+          </>
+        );
+      }
       return (
         <>
           <p>
-            <strong>Esta calculadora es SOLO INFORMATIVA y EDUCATIVA.</strong>
+            Esta herramienta tiene <strong>carácter orientativo</strong>. Los resultados son
+            referencias generales y no sustituyen la valoración de un profesional sanitario.
           </p>
-          <ul className={styles.list}>
-            <li>
-              <strong>✗ NO es un dispositivo médico</strong>
-            </li>
-            <li>
-              <strong>✗ NO realiza diagnósticos</strong>
-            </li>
-            <li>
-              <strong>✗ NO sustituye</strong> la consulta médica profesional
-            </li>
-          </ul>
-          <p className={styles.highlight}>
-            <strong>SIEMPRE consulta con tu médico</strong> antes de tomar decisiones relacionadas
-            con tu salud, dieta, ejercicio o tratamiento médico.
-          </p>
-          <p className={styles.emergency}>
-            <strong>EMERGENCIAS MÉDICAS:</strong> En caso de síntomas graves, contacta
-            inmediatamente con servicios de emergencia (112 en España).
+          <p>
+            Consulta siempre con tu médico o especialista antes de realizar cambios significativos
+            en tu salud o hábitos.
           </p>
           <p className={styles.limitation}>
-            meskeIA no asume ninguna responsabilidad por decisiones tomadas en base a los
-            resultados de esta herramienta, ni por un uso inadecuado de la misma.
+            meskeIA no se responsabiliza de decisiones basadas en el uso de esta herramienta.
           </p>
         </>
       );
@@ -205,17 +248,45 @@ function DefaultContent({ variant }: { variant: DisclaimerVariant }) {
         </>
       );
 
-    case 'general':
-    default:
+    case 'technical':
       return (
         <>
           <p>
-            <strong>Esta herramienta proporciona resultados orientativos.</strong>
+            Esta herramienta tiene <strong>carácter orientativo</strong> y está dirigida a
+            profesionales del dominio que conocen sus limitaciones.
           </p>
+          <p className={styles.limitation}>
+            meskeIA no se responsabiliza de decisiones basadas en el uso de esta herramienta.
+          </p>
+        </>
+      );
+
+    case 'general':
+    default:
+      if (isCriticalOrHigh) {
+        return (
+          <>
+            <p>
+              La información proporcionada por esta herramienta tiene{' '}
+              <strong>carácter exclusivamente orientativo</strong> y no constituye asesoramiento
+              profesional.
+            </p>
+            <p className={styles.responsibility}>
+              <strong>TÚ ERES RESPONSABLE</strong> de verificar esta información con un profesional
+              cualificado antes de tomar decisiones. meskeIA no se responsabiliza de las
+              consecuencias derivadas del uso de esta herramienta.
+            </p>
+          </>
+        );
+      }
+      return (
+        <>
           <p>
-            Los resultados son estimaciones basadas en los datos introducidos y no constituyen
-            asesoramiento profesional. Verifica la información con fuentes oficiales o profesionales
-            cualificados.
+            La información proporcionada tiene <strong>carácter orientativo</strong>. Los resultados
+            pueden variar según tu situación particular.
+          </p>
+          <p className={styles.limitation}>
+            meskeIA no se responsabiliza de decisiones basadas en el uso de esta herramienta.
           </p>
         </>
       );

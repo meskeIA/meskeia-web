@@ -292,7 +292,7 @@ export default function CalculadoraHidratacionPage() {
       <DisclaimerCard
         variant="medical"
         severity="high"
-        collapsible={true}
+        collapsible={false}
         context="calculadora-hidratacion"
       >
         <p>

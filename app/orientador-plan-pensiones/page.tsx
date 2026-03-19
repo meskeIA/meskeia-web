@@ -122,7 +122,8 @@ export default function OrientadorPlanPensiones() {
         <p className={styles.subtitle}>Cuánto ahorras en IRPF, cuánto acumulas y cuánto cobrarás · 2025</p>
       </header>
 
-      <DisclaimerCard variant="financial">
+      <DisclaimerCard variant="financial"
+        severity="critical">
         <span>
           Esta herramienta es SOLO orientativa. Las condiciones reales dependen del plan concreto contratado y de tu declaración de la renta.
           <br /><strong>No es</strong> asesoramiento financiero ni fiscal personalizado.

@@ -147,7 +147,8 @@ export default function EstimadorIrpfPensionista() {
         <p className={styles.subtitle}>Cuánto pagas de renta siendo jubilado y cuál es tu pensión neta real · 2025</p>
       </header>
 
-      <DisclaimerCard variant="financial">
+      <DisclaimerCard variant="financial"
+        severity="critical">
         <span>
           Esta herramienta es SOLO orientativa. El IRPF real depende de toda tu situación personal, familiar y de las deducciones autonómicas.
           <br /><strong>No es</strong> asesoramiento fiscal personalizado ni sustituye a la declaración de la renta.

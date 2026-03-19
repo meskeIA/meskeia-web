@@ -144,7 +144,7 @@ export default function AdaptadorDislexiaPage() {
 
       <DisclaimerCard
         variant="medical"
-        severity="medium"
+        severity="high"
         title="Herramienta de apoyo a la lectura"
       >
         Esta herramienta adapta visualmente los textos para facilitar la lectura.

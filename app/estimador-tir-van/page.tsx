@@ -424,7 +424,7 @@ export default function CalculadoraTIRVANPage() {
         variant="financial"
         severity="high"
         context="estimador-tir-van"
-        collapsible={true}
+        collapsible={false}
       />
 
       

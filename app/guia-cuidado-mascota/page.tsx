@@ -133,7 +133,7 @@ function GuideContent() {
 
       
 
-      <DisclaimerCard variant="medical" severity="medium" collapsible={true} context="guia-cuidado-mascota">
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} context="guia-cuidado-mascota">
         <p>Esta guía proporciona <strong>información educativa general</strong> sobre cuidado de mascotas:</p>
         <ul className={styles.disclaimerList}>
           <li><strong>No sustituye atención veterinaria</strong>: Consulta siempre con tu veterinario para diagnósticos, vacunas y tratamientos</li>

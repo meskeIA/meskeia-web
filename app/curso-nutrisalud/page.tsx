@@ -196,7 +196,7 @@ export default function CursoNutrisaludPage() {
 
       
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} context="curso-nutrisalud">
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} context="curso-nutrisalud">
         <p>Este curso es una <strong>herramienta educativa</strong> basada en evidencia científica:</p>
         <ul className={styles.disclaimerList}>
           <li><strong>No sustituye consejo médico profesional</strong>: El contenido es informativo, no prescriptivo</li>
