@@ -117,7 +117,7 @@ export default function DashboardAnalyticsPage() {
   const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros'>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
-  const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'mcp'>('todos');
+  const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'referral-ia' | 'mcp' | 'bot'>('todos');
 
   // Ref para control de inicialización
   const iniciado = useRef(false);
@@ -1039,7 +1039,14 @@ export default function DashboardAnalyticsPage() {
                   className={`${styles.filtroModoBtn} ${filtroModo === 'web' ? styles.filtroModoActivo : ''}`}
                   onClick={() => setFiltroModo('web')}
                 >
-                  🌐 Web ({datos.data.filter((r: any) => r.modo !== 'mcp').length})
+                  🌐 Web ({datos.data.filter((r: any) => r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot').length})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.filtroModoBtn} ${filtroModo === 'referral-ia' ? styles.filtroModoActivoReferral : ''}`}
+                  onClick={() => setFiltroModo('referral-ia')}
+                >
+                  🔗 Desde IA ({datos.data.filter((r: any) => r.modo === 'referral-ia').length})
                 </button>
                 <button
                   type="button"
@@ -1047,6 +1054,13 @@ export default function DashboardAnalyticsPage() {
                   onClick={() => setFiltroModo('mcp')}
                 >
                   🤖 IA / MCP ({datos.data.filter((r: any) => r.modo === 'mcp').length})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.filtroModoBtn} ${filtroModo === 'bot' ? styles.filtroModoActivoBot : ''}`}
+                  onClick={() => setFiltroModo('bot')}
+                >
+                  🕷️ Bots ({datos.data.filter((r: any) => r.modo === 'bot').length})
                 </button>
               </div>
             </div>
@@ -1066,18 +1080,28 @@ export default function DashboardAnalyticsPage() {
                 <tbody>
                   {datos.data
                     .filter((r: any) => {
-                      if (filtroModo === 'web') return r.modo !== 'mcp';
+                      if (filtroModo === 'web') return r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot';
+                      if (filtroModo === 'referral-ia') return r.modo === 'referral-ia';
                       if (filtroModo === 'mcp') return r.modo === 'mcp';
+                      if (filtroModo === 'bot') return r.modo === 'bot';
                       return true;
                     })
                     .slice(0, 100)
                     .map((registro: any) => (
-                      <tr key={registro.id} className={registro.modo === 'mcp' ? styles.rowMCP : ''}>
+                      <tr key={registro.id} className={
+                        registro.modo === 'mcp' ? styles.rowMCP :
+                        registro.modo === 'referral-ia' ? styles.rowReferral :
+                        registro.modo === 'bot' ? styles.rowBot : ''
+                      }>
                         <td>{registro.id}</td>
                         <td><strong>{registro.aplicacion}</strong></td>
                         <td>
                           {registro.modo === 'mcp'
-                            ? <span className={styles.badgeMCP}>🤖 IA</span>
+                            ? <span className={styles.badgeMCP}>🤖 MCP</span>
+                            : registro.modo === 'referral-ia'
+                            ? <span className={styles.badgeReferral}>🔗 Desde IA</span>
+                            : registro.modo === 'bot'
+                            ? <span className={styles.badgeBot}>🕷️ Bot</span>
                             : <span className={styles.badgeWeb}>🌐 Web</span>}
                         </td>
                         <td>{registro.timestamp}</td>

@@ -894,3 +894,49 @@
 [data-theme='dark'] .rowMCP {
   background: rgba(72, 169, 166, 0.08);
 }
+
+.filtroModoActivoReferral {
+  background: #7B61FF;
+  color: #fff;
+  border-color: #7B61FF;
+}
+
+.filtroModoActivoBot {
+  background: #999;
+  color: #fff;
+  border-color: #999;
+}
+
+.badgeReferral {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  background: rgba(123, 97, 255, 0.12);
+  color: #7B61FF;
+}
+
+.badgeBot {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  background: rgba(150, 150, 150, 0.12);
+  color: #888;
+}
+
+.rowReferral {
+  background: rgba(123, 97, 255, 0.04);
+}
+
+[data-theme='dark'] .rowReferral {
+  background: rgba(123, 97, 255, 0.08);
+}
+
+.rowBot {
+  background: rgba(150, 150, 150, 0.04);
+}
+
+[data-theme='dark'] .rowBot {
+  background: rgba(150, 150, 150, 0.07);
+}

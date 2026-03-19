@@ -55,12 +55,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || '';
     const botsPattern = /Googlebot|Google-InspectionTool|AdsBot-Google|APIs-Google|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Applebot|Screaming Frog|AhrefsBot|SemrushBot|MJ12bot|DotBot|PetalBot|GPTBot|ClaudeBot|anthropic-ai/i;
 
-    if (botsPattern.test(userAgent)) {
-      return NextResponse.json(
-        { status: 'ignored', message: 'Tráfico de bot ignorado' },
-        { status: 200, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
-      );
-    }
+    const esBot = botsPattern.test(userAgent);
 
     // Inicializar DB si es necesario
     await initializeDatabase();
@@ -92,7 +87,7 @@ export async function POST(request: NextRequest) {
     const resolucion = truncar(datos.resolucion, 50);
     const tipo_dispositivo = truncar(datos.tipo_dispositivo, 50);
     const es_recurrente = datos.es_recurrente ? 1 : 0;
-    const modo = truncar(datos.modo, 20) || 'web';
+    const modo = esBot ? 'bot' : (truncar(datos.modo, 20) || 'web');
     const sesion_id = truncar(datos.sesion_id, 50);
 
     // RGPD: Anonimizar IP (truncar último octeto)

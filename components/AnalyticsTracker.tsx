@@ -49,6 +49,10 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
                   (window.navigator as any).standalone === true;
 
+    // Detectar si la visita viene referida desde una plataforma de IA
+    const referrer = document.referrer;
+    const esReferralIA = /chatgpt\.com|perplexity\.ai|claude\.ai|gemini\.google|copilot\.microsoft\.com|you\.com|phind\.com|poe\.com/i.test(referrer);
+
     // Detectar visita recurrente usando localStorage
     const storageKey = `meskeia_${finalAppName}`;
     const isRecurrent = localStorage.getItem(storageKey) !== null;
@@ -73,7 +77,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     // Datos de entrada (registro inicial)
     const entryData = {
       aplicacion: finalAppName,
-      modo: isPWA ? 'pwa' : 'web',
+      modo: isPWA ? 'pwa' : esReferralIA ? 'referral-ia' : 'web',
       navegador: navigator.userAgent,
       sistema_operativo: navigator.platform,
       resolucion: `${window.screen.width}x${window.screen.height}`,
@@ -108,7 +112,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
           aplicacion: finalAppName,
           duracion_segundos: durationSeconds,
           tipo_dispositivo: deviceType,
-          modo: isPWA ? 'pwa' : 'web',
+          modo: isPWA ? 'pwa' : esReferralIA ? 'referral-ia' : 'web',
           sesion_id: sessionId,
         });
 
