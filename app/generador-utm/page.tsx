@@ -4,7 +4,9 @@ import { useState, useCallback, useEffect } from 'react';
 import styles from './GeneradorUTM.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface UTMParams {
@@ -181,6 +183,13 @@ export default function GeneradorUTMPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="generador-utm-disclaimer"
+      />
 
       {error && (
         <div className={styles.errorBanner}>

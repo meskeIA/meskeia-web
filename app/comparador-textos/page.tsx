@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorTextos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -184,6 +186,13 @@ Nueva línea agregada
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="comparador-textos-disclaimer"
+      />
 
       {/* Opciones */}
       <div className={styles.opcionesBar}>

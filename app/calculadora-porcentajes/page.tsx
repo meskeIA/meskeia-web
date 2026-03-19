@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import styles from './CalculadoraPorcentajes.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -157,6 +159,13 @@ export default function CalculadoraPorcentajesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="calculadora-porcentajes-disclaimer"
+      />
 
       <div className={styles.modeSelector}>
         {MODES.map((m) => (

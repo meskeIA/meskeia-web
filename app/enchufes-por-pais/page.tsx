@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { jsonLd } from './metadata';
 import styles from './EnchufesPais.module.css';
@@ -136,6 +138,13 @@ export default function EnchufesPais() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="enchufes-por-pais-disclaimer"
+      />
 
       <main className={styles.main}>
         {/* Selector de país */}

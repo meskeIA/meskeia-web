@@ -53,6 +53,13 @@ const SUITE_LEVEL = {
 
 // Apps sin disclaimer (contenido informativo puro, sin riesgo)
 const APPS_SIN_DISCLAIMER = new Set([
+  // Cursos (/curso-*) — excluidos del patrón v2.0 (estructura propia, ver CLAUDE.md)
+  'curso-emprendimiento',
+  'curso-empresa-familiar',
+  'curso-estrategia-empresarial',
+  'curso-marketing-digital',
+  'curso-negociacion',
+  'curso-optimizacion-ia',
   'calculadora-cocina',       // recetas — sin implicación financiera/legal
   'calculadora-pintura',      // m² de pintura — sin consejo profesional
   'golden-hour',              // hora dorada fotográfica — herramienta creativa

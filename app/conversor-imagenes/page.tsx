@@ -4,7 +4,9 @@ import { useState, useCallback, useRef } from 'react';
 import styles from './ConversorImagenes.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type OutputFormat = 'jpeg' | 'png' | 'webp';
@@ -180,6 +182,13 @@ export default function ConversorImagenesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="conversor-imagenes-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

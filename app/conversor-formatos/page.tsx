@@ -2,7 +2,9 @@
 
 import { useState, useCallback, useRef } from 'react';
 import styles from './ConversorFormatos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de formato soportados
@@ -474,6 +476,13 @@ export default function ConversorFormatosPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="conversor-formatos-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Zona de carga */}

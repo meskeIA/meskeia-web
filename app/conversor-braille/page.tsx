@@ -4,7 +4,9 @@ import { useState } from 'react';
 import styles from './ConversorBraille.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Alfabeto Braille español (Unicode)
@@ -225,6 +227,13 @@ export default function ConversorBraillePage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="educational"
+        severity="medium"
+        collapsible={true}
+        context="conversor-braille-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         <div className={styles.modeSelector}>

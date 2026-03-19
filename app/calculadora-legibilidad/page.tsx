@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import styles from './CalculadoraLegibilidad.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -194,6 +196,13 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="calculadora-legibilidad-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

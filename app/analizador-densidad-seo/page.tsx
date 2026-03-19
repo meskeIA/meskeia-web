@@ -5,7 +5,9 @@ import styles from './AnalizadorDensidadSeo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import EducationalSection from '@/components/EducationalSection';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -200,6 +202,13 @@ export default function AnalizadorDensidadSeoPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="analizador-densidad-seo-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

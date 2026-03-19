@@ -2,7 +2,9 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './RecortadorAudio.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -512,6 +514,13 @@ export default function RecortadorAudioPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="recortador-audio-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Zona de carga */}

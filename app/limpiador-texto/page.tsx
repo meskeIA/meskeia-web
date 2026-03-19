@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './LimpiadorTexto.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -164,6 +166,13 @@ export default function LimpiadorTextoPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="limpiador-texto-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de opciones */}

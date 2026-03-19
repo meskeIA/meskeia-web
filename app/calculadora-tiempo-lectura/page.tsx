@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import styles from './CalculadoraTiempoLectura.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -143,6 +145,13 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="calculadora-tiempo-lectura-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

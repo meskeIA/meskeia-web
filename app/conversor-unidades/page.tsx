@@ -4,7 +4,9 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import styles from './ConversorUnidades.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -392,6 +394,13 @@ export default function ConversorUnidadesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="conversor-unidades-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de categorías */}

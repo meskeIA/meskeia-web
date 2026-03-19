@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorFirmaEmail.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type Template = 'minimal' | 'corporate' | 'creative' | 'social';
@@ -193,6 +195,13 @@ export default function GeneradorFirmaEmailPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="generador-firma-email-disclaimer"
+      />
 
       <div className={styles.mainGrid}>
         <div className={styles.formSection}>

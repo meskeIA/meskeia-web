@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './ChecklistDocumentosViaje.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type TipoViaje = 'espana' | 'europa' | 'internacional';
@@ -202,6 +204,13 @@ export default function ChecklistDocumentosViajePage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="checklist-documentos-viaje-disclaimer"
+      />
 
       {/* Selector de tipo de viaje */}
       <div className={styles.tipoBar}>

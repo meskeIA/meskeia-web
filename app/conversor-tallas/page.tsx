@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import styles from './ConversorTallas.module.css';
-import { Footer, ResultCard, MeskeiaLogo, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { Footer, ResultCard, MeskeiaLogo, EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -386,6 +388,13 @@ export default function ConversorTallasPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="conversor-tallas-disclaimer"
+      />
 
       {/* Tabs */}
       <div className={styles.tabs}>

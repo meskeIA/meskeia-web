@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import styles from './AnalizadorGeo.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -426,6 +428,13 @@ export default function AnalizadorGeoPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="analizador-geo-disclaimer"
+      />
 
       {/* Plataformas */}
       <div className={styles.platformsBar}>

@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -206,6 +207,13 @@ export default function TestMadurezDigitalPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="educational"
+        severity="medium"
+        collapsible={true}
+        context="test-madurez-digital-disclaimer"
+      />
 
       {/* FORMULARIO */}
       <div className={styles.formPanel}>

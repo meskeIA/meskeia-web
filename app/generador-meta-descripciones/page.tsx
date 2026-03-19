@@ -4,7 +4,9 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import styles from './GeneradorMetaDescripciones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -205,6 +207,13 @@ export default function GeneradorMetaDescripcionesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="generador-meta-descripciones-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de edición */}

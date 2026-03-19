@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './PlanificadorTurnos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ============ TIPOS ============
@@ -444,6 +446,13 @@ export default function PlanificadorTurnosPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="planificador-turnos-disclaimer"
+      />
 
       {/* Tabs */}
       <div className={styles.tabs}>

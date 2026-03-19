@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import styles from './AsistenteReclamaciones.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   PROBLEM_OPTIONS,
@@ -101,6 +103,13 @@ export default function AsistenteReclamacionesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="asistente-reclamaciones-disclaimer"
+      />
 
       {/* Progress indicator */}
       <div className={styles.progress}>

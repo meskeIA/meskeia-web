@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './ContadorManual.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Contador {
@@ -154,6 +156,13 @@ export default function ContadorManualPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="contador-manual-disclaimer"
+      />
 
       {/* Configuración */}
       <div className={styles.config}>

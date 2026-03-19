@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import styles from './AnalizadorTitulosSeo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Palabras de poder que aumentan CTR
@@ -194,6 +196,13 @@ export default function AnalizadorTitulosSeoPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="analizador-titulos-seo-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

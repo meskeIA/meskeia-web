@@ -2,7 +2,9 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import styles from './PaisesDelMundo.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   countries,
@@ -109,6 +111,13 @@ export default function PaisesDelMundoPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="educational"
+        severity="medium"
+        collapsible={true}
+        context="paises-del-mundo-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de búsqueda */}

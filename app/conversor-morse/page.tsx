@@ -2,7 +2,9 @@
 
 import { useState, useRef, useCallback } from 'react';
 import styles from './ConversorMorse.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Diccionario Morse internacional
@@ -161,6 +163,13 @@ export default function ConversorMorsePage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="educational"
+        severity="medium"
+        collapsible={true}
+        context="conversor-morse-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         <div className={styles.modeSelector}>

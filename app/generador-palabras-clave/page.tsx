@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './GeneradorPalabrasClave.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -203,6 +205,13 @@ export default function GeneradorPalabrasClavePage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="generador-palabras-clave-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}

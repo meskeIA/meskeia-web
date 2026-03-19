@@ -4,7 +4,9 @@ import { useState, useCallback } from 'react';
 import styles from './PlanificadorItinerario.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
@@ -427,6 +429,13 @@ export default function PlanificadorItinerario() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="planificador-itinerario-disclaimer"
+      />
 
       {/* Cabecera del viaje */}
       <div className={styles.cabeceraViaje}>

@@ -4,7 +4,9 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './GeneradorOGImages.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Constantes del canvas OG estándar
@@ -605,6 +607,13 @@ export default function GeneradorOGImagesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="generador-og-images-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de controles */}

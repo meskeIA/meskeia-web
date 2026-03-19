@@ -4,7 +4,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorCodigosBarras.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCodigoBarras = 'EAN13' | 'EAN8' | 'UPCA' | 'CODE128' | 'CODE39' | 'ITF14';
@@ -362,6 +364,13 @@ export default function GeneradorCodigosBarrasPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="generador-codigos-barras-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de configuración */}

@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import styles from './ReglaDeTres.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -193,6 +195,13 @@ export default function CalculadoraReglaDeTresPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="calculadora-regla-de-tres-disclaimer"
+      />
 
       <main className={styles.mainContent}>
         {/* Panel de configuración */}

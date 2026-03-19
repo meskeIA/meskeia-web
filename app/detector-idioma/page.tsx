@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import styles from './DetectorIdioma.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Patrones de palabras frecuentes por idioma
@@ -142,6 +144,13 @@ export default function DetectorIdiomaPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="detector-idioma-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         <div className={styles.inputSection}>

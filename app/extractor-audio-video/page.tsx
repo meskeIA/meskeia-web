@@ -3,7 +3,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { FFmpeg } from '@ffmpeg/ffmpeg';
 import styles from './ExtractorAudioVideo.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type FormatoSalida = 'mp3' | 'wav';
@@ -212,6 +214,13 @@ export default function ExtractorAudioVideoPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="extractor-audio-video-disclaimer"
+      />
 
       {/* Badge privacidad — SIEMPRE VISIBLE */}
       <div className={styles.privacyBadge}>

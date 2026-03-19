@@ -4,7 +4,9 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import styles from './ContrasteColores.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface ContrastResult {
@@ -198,6 +200,13 @@ export default function ContrasteColoresPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="contraste-colores-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel izquierdo - Preview y Resultados */}

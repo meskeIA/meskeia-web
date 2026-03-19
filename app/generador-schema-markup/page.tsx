@@ -4,7 +4,9 @@ import { useState } from 'react';
 import styles from './GeneradorSchemaMarkup.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type SchemaType = 'article' | 'product' | 'faq' | 'localbusiness' | 'recipe';
@@ -270,6 +272,13 @@ export default function GeneradorSchemaMarkupPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="generador-schema-markup-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de configuración */}

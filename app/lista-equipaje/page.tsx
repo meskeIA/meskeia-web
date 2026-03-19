@@ -4,7 +4,9 @@ import { useState, useEffect, KeyboardEvent } from 'react';
 import styles from './ListaEquipaje.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type TipoViaje = 'playa' | 'montana' | 'ciudad' | 'negocios' | 'aventura';
@@ -329,6 +331,13 @@ export default function ListaEquipajePage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="lista-equipaje-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel de configuración */}

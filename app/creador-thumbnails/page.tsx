@@ -4,7 +4,9 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './CreadorThumbnails.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Constantes del canvas
@@ -726,6 +728,13 @@ export default function CreadorThumbnailsPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="technical"
+        severity="medium"
+        collapsible={true}
+        context="creador-thumbnails-disclaimer"
+      />
 
       <div className={styles.editor}>
         {/* Panel izquierdo - Herramientas */}

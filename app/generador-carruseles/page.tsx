@@ -2,7 +2,9 @@
 
 import { useState, useRef, useCallback } from 'react';
 import styles from './GeneradorCarruseles.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -272,6 +274,13 @@ export default function GeneradorCarruselesPage() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="generador-carruseles-disclaimer"
+      />
 
       <div className={styles.mainContent}>
         {/* Panel izquierdo: Editor */}
