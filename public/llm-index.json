@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 296+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
+  "description": "Biblioteca gratuita de 298+ aplicaciones web educativas en español. Calculadoras, conversores, generadores, simuladores y herramientas de productividad. 100% gratuitas, sin registro, funcionan offline.",
   "language": "es",
   "country": "ES",
-  "total_tools": 296,
+  "total_tools": 298,
   "last_updated": "2026-03-19",
   "features": {
     "all_free": true,
@@ -22,14 +22,14 @@
       "name": "Trabajando",
       "icon": "💼",
       "description": "Productividad y herramientas profesionales",
-      "tool_count": 118
+      "tool_count": 119
     },
     {
       "id": "estudio",
       "name": "Estudiando",
       "icon": "🎓",
       "description": "Aprende y resuelve ejercicios",
-      "tool_count": 94
+      "tool_count": 95
     },
     {
       "id": "casa",
@@ -50,21 +50,21 @@
       "name": "Creando",
       "icon": "🎨",
       "description": "Diseño, contenido y desarrollo web",
-      "tool_count": 55
+      "tool_count": 56
     },
     {
       "id": "relax",
       "name": "Relajándome",
       "icon": "🎮",
       "description": "Juegos y entretenimiento",
-      "tool_count": 30
+      "tool_count": 31
     },
     {
       "id": "curiosidad",
       "name": "Curioseando",
       "icon": "🧭",
       "description": "Descubre y aprende cosas curiosas",
-      "tool_count": 54
+      "tool_count": 56
     }
   ],
   "tools": [
@@ -7261,6 +7261,57 @@
         "selectividad historia"
       ],
       "icon": "🏛️"
+    },
+    {
+      "slug": "quiz-geografia-espana",
+      "name": "Quiz Geografía de España",
+      "url": "https://meskeia.com/quiz-geografia-espana/",
+      "description": "Pon a prueba tus conocimientos de geografía española: 75 preguntas sobre provincias, capitales, ríos, montañas y comunidades autónomas. 3 niveles de dificultad, ideal para oposiciones y estudiantes.",
+      "suites": [
+        "cultura",
+        "estudiantes"
+      ],
+      "contexts": [
+        "estudio",
+        "relax",
+        "curiosidad"
+      ],
+      "keywords": [
+        "quiz geografia españa",
+        "test geografía española",
+        "provincias capitales españa quiz",
+        "ríos españa quiz",
+        "comunidades autónomas quiz",
+        "oposiciones geografía",
+        "geografía bachillerato"
+      ],
+      "icon": "🌍"
+    },
+    {
+      "slug": "test-madurez-digital",
+      "name": "Test Madurez Digital",
+      "url": "https://meskeia.com/test-madurez-digital/",
+      "description": "Descubre el nivel de madurez digital de tu empresa: 15 preguntas en 5 dimensiones (herramientas, IA, automatización, cultura digital, datos). Obtén tu perfil (Analógica→Líder Digital) con recomendaciones prácticas.",
+      "suites": [
+        "productividad",
+        "tecnicas",
+        "marketing"
+      ],
+      "contexts": [
+        "trabajo",
+        "creando",
+        "curiosidad"
+      ],
+      "keywords": [
+        "test madurez digital empresa",
+        "nivel digitalización empresa",
+        "uso IA empresa",
+        "transformación digital test",
+        "madurez digital trabajo",
+        "cultura digital organizacion",
+        "inteligencia artificial empresa"
+      ],
+      "icon": "🤖"
     }
   ],
   "llm_instructions": {
