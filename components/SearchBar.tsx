@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Fuse from 'fuse.js';
 import type { FuseResult } from 'fuse.js';
 import { Application, applicationsDatabase, moments, suites, SuiteType } from '@/data/applications';
-import type { AppRecomendada } from '@/app/api/asistente/route';
+import AsistenteChat from './AsistenteChat';
 import styles from './SearchBar.module.css';
 
 interface SearchBarProps {
@@ -71,12 +71,8 @@ export default function SearchBar({ large = false }: SearchBarProps) {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const inlineContainerRef = useRef<HTMLDivElement>(null);
 
-  // Estado modo asistente (solo afecta versión large)
+  // Estado modo (solo afecta versión large)
   const [modo, setModo] = useState<ModoBusqueda>('buscar');
-  const [asistenteQuery, setAsistenteQuery] = useState('');
-  const [asistenteResultados, setAsistenteResultados] = useState<AppRecomendada[]>([]);
-  const [asistenteLoading, setAsistenteLoading] = useState(false);
-  const [asistenteMensaje, setAsistenteMensaje] = useState('');
 
   // Detectar si es móvil
   useEffect(() => {
@@ -177,48 +173,9 @@ export default function SearchBar({ large = false }: SearchBarProps) {
 
   const cambiarModo = (nuevoModo: ModoBusqueda) => {
     setModo(nuevoModo);
-    setAsistenteQuery('');
-    setAsistenteResultados([]);
-    setAsistenteMensaje('');
     setQuery('');
     setResults([]);
     setShowDropdown(false);
-    searchInputLargeRef.current?.focus();
-  };
-
-  const consultarAsistente = async (consulta: string) => {
-    const texto = consulta.trim();
-    if (texto.length < 3) return;
-
-    setAsistenteLoading(true);
-    setAsistenteResultados([]);
-    setAsistenteMensaje('');
-
-    try {
-      const res = await fetch('/api/asistente', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ consulta: texto }),
-      });
-
-      const datos = await res.json() as { apps?: AppRecomendada[]; error?: string };
-
-      if (!res.ok || datos.error) {
-        setAsistenteMensaje('No he podido procesar tu consulta. Prueba de nuevo.');
-        return;
-      }
-
-      if (!datos.apps || datos.apps.length === 0) {
-        setAsistenteMensaje('No tengo una herramienta específica para eso. Prueba a buscar con otras palabras.');
-        return;
-      }
-
-      setAsistenteResultados(datos.apps);
-    } catch {
-      setAsistenteMensaje('Error de conexión. Comprueba tu red e inténtalo de nuevo.');
-    } finally {
-      setAsistenteLoading(false);
-    }
   };
 
   const performSearch = (searchQuery: string) => {
@@ -249,15 +206,6 @@ export default function SearchBar({ large = false }: SearchBarProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Modo asistente: Enter dispara la consulta
-    if (modo === 'asistente' && large) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        void consultarAsistente(asistenteQuery);
-      }
-      return;
-    }
-
     if (results.length === 0) return;
 
     switch (e.key) {
@@ -414,72 +362,35 @@ export default function SearchBar({ large = false }: SearchBarProps) {
             </button>
           </div>
 
-          {/* Input — comportamiento cambia según modo */}
-          <div className={`${styles.searchLarge} ${(showDropdown || asistenteResultados.length > 0 || asistenteLoading) ? styles.searchLargeActive : ''} ${isMobile && showDropdown ? styles.searchLargeMobileActive : ''}`}>
-            <span className={styles.searchLargeIcon} aria-hidden="true">
-              {modo === 'asistente' ? '✨' : '🔍'}
-            </span>
-
-            {modo === 'buscar' ? (
-              <input
-                ref={searchInputLargeRef}
-                type="text"
-                className={styles.searchLargeInput}
-                placeholder="Buscar aplicaciones..."
-                value={query}
-                onChange={(e) => performSearch(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onFocus={() => {
-                  if (query.length >= 2) setShowDropdown(true);
-                }}
-              />
-            ) : (
-              <input
-                ref={searchInputLargeRef}
-                type="text"
-                className={styles.searchLargeInput}
-                placeholder="Describe lo que necesitas... (pulsa Enter)"
-                value={asistenteQuery}
-                onChange={(e) => setAsistenteQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={asistenteLoading}
-              />
-            )}
-
-            {modo === 'buscar' && query.length > 0 ? (
+          {/* Input búsqueda — solo visible en modo Buscar */}
+          {modo === 'buscar' && (
+          <div className={`${styles.searchLarge} ${showDropdown ? styles.searchLargeActive : ''} ${isMobile && showDropdown ? styles.searchLargeMobileActive : ''}`}>
+            <span className={styles.searchLargeIcon} aria-hidden="true">🔍</span>
+            <input
+              ref={searchInputLargeRef}
+              type="text"
+              className={styles.searchLargeInput}
+              placeholder="Buscar aplicaciones..."
+              value={query}
+              onChange={(e) => performSearch(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => { if (query.length >= 2) setShowDropdown(true); }}
+            />
+            {query.length > 0 ? (
               <button
                 type="button"
                 className={styles.searchLargeClear}
-                onClick={() => {
-                  setQuery('');
-                  setResults([]);
-                  setShowDropdown(false);
-                  searchInputLargeRef.current?.focus();
-                }}
+                onClick={() => { setQuery(''); setResults([]); setShowDropdown(false); searchInputLargeRef.current?.focus(); }}
                 aria-label="Limpiar búsqueda"
-              >
-                ✕
-              </button>
-            ) : modo === 'asistente' && asistenteQuery.length > 0 && !asistenteLoading ? (
-              <button
-                type="button"
-                className={styles.searchLargeClear}
-                onClick={() => {
-                  setAsistenteQuery('');
-                  setAsistenteResultados([]);
-                  setAsistenteMensaje('');
-                  searchInputLargeRef.current?.focus();
-                }}
-                aria-label="Limpiar consulta"
-              >
-                ✕
-              </button>
-            ) : modo === 'asistente' && asistenteLoading ? (
-              <span className={styles.asistenteSpinner} aria-label="Buscando..." />
+              >✕</button>
             ) : (
               <kbd className={styles.searchLargeKbd}>Ctrl+K</kbd>
             )}
           </div>
+          )}
+
+          {/* Chat conversacional — solo visible en modo Asistente */}
+          {modo === 'asistente' && <AsistenteChat />}
 
           {/* Dropdown modo Buscar */}
           {modo === 'buscar' && showDropdown && query.length >= 2 && (
@@ -506,33 +417,6 @@ export default function SearchBar({ large = false }: SearchBarProps) {
             </div>
           )}
 
-          {/* Resultados modo Asistente */}
-          {modo === 'asistente' && (asistenteResultados.length > 0 || asistenteMensaje) && (
-            <div className={styles.asistenteResultados}>
-              {asistenteMensaje ? (
-                <p className={styles.asistenteMensaje}>{asistenteMensaje}</p>
-              ) : (
-                <>
-                  <p className={styles.asistenteIntro}>He encontrado estas herramientas para ti:</p>
-                  <div className={styles.asistenteCards}>
-                    {asistenteResultados.map((app) => (
-                      <a
-                        key={app.url}
-                        href={app.url}
-                        className={styles.asistenteCard}
-                      >
-                        <span className={styles.asistenteCardIcon}>{app.icon}</span>
-                        <div className={styles.asistenteCardContent}>
-                          <div className={styles.asistenteCardName}>{app.name}</div>
-                          <div className={styles.asistenteCardDesc}>{app.description}</div>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
         </div>
       )}
 

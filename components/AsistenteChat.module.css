@@ -1,0 +1,225 @@
+/* AsistenteChat — Interfaz conversacional meskeIA */
+
+.chat {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ===== HISTORIAL DE MENSAJES ===== */
+.mensajes {
+  max-height: 380px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 1rem;
+  scroll-behavior: smooth;
+}
+
+.mensaje {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.mensajeUsuario {
+  flex-direction: row-reverse;
+}
+
+.avatarAsistente {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.mensajeContenido {
+  max-width: 85%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mensajeUsuario .mensajeContenido {
+  align-items: flex-end;
+}
+
+.mensajeTexto {
+  margin: 0;
+  padding: 0.625rem 0.875rem;
+  border-radius: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.mensajeAsistente .mensajeTexto {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 0.25rem 1rem 1rem 1rem;
+}
+
+.mensajeUsuario .mensajeTexto {
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: 1rem 0.25rem 1rem 1rem;
+}
+
+/* ===== APP CARDS (resultado de recomendación) ===== */
+.appCards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.appCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(153, 153, 153, 0.2);
+  background: var(--bg-primary);
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.appCard:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.appCardIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.appCardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.appCardName {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.15rem;
+}
+
+.appCardDesc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ===== ANIMACIÓN DE TYPING ===== */
+.typing {
+  display: flex;
+  gap: 4px;
+  padding: 0.625rem 0.875rem;
+  background: var(--bg-primary);
+  border-radius: 0.25rem 1rem 1rem 1rem;
+  width: fit-content;
+}
+
+.typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: tiping 1.2s infinite;
+}
+
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes tiping {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typing span { animation: none; opacity: 0.6; }
+}
+
+/* ===== ÁREA DE INPUT ===== */
+.inputArea {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  padding: 0.875rem 1.125rem;
+  border: 1.5px solid rgba(153, 153, 153, 0.25);
+  border-radius: 0.875rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.input:focus {
+  border-color: var(--primary);
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnEnviar {
+  padding: 0.875rem 1rem;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 0.875rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.btnEnviar:hover:not(:disabled) { opacity: 0.85; }
+.btnEnviar:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btnReiniciar {
+  padding: 0.875rem 0.75rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1.5px solid rgba(153, 153, 153, 0.25);
+  border-radius: 0.875rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.btnReiniciar:hover {
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+/* ===== DARK MODE ===== */
+[data-theme='dark'] .mensajes {
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .appCard:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
