@@ -614,3 +614,144 @@
   color: var(--text-secondary);
   font-size: 0.95rem;
 }
+
+/* ===== TABS BUSCAR / ¿QUÉ NECESITAS? ===== */
+.modeTabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.modeTab {
+  padding: 0.45rem 1rem;
+  border: 1.5px solid transparent;
+  border-radius: 2rem;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  line-height: 1;
+}
+
+.modeTab:hover {
+  color: var(--primary);
+  border-color: var(--accent);
+}
+
+.modeTabActive {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+}
+
+/* ===== SPINNER ASISTENTE ===== */
+.asistenteSpinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(46, 134, 171, 0.25);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spinnerRodar 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spinnerRodar {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .asistenteSpinner {
+    animation: none;
+    border-top-color: var(--primary);
+  }
+}
+
+/* ===== RESULTADOS ASISTENTE ===== */
+.asistenteResultados {
+  margin-top: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.20);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.asistenteIntro {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.asistenteMensaje {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 0.5rem 0;
+  margin: 0;
+}
+
+.asistenteCards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.asistenteCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(153, 153, 153, 0.20);
+  background: var(--bg-primary);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.asistenteCard:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+  transform: translateX(2px);
+}
+
+.asistenteCardIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.asistenteCardContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.asistenteCardName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.asistenteCardDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Dark mode asistente */
+[data-theme='dark'] .asistenteResultados {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+[data-theme='dark'] .asistenteCard:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
