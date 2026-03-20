@@ -8,15 +8,20 @@ cálculos directamente en el chat en lugar de limitarse a recomendar la app.
 
 ## Cuándo añadir una calculadora al asistente
 
-✅ Recomendado:
+✅ Recomendado sin disclaimer:
 - Lógica determinista (mismo input → mismo output siempre)
 - Parámetros claros y en número limitado (≤ 6)
-- Riesgo legal bajo o nulo (matemáticas, conversores, hogar, viajes)
+- Riesgo legal bajo o nulo (matemáticas, conversores, hogar, viajes, fechas)
 
-⚠️ Requiere revisión legal previa:
-- Apps de la suite Fiscal (IRPF, IVA empresarial, plusvalías...)
-- Apps de la suite Salud con orientación clínica
-- Cualquier app con DisclaimerCard de nivel 1 o 2
+✅ Recomendado con disclaimer estándar (patrón `_disclaimer`):
+- Apps de la suite Salud con carácter orientativo (IMC, nutrición, hábitos)
+- Apps financieras generales (ahorro, simuladores, comparadores)
+- Cualquier app con `DisclaimerCard` de severity `medium` o `high`
+
+⚠️ Requiere validación legal antes de implementar:
+- Suite Fiscal (IRPF, IVA empresarial, plusvalías, retenciones...)
+- Apps de salud con orientación clínica directa
+- Cualquier app con `DisclaimerCard` de severity `critical`
 
 ❌ No aplica:
 - Quizzes, juegos, generadores de contenido
@@ -37,7 +42,7 @@ lib/calculadoras/[nombre].ts
 - Exporta al menos una función con tipos explícitos en input y output
 - Lanza errores descriptivos para inputs inválidos
 
-**Ejemplo mínimo:**
+**Ejemplo mínimo (sin disclaimer):**
 ```typescript
 // lib/calculadoras/descuentos.ts
 
@@ -98,6 +103,8 @@ import { calcularDescuento } from '@/lib/calculadoras/descuentos';
 - Sé conciso — Claude lee todas las descripciones para elegir la correcta
 
 ### 2c. Añadir el caso en `ejecutarHerramienta()`
+
+**Sin disclaimer** (matemáticas puras, sin riesgo legal):
 ```typescript
 if (nombre === 'calcular_descuento') {
   const { precioOriginal, porcentajeDescuento } = params as {
@@ -113,8 +120,23 @@ if (nombre === 'calcular_descuento') {
 }
 ```
 
-**Nota:** Devuelve JSON con claves descriptivas en español — Claude las usa
-para formatear la respuesta al usuario.
+**Con disclaimer** (salud, financiero, legal): añadir `_disclaimer` al JSON:
+```typescript
+if (nombre === 'calcular_imc') {
+  const { pesoKg, alturaCm } = params as { pesoKg: number; alturaCm: number };
+  const r = calcularIMC({ pesoKg, alturaCm });
+  return JSON.stringify({
+    imc: r.imcFormateado,
+    categoria: r.categoria,
+    // ... resto de campos ...
+    _disclaimer: { variant: 'medical', severity: 'high' },  // ← esto es todo
+  });
+}
+```
+
+La infraestructura (route.ts + AsistenteChat) detecta `_disclaimer` automáticamente,
+lo extrae antes de enviar el resultado a Claude, y renderiza el `DisclaimerCard`
+estándar en el chat tras la respuesta. **No requiere ningún otro cambio.**
 
 ---
 
@@ -137,33 +159,89 @@ git push origin main   # Vercel despliega automáticamente
 [ ] Import añadido en app/api/asistente/route.ts
 [ ] Tool añadida a HERRAMIENTAS[] con description clara
 [ ] Caso añadido en ejecutarHerramienta()
+[ ] Si la app tiene DisclaimerCard → añadir _disclaimer:{variant,severity} al JSON
 [ ] npm run build → exit code 0
 [ ] Probado en chat: consulta directa + consulta con datos faltantes
+[ ] Si tiene disclaimer: verificar que aparece tras el resultado
 [ ] Commit y push
+```
+
+---
+
+## Patrón `_disclaimer` — referencia rápida
+
+El disclaimer en el chat usa exactamente el mismo componente (`DisclaimerCard`)
+y los mismos contenidos por defecto que las apps individuales. No se escribe
+texto personalizado — se reutiliza el estándar de la política de disclaimers.
+
+### Mapa variant + severity por suite
+
+| Suite | variant | severity |
+|-------|---------|----------|
+| Salud orientativa (IMC, nutrición, hábitos) | `medical` | `high` |
+| Salud clínica (diagnóstico, medicación) | `medical` | `critical` |
+| Financiero general (ahorro, simuladores) | `financial` | `high` |
+| Fiscal (IRPF, IVA, plusvalías...) | `financial` | `critical` |
+| Productividad / planificadores cotidianos | `general` | `medium` |
+| Matemáticas / conversores / fechas | — | *(sin disclaimer)* |
+
+### Cómo funciona internamente
+
+```
+ejecutarHerramienta() devuelve JSON con _disclaimer
+    ↓
+route.ts detecta _disclaimer, lo extrae, lo almacena en disclaimerInfo
+    ↓
+Claude recibe el JSON limpio (sin _disclaimer)
+    ↓
+API response incluye campo disclaimer: { variant, severity }
+    ↓
+AsistenteChat renderiza <DisclaimerCard variant=... severity=... />
+tras el texto de la respuesta
 ```
 
 ---
 
 ## Calculadoras ya integradas (referencia)
 
-| Tool | Archivo | Modos |
-|------|---------|-------|
-| `calcular_propina` | `lib/calculadoras/propinas.ts` | monto + % + personas |
-| `calcular_porcentaje` | `lib/calculadoras/porcentajes.ts` | percentOf, whatPercent, increase, decrease, variation |
-| `calcular_combustible` | `lib/calculadoras/combustible.ts` | consumo, viaje |
+| Tool | Archivo | Disclaimer |
+|------|---------|-----------|
+| `calcular_propina` | `lib/calculadoras/propinas.ts` | — |
+| `calcular_porcentaje` | `lib/calculadoras/porcentajes.ts` | — |
+| `calcular_combustible` | `lib/calculadoras/combustible.ts` | — |
+| `calcular_diferencia_fechas` | `lib/calculadoras/fechas.ts` | — |
+| `calcular_fecha_resultado` | `lib/calculadoras/fechas.ts` | — |
+| `calcular_dia_semana` | `lib/calculadoras/fechas.ts` | — |
+| `calcular_edad` | `lib/calculadoras/fechas.ts` | — |
+| `calcular_imc` | `lib/calculadoras/imc.ts` | `medical/high` |
 
 ---
 
-## Candidatas prioritarias (sin riesgo legal)
+## Candidatas siguientes
+
+### Sin disclaimer (incorporación directa)
 
 | App | Archivo a crear | Complejidad |
 |-----|----------------|-------------|
 | Calculadora de Descuentos | `lib/calculadoras/descuentos.ts` | Baja |
-| Calculadora de Fechas | `lib/calculadoras/fechas.ts` | Baja |
-| Calculadora de Cocina | `lib/calculadoras/cocina.ts` | Media |
-| Conversor de Tallas | `lib/calculadoras/tallas.ts` | Baja |
-| Calculadora de Pintura | `lib/calculadoras/pintura.ts` | Baja |
 | Regla de Tres | `lib/calculadoras/reglaTres.ts` | Baja |
+| Calculadora de Pintura | `lib/calculadoras/pintura.ts` | Baja |
+| Conversor de Tallas | `lib/calculadoras/tallas.ts` | Baja |
+| Calculadora de Cocina | `lib/calculadoras/cocina.ts` | Media |
+
+### Con disclaimer `medical/high`
+
+| App | Archivo a crear |
+|-----|----------------|
+| Calculadora de Calorías | `lib/calculadoras/calorias.ts` |
+| Calculadora de Hidratación | `lib/calculadoras/hidratacion.ts` |
+
+### Con disclaimer `financial/high`
+
+| App | Archivo a crear |
+|-----|----------------|
+| Calculadora de Ahorro | `lib/calculadoras/ahorro.ts` |
+| Simulador de Interés Compuesto | `lib/calculadoras/interes.ts` |
 
 ---
 
