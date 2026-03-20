@@ -114,7 +114,7 @@ interface IPConfig {
 }
 
 export default function DashboardAnalyticsPage() {
-  const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros'>('general');
+  const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros' | 'resumen'>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
   const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'referral-ia' | 'mcp' | 'bot'>('todos');
@@ -127,6 +127,9 @@ export default function DashboardAnalyticsPage() {
     { limite: 500, excluir_mi_ip: filtroIPActivo },
     { enabled: true } // Siempre habilitado
   );
+
+  // tRPC: Resumen por origen (nueva pestaña)
+  const resumenQuery = trpc.analytics.getResumen.useQuery({});
 
   // tRPC: Obtener configuración de IP
   const ipConfigQuery = trpc.analytics.getIPConfig.useQuery(
@@ -495,6 +498,12 @@ export default function DashboardAnalyticsPage() {
           onClick={() => setTabActiva('aplicacion')}
         >
           🔍 Por Aplicación
+        </button>
+        <button
+          className={`${styles.tabButton} ${tabActiva === 'resumen' ? styles.active : ''}`}
+          onClick={() => setTabActiva('resumen')}
+        >
+          📈 Resumen IA
         </button>
         <button
           className={`${styles.tabButton} ${tabActiva === 'registros' ? styles.active : ''}`}
@@ -1117,6 +1126,90 @@ export default function DashboardAnalyticsPage() {
                 </tbody>
               </table>
             </div>
+          </section>
+        </div>
+      )}
+
+      {/* Tab: Resumen IA */}
+      {tabActiva === 'resumen' && (
+        <div className={styles.tabContent}>
+          <section className={styles.section}>
+            <h2>📈 Resumen por Origen</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+              Desglose completo de visitas por origen y período. Total Real excluye Bots y Mi IP.
+            </p>
+
+            {resumenQuery.isLoading && <p>Cargando resumen...</p>}
+            {resumenQuery.error && <p style={{ color: 'red' }}>Error al cargar resumen</p>}
+
+            {resumenQuery.data && (
+              <div className={styles.tableContainer}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left' }}>Origen</th>
+                      <th style={{ textAlign: 'center' }}>Hoy</th>
+                      <th style={{ textAlign: 'center' }}>Ayer</th>
+                      <th style={{ textAlign: 'center' }}>7 días</th>
+                      <th style={{ textAlign: 'center' }}>Este mes</th>
+                      <th style={{ textAlign: 'center' }}>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {resumenQuery.data.filas.map((fila) => {
+                      const esCero = fila.total === 0;
+                      const esGrupoIA = fila.grupo === 'ia';
+                      const esBot = fila.grupo === 'bot';
+                      const esMiIP = fila.grupo === 'miip';
+                      const rowStyle: React.CSSProperties = {
+                        opacity: esCero ? 0.4 : 1,
+                        backgroundColor: esGrupoIA
+                          ? 'rgba(72, 169, 166, 0.05)'
+                          : esBot || esMiIP
+                          ? 'rgba(0,0,0,0.03)'
+                          : undefined,
+                      };
+                      return (
+                        <tr key={fila.origen} style={rowStyle}>
+                          <td>
+                            <span style={{ marginRight: '0.4rem' }}>{fila.icono}</span>
+                            {fila.origen}
+                          </td>
+                          <td style={{ textAlign: 'center', fontWeight: fila.hoy > 0 ? 600 : 400 }}>
+                            {fila.hoy > 0 ? fila.hoy : '–'}
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            {fila.ayer > 0 ? fila.ayer : '–'}
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            {fila.semana > 0 ? fila.semana : '–'}
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            {fila.mes > 0 ? fila.mes : '–'}
+                          </td>
+                          <td style={{ textAlign: 'center', fontWeight: fila.total > 0 ? 600 : 400 }}>
+                            {fila.total > 0 ? fila.total : '–'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {/* Fila Total Real */}
+                    <tr style={{ borderTop: '2px solid var(--primary)', fontWeight: 700 }}>
+                      <td>✅ TOTAL REAL</td>
+                      <td style={{ textAlign: 'center' }}>{resumenQuery.data.totalReal.hoy || '–'}</td>
+                      <td style={{ textAlign: 'center' }}>{resumenQuery.data.totalReal.ayer || '–'}</td>
+                      <td style={{ textAlign: 'center' }}>{resumenQuery.data.totalReal.semana || '–'}</td>
+                      <td style={{ textAlign: 'center' }}>{resumenQuery.data.totalReal.mes || '–'}</td>
+                      <td style={{ textAlign: 'center' }}>{resumenQuery.data.totalReal.total || '–'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '1rem' }}>
+              * Las visitas anteriores al 20/03/2026 aparecen en &quot;IA sin detalle&quot; (datos no disponibles antes de esa fecha).
+            </p>
           </section>
         </div>
       )}

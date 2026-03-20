@@ -363,6 +363,171 @@ export const analyticsRouter = router({
     }),
 
   /**
+   * Procedure: getResumen
+   * Devuelve tabla de usos desglosada por origen (Web, IA por plataforma, MCP, Bots, Mi IP)
+   * y período (Hoy, Ayer, 7 días, Este mes, Total)
+   */
+  getResumen: publicProcedure
+    .input(z.object({}))
+    .query(async () => {
+      await initializeDatabase();
+      const client = getTursoClient();
+
+      // Leer IP excluida siempre (para separar "Mi IP" como fila propia)
+      let ipExcluida = '';
+      try {
+        const configResult = await client.execute({
+          sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+          args: [],
+        });
+        if (configResult.rows.length > 0) {
+          ipExcluida = String(configResult.rows[0].valor);
+        }
+      } catch {
+        // Ignorar si la tabla no existe
+      }
+
+      // Obtener todos los registros (solo campos necesarios)
+      const result = await client.execute({
+        sql: `SELECT timestamp, modo, datos_adicionales, ip_address FROM uso_aplicaciones ORDER BY id DESC`,
+        args: [],
+      });
+
+      // Rangos de fechas (inicio del día, sin hora)
+      const ahora = new Date();
+      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+      const hace7Dias = new Date(hoy); hace7Dias.setDate(hoy.getDate() - 7);
+      const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+      // Parsear timestamp español "DD/MM/YYYY, HH:MM:SS" → Date (solo fecha)
+      const parsearFecha = (ts: string): Date | null => {
+        const m = ts.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+        if (!m) return null;
+        return new Date(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]));
+      };
+
+      type Conteo = { hoy: number; ayer: number; semana: number; mes: number; total: number };
+      const conteos: Record<string, Conteo> = {};
+      const nuevaFila = (): Conteo => ({ hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 });
+
+      // Plataformas IA conocidas (en orden de visualización)
+      const PLATAFORMAS_IA = [
+        'claude.ai',
+        'perplexity.ai',
+        'chatgpt.com',
+        'gemini.google.com',
+        'copilot.microsoft.com',
+        'you.com',
+        'phind.com',
+        'poe.com',
+      ];
+
+      // Pre-inicializar todas las filas conocidas
+      ['web', ...PLATAFORMAS_IA, 'ia-sin-detalle', 'mcp', 'bot', 'mi-ip'].forEach(
+        (k) => { conteos[k] = nuevaFila(); }
+      );
+
+      for (const row of result.rows) {
+        const ts = String(row.timestamp || '');
+        const fecha = parsearFecha(ts);
+        if (!fecha) continue;
+
+        const modo = String(row.modo || 'web');
+        const ip = String(row.ip_address || '');
+
+        let datosAd: Record<string, string> | null = null;
+        try {
+          if (row.datos_adicionales) {
+            datosAd = JSON.parse(String(row.datos_adicionales));
+          }
+        } catch { /* ignorar JSON inválido */ }
+
+        // Clasificar origen
+        let origen: string;
+        if (ipExcluida && ip === ipExcluida) {
+          origen = 'mi-ip';
+        } else if (modo === 'bot') {
+          origen = 'bot';
+        } else if (modo === 'mcp') {
+          origen = 'mcp';
+        } else if (modo === 'referral-ia') {
+          const hostname = datosAd?.referrer_ia || null;
+          if (hostname && PLATAFORMAS_IA.includes(hostname)) {
+            origen = hostname;
+          } else if (hostname) {
+            // Plataforma IA desconocida — agregar dinámicamente
+            if (!conteos[hostname]) conteos[hostname] = nuevaFila();
+            origen = hostname;
+          } else {
+            origen = 'ia-sin-detalle';
+          }
+        } else {
+          origen = 'web';
+        }
+
+        // Acumular en los períodos que corresponda
+        const c = conteos[origen];
+        if (fecha >= hoy)      c.hoy++;
+        if (fecha >= ayer && fecha < hoy) c.ayer++;
+        if (fecha >= hace7Dias) c.semana++;
+        if (fecha >= inicioMes) c.mes++;
+        c.total++;
+      }
+
+      // Construir filas en orden fijo
+      const filasOrden: Array<{ key: string; label: string; icono: string; grupo: string }> = [
+        { key: 'web',                   label: 'Web',               icono: '🌐', grupo: 'web' },
+        { key: 'claude.ai',             label: 'claude.ai',         icono: '🤖', grupo: 'ia' },
+        { key: 'perplexity.ai',         label: 'perplexity.ai',     icono: '🤖', grupo: 'ia' },
+        { key: 'chatgpt.com',           label: 'chatgpt.com',       icono: '🤖', grupo: 'ia' },
+        { key: 'gemini.google.com',     label: 'gemini.google',     icono: '🤖', grupo: 'ia' },
+        { key: 'copilot.microsoft.com', label: 'copilot',           icono: '🤖', grupo: 'ia' },
+        { key: 'you.com',               label: 'you.com',           icono: '🤖', grupo: 'ia' },
+        { key: 'phind.com',             label: 'phind.com',         icono: '🤖', grupo: 'ia' },
+        { key: 'poe.com',               label: 'poe.com',           icono: '🤖', grupo: 'ia' },
+        { key: 'ia-sin-detalle',        label: 'IA sin detalle',    icono: '🤖', grupo: 'ia' },
+        { key: 'mcp',                   label: 'IA / MCP',          icono: '🔗', grupo: 'mcp' },
+        { key: 'bot',                   label: 'Bots',              icono: '🕷️', grupo: 'bot' },
+        { key: 'mi-ip',                 label: 'Mi IP',             icono: '🏠', grupo: 'miip' },
+      ];
+
+      // Añadir plataformas IA desconocidas que hayan aparecido en los datos
+      const conocidas = new Set(filasOrden.map(f => f.key));
+      for (const key of Object.keys(conteos)) {
+        if (!conocidas.has(key) && conteos[key].total > 0) {
+          filasOrden.splice(
+            filasOrden.findIndex(f => f.key === 'ia-sin-detalle'),
+            0,
+            { key, label: key, icono: '🤖', grupo: 'ia' }
+          );
+        }
+      }
+
+      const filas = filasOrden.map(({ key, label, icono, grupo }) => ({
+        origen: label,
+        icono,
+        grupo,
+        ...(conteos[key] || nuevaFila()),
+      }));
+
+      // Total Real = todo excepto Bots y Mi IP
+      const excluirDeTotalReal = new Set(['bot', 'mi-ip']);
+      const totalReal = nuevaFila();
+      for (const [key, vals] of Object.entries(conteos)) {
+        if (!excluirDeTotalReal.has(key)) {
+          totalReal.hoy    += vals.hoy;
+          totalReal.ayer   += vals.ayer;
+          totalReal.semana += vals.semana;
+          totalReal.mes    += vals.mes;
+          totalReal.total  += vals.total;
+        }
+      }
+
+      return { filas, totalReal };
+    }),
+
+  /**
    * Procedure: getIPConfig
    * Obtiene configuración de IP excluida
    * Reemplaza: GET /api/analytics/ip-filter

@@ -53,6 +53,16 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     const referrer = document.referrer;
     const esReferralIA = /chatgpt\.com|perplexity\.ai|claude\.ai|gemini\.google|copilot\.microsoft\.com|you\.com|phind\.com|poe\.com/i.test(referrer);
 
+    // Extraer solo el hostname del referrer (RGPD: solo dominio, nunca la URL completa)
+    let referrerHostname: string | null = null;
+    if (esReferralIA && referrer) {
+      try {
+        referrerHostname = new URL(referrer).hostname;
+      } catch {
+        // Si el referrer no es una URL válida, ignorar
+      }
+    }
+
     // Detectar visita recurrente usando localStorage
     const storageKey = `meskeia_${finalAppName}`;
     const isRecurrent = localStorage.getItem(storageKey) !== null;
@@ -84,7 +94,12 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       tipo_dispositivo: deviceType,
       es_recurrente: isRecurrent,
       sesion_id: sessionId,
-      datos_adicionales: refParam ? { ref: refParam } : undefined,
+      datos_adicionales: (() => {
+        const extra: Record<string, string> = {};
+        if (refParam) extra.ref = refParam;
+        if (referrerHostname) extra.referrer_ia = referrerHostname;
+        return Object.keys(extra).length > 0 ? extra : undefined;
+      })(),
     };
 
     // Registrar entrada (nueva API Turso)
