@@ -134,11 +134,7 @@ Formato de respuesta (SOLO esto, sin texto adicional):
         url: app.url,
       }));
 
-    return Response.json({
-      apps: appsRecomendadas,
-      // Campo de debug temporal (ver logs en Vercel Dashboard → Functions)
-      _debug: textoRaw,
-    });
+    return Response.json({ apps: appsRecomendadas });
 
   } catch (error) {
     console.error('[asistente] Error:', error);
