@@ -4,6 +4,52 @@ import { useState, useRef, useEffect } from 'react';
 import type { AppRecomendada, MensajeHistorial } from '@/app/api/asistente/route';
 import styles from './AsistenteChat.module.css';
 
+// Convierte markdown básico a JSX sin librerías externas.
+// Cubre los patrones que usa Claude: **negrita**, - listas, líneas vacías.
+function renderMarkdown(texto: string): React.ReactNode {
+  const lineas = texto.split('\n');
+  const nodos: React.ReactNode[] = [];
+  let i = 0;
+
+  while (i < lineas.length) {
+    const linea = lineas[i];
+
+    // Línea vacía → separador
+    if (linea.trim() === '') { i++; continue; }
+
+    // Elemento de lista
+    if (/^[-*]\s/.test(linea)) {
+      const items: string[] = [];
+      while (i < lineas.length && /^[-*]\s/.test(lineas[i])) {
+        items.push(lineas[i].replace(/^[-*]\s/, ''));
+        i++;
+      }
+      nodos.push(
+        <ul key={i} className={styles.mdLista}>
+          {items.map((item, j) => <li key={j}>{aplicarInline(item)}</li>)}
+        </ul>
+      );
+      continue;
+    }
+
+    // Párrafo normal
+    nodos.push(<p key={i} className={styles.mdParrafo}>{aplicarInline(linea)}</p>);
+    i++;
+  }
+
+  return <>{nodos}</>;
+}
+
+// Aplica negrita (**texto**) dentro de una línea
+function aplicarInline(texto: string): React.ReactNode {
+  const partes = texto.split(/(\*\*[^*]+\*\*)/g);
+  return partes.map((parte, i) =>
+    parte.startsWith('**') && parte.endsWith('**')
+      ? <strong key={i}>{parte.slice(2, -2)}</strong>
+      : parte
+  );
+}
+
 interface MensajeUI {
   rol: 'usuario' | 'asistente';
   texto?: string;
@@ -108,7 +154,11 @@ export default function AsistenteChat() {
                 <span className={styles.avatarAsistente} aria-hidden="true">✨</span>
               )}
               <div className={styles.mensajeContenido}>
-                {m.texto && <p className={styles.mensajeTexto}>{m.texto}</p>}
+                {m.texto && (
+                  <div className={`${styles.mensajeTexto} ${m.rol === 'asistente' ? styles.mensajeTextoMd : ''}`}>
+                    {m.rol === 'asistente' ? renderMarkdown(m.texto) : m.texto}
+                  </div>
+                )}
                 {m.apps && m.apps.length > 0 && (
                   <div className={styles.appCards}>
                     {m.apps.map((app) => (
