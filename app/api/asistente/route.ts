@@ -18,6 +18,7 @@ import { calcularPropina } from '@/lib/calculadoras/propinas';
 import { calcularPorcentaje, type ModoPorcentaje } from '@/lib/calculadoras/porcentajes';
 import { calcularConsumo, calcularViaje } from '@/lib/calculadoras/combustible';
 import { calcularIMC } from '@/lib/calculadoras/imc';
+import { calcularInteresCompuesto, type FrecuenciaCapitalizacion } from '@/lib/calculadoras/interesCompuesto';
 import {
   calcularDiferenciaFechas,
   calcularOperacionFecha,
@@ -153,6 +154,21 @@ const HERRAMIENTAS: Anthropic.Tool[] = [
       required: ['pesoKg', 'alturaCm'],
     },
   },
+  {
+    name: 'calcular_interes_compuesto',
+    description: 'Simula el crecimiento de una inversión o ahorro con interés compuesto. Calcula el capital final, intereses generados y rentabilidad. Úsalo cuando el usuario pregunte cuánto tendrá si invierte o ahorra durante varios años, rentabilidad de fondos, o quiera simular el efecto del interés compuesto.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        capitalInicial:          { type: 'number', description: 'Capital inicial invertido en euros, ej: 10000' },
+        tasaAnual:               { type: 'number', description: 'Rentabilidad anual en porcentaje, ej: 7 para 7%' },
+        anos:                    { type: 'number', description: 'Número de años de la inversión' },
+        aportacionPeriodica:     { type: 'number', description: 'Aportación mensual adicional en euros (opcional, por defecto 0)' },
+        frecuenciaCapitalizacion:{ type: 'string', enum: ['anual', 'semestral', 'trimestral', 'mensual'], description: 'Frecuencia de capitalización (por defecto anual)' },
+      },
+      required: ['capitalInicial', 'tasaAnual', 'anos'],
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -273,6 +289,24 @@ function ejecutarHerramienta(nombre: string, params: Record<string, unknown>): s
       });
     }
 
+    if (nombre === 'calcular_interes_compuesto') {
+      const { capitalInicial, tasaAnual, anos, aportacionPeriodica, frecuenciaCapitalizacion } = params as {
+        capitalInicial: number;
+        tasaAnual: number;
+        anos: number;
+        aportacionPeriodica?: number;
+        frecuenciaCapitalizacion?: FrecuenciaCapitalizacion;
+      };
+      const r = calcularInteresCompuesto({ capitalInicial, tasaAnual, anos, aportacionPeriodica, frecuenciaCapitalizacion });
+      return JSON.stringify({
+        capital_final_euros: r.capitalFinal,
+        total_aportado_euros: r.totalAportado,
+        intereses_generados_euros: r.totalIntereses,
+        rentabilidad_pct: r.rentabilidadPct,
+        _disclaimer: { variant: 'financial', severity: 'high' },
+      });
+    }
+
     return 'Herramienta no reconocida.';
   } catch (e) {
     return `Error: ${e instanceof Error ? e.message : 'parámetros inválidos'}`;
@@ -313,7 +347,7 @@ CAPACIDADES:
 2. Para otros temas, recomienda apps del catálogo respondiendo SOLO con un array JSON de URLs.
 
 COMPORTAMIENTO:
-- Si el usuario pide un cálculo de propina, porcentaje, combustible, fechas o IMC → usa SIEMPRE la herramienta correspondiente, aunque tengas los datos suficientes para calcularlo mentalmente. Nunca calcules directamente en texto.
+- Si el usuario pide un cálculo de propina, porcentaje, combustible, fechas, IMC o interés compuesto → usa SIEMPRE la herramienta correspondiente, aunque tengas los datos suficientes para calcularlo mentalmente. Nunca calcules directamente en texto.
 - Si faltan datos para calcular → pregunta solo lo estrictamente necesario, en una sola pregunta.
 - Si el tema no corresponde a ninguna herramienta → responde con un array JSON: ["/url-app/"]
 - Si no hay ninguna app relevante → responde con []
