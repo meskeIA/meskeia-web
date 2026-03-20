@@ -17,6 +17,7 @@ import { implementedAppsUrls } from '@/data/implemented-apps';
 import { calcularPropina } from '@/lib/calculadoras/propinas';
 import { calcularPorcentaje, type ModoPorcentaje } from '@/lib/calculadoras/porcentajes';
 import { calcularConsumo, calcularViaje } from '@/lib/calculadoras/combustible';
+import { calcularIMC } from '@/lib/calculadoras/imc';
 import {
   calcularDiferenciaFechas,
   calcularOperacionFecha,
@@ -140,6 +141,18 @@ const HERRAMIENTAS: Anthropic.Tool[] = [
       required: ['fechaNacimiento'],
     },
   },
+  {
+    name: 'calcular_imc',
+    description: 'Calcula el Índice de Masa Corporal (IMC) a partir del peso y la altura, e indica la categoría (normopeso, sobrepeso, obesidad...) y el rango de peso saludable. Úsalo cuando el usuario pregunte por su IMC, peso ideal o clasificación de peso.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        pesoKg:   { type: 'number', description: 'Peso en kilogramos, ej: 75' },
+        alturaCm: { type: 'number', description: 'Altura en centímetros, ej: 175' },
+      },
+      required: ['pesoKg', 'alturaCm'],
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -246,6 +259,20 @@ function ejecutarHerramienta(nombre: string, params: Record<string, unknown>): s
       });
     }
 
+    if (nombre === 'calcular_imc') {
+      const { pesoKg, alturaCm } = params as { pesoKg: number; alturaCm: number };
+      const r = calcularIMC({ pesoKg, alturaCm });
+      return JSON.stringify({
+        imc: r.imcFormateado,
+        categoria: `${r.icono} ${r.categoria}`,
+        descripcion: r.descripcion,
+        peso_ideal_min_kg: r.pesoIdealMinKg,
+        peso_ideal_max_kg: r.pesoIdealMaxKg,
+        diferencia_kg: r.diferenciaKg,
+        _disclaimer: { variant: 'medical', severity: 'high' },
+      });
+    }
+
     return 'Herramienta no reconocida.';
   } catch (e) {
     return `Error: ${e instanceof Error ? e.message : 'parámetros inválidos'}`;
@@ -325,18 +352,31 @@ export async function POST(req: Request): Promise<Response> {
       messages: mensajes,
     });
 
+    // Acumulador de disclaimer (se rellena si alguna tool lo incluye)
+    let disclaimerInfo: { variant: string; severity: string } | undefined;
+
     // Bucle de tool_use: Claude puede pedir ejecutar una herramienta
     while (respuesta.stop_reason === 'tool_use') {
       const bloquesTool = respuesta.content.filter(
         (b): b is Anthropic.ToolUseBlock => b.type === 'tool_use'
       );
 
-      // Construir resultados de todas las herramientas llamadas
-      const resultadosTool: Anthropic.ToolResultBlockParam[] = bloquesTool.map((bloque) => ({
-        type: 'tool_result' as const,
-        tool_use_id: bloque.id,
-        content: ejecutarHerramienta(bloque.name, bloque.input as Record<string, unknown>),
-      }));
+      // Construir resultados: extraer _disclaimer antes de enviar a Claude
+      const resultadosTool: Anthropic.ToolResultBlockParam[] = bloquesTool.map((bloque) => {
+        const resultado = ejecutarHerramienta(bloque.name, bloque.input as Record<string, unknown>);
+
+        // Detectar y extraer _disclaimer del JSON resultado
+        try {
+          const parsed = JSON.parse(resultado) as Record<string, unknown>;
+          if (parsed._disclaimer) {
+            disclaimerInfo = parsed._disclaimer as { variant: string; severity: string };
+            delete parsed._disclaimer;
+            return { type: 'tool_result' as const, tool_use_id: bloque.id, content: JSON.stringify(parsed) };
+          }
+        } catch { /* resultado no es JSON, pasar tal cual */ }
+
+        return { type: 'tool_result' as const, tool_use_id: bloque.id, content: resultado };
+      });
 
       // Añadir la respuesta del asistente (con tool_use) y los resultados
       mensajes.push({ role: 'assistant', content: respuesta.content });
@@ -375,6 +415,7 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json({
       texto: apps.length > 0 ? undefined : textoFinal,
       apps: apps.length > 0 ? apps : undefined,
+      disclaimer: disclaimerInfo,
       historial: historialActualizado,
     });
 

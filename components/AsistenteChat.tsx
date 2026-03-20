@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import type { AppRecomendada, MensajeHistorial } from '@/app/api/asistente/route';
+import DisclaimerCard, { type DisclaimerVariant, type DisclaimerSeverity } from './DisclaimerCard';
 import styles from './AsistenteChat.module.css';
 
 // Convierte markdown básico a JSX sin librerías externas.
@@ -50,15 +51,22 @@ function aplicarInline(texto: string): React.ReactNode {
   );
 }
 
+interface DisclaimerInfo {
+  variant: DisclaimerVariant;
+  severity: DisclaimerSeverity;
+}
+
 interface MensajeUI {
   rol: 'usuario' | 'asistente';
   texto?: string;
   apps?: AppRecomendada[];
+  disclaimer?: DisclaimerInfo;
 }
 
 interface RespuestaAPI {
   texto?: string;
   apps?: AppRecomendada[];
+  disclaimer?: DisclaimerInfo;
   historial?: MensajeHistorial[];
   error?: string;
 }
@@ -110,7 +118,7 @@ export default function AsistenteChat() {
 
       setMensajes((prev) => [
         ...prev,
-        { rol: 'asistente', texto: datos.texto, apps: datos.apps },
+        { rol: 'asistente', texto: datos.texto, apps: datos.apps, disclaimer: datos.disclaimer },
       ]);
 
       if (datos.historial) setHistorial(datos.historial);
@@ -158,6 +166,12 @@ export default function AsistenteChat() {
                   <div className={`${styles.mensajeTexto} ${m.rol === 'asistente' ? styles.mensajeTextoMd : ''}`}>
                     {m.rol === 'asistente' ? renderMarkdown(m.texto) : m.texto}
                   </div>
+                )}
+                {m.disclaimer && (
+                  <DisclaimerCard
+                    variant={m.disclaimer.variant}
+                    severity={m.disclaimer.severity}
+                  />
                 )}
                 {m.apps && m.apps.length > 0 && (
                   <div className={styles.appCards}>
