@@ -214,6 +214,7 @@ tras el texto de la respuesta
 | `calcular_dia_semana` | `lib/calculadoras/fechas.ts` | — |
 | `calcular_edad` | `lib/calculadoras/fechas.ts` | — |
 | `calcular_imc` | `lib/calculadoras/imc.ts` | `medical/high` |
+| `calcular_interes_compuesto` | `lib/calculadoras/interesCompuesto.ts` | `financial/high` |
 
 ---
 
