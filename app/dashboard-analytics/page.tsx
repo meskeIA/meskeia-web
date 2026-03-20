@@ -151,7 +151,7 @@ export default function DashboardAnalyticsPage() {
 
   // Variables derivadas de los queries
   const datos = statsQuery.data || null;
-  const loading = statsQuery.isLoading || statsQuery.isFetching;
+  const loading = statsQuery.isLoading || statsQuery.isFetching || resumenQuery.isFetching;
   const error = statsQuery.error?.message || null;
   const ipConfig = ipConfigQuery.data?.data || null;
   const actualizandoIP = updateIPMutation.isPending;
@@ -434,7 +434,7 @@ export default function DashboardAnalyticsPage() {
 
         <div className={styles.headerControls}>
           <button
-            onClick={() => statsQuery.refetch()}
+            onClick={() => { statsQuery.refetch(); resumenQuery.refetch(); }}
             className={styles.btnRefresh}
             disabled={loading}
           >
