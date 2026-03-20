@@ -17,6 +17,14 @@ import { implementedAppsUrls } from '@/data/implemented-apps';
 import { calcularPropina } from '@/lib/calculadoras/propinas';
 import { calcularPorcentaje, type ModoPorcentaje } from '@/lib/calculadoras/porcentajes';
 import { calcularConsumo, calcularViaje } from '@/lib/calculadoras/combustible';
+import {
+  calcularDiferenciaFechas,
+  calcularOperacionFecha,
+  calcularDiaSemana,
+  calcularEdad,
+  type UnidadTiempo,
+  type OperacionFecha,
+} from '@/lib/calculadoras/fechas';
 
 const cliente = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -83,6 +91,55 @@ const HERRAMIENTAS: Anthropic.Tool[] = [
       required: ['modo', 'precioCombustible'],
     },
   },
+  {
+    name: 'calcular_diferencia_fechas',
+    description: 'Calcula cuántos días, semanas, meses y años hay entre dos fechas. Úsalo cuando el usuario pregunte "cuánto tiempo falta/queda/hay", "cuántos días entre", plazos, antigüedad, tiempo transcurrido.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        fechaInicio: { type: 'string', description: 'Fecha inicial en formato YYYY-MM-DD o "hoy"' },
+        fechaFin:    { type: 'string', description: 'Fecha final en formato YYYY-MM-DD o "hoy"' },
+      },
+      required: ['fechaInicio', 'fechaFin'],
+    },
+  },
+  {
+    name: 'calcular_fecha_resultado',
+    description: 'Suma o resta días, semanas, meses o años a una fecha para obtener otra fecha. Úsalo cuando el usuario pregunte "qué fecha será en X días/meses", "cuándo vence en X días", plazos futuros o pasados.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        fechaBase:  { type: 'string', description: 'Fecha de partida en formato YYYY-MM-DD o "hoy"' },
+        operacion:  { type: 'string', enum: ['sumar', 'restar'], description: '"sumar" para fecha futura, "restar" para fecha pasada' },
+        cantidad:   { type: 'number', description: 'Número de unidades a sumar o restar' },
+        unidad:     { type: 'string', enum: ['dias', 'semanas', 'meses', 'anios'], description: 'Unidad temporal' },
+      },
+      required: ['fechaBase', 'operacion', 'cantidad', 'unidad'],
+    },
+  },
+  {
+    name: 'calcular_dia_semana',
+    description: 'Dice qué día de la semana (lunes, martes...) es una fecha concreta. Úsalo cuando el usuario pregunte "qué día cae", "en qué día de la semana es/fue", o quiera saber si una fecha es festivo/fin de semana.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        fecha: { type: 'string', description: 'Fecha a consultar en formato YYYY-MM-DD o "hoy"' },
+      },
+      required: ['fecha'],
+    },
+  },
+  {
+    name: 'calcular_edad',
+    description: 'Calcula la edad exacta (años, meses, días) a partir de una fecha de nacimiento. Úsalo para preguntas de edad, cuántos años tiene alguien, cuándo cumple años.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        fechaNacimiento: { type: 'string', description: 'Fecha de nacimiento en formato YYYY-MM-DD' },
+        fechaReferencia: { type: 'string', description: 'Fecha en la que calcular la edad (YYYY-MM-DD o "hoy"). Por defecto hoy.' },
+      },
+      required: ['fechaNacimiento'],
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -142,6 +199,53 @@ function ejecutarHerramienta(nombre: string, params: Record<string, unknown>): s
       }
     }
 
+    if (nombre === 'calcular_diferencia_fechas') {
+      const { fechaInicio, fechaFin } = params as { fechaInicio: string; fechaFin: string };
+      const r = calcularDiferenciaFechas({ fechaInicio, fechaFin });
+      return JSON.stringify({
+        dias_totales: r.diasTotales,
+        semanas: r.semanas,
+        meses_aproximados: r.mesesAproximados,
+        tiempo_exacto: r.descripcion,
+      });
+    }
+
+    if (nombre === 'calcular_fecha_resultado') {
+      const { fechaBase, operacion, cantidad, unidad } = params as {
+        fechaBase: string; operacion: OperacionFecha; cantidad: number; unidad: UnidadTiempo;
+      };
+      const r = calcularOperacionFecha({ fechaBase, operacion, cantidad, unidad });
+      return JSON.stringify({
+        fecha_resultado: r.fechaFormateada,
+        fecha_iso: r.fechaResultado,
+        dia_semana: r.diaSemana,
+      });
+    }
+
+    if (nombre === 'calcular_dia_semana') {
+      const { fecha } = params as { fecha: string };
+      const r = calcularDiaSemana({ fecha });
+      return JSON.stringify({
+        dia_semana: r.diaSemana,
+        fecha_completa: r.fechaFormateada,
+        referencia: r.referenciaHoy,
+      });
+    }
+
+    if (nombre === 'calcular_edad') {
+      const { fechaNacimiento, fechaReferencia } = params as {
+        fechaNacimiento: string; fechaReferencia?: string;
+      };
+      const r = calcularEdad({ fechaNacimiento, fechaReferencia });
+      return JSON.stringify({
+        edad: r.descripcion,
+        anios: r.anios,
+        dias_vividos: r.totalDias,
+        proximo_cumpleanos: r.proximoCumpleanos,
+        dias_hasta_cumpleanos: r.diasHastaProximoCumpleanos,
+      });
+    }
+
     return 'Herramienta no reconocida.';
   } catch (e) {
     return `Error: ${e instanceof Error ? e.message : 'parámetros inválidos'}`;
@@ -178,11 +282,11 @@ function extraerArrayJSON(texto: string): string[] {
 const SYSTEM_PROMPT = `Eres el asistente de meskeIA, una web de herramientas gratuitas para el día a día en España.
 
 CAPACIDADES:
-1. Tienes herramientas para calcular propinas, porcentajes y combustible — úsalas cuando el usuario lo necesite.
+1. Tienes herramientas para calcular propinas, porcentajes, combustible y fechas — úsalas cuando el usuario lo necesite.
 2. Para otros temas, recomienda apps del catálogo respondiendo SOLO con un array JSON de URLs.
 
 COMPORTAMIENTO:
-- Si el usuario pide un cálculo de propina, porcentaje o combustible → usa la herramienta correspondiente.
+- Si el usuario pide un cálculo de propina, porcentaje, combustible o fechas → usa la herramienta correspondiente.
 - Si faltan datos para calcular → pregunta solo lo estrictamente necesario, en una sola pregunta.
 - Si el tema no corresponde a ninguna herramienta → responde con un array JSON: ["/url-app/"]
 - Si no hay ninguna app relevante → responde con []
