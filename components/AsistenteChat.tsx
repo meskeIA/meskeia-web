@@ -2,71 +2,16 @@
 
 import { useState, useRef, useEffect } from 'react';
 import type { AppRecomendada, MensajeHistorial } from '@/app/api/asistente/route';
-import DisclaimerCard, { type DisclaimerVariant, type DisclaimerSeverity } from './DisclaimerCard';
 import styles from './AsistenteChat.module.css';
-
-// Convierte markdown básico a JSX sin librerías externas.
-// Cubre los patrones que usa Claude: **negrita**, - listas, líneas vacías.
-function renderMarkdown(texto: string): React.ReactNode {
-  const lineas = texto.split('\n');
-  const nodos: React.ReactNode[] = [];
-  let i = 0;
-
-  while (i < lineas.length) {
-    const linea = lineas[i];
-
-    // Línea vacía → separador
-    if (linea.trim() === '') { i++; continue; }
-
-    // Elemento de lista
-    if (/^[-*]\s/.test(linea)) {
-      const items: string[] = [];
-      while (i < lineas.length && /^[-*]\s/.test(lineas[i])) {
-        items.push(lineas[i].replace(/^[-*]\s/, ''));
-        i++;
-      }
-      nodos.push(
-        <ul key={i} className={styles.mdLista}>
-          {items.map((item, j) => <li key={j}>{aplicarInline(item)}</li>)}
-        </ul>
-      );
-      continue;
-    }
-
-    // Párrafo normal
-    nodos.push(<p key={i} className={styles.mdParrafo}>{aplicarInline(linea)}</p>);
-    i++;
-  }
-
-  return <>{nodos}</>;
-}
-
-// Aplica negrita (**texto**) dentro de una línea
-function aplicarInline(texto: string): React.ReactNode {
-  const partes = texto.split(/(\*\*[^*]+\*\*)/g);
-  return partes.map((parte, i) =>
-    parte.startsWith('**') && parte.endsWith('**')
-      ? <strong key={i}>{parte.slice(2, -2)}</strong>
-      : parte
-  );
-}
-
-interface DisclaimerInfo {
-  variant: DisclaimerVariant;
-  severity: DisclaimerSeverity;
-}
 
 interface MensajeUI {
   rol: 'usuario' | 'asistente';
   texto?: string;
   apps?: AppRecomendada[];
-  disclaimer?: DisclaimerInfo;
 }
 
 interface RespuestaAPI {
-  texto?: string;
   apps?: AppRecomendada[];
-  disclaimer?: DisclaimerInfo;
   historial?: MensajeHistorial[];
   error?: string;
 }
@@ -79,14 +24,12 @@ export default function AsistenteChat() {
   const inputRef = useRef<HTMLInputElement>(null);
   const mensajesRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll al último mensaje
   useEffect(() => {
     if (mensajesRef.current) {
       mensajesRef.current.scrollTop = mensajesRef.current.scrollHeight;
     }
   }, [mensajes, cargando]);
 
-  // Focus al montar
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -116,10 +59,14 @@ export default function AsistenteChat() {
         return;
       }
 
-      setMensajes((prev) => [
-        ...prev,
-        { rol: 'asistente', texto: datos.texto, apps: datos.apps, disclaimer: datos.disclaimer },
-      ]);
+      if (datos.apps && datos.apps.length > 0) {
+        setMensajes((prev) => [...prev, { rol: 'asistente', apps: datos.apps }]);
+      } else {
+        setMensajes((prev) => [
+          ...prev,
+          { rol: 'asistente', texto: 'No he encontrado apps relacionadas. Prueba a describir lo que necesitas con otras palabras.' },
+        ]);
+      }
 
       if (datos.historial) setHistorial(datos.historial);
 
@@ -150,7 +97,6 @@ export default function AsistenteChat() {
 
   return (
     <div className={styles.chat}>
-      {/* Historial de mensajes */}
       {mensajes.length > 0 && (
         <div className={styles.mensajes} ref={mensajesRef}>
           {mensajes.map((m, i) => (
@@ -163,15 +109,7 @@ export default function AsistenteChat() {
               )}
               <div className={styles.mensajeContenido}>
                 {m.texto && (
-                  <div className={`${styles.mensajeTexto} ${m.rol === 'asistente' ? styles.mensajeTextoMd : ''}`}>
-                    {m.rol === 'asistente' ? renderMarkdown(m.texto) : m.texto}
-                  </div>
-                )}
-                {m.disclaimer && (
-                  <DisclaimerCard
-                    variant={m.disclaimer.variant}
-                    severity={m.disclaimer.severity}
-                  />
+                  <div className={styles.mensajeTexto}>{m.texto}</div>
                 )}
                 {m.apps && m.apps.length > 0 && (
                   <div className={styles.appCards}>
@@ -190,7 +128,6 @@ export default function AsistenteChat() {
             </div>
           ))}
 
-          {/* Indicador de carga */}
           {cargando && (
             <div className={`${styles.mensaje} ${styles.mensajeAsistente}`}>
               <span className={styles.avatarAsistente} aria-hidden="true">✨</span>
@@ -204,7 +141,6 @@ export default function AsistenteChat() {
         </div>
       )}
 
-      {/* Input */}
       <div className={styles.inputArea}>
         <input
           ref={inputRef}
