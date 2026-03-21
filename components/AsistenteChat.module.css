@@ -238,6 +238,15 @@
   line-height: 1.5;
 }
 
+/* ===== SIN RESULTADOS ===== */
+.sinResultados {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
 /* ===== DARK MODE ===== */
 [data-theme='dark'] .mensajes {
   border-color: rgba(46, 134, 171, 0.2);

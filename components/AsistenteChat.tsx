@@ -1,181 +1,91 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import type { AppRecomendada, MensajeHistorial } from '@/app/api/asistente/route';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import Fuse from 'fuse.js';
+import { applicationsDatabase } from '@/data/applications';
+import { implementedAppsUrls } from '@/data/implemented-apps';
 import styles from './AsistenteChat.module.css';
 
-interface MensajeUI {
-  rol: 'usuario' | 'asistente';
-  texto?: string;
-  apps?: AppRecomendada[];
-}
+// Solo apps implementadas, instancia compartida
+const appsImplementadas = applicationsDatabase.filter((app) =>
+  implementedAppsUrls.includes(app.url)
+);
 
-interface RespuestaAPI {
-  apps?: AppRecomendada[];
-  historial?: MensajeHistorial[];
-  error?: string;
-}
+const fuseAsistente = new Fuse(appsImplementadas, {
+  keys: [
+    { name: 'name', weight: 0.4 },
+    { name: 'description', weight: 0.3 },
+    { name: 'keywords', weight: 0.2 },
+    { name: 'suites', weight: 0.1 },
+  ],
+  threshold: 0.4,
+  includeScore: true,
+  minMatchCharLength: 2,
+  ignoreLocation: true,
+});
 
 export default function AsistenteChat() {
-  const [mensajes, setMensajes] = useState<MensajeUI[]>([]);
-  const [input, setInput] = useState('');
-  const [cargando, setCargando] = useState(false);
-  const [historial, setHistorial] = useState<MensajeHistorial[]>([]);
+  const [consulta, setConsulta] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const mensajesRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (mensajesRef.current) {
-      mensajesRef.current.scrollTop = mensajesRef.current.scrollHeight;
-    }
-  }, [mensajes, cargando]);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  const enviar = async () => {
-    const consulta = input.trim();
-    if (!consulta || cargando) return;
+  const resultados = useMemo(() => {
+    if (consulta.trim().length < 2) return [];
+    return fuseAsistente.search(consulta.trim()).slice(0, 5);
+  }, [consulta]);
 
-    setInput('');
-    setMensajes((prev) => [...prev, { rol: 'usuario', texto: consulta }]);
-    setCargando(true);
-
-    try {
-      const res = await fetch('/api/asistente', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ consulta, historial }),
-      });
-
-      const datos = await res.json() as RespuestaAPI;
-
-      if (!res.ok || datos.error) {
-        setMensajes((prev) => [
-          ...prev,
-          { rol: 'asistente', texto: 'No he podido procesar tu consulta. Inténtalo de nuevo.' },
-        ]);
-        return;
-      }
-
-      if (datos.apps && datos.apps.length > 0) {
-        setMensajes((prev) => [...prev, { rol: 'asistente', apps: datos.apps }]);
-      } else {
-        setMensajes((prev) => [
-          ...prev,
-          { rol: 'asistente', texto: 'No he encontrado apps relacionadas. Prueba a describir lo que necesitas con otras palabras.' },
-        ]);
-      }
-
-      if (datos.historial) setHistorial(datos.historial);
-
-    } catch {
-      setMensajes((prev) => [
-        ...prev,
-        { rol: 'asistente', texto: 'Error de conexión. Comprueba tu red e inténtalo de nuevo.' },
-      ]);
-    } finally {
-      setCargando(false);
-      inputRef.current?.focus();
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      void enviar();
-    }
-  };
-
-  const reiniciar = () => {
-    setMensajes([]);
-    setHistorial([]);
-    setInput('');
+  const limpiar = () => {
+    setConsulta('');
     inputRef.current?.focus();
   };
 
   return (
     <div className={styles.chat}>
-      {mensajes.length > 0 && (
-        <div className={styles.mensajes} ref={mensajesRef}>
-          {mensajes.map((m, i) => (
-            <div
-              key={i}
-              className={`${styles.mensaje} ${m.rol === 'usuario' ? styles.mensajeUsuario : styles.mensajeAsistente}`}
-            >
-              {m.rol === 'asistente' && (
-                <span className={styles.avatarAsistente} aria-hidden="true">✨</span>
-              )}
-              <div className={styles.mensajeContenido}>
-                {m.texto && (
-                  <div className={styles.mensajeTexto}>{m.texto}</div>
-                )}
-                {m.apps && m.apps.length > 0 && (
-                  <div className={styles.appCards}>
-                    {m.apps.map((app) => (
-                      <a key={app.url} href={app.url} className={styles.appCard}>
-                        <span className={styles.appCardIcon}>{app.icon}</span>
-                        <div className={styles.appCardBody}>
-                          <div className={styles.appCardName}>{app.name}</div>
-                          <div className={styles.appCardDesc}>{app.description}</div>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-
-          {cargando && (
-            <div className={`${styles.mensaje} ${styles.mensajeAsistente}`}>
-              <span className={styles.avatarAsistente} aria-hidden="true">✨</span>
-              <div className={styles.mensajeContenido}>
-                <div className={styles.typing}>
-                  <span /><span /><span />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       <div className={styles.inputArea}>
         <input
           ref={inputRef}
           type="text"
           className={styles.input}
-          placeholder={mensajes.length === 0
-            ? 'Describe lo que necesitas... (pulsa Enter)'
-            : 'Continúa la conversación...'}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          disabled={cargando}
-          aria-label="Mensaje al asistente"
+          placeholder="Describe lo que necesitas..."
+          value={consulta}
+          onChange={(e) => setConsulta(e.target.value)}
+          aria-label="Describe lo que necesitas"
         />
-        <button
-          type="button"
-          className={styles.btnEnviar}
-          onClick={() => void enviar()}
-          disabled={!input.trim() || cargando}
-          aria-label="Enviar mensaje"
-        >
-          ↵
-        </button>
-        {mensajes.length > 0 && (
+        {consulta && (
           <button
             type="button"
             className={styles.btnReiniciar}
-            onClick={reiniciar}
-            aria-label="Nueva conversación"
-            title="Nueva conversación"
+            onClick={limpiar}
+            aria-label="Borrar búsqueda"
+            title="Borrar"
           >
             ✕
           </button>
         )}
       </div>
+
+      {resultados.length > 0 && (
+        <div className={styles.appCards}>
+          {resultados.map(({ item }) => (
+            <a key={item.url} href={item.url} className={styles.appCard}>
+              <span className={styles.appCardIcon}>{item.icon}</span>
+              <div className={styles.appCardBody}>
+                <div className={styles.appCardName}>{item.name}</div>
+                <div className={styles.appCardDesc}>{item.description}</div>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+
+      {consulta.trim().length >= 2 && resultados.length === 0 && (
+        <p className={styles.sinResultados}>
+          No hemos encontrado apps relacionadas. Prueba con otras palabras.
+        </p>
+      )}
     </div>
   );
 }
