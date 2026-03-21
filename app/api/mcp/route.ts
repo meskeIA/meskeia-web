@@ -14,6 +14,16 @@ import { z } from 'zod';
 import { calcularPropina, obtenerPorcentajePais, PROPINAS_POR_PAIS } from '@/lib/calculadoras/propinas';
 import { calcularPorcentaje, type ModoPorcentaje } from '@/lib/calculadoras/porcentajes';
 import { calcularConsumo, calcularViaje } from '@/lib/calculadoras/combustible';
+import { calcularIMC } from '@/lib/calculadoras/imc';
+import { calcularInteresCompuesto, type FrecuenciaCapitalizacion } from '@/lib/calculadoras/interesCompuesto';
+import {
+  calcularDiferenciaFechas,
+  calcularOperacionFecha,
+  calcularDiaSemana,
+  calcularEdad,
+  type UnidadTiempo,
+  type OperacionFecha,
+} from '@/lib/calculadoras/fechas';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -215,6 +225,222 @@ function crearServidorMCP(): McpServer {
         `💶 Coste total: **${r.costeTotal} €**`,
         `📍 Coste por km: **${r.costePorKm} €/km**`,
       ].join('\n');
+      return { content: [{ type: 'text', text: texto }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_imc
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_imc',
+    'Calcula el Índice de Masa Corporal (IMC) a partir del peso y la altura. ' +
+    'Devuelve la categoría (normopeso, sobrepeso, obesidad...), el rango de peso saludable ' +
+    'y cuántos kg faltan o sobran para alcanzarlo. ' +
+    '⚕️ Herramienta orientativa — no reemplaza valoración médica.',
+    {
+      pesoKg: z.number().positive().max(500)
+        .describe('Peso en kilogramos (ej: 75)'),
+      alturaCm: z.number().positive().max(300)
+        .describe('Altura en centímetros (ej: 175)'),
+    },
+    async ({ pesoKg, alturaCm }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_imc', aiCaller);
+
+      const r = calcularIMC({ pesoKg, alturaCm });
+
+      const lineas = [
+        `${r.icono} **IMC: ${r.imcFormateado}** — ${r.categoria}`,
+        `📋 ${r.descripcion}`,
+        `⚖️ Rango de peso saludable para tu altura: ${r.pesoIdealMinKg} – ${r.pesoIdealMaxKg} kg`,
+      ];
+
+      if (r.diferenciaKg > 0) {
+        lineas.push(`📈 Necesitarías ganar ${r.diferenciaKg} kg para alcanzar el normopeso`);
+      } else if (r.diferenciaKg < 0) {
+        lineas.push(`📉 Necesitarías perder ${Math.abs(r.diferenciaKg)} kg para alcanzar el normopeso`);
+      } else {
+        lineas.push(`✅ Tu peso actual está dentro del rango saludable`);
+      }
+
+      lineas.push('', '⚕️ *Este resultado es orientativo. Consulta con un profesional sanitario para una valoración completa.*');
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_interes_compuesto
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_interes_compuesto',
+    'Simula el crecimiento de una inversión o ahorro con interés compuesto. ' +
+    'Calcula el capital final, los intereses generados y la rentabilidad total. ' +
+    'Admite aportaciones periódicas mensuales y diferentes frecuencias de capitalización. ' +
+    '💰 Herramienta orientativa — no constituye asesoramiento financiero.',
+    {
+      capitalInicial: z.number().nonnegative()
+        .describe('Capital inicial invertido en euros (ej: 10000)'),
+      tasaAnual: z.number().min(0).max(100)
+        .describe('Rentabilidad anual en porcentaje (ej: 7 para 7%)'),
+      anos: z.number().int().min(1).max(100)
+        .describe('Número de años de la inversión'),
+      aportacionPeriodica: z.number().nonnegative().optional()
+        .describe('Aportación mensual adicional en euros (opcional, por defecto 0)'),
+      frecuenciaCapitalizacion: z.enum(['anual', 'semestral', 'trimestral', 'mensual']).optional()
+        .describe('Frecuencia de capitalización de intereses (por defecto anual)'),
+    },
+    async ({ capitalInicial, tasaAnual, anos, aportacionPeriodica, frecuenciaCapitalizacion }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_interes_compuesto', aiCaller);
+
+      const r = calcularInteresCompuesto({
+        capitalInicial,
+        tasaAnual,
+        anos,
+        aportacionPeriodica,
+        frecuenciaCapitalizacion: frecuenciaCapitalizacion as FrecuenciaCapitalizacion | undefined,
+      });
+
+      const lineas = [
+        `💰 **Simulación de interés compuesto — ${anos} años al ${tasaAnual}%**`,
+        '',
+        `💵 Capital inicial: **${capitalInicial.toLocaleString('es-ES')} €**`,
+        aportacionPeriodica ? `➕ Aportación mensual: **${aportacionPeriodica.toLocaleString('es-ES')} €**` : '',
+        `📦 Total aportado: **${r.totalAportado.toLocaleString('es-ES')} €**`,
+        `📈 Intereses generados: **${r.totalIntereses.toLocaleString('es-ES')} €**`,
+        `🏆 Capital final: **${r.capitalFinal.toLocaleString('es-ES')} €**`,
+        `📊 Rentabilidad total: **${r.rentabilidadPct}%**`,
+        '',
+        '💡 *Resultado orientativo. No constituye asesoramiento financiero. Consulta con un asesor antes de invertir.*',
+      ].filter((l) => l !== undefined);
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_diferencia_fechas
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_diferencia_fechas',
+    'Calcula cuánto tiempo hay entre dos fechas: días totales, semanas, meses y desglose exacto en años/meses/días. ' +
+    'Útil para plazos, antigüedad, tiempo transcurrido o tiempo restante hasta un evento.',
+    {
+      fechaInicio: z.string()
+        .describe('Fecha inicial en formato YYYY-MM-DD o "hoy"'),
+      fechaFin: z.string()
+        .describe('Fecha final en formato YYYY-MM-DD o "hoy"'),
+    },
+    async ({ fechaInicio, fechaFin }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_diferencia_fechas', aiCaller);
+
+      const r = calcularDiferenciaFechas({ fechaInicio, fechaFin });
+
+      const texto = [
+        `📅 **Diferencia entre fechas**`,
+        `⏱️ Tiempo exacto: **${r.descripcion}**`,
+        `📆 Días totales: ${r.diasTotales}`,
+        `📆 Semanas: ${r.semanas}`,
+        `📆 Meses aproximados: ${r.mesesAproximados}`,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: texto }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_fecha_resultado
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_fecha_resultado',
+    'Suma o resta días, semanas, meses o años a una fecha para obtener otra fecha. ' +
+    'Útil para calcular plazos, vencimientos, fechas futuras o pasadas.',
+    {
+      fechaBase: z.string()
+        .describe('Fecha de partida en formato YYYY-MM-DD o "hoy"'),
+      operacion: z.enum(['sumar', 'restar'])
+        .describe('"sumar" para obtener una fecha futura, "restar" para una fecha pasada'),
+      cantidad: z.number().int().positive()
+        .describe('Número de unidades a sumar o restar'),
+      unidad: z.enum(['dias', 'semanas', 'meses', 'anios'])
+        .describe('Unidad de tiempo: dias, semanas, meses o anios'),
+    },
+    async ({ fechaBase, operacion, cantidad, unidad }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_fecha_resultado', aiCaller);
+
+      const r = calcularOperacionFecha({
+        fechaBase,
+        operacion: operacion as OperacionFecha,
+        cantidad,
+        unidad: unidad as UnidadTiempo,
+      });
+
+      const texto = [
+        `📅 **Fecha resultado**`,
+        `📆 ${r.fechaFormateada}`,
+        `🗓️ Día de la semana: **${r.diaSemana}**`,
+        `🔢 Fecha ISO: ${r.fechaResultado}`,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: texto }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_dia_semana
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_dia_semana',
+    'Dice qué día de la semana (lunes, martes...) cae una fecha concreta. ' +
+    'Indica también si es hoy, ayer, mañana o cuántos días faltan/han pasado.',
+    {
+      fecha: z.string()
+        .describe('Fecha a consultar en formato YYYY-MM-DD o "hoy"'),
+    },
+    async ({ fecha }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_dia_semana', aiCaller);
+
+      const r = calcularDiaSemana({ fecha });
+
+      const texto = [
+        `📅 **${r.fechaFormateada}**`,
+        `📆 Día: **${r.diaSemana}** (${r.referenciaHoy})`,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: texto }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_edad
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_edad',
+    'Calcula la edad exacta en años, meses y días a partir de una fecha de nacimiento. ' +
+    'Indica también el total de días vividos y cuándo es el próximo cumpleaños.',
+    {
+      fechaNacimiento: z.string()
+        .describe('Fecha de nacimiento en formato YYYY-MM-DD (ej: 1990-05-15)'),
+      fechaReferencia: z.string().optional()
+        .describe('Fecha en la que calcular la edad en formato YYYY-MM-DD o "hoy". Por defecto hoy.'),
+    },
+    async ({ fechaNacimiento, fechaReferencia }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_edad', aiCaller);
+
+      const r = calcularEdad({ fechaNacimiento, fechaReferencia });
+
+      const texto = [
+        `🎂 **Edad: ${r.descripcion}**`,
+        `📆 Días vividos: ${r.totalDias.toLocaleString('es-ES')}`,
+        `🎉 Próximo cumpleaños: ${r.proximoCumpleanos} (en ${r.diasHastaProximoCumpleanos} días)`,
+      ].join('\n');
+
       return { content: [{ type: 'text', text: texto }] };
     }
   );
