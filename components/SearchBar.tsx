@@ -11,8 +11,6 @@ interface SearchBarProps {
   large?: boolean;
 }
 
-type ModoBusqueda = 'buscar' | 'asistente';
-
 // Stopwords en español - palabras comunes que no aportan valor a la búsqueda
 const STOPWORDS = new Set([
   // Artículos
@@ -65,25 +63,8 @@ export default function SearchBar({ large = false }: SearchBarProps) {
   const [results, setResults] = useState<FuseResult<Application>[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const searchInputLargeRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  const inlineContainerRef = useRef<HTMLDivElement>(null);
-
-  // Estado modo (solo afecta versión large)
-  const [modo, setModo] = useState<ModoBusqueda>('buscar');
-
-  // Detectar si es móvil
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   // Configurar Fuse.js
   const fuse = useRef(
@@ -101,63 +82,41 @@ export default function SearchBar({ large = false }: SearchBarProps) {
     })
   );
 
-  // Atajo de teclado Ctrl+K o Cmd+K
+  // Atajo de teclado Ctrl+K o Cmd+K (solo para versión modal pequeña)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+K o Cmd+K para enfocar búsqueda
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
-        if (large) {
-          searchInputLargeRef.current?.focus();
-        } else {
-          openSearch();
-        }
+        openSearch();
       }
-
-      // ESC para cerrar
       if (e.key === 'Escape') {
-        if (large) {
-          setShowDropdown(false);
-          setQuery('');
-          setResults([]);
-          searchInputLargeRef.current?.blur();
-        } else {
-          closeSearch();
-        }
+        closeSearch();
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    if (!large) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
   }, [large]);
 
-  // Cerrar dropdown inline al hacer clic fuera
+  // Cerrar modal al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      // Para modo modal
       if (
-        !large &&
         searchContainerRef.current &&
         !searchContainerRef.current.contains(e.target as Node)
       ) {
         closeSearch();
       }
-      // Para modo inline
-      if (
-        large &&
-        inlineContainerRef.current &&
-        !inlineContainerRef.current.contains(e.target as Node)
-      ) {
-        setShowDropdown(false);
-      }
     };
 
-    if (isOpen || showDropdown) {
+    if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, showDropdown, large]);
+  }, [isOpen]);
 
   const openSearch = () => {
     setIsOpen(true);
@@ -169,13 +128,6 @@ export default function SearchBar({ large = false }: SearchBarProps) {
     setQuery('');
     setResults([]);
     setSelectedIndex(-1);
-  };
-
-  const cambiarModo = (nuevoModo: ModoBusqueda) => {
-    setModo(nuevoModo);
-    setQuery('');
-    setResults([]);
-    setShowDropdown(false);
   };
 
   const performSearch = (searchQuery: string) => {
@@ -337,88 +289,7 @@ export default function SearchBar({ large = false }: SearchBarProps) {
       </div>
 
       {/* ===== VERSIÓN GRANDE (INLINE) ===== */}
-      {large && (
-        <div className={styles.inlineSearchWrapper} ref={inlineContainerRef}>
-
-          {/* Tabs Buscar / ¿Qué necesitas? */}
-          <div className={styles.modeTabs} role="tablist" aria-label="Modo de búsqueda">
-            <button
-              role="tab"
-              aria-selected={modo === 'buscar'}
-              className={`${styles.modeTab} ${modo === 'buscar' ? styles.modeTabActive : ''}`}
-              onClick={() => cambiarModo('buscar')}
-              type="button"
-            >
-              🔍 Buscar
-            </button>
-            <button
-              role="tab"
-              aria-selected={modo === 'asistente'}
-              className={`${styles.modeTab} ${modo === 'asistente' ? styles.modeTabActive : ''}`}
-              onClick={() => cambiarModo('asistente')}
-              type="button"
-            >
-              ✨ ¿Qué necesitas?
-            </button>
-          </div>
-
-          {/* Input búsqueda — solo visible en modo Buscar */}
-          {modo === 'buscar' && (
-          <div className={`${styles.searchLarge} ${showDropdown ? styles.searchLargeActive : ''} ${isMobile && showDropdown ? styles.searchLargeMobileActive : ''}`}>
-            <span className={styles.searchLargeIcon} aria-hidden="true">🔍</span>
-            <input
-              ref={searchInputLargeRef}
-              type="text"
-              className={styles.searchLargeInput}
-              placeholder="Buscar aplicaciones..."
-              value={query}
-              onChange={(e) => performSearch(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onFocus={() => { if (query.length >= 2) setShowDropdown(true); }}
-            />
-            {query.length > 0 ? (
-              <button
-                type="button"
-                className={styles.searchLargeClear}
-                onClick={() => { setQuery(''); setResults([]); setShowDropdown(false); searchInputLargeRef.current?.focus(); }}
-                aria-label="Limpiar búsqueda"
-              >✕</button>
-            ) : (
-              <kbd className={styles.searchLargeKbd}>Ctrl+K</kbd>
-            )}
-          </div>
-          )}
-
-          {/* Chat conversacional — solo visible en modo Asistente */}
-          {modo === 'asistente' && <AsistenteChat />}
-
-          {/* Dropdown modo Buscar */}
-          {modo === 'buscar' && showDropdown && query.length >= 2 && (
-            <div className={`${styles.inlineDropdown} ${isMobile ? styles.inlineDropdownMobile : ''}`}>
-              <div className={`${styles.inlineResults} ${isMobile ? styles.inlineResultsMobile : ''}`}>
-                {isMobile ? renderResultsCompact() : renderResults()}
-              </div>
-              {!isMobile && (
-                <div className={styles.inlineFooter}>
-                  <div className={styles.searchHints}>
-                    <span>
-                      <kbd>↑</kbd>
-                      <kbd>↓</kbd> navegar
-                    </span>
-                    <span>
-                      <kbd>Enter</kbd> seleccionar
-                    </span>
-                    <span>
-                      <kbd>Esc</kbd> cerrar
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-        </div>
-      )}
+      {large && <AsistenteChat />}
 
       {/* ===== VERSIÓN PEQUEÑA (MODAL) ===== */}
       {!large && !isOpen && (

@@ -49,7 +49,7 @@ export default function AsistenteChat() {
           ref={inputRef}
           type="text"
           className={styles.input}
-          placeholder="Describe lo que necesitas..."
+          placeholder="Buscar aplicaciones..."
           value={consulta}
           onChange={(e) => setConsulta(e.target.value)}
           aria-label="Describe lo que necesitas"
