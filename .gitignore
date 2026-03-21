@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# Archivos generados en build (no necesitan estar en git, Vercel los regenera)
+/public/llm-index.json
+
 # dependencies
 /node_modules
 /.pnp
