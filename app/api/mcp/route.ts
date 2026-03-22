@@ -55,6 +55,13 @@ import { calcularPensionViudedad, type SituacionCausante } from '@/lib/calculado
 import { calcularLegitimas, type RegimenId } from '@/lib/calculadoras/legitimas';
 import { calcularTarifaFreelance } from '@/lib/calculadoras/tarifaFreelance';
 import { calcularBreakEven } from '@/lib/calculadoras/breakEven';
+import { calcularCosteAplazado } from '@/lib/calculadoras/costeAplazado';
+import { calcularROIMarketing, type CanalMarketing } from '@/lib/calculadoras/roiMarketing';
+import { calcularGastoEnergetico, type Electrodomestico } from '@/lib/calculadoras/gastoEnergetico';
+import { convertirEdadMascota, type TipoMascota, type TamanoPerro } from '@/lib/calculadoras/edadMascota';
+import { calcularReglaTres, type TipoRegla, type TipoRelacion } from '@/lib/calculadoras/reglaTres';
+import { compararAlquilerVsCompra } from '@/lib/calculadoras/alquilerVsCompra';
+import { calcularJubilacionAnticipada, type TipoJubilacionAnticipada } from '@/lib/calculadoras/jubilacionAnticipada';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -1608,6 +1615,423 @@ function crearServidorMCP(): McpServer {
         '',
         `⚖️ *Estimación orientativa. El tipo de IRPF real depende de tu renta total anual. Consulta con gestoría.*`,
       ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_coste_aplazado
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_coste_aplazado',
+    'Calcula el coste real de financiar una compra a plazos: cuánto pagas de más respecto ' +
+    'al precio al contado y la TAE implícita. ' +
+    'Útil para decidir si vale la pena pagar a plazos o si es mejor esperar y pagar al contado, ' +
+    'y para comparar ofertas de financiación.',
+    {
+      precioContado: z.number().positive()
+        .describe('Precio del producto al contado en euros'),
+      cuotaMensual: z.number().positive()
+        .describe('Cuota mensual a pagar en euros'),
+      numeroCuotas: z.number().int().min(1).max(600)
+        .describe('Número de cuotas mensuales'),
+      entradaInicial: z.number().min(0).optional()
+        .describe('Pago inicial o entrada en euros. Por defecto 0.'),
+    },
+    async ({ precioContado, cuotaMensual, numeroCuotas, entradaInicial }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_coste_aplazado', aiCaller);
+
+      let r;
+      try {
+        r = calcularCosteAplazado({ precioContado, cuotaMensual, numeroCuotas, entradaInicial });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const valoracion = r.taeAproximada < 5 ? '✅ Financiación razonable' : r.taeAproximada < 15 ? '⚠️ Coste moderado' : '❌ Financiación cara';
+      const lineas = [
+        `💳 **Coste de Compra a Plazos**`,
+        '',
+        `🏷️ Precio al contado: **${fmt(precioContado)} €**`,
+        r.entradaInicial > 0 ? `💵 Entrada inicial: ${fmt(r.entradaInicial)} €` : '',
+        `📊 ${numeroCuotas} cuotas × ${fmt(cuotaMensual)} €/mes`,
+        '',
+        `💰 **Total pagado a plazos: ${fmt(r.totalPlazos)} €**`,
+        `📈 Coste de la financiación: **${fmt(r.costeFinanciacion)} €** (+${r.porcentajeExtra.toFixed(1).replace('.', ',')}%)`,
+        `📉 Importe financiado: ${fmt(r.importeFinanciado)} €`,
+        `📊 **TAE implícita: ${r.taeAproximada.toFixed(2).replace('.', ',')}%** — ${valoracion}`,
+        '',
+        `💡 Por cada 100 € de precio, pagas **${(100 + r.porcentajeExtra).toFixed(1).replace('.', ',')} €** a plazos.`,
+        `⚖️ *La TAE es aproximada. Compara siempre la TAE oficial que debe indicar el vendedor/financiador.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_roi_marketing
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_roi_marketing',
+    'Calcula el ROI (Retorno sobre la Inversión) por canal de marketing: ' +
+    'Google Ads, Facebook, email marketing, SEO, influencers, etc. ' +
+    'Para cada canal devuelve beneficio, ROI%, CAC (coste de adquisición de cliente), ' +
+    'ROAS (multiplicador de retorno) y una recomendación de acción. ' +
+    'También compara los canales y determina cuál es el más rentable.',
+    {
+      canales: z.array(z.object({
+        nombre: z.string().describe('Nombre del canal (ej: "Google Ads", "Email Marketing")'),
+        inversion: z.number().min(0).describe('Inversión en el canal en euros'),
+        clientes: z.number().min(0).describe('Número de clientes captados'),
+        ingresoPorCliente: z.number().min(0).describe('Ingreso medio por cliente en euros'),
+      })).min(1).max(15)
+        .describe('Lista de canales con su inversión y resultados'),
+      valorVidaCliente: z.number().min(0).optional()
+        .describe('Valor de vida del cliente (CLV) en euros. Si se proporciona, calcula el ratio CLV/CAC para evaluar si el coste de adquisición es sostenible.'),
+    },
+    async ({ canales, valorVidaCliente }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_roi_marketing', aiCaller);
+
+      let r;
+      try {
+        r = calcularROIMarketing(canales as CanalMarketing[], valorVidaCliente);
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const emojiRec: Record<string, string> = { excelente: '🚀', bueno: '✅', revisar: '⚠️', pausar: '🛑' };
+      const lineas = [
+        `📊 **ROI de Marketing — ${r.canales.length} canal(es)**`,
+        '',
+        `💰 Inversión total: ${fmt(r.inversionTotal)} € → Ingresos: ${fmt(r.ingresosTotal)} € → Beneficio: **${fmt(r.beneficioTotal)} €**`,
+        `📈 **ROI total: ${r.roiTotal.toFixed(1).replace('.', ',')}%** | CAC medio: ${fmt(r.cacPromedio)} €/cliente | Clientes: ${r.clientesTotal}`,
+        '',
+        `📋 **Por canal**`,
+        ...r.canales.filter(c => c.inversion > 0).map(c =>
+          `  ${emojiRec[c.tipoRecomendacion]} **${c.nombre}**: ROI ${c.roi.toFixed(0)}% | Beneficio ${fmt(c.beneficio)} € | CAC ${fmt(c.cac)} € | ROAS ${c.roas.toFixed(1).replace('.', ',')}x → *${c.recomendacion}*`
+        ),
+        '',
+        r.mejorCanal ? `🏆 Mejor canal: **${r.mejorCanal}**` : '',
+        r.peorCanal && r.peorCanal !== r.mejorCanal ? `⚠️ Canal a revisar: **${r.peorCanal}**` : '',
+        '',
+        `⚖️ *ROI = (Beneficio / Inversión) × 100. ROAS = Ingresos / Inversión. CAC = Inversión / Clientes captados.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_gasto_energetico
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_gasto_energetico',
+    'Calcula el consumo eléctrico mensual del hogar y la factura estimada. ' +
+    'A partir de los electrodomésticos (potencia, horas de uso, días al mes) ' +
+    'calcula los kWh totales y desglosa la factura con todos los conceptos: ' +
+    'coste de energía, término de potencia, impuesto eléctrico (5.113%) e IVA (21%).',
+    {
+      electrodomesticos: z.array(z.object({
+        nombre: z.string().describe('Nombre del electrodoméstico (ej: "Nevera", "TV salón")'),
+        potenciaW: z.number().min(0).describe('Potencia en Watios (W). Ejemplos: nevera 150W, TV 100W, lavadora 2000W, aire acondicionado 1500W'),
+        horasDia: z.number().min(0).max(24).describe('Horas de uso al día'),
+        diasMes: z.number().int().min(1).max(31).optional().describe('Días de uso al mes. Por defecto 30.'),
+        cantidad: z.number().int().min(1).optional().describe('Número de unidades. Por defecto 1.'),
+      })).min(1).max(30)
+        .describe('Lista de electrodomésticos con su potencia y uso'),
+      preciokWh: z.number().min(0).optional()
+        .describe('Precio del kWh en euros. Por defecto 0.15 €/kWh (mercado libre orientativo). PVPC media ~0.13 €/kWh.'),
+      potenciaContratadaKW: z.number().min(0).optional()
+        .describe('Potencia contratada en kW. Habitual: 3.45, 4.6, 5.75, 6.9, 8.05 kW. Por defecto 4.6 kW.'),
+    },
+    async ({ electrodomesticos, preciokWh, potenciaContratadaKW }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_gasto_energetico', aiCaller);
+
+      let r;
+      try {
+        r = calcularGastoEnergetico({ electrodomesticos: electrodomesticos as Electrodomestico[], preciokWh, potenciaContratadaKW });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const top3 = [...r.detalle].sort((a, b) => b.consumoMensualKWh - a.consumoMensualKWh).slice(0, 3);
+      const lineas = [
+        `⚡ **Gasto Energético del Hogar**`,
+        '',
+        `📊 Consumo total: **${r.consumoTotalKWh.toFixed(2).replace('.', ',')} kWh/mes** | Precio: ${r.preciokWh.toFixed(4).replace('.', ',')} €/kWh`,
+        `🔌 Potencia contratada: ${r.potenciaContratadaKW} kW`,
+        '',
+        `🧾 **Desglose de la factura**`,
+        `  ⚡ Energía consumida: ${fmt(r.costeEnergia)} €`,
+        `  🔌 Término de potencia: ${fmt(r.terminoPotencia)} €`,
+        `  ─────────────────────`,
+        `  Subtotal: ${fmt(r.subtotal)} €`,
+        `  🏛️ Impuesto eléctrico (5,113%): ${fmt(r.impuestoElectricidad)} €`,
+        `  🧾 IVA (21%): ${fmt(r.iva)} €`,
+        `  ─────────────────────`,
+        `  💰 **Total mensual estimado: ${fmt(r.totalMensual)} €**`,
+        `  📅 Coste anual estimado: ${fmt(r.totalAnual)} €`,
+        '',
+        `🏆 **Top consumidores**`,
+        ...top3.map(e => `  📌 ${e.nombre}: ${e.consumoMensualKWh.toFixed(2).replace('.', ',')} kWh/mes → ${fmt(e.costeMensual)} €`),
+        '',
+        `⚖️ *Estimación orientativa. La factura real varía según tarifa y discriminación horaria.*`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: convertir_edad_mascota
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'convertir_edad_mascota',
+    'Convierte la edad de un perro o gato a años humanos equivalentes ' +
+    'y determina su etapa de vida con recomendaciones de cuidado. ' +
+    'Para perros usa factores por tamaño (pequeño, mediano, grande, gigante). ' +
+    'Para gatos: primer año = 15 años humanos, segundo = 9, resto × 4.',
+    {
+      edadMascota: z.number().min(0).max(30)
+        .describe('Edad de la mascota en años. Puede tener decimales (ej: 0.5 = 6 meses, 1.5 = 1 año y medio).'),
+      tipoMascota: z.enum(['perro', 'gato'])
+        .describe('Tipo de mascota'),
+      tamanoPerro: z.enum(['pequeno', 'mediano', 'grande', 'gigante']).optional()
+        .describe('Tamaño del perro (solo si tipoMascota="perro"): "pequeno" <10kg, "mediano" 10-25kg, "grande" 25-45kg, "gigante" >45kg. Por defecto "mediano".'),
+    },
+    async ({ edadMascota, tipoMascota, tamanoPerro }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('convertir_edad_mascota', aiCaller);
+
+      let r;
+      try {
+        r = convertirEdadMascota({
+          edadMascota,
+          tipoMascota: tipoMascota as TipoMascota,
+          tamanoPerro: tamanoPerro as TamanoPerro | undefined,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const mascotaEmoji = tipoMascota === 'perro' ? '🐶' : '🐱';
+      const lineas = [
+        `${mascotaEmoji} **Edad en Años Humanos**`,
+        '',
+        `Tu ${tipoMascota} tiene **${edadMascota} año(s)** ${tipoMascota === 'perro' && tamanoPerro ? `(talla ${tamanoPerro})` : ''}`,
+        `➡️ Equivale a **${r.edadHumana} años humanos**`,
+        '',
+        `🏷️ Etapa: **${r.etapaVida}** — ${r.descripcion}`,
+        `📅 Expectativa de vida: ${r.expectativaVida}`,
+        '',
+        `💡 **Recomendaciones de cuidado**`,
+        ...r.recomendaciones.map(rec => `  ✅ ${rec}`),
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_regla_tres
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_regla_tres',
+    'Resuelve reglas de tres simples (directa e inversa) y compuestas. ' +
+    'La regla de tres directa: si A→B entonces C→X (X = B×C/A). ' +
+    'La inversa: si A×B = C×X (X = A×B/C). ' +
+    'La compuesta maneja dos variables simultáneas con cualquier combinación directa/inversa. ' +
+    'Muestra la fórmula y los pasos de resolución.',
+    {
+      tipo: z.enum(['simple-directa', 'simple-inversa', 'compuesta'])
+        .describe('"simple-directa": proporción directa (más de A → más de B). "simple-inversa": proporción inversa (más de A → menos de B). "compuesta": dos variables simultáneas.'),
+      a: z.number().describe('Valor A (referencia 1 de la variable principal)'),
+      b: z.number().describe('Valor B (resultado 1 de la variable principal)'),
+      c: z.number().describe('Valor C (referencia 2 de la variable principal, para la que buscamos X)'),
+      d: z.number().optional().describe('Valor D (referencia 1 de la segunda variable). Solo para tipo "compuesta".'),
+      e: z.number().optional().describe('Valor E (referencia 2 de la segunda variable). Solo para tipo "compuesta".'),
+      relacionSegundaVariable: z.enum(['directa', 'inversa']).optional()
+        .describe('Relación de la segunda variable: "directa" (más D → más X) o "inversa" (más D → menos X). Solo para tipo "compuesta".'),
+    },
+    async ({ tipo, a, b, c, d, e, relacionSegundaVariable }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_regla_tres', aiCaller);
+
+      let r;
+      try {
+        r = calcularReglaTres({
+          tipo: tipo as TipoRegla,
+          a, b, c, d, e,
+          relacionSegundaVariable: relacionSegundaVariable as TipoRelacion | undefined,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const xFormateado = Number.isInteger(r.valorX) ? r.valorX.toString() : r.valorX.toLocaleString('es-ES', { maximumFractionDigits: 6 });
+      const lineas = [
+        `🔢 **Regla de Tres — ${tipo === 'simple-directa' ? 'Simple Directa' : tipo === 'simple-inversa' ? 'Simple Inversa' : 'Compuesta'}**`,
+        '',
+        `📐 Fórmula: \`${r.formula}\``,
+        '',
+        `📋 **Resolución paso a paso**`,
+        ...r.pasos.map(p => `  ${p}`),
+        '',
+        `✅ **X = ${xFormateado}**`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: comparar_alquiler_compra
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'comparar_alquiler_compra',
+    'Compara financieramente alquilar vs comprar una vivienda en España a lo largo del tiempo. ' +
+    'Calcula el patrimonio acumulado en ambos escenarios teniendo en cuenta: hipoteca (sistema francés), ' +
+    'gastos de compra (~10%), IBI, comunidad, seguro, mantenimiento, revalorización de la vivienda ' +
+    'y la rentabilidad de invertir la entrada en el escenario alquiler. ' +
+    'Determina qué opción genera más patrimonio y el punto de equilibrio.',
+    {
+      precioVivienda: z.number().positive()
+        .describe('Precio de la vivienda en euros'),
+      entrada: z.number().min(0)
+        .describe('Ahorros aportados como entrada (€). Recomendado ≥ 20% del precio.'),
+      tipoInteres: z.number().min(0).max(20)
+        .describe('Tipo de interés de la hipoteca en %. Ejemplo: 3.5 para tipo fijo actual.'),
+      alquilerMensual: z.number().positive()
+        .describe('Alquiler mensual equivalente en euros'),
+      plazoHipoteca: z.number().int().min(5).max(40).optional()
+        .describe('Plazo de la hipoteca en años. Por defecto 25.'),
+      ibi: z.number().min(0).optional()
+        .describe('IBI anual en euros. Por defecto 400 €.'),
+      comunidadMensual: z.number().min(0).optional()
+        .describe('Cuota de comunidad mensual en euros. Por defecto 80 €.'),
+      seguroAnual: z.number().min(0).optional()
+        .describe('Seguro de hogar anual en euros. Por defecto 300 €.'),
+      mantenimientoPct: z.number().min(0).max(5).optional()
+        .describe('Gastos de mantenimiento anuales como % del valor de la vivienda. Por defecto 0.5%.'),
+      incrementoAlquilerPct: z.number().min(0).max(10).optional()
+        .describe('Incremento anual del alquiler en %. Por defecto 3%.'),
+      rentabilidadInversionPct: z.number().min(0).max(15).optional()
+        .describe('Rentabilidad anual de la inversión alternativa (donde invertiría la entrada el inquilino) en %. Por defecto 5%.'),
+      revalorizacionPct: z.number().min(-5).max(15).optional()
+        .describe('Revalorización anual esperada de la vivienda en %. Por defecto 3%.'),
+      anos: z.number().int().min(1).max(40).optional()
+        .describe('Horizonte temporal de comparación en años. Por defecto 15.'),
+    },
+    async ({ precioVivienda, entrada, tipoInteres, alquilerMensual, plazoHipoteca, ibi, comunidadMensual, seguroAnual, mantenimientoPct, incrementoAlquilerPct, rentabilidadInversionPct, revalorizacionPct, anos }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('comparar_alquiler_compra', aiCaller);
+
+      let r;
+      try {
+        r = compararAlquilerVsCompra({ precioVivienda, entrada, tipoInteres, alquilerMensual, plazoHipoteca, ibi, comunidadMensual, seguroAnual, mantenimientoPct, incrementoAlquilerPct, rentabilidadInversionPct, revalorizacionPct, anos });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      const fmtDec = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const horizonte = anos ?? 15;
+      const ganador = r.mejorOpcion === 'comprar' ? '🏠 **COMPRAR sale mejor**' : '🔑 **ALQUILAR sale mejor**';
+      const lineas = [
+        `🏠🔑 **Comparativa Alquiler vs Compra** (${horizonte} años)`,
+        '',
+        `💶 Precio: ${fmt(precioVivienda)} € | Entrada: ${fmt(entrada)} € | Hipoteca: ${tipoInteres}% a ${plazoHipoteca ?? 25} años`,
+        `📊 Cuota hipoteca: **${fmtDec(r.cuotaHipoteca)} €/mes** | Gasto total compra: ${fmtDec(r.gastoMensualCompra)} €/mes`,
+        `🔑 Alquiler: ${fmtDec(alquilerMensual)} €/mes`,
+        `🏦 Gastos de compra iniciales (~10%): ${fmt(r.gastosCompra)} €`,
+        '',
+        `📈 **Patrimonio al cabo de ${horizonte} años**`,
+        `  🏠 Comprando: **${fmt(r.patrimonioFinalCompra)} €** (vivienda: ${fmt(r.valorFinalVivienda)} €)`,
+        `  🔑 Alquilando e invirtiendo: **${fmt(r.patrimonioFinalAlquiler)} €**`,
+        `  📊 Diferencia: ${fmt(Math.abs(r.diferencia))} € a favor de ${r.mejorOpcion === 'comprar' ? 'comprar' : 'alquilar'}`,
+        '',
+        r.puntoEquilibrio > 0
+          ? `⏱️ Punto de equilibrio: comprar supera a alquilar en el **año ${r.puntoEquilibrio}**`
+          : `⏱️ Comprar no supera a alquilar dentro del horizonte de ${horizonte} años`,
+        '',
+        `${ganador} en el horizonte de ${horizonte} años`,
+        '',
+        `⚖️ *Estimación orientativa. Resultado muy sensible a la revalorización de la vivienda (${revalorizacionPct ?? 3}%) y la rentabilidad de la inversión alternativa (${rentabilidadInversionPct ?? 5}%). Ajusta estos parámetros a tu situación.*`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_jubilacion_anticipada
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_jubilacion_anticipada',
+    'Calcula el impacto económico de jubilarse anticipadamente en España. ' +
+    'Determina si es posible (según años cotizados y modalidad), ' +
+    'el coeficiente reductor acumulado trimestre a trimestre ' +
+    'y la pensión resultante tras la reducción. ' +
+    '⚠️ Modalidad voluntaria: hasta 2 años antes, necesita ≥ 35 años cotizados. ' +
+    'Modalidad involuntaria (despido, ERTE): hasta 4 años antes, necesita ≥ 33 años. ' +
+    'Normativa: LGSS arts. 207-208 + Ley 21/2021.',
+    {
+      anosCotizados: z.number().min(0).max(50)
+        .describe('Años cotizados a la Seguridad Social'),
+      mesesAnticipacion: z.number().int().min(1).max(48)
+        .describe('Meses de anticipación respecto a la edad ordinaria de jubilación (66 años y 6 meses con <37 años y 3 meses cotizados; 65 años con ≥37 años y 3 meses)'),
+      tipo: z.enum(['voluntaria', 'involuntaria'])
+        .describe('"voluntaria": el trabajador decide jubilarse antes. "involuntaria": causas ajenas al trabajador (despido colectivo, ERTE, cierre empresa). La involuntaria tiene coeficientes reductores menores.'),
+      pensionOrdinaria: z.number().positive()
+        .describe('Pensión mensual estimada si te jubilaras a la edad ordinaria (€/mes). Puedes estimarla con calcular_pension_publica.'),
+    },
+    async ({ anosCotizados, mesesAnticipacion, tipo, pensionOrdinaria }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_jubilacion_anticipada', aiCaller);
+
+      let r;
+      try {
+        r = calcularJubilacionAnticipada({
+          anosCotizados, mesesAnticipacion,
+          tipo: tipo as TipoJubilacionAnticipada,
+          pensionOrdinaria,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `👴 **Jubilación Anticipada — Modalidad ${tipo === 'voluntaria' ? 'Voluntaria' : 'Involuntaria'}**`,
+        '',
+        `📊 Años cotizados: ${anosCotizados} | Anticipación: ${mesesAnticipacion} meses (${r.trimestreAnticipacion} trimestres)`,
+        `🎯 Edad ordinaria según cotización: ${r.edadOrdinaria}`,
+        '',
+        r.posible
+          ? `✅ **Jubilación anticipada POSIBLE**`
+          : `❌ **No es posible**: ${r.motivoImpedimento}`,
+        r.posible ? '' : `  ℹ️ Mínimo requerido: ${r.anosMinimosRequeridos} años cotizados | Máximo: ${r.maxMesesPermitidos} meses anticipación`,
+        '',
+        r.posible ? `📉 **Reducción total: ${r.reduccionTotal.toFixed(2).replace('.', ',')}%**` : '',
+        r.posible
+          ? [
+            `  💰 Pensión ordinaria: ${fmt(pensionOrdinaria)} €/mes`,
+            `  📉 Pensión con reducción: **${fmt(r.pensionConReduccion)} €/mes**`,
+            `  ⚠️ Pérdida mensual: **${fmt(r.perdidaMensual)} €** | Pérdida anual (14 pagas): **${fmt(r.perdidaAnual)} €**`,
+          ].join('\n')
+          : '',
+        r.posible && r.desglosePorTrimestre.length > 0
+          ? [
+            '',
+            `📋 **Desglose por trimestre**`,
+            ...r.desglosePorTrimestre.map(d => `  Trimestre ${d.trimestre}: -${d.reduccion.toFixed(2).replace('.', ',')}%`),
+          ].join('\n')
+          : '',
+        '',
+        `📚 ${r.fuenteDatos}`,
+        `⚖️ *La reducción es permanente y vitalicia. La SS calculará el resultado real a partir de tu historial exacto.*`,
+      ].filter(l => l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
   );
