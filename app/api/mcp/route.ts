@@ -118,6 +118,14 @@ import { calcularReduccionJornada, type MotivoReduccionJornada } from '@/lib/cal
 import { calcularIRPFNoResidente, type TipoRentaNoResidente, type ResidenciaFiscal } from '@/lib/calculadoras/irpfNoResidente';
 import { calcularModelo130, type TrimestreModelo130 } from '@/lib/calculadoras/modelo130';
 import { calcularConceptosCotizables } from '@/lib/calculadoras/conceptosCotizables';
+import { calcularEmbargoSalario } from '@/lib/calculadoras/embargoSalario';
+import { calcularPensionIncapacidad, type GradoIncapacidad, type OrigenContingencia } from '@/lib/calculadoras/pensionIncapacidad';
+import { calcularCapitalizarDesempleo, type ModalidadCapitalizacion } from '@/lib/calculadoras/capitalizarDesempleo';
+import { calcularIRPFSegundoPagador } from '@/lib/calculadoras/irpfSegundoPagador';
+import { calcularDeduccionAutonomoIRPF, type ModalidadEstimacion } from '@/lib/calculadoras/deduccionAutonomoIRPF';
+import { calcularComplementoBrechaGenero, type SexoBeneficiario, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
+import { calcularPlusNocturnidad } from '@/lib/calculadoras/plusNocturnidad';
+import { calcularMoratoriaHipoteca, type TipoCarenciaHipoteca } from '@/lib/calculadoras/moratoriaHipoteca';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -5709,6 +5717,439 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote L: calcular_embargo_salario ─────────────────────────────────────────
+  servidor.tool(
+    'calcular_embargo_salario',
+    'Calcula el importe máximo embargable del salario según la escala del art. 607 LEC. Determina la parte inembargable (SMI) y los tramos embargables sobre el exceso. Útil para deudores, acreedores y abogados.',
+    {
+      salarioNetoMensual: z.number().positive().describe('Salario neto mensual del deudor (€)'),
+      pagas: z.enum(['12', '14']).optional().describe('Número de pagas anuales para el cálculo del SMI (12 o 14). Por defecto 14 (oficial LEC).'),
+      reduccionCargasFamiliares: z.number().min(0).max(15).optional().describe('Porcentaje de reducción por cargas familiares acordado judicialmente (0-15%). Solo si el juez lo ha autorizado.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_embargo_salario', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const pagasNum = args.pagas ? (parseInt(args.pagas) as 12 | 14) : 14;
+      const r = calcularEmbargoSalario({
+        salarioNetoMensual: args.salarioNetoMensual,
+        pagas: pagasNum,
+        reduccionCargasFamiliares: args.reduccionCargasFamiliares,
+      });
+      const lineas = [
+        `⚖️ **Embargo de Salario — Art. 607 LEC**`,
+        '',
+        `Salario neto mensual: ${fmt(r.salarioNetoMensual)} €`,
+        `SMI mensual (${pagasNum} pagas): ${fmt(r.smiMensual)} €`,
+        `Cantidad inembargable: **${fmt(r.cantidadInembargable)} €**`,
+        '',
+        r.esEmbargable
+          ? [
+              `Exceso sobre SMI: ${fmt(r.excesoSobreSMI)} €`,
+              '',
+              `📊 **Desglose por tramos:**`,
+              ...r.tramos.map(t =>
+                `  ${t.tramo}: ${fmt(t.baseTramo)} € × ${t.tipo}% = **${fmt(t.importeEmbargado)} €**`
+              ),
+              '',
+              `Importe embargable bruto: ${fmt(r.importeEmbargableBruto)} €`,
+              r.reduccionCargasFamiliaresImporte > 0
+                ? `Reducción cargas familiares: -${fmt(r.reduccionCargasFamiliaresImporte)} €`
+                : null,
+              `💰 **Importe máximo embargable: ${fmt(r.importeMaximoEmbargable)} €/mes**`,
+              `Importe libre al deudor: ${fmt(r.importeLibreDeudor)} €`,
+              `Porcentaje efectivo embargado: ${r.pctEfectivoEmbargado}%`,
+            ].filter(Boolean).join('\n')
+          : `✅ **Salario NO embargable** — No supera el SMI (${fmt(r.smiMensual)} €).`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote L: calcular_pension_incapacidad ─────────────────────────────────────
+  servidor.tool(
+    'calcular_pension_incapacidad',
+    'Calcula la cuantía de la pensión de incapacidad permanente (parcial, total, absoluta, gran invalidez) según la LGSS arts. 194-200. Devuelve base reguladora, porcentaje aplicado, recargos por edad y complemento de gran invalidez.',
+    {
+      gradoIncapacidad: z.enum(['parcial', 'total', 'absoluta', 'gran_invalidez']).describe('Grado de incapacidad permanente declarado'),
+      origenContingencia: z.enum(['comun', 'profesional']).describe('Origen: comun (enfermedad común) o profesional (accidente trabajo/enfermedad profesional)'),
+      sumaBasesCotizacion: z.number().positive().describe('Suma de las bases de cotización del período de referencia (€). Comunes: últimas 112 mensualidades (8 años). Profesionales: últimas 12 mensualidades.'),
+      edad: z.number().min(16).max(100).describe('Edad del beneficiario (años). Relevante para recargo del 20% en IPT con ≥ 55 años.'),
+      tieneConyuge: z.boolean().optional().describe('¿Tiene cónyuge a cargo? Afecta a la pensión mínima garantizada.'),
+      ultimaBaseCotizacion: z.number().positive().optional().describe('Última base de cotización mensual (€). Necesaria para calcular el complemento de Gran Invalidez.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_pension_incapacidad', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const gradoMap: Record<string, GradoIncapacidad> = { parcial: 'parcial', total: 'total', absoluta: 'absoluta', gran_invalidez: 'gran_invalidez' };
+      const origenMap: Record<string, OrigenContingencia> = { comun: 'comun', profesional: 'profesional' };
+      const r = calcularPensionIncapacidad({
+        gradoIncapacidad: gradoMap[args.gradoIncapacidad],
+        origenContingencia: origenMap[args.origenContingencia],
+        sumaBasesCotizacion: args.sumaBasesCotizacion,
+        edad: args.edad,
+        tieneConyuge: args.tieneConyuge,
+        ultimaBaseCotizacion: args.ultimaBaseCotizacion,
+      });
+      const gradoDesc: Record<string, string> = {
+        parcial: 'IP Parcial', total: 'IP Total (IPT)', absoluta: 'IP Absoluta (IPA)', gran_invalidez: 'Gran Invalidez (GI)',
+      };
+      const lineas = [
+        `🏥 **Pensión de Incapacidad Permanente — ${gradoDesc[r.gradoIncapacidad]}**`,
+        '',
+        `Base reguladora mensual: **${fmt(r.baseReguladora)} €**`,
+        r.gradoIncapacidad !== 'parcial' ? `Porcentaje aplicado: **${r.porcentajeAplicado}%**${r.recargo55Anios ? ' (55% + 20% recargo ≥ 55 años)' : ''}` : null,
+        r.indemnizacionTotalIPParcial
+          ? `💰 **Indemnización a tanto alzado (IP Parcial): ${fmt(r.indemnizacionTotalIPParcial)} €**`
+          : null,
+        r.gradoIncapacidad !== 'parcial' ? `Cuantía bruta calculada: ${fmt(r.cuantiaBrutaMensual)} €/mes` : null,
+        r.complementoGranInvalidez
+          ? `Complemento Gran Invalidez: +${fmt(r.complementoGranInvalidez)} €/mes`
+          : null,
+        r.gradoIncapacidad !== 'parcial' ? `Pensión mínima garantizada: ${fmt(r.pensionMinimaGarantizada)} €/mes` : null,
+        r.gradoIncapacidad !== 'parcial' ? `💰 **Cuantía efectiva mensual: ${fmt(r.cuantiaEfectivaMensual)} €/mes**` : null,
+        r.gradoIncapacidad !== 'parcial' ? `Cuantía anual (14 pagas): ${fmt(r.cuantiaAnual14Pagas)} €` : null,
+        '',
+        `ℹ️ ${r.explicacion}`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote L: calcular_capitalizar_desempleo ───────────────────────────────────
+  servidor.tool(
+    'calcular_capitalizar_desempleo',
+    'Calcula el importe del pago único (capitalización) de la prestación por desempleo para trabajadores que van a constituirse como autónomos, emprender o incorporarse a cooperativas. Verifica requisitos y exención de IRPF.',
+    {
+      prestacionMensualBruta: z.number().positive().describe('Importe mensual bruto de la prestación por desempleo (€)'),
+      mesesPendientes: z.number().min(0).describe('Meses pendientes de prestación en el momento de la solicitud'),
+      modalidad: z.enum(['autonomo', 'cooperativa', 'reduccion_cuotas_ss']).describe('Modalidad: autonomo (pago único 100%), cooperativa (cuota ingreso), reduccion_cuotas_ss (para pagar cuotas SS)'),
+      edad: z.number().min(16).max(100).optional().describe('Edad del beneficiario (años). Relevante para condiciones especiales < 30 o < 35 años con hijos.'),
+      tieneHijos: z.boolean().optional().describe('¿Tiene hijos a cargo? Relevante para menores de 35 años.'),
+      haCapitalizadoAnteriormente: z.boolean().optional().describe('¿Ha capitalizado el desempleo en los últimos 4 años? Si es true, no puede volver a capitalizar.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_capitalizar_desempleo', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const modalidadMap: Record<string, ModalidadCapitalizacion> = { autonomo: 'autonomo', cooperativa: 'cooperativa', reduccion_cuotas_ss: 'reduccion_cuotas_ss' };
+      const r = calcularCapitalizarDesempleo({
+        prestacionMensualBruta: args.prestacionMensualBruta,
+        mesesPendientes: args.mesesPendientes,
+        modalidad: modalidadMap[args.modalidad],
+        edad: args.edad,
+        tieneHijos: args.tieneHijos,
+        haCapitalizadoAnteriormente: args.haCapitalizadoAnteriormente,
+      });
+      const modalidadDesc: Record<string, string> = { autonomo: 'Autónomo (pago único)', cooperativa: 'Cooperativa / Soc. Laboral', reduccion_cuotas_ss: 'Reducción cuotas SS' };
+      const lineas = [
+        `💼 **Capitalización de la Prestación por Desempleo**`,
+        '',
+        `Prestación mensual bruta: ${fmt(r.prestacionMensualBruta)} €`,
+        `Meses pendientes: ${r.mesesPendientes} meses`,
+        `Total prestación pendiente: ${fmt(r.importeTotalPendiente)} €`,
+        `Modalidad: ${modalidadDesc[r.modalidad]}`,
+        '',
+        r.puedeCapitalizar
+          ? [
+              `✅ **Puede capitalizar**`,
+              `Porcentaje capitalizable: ${r.pctCapitalizable}%`,
+              `💰 **Importe del pago único: ${fmt(r.importeCapitalizacion)} €**`,
+              r.exentoIRPF ? `IRPF: ✅ Exento (si mantiene la actividad ≥ 5 años)` : '',
+              r.mesesCubiertosSSEstimado ? `SS estimada cubierta: ~${r.mesesCubiertosSSEstimado} meses` : '',
+            ].filter(Boolean).join('\n')
+          : `❌ **No puede capitalizar**: ${r.motivoNoCapitaliza}`,
+        '',
+        `Requisitos:`,
+        `  Meses mínimos (≥ 3): ${r.cumpleMesesMinimos ? '✅' : '❌'}`,
+        `  No capitalizado antes: ${r.cumpleRequisitoPrevio ? '✅' : '❌'}`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote L: calcular_irpf_segunda_pagador ────────────────────────────────────
+  servidor.tool(
+    'calcular_irpf_segunda_pagador',
+    'Determina si existe obligación de declarar IRPF con más de un pagador (regla del 2º pagador, art. 96.3 LIRPF). Calcula el impacto en retenciones, estima la cuota IRPF total y advierte si habrá deuda con Hacienda.',
+    {
+      pagadores: z.array(z.object({
+        descripcion: z.string().describe('Nombre o descripción del pagador (ej: "Empresa principal", "SEPE", "2ª empresa")'),
+        importeBruto: z.number().min(0).describe('Rendimientos brutos percibidos de este pagador en el año (€)'),
+        retencionesPracticadas: z.number().min(0).describe('Retenciones practicadas por este pagador en el año (€)'),
+      })).min(1).describe('Lista de todos los pagadores del año'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_irpf_segunda_pagador', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const r = calcularIRPFSegundoPagador({ pagadores: args.pagadores });
+      const resultadoEmoji = r.resultadoDeclaracion === 'a_pagar' ? '🔴' : r.resultadoDeclaracion === 'a_devolver' ? '🟢' : '⚪';
+      const lineas = [
+        `📋 **IRPF con Segundo Pagador — Art. 96.3 LIRPF**`,
+        '',
+        `**Pagadores:**`,
+        ...r.pagadores.map((p, i) =>
+          `  ${i === 0 ? '1º (principal)' : `${i + 1}º`}: ${p.descripcion} — ${fmt(p.importeBruto)} € brutos | ${fmt(p.retencionesPracticadas)} € retenidos`
+        ),
+        '',
+        `Total rendimientos brutos: **${fmt(r.totalRendimientosBrutos)} €**`,
+        `2º y restantes pagadores: **${fmt(r.importeSegundoYRestantesPagadores)} €**`,
+        `¿Supera umbral 1.500 €?: ${r.superaUmbralSegundoPagador ? '✅ Sí' : '❌ No'}`,
+        `Límite obligación declarar: ${fmt(r.limiteObligacionDeclarar)} €`,
+        `**Obligación de declarar: ${r.obligacionDeclarar ? '✅ SÍ' : '❌ NO'}**`,
+        '',
+        `Total retenciones practicadas: ${fmt(r.totalRetencionesPracticadas)} €`,
+        `Cuota IRPF estimada (total): ${fmt(r.cuotaIRPFEstimada)} € (tipo efectivo ~${r.tipoEfectivoEstimado}%)`,
+        `${resultadoEmoji} **Resultado estimado declaración: ${r.resultadoDeclaracion === 'a_pagar' ? 'A PAGAR' : r.resultadoDeclaracion === 'a_devolver' ? 'A DEVOLVER' : 'CERO'} ${fmt(Math.abs(r.resultadoEstimadoDeclaracion))} €**`,
+        '',
+        `Retención óptima recomendada: ${fmt(r.retencionOptimaMensual)} €/mes (${r.tipoRetencionRecomendado}%)`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote L: calcular_deduccion_autonomo_irpf ─────────────────────────────────
+  servidor.tool(
+    'calcular_deduccion_autonomo_irpf',
+    'Calcula los gastos deducibles en el IRPF para autónomos en estimación directa simplificada o normal: cuotas SS, alquiler, suministros del hogar, asesoría, dietas y otros. Devuelve el rendimiento neto de la actividad.',
+    {
+      modalidadEstimacion: z.enum(['simplificada', 'directa_normal']).describe('Modalidad de estimación directa: simplificada o directa_normal'),
+      ingresosBrutos: z.number().min(0).describe('Ingresos brutos anuales de la actividad (€)'),
+      cuotasSSAutonomo: z.number().min(0).optional().describe('Cuotas SS autónomo (RETA) pagadas anualmente (€)'),
+      alquilerLocal: z.number().min(0).optional().describe('Alquiler de local u oficina exterior anual (€)'),
+      gastosSupministrosHogar: z.number().min(0).optional().describe('Gasto total en suministros del hogar (luz, agua, internet, gas) anual (€)'),
+      pctSuperficieActividadHogar: z.number().min(0).max(100).optional().describe('Porcentaje de la superficie del hogar dedicada a la actividad (%)'),
+      gastosAsesoria: z.number().min(0).optional().describe('Gastos de asesoría o gestoría anuales (€)'),
+      gastosSeguros: z.number().min(0).optional().describe('Gastos en seguros (RC, accidentes, salud) anuales (€)'),
+      otrosGastos: z.number().min(0).optional().describe('Material de oficina, publicidad, formación y otros gastos deducibles (€)'),
+      gastosDietas: z.number().min(0).optional().describe('Gastos en dietas propias en hostelería pagadas con tarjeta (€). Requieren pago electrónico.'),
+      diasDietasEspaniaSinPernoctar: z.number().min(0).optional().describe('Días de desplazamiento en España sin pernoctar (límite 26,67 €/día)'),
+      diasDietasEspaniaPernoctando: z.number().min(0).optional().describe('Días en España con pernocta (límite 53,34 €/día)'),
+      diasDietasExtranjeroSinPernoctar: z.number().min(0).optional().describe('Días en extranjero sin pernoctar (límite 48,08 €/día)'),
+      diasDietasExtranjeroPernoctando: z.number().min(0).optional().describe('Días en extranjero con pernocta (límite 91,35 €/día)'),
+      otrosGastosAcreditados: z.number().min(0).optional().describe('Otros gastos deducibles acreditados (amortizaciones, compras, etc.) (€)'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_deduccion_autonomo_irpf', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const modalidadMap: Record<string, ModalidadEstimacion> = { simplificada: 'simplificada', directa_normal: 'directa_normal' };
+      const r = calcularDeduccionAutonomoIRPF({
+        modalidadEstimacion: modalidadMap[args.modalidadEstimacion],
+        ingresosBrutos: args.ingresosBrutos,
+        cuotasSSAutonomo: args.cuotasSSAutonomo,
+        alquilerLocal: args.alquilerLocal,
+        gastosSupministrosHogar: args.gastosSupministrosHogar,
+        pctSuperficieActividadHogar: args.pctSuperficieActividadHogar,
+        gastosAsesoria: args.gastosAsesoria,
+        gastosSeguros: args.gastosSeguros,
+        otrosGastos: args.otrosGastos,
+        gastosDietas: args.gastosDietas,
+        diasDietasEspaniaSinPernoctar: args.diasDietasEspaniaSinPernoctar,
+        diasDietasEspaniaPernoctando: args.diasDietasEspaniaPernoctando,
+        diasDietasExtranjeroSinPernoctar: args.diasDietasExtranjeroSinPernoctar,
+        diasDietasExtranjeroPernoctando: args.diasDietasExtranjeroPernoctando,
+        otrosGastosAcreditados: args.otrosGastosAcreditados,
+      });
+      const lineas = [
+        `📊 **Gastos Deducibles IRPF — Autónomo Estimación Directa ${args.modalidadEstimacion === 'simplificada' ? 'Simplificada' : 'Normal'}**`,
+        '',
+        `Ingresos brutos: ${fmt(r.ingresosBrutos)} €`,
+        '',
+        `**Gastos deducibles:**`,
+        ...r.gastos.map(g =>
+          `  ${g.concepto}: ${fmt(g.importeDeducible)} € (${g.pctDeduccion}% de ${fmt(g.importeTotal)} €)`
+        ),
+        '',
+        `Total gastos deducibles: **${fmt(r.totalGastosDeducibles)} €**`,
+        `Rendimiento neto previo: ${fmt(r.rendimientoNetoPrevio)} €`,
+        r.deduccionDificilJustificacion > 0
+          ? `Deducción difícil justificación (7%, máx. 2.000 €): -${fmt(r.deduccionDificilJustificacion)} €`
+          : null,
+        `💰 **Rendimiento neto actividad: ${fmt(r.rendimientoNetoActividad)} €**`,
+        '',
+        `Cuota IRPF estimada (tipo marginal ~${r.tipoIRPFEstimado}%): ~${fmt(r.cuotaIRPFEstimada)} €`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote L: calcular_complemento_brecha_genero ───────────────────────────────
+  servidor.tool(
+    'calcular_complemento_brecha_genero',
+    'Calcula el complemento de pensión para la reducción de la brecha de género (antiguo complemento de maternidad, RDL 3/2021). Aplica a hombres y mujeres con 2 o más hijos que cobran pensión de jubilación, IP o viudedad.',
+    {
+      sexo: z.enum(['mujer', 'hombre']).describe('Sexo del beneficiario de la pensión'),
+      numHijos: z.number().min(0).describe('Número de hijos/as del beneficiario'),
+      tipoPension: z.enum(['jubilacion', 'incapacidad_permanente', 'viudedad']).describe('Tipo de pensión contributiva que se percibe'),
+      cuantiaPensionBeneficiario: z.number().positive().describe('Cuantía mensual de la pensión base del beneficiario (€/mes, 14 pagas)'),
+      pensionAntesDe2021: z.boolean().optional().describe('¿La pensión se causó antes del 04/02/2021? Afecta al régimen aplicable (transitorio vs nuevo).'),
+      cuantiaPensionMadre: z.number().positive().optional().describe('Para hombres: cuantía mensual de la pensión de la madre de los hijos (€/mes). Necesaria para verificar la brecha.'),
+      madrePcibeComplemento: z.boolean().optional().describe('Para hombres: ¿la madre ya percibe este complemento? Si es true, el hombre no puede acceder.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_complemento_brecha_genero', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const sexoMap: Record<string, SexoBeneficiario> = { mujer: 'mujer', hombre: 'hombre' };
+      const tipoPensionMap: Record<string, TipoPensionBG> = { jubilacion: 'jubilacion', incapacidad_permanente: 'incapacidad_permanente', viudedad: 'viudedad' };
+      const r = calcularComplementoBrechaGenero({
+        sexo: sexoMap[args.sexo],
+        numHijos: args.numHijos,
+        tipoPension: tipoPensionMap[args.tipoPension],
+        cuantiaPensionBeneficiario: args.cuantiaPensionBeneficiario,
+        pensionAntesDe2021: args.pensionAntesDe2021,
+        cuantiaPensionMadre: args.cuantiaPensionMadre,
+        madrePcibeComplemento: args.madrePcibeComplemento,
+      });
+      const tipoPensionDesc: Record<string, string> = { jubilacion: 'Jubilación', incapacidad_permanente: 'Incapacidad Permanente', viudedad: 'Viudedad' };
+      const lineas = [
+        `👶 **Complemento para la Reducción de la Brecha de Género (RDL 3/2021)**`,
+        '',
+        `Beneficiario: ${args.sexo === 'mujer' ? 'Mujer' : 'Hombre'} | Hijos: ${r.numHijos} | Pensión: ${tipoPensionDesc[r.tipoPension]}`,
+        `Cuantía pensión base: ${fmt(args.cuantiaPensionBeneficiario)} €/mes`,
+        '',
+        r.tieneDerechoComplemento
+          ? [
+              `✅ **Tiene derecho al complemento**`,
+              `Complemento por hijo: ${fmt(r.complementoPorHijoAnual)} €/año (${fmt(r.complementoEfectivoMensual / r.numHijos > 0 ? r.complementoEfectivoMensual / r.numHijos : 0)} €/mes cada uno)`,
+              `Complemento bruto calculado: ${fmt(r.complementoBrutoMensual)} €/mes`,
+              `Límite máximo (50% pensión): ${fmt(r.limiteMaximoComplemento)} €/mes`,
+              `💰 **Complemento efectivo: ${fmt(r.complementoEfectivoMensual)} €/mes (${fmt(r.complementoEfectivoAnual)} €/año)**`,
+              `Pensión total con complemento: **${fmt(r.pensionTotalMensual)} €/mes**`,
+            ].join('\n')
+          : `❌ **Sin derecho al complemento**: ${r.motivoSinDerecho}`,
+        r.brechaCalculadaPct !== undefined ? `Brecha de pensión calculada: ${r.brechaCalculadaPct}%` : null,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote L: calcular_plus_nocturnidad ────────────────────────────────────────
+  servidor.tool(
+    'calcular_plus_nocturnidad',
+    'Calcula el plus de nocturnidad (horas trabajadas entre 22h y 6h), el importe mensual según el porcentaje del convenio, y el impacto en la cotización a la Seguridad Social. Determina si el trabajador es "nocturno" según el ET art. 36.',
+    {
+      salarioBaseMensual: z.number().positive().describe('Salario base mensual bruto (€), sin el plus de nocturnidad'),
+      horasMensualesJornada: z.number().positive().describe('Horas ordinarias de jornada al mes (ej: 160 para jornada completa de 40h/semana)'),
+      pctPlusNocturnidad: z.number().min(0).max(100).describe('Porcentaje del plus de nocturnidad sobre el salario base, según convenio colectivo (%). Rango habitual: 25-35%.'),
+      horasNocturnasMes: z.number().min(0).optional().describe('Horas nocturnas trabajadas al mes (entre 22h y 6h). Si se indica, tiene prioridad.'),
+      salariosAbsorbeNocturnidad: z.boolean().optional().describe('¿El salario ya incorpora la nocturnidad? Si es true, no se calcula plus adicional.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_plus_nocturnidad', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const r = calcularPlusNocturnidad({
+        salarioBaseMensual: args.salarioBaseMensual,
+        horasMensualesJornada: args.horasMensualesJornada,
+        pctPlusNocturnidad: args.pctPlusNocturnidad,
+        horasNocturnasMes: args.horasNocturnasMes,
+        salariosAbsorbeNocturnidad: args.salariosAbsorbeNocturnidad,
+      });
+      const lineas = [
+        `🌙 **Plus de Nocturnidad — ET art. 36**`,
+        '',
+        `Salario base mensual: ${fmt(r.salarioBaseMensual)} €`,
+        `Horas nocturnas/mes: ${r.horasNocturnasMes} h (${r.pctJornadaNocturna}% de la jornada)`,
+        `Trabajador nocturno (ET art. 36): ${r.esTrabajoNocturno ? '✅ Sí' : '❌ No'}`,
+        '',
+        r.salariosAbsorbeNocturnidad
+          ? `ℹ️ El salario ya absorbe la nocturnidad. No se genera plus adicional.`
+          : [
+              `Plus nocturnidad (${r.pctPlusNocturnidad}% s/base): **${fmt(r.plusNocturnidadMensual)} €/mes**`,
+              `Plus anual (12 meses): ${fmt(r.plusNocturnidadAnual)} €`,
+              `Salario total con plus: **${fmt(r.salarioTotalMensual)} €/mes**`,
+              '',
+              `**Cotización SS sobre el plus:**`,
+              `  Empresa (23,6%): ${fmt(r.cotizacionSSEmpresaMensual)} €/mes`,
+              `  Trabajador (4,7%): ${fmt(r.cotizacionSSTrabajadorMensual)} €/mes`,
+              `Coste total empresa (salario + plus + SS): ${fmt(r.costeTotalEmpresaMensual)} €/mes`,
+            ].join('\n'),
+        `Valor hora ordinaria: ${fmt(r.valorHoraOrdinaria)} €/h`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote L: calcular_moratoria_hipoteca ──────────────────────────────────────
+  servidor.tool(
+    'calcular_moratoria_hipoteca',
+    'Calcula el impacto financiero de aplicar una carencia hipotecaria (moratoria): carencia total (no se paga nada, intereses capitalizados) o carencia parcial (solo se pagan intereses). Muestra la nueva cuota, el sobrecoste total y el incremento de cuota tras el período de carencia.',
+    {
+      capitalPendiente: z.number().positive().describe('Capital pendiente de la hipoteca en el momento de aplicar la carencia (€)'),
+      tinAnual: z.number().min(0).describe('Tipo de interés nominal anual (TIN) en % (ej: 3.5 para el 3,5%)'),
+      plazoRestanteMeses: z.number().positive().describe('Plazo restante de la hipoteca antes de la carencia (meses)'),
+      tipoCarencia: z.enum(['total', 'parcial_solo_intereses']).describe('Tipo de carencia: total (no se paga nada, intereses capitalizados) o parcial_solo_intereses (solo se pagan intereses)'),
+      duracionCarenciaMeses: z.number().positive().describe('Duración del período de carencia (meses)'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_moratoria_hipoteca', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const tipoCarenciaMap: Record<string, TipoCarenciaHipoteca> = { total: 'total', parcial_solo_intereses: 'parcial_solo_intereses' };
+      const r = calcularMoratoriaHipoteca({
+        capitalPendiente: args.capitalPendiente,
+        tinAnual: args.tinAnual,
+        plazoRestanteMeses: args.plazoRestanteMeses,
+        tipoCarencia: tipoCarenciaMap[args.tipoCarencia],
+        duracionCarenciaMeses: args.duracionCarenciaMeses,
+      });
+      const tipoDesc = r.tipoCarencia === 'total' ? 'Total (sin pagar nada)' : 'Parcial (solo intereses)';
+      const lineas = [
+        `🏦 **Moratoria / Carencia Hipotecaria**`,
+        '',
+        `Capital pendiente: ${fmt(r.capitalPendiente)} €`,
+        `TIN: ${r.tinAnual}% | Plazo restante: ${r.plazoRestanteMeses} meses`,
+        `Tipo de carencia: ${tipoDesc} | Duración: ${r.duracionCarenciaMeses} meses`,
+        '',
+        `Cuota original: ${fmt(r.cuotaOriginalMensual)} €/mes`,
+        '',
+        `**Durante la carencia (${r.duracionCarenciaMeses} meses):**`,
+        `  Cuota mensual: ${fmt(r.cuotaDuranteCarencia)} €/mes`,
+        `  Total pagado: ${fmt(r.totalPagadoCarencia)} €`,
+        `  Intereses devengados: ${fmt(r.interesesDuranteCarencia)} €`,
+        r.tipoCarencia === 'total' ? `  Capital al terminar carencia (crece por intereses capitalizados): ${fmt(r.capitalTrasCasencia)} €` : null,
+        '',
+        `**Tras la carencia (${r.plazoTrasCasenciaMeses} meses restantes):**`,
+        `  Nueva cuota mensual: **${fmt(r.nuevaCuotaTrasCasencia)} €/mes**`,
+        `  Incremento respecto a cuota original: +${fmt(r.incrementoCuotaMensual)} €/mes`,
+        '',
+        `**Impacto total:**`,
+        `  Total pagado SIN carencia: ${fmt(r.totalPagadoSinCarencia)} €`,
+        `  Total pagado CON carencia: ${fmt(r.totalPagadoConCarencia)} €`,
+        `  💸 **Sobrecoste de la carencia: ${fmt(r.sobrecosteTotalCarencia)} €**`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
   );
