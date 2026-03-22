@@ -78,6 +78,14 @@ import { calcularHerenciaConjunta, type HerederoInput } from '@/lib/calculadoras
 import { calcularSeguroVida } from '@/lib/calculadoras/seguroVida';
 import { compararAutonomoVsSL, type TipoIS as TipoISSL } from '@/lib/calculadoras/autonomoVsSL';
 import { calcularDeclaracionConjunta } from '@/lib/calculadoras/declaracionConjunta';
+import { calcularRentabilidadAlquiler } from '@/lib/calculadoras/rentabilidadAlquiler';
+import { calcularEstrategiaDeuda, type DeudaInput } from '@/lib/calculadoras/estrategiaDeuda';
+import { calcularCapacidadHipoteca } from '@/lib/calculadoras/capacidadHipoteca';
+import { calcularObjetivoAhorro } from '@/lib/calculadoras/objetivoAhorro';
+import { calcularRegla72 } from '@/lib/calculadoras/regla72';
+import { calcularEstadisticas } from '@/lib/calculadoras/estadisticas';
+import { calcularPensionComplementaria } from '@/lib/calculadoras/pensionComplementaria';
+import { calcularRetencionAlquiler } from '@/lib/calculadoras/retencionAlquiler';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -3161,6 +3169,530 @@ function crearServidorMCP(): McpServer {
         '',
         `📚 ${r.fuenteDatos}`,
         `⚠️ *Estimación con tipos estatal + autonómico medio. No incluye deducciones autonómicas ni circunstancias específicas. Verificar con Renta Web de la AEAT.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_rentabilidad_alquiler
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_rentabilidad_alquiler',
+    'Calcula la rentabilidad bruta, neta, cash flow mensual y payback de una inversión inmobiliaria en alquiler. ' +
+    'Encadenable con calcular_hipoteca, calcular_retencion_alquiler, calcular_irpf. ' +
+    'Ideal para responder: "¿Vale la pena comprar este piso para alquilarlo?" o ' +
+    '"¿Cuánto dinero saco neto cada mes de un alquiler?"',
+    {
+      precioCompra: z.number().positive().describe('Precio de compra del inmueble en euros.'),
+      alquilerMensual: z.number().positive().describe('Alquiler mensual esperado en euros.'),
+      porcentajeGastosCompra: z.number().min(0).max(20).optional()
+        .describe('Porcentaje de gastos de compra (ITP/AJD, notaría, registro). Por defecto 10%.'),
+      reforma: z.number().min(0).optional().describe('Coste de reforma e inversión inicial adicional en euros. Por defecto 0.'),
+      tasaOcupacion: z.number().min(0).max(100).optional()
+        .describe('Tasa de ocupación esperada en porcentaje (días alquilados vs total). Por defecto 95%.'),
+      ibi: z.number().min(0).optional().describe('IBI anual en euros. Por defecto 0.'),
+      comunidad: z.number().min(0).optional().describe('Gastos de comunidad anuales en euros. Por defecto 0.'),
+      seguro: z.number().min(0).optional().describe('Seguro de hogar anual en euros. Por defecto 0.'),
+      mantenimiento: z.number().min(0).optional().describe('Mantenimiento y reparaciones anuales estimados en euros. Por defecto 0.'),
+      conHipoteca: z.boolean().optional().describe('¿El inmueble tiene hipoteca? Por defecto false.'),
+      capitalHipoteca: z.number().positive().optional().describe('Capital hipotecario en euros.'),
+      tasaHipoteca: z.number().positive().optional().describe('Tipo de interés anual de la hipoteca en porcentaje. Por defecto 3.5%.'),
+      aniosHipoteca: z.number().positive().optional().describe('Plazo de la hipoteca en años. Por defecto 25.'),
+    },
+    async ({ precioCompra, alquilerMensual, porcentajeGastosCompra, reforma, tasaOcupacion, ibi, comunidad, seguro, mantenimiento, conHipoteca, capitalHipoteca, tasaHipoteca, aniosHipoteca }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_rentabilidad_alquiler', aiCaller);
+
+      let r;
+      try {
+        r = calcularRentabilidadAlquiler({ precioCompra, alquilerMensual, porcentajeGastosCompra, reforma, tasaOcupacion, ibi, comunidad, seguro, mantenimiento, conHipoteca, capitalHipoteca, tasaHipoteca, aniosHipoteca });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const semaforo = r.valoracion === 'excelente' ? '🟢' : r.valoracion === 'aceptable' ? '🟡' : r.valoracion === 'baja' ? '🟠' : '🔴';
+      const lineas = [
+        `🏠 **Rentabilidad de Alquiler**`,
+        '',
+        `💰 Inversión total: **${fmt(r.inversionTotal)} €** (precio + ${fmt(r.gastosCompra)} € gastos + reforma)`,
+        `📅 Alquiler bruto anual (${tasaOcupacion ?? 95}% ocupación): ${fmt(r.alquilerBrutoAnual)} €`,
+        `📉 Gastos anuales totales: ${fmt(r.gastosTotalesAnual)} €`,
+        conHipoteca ? `  └ Hipoteca: ${fmt(r.cuotaHipotecaMensual)} €/mes (${fmt(r.cuotaHipotecaMensual * 12)} €/año)` : '',
+        '',
+        `📊 **Resultados:**`,
+        `  Rentabilidad bruta: **${r.rentabilidadBruta.toFixed(2).replace('.', ',')}%**`,
+        `  Rentabilidad neta: **${r.rentabilidadNeta.toFixed(2).replace('.', ',')}%**`,
+        `  Cash flow mensual: **${r.cashFlowMensual >= 0 ? '+' : ''}${fmt(r.cashFlowMensual)} €/mes**`,
+        `  Payback: **${r.paybackAnios >= 9999 ? 'Nunca (cash flow negativo)' : `${r.paybackAnios.toFixed(1).replace('.', ',')} años`}**`,
+        '',
+        `${semaforo} **${r.valoracion === 'excelente' ? 'Excelente inversión (≥7% neto)' : r.valoracion === 'aceptable' ? 'Inversión aceptable (4-7% neto, media del mercado español)' : r.valoracion === 'baja' ? 'Rentabilidad baja (1-4% neto)' : 'Cash flow negativo — los gastos superan los ingresos'}**`,
+        '',
+        `⚠️ *Rentabilidad antes de IRPF. Usa calcular_retencion_alquiler para el impacto fiscal.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_estrategia_deuda
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_estrategia_deuda',
+    'Compara los métodos Avalancha (mayor interés primero) y Bola de Nieve (menor saldo primero) ' +
+    'para pagar múltiples deudas, con soporte para pagos extra mensuales. ' +
+    'Devuelve: total intereses pagados, meses hasta liquidar, ahorro vs pagar solo mínimos y método recomendado. ' +
+    'Encadenable con calcular_prestamo, calcular_break_even. ' +
+    'Ideal para: "Tengo 3 préstamos, ¿cómo pago menos intereses?"',
+    {
+      deudas: z.array(z.object({
+        nombre: z.string().describe('Nombre identificativo de la deuda.'),
+        saldo: z.number().positive().describe('Saldo pendiente actual en euros.'),
+        tasaInteres: z.number().min(0).describe('Tipo de interés anual en porcentaje.'),
+        pagoMinimo: z.number().positive().describe('Pago mínimo mensual en euros.'),
+      })).min(1).max(10).describe('Lista de deudas a analizar (máximo 10).'),
+      pagoExtraMensual: z.number().min(0).optional()
+        .describe('Pago extra mensual adicional sobre los mínimos en euros. Por defecto 0.'),
+    },
+    async ({ deudas, pagoExtraMensual }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_estrategia_deuda', aiCaller);
+
+      let r;
+      try {
+        r = calcularEstrategiaDeuda({ deudas: deudas as DeudaInput[], pagoExtraMensual });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const mesesAAnios = (m: number) => `${Math.floor(m / 12)} años ${m % 12} meses`;
+      const lineas = [
+        `💳 **Estrategia de Pago de Deudas**`,
+        '',
+        `📊 Total deuda: **${fmt(r.totalDeuda)} €** | Pago mínimo total: ${fmt(r.pagoMinimoTotal)} €/mes${pagoExtraMensual ? ` + ${fmt(pagoExtraMensual)} € extra` : ''}`,
+        '',
+        `🏔️ **Método Avalancha** (mayor interés primero):`,
+        `  Total intereses: **${fmt(r.avalancha.totalIntereses)} €**`,
+        `  Tiempo para liquidar: **${mesesAAnios(r.avalancha.mesesTotales)}**`,
+        `  Ahorro vs solo mínimos: **${fmt(r.avalancha.ahorroVsMinimo)} €**`,
+        '',
+        `⛄ **Método Bola de Nieve** (menor saldo primero):`,
+        `  Total intereses: **${fmt(r.bolaNieve.totalIntereses)} €**`,
+        `  Tiempo para liquidar: **${mesesAAnios(r.bolaNieve.mesesTotales)}**`,
+        `  Ahorro vs solo mínimos: **${fmt(r.bolaNieve.ahorroVsMinimo)} €**`,
+        '',
+        `🐢 **Solo mínimos** (sin pago extra):`,
+        `  Total intereses: **${fmt(r.soloMinimos.totalIntereses)} €**`,
+        `  Tiempo: **${mesesAAnios(r.soloMinimos.mesesTotales)}**`,
+        '',
+        `✅ **Método recomendado: ${r.metodoRecomendado}** (ahorra ${fmt(r.diferenciaEntreMetodos)} € vs el otro método)`,
+        '',
+        `💡 Ambos métodos con ${pagoExtraMensual ? `${fmt(pagoExtraMensual)} € de pago extra` : 'el pago mínimo'} ahorran ${fmt(Math.min(r.avalancha.ahorroVsMinimo, r.bolaNieve.ahorroVsMinimo))} €+ en intereses vs pagar solo los mínimos.`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_capacidad_hipoteca
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_capacidad_hipoteca',
+    'Estima el máximo préstamo hipotecario que un hogar puede asumir de forma sostenible, ' +
+    'aplicando la regla de esfuerzo hipotecario del Banco de España (cuota ≤ 30-35% ingresos netos). ' +
+    'Devuelve: capital máximo financiable, precio máximo de vivienda, entrada disponible, ' +
+    'porcentaje de financiación y advertencias. ' +
+    'Encadenable con calcular_hipoteca, calcular_sueldo_neto. ' +
+    'Ideal para: "Con mi sueldo, ¿cuánta hipoteca puedo pedir?" o "¿Puedo comprar una casa de X euros?"',
+    {
+      ingresosMensualesNetos: z.number().positive()
+        .describe('Ingresos netos mensuales del hogar (todos los miembros) en euros.'),
+      ahorrosDisponibles: z.number().min(0)
+        .describe('Ahorros disponibles para la entrada en euros.'),
+      otrasDeudasMensuales: z.number().min(0).optional()
+        .describe('Otras cuotas de deuda ya existentes (préstamo coche, personal, etc.) en euros/mes. Por defecto 0.'),
+      tasaInteres: z.number().positive().optional()
+        .describe('Tipo de interés a aplicar en la simulación en porcentaje. Por defecto 3.5%.'),
+      plazo: z.number().int().positive().optional()
+        .describe('Plazo de la hipoteca en años. Por defecto 30.'),
+      umbralEsfuerzo: z.number().min(20).max(40).optional()
+        .describe('Umbral máximo de esfuerzo hipotecario en porcentaje (Banco de España recomienda ≤30%). Por defecto 30%.'),
+      porcentajeGastosCompra: z.number().min(5).max(15).optional()
+        .describe('Porcentaje de gastos de compra a reservar de los ahorros (notaría, impuestos, registro). Por defecto 10%.'),
+    },
+    async ({ ingresosMensualesNetos, ahorrosDisponibles, otrasDeudasMensuales, tasaInteres, plazo, umbralEsfuerzo, porcentajeGastosCompra }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_capacidad_hipoteca', aiCaller);
+
+      let r;
+      try {
+        r = calcularCapacidadHipoteca({ ingresosMensualesNetos, ahorrosDisponibles, otrasDeudasMensuales, tasaInteres, plazo, umbralEsfuerzo, porcentajeGastosCompra });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      const fmt2 = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🏦 **Capacidad Hipotecaria**`,
+        '',
+        `💼 Ingresos netos: ${fmt2(ingresosMensualesNetos)} €/mes | Ahorros: ${fmt(ahorrosDisponibles)} €`,
+        otrasDeudasMensuales ? `📋 Otras deudas: ${fmt2(otrasDeudasMensuales)} €/mes` : '',
+        '',
+        `📊 **Resultados (esfuerzo ≤${umbralEsfuerzo ?? 30}%, tasa ${tasaInteres ?? 3.5}%, ${plazo ?? 30} años):**`,
+        `  Cuota máxima sostenible: **${fmt2(r.cuotaMaximaMensual)} €/mes**`,
+        `  Cuota disponible tras otras deudas: **${fmt2(r.cuotaDisponible)} €/mes**`,
+        `  Capital máximo financiable: **${fmt(r.capitalMaximo)} €**`,
+        '',
+        `🏠 **Vivienda:**`,
+        `  Entrada disponible: ${fmt(r.entradaDisponible)} €`,
+        `  Gastos compra reservados: ${fmt(r.gastosCompraReservados)} €`,
+        `  Precio máximo vivienda: **${fmt(r.precioMaximoVivienda)} €**`,
+        `  Financiación: ${r.porcentajeFinanciacion.toFixed(0)}% del precio`,
+        `  Esfuerzo hipotecario real: ${r.esfuerzoHipotecario.toFixed(1).replace('.', ',')}% ${r.cumpleRecomendacionBDE ? '✅ (cumple BDE ≤30%)' : '⚠️ (supera recomendación BDE)'}`,
+        r.advertencias.length > 0 ? '' : '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        '',
+        `📚 Fuente: Banco de España — Guía de acceso al crédito hipotecario`,
+        `⚠️ *Capacidad estimada. Los bancos aplican sus propios criterios de concesión.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_objetivo_ahorro
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_objetivo_ahorro',
+    'Responde dos preguntas complementarias sobre objetivos de ahorro: ' +
+    'A) ¿Cuántos meses/años necesito para ahorrar X euros dado un ahorro mensual? ' +
+    'B) ¿Cuánto debo ahorrar mensualmente para alcanzar X euros en N meses? ' +
+    'Considera rentabilidad del ahorro (cuenta remunerada, fondo indexado, etc.) ' +
+    'Encadenable con calcular_interes_compuesto, calcular_fire, calcular_pension_complementaria. ' +
+    'Ideal para: "¿Cuánto tiempo tardaré en ahorrar 30.000€ para una entrada de piso?"',
+    {
+      objetivoEuros: z.number().positive().describe('Objetivo de ahorro a alcanzar en euros.'),
+      ahorroMensual: z.number().positive().optional()
+        .describe('Ahorro mensual disponible en euros. Proporciona este campo para calcular el plazo necesario.'),
+      mesesObjetivo: z.number().int().positive().optional()
+        .describe('Número de meses para alcanzar el objetivo. Proporciona este campo para calcular la cuota mensual necesaria.'),
+      rentabilidadAnual: z.number().min(0).optional()
+        .describe('Rentabilidad anual del ahorro en porcentaje (ej: 3 para cuenta remunerada al 3%). Por defecto 0%.'),
+      capitalInicial: z.number().min(0).optional()
+        .describe('Capital inicial ya disponible para el objetivo en euros. Por defecto 0.'),
+    },
+    async ({ objetivoEuros, ahorroMensual, mesesObjetivo, rentabilidadAnual, capitalInicial }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_objetivo_ahorro', aiCaller);
+
+      let r;
+      try {
+        r = calcularObjetivoAhorro({ objetivoEuros, ahorroMensual, mesesObjetivo, rentabilidadAnual, capitalInicial });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const plazoTexto = r.anios > 0
+        ? `${r.anios} año${r.anios !== 1 ? 's' : ''} y ${r.mesesRestantes} mes${r.mesesRestantes !== 1 ? 'es' : ''}`
+        : `${r.mesesRestantes} mes${r.mesesRestantes !== 1 ? 'es' : ''}`;
+      const lineas = [
+        `💰 **Objetivo de Ahorro: ${fmt(r.objetivoEuros)} €**`,
+        '',
+        r.capitalInicial > 0 ? `🏦 Capital inicial: ${fmt(r.capitalInicial)} € | Capital a acumular: ${fmt(r.capitalAcumular)} €` : '',
+        r.rentabilidadAnual > 0 ? `📈 Rentabilidad: ${r.rentabilidadAnual}% anual` : '',
+        '',
+        r.meses === 0
+          ? `✅ **¡El capital inicial ya cubre el objetivo!**`
+          : r.modo === 'plazo'
+            ? [
+              `💶 Ahorrando **${fmt(r.ahorroMensual)} €/mes**`,
+              `⏳ Tiempo necesario: **${plazoTexto}** (${r.meses} meses)`,
+              `📊 Total aportado: ${fmt(r.totalAportado)} €`,
+              r.rentabilidadAnual > 0 ? `💹 Rentabilidad generada: ${fmt(r.rentabilidadGenerada)} €` : '',
+            ].join('\n')
+            : [
+              `⏳ Para alcanzarlo en **${plazoTexto}** (${r.meses} meses):`,
+              `💶 Ahorro mensual necesario: **${fmt(r.ahorroMensual)} €/mes**`,
+              `📊 Total aportado: ${fmt(r.totalAportado)} €`,
+              r.rentabilidadAnual > 0 ? `💹 Rentabilidad generada: ${fmt(r.rentabilidadGenerada)} €` : '',
+            ].join('\n'),
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_regla_72
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_regla_72',
+    'Aplica la Regla del 72, la heurística financiera más conocida: ' +
+    'A) Dado un tipo de interés anual, ¿en cuántos años se dobla el capital? ' +
+    'B) Dado un plazo en años, ¿qué rentabilidad necesito para doblar el capital? ' +
+    'Incluye el cálculo exacto logarítmico para comparar la aproximación, ' +
+    'tabla de dobles sucesivos (2x, 4x, 8x...) y comparativa con tipos habituales de inversión. ' +
+    'Encadenable con calcular_interes_compuesto, calcular_fire. ' +
+    'Ideal para: "¿Cuánto tarda en doblarse mi inversión al 7% anual?"',
+    {
+      tipoInteres: z.number().positive().optional()
+        .describe('Tipo de interés anual en porcentaje. Proporciona este campo para calcular los años necesarios para doblar.'),
+      aniosParaDoblar: z.number().positive().optional()
+        .describe('Años deseados para doblar el capital. Proporciona este campo para calcular el tipo de interés necesario.'),
+      capitalInicial: z.number().positive().optional()
+        .describe('Capital inicial en euros (opcional, para mostrar importes absolutos en la tabla de dobles).'),
+    },
+    async ({ tipoInteres, aniosParaDoblar, capitalInicial }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_regla_72', aiCaller);
+
+      let r;
+      try {
+        r = calcularRegla72({ tipoInteres, aniosParaDoblar, capitalInicial });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const fmtK = (n: number) => n >= 1000000
+        ? `${(n / 1000000).toFixed(2).replace('.', ',')} M€`
+        : n >= 1000 ? `${(n / 1000).toFixed(1).replace('.', ',')} k€` : `${fmt(n)} €`;
+      const lineas = [
+        `⚖️ **Regla del 72**`,
+        '',
+        r.modo === 'anios'
+          ? `📈 Con un **${r.tipoInteres.toFixed(2).replace('.', ',')}% anual**, el capital se dobla en:`
+          : `⏳ Para doblar el capital en **${r.aniosRegla72} años**, necesitas:`,
+        '',
+        r.modo === 'anios'
+          ? [
+            `  Regla del 72: **≈ ${r.aniosRegla72} años**`,
+            `  Cálculo exacto: **${r.aniosExacto} años**`,
+            `  (Error de la aproximación: ${r.errorAproximacion.toFixed(2).replace('.', ',')}%)`,
+          ].join('\n')
+          : `  Tipo de interés necesario: **${r.tipoInteres.toFixed(2).replace('.', ',')}% anual**`,
+        capitalInicial ? `\n💶 ${fmtK(capitalInicial)} → **${fmtK(capitalInicial * 2)}** en ${r.aniosExacto} años` : '',
+        '',
+        `📊 **Tabla de dobles** (${r.tipoInteres.toFixed(2).replace('.', ',')}% anual):`,
+        ...r.tablaDobles.slice(0, 6).map((d, i) =>
+          `  ${i + 1}x → **${d.anios.toFixed(1).replace('.', ',')} años**${d.capitalFinal ? ` → ${fmtK(d.capitalFinal)}` : ''}`
+        ),
+        '',
+        `📋 **Comparativa tipos habituales:**`,
+        ...r.comparativa.slice(0, 5).map(c =>
+          `  ${c.tipo}% — ${c.anios.toFixed(1).replace('.', ',')} años (${c.descripcion})`
+        ),
+        '',
+        `⚠️ *Rentabilidades históricas no garantizan rendimientos futuros.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_estadisticas
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_estadisticas',
+    'Calcula los principales descriptores estadísticos de un conjunto de datos numéricos: ' +
+    'media, mediana, moda, varianza, desviación típica, percentiles (Q1/Q2/Q3), ' +
+    'rango intercuartílico, coeficiente de variación y asimetría de Fisher. ' +
+    'Muy útil para analizar rendimientos de inversiones, precios, gastos, ingresos, etc. ' +
+    'Encadenable con cualquier tool que devuelva series de valores numéricos. ' +
+    'Ideal para: "Analiza estas rentabilidades mensuales de mi cartera: [2.3, -1.1, 3.4, ...]"',
+    {
+      valores: z.array(z.number()).min(2).max(1000)
+        .describe('Lista de valores numéricos a analizar (mínimo 2, máximo 1.000). Ejemplos: rendimientos mensuales, precios, gastos.'),
+      nombre: z.string().optional()
+        .describe('Nombre descriptivo del conjunto de datos (ej: "Rendimientos cartera 2024").'),
+      decimales: z.number().int().min(0).max(6).optional()
+        .describe('Número de decimales para los resultados. Por defecto 4.'),
+    },
+    async ({ valores, nombre, decimales }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_estadisticas', aiCaller);
+
+      let r;
+      try {
+        r = calcularEstadisticas({ valores, nombre, decimales });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => Number.isInteger(n) ? String(n) : n.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+      const asim = r.asimetria > 0.5 ? 'asimetría positiva (cola derecha)' : r.asimetria < -0.5 ? 'asimetría negativa (cola izquierda)' : 'distribución aproximadamente simétrica';
+      const lineas = [
+        `📊 **Estadísticas${nombre ? `: ${nombre}` : ''}**`,
+        '',
+        `📈 **Descriptores centrales (n=${r.n}):**`,
+        `  Media: **${fmt(r.media)}**`,
+        `  Mediana: **${fmt(r.mediana)}**`,
+        r.moda ? `  Moda: **${r.moda.join(', ')}**` : '  Moda: no hay (todos los valores son únicos)',
+        '',
+        `📉 **Dispersión:**`,
+        `  Mínimo: ${fmt(r.minimo)} | Máximo: ${fmt(r.maximo)} | Rango: ${fmt(r.rango)}`,
+        `  Desviación típica (muestral): **${fmt(r.desviacionTipicaMuestral)}**`,
+        `  Varianza muestral: ${fmt(r.varianzaMuestral)}`,
+        `  Coeficiente de variación: **${r.coeficienteVariacion.toFixed(2).replace('.', ',')}%**`,
+        '',
+        `📦 **Percentiles:**`,
+        `  Q1 (25%): ${fmt(r.q1)}`,
+        `  Q2 (50%): ${fmt(r.q2)}`,
+        `  Q3 (75%): ${fmt(r.q3)}`,
+        `  Rango intercuartílico (IQR): ${fmt(r.ric)}`,
+        '',
+        `🔀 **Forma:** Asimetría Fisher = ${fmt(r.asimetria)} → ${asim}`,
+        `📋 Suma total: ${fmt(r.suma)}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_pension_complementaria
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_pension_complementaria',
+    'Calcula cuánto capital privado necesitas acumular y cuánto debes ahorrar mensualmente ' +
+    'para complementar la pensión pública hasta el nivel de renta deseado en jubilación. ' +
+    'Usa la Regla del 4% o el método de anualidad para estimar el capital necesario. ' +
+    'Encadenable con calcular_pension_publica, calcular_brecha_jubilacion, ' +
+    'calcular_interes_compuesto, calcular_fire. ' +
+    'Ideal para: "Si mi pensión será de 1.200€ y quiero 2.000€, ¿cuánto debo ahorrar?"',
+    {
+      rentaDeseadaMensual: z.number().positive()
+        .describe('Renta mensual neta deseada en la jubilación en euros.'),
+      pensionPublicaEstimada: z.number().min(0)
+        .describe('Pensión pública estimada (neta mensual) en euros. Usa calcular_pension_publica si no la conoces.'),
+      edadActual: z.number().int().min(18).max(70)
+        .describe('Edad actual en años.'),
+      edadJubilacion: z.number().int().min(55).max(75).optional()
+        .describe('Edad de jubilación objetivo en años. Por defecto 67.'),
+      esperanzaVida: z.number().int().min(65).max(100).optional()
+        .describe('Esperanza de vida estimada en años. Por defecto 85.'),
+      rentabilidadAcumulacion: z.number().min(0).max(15).optional()
+        .describe('Rentabilidad anual esperada durante la fase de ahorro en porcentaje. Por defecto 5%.'),
+      rentabilidadRetiro: z.number().min(0).max(10).optional()
+        .describe('Rentabilidad anual esperada durante la fase de retiro en porcentaje. Por defecto 3%.'),
+      capitalYaAcumulado: z.number().min(0).optional()
+        .describe('Capital privado ya acumulado para jubilación (planes de pensiones, fondos, etc.) en euros. Por defecto 0.'),
+      metodo: z.enum(['regla4', 'anualidad']).optional()
+        .describe('Método de estimación del capital: "regla4" (capital = gasto_anual/4%) o "anualidad" (valor presente de renta). Por defecto "anualidad".'),
+    },
+    async ({ rentaDeseadaMensual, pensionPublicaEstimada, edadActual, edadJubilacion, esperanzaVida, rentabilidadAcumulacion, rentabilidadRetiro, capitalYaAcumulado, metodo }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_pension_complementaria', aiCaller);
+
+      let r;
+      try {
+        r = calcularPensionComplementaria({ rentaDeseadaMensual, pensionPublicaEstimada, edadActual, edadJubilacion, esperanzaVida, rentabilidadAcumulacion, rentabilidadRetiro, capitalYaAcumulado, metodo });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const fmtK = (n: number) => n >= 1000000
+        ? `${(n / 1000000).toFixed(2).replace('.', ',')} M€`
+        : `${Math.round(n).toLocaleString('es-ES')} €`;
+
+      if (r.pensionSuficiente) {
+        return { content: [{ type: 'text', text: `✅ **La pensión pública ya cubre la renta deseada.** No necesitas ahorro complementario.\n\nPensión pública: ${fmt(r.pensionPublicaEstimada)} €/mes ≥ Renta deseada: ${fmt(r.rentaDeseadaMensual)} €/mes` }] };
+      }
+
+      const lineas = [
+        `🎯 **Pensión Complementaria Necesaria**`,
+        '',
+        `💶 Renta deseada: ${fmt(r.rentaDeseadaMensual)} €/mes | Pensión pública: ${fmt(r.pensionPublicaEstimada)} €/mes`,
+        `📉 Brecha mensual: **${fmt(r.brechaMensual)} €/mes** (${fmt(r.brechaAnual)} €/año)`,
+        '',
+        `📊 **Plan de acumulación (${r.anosAhorro} años de ahorro | ${r.anosJubilacion} años de jubilación):**`,
+        `  Capital necesario en la jubilación: **${fmtK(r.capitalNecesario)}** (método: ${r.metodo === 'regla4' ? 'Regla del 4%' : 'Anualidad'})`,
+        capitalYaAcumulado ? `  Capital ya acumulado: ${fmtK(r.capitalYaAcumulado)}` : '',
+        `  Capital adicional a acumular: **${fmtK(r.capitalPorAcumular)}**`,
+        '',
+        `💰 **Ahorro mensual necesario: ${fmt(r.ahorroMensualNecesario)} €/mes**`,
+        `  (con rentabilidad ${rentabilidadAcumulacion ?? 5}% anual durante ${r.anosAhorro} años)`,
+        '',
+        `⚠️ *Estimación orientativa. Consulta con un asesor financiero para un plan personalizado.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_retencion_alquiler
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_retencion_alquiler',
+    'Calcula el rendimiento neto del capital inmobiliario, los gastos deducibles y el impacto en el IRPF ' +
+    'del arrendador de un inmueble residencial. ' +
+    'Aplica la reducción del 60% por arrendamiento de vivienda habitual (art. 23.2 LIRPF) ' +
+    'y la retención del 19% cuando el arrendatario es empresa o profesional (art. 101.4 LIRPF). ' +
+    'Encadenable con calcular_rentabilidad_alquiler, calcular_irpf, calcular_hipoteca. ' +
+    'Ideal para: "¿Cuánto IRPF pago por alquilar mi piso?" o "¿Qué gastos puedo deducir del alquiler?"',
+    {
+      alquilerMensual: z.number().positive().describe('Alquiler mensual bruto en euros.'),
+      mesesAlquilados: z.number().int().min(1).max(12).optional()
+        .describe('Número de meses alquilados al año. Por defecto 12.'),
+      precioCompra: z.number().min(0).optional()
+        .describe('Precio de compra del inmueble en euros. Se usa para calcular la amortización (3% del 70% del valor de compra). Por defecto 0.'),
+      valorCatastral: z.number().min(0).optional()
+        .describe('Valor catastral del inmueble en euros. Se usa como alternativa para calcular amortización. Por defecto 0.'),
+      ibi: z.number().min(0).optional().describe('IBI anual en euros. Por defecto 0.'),
+      comunidad: z.number().min(0).optional().describe('Gastos de comunidad anuales en euros. Por defecto 0.'),
+      seguro: z.number().min(0).optional().describe('Seguro de hogar anual en euros. Por defecto 0.'),
+      reparaciones: z.number().min(0).optional().describe('Gastos de reparación y conservación anuales en euros. Por defecto 0.'),
+      interesesHipoteca: z.number().min(0).optional().describe('Intereses de hipoteca pagados en el año en euros. Por defecto 0.'),
+      otrosGastos: z.number().min(0).optional().describe('Otros gastos deducibles (gestoría, publicidad, etc.) en euros. Por defecto 0.'),
+      arrendatarioEmpresa: z.boolean().optional()
+        .describe('¿El arrendatario es empresa o profesional? Si es true, aplica retención del 19%. Por defecto false.'),
+      otrosIngresos: z.number().min(0).optional()
+        .describe('Otros ingresos anuales del contribuyente en euros (para calcular tipo marginal). Por defecto 0.'),
+    },
+    async ({ alquilerMensual, mesesAlquilados, precioCompra, valorCatastral, ibi, comunidad, seguro, reparaciones, interesesHipoteca, otrosGastos, arrendatarioEmpresa, otrosIngresos }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_retencion_alquiler', aiCaller);
+
+      let r;
+      try {
+        r = calcularRetencionAlquiler({ alquilerMensual, mesesAlquilados, precioCompra, valorCatastral, ibi, comunidad, seguro, reparaciones, interesesHipoteca, otrosGastos, arrendatarioEmpresa, otrosIngresos });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🏠 **IRPF del Alquiler — Rendimiento Capital Inmobiliario**`,
+        '',
+        `💶 Alquiler bruto: ${fmt(r.ingresosIntegros)} €/año (${fmt(alquilerMensual)} €/mes × ${mesesAlquilados ?? 12} meses)`,
+        '',
+        `📉 **Gastos deducibles:**`,
+        r.gastos.ibi > 0 ? `  IBI: ${fmt(r.gastos.ibi)} €` : '',
+        r.gastos.comunidad > 0 ? `  Comunidad: ${fmt(r.gastos.comunidad)} €` : '',
+        r.gastos.seguro > 0 ? `  Seguro: ${fmt(r.gastos.seguro)} €` : '',
+        r.gastos.reparaciones > 0 ? `  Reparaciones: ${fmt(r.gastos.reparaciones)} €` : '',
+        r.gastos.interesesHipoteca > 0 ? `  Intereses hipoteca: ${fmt(r.gastos.interesesHipoteca)} €` : '',
+        r.gastos.amortizacion > 0 ? `  Amortización (3% construcción): ${fmt(r.gastos.amortizacion)} €` : '',
+        r.gastos.otrosGastos > 0 ? `  Otros gastos: ${fmt(r.gastos.otrosGastos)} €` : '',
+        `  **Total gastos: ${fmt(r.gastos.total)} €**`,
+        '',
+        `📊 **Rendimiento neto: ${fmt(r.rendimientoNeto)} €**`,
+        r.reduccionViviendaHabitual
+          ? `  Reducción 60% vivienda habitual: -${fmt(r.reduccion60pct)} €`
+          : '  (sin reducción 60% — aplicar solo si es arrendamiento de vivienda habitual del inquilino)',
+        `  **Rendimiento neto reducido (base IRPF): ${fmt(r.rendimientoNetoReducido)} €**`,
+        '',
+        `💰 **IRPF estimado:** ${fmt(r.cuotaIRPFEstimada)} € (tipo marginal aprox. ${r.tipoMarginal}%)`,
+        arrendatarioEmpresa
+          ? `🏢 Retención 19% (arrendatario empresa): ${fmt(r.retencionAnual)} €/año (${fmt(r.retencionMensual)} €/mes)`
+          : '👤 Sin retención (arrendatario persona física)',
+        `🔄 Cuota diferencial: **${r.cuotaDiferencial >= 0 ? '+' : ''}${fmt(r.cuotaDiferencial)} €** ${r.aDevolver ? '(a devolver)' : '(a pagar en IRPF)'}`,
+        '',
+        `📚 ${r.fuenteDatos}`,
+        `⚠️ *Estimación con tramos estatales + autonómicos medios. No incluye deducciones autonómicas ni otras fuentes de renta complejas.*`,
       ].filter(l => l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
