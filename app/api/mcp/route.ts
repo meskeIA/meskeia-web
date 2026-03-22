@@ -134,6 +134,14 @@ import { calcularRecargoPresentacionTardia } from '@/lib/calculadoras/recargoPre
 import { calcularComplementoIT, type TipoContingenciaIT } from '@/lib/calculadoras/complementoIT';
 import { calcularVehiculoEmpresaFiscal, type TipoVehiculoEmpresa, type UsoVehiculo, type ActividadEspecialVehiculo, type ModalidadAdquisicion } from '@/lib/calculadoras/vehiculoEmpresaFiscal';
 import { calcularExcedenteCotizacionSS } from '@/lib/calculadoras/excedenteCotizacionSS';
+import { calcularIIVTNU } from '@/lib/calculadoras/iivtnuPlusvaliaMunicipal';
+import { calcularReduccionArrendamientoIRPF, type SituacionArrendamiento } from '@/lib/calculadoras/reduccionArrendamientoIRPF';
+import { calcularPrestacionMaternidadPaternidad, type EdadProgenitor, type SituacionLaboralMP } from '@/lib/calculadoras/prestacionMaternidadPaternidad';
+import { calcularITPCCAA, type ComunidadAutonomaITP, type TipoReduccionITP } from '@/lib/calculadoras/itpCCAA';
+import { calcularImputacionRentasInmuebles, type SituacionCatastralIRI } from '@/lib/calculadoras/imputacionRentasInmuebles';
+import { calcularDeduccionViviendaCCAA, type ComunidadAutonomaVivienda, type TipoDeduccionViviendaCCAA } from '@/lib/calculadoras/deduccionViviendaCCAA';
+import { calcularEstimacionObjetiva, type TamanioMunicipioEO, type SituacionInicioActividadEO } from '@/lib/calculadoras/estimacionObjetiva';
+import { calcularNocturnidadTurnoRotativo, type PatronTurnosNocturno } from '@/lib/calculadoras/nocturnidadTurnoRotativo';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -6591,6 +6599,364 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
           `💰 **Importe a devolver (50% del exceso): ${fmt(r.importeADevolver)} €**`,
           `Plazo de solicitud: ${r.plazoDeSolicitud}`,
         ].join('\n') : `❌ **Sin exceso**: Las cotizaciones totales (${fmt(r.totalCuotasCotizadas)} €) no superan el límite (${fmt(r.limiteAnualCotizaciones)} €).`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote N: IIVTNU, arrendamiento, maternidad, ITP, imputación, vivienda CCAA, módulos, nocturnidad rotativa ──
+
+  servidor.tool(
+    'calcular_iivtnu_plusvalia_municipal',
+    'Calcula el IIVTNU (plusvalía municipal) usando los dos métodos vigentes tras la STC 182/2021: método objetivo (coeficiente × valor catastral suelo) y método real (incremento real × proporción suelo). El contribuyente puede elegir el menor. Si no hay incremento real, no se tributa. Proporciona la cuota aplicando el tipo municipal indicado (máximo legal: 30%). Normativa: TRLHL arts. 104-110 + RDL 26/2021.',
+    {
+      valorCatastralSuelo: z.number().positive().describe('Valor catastral del suelo en la fecha de transmisión (€)'),
+      valorCatastralTotal: z.number().positive().describe('Valor catastral total del inmueble, suelo + construcción (€)'),
+      aniosTenencia: z.number().min(0).describe('Años completos de tenencia del inmueble (diferencia entre fecha adquisición y transmisión)'),
+      tipoImpositivo: z.number().min(0).max(30).optional().describe('Tipo impositivo municipal (%). Si no se indica, se aplica el máximo legal del 30%'),
+      coeficienteMunicipal: z.number().min(0).optional().describe('Coeficiente municipal propio (si el municipio aplica uno inferior al máximo estatal). Omitir para usar el máximo estatal'),
+      precioAdquisicion: z.number().positive().optional().describe('Precio de adquisición original del inmueble (€) — para calcular el método real'),
+      precioTransmision: z.number().positive().optional().describe('Precio de transmisión (venta) del inmueble (€) — para calcular el método real'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_iivtnu_plusvalia_municipal', aiCaller);
+      const r = calcularIIVTNU(args);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📊 **IIVTNU (Plusvalía Municipal)**`,
+        `Años de tenencia: ${r.aniosTenencia} años | Coeficiente aplicado: ${r.coeficienteAplicado} | Tipo municipal: ${r.tipoImpositivoAplicado}%`,
+        '',
+        `**Método objetivo:** Base ${fmt(r.baseImponibleObjetivo)} € → Cuota: ${fmt(r.cuotaMetodoObjetivo)} €`,
+        r.baseImponibleReal !== null
+          ? `**Método real:** Base ${fmt(r.baseImponibleReal)} € → Cuota: ${fmt(r.cuotaMetodoReal!)} € (incremento real: ${fmt(r.incrementoRealValor!)} €)`
+          : 'Método real: no calculado (no se aportaron precios de adquisición y transmisión)',
+        '',
+        r.hayIncrementoReal
+          ? `✅ Método aplicable: **${r.metodoAplicable === 'objetivo' ? 'Objetivo' : 'Real'} (más favorable)**`
+          : '❌ Sin incremento real de valor — no existe hecho imponible (STC 182/2021)',
+        `💰 **Cuota IIVTNU a pagar: ${fmt(r.cuotaIIVTNU)} €**`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_reduccion_arrendamiento_irpf',
+    'Calcula el rendimiento neto reducido del capital inmobiliario por alquiler de vivienda habitual, aplicando los nuevos porcentajes de reducción de la Ley 12/2023 (Ley de Vivienda): 50% (fuera de zona tensionada), 60% (zona tensionada general o contrato pre-2024), 70% (joven 18-35 o rehabilitación reciente), 90% (zona tensionada + reducción renta ≥5%). Calcula gastos deducibles incluyendo amortización y estima el ahorro fiscal. Normativa: LIRPF art. 23.2.',
+    {
+      situacionArrendamiento: z.enum(['contrato_pre2024', 'zona_tensionada_90pct', 'zona_tensionada_70pct_joven', 'rehabilitacion_reciente', 'zona_tensionada_general', 'fuera_zona_tensionada']).describe('Situación del contrato: contrato_pre2024=contratos antes del 01/01/2024 (60%), zona_tensionada_90pct=zona tensionada+reducción renta≥5% (90%), zona_tensionada_70pct_joven=zona tensionada+arrendatario 18-35 años (70%), rehabilitacion_reciente=rehab concluida en últimos 2 años (70%), zona_tensionada_general=zona tensionada sin requisitos adicionales (60%), fuera_zona_tensionada=resto (50%)'),
+      ingresosIntegros: z.number().min(0).describe('Alquiler bruto anual recibido (€/año)'),
+      intereses: z.number().min(0).optional().describe('Intereses hipoteca y gastos de financiación del inmueble (€/año)'),
+      ibi: z.number().min(0).optional().describe('IBI + tasa de basuras (€/año)'),
+      comunidadPropietarios: z.number().min(0).optional().describe('Cuota de comunidad de propietarios (€/año)'),
+      seguro: z.number().min(0).optional().describe('Seguro del inmueble (€/año)'),
+      reparacionConservacion: z.number().min(0).optional().describe('Gastos de reparación y conservación (€/año, no mejoras)'),
+      amortizacion: z.number().min(0).optional().describe('Amortización del inmueble (€/año) si ya la conoces. Alternativa: indicar valorCatastralConstruccion'),
+      valorCatastralConstruccion: z.number().min(0).optional().describe('Valor catastral de construcción (€) para calcular amortización automáticamente al 3%'),
+      otrosGastos: z.number().min(0).optional().describe('Otros gastos necesarios: administración, suministros pagados por arrendador (€/año)'),
+      tipoMarginalIRPF: z.number().min(0).max(60).optional().describe('Tipo marginal IRPF del arrendador (%) para calcular el ahorro fiscal estimado'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_reduccion_arrendamiento_irpf', aiCaller);
+      const r = calcularReduccionArrendamientoIRPF({
+        situacionArrendamiento: args.situacionArrendamiento as SituacionArrendamiento,
+        ingresosIntegros: args.ingresosIntegros,
+        gastos: {
+          intereses: args.intereses,
+          ibi: args.ibi,
+          comunidadPropietarios: args.comunidadPropietarios,
+          seguro: args.seguro,
+          reparacionConservacion: args.reparacionConservacion,
+          amortizacion: args.amortizacion,
+          valorCatastralConstruccion: args.valorCatastralConstruccion,
+          otrosGastos: args.otrosGastos,
+        },
+        tipoMarginalIRPF: args.tipoMarginalIRPF,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🏠 **Reducción por Arrendamiento de Vivienda — IRPF**`,
+        `Situación: ${r.situacionArrendamiento} | Reducción: **${r.pctReduccion}%**`,
+        '',
+        `Ingresos íntegros: ${fmt(r.ingresosIntegros)} €`,
+        `Gastos deducibles totales: ${fmt(r.totalGastosDeducibles)} € (amortización: ${fmt(r.amortizacionAplicada)} €)`,
+        `Rendimiento neto previo: ${fmt(r.rendimientoNetoPrevio)} €`,
+        `Reducción aplicada (${r.pctReduccion}%): -${fmt(r.reduccionAplicada)} €`,
+        `💰 **Rendimiento neto reducido (base IRPF): ${fmt(r.rendimientoNetoReducido)} €**`,
+        `Ahorro fiscal estimado vs sin reducción: ${fmt(r.ahorroFiscalEstimado)} €`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_prestacion_maternidad_paternidad',
+    'Calcula la prestación por nacimiento/adopción (maternidad/paternidad) para cualquiera de los dos progenitores. Desde enero 2021, ambos tienen 16 semanas iguales. Calcula la cuota diaria (100% de la base reguladora), la duración total (con extras por parto múltiple o discapacidad), la parte obligatoria (6 semanas) y la flexible. Verifica el período de carencia según la edad del progenitor. Normativa: LGSS arts. 177-182.',
+    {
+      baseCotizacionMensual: z.number().positive().describe('Base de cotización mensual del mes anterior al inicio de la prestación (€)'),
+      edadProgenitor: z.enum(['menor_21', 'entre_21_y_26', 'mayor_26']).describe('Tramo de edad del progenitor para determinar el período de carencia requerido'),
+      diasMesBaseCotizacion: z.number().min(28).max(31).optional().describe('Número de días del mes de la base de cotización (28-31). Default: 30'),
+      numerosHijos: z.number().int().min(1).optional().describe('Número total de hijos en el parto (1=simple, 2+=múltiple con semanas adicionales). Default: 1'),
+      hijoConDiscapacidad: z.boolean().optional().describe('¿Alguno de los hijos tiene discapacidad reconocida ≥33%? Añade 2 semanas adicionales'),
+      cumpleCarencia: z.boolean().optional().describe('¿Cumple el período de carencia requerido según su edad? Default: true (asume que sí cumple)'),
+      situacionLaboral: z.enum(['trabajador_cuenta_ajena', 'autonomo', 'desempleado_sin_derecho']).optional().describe('Situación laboral del progenitor'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_prestacion_maternidad_paternidad', aiCaller);
+      const r = calcularPrestacionMaternidadPaternidad({
+        baseCotizacionMensual: args.baseCotizacionMensual,
+        edadProgenitor: args.edadProgenitor as EdadProgenitor,
+        diasMesBaseCotizacion: args.diasMesBaseCotizacion,
+        numerosHijos: args.numerosHijos,
+        hijoConDiscapacidad: args.hijoConDiscapacidad,
+        cumpleCarencia: args.cumpleCarencia,
+        situacionLaboral: args.situacionLaboral as SituacionLaboralMP | undefined,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `👶 **Prestación por Maternidad/Paternidad**`,
+        `Duración total: **${r.duracionTotalDias} días (${r.semanasBase + r.semanasAdicionalMultiple + r.semanasAdicionalDiscapacidad} semanas)**`,
+        `• ${r.diasObligatorios} días obligatorios (primeras ${r.semanasBase > 6 ? 6 : r.semanasBase} semanas tras el parto)`,
+        `• ${r.diasFlexibles} días flexibles (hasta que el menor cumpla 12 meses)`,
+        '',
+        `Base reguladora diaria: ${fmt(r.baseReguladoraDiaria)} €/día${r.limitadaPorBaseMaxima ? ' (limitada por base máxima)' : ''}`,
+        `Cuantía diaria (100% BR): ${fmt(r.cuantiaDiaria)} €/día`,
+        `Cuantía mensual equivalente: ${fmt(r.cuantiaMensual)} €/mes`,
+        `💰 **Prestación total del período: ${fmt(r.cuotaTotalPrestacion)} €**`,
+        r.cumpleCarencia ? '✅ Cumple período de carencia' : '❌ No cumple período de carencia — sin derecho a prestación',
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_itp_ccaa',
+    'Calcula el Impuesto sobre Transmisiones Patrimoniales (ITP) en la compraventa de inmuebles de segunda mano, aplicando el tipo vigente de la Comunidad Autónoma donde se ubica el inmueble. Incluye tipos generales y reducidos para jóvenes, familias numerosas, discapacidad y VPO de las 17 CCAA. La base imponible desde 2022 es el mayor entre el valor de referencia catastral y el precio pactado. Normativa: TRLITP arts. 7-13.',
+    {
+      comunidadAutonoma: z.enum(['andalucia','aragon','asturias','baleares','canarias','cantabria','castilla_la_mancha','castilla_leon','cataluna','extremadura','galicia','la_rioja','madrid','murcia','navarra','pais_vasco','valencia']).describe('Comunidad Autónoma de ubicación del inmueble'),
+      baseImponible: z.number().positive().describe('Base imponible: el mayor entre el valor de referencia catastral del inmueble y el precio pactado (€)'),
+      tipoReduccion: z.enum(['ninguna','joven','vivienda_habitual_bajo_valor','familia_numerosa','discapacidad','vpo']).optional().describe('Tipo de reducción a aplicar si el comprador cumple los requisitos. Default: ninguna'),
+      edadComprador: z.number().min(18).max(100).optional().describe('Edad del comprador en años (necesario para la reducción por joven)'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_itp_ccaa', aiCaller);
+      const r = calcularITPCCAA({
+        comunidadAutonoma: args.comunidadAutonoma as ComunidadAutonomaITP,
+        baseImponible: args.baseImponible,
+        tipoReduccion: args.tipoReduccion as TipoReduccionITP | undefined,
+        edadComprador: args.edadComprador,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🏡 **ITP — ${r.comunidadAutonoma.replace(/_/g, ' ').toUpperCase()}**`,
+        `Base imponible: ${fmt(r.baseImponible)} €`,
+        `Tipo ITP aplicado: **${r.tipoImpositivo}%**${r.tipoReduccion !== 'ninguna' ? ` (reducción: ${r.tipoReduccion})` : ''}`,
+        `💰 **Cuota ITP a pagar: ${fmt(r.cuotaITP)} €**`,
+        '',
+        `ℹ️ ${r.notasReduccion}`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_imputacion_rentas_inmuebles',
+    'Calcula la imputación de rentas inmobiliarias (LIRPF art. 85) que debe declararse en el IRPF por inmuebles urbanos que no son vivienda habitual y no están arrendados. Aplica el 2% del valor catastral (sin revisión reciente) o el 1,1% (revisado en últimos 10 años o sin valor catastral). Soporta múltiples inmuebles, copropiedad y uso parcial del año.',
+    {
+      inmuebles: z.array(z.object({
+        descripcion: z.string().optional().describe('Descripción del inmueble (ej: "Piso Valencia calle Mayor 5")'),
+        situacionCatastral: z.enum(['revisado_reciente', 'no_revisado', 'sin_valor_catastral']).describe('revisado_reciente=valor catastral revisado en últimos 10 años→1,1%; no_revisado=sin revisión reciente→2%; sin_valor_catastral=sin valor catastral→1,1% sobre 50% del precio de compra'),
+        valorCatastral: z.number().positive().optional().describe('Valor catastral del inmueble (€). No necesario si sin_valor_catastral'),
+        valorAdquisicion: z.number().positive().optional().describe('Valor de adquisición/compra (€). Solo necesario si sin_valor_catastral'),
+        pctTitularidad: z.number().min(1).max(100).optional().describe('Porcentaje de titularidad del contribuyente (%). Default: 100%'),
+        diasImputacion: z.number().min(1).max(366).optional().describe('Días del año que el inmueble está en situación de imputación (si estuvo arrendado parte del año, solo los días no arrendados). Default: 365'),
+      })).min(1).describe('Lista de inmuebles sujetos a imputación de rentas'),
+      tipoMarginalIRPF: z.number().min(0).max(60).optional().describe('Tipo marginal IRPF del contribuyente (%) para calcular la cuota estimada. Default: 30%'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_imputacion_rentas_inmuebles', aiCaller);
+      const r = calcularImputacionRentasInmuebles({
+        inmuebles: args.inmuebles.map(i => ({
+          descripcion: i.descripcion,
+          situacionCatastral: i.situacionCatastral as SituacionCatastralIRI,
+          valorCatastral: i.valorCatastral,
+          valorAdquisicion: i.valorAdquisicion,
+          pctTitularidad: i.pctTitularidad,
+          diasImputacion: i.diasImputacion,
+        })),
+        tipoMarginalIRPF: args.tipoMarginalIRPF,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🏢 **Imputación de Rentas Inmobiliarias — IRPF art. 85**`,
+        '',
+        ...r.detalleInmuebles.map(d =>
+          `• ${d.descripcion}: ${d.pctImputacion}% × ${fmt(d.baseCalculo)} € × ${d.pctTitularidad}% × ${d.diasImputacion}/365 = **${fmt(d.rentaImputadaProporcional)} €**`
+        ),
+        '',
+        `💰 **Total renta imputada (base imponible general): ${fmt(r.totalRentaImputada)} €**`,
+        `Cuota IRPF estimada (tipo ${r.tipoMarginalIRPF}%): ${fmt(r.cuotaIRPFEstimada)} €`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_deduccion_vivienda_ccaa',
+    'Calcula las deducciones autonómicas por vivienda habitual en el IRPF: (A) régimen estatal transitorio para compras antes del 01/01/2013 (7,5% estatal + porcentaje autonómico); (B) deducciones autonómicas actuales por jóvenes, rehabilitación o zonas rurales en las principales CCAA. Incluye País Vasco y Navarra (régimen foral). Normativa: DA 18.ª LIRPF + normativas autonómicas.',
+    {
+      comunidadAutonoma: z.enum(['andalucia','aragon','asturias','baleares','canarias','cantabria','castilla_la_mancha','castilla_leon','cataluna','extremadura','galicia','la_rioja','madrid','murcia','navarra','pais_vasco','valencia']).describe('Comunidad Autónoma de residencia fiscal del contribuyente'),
+      tipoDeduccion: z.enum(['transitorio_pre2013','joven','rehabilitacion','alquiler_joven','zona_rural']).describe('Tipo de deducción: transitorio_pre2013=régimen transitorio para compras antes del 01/01/2013; joven=deducción autonómica para compradores jóvenes; rehabilitacion=rehabilitación vivienda habitual; zona_rural=municipio en riesgo de despoblación'),
+      inversionAnual: z.number().min(0).optional().describe('Cantidades invertidas en el año (amortización capital hipoteca + intereses + seguros vinculados) (€/año). Necesario para calcular la deducción'),
+      edadContribuyente: z.number().min(18).max(100).optional().describe('Edad del contribuyente (para verificar límites de edad en deducciones de jóvenes)'),
+      baseImponibleTotal: z.number().min(0).optional().describe('Base imponible total del contribuyente (€) — para verificar límites de renta'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_deduccion_vivienda_ccaa', aiCaller);
+      const r = calcularDeduccionViviendaCCAA({
+        comunidadAutonoma: args.comunidadAutonoma as ComunidadAutonomaVivienda,
+        tipoDeduccion: args.tipoDeduccion as TipoDeduccionViviendaCCAA,
+        inversionAnual: args.inversionAnual,
+        edadContribuyente: args.edadContribuyente,
+        baseImponibleTotal: args.baseImponibleTotal,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🏠 **Deducción Vivienda Habitual — ${r.comunidadAutonoma.replace(/_/g, ' ').toUpperCase()}**`,
+        `${r.nombreDeduccion}`,
+        r.disponible ? '' : '❌ Deducción no disponible para esta CCAA y tipo seleccionado.',
+        r.disponible ? `Tipo deducción autonómica: ${r.pctDeduccion}% | Base máxima: ${fmt(r.baseMaxima)} €` : '',
+        r.disponible ? `Base aplicada: ${fmt(r.baseAplicada)} €` : '',
+        r.deduccionEstatalTransitoria > 0 ? `Deducción estatal (7,5%): ${fmt(r.deduccionEstatalTransitoria)} €` : '',
+        r.disponible ? `Deducción autonómica (${r.pctDeduccion}%): ${fmt(r.deduccionAutonomica)} €` : '',
+        r.disponible ? `💰 **Deducción total IRPF: ${fmt(r.deduccionTotal)} €**` : '',
+        '',
+        `ℹ️ ${r.notas}`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_estimacion_objetiva',
+    'Calcula el rendimiento neto de actividades económicas en el régimen de Estimación Objetiva (módulos). El usuario aporta los módulos con sus unidades y el rendimiento anual por unidad (según la Orden Ministerial anual). Aplica índices correctores por tamaño de municipio, temporada, reducciones por inicio de actividad y la reducción general del 10% prorrogada para 2025. Normativa: RIRPF arts. 32-37.',
+    {
+      modulos: z.array(z.object({
+        nombre: z.string().describe('Nombre del módulo (ej: "Personal no asalariado", "Superficie del local", "Potencia instalada", "Mesas")'),
+        unidades: z.number().min(0).describe('Número de unidades del módulo (personas, m², kW, mesas, etc.)'),
+        rendimientoAnualPorUnidad: z.number().min(0).describe('Rendimiento anual por unidad según la Orden Ministerial de Módulos vigente para la actividad IAE (€/unidad/año)'),
+      })).min(1).describe('Lista de módulos con sus unidades y rendimiento por unidad. Los valores de rendimiento/unidad están publicados en la Orden Ministerial anual para cada actividad IAE'),
+      descripcionActividad: z.string().optional().describe('Descripción de la actividad (ej: "Bar - IAE 672.1", "Taxi - IAE 721.2")'),
+      codigoIAE: z.string().optional().describe('Código IAE de la actividad (referencia)'),
+      tamanioMunicipio: z.enum(['hasta_2000_hab', '2001_5000_hab', 'mas_5000_hab']).optional().describe('Tamaño del municipio para aplicar índice corrector: hasta_2000_hab→0,80; 2001_5000_hab→0,90; mas_5000_hab→sin corrector'),
+      mesesActividad: z.number().min(1).max(12).optional().describe('Meses de actividad al año (para actividades de temporada). Default: 12'),
+      situacionInicio: z.enum(['actividad_consolidada', 'primer_anio', 'segundo_anio']).optional().describe('Situación de inicio de actividad para reducciones: primer_anio→20%, segundo_anio→10%, actividad_consolidada→sin reducción'),
+      aplicarReduccionGeneral2025: z.boolean().optional().describe('¿Aplicar reducción general 2025 del 10% (prorrogada por Ley 22/2024)? Default: true'),
+      aplicarReduccionIrregularidad: z.boolean().optional().describe('¿Aplicar reducción por irregularidad del 30% (ingresos generados en más de 2 años)? Default: false'),
+      tipoMarginalIRPF: z.number().min(0).max(60).optional().describe('Tipo marginal IRPF (%) para estimar la cuota. Default: 30%'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_estimacion_objetiva', aiCaller);
+      const r = calcularEstimacionObjetiva({
+        modulos: args.modulos,
+        descripcionActividad: args.descripcionActividad,
+        codigoIAE: args.codigoIAE,
+        tamanioMunicipio: args.tamanioMunicipio as TamanioMunicipioEO | undefined,
+        mesesActividad: args.mesesActividad,
+        situacionInicio: args.situacionInicio as SituacionInicioActividadEO | undefined,
+        aplicarReduccionGeneral2025: args.aplicarReduccionGeneral2025,
+        aplicarReduccionIrregularidad: args.aplicarReduccionIrregularidad,
+        tipoMarginalIRPF: args.tipoMarginalIRPF,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📊 **Estimación Objetiva (Módulos) — ${r.descripcionActividad}**`,
+        '',
+        '**Módulos:**',
+        ...r.detalleModulos.map(m => `• ${m.nombre}: ${m.unidades} uds × ${fmt(m.rendimientoPorUnidad)} €/ud = ${fmt(m.totalModulo)} €`),
+        '',
+        `Rendimiento neto previo: ${fmt(r.rendimientoNetoPrevio)} €`,
+        r.indiceCorrectorMunicipio !== 1 ? `Índice corrector municipio: ×${r.indiceCorrectorMunicipio}` : '',
+        r.proporcionTemporada !== 1 ? `Temporada: ×${r.proporcionTemporada.toFixed(4)} (${Math.round(r.proporcionTemporada * 12)} meses)` : '',
+        `Rendimiento tras correctores: ${fmt(r.rendimientoNetoTrasCorrectores)} €`,
+        r.reduccionInicio > 0 ? `Reducción inicio actividad: -${fmt(r.reduccionInicio)} €` : '',
+        r.reduccionGeneral2025 > 0 ? `Reducción general 2025 (10%): -${fmt(r.reduccionGeneral2025)} €` : '',
+        r.reduccionIrregularidad > 0 ? `Reducción irregularidad (30%): -${fmt(r.reduccionIrregularidad)} €` : '',
+        `💰 **Rendimiento neto de módulos: ${fmt(r.rendimientoNetoModulos)} €**`,
+        `Cuota IRPF estimada: ${fmt(r.cuotaIRPFEstimada)} €`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_nocturnidad_turno_rotativo',
+    'Calcula las horas nocturnas acumuladas en esquemas de turnos rotativos (2 turnos, 3 turnos, turno noche fijo o personalizado), determina si el trabajador adquiere la condición legal de "trabajador nocturno" según el ET art. 36.2 (≥3h nocturnas diarias o ≥1/3 de las horas anuales) y estima el plus de nocturnidad anual o los días de descanso adicional equivalentes. Diferente de calcular_plus_nocturnidad, que parte de horas ya conocidas.',
+    {
+      patronTurnos: z.enum(['dos_turnos_sin_nocturno', 'dos_turnos_con_nocturno', 'tres_turnos_rotativos_iguales', 'turno_noche_fijo', 'personalizado']).describe('Patrón de turnos: dos_turnos_sin_nocturno=M+T (6-14/14-22, sin horas nocturnas); dos_turnos_con_nocturno=M+N alternando (6-14/22-6); tres_turnos_rotativos_iguales=M+T+N rotando en ciclo de 3 (1/3 del tiempo nocturno); turno_noche_fijo=solo turno de noche (22-6); personalizado=indicar horasNocturnasSemana directamente'),
+      horasJornadaSemanal: z.number().positive().describe('Horas totales de jornada laboral por semana (ej: 40 para jornada completa estándar)'),
+      salarioBaseMensual: z.number().positive().describe('Salario base mensual del trabajador (€) — base del cálculo del plus de nocturnidad'),
+      horasNocturnasSemana: z.number().min(0).optional().describe('Horas nocturnas (22h-6h) por semana. Solo necesario si patronTurnos=personalizado'),
+      pctPlusNocturnidadConvenio: z.number().min(0).max(100).optional().describe('Porcentaje del plus de nocturnidad según convenio colectivo (%). Si no hay convenio, el ET no fija mínimo — rango habitual: 20-35%. Default: 25%'),
+      diasLaborablesSemanales: z.number().min(1).max(7).optional().describe('Días laborables por semana (Default: 5). Usar 6 si trabaja 6 días/semana'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_nocturnidad_turno_rotativo', aiCaller);
+      const r = calcularNocturnidadTurnoRotativo({
+        patronTurnos: args.patronTurnos as PatronTurnosNocturno,
+        horasJornadaSemanal: args.horasJornadaSemanal,
+        salarioBaseMensual: args.salarioBaseMensual,
+        horasNocturnasSemana: args.horasNocturnasSemana,
+        pctPlusNocturnidadConvenio: args.pctPlusNocturnidadConvenio,
+        diasLaborablesSemanales: args.diasLaborablesSemanales,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🌙 **Nocturnidad en Turno Rotativo**`,
+        `Patrón: ${r.patronTurnos.replace(/_/g, ' ')} | Jornada: ${r.horasJornadaAnuales}h/año`,
+        '',
+        `Horas nocturnas/semana: ${r.horasNocturnasSemana}h | Horas nocturnas/año: ${r.horasNocturnasAnuales}h (${r.pctHorasNocturnas}% del total)`,
+        `Horas nocturnas medias/día: ${r.horasNocturnasMediasDiarias}h`,
+        '',
+        r.esTrabajadorNocturno
+          ? `✅ **TRABAJADOR NOCTURNO** (ET art. 36.2): cumple ${r.cumpleUmbralDiario ? '≥3h nocturnas/día' : ''}${r.cumpleUmbralDiario && r.cumpleUmbralAnual ? ' y ' : ''}${r.cumpleUmbralAnual ? '≥1/3 de las horas anuales' : ''}`
+          : `⬜ No alcanza el umbral de "trabajador nocturno" (ET art. 36.2). El plus puede pactarse igualmente en convenio.`,
+        '',
+        `Plus nocturnidad mensual (${args.pctPlusNocturnidadConvenio ?? 25}%): ${fmt(r.plusNocturnidadMensual)} €/mes`,
+        `💰 **Plus nocturnidad anual: ${fmt(r.plusNocturnidadAnual)} €/año**`,
+        `Equivalencia en descanso adicional estimado: ~${r.diasDescansoAdicionalEstimados} días/año`,
         '',
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
