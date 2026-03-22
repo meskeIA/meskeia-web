@@ -102,6 +102,14 @@ import { calcularModelo303, type Trimestre303 } from '@/lib/calculadoras/modelo3
 import { calcularHorasEfectivas, type PerfilHoras } from '@/lib/calculadoras/horasEfectivas';
 import { calcularNumeroPagos } from '@/lib/calculadoras/numeroPagos';
 import { calcularImpuestoMatriculacion, type TipoVehiculoIEDMT } from '@/lib/calculadoras/impuestoMatriculacion';
+import { calcularDividendoEmpresarial, type TipoIS_Dividendo } from '@/lib/calculadoras/dividendoEmpresarial';
+import { calcularCeseActividadAutonomo, type CausaCese } from '@/lib/calculadoras/ceseActividadAutonomo';
+import { calcularDeduccionVivienda, type ModoDeduccionVivienda } from '@/lib/calculadoras/deduccionVivienda';
+import { calcularRendimientoBono, type ModoBono, type FrecuenciaCupon } from '@/lib/calculadoras/rendimientoBono';
+import { calcularReequilibrioCartera, type EstrategiaReequilibrio } from '@/lib/calculadoras/reequilibrioCartera';
+import { calcularPagoAplazadoAEAT, type TipoSolicitante, type ModalidadAplazamiento } from '@/lib/calculadoras/pagoAplazadoAEAT';
+import { calcularPermisoParental, type SituacionLaboral as SituacionLaboralPermiso, type ModoDisfrute } from '@/lib/calculadoras/permisoParental';
+import { calcularStockOptions, type TipoRetribucionAcciones } from '@/lib/calculadoras/stockOptions';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -4826,6 +4834,447 @@ function crearServidorMCP(): McpServer {
         `  **Coste total: ${fmt(r.desglose.total)} €**`,
         '',
         `💡 ${r.consejo}`,
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote J: dividendo_empresarial ─────────────────────────────────────────
+  servidor.tool(
+    'dividendo_empresarial',
+    `Compara las estrategias de remuneración en una SL española: solo dividendo, solo salario o combinación de ambos.
+Calcula el coste total (IS + IRPF + cuotas SS autónomo societario) para el socio-administrador y determina qué opción maximiza el neto tras impuestos.
+Usa los tipos del Impuesto sobre Sociedades 2025 (general 25%, PYME 23%) y los tramos IRPF 2025.
+Encadenable con: calcular_irpf, calcular_autonomo, calcular_irpf_devolucion.`,
+    {
+      beneficioAntesIS: z.number().positive().describe('Beneficio de la empresa antes del Impuesto sobre Sociedades (€)'),
+      tipoIS: z.enum(['general', 'pyme', 'startup']).optional().describe('Régimen IS: general (25%), pyme (23%), startup (15% primeros 2 años). Por defecto pyme.'),
+      participacion: z.number().min(0).max(100).optional().describe('Participación del socio en el capital (%). Por defecto 100.'),
+      tieneControl: z.boolean().optional().describe('¿El socio tiene control efectivo de la sociedad? (Afecta a cotización SS autónomo societario). Por defecto true.'),
+      otrosRendimientos: z.number().min(0).optional().describe('Otros rendimientos del trabajo anuales del socio, aparte de los de la SL (€). Por defecto 0.'),
+      hijos: z.number().int().min(0).optional().describe('Número de hijos (para el mínimo familiar en IRPF). Por defecto 0.'),
+      salarioBruto: z.number().min(0).optional().describe('Salario bruto anual para el escenario combinado (€). Si se omite, se usa el 50% del beneficio.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('dividendo_empresarial', aiCaller);
+      const r = calcularDividendoEmpresarial({
+        beneficioAntesIS: args.beneficioAntesIS,
+        tipoIS: args.tipoIS as TipoIS_Dividendo | undefined,
+        participacionPct: args.participacion,
+        tieneControl: args.tieneControl,
+        otrosRendimientosTrabajo: args.otrosRendimientos,
+        numHijos: args.hijos,
+        salarioBrutoSocio: args.salarioBruto,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const escenarios = [r.escenarioSoloDividendo, r.escenarioSoloSalario, r.escenarioCombinado];
+      const lineas = [
+        `🏢 **Optimización fiscal SL — Beneficio ${fmt(r.beneficioAntesIS)} €**`,
+        `📋 IS aplicado: ${r.tipoISAplicado}%`,
+        '',
+        ...escenarios.map(e => [
+          `**${e.nombre === r.escenarioOptimo ? '⭐ ' : ''}${e.nombre}**`,
+          `  IS SL: ${fmt(e.isPagado)} €  |  SS autónomo: ${fmt(e.cuotaSSAutonomo)} €`,
+          `  Dividendo bruto: ${fmt(e.dividendoBruto)} €  |  Salario bruto: ${fmt(e.salarioBruto)} €`,
+          `  IRPF total: ${fmt(e.irpfTotal)} €`,
+          `  **Neto socio: ${fmt(e.netoDisponibleSocio)} €**  |  Tipo efectivo total: ${e.tipoEfectivoTotal.toFixed(1).replace('.', ',')}%`,
+          '',
+        ].join('\n')),
+        `✅ **Mejor opción: ${r.escenarioOptimo}** | Ventaja sobre la peor: ${fmt(r.ventajaOptimo)} €`,
+        '',
+        `⚠️ ${r.advertencia}`,
+        `📎 ${r.fuenteDatos}`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote J: cese_actividad_autonomo ───────────────────────────────────────
+  servidor.tool(
+    'cese_actividad_autonomo',
+    `Calcula la prestación por cese de actividad (paro de autónomos) según la LGSS arts. 327-339.
+Duración: 2 meses por año cotizado (mínimo 12 meses continuados), máximo 24 meses. Cuantía: 70% de la base reguladora (media últimas 12 bases).
+Verifica los requisitos de acceso: causa de cese, cotizaciones previas, alta en RETA, no haber cumplido los 67 años.
+Encadenable con: calcular_cuota_autonomo, calcular_baja_medica, calcular_irpf.`,
+    {
+      mesesCotizados: z.number().int().min(0).describe('Meses cotizados continuados al RETA inmediatamente antes del cese (para determinar duración de la prestación)'),
+      baseCotizacionMedia: z.number().positive().describe('Base de cotización mensual media de los últimos 12 meses (€) — base reguladora'),
+      causaCese: z.enum(['economica_tecnica', 'fuerza_mayor', 'perdida_licencia', 'violencia_genero', 'divorcio_separacion', 'deudas_insolvencia']).optional().describe('Causa del cese de actividad. Por defecto economica_tecnica.'),
+      edad: z.number().int().min(16).max(80).optional().describe('Edad del autónomo al solicitar la prestación. Por defecto 45.'),
+      tieneEmpleados: z.boolean().optional().describe('¿Tiene trabajadores a cargo? El cese colectivo puede flexibilizar el acceso. Por defecto false.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('cese_actividad_autonomo', aiCaller);
+      const r = calcularCeseActividadAutonomo({
+        mesesCotizados: args.mesesCotizados,
+        baseCotizacionMedia: args.baseCotizacionMedia,
+        causaCese: args.causaCese as CausaCese | undefined,
+        edad: args.edad,
+        tieneEmpleados: args.tieneEmpleados,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🛑 **Cese de Actividad (Paro Autónomo)**`,
+        '',
+        r.tieneAcceso
+          ? `✅ **Cumple requisitos de acceso**`
+          : `❌ **No cumple requisitos** — ${r.razonDenegacion}`,
+        '',
+        `📅 Meses cotizados: ${r.mesesCotizados}`,
+        `⏱️ Duración de la prestación: **${r.duracionMeses} meses**`,
+        '',
+        `💶 Base reguladora mensual: ${fmt(r.baseReguladora)} €`,
+        `💰 Cuantía mensual bruta: **${fmt(r.cuantiaMensualBruta)} €**`,
+        `🏦 Retención IRPF estimada: ${fmt(r.retencionIRPFEstimada)} €`,
+        `✅ Cuantía mensual neta: **${fmt(r.cuantiaMensualNeta)} €**`,
+        '',
+        `💵 Prestación total bruta estimada: **${fmt(r.totalBrutoPrestacion)} €**`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote J: deduccion_vivienda ────────────────────────────────────────────
+  servidor.tool(
+    'deduccion_vivienda',
+    `Calcula dos beneficios fiscales relacionados con la vivienda en IRPF:
+1. Deducción por inversión en vivienda habitual (solo contratos pre-01/01/2013): 15% de las cantidades satisfechas, base máxima 9.040 €/año.
+2. Reducción por arrendamiento de vivienda habitual (arrendador): 60% del rendimiento neto (art. 23.2 LIRPF), solo si es vivienda habitual del inquilino.
+Encadenable con: calcular_hipoteca, calcular_irpf, calcular_devolucion_irpf.`,
+    {
+      modo: z.enum(['inversion_pre2013', 'alquiler_habitual']).describe('Modo de cálculo: deducción por compra pre-2013 o reducción por alquiler de vivienda habitual'),
+      // Modo inversion_pre2013
+      fechaAdquisicion: z.string().optional().describe('[inversion_pre2013] Fecha de adquisición/firma del contrato (YYYY-MM-DD). Debe ser anterior al 01/01/2013.'),
+      cantidadesPagadasHipoteca: z.number().min(0).optional().describe('[inversion_pre2013] Cuotas de hipoteca pagadas en el año (capital + intereses) (€)'),
+      seguroVidaHipoteca: z.number().min(0).optional().describe('[inversion_pre2013] Primas de seguro de vida vinculado a la hipoteca (€). Por defecto 0.'),
+      seguroHogar: z.number().min(0).optional().describe('[inversion_pre2013] Primas de seguro de hogar (€). Por defecto 0.'),
+      otrosGastosVivienda: z.number().min(0).optional().describe('[inversion_pre2013] Otras cantidades satisfechas por la vivienda habitual (€). Por defecto 0.'),
+      declaracionConjunta: z.boolean().optional().describe('[inversion_pre2013] ¿Declaración conjunta con cónyuge? La base máx. de 9.040€ aplica individualmente. Por defecto false.'),
+      // Modo alquiler_habitual
+      rendimientoNetoAlquiler: z.number().optional().describe('[alquiler_habitual] Rendimiento neto del alquiler (ingresos - gastos deducibles) (€). Puede ser negativo.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('deduccion_vivienda', aiCaller);
+      const r = calcularDeduccionVivienda({
+        modo: args.modo as ModoDeduccionVivienda,
+        fechaAdquisicion: args.fechaAdquisicion,
+        cantidadesPagadasHipoteca: args.cantidadesPagadasHipoteca,
+        seguroVidaHipoteca: args.seguroVidaHipoteca,
+        seguroHogar: args.seguroHogar,
+        otrosGastosVivienda: args.otrosGastosVivienda,
+        declaracionConjunta: args.declaracionConjunta,
+        rendimientoNetoAlquiler: args.rendimientoNetoAlquiler,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      let lineas: string[];
+      if (r.modo === 'inversion_pre2013') {
+        lineas = [
+          `🏠 **Deducción Vivienda Habitual (pre-2013)**`,
+          r.cumpleFechaRequisito === false ? `❌ La adquisición no es anterior al 01/01/2013 — no aplica el régimen transitorio` : `✅ Adquisición dentro del régimen transitorio`,
+          '',
+          `💶 Cantidades satisfechas en el año: ${fmt(r.totalCantidadesSatisfechas ?? 0)} €`,
+          `📊 Base de deducción (máx. 9.040 €): ${fmt(r.baseDeduccion ?? 0)} €`,
+          `🏷️ Deducción estatal (7,5%): ${fmt(r.deduccionEstatal ?? 0)} €`,
+          `🏷️ Deducción autonómica estimada (7,5%): ${fmt(r.deduccionAutonomicaEstimada ?? 0)} €`,
+          `✅ **Deducción total: ${fmt(r.deduccionTotal ?? 0)} €**`,
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📎 ${r.fuenteDatos}`,
+        ];
+      } else {
+        lineas = [
+          `🏠 **Reducción Arrendamiento Vivienda Habitual (60%)**`,
+          '',
+          `📊 Rendimiento neto antes de reducción: ${fmt(r.rendimientoNetoAntes ?? 0)} €`,
+          `🏷️ Reducción ${r.porcentajeReduccion ?? 60}%: ${fmt(r.reduccionAplicada ?? 0)} €`,
+          `✅ **Rendimiento neto tras reducción: ${fmt(r.rendimientoNetoTrasReduccion ?? 0)} €**`,
+          `💡 Ahorro fiscal estimado (tipo marginal ~30%): ${fmt(r.ahorroFiscalEstimado ?? 0)} €`,
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📎 ${r.fuenteDatos}`,
+        ];
+      }
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote J: rendimiento_bono ───────────────────────────────────────────────
+  servidor.tool(
+    'rendimiento_bono',
+    `Calcula el rendimiento (TIR/YTM) o el precio de un bono de renta fija con cupones periódicos.
+Modo calcular_tir: dado el precio de mercado (valorEntrada), calcula la Tasa Interna de Retorno (yield to maturity).
+Modo calcular_precio: dado el rendimiento exigido en % (valorEntrada), calcula el precio limpio del bono.
+También calcula la duración de Macaulay y la duración modificada (sensibilidad al tipo de interés).
+Encadenable con: calcular_plusvalias_irpf, calcular_reequilibrio_cartera.`,
+    {
+      modo: z.enum(['calcular_tir', 'calcular_precio']).describe('calcular_tir: valorEntrada = precio de mercado en €. calcular_precio: valorEntrada = TIR/yield en %.'),
+      valorNominal: z.number().positive().optional().describe('Valor nominal del bono (€). Por defecto 1.000 €.'),
+      tasaCuponAnual: z.number().min(0).describe('Tasa de cupón anual (%). Ej: 3.5 para un cupón del 3,5%.'),
+      anosVencimiento: z.number().positive().describe('Años hasta el vencimiento del bono.'),
+      frecuenciaCupon: z.enum(['anual', 'semestral', 'trimestral']).optional().describe('Frecuencia de pago de cupones. Por defecto anual.'),
+      valorEntrada: z.number().positive().describe('Para calcular_tir: precio de mercado (€). Para calcular_precio: TIR/yield (%).'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('rendimiento_bono', aiCaller);
+      const r = calcularRendimientoBono({
+        modo: args.modo as ModoBono,
+        valorNominal: args.valorNominal,
+        tasaCuponAnual: args.tasaCuponAnual,
+        anosVencimiento: args.anosVencimiento,
+        frecuenciaCupon: args.frecuenciaCupon as FrecuenciaCupon | undefined,
+        valorEntrada: args.valorEntrada,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const signo = r.primaDescuento >= 0 ? '+' : '';
+      const lineas = [
+        `📈 **Bono Renta Fija — Nominal ${fmt(r.valorNominal)} € | Cupón ${r.tasaCuponAnual.toFixed(2).replace('.', ',')}% ${r.frecuenciaCupon}**`,
+        `⏱️ Vencimiento: ${r.anosVencimiento} años | ${r.numPeriodos} períodos | Cupón/período: ${fmt(r.cuponPorPeriodo)} €`,
+        '',
+        r.modo === 'calcular_tir'
+          ? `💹 Precio mercado: ${fmt(r.precioLimpio)} €\n📊 **TIR (Yield to Maturity): ${r.tirAnual.toFixed(4).replace('.', ',')}%**`
+          : `📊 Rendimiento exigido: ${r.tirAnual.toFixed(4).replace('.', ',')}%\n💹 **Precio limpio: ${fmt(r.precioLimpio)} €**`,
+        '',
+        `⚖️ Prima/Descuento vs nominal: ${signo}${fmt(r.primaDescuento)} € → ${r.posicionPar.replace('_', ' ')}`,
+        '',
+        `📐 Duración Macaulay: ${r.duracionMacaulay.toFixed(4).replace('.', ',')} años`,
+        `📐 Duración Modificada: ${r.duracionModificada.toFixed(4).replace('.', ',')}`,
+        `💡 Variación precio por +1% en tipos: aprox. ${fmt(-r.duracionModificada * r.precioLimpio / 100)} €`,
+        '',
+        `📝 ${r.interpretacion}`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote J: reequilibrio_cartera ──────────────────────────────────────────
+  servidor.tool(
+    'reequilibrio_cartera',
+    `Calcula cómo reequilibrar (rebalancear) una cartera de inversión cuando los pesos actuales de los activos han divergido de los pesos objetivo.
+Estrategia comprar_vender: compras y ventas para alcanzar los pesos exactos.
+Estrategia solo_comprar: solo aportar nuevo capital sin vender (evita fiscalidad de plusvalías).
+Calcula las plusvalías y el coste fiscal estimado de las ventas (tarifa del ahorro IRPF 2025).
+Encadenable con: calcular_fire, calcular_plusvalias_irpf, calcular_rendimiento_bono.`,
+    {
+      activos: z.array(z.object({
+        nombre: z.string().describe('Nombre del activo o categoría (ej: "Renta Variable Global")'),
+        valorActual: z.number().min(0).describe('Valor actual de mercado en cartera (€)'),
+        pesoObjetivoPct: z.number().min(0).max(100).describe('Peso objetivo en la cartera (%). Todos deben sumar 100.'),
+        costeMedio: z.number().min(0).optional().describe('Coste de adquisición medio total (€). Para calcular plusvalías si se vende. Por defecto = valorActual.'),
+      })).describe('Lista de activos de la cartera'),
+      estrategia: z.enum(['comprar_vender', 'solo_comprar']).optional().describe('Estrategia de reequilibrio. Por defecto comprar_vender.'),
+      nuevoCapital: z.number().min(0).optional().describe('Nuevo capital disponible para aportar (€). Relevante para estrategia solo_comprar. Por defecto 0.'),
+      umbralDesviacion: z.number().min(0).max(50).optional().describe('Umbral de desviación (pp) para activar operación. Por defecto 5%.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('reequilibrio_cartera', aiCaller);
+      const r = calcularReequilibrioCartera({
+        activos: args.activos,
+        estrategia: args.estrategia as EstrategiaReequilibrio | undefined,
+        nuevoCapital: args.nuevoCapital,
+        umbralDesviacion: args.umbralDesviacion,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `⚖️ **Reequilibrio de Cartera** — Estrategia: ${r.estrategia} | Umbral: ${r.umbralDesviacion}%`,
+        `💼 Valor total cartera: ${fmt(r.valorTotalActual)} €`,
+        '',
+        ...r.operaciones.map(o => {
+          const icono = o.tipoOperacion === 'comprar' ? '🟢' : o.tipoOperacion === 'vender' ? '🔴' : '⚪';
+          const op = o.tipoOperacion === 'mantener'
+            ? `mantener (desv. ${o.desviacion > 0 ? '+' : ''}${o.desviacion.toFixed(1).replace('.', ',')}%)`
+            : `${o.tipoOperacion === 'comprar' ? '+' : ''}${fmt(o.operacion)} € (${o.pesoActual.toFixed(1).replace('.', ',')}% → ${o.pesoObjetivo}%)`;
+          const fiscal = o.plusvaliaEstimada && o.plusvaliaEstimada > 0
+            ? ` | Plusvalía: ${fmt(o.plusvaliaEstimada)} € → IRPF: ${fmt(o.impuestoEstimado ?? 0)} €`
+            : '';
+          return `${icono} **${o.nombre}**: ${op}${fiscal}`;
+        }),
+        '',
+        r.necesitaReequilibrio
+          ? [`📊 Total comprar: ${fmt(r.totalComprar)} € | Total vender: ${fmt(r.totalVender)} €`,
+             r.impuestoTotal > 0 ? `💸 Coste fiscal ventas: ${fmt(r.impuestoTotal)} €` : '',
+            ].filter(Boolean).join('\n')
+          : '',
+        '',
+        `💡 ${r.interpretacion}`,
+      ].filter(l => l !== undefined);
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote J: pago_aplazado_aeat ────────────────────────────────────────────
+  servidor.tool(
+    'pago_aplazado_aeat',
+    `Calcula el plan de pagos de una deuda tributaria en aplazamiento o fraccionamiento con la AEAT (art. 65 LGT).
+Aplica el interés de demora tributario del 7,25% anual (LPGE 2023 prorrogado a 2025).
+Determina si se requieren garantías según el importe y número de plazos. Genera la tabla de amortización mensual.
+Encadenable con: calcular_irpf, calcular_modelo_303, calcular_interes_demora.`,
+    {
+      importeDeuda: z.number().positive().describe('Importe de la deuda tributaria principal (€)'),
+      numPlazos: z.number().int().min(1).max(120).describe('Número de plazos mensuales solicitados'),
+      tipoSolicitante: z.enum(['persona_fisica', 'persona_juridica']).optional().describe('Tipo de solicitante. Por defecto persona_fisica.'),
+      modalidad: z.enum(['aplazamiento', 'fraccionamiento']).optional().describe('Modalidad de pago diferido. Por defecto aplazamiento.'),
+      fechaInicio: z.string().optional().describe('Fecha de inicio del aplazamiento (YYYY-MM-DD). Por defecto hoy.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('pago_aplazado_aeat', aiCaller);
+      const r = calcularPagoAplazadoAEAT({
+        importeDeuda: args.importeDeuda,
+        numPlazos: args.numPlazos,
+        tipoSolicitante: args.tipoSolicitante as TipoSolicitante | undefined,
+        modalidad: args.modalidad as ModalidadAplazamiento | undefined,
+        fechaInicio: args.fechaInicio,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      // Mostrar primeras 6 cuotas + última
+      const cuotasMostrar = r.planPagos.length <= 8
+        ? r.planPagos
+        : [...r.planPagos.slice(0, 5), { cuota: -1, fechaPago: '...', capitalPendiente: 0, interesesPeriodo: 0, importeCuota: 0, capitalAmortizado: 0 }, r.planPagos[r.planPagos.length - 1]];
+      const lineas = [
+        `📋 **Aplazamiento AEAT — ${fmt(r.importeDeuda)} € en ${r.numPlazos} plazos**`,
+        `🏷️ Tipo interés demora: ${r.tasaInteresDemora}% anual`,
+        `🔒 Garantías: ${r.requiereGarantias ? r.tipoGarantia : 'No requeridas'}`,
+        '',
+        `💶 Cuota mensual media: **${fmt(r.cuotaMensualMedia)} €**`,
+        `💸 Total intereses: ${fmt(r.totalIntereses)} €`,
+        `💰 Total a pagar: **${fmt(r.totalAPagar)} €**`,
+        `📊 Coste financiero: ${r.costeTotalPct.toFixed(2).replace('.', ',')}%`,
+        '',
+        `**Plan de pagos:**`,
+        ...cuotasMostrar.map(c =>
+          c.cuota === -1
+            ? '  ...'
+            : `  Cuota ${c.cuota} (${c.fechaPago}): ${fmt(c.importeCuota)} € [capital: ${fmt(c.capitalAmortizado)} € + intereses: ${fmt(c.interesesPeriodo)} €]`
+        ),
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote J: permiso_parental ───────────────────────────────────────────────
+  servidor.tool(
+    'permiso_parental',
+    `Calcula la prestación económica por nacimiento, adopción o acogimiento (baja por maternidad/paternidad) de la Seguridad Social.
+Desde 2021, ambos progenitores tienen derecho a 16 semanas intransferibles. Cuantía: 100% de la base reguladora.
+Calcula semanas adicionales por parto múltiple, discapacidad del hijo u hospitalización, y la cuantía con disfrute a tiempo parcial.
+Encadenable con: calcular_sueldo_neto, calcular_baja_medica, calcular_irpf.`,
+    {
+      baseCotizacionMensual: z.number().positive().describe('Base de cotización mensual del mes anterior al inicio del permiso (€)'),
+      situacionLaboral: z.enum(['empleado', 'autonomo', 'funcionario']).optional().describe('Situación laboral del beneficiario. Por defecto empleado.'),
+      modoDisfrute: z.enum(['completo', 'parcial_50', 'parcial_75', 'parcial_87_5']).optional().describe('Modo de disfrute de las semanas voluntarias. Por defecto completo.'),
+      partoMultiple: z.boolean().optional().describe('¿Parto, adopción o acogimiento múltiple? (+2 semanas por hijo adicional). Por defecto false.'),
+      numHijos: z.number().int().min(1).optional().describe('Número de hijos en caso de parto múltiple. Por defecto 1.'),
+      discapacidadHijo: z.boolean().optional().describe('¿Hijo con discapacidad ≥33%? (+2 semanas adicionales). Por defecto false.'),
+      diasHospitalizacion: z.number().int().min(0).optional().describe('Días de hospitalización tras el parto (para semanas adicionales, máx. 13 semanas). Por defecto 0.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('permiso_parental', aiCaller);
+      const r = calcularPermisoParental({
+        baseCotizacionMensual: args.baseCotizacionMensual,
+        situacionLaboral: args.situacionLaboral as SituacionLaboralPermiso | undefined,
+        modoDisfrute: args.modoDisfrute as ModoDisfrute | undefined,
+        partoMultiple: args.partoMultiple,
+        numHijos: args.numHijos,
+        discapacidadHijo: args.discapacidadHijo,
+        diasHospitalizacion: args.diasHospitalizacion,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const supl = r.semanasSuplementarias;
+      const haySupl = supl.partoMultiple + supl.discapacidad + supl.hospitalizacion > 0;
+      const lineas = [
+        `👶 **Prestación por Nacimiento/Cuidado de Menor**`,
+        `👤 Situación: ${r.situacionLaboral} | Disfrute: ${r.modoDisfrute}`,
+        '',
+        `⏱️ Semanas de permiso: **${r.semanasPermiso} semanas (${r.diasPermiso} días naturales)**`,
+        haySupl ? `  (Base 16 sem. + ${supl.partoMultiple > 0 ? `${supl.partoMultiple} múltiple ` : ''}${supl.discapacidad > 0 ? `${supl.discapacidad} discap. ` : ''}${supl.hospitalizacion > 0 ? `${supl.hospitalizacion} hosp.` : ''})` : '',
+        r.modoDisfrute !== 'completo' ? `  ⏳ Semanas reales con disfrute parcial: ${r.semanasRealesConParcial} semanas` : '',
+        '',
+        `💶 Base reguladora diaria: ${fmt(r.baseReguladoraDiaria)} €`,
+        `💰 Cuantía diaria bruta: ${fmt(r.cuantiaDiariaBruta)} €`,
+        `📅 Cuantía mensual bruta: **${fmt(r.cuantiaMensualBruta)} €**`,
+        `🏦 Retención IRPF estimada: ${fmt(r.retencionIRPF)} €`,
+        `✅ **Cuantía mensual neta: ${fmt(r.cuantiaMensualNeta)} €**`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote J: calcular_stock_options ────────────────────────────────────────
+  servidor.tool(
+    'calcular_stock_options',
+    `Calcula el impacto fiscal en IRPF de las retribuciones en acciones: Stock Options y RSUs.
+Stock Options: la diferencia (valor mercado - precio ejercicio) tributa como rendimiento del trabajo en el ejercicio.
+RSUs: el valor íntegro en el vesting tributa como rendimiento del trabajo.
+Aplica la exención de 12.000 €/año del art. 42.3 LIRPF y la reducción del 30% por rendimientos irregulares (art. 18.2).
+La venta posterior tributa como ganancia patrimonial en la tarifa del ahorro.
+Encadenable con: calcular_irpf, calcular_devolucion_irpf, calcular_plusvalias_irpf.`,
+    {
+      tipo: z.enum(['stock_options', 'rsus']).describe('Tipo de retribución: stock_options u rsus'),
+      numAcciones: z.number().positive().describe('Número de acciones u opciones ejercidas o consolidadas'),
+      valorMercadoEjercicio: z.number().positive().describe('Valor de mercado de la acción en el momento de ejercicio/vesting (€)'),
+      precioEjercicio: z.number().min(0).optional().describe('Precio de ejercicio (strike price) para stock options (€). Para RSUs usar 0 o no indicar. Por defecto 0.'),
+      rendimientosTrabajo: z.number().min(0).describe('Rendimientos del trabajo anuales del contribuyente aparte de las acciones (€)'),
+      cumpleExencionArt42: z.boolean().optional().describe('¿Cumple los requisitos de la exención art. 42.3 LIRPF? (oferta general a todos los empleados, mantener ≥3 años, no >10% del capital). Por defecto false.'),
+      periodoGeneracionMayor2Anios: z.boolean().optional().describe('¿El período de generación de las opciones supera 2 años y no son rendimientos recurrentes? (reducción 30%). Por defecto false.'),
+      valorVenta: z.number().min(0).optional().describe('Valor de venta de la acción (€) para calcular la plusvalía posterior. Por defecto 0 (sin venta).'),
+      masDeUnAnoHastaVenta: z.boolean().optional().describe('¿Han transcurrido más de 1 año entre el ejercicio/vesting y la venta? Por defecto true.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_stock_options', aiCaller);
+      const r = calcularStockOptions({
+        tipo: args.tipo as TipoRetribucionAcciones,
+        numAcciones: args.numAcciones,
+        valorMercadoEjercicio: args.valorMercadoEjercicio,
+        precioEjercicio: args.precioEjercicio,
+        rendimientosTrabajo: args.rendimientosTrabajo,
+        cumpleExencionArt42: args.cumpleExencionArt42,
+        periodoGeneracionMayor2Anios: args.periodoGeneracionMayor2Anios,
+        valorVenta: args.valorVenta,
+        masDeUnAnoHastaVenta: args.masDeUnAnoHastaVenta,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📊 **Fiscalidad ${r.tipo === 'stock_options' ? 'Stock Options' : 'RSUs'} — ${r.numAcciones} acciones**`,
+        `💹 Valor mercado ejercicio/vesting: ${fmt(r.valorMercadoEjercicio)} €/acción`,
+        r.tipo === 'stock_options' ? `🏷️ Precio ejercicio: ${fmt(r.precioEjercicio)} €/acción` : '',
+        '',
+        `**Tributación en el ejercicio/vesting (rendimiento del trabajo):**`,
+        `  Ganancia bruta: ${fmt(r.gananciaBrutaEjercicio)} €`,
+        r.exencionAplicada > 0 ? `  Exención art. 42.3: -${fmt(r.exencionAplicada)} €` : '',
+        `  Base sujeta: ${fmt(r.baseSujeta)} €`,
+        r.reduccionIrregular > 0 ? `  Reducción 30% irregular: -${fmt(r.reduccionIrregular)} €` : '',
+        `  Base liquidable: ${fmt(r.baseLiquidable)} €`,
+        `  💸 IRPF en ejercicio: **${fmt(r.irpfEjercicio)} €** (tipo ef. ${r.tipoEfectivoEjercicio.toFixed(1).replace('.', ',')}%)`,
+        `  Neto ejercicio: **${fmt(r.netoEjercicio)} €**`,
+        '',
+        r.hayVentaPosterior ? [
+          `**Venta posterior:**`,
+          `  Base adquisición: ${fmt(r.baseAdquisicion ?? 0)} €`,
+          `  Precio venta: ${fmt(r.precioVenta ?? 0)} €`,
+          `  Plusvalía: ${fmt(r.plusvaliaVenta ?? 0)} €`,
+          `  💸 IRPF venta (ahorro): ${fmt(r.irpfVenta ?? 0)} €`,
+          '',
+        ].join('\n') : '',
+        `**✅ IRPF total: ${fmt(r.irpfTotal)} € | Neto total: ${fmt(r.netoTotal)} €**`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
