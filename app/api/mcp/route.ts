@@ -142,6 +142,14 @@ import { calcularImputacionRentasInmuebles, type SituacionCatastralIRI } from '@
 import { calcularDeduccionViviendaCCAA, type ComunidadAutonomaVivienda, type TipoDeduccionViviendaCCAA } from '@/lib/calculadoras/deduccionViviendaCCAA';
 import { calcularEstimacionObjetiva, type TamanioMunicipioEO, type SituacionInicioActividadEO } from '@/lib/calculadoras/estimacionObjetiva';
 import { calcularNocturnidadTurnoRotativo, type PatronTurnosNocturno } from '@/lib/calculadoras/nocturnidadTurnoRotativo';
+import { calcularAJDCCAA, type ComunidadAutonomaAJD, type TipoDocumentoAJD, type ReduccionAJD } from '@/lib/calculadoras/ajdCCAA';
+import { calcularRentaVitaliciaIRPF, type TipoRentaVitalicia } from '@/lib/calculadoras/rentaVitaliciaIRPF';
+import { calcularPlanPensionEmpresa, type ColectivoParticide } from '@/lib/calculadoras/planPensionEmpresa';
+import { calcularDespidoObjetivo, type CausaDespidoObjetivo } from '@/lib/calculadoras/despidoObjetivo';
+import { calcularERTEReduccion, type MotivoERTE } from '@/lib/calculadoras/erteReduccion';
+import { calcularDietasIRPF, type TipoLocomocion, type ZonaDesplazamiento, type TipoDesplazamiento } from '@/lib/calculadoras/dietasIRPF';
+import { calcularDescuentoEfectos, type TipoOperacionCesion } from '@/lib/calculadoras/descuentoEfectos';
+import { calcularProvisionInsolvencias, type CausaDeducibilidadInsolvencia } from '@/lib/calculadoras/provisionInsolvencias';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -6599,6 +6607,380 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
           `💰 **Importe a devolver (50% del exceso): ${fmt(r.importeADevolver)} €**`,
           `Plazo de solicitud: ${r.plazoDeSolicitud}`,
         ].join('\n') : `❌ **Sin exceso**: Las cotizaciones totales (${fmt(r.totalCuotasCotizadas)} €) no superan el límite (${fmt(r.limiteAnualCotizaciones)} €).`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote O: AJD, renta vitalicia, plan pensión empresa, despido objetivo, ERTE, dietas, descuento efectos, provisión insolvencias ──
+
+  servidor.tool(
+    'calcular_ajd_ccaa',
+    'Calcula el Impuesto sobre Actos Jurídicos Documentados (AJD — cuota variable de documentos notariales) aplicando el tipo vigente en cada Comunidad Autónoma. Cubre: compraventa de vivienda nueva (el comprador paga AJD), préstamos hipotecarios (desde 2019 el BANCO paga AJD, no el comprador) y otros documentos notariales inscribibles. Incluye tipos generales y reducidos (VPO, jóvenes, familia numerosa) para todas las CCAA. Normativa: TRLITP arts. 27-32.',
+    {
+      comunidadAutonoma: z.enum(['andalucia','aragon','asturias','baleares','canarias','cantabria','castilla_la_mancha','castilla_leon','cataluna','extremadura','galicia','la_rioja','madrid','murcia','navarra','pais_vasco','valencia']).describe('Comunidad Autónoma donde se otorga e inscribe el documento'),
+      tipoDocumento: z.enum(['compraventa_vivienda_nueva','prestamo_hipotecario_banco','otro_documento_notarial']).describe('compraventa_vivienda_nueva=1.ª transmisión, el comprador paga AJD+IVA; prestamo_hipotecario_banco=desde Ley 5/2019 lo paga el banco; otro_documento_notarial=otros actos inscribibles'),
+      baseImponible: z.number().positive().describe('Base imponible del AJD (€): para compraventa=precio sin IVA; para hipoteca=total garantizado (capital+intereses+costas)'),
+      reduccion: z.enum(['ninguna','joven','vpo','familia_numerosa','discapacidad']).optional().describe('Tipo de reducción si el comprador cumple los requisitos. Default: ninguna'),
+      edadComprador: z.number().min(18).max(100).optional().describe('Edad del comprador (para reducción joven)'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_ajd_ccaa', aiCaller);
+      const r = calcularAJDCCAA({
+        comunidadAutonoma: args.comunidadAutonoma as ComunidadAutonomaAJD,
+        tipoDocumento: args.tipoDocumento as TipoDocumentoAJD,
+        baseImponible: args.baseImponible,
+        reduccion: args.reduccion as ReduccionAJD | undefined,
+        edadComprador: args.edadComprador,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📄 **AJD — ${r.comunidadAutonoma.replace(/_/g, ' ').toUpperCase()}**`,
+        `Documento: ${r.tipoDocumento.replace(/_/g, ' ')} | Tipo AJD: **${r.tipoAJD}%**${r.reduccion !== 'ninguna' ? ` (${r.reduccion})` : ''}`,
+        `Base imponible: ${fmt(r.baseImponible)} €`,
+        `💰 **Cuota AJD: ${fmt(r.cuotaAJD)} €**`,
+        '',
+        `ℹ️ ${r.notasReduccion}`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_renta_vitalicia_irpf',
+    'Calcula la tributación en IRPF de rentas vitalicias y temporales de seguros de vida (base del ahorro). El porcentaje tributable de cada cobro depende de la edad al constituir la renta vitalicia (8% si ≥70 años, 40% si <40 años) o de la duración para rentas temporales (12%-25%). También calcula la tributación en caso de rescate del capital diferido. Informa de la posible exención del art. 7.v LIRPF para mayores de 65 años. Normativa: LIRPF art. 25.3.',
+    {
+      tipoRenta: z.enum(['vitalicia_inmediata','temporal_inmediata','rescate_capital']).describe('vitalicia_inmediata=renta vitalicia (el % tributable depende de la edad al constituir); temporal_inmediata=renta temporal (el % depende de la duración); rescate_capital=rescate del capital diferido'),
+      cobroAnual: z.number().positive().optional().describe('Cobro anual de la renta (€/año) — para vitalicia y temporal'),
+      edadConstitucion: z.number().min(0).max(100).optional().describe('Edad del beneficiario en el momento de CONSTITUCIÓN de la renta vitalicia — determina el % tributable fijo para toda la vida'),
+      duracionAnios: z.number().positive().optional().describe('Duración de la renta temporal en años — para temporal_inmediata'),
+      valorRescate: z.number().positive().optional().describe('Valor de rescate del seguro (€) — para rescate_capital'),
+      primasPagadas: z.number().positive().optional().describe('Total de primas pagadas (€) — para rescate_capital. Rendimiento = rescate - primas'),
+      edadActual: z.number().min(0).max(120).optional().describe('Edad actual del contribuyente — para evaluar posible exención art. 7.v LIRPF (≥65 años)'),
+      capitaldart7v: z.boolean().optional().describe('¿El capital procede de una ganancia patrimonial acogida a la exención del art. 7.v LIRPF (transmisión de bienes por mayores de 65 años)?'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_renta_vitalicia_irpf', aiCaller);
+      const r = calcularRentaVitaliciaIRPF({
+        tipoRenta: args.tipoRenta as TipoRentaVitalicia,
+        cobroAnual: args.cobroAnual,
+        edadConstitucion: args.edadConstitucion,
+        duracionAnios: args.duracionAnios,
+        valorRescate: args.valorRescate,
+        primasPagadas: args.primasPagadas,
+        edadActual: args.edadActual,
+        capitaldart7v: args.capitaldart7v,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `💰 **Renta Vitalicia/Temporal — IRPF**`,
+        `Tipo: ${r.tipoRenta.replace(/_/g, ' ')} | Porcentaje tributable: **${r.pctTributable}%**`,
+        `Cobro/importe total: ${fmt(r.cobroAnual)} €`,
+        `Rendimiento tributable (base ahorro): ${fmt(r.rendimientoTributable)} €/año`,
+        `Rendimiento exento: ${fmt(r.rendimientoExento)} €/año`,
+        `Tipo medio ahorro aplicado: ${r.tipoMedioAhorro}%`,
+        `💰 **Cuota IRPF estimada: ${fmt(r.cuotaIRPFAnual)} €/año**`,
+        r.posibleExencionArt7v ? '✅ Posible exención art. 7.v LIRPF aplicable — consultar asesor fiscal' : '',
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_plan_pension_empresa',
+    'Calcula el beneficio fiscal de los planes de pensiones de empleo (PPE) para empresa y trabajador. Límites 2025: aportación empresarial hasta 8.500 €/año (deducible en IS y exenta de SS), aportación individual hasta 1.500 €/año (reduce base IRPF); total conjunto 10.000 €. Para autónomos con PPE simplificado (Ley 12/2022): hasta 5.750 €/año adicionales. Calcula el coste neto real para la empresa tras IS y ahorro de cotizaciones SS. Normativa: LIRPF arts. 51-52.',
+    {
+      colectivo: z.enum(['trabajador_cuenta_ajena','autonomo_con_ppe_simplificado']).describe('Tipo de partícipe: trabajador_cuenta_ajena=empleado por cuenta ajena; autonomo_con_ppe_simplificado=autónomo con PPE simplificado Ley 12/2022 (límite adicional 4.250€)'),
+      salarioBrutoAnual: z.number().positive().describe('Salario/rendimiento bruto anual del empleado (€) — base para el límite del 30%'),
+      aportacionEmpresaAnual: z.number().min(0).describe('Aportación anual de la empresa al PPE (€) — máximo legal: 8.500 €/año'),
+      aportacionEmpleadoAnual: z.number().min(0).optional().describe('Aportación anual propia del empleado (€) — máximo legal: 1.500 €/año'),
+      tipoMarginalIRPFEmpleado: z.number().min(0).max(60).describe('Tipo marginal IRPF del empleado (%) — para cuantificar el ahorro fiscal en IRPF'),
+      tipoISEmpresa: z.number().min(0).max(35).optional().describe('Tipo IS de la empresa (%) para cuantificar el ahorro fiscal en IS. Default: 25%'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_plan_pension_empresa', aiCaller);
+      const r = calcularPlanPensionEmpresa({
+        colectivo: args.colectivo as ColectivoParticide,
+        salarioBrutoAnual: args.salarioBrutoAnual,
+        aportacionEmpresaAnual: args.aportacionEmpresaAnual,
+        aportacionEmpleadoAnual: args.aportacionEmpleadoAnual,
+        tipoMarginalIRPFEmpleado: args.tipoMarginalIRPFEmpleado,
+        tipoISEmpresa: args.tipoISEmpresa,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🏦 **Plan de Pensiones de Empresa (PPE)**`,
+        `Aportación empresa: ${fmt(r.aportacionEmpresaEfectiva)} €/año | Aportación empleado: ${fmt(r.aportacionEmpleadoEfectiva)} €/año`,
+        `Total al fondo: ${fmt(r.totalAportado)} €/año`,
+        '',
+        `**Para el empleado:**`,
+        `Reducción base IRPF: -${fmt(r.reduccionBaseImponibleEmpleado)} € → Ahorro IRPF: ${fmt(r.ahorroFiscalIRPFEmpleado)} €/año`,
+        '',
+        `**Para la empresa:**`,
+        `Gasto deducible IS: ${fmt(r.gastoDeducibleIS)} € → Ahorro IS: ${fmt(r.ahorroFiscalISEmpresa)} €/año`,
+        `Ahorro SS empresa (exento de cotización): ${fmt(r.ahorroSSOEmpresa)} €/año`,
+        `💰 **Coste neto real para la empresa: ${fmt(r.costeNetoEmpresa)} €/año** (vs ${fmt(r.aportacionEmpresaEfectiva)} € brutos)`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_despido_objetivo',
+    'Calcula la indemnización y el preaviso del despido por causas objetivas (ET arts. 52-53): 20 días/año con máximo 12 mensualidades. Distingue entre despido procedente (20 días) e improcedente (33 días, máximo 24 mensualidades). Causas: económicas/técnicas/organizativas/productivas, ineptitud sobrevenida, falta de adaptación, absentismo. Incluye advertencias sobre el procedimiento obligatorio (carta + indemnización simultánea + preaviso 15 días). Normativa: ET arts. 52-53, 56.',
+    {
+      causaDespido: z.enum(['causas_economicas_tecnicas','ineptitud_sobrevenida','falta_adaptacion','absentismo','otras']).describe('Causa del despido objetivo: causas_economicas_tecnicas=ETOP (económicas, técnicas, organizativas o productivas); ineptitud_sobrevenida=incapacidad sobrevenida; falta_adaptacion=no adaptación a cambios técnicos; absentismo=faltas según umbral ET art. 52.d'),
+      salarioBrutoAnual: z.number().positive().describe('Salario bruto anual del trabajador incluyendo pagas extras prorrateadas (€/año)'),
+      aniosAntiguedad: z.number().min(0).describe('Años completos de antigüedad'),
+      mesesAntiguedadAdicionales: z.number().min(0).max(11).optional().describe('Meses adicionales de antigüedad (0-11) además de los años completos'),
+      preAvisoDado: z.boolean().optional().describe('¿La empresa ha dado el preaviso de 15 días? Si no se da, debe abonarse el salario de esos 15 días. Default: true'),
+      declaradoImprocedente: z.boolean().optional().describe('¿Ha sido declarado improcedente por el juzgado? Si es true, calcula la indemnización de 33 días/año (máx. 24 meses) y la diferencia a pagar adicionalmente. Default: false'),
+      fechaInicioContrato: z.string().optional().describe('Fecha de inicio del contrato (YYYY-MM-DD o YYYY-MM) — para detectar si hay período anterior al 12/02/2012 (reforma laboral)'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_despido_objetivo', aiCaller);
+      const r = calcularDespidoObjetivo({
+        causaDespido: args.causaDespido as CausaDespidoObjetivo,
+        salarioBrutoAnual: args.salarioBrutoAnual,
+        aniosAntiguedad: args.aniosAntiguedad,
+        mesesAntiguedadAdicionales: args.mesesAntiguedadAdicionales,
+        preAvisoDado: args.preAvisoDado,
+        declaradoImprocedente: args.declaradoImprocedente,
+        fechaInicioContrato: args.fechaInicioContrato,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📋 **Despido Objetivo (ET arts. 52-53)**`,
+        `Causa: ${r.causaDespido.replace(/_/g, ' ')} | Antigüedad: ${r.antiguedadAnios.toFixed(2)} años`,
+        `Salario diario: ${fmt(r.salarioDiario)} €/día | Salario mensual: ${fmt(r.salarioMensual)} €/mes`,
+        '',
+        `**Indemnización procedente (20 días/año, máx. 12 meses):**`,
+        `Días calculados: ${r.diasIndemnizacionProcedente.toFixed(1)} | Días aplicados: ${r.diasAplicadosProcedente.toFixed(1)}`,
+        `💰 **Indemnización objetivo: ${fmt(r.indemnizacionObjetivo)} €**`,
+        r.preAvisoDado ? '✅ Preaviso de 15 días dado' : `⚠️ Sin preaviso: abono adicional ${fmt(r.salarioPreavisoNoDado)} €`,
+        '',
+        r.declaradoImprocedente
+          ? [`**Si declarado improcedente (33 días/año, máx. 24 meses):**`,
+             `Indemnización improcedente: ${fmt(r.indemnizacionImprocedente)} €`,
+             `Diferencia adicional a pagar: **${fmt(r.diferenciaImprocedente)} €**`].join('\n')
+          : '',
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_erte_reduccion',
+    'Calcula el impacto económico de un ERTE por reducción de jornada (entre el 10% y el 70%) para el trabajador y la empresa. El trabajador cobra el salario proporcional a las horas trabajadas (empresa) + la prestación del SEPE por las horas no trabajadas (70% BR los primeros 180 días, 50% a partir del día 181). La empresa puede estar exonerada de cotizar SS por las horas reducidas. El ERTE de reducción NO consume el contador de desempleo del trabajador. Normativa: ET art. 47 + Ley 32/2021.',
+    {
+      motivoERTE: z.enum(['etop_economico','etop_tecnico_organizativo','fuerza_mayor','mecanismo_red']).describe('Motivo del ERTE: etop_economico=causas económicas; etop_tecnico_organizativo=causas técnicas u organizativas; fuerza_mayor=fuerza mayor (requiere resolución autoridad laboral); mecanismo_red=MECAS Ley 32/2021'),
+      salarioBrutoMensual: z.number().positive().describe('Salario bruto mensual del trabajador antes del ERTE (€/mes)'),
+      baseCotizacionDesempleo: z.number().positive().describe('Base de cotización mensual por desempleo (€) — para calcular la prestación del SEPE (normalmente coincide con el salario bruto)'),
+      pctReduccionJornada: z.number().min(10).max(70).describe('Porcentaje de reducción de jornada (entre 10% y 70%). Ej: 50 para reducción del 50% de la jornada'),
+      diasConsumidos: z.number().min(0).optional().describe('Días de prestación de desempleo ya consumidos por este trabajador antes del ERTE. Importa para saber si aplica el 70% (primeros 180 días) o el 50% (desde el día 181). Default: 0'),
+      exoneracionCotizacionSS: z.boolean().optional().describe('¿La empresa está exonerada de cotizar SS por las horas reducidas? Aplica en MECAS y ERTE de fuerza mayor. Default: false'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_erte_reduccion', aiCaller);
+      const r = calcularERTEReduccion({
+        motivoERTE: args.motivoERTE as MotivoERTE,
+        salarioBrutoMensual: args.salarioBrutoMensual,
+        baseCotizacionDesempleo: args.baseCotizacionDesempleo,
+        pctReduccionJornada: args.pctReduccionJornada,
+        diasConsumidos: args.diasConsumidos,
+        exoneracionCotizacionSS: args.exoneracionCotizacionSS,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🔄 **ERTE por Reducción de Jornada**`,
+        `Reducción: ${r.pctReduccionJornada}% | Jornada mantenida: ${r.pctJornadaMantenida}% | Prestación SEPE: ${r.pctPrestacionSEPE}%`,
+        '',
+        `**Para el trabajador:**`,
+        `Salario por horas trabajadas: ${fmt(r.salarioHorasTrabajadasMensual)} €/mes`,
+        `Prestación SEPE (${r.pctReduccionJornada}% jornada × ${r.pctPrestacionSEPE}% BR): ${fmt(r.prestacionSEPEMensual)} €/mes`,
+        `💰 **Ingreso total trabajador: ${fmt(r.ingresoTotalTrabajadorMensual)} €/mes** (vs ${fmt(args.salarioBrutoMensual)} € sin ERTE)`,
+        `Pérdida económica mensual: ${fmt(r.perdidaEconomicaMensual)} €/mes`,
+        '',
+        `**Para la empresa:**`,
+        `Coste salarial horas trabajadas: ${fmt(r.costeSalarialHorasTrabajadasMensual)} €/mes`,
+        `Cuota SS empresa (horas trabajadas): ${fmt(r.cuotaSSEmpresaHorasTrabajadasMensual)} €/mes`,
+        r.cuotaSSEmpresaExoneradaMensual > 0 ? `Cuota SS exonerada: ${fmt(r.cuotaSSEmpresaExoneradaMensual)} €/mes (el SEPE asume esta cuota)` : '',
+        `💰 **Coste empresa total: ${fmt(r.costeTotalEmpresaMensual)} €/mes** (ahorro: ${fmt(r.ahorroEmpresaMensual)} €/mes)`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_dietas_irpf',
+    'Calcula la parte exenta y sujeta a IRPF de las dietas y asignaciones para gastos de locomoción y manutención pagadas por la empresa al trabajador (RIRPF art. 9). Límites 2025: vehículo propio 0,26 €/km; manutención España con pernocta 53,34 €/día, sin pernocta 26,67 €/día; extranjero 91,35 €/día con pernocta, 48,08 €/día sin pernocta; transportistas 36,06 €/día (España). El exceso tributa como rendimiento del trabajo.',
+    {
+      locomocion: z.array(z.object({
+        tipo: z.enum(['vehiculo_propio','transporte_publico','vehiculo_empresa']).describe('vehiculo_propio=0,26€/km exento; transporte_publico=importe factura exento; vehiculo_empresa=no genera dieta'),
+        kilometros: z.number().min(0).optional().describe('Km recorridos con vehículo propio'),
+        peajeAparcamiento: z.number().min(0).optional().describe('Peajes y aparcamientos justificados con factura (€)'),
+        importeTransportePublico: z.number().min(0).optional().describe('Importe transporte público justificado con billete (€)'),
+      })).optional().describe('Gastos de locomoción del período'),
+      manutencion: z.array(z.object({
+        zona: z.enum(['espana','extranjero']).describe('España o extranjero'),
+        tipoDesplazamiento: z.enum(['con_pernocta','sin_pernocta','transportista']).describe('con_pernocta=53,34€/día España o 91,35€ extran; sin_pernocta=26,67€ España o 48,08€ extran; transportista=36,06€ España o 66,11€ extran'),
+        dias: z.number().min(1).describe('Número de días del desplazamiento'),
+        importePagadoEmpresa: z.number().min(0).describe('Total dietas pagadas por la empresa en este período (€)'),
+        gastosEstanciaJustificados: z.number().min(0).optional().describe('Gastos de hotel/estancia con factura (€) — exentos sin límite si hay pernocta y factura'),
+      })).optional().describe('Gastos de manutención y estancia'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_dietas_irpf', aiCaller);
+      const r = calcularDietasIRPF({
+        locomocion: args.locomocion?.map(l => ({
+          tipo: l.tipo as TipoLocomocion,
+          kilometros: l.kilometros,
+          peajeAparcamiento: l.peajeAparcamiento,
+          importeTransportePublico: l.importeTransportePublico,
+        })),
+        manutencion: args.manutencion?.map(m => ({
+          zona: m.zona as ZonaDesplazamiento,
+          tipoDesplazamiento: m.tipoDesplazamiento as TipoDesplazamiento,
+          dias: m.dias,
+          importePagadoEmpresa: m.importePagadoEmpresa,
+          gastosEstanciaJustificados: m.gastosEstanciaJustificados,
+        })),
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🚗 **Dietas y Locomoción — IRPF (RIRPF art. 9)**`,
+        '',
+        `Locomoción exenta: ${fmt(r.locomocionExenta)} €${r.locomocionSujeta > 0 ? ` | Sujeta: ${fmt(r.locomocionSujeta)} €` : ''}`,
+        `Manutención exenta: ${fmt(r.manutencionExenta)} €${r.manutencionSujeta > 0 ? ` | Sujeta: ${fmt(r.manutencionSujeta)} €` : ''}`,
+        `(Límite máx. manutención: ${fmt(r.limiteManutenciónExenta)} €)`,
+        '',
+        `✅ **Total EXENTO de IRPF: ${fmt(r.totalExento)} €**`,
+        r.totalSujeto > 0 ? `❗ **Total SUJETO a IRPF (rendimiento del trabajo): ${fmt(r.totalSujeto)} €**` : '✅ Sin exceso sujeto a IRPF',
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_descuento_efectos',
+    'Calcula el coste real (TAE) del descuento de efectos comerciales (pagarés, letras de cambio) y del factoring (con o sin recurso). Calcula el importe neto recibido por la empresa cedente, el total de costes (intereses + comisiones), la TAE efectiva de la operación y el ahorro fiscal al ser gasto deducible en IS/IRPF. El descuento usa el año comercial de 360 días. Normativa: LIS art. 16.',
+    {
+      tipoOperacion: z.enum(['descuento_pagare','descuento_letra','factoring_con_recurso','factoring_sin_recurso']).describe('Tipo de operación: descuento_pagare=anticipo de pagaré; descuento_letra=anticipo de letra (sujeta a timbre AJD); factoring_con_recurso=cesión de facturas con riesgo para cedente; factoring_sin_recurso=el factor asume el riesgo de impago'),
+      nominal: z.number().positive().describe('Nominal del efecto o factura (€) — importe que pagará el deudor al vencimiento'),
+      diasVencimiento: z.number().int().positive().describe('Días hasta el vencimiento del efecto o factura'),
+      tipoDescuentoAnual: z.number().min(0).describe('Tipo de descuento/interés anual aplicado por el banco (%). Ej: 4.5 para el 4,5%'),
+      comisionFija: z.number().min(0).optional().describe('Comisión fija por operación (€)'),
+      comisionPct: z.number().min(0).optional().describe('Comisión en porcentaje sobre el nominal (%)'),
+      gastosAdicionales: z.number().min(0).optional().describe('Gastos adicionales: corretaje, timbre (AJD letras), etc. (€)'),
+      tipoFiscalEmpresa: z.number().min(0).max(35).optional().describe('Tipo IS o IRPF de la empresa cedente (%) para calcular el ahorro fiscal. Default: 25%'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_descuento_efectos', aiCaller);
+      const r = calcularDescuentoEfectos({
+        tipoOperacion: args.tipoOperacion as TipoOperacionCesion,
+        nominal: args.nominal,
+        diasVencimiento: args.diasVencimiento,
+        tipoDescuentoAnual: args.tipoDescuentoAnual,
+        comisionFija: args.comisionFija,
+        comisionPct: args.comisionPct,
+        gastosAdicionales: args.gastosAdicionales,
+        tipoFiscalEmpresa: args.tipoFiscalEmpresa,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📄 **Descuento de Efectos / Factoring**`,
+        `Operación: ${r.tipoOperacion.replace(/_/g, ' ')} | Nominal: ${fmt(r.nominal)} € | Vencimiento: ${r.diasVencimiento} días`,
+        `Tipo nominal: ${r.tipoDescuentoAnual}% anual`,
+        '',
+        `Intereses descontados: ${fmt(r.importeIntereses)} €`,
+        `Comisiones: ${fmt(r.comisionTotal)} €`,
+        r.gastosAdicionales > 0 ? `Gastos adicionales: ${fmt(r.gastosAdicionales)} €` : '',
+        `Total costes: ${fmt(r.totalCostes)} €`,
+        `💰 **Importe neto recibido: ${fmt(r.importeNetoCobrado)} €**`,
+        `📊 **TAE efectiva de la operación: ${r.tae.toFixed(2)}%**`,
+        '',
+        `Gasto deducible IS/IRPF: ${fmt(r.costeDeducibleFiscal)} € → Ahorro fiscal: ${fmt(r.ahorroFiscalEstimado)} €`,
+        `Coste neto tras ahorro fiscal: ${fmt(r.costeNetoTrasFiscal)} €`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_provision_insolvencias',
+    'Calcula la deducibilidad en el IS de las provisiones por créditos de dudoso cobro (insolvencias), según el LIS art. 13. Un crédito es deducible cuando: han pasado ≥6 meses desde el vencimiento, el deudor está en concurso de acreedores, hay reclamación judicial, o el deudor está procesado por alzamiento de bienes. No son deducibles los créditos de entidades vinculadas, garantizados por banco/seguro, o adeudados por entes públicos. Las PYMES (ERD, negocios <10M€) pueden dotación global adicional del 1% del saldo de deudores. Normativa: LIS art. 13.',
+    {
+      creditos: z.array(z.object({
+        descripcion: z.string().optional().describe('Descripción del crédito (cliente/factura)'),
+        importe: z.number().positive().describe('Importe pendiente de cobro (€)'),
+        causaDeducibilidad: z.enum(['plazo_6_meses','concurso_acreedores','reclamacion_judicial','alzamiento_bienes']).describe('Causa que permite la deducibilidad: plazo_6_meses=≥6 meses desde el vencimiento; concurso_acreedores=auto de concurso declarado; reclamacion_judicial=deuda en litigio o arbitraje; alzamiento_bienes=deudor procesado'),
+        excluido: z.boolean().optional().describe('true si el crédito NO es deducible (vinculada, garantizado por banco/seguro, ente público). Default: false (deducible)'),
+        motivoExclusion: z.string().optional().describe('Motivo de la exclusión si excluido=true'),
+      })).min(1).describe('Lista de créditos de dudoso cobro a analizar'),
+      tipoIS: z.number().min(0).max(35).optional().describe('Tipo IS de la empresa (%). Default: 25%'),
+      esERD: z.boolean().optional().describe('¿Es empresa de reducida dimensión (ERD)? Cifra de negocios < 10 millones €. Las ERD pueden dotación global adicional del 1%. Default: false'),
+      saldoTotalDeudoresCierre: z.number().min(0).optional().describe('Saldo total de deudores al cierre del ejercicio (€) — solo necesario si esERD=true, para calcular la dotación global del 1%'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_provision_insolvencias', aiCaller);
+      const r = calcularProvisionInsolvencias({
+        creditos: args.creditos.map(c => ({
+          descripcion: c.descripcion,
+          importe: c.importe,
+          causaDeducibilidad: c.causaDeducibilidad as CausaDeducibilidadInsolvencia,
+          excluido: c.excluido,
+          motivoExclusion: c.motivoExclusion,
+        })),
+        tipoIS: args.tipoIS,
+        esERD: args.esERD,
+        saldoTotalDeudoresCierre: args.saldoTotalDeudoresCierre,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📊 **Provisión por Insolvencias — IS (LIS art. 13)**`,
+        '',
+        ...r.detalleCreditos.map(d =>
+          `• ${d.descripcion}: ${fmt(d.importe)} € — ${d.deducible ? '✅ Deducible' : `❌ Excluido${d.motivoExclusion ? ` (${d.motivoExclusion})` : ''}`}`
+        ),
+        '',
+        `Total analizado: ${fmt(r.totalAnalizado)} €`,
+        `Deducible individualmente: ${fmt(r.totalDeducibleIndividual)} €`,
+        r.totalExcluido > 0 ? `Excluido de deducción: ${fmt(r.totalExcluido)} €` : '',
+        r.esERD && r.dotacionGlobalERD > 0 ? `Dotación global ERD (1%): +${fmt(r.dotacionGlobalERD)} €` : '',
+        `💰 **Total deducible en IS: ${fmt(r.totalDeducibleConGlobal)} €**`,
+        `Ahorro fiscal IS (${args.tipoIS ?? 25}%): ${fmt(r.ahorroFiscalIS)} €`,
         '',
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
