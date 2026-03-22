@@ -47,6 +47,14 @@ import {
   type TipoInmuebleMCP,
   type PerfilCompradorMCP,
 } from '@/lib/calculadoras/compraventa';
+import { calcularAmortizacionAnticipada } from '@/lib/calculadoras/amortizacionAnticipada';
+import { calcularBrechaJubilacion } from '@/lib/calculadoras/brechaJubilacion';
+import { calcularTIRVAN } from '@/lib/calculadoras/tirVan';
+import { calcularFIRE } from '@/lib/calculadoras/fire';
+import { calcularPensionViudedad, type SituacionCausante } from '@/lib/calculadoras/pensionViudedad';
+import { calcularLegitimas, type RegimenId } from '@/lib/calculadoras/legitimas';
+import { calcularTarifaFreelance } from '@/lib/calculadoras/tarifaFreelance';
+import { calcularBreakEven } from '@/lib/calculadoras/breakEven';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -1167,6 +1175,505 @@ function crearServidorMCP(): McpServer {
         `⚖️ *Estimación orientativa. Los aranceles de notaría y registro dependen de la operación exacta. Consulta con un gestor o notario antes de firmar.*`,
       );
 
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_amortizacion_anticipada
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_amortizacion_anticipada',
+    'Calcula el efecto de una amortización anticipada de hipoteca o préstamo en España. ' +
+    'Compara las dos opciones que ofrecen los bancos: reducir la cuota mensual (misma duración) ' +
+    'o reducir el plazo (misma cuota, terminas antes). ' +
+    'Muestra el ahorro en intereses de cada opción y recomienda la más ventajosa. ' +
+    'Usa sistema de amortización francés (el estándar en España).',
+    {
+      capitalInicial: z.number().positive()
+        .describe('Capital original del préstamo o hipoteca en euros'),
+      plazoAnios: z.number().int().min(1).max(40)
+        .describe('Plazo original del préstamo en años'),
+      tin: z.number().min(0).max(30)
+        .describe('Tipo de interés nominal anual (TIN) en porcentaje'),
+      importeAmortizacion: z.number().positive()
+        .describe('Importe que se amortiza anticipadamente en euros'),
+      mesesTranscurridos: z.number().int().min(0).optional()
+        .describe('Meses transcurridos desde el inicio del préstamo hasta el momento de la amortización. Alternativa a fechaInicio + fechaAmortizacion.'),
+      fechaInicio: z.string().optional()
+        .describe('Fecha de inicio del préstamo en formato YYYY-MM-DD (alternativa a mesesTranscurridos)'),
+      fechaAmortizacion: z.string().optional()
+        .describe('Fecha en que se hace la amortización anticipada en formato YYYY-MM-DD'),
+    },
+    async ({ capitalInicial, plazoAnios, tin, importeAmortizacion, mesesTranscurridos, fechaInicio, fechaAmortizacion }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_amortizacion_anticipada', aiCaller);
+
+      let r;
+      try {
+        r = calcularAmortizacionAnticipada({ capitalInicial, plazoAnios, tin, importeAmortizacion, mesesTranscurridos, fechaInicio, fechaAmortizacion });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🏦 **Amortización Anticipada — Análisis Comparativo**`,
+        '',
+        `💶 Capital original: ${fmt(r.capitalInicial)} € · TIN: ${tin}% · Plazo: ${plazoAnios} años`,
+        `📅 Meses transcurridos: ${r.mesesTranscurridos} · Plazo restante: ${r.plazoRestanteMeses} meses`,
+        `💰 Saldo antes de amortizar: ${fmt(r.saldoAntes)} €`,
+        `➡️ Amortización: **${fmt(importeAmortizacion)} €** → Saldo nuevo: ${fmt(r.saldoDespues)} €`,
+        `📊 Cuota actual: ${fmt(r.cuotaOriginal)} €/mes`,
+        '',
+        `**OPCIÓN 1 — Reducir cuota (mismo plazo restante)**`,
+        `  📉 Nueva cuota: **${fmt(r.nuevaCuota)} €/mes** (ahorras ${fmt(r.reduccionCuota)} €/mes)`,
+        `  💸 Ahorro en intereses: **${fmt(r.ahorroInteresesCuota)} €**`,
+        '',
+        `**OPCIÓN 2 — Reducir plazo (misma cuota)**`,
+        `  ⏱️ Nuevo plazo: **${r.nuevoPlazoMeses} meses** (acortas ${r.reduccionMeses} meses = ${(r.reduccionMeses / 12).toFixed(1).replace('.', ',')} años)`,
+        `  💸 Ahorro en intereses: **${fmt(r.ahorroInteresesPlazo)} €**`,
+        '',
+        `🏆 **Recomendación**: ${r.recomendacion}`,
+        '',
+        `ℹ️ Intereses totales sin amortizar: ${fmt(r.totalInteresesSinAmortizar)} €`,
+        `⚖️ *Cálculo orientativo con sistema francés. Consulta con tu banco las condiciones exactas.*`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_brecha_jubilacion
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_brecha_jubilacion',
+    'Calcula la brecha económica de jubilación: cuánto dinero perderás mensualmente al pasar ' +
+    'de tu sueldo actual a la pensión pública. ' +
+    'Calcula el capital total que necesitarías acumular y cuánto debes ahorrar mensualmente desde hoy ' +
+    'para cubrirlo, usando interés compuesto.',
+    {
+      sueldoNetoMensual: z.number().positive()
+        .describe('Sueldo neto mensual actual en euros'),
+      pensionEstimadaMensual: z.number().min(0)
+        .describe('Pensión mensual estimada al jubilarse en euros (puedes usar calcular_pension_publica para estimarla)'),
+      edadActual: z.number().int().min(18).max(70)
+        .describe('Edad actual en años'),
+      edadJubilacion: z.number().int().min(60).max(75).optional()
+        .describe('Edad prevista de jubilación. Por defecto 67 (edad ordinaria 2025 con <37 años cotizados).'),
+      anosJubilado: z.number().int().min(1).max(40).optional()
+        .describe('Años de jubilación previstos para cubrir. Por defecto 20.'),
+      rentabilidadAnual: z.number().min(0).max(15).optional()
+        .describe('Rentabilidad anual esperada del ahorro/inversión en %. Por defecto 4%.'),
+    },
+    async ({ sueldoNetoMensual, pensionEstimadaMensual, edadActual, edadJubilacion, anosJubilado, rentabilidadAnual }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_brecha_jubilacion', aiCaller);
+
+      let r;
+      try {
+        r = calcularBrechaJubilacion({ sueldoNetoMensual, pensionEstimadaMensual, edadActual, edadJubilacion, anosJubilado, rentabilidadAnual });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `👴 **Brecha de Jubilación**`,
+        '',
+        `💼 Sueldo neto actual: **${fmt(sueldoNetoMensual)} €/mes**`,
+        `🏛️ Pensión estimada: **${fmt(pensionEstimadaMensual)} €/mes** (${r.porcentajePensionSobreSueldo.toFixed(1).replace('.', ',')}% del sueldo)`,
+        '',
+        r.tieneBrecha
+          ? `⚠️ **Brecha mensual: ${fmt(r.brechaMensual)} €** (lo que perderías al jubilarte)`
+          : `✅ La pensión cubre el sueldo actual — sin brecha económica.`,
+        r.tieneBrecha ? `📅 Brecha anual: ${fmt(r.brechaAnual)} €` : '',
+        '',
+        `📊 **Plan de ahorro para cubrir la brecha**`,
+        `  ⏳ Años hasta jubilación (${r.edadJubilacion}): **${r.anosHastaJubilacion} años**`,
+        `  💰 Capital necesario (${r.anosJubilado} años de jubilación): **${fmt(r.capitalNecesario)} €**`,
+        `  📈 Rentabilidad anual asumida: ${rentabilidadAnual ?? 4}%`,
+        `  💸 **Ahorro mensual necesario desde hoy: ${fmt(r.ahorroMensualNecesario)} €**`,
+        '',
+        `⚖️ *Estimación orientativa. La pensión real la calcula la Seguridad Social según tu historial de cotización.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_tir_van
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_tir_van',
+    'Calcula el VAN (Valor Actual Neto) y la TIR (Tasa Interna de Retorno) de una inversión. ' +
+    'Útil para analizar si un proyecto es rentable: un VAN positivo indica que la inversión crea valor; ' +
+    'la TIR es la rentabilidad real anualizada del proyecto. ' +
+    'También calcula el período de recuperación (payback) descontado.',
+    {
+      inversionInicial: z.number().positive()
+        .describe('Inversión inicial en euros (valor positivo, representa la salida de caja en el año 0)'),
+      tasaDescuento: z.number().min(0).max(100)
+        .describe('Tasa de descuento anual en % (coste del capital o rentabilidad mínima exigida). Habitual: 8-12% para proyectos empresariales.'),
+      flujosCaja: z.array(z.number()).min(1).max(30)
+        .describe('Flujos de caja anuales en euros, del año 1 en adelante. Pueden ser positivos (ingresos) o negativos (pérdidas). Ejemplo: [10000, 15000, 20000] para 3 años.'),
+    },
+    async ({ inversionInicial, tasaDescuento, flujosCaja }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_tir_van', aiCaller);
+
+      let r;
+      try {
+        r = calcularTIRVAN({ inversionInicial, tasaDescuento, flujosCaja });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const vanEmoji = r.van > 0 ? '✅' : r.van < 0 ? '❌' : '⚖️';
+      const lineas = [
+        `📈 **Análisis TIR y VAN**`,
+        '',
+        `💶 Inversión inicial: **${fmt(inversionInicial)} €**`,
+        `📊 Tasa de descuento: ${tasaDescuento}%`,
+        `📅 Período: ${flujosCaja.length} año(s)`,
+        '',
+        `${vanEmoji} **VAN: ${fmt(r.van)} €**`,
+        r.tirEncontrada && r.tir !== null ? `📉 **TIR: ${r.tir.toFixed(2).replace('.', ',')}%**` : `📉 TIR: no converge (flujos inconsistentes)`,
+        r.payback !== null ? `⏱️ Payback descontado: **${r.payback.toFixed(1).replace('.', ',')} años**` : `⏱️ Payback: no se recupera dentro del período`,
+        '',
+        `💡 ${r.interpretacion}`,
+        '',
+        `📋 **Flujos descontados (resumen)**`,
+        ...r.flujosDescontados.map(f =>
+          `  Año ${f.ano}: ${fmt(f.flujo)} € → descontado: ${fmt(f.flujoDescontado)} € | acumulado: ${fmt(f.acumulado)} €`
+        ),
+        '',
+        `💰 Total retornos (sin descontar): ${fmt(r.totalRetornos)} € | Rentabilidad bruta: ${r.rentabilidadBruta.toFixed(1).replace('.', ',')}%`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_fire
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_fire',
+    'Calcula el objetivo de independencia financiera (FIRE — Financial Independence, Retire Early). ' +
+    'Determina el "número FIRE" (patrimonio necesario según la regla del 4%), ' +
+    'los años necesarios para alcanzarlo con tu ahorro e inversión actual, ' +
+    'y una proyección patrimonial año a año. ' +
+    'Clasifica el objetivo en Lean FIRE (<20k€/año), FIRE normal (20-50k€) o Fat FIRE (>50k€).',
+    {
+      gastosAnuales: z.number().positive()
+        .describe('Gastos anuales totales en euros (base del cálculo FIRE)'),
+      ingresosAnuales: z.number().positive()
+        .describe('Ingresos anuales netos en euros (para calcular el ahorro anual)'),
+      patrimonioActual: z.number().min(0).optional()
+        .describe('Patrimonio financiero ya invertido en euros (acciones, fondos, etc.). Por defecto 0.'),
+      rentabilidadAnual: z.number().min(0).max(20).optional()
+        .describe('Rentabilidad anual esperada de la cartera en %. Por defecto 7% (histórica renta variable diversificada).'),
+      tasaRetiro: z.number().min(1).max(10).optional()
+        .describe('Tasa de retiro segura anual en %. Por defecto 4% (regla del 4% de Trinity Study). Una tasa menor (3-3,5%) es más conservadora.'),
+    },
+    async ({ gastosAnuales, ingresosAnuales, patrimonioActual, rentabilidadAnual, tasaRetiro }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_fire', aiCaller);
+
+      let r;
+      try {
+        r = calcularFIRE({ gastosAnuales, ingresosAnuales, patrimonioActual, rentabilidadAnual, tasaRetiro });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      const fmtDec = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const fireEmoji = r.tipoFIRE === 'lean' ? '🥦' : r.tipoFIRE === 'fat' ? '🥂' : '⚡';
+      const lineas = [
+        `${fireEmoji} **FIRE — Independencia Financiera**`,
+        '',
+        `💸 Gastos anuales: **${fmt(gastosAnuales)} €/año** | Ingresos: ${fmt(ingresosAnuales)} €/año`,
+        `💰 Ahorro anual: **${fmt(r.ahorroAnual)} €** (tasa de ahorro: ${r.tasaAhorro.toFixed(1).replace('.', ',')}%)`,
+        '',
+        `🎯 **Número FIRE (tasa retiro ${r.tasaRetiro}%): ${fmt(r.numeroFIRE)} €**`,
+        `📊 Patrimonio actual: ${fmt(patrimonioActual ?? 0)} €`,
+        `📈 Rentabilidad esperada: ${r.rentabilidadAnual}% anual`,
+        '',
+        r.tieneAhorroPositivo
+          ? `⏱️ **Años para alcanzar FIRE: ${r.anosParaFIRE === Infinity ? '> 100 años (aumenta el ahorro)' : r.anosParaFIRE + ' años'}**`
+          : `⚠️ El ahorro es negativo (gastas más de lo que ingresas). Imposible alcanzar FIRE con la situación actual.`,
+        '',
+        `🏷️ ${r.descripcionTipoFIRE}`,
+        '',
+        r.proyeccion.length > 1 ? `📋 **Proyección patrimonial (primeros ${Math.min(r.proyeccion.length - 1, 10)} años)**` : '',
+        ...r.proyeccion.slice(1, 11).map(p => `  Año ${p.ano}: ${fmt(p.patrimonio)} €`),
+        '',
+        `⚖️ *Cálculo orientativo. La rentabilidad real varía. No incluye inflación ni impuestos sobre plusvalías.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_pension_viudedad
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_pension_viudedad',
+    'Calcula de forma orientativa la pensión de viudedad en España según la LGSS (arts. 219-231). ' +
+    'Determina la base reguladora, el porcentaje aplicable (52%, 60% o 70% según cargas e ingresos), ' +
+    'la pensión mínima garantizada 2026 y la pensión final con tope máximo de la SS. ' +
+    '⚠️ Estimación orientativa — la SS calcula la pensión real a partir del historial completo de cotización.',
+    {
+      situacionCausante: z.enum(['activo', 'jubilado', 'no-alta'])
+        .describe('"activo" = en alta en SS al fallecer. "jubilado" = percibía pensión de jubilación. "no-alta" = no estaba de alta (requiere cotización mínima).'),
+      baseCotizacionMedia: z.number().positive().optional()
+        .describe('Base de cotización media mensual del causante en los últimos 2 años (€). Obligatoria si situacion es "activo" o "no-alta".'),
+      pensionCausante: z.number().positive().optional()
+        .describe('Pensión de jubilación mensual del causante en euros. Obligatoria si situacion es "jubilado".'),
+      edadBeneficiario: z.number().int().min(0).max(100)
+        .describe('Edad del beneficiario (viudo/a) en años. Afecta al porcentaje y a la pensión mínima garantizada.'),
+      tieneCargas: z.boolean().optional()
+        .describe('Si el beneficiario tiene cargas familiares (hijos menores de 26 o con discapacidad a cargo). Puede elevar el porcentaje al 70%.'),
+      ingresosMensualesPropios: z.number().min(0).optional()
+        .describe('Ingresos mensuales propios del beneficiario por trabajo o pensión (€). Determina acceso a los porcentajes del 60% y 70%.'),
+    },
+    async ({ situacionCausante, baseCotizacionMedia, pensionCausante, edadBeneficiario, tieneCargas, ingresosMensualesPropios }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_pension_viudedad', aiCaller);
+
+      let r;
+      try {
+        r = calcularPensionViudedad({
+          situacionCausante: situacionCausante as SituacionCausante,
+          baseCotizacionMedia, pensionCausante, edadBeneficiario, tieneCargas, ingresosMensualesPropios,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🕊️ **Pensión de Viudedad — Estimación Orientativa**`,
+        '',
+        `📊 Base reguladora: **${fmt(r.baseReguladora)} €/mes**`,
+        `📏 Porcentaje aplicado: **${r.porcentajeAplicable}%** — ${r.razonPorcentaje}`,
+        `💰 Pensión bruta calculada: ${fmt(r.pensionBruta)} €/mes`,
+        `🛡️ Pensión mínima garantizada (2026): ${fmt(r.pensionMinima)} €/mes`,
+        '',
+        `🏦 **Pensión final estimada: ${fmt(r.pensionFinal)} €/mes** (${fmt(r.pensionFinal * 14)} €/año · 14 pagas)`,
+        `💵 Estimación neta tras IRPF: ~${fmt(r.pensionNetaAprox)} €/mes`,
+        '',
+        ...r.notas.map(n => `ℹ️ ${n}`),
+        '',
+        `📚 ${r.fuenteDatos}`,
+        `⚖️ *Estimación orientativa. La SS calcula la pensión real a partir del historial completo de cotización del causante.*`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_legitimas
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_legitimas',
+    'Calcula la herencia forzosa (legítima) según el régimen de derecho civil aplicable en España. ' +
+    'Cubre los 7 regímenes: Derecho Común (Madrid, Andalucía, Castilla...), Cataluña, Aragón, ' +
+    'Galicia, Baleares, País Vasco y Navarra (que tiene legítima puramente formal = 0€). ' +
+    'Determina la legítima total, la parte por hijo, el tercio de mejora y los derechos del cónyuge.',
+    {
+      patrimonioNeto: z.number().min(0)
+        .describe('Patrimonio neto del causante en euros (activos - pasivos)'),
+      regimen: z.enum(['comun', 'cataluna', 'aragon', 'galicia', 'baleares', 'pais-vasco', 'navarra'])
+        .describe('"comun" = Madrid, Andalucía, Castilla, Extremadura, La Rioja, Cantabria, Asturias, Murcia, C.Valenciana, Canarias. El resto por su nombre.'),
+      numHijos: z.number().int().min(0).max(20)
+        .describe('Número de hijos o descendientes directos'),
+      tieneConyuge: z.boolean().optional()
+        .describe('Si hay cónyuge o pareja de hecho superviviente. Afecta al usufructo viudal.'),
+    },
+    async ({ patrimonioNeto, regimen, numHijos, tieneConyuge }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_legitimas', aiCaller);
+
+      let r;
+      try {
+        r = calcularLegitimas({ patrimonioNeto, regimen: regimen as RegimenId, numHijos, tieneConyuge });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `⚖️ **Legítimas Hereditarias — ${r.nombreRegimen}**`,
+        `📍 CCAA: ${r.ccaas}`,
+        `📚 Normativa: ${r.fuenteNormativa}`,
+        '',
+        `💶 Patrimonio neto: **${fmt(patrimonioNeto)} €**`,
+        `👨‍👩‍👧‍👦 Hijos: ${numHijos} | Cónyuge: ${tieneConyuge ? 'sí' : 'no'}`,
+        '',
+        r.esNavarra
+          ? `🟢 **Legítima formal (simbólica): 0 €** — ${r.fraccionLegitima}`
+          : `🔒 **Legítima total (herencia forzosa): ${fmt(r.legitimaTotal)} €** — ${r.fraccionLegitima}`,
+        r.legitimaPorHijo !== null && numHijos > 0
+          ? `  👤 Legítima individual por hijo: **${fmt(r.legitimaPorHijo)} €**`
+          : r.esLegitivaColectiva ? `  👥 Legítima colectiva: distribución libre entre descendientes` : '',
+        r.tercioMejora !== null ? `  🎯 Tercio de mejora (libre entre descendientes): ${fmt(r.tercioMejora)} €` : '',
+        `  🟢 Parte de libre disposición: **${fmt(r.libreDisposicion)} €**`,
+        '',
+        tieneConyuge && r.derechoConyuge !== null
+          ? `💑 **Derechos del cónyuge**: ${r.descripcionDerechoConyuge} (valor referencia: ${fmt(r.derechoConyuge)} €)`
+          : '',
+        ...r.notas.map(n => `ℹ️ ${n}`),
+        '',
+        `⚖️ *Estimación orientativa. Consulta con notaría para tu situación concreta.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_tarifa_freelance
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_tarifa_freelance',
+    'Calcula la tarifa ideal (€/hora, €/día, €/semana) para un freelance o autónomo en España. ' +
+    'Parte del ingreso neto deseado, suma los gastos deducibles, aplica IRPF, IVA y margen de beneficio, ' +
+    'y ajusta por los días realmente facturables (descontando fines de semana, vacaciones, festivos y porcentaje de ocupación). ' +
+    'Devuelve tarifas con y sin IVA y proyección anual.',
+    {
+      ingresoNetoMensual: z.number().positive()
+        .describe('Ingreso neto mensual deseado en euros (lo que quieres llevarte a casa)'),
+      horasSemanales: z.number().min(1).max(80).optional()
+        .describe('Horas de trabajo por semana. Por defecto 40.'),
+      diasVacaciones: z.number().int().min(0).max(60).optional()
+        .describe('Días de vacaciones al año. Por defecto 22 (convenio estándar).'),
+      diasFestivos: z.number().int().min(0).max(20).optional()
+        .describe('Días festivos al año. Por defecto 14.'),
+      diasEnfermedad: z.number().int().min(0).max(30).optional()
+        .describe('Días de baja o enfermedad previstos al año. Por defecto 5.'),
+      porcentajeOcupacion: z.number().min(10).max(100).optional()
+        .describe('Porcentaje de días laborables que realmente se facturan (el resto es captación, admin, formación). Por defecto 70%.'),
+      tipoIRPF: z.number().min(0).max(50).optional()
+        .describe('Tipo de IRPF estimado en %. Por defecto 21% (retención autónomo estándar).'),
+      tipoIVA: z.number().min(0).max(21).optional()
+        .describe('Tipo de IVA que aplicas en tus facturas (%). Por defecto 21%. Algunos servicios exentos = 0.'),
+      margenBeneficio: z.number().min(0).max(100).optional()
+        .describe('Margen de beneficio adicional sobre costes en %. Por defecto 15%.'),
+      totalGastosMensuales: z.number().min(0).optional()
+        .describe('Total de gastos mensuales deducibles en euros (cuota autónomo, seguros, software, oficina, gestoría...). Si los conoces, úsalo directamente.'),
+    },
+    async ({ ingresoNetoMensual, horasSemanales, diasVacaciones, diasFestivos, diasEnfermedad, porcentajeOcupacion, tipoIRPF, tipoIVA, margenBeneficio, totalGastosMensuales }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_tarifa_freelance', aiCaller);
+
+      let r;
+      try {
+        r = calcularTarifaFreelance({
+          ingresoNetoMensual,
+          horasSemanales, diasVacaciones, diasFestivos, diasEnfermedad,
+          porcentajeOcupacion, tipoIRPF, tipoIVA, margenBeneficio,
+          gastosFijos: totalGastosMensuales ? [{ concepto: 'Gastos totales', importe: totalGastosMensuales }] : [],
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `💼 **Tarifa Freelance / Autónomo**`,
+        '',
+        `📅 Días laborables al año: ${r.diasLaborablesAno} | Facturables: ${r.diasFacturablesAno.toFixed(1).replace('.', ',')} (${porcentajeOcupacion ?? 70}% ocupación)`,
+        `⏰ Horas facturables: ${r.horasFacturablesAno.toFixed(0)} año · ${r.horasFacturablesMes.toFixed(1).replace('.', ',')} mes`,
+        '',
+        `💸 Gastos mensuales deducibles: ${fmt(r.totalGastosMensuales)} €`,
+        `💰 Facturación mensual necesaria (sin IVA): ${fmt(r.facturacionMensualNecesaria)} €`,
+        '',
+        `🏷️ **TARIFAS SIN IVA (lo que cobras)**`,
+        `  ⏱️ Por hora: **${fmt(r.tarifaHora)} €/h**`,
+        `  📅 Por día: **${fmt(r.tarifaDia)} €/día**`,
+        `  📆 Por semana: **${fmt(r.tarifaSemana)} €/semana**`,
+        '',
+        `🧾 **TARIFAS CON IVA (lo que paga el cliente)**`,
+        `  ⏱️ Por hora: **${fmt(r.tarifaHoraConIVA)} €/h**`,
+        `  📅 Por día: **${fmt(r.tarifaDiaConIVA)} €/día**`,
+        `  📆 Por semana: **${fmt(r.tarifaSemanaConIVA)} €/semana**`,
+        '',
+        `📊 **Proyección anual**`,
+        `  💰 Facturación anual (sin IVA): ${fmt(r.facturacionAnual)} €`,
+        `  💸 Gastos anuales: ${fmt(r.gastosAnuales)} €`,
+        `  🧾 IRPF estimado: ${fmt(r.irpfAnual)} €`,
+        `  ✅ Beneficio neto anual: **${fmt(r.beneficioNetoAnual)} €**`,
+        '',
+        `⚖️ *Estimación orientativa. El tipo de IRPF real depende de tu renta total anual. Consulta con gestoría.*`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_break_even
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_break_even',
+    'Calcula el punto de equilibrio (break-even) de un negocio o producto: ' +
+    'las unidades y euros de ventas necesarios para cubrir todos los costes. ' +
+    'Incluye análisis de situación actual (si se proporcionan ventas actuales), ' +
+    'unidades para alcanzar un objetivo de ganancia y 4 escenarios what-if ' +
+    '(+10% precio, -10% costes variables, -20% costes fijos, combinado).',
+    {
+      precioVenta: z.number().positive()
+        .describe('Precio de venta por unidad en euros'),
+      costoVariable: z.number().min(0)
+        .describe('Coste variable por unidad en euros (materiales, comisiones, packaging, etc.)'),
+      costosFijos: z.number().min(0)
+        .describe('Costes fijos totales mensuales en euros (alquiler, nóminas fijas, seguros, amortizaciones...)'),
+      ventasActuales: z.number().int().min(0).optional()
+        .describe('Unidades vendidas actualmente al mes. Opcional — permite comparar la situación real con el break-even.'),
+      objetivoGanancia: z.number().min(0).optional()
+        .describe('Objetivo de ganancia mensual deseado en euros. Opcional — calcula las unidades necesarias para alcanzarlo.'),
+    },
+    async ({ precioVenta, costoVariable, costosFijos, ventasActuales, objetivoGanancia }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_break_even', aiCaller);
+
+      let r;
+      try {
+        r = calcularBreakEven({ precioVenta, costoVariable, costosFijos, ventasActuales, objetivoGanancia });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📊 **Punto de Equilibrio (Break-Even)**`,
+        '',
+        `💶 Precio: ${fmt(precioVenta)} €/ud · Coste variable: ${fmt(costoVariable)} €/ud · Costes fijos: ${fmt(costosFijos)} €/mes`,
+        `📈 Margen de contribución: **${fmt(r.margenContribucion)} €/ud** (${r.margenContribucionPorcentaje.toFixed(1).replace('.', ',')}% del precio)`,
+        '',
+        `🎯 **Break-even: ${r.breakEvenUnidades} unidades/mes = ${fmt(r.breakEvenEuros)} €/mes en ventas**`,
+        '',
+        r.unidadesParaObjetivo !== null
+          ? `💰 Para objetivo de ganancia (${fmt(objetivoGanancia ?? 0)} €/mes): **${r.unidadesParaObjetivo} unidades/mes**`
+          : '',
+        r.gananciaActual !== null
+          ? [
+            ``,
+            `📋 **Situación actual (${ventasActuales} unidades/mes)**`,
+            `  ${r.esRentable ? '✅' : '❌'} Ganancia/pérdida: **${fmt(r.gananciaActual)} €/mes**`,
+            `  📊 Nivel vs break-even: ${r.porcentajeBreakEven?.toFixed(1).replace('.', ',')}%`,
+            `  🛡️ Margen de seguridad: ${r.margenSeguridad} ud (${r.margenSeguridadPorcentaje?.toFixed(1).replace('.', ',')}%)`,
+          ].join('\n')
+          : '',
+        '',
+        `🔬 **Escenarios what-if**`,
+        ...r.escenarios.map(e =>
+          `  📌 ${e.descripcion}: break-even = **${e.breakEvenUnidades} ud** (${e.variacionVsActual !== null ? (e.variacionVsActual > 0 ? '+' : '') + e.variacionVsActual + '%' : 'base'})`
+        ),
+        '',
+        `⚖️ *Cálculo mensual orientativo. Los costes variables y fijos son estimaciones — verifica con tu contabilidad.*`,
+      ].filter(l => l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
   );
