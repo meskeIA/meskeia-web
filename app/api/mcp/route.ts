@@ -94,6 +94,14 @@ import { calcularRegla72 } from '@/lib/calculadoras/regla72';
 import { calcularEstadisticas } from '@/lib/calculadoras/estadisticas';
 import { calcularPensionComplementaria } from '@/lib/calculadoras/pensionComplementaria';
 import { calcularRetencionAlquiler } from '@/lib/calculadoras/retencionAlquiler';
+import { calcularDevolucionIRPF } from '@/lib/calculadoras/devolucionIRPF';
+import { calcularAmortizacionContable, type MetodoAmortizacion, type GrupoRIS } from '@/lib/calculadoras/amortizacionContable';
+import { calcularPenalizacionHipoteca, type TipoHipotecaAmortizacion, type RegulacionHipoteca } from '@/lib/calculadoras/penalizacionHipoteca';
+import { calcularPrecioVenta, type ModoPrecioVenta } from '@/lib/calculadoras/precioVenta';
+import { calcularModelo303, type Trimestre303 } from '@/lib/calculadoras/modelo303';
+import { calcularHorasEfectivas, type PerfilHoras } from '@/lib/calculadoras/horasEfectivas';
+import { calcularNumeroPagos } from '@/lib/calculadoras/numeroPagos';
+import { calcularImpuestoMatriculacion, type TipoVehiculoIEDMT } from '@/lib/calculadoras/impuestoMatriculacion';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -4238,6 +4246,587 @@ function crearServidorMCP(): McpServer {
         '',
         r.pasosEuclides ? `📐 **Algoritmo de Euclides:**` : '',
         ...(r.pasosEuclides ?? []).map(p => `  ${p}`),
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_devolucion_irpf
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_devolucion_irpf',
+    'Simula si la declaración de la Renta (IRPF) saldrá a pagar o a devolver, ' +
+    'comparando las retenciones practicadas con la cuota íntegra calculada sobre la base imponible. ' +
+    'Incluye rendimientos del trabajo, actividades económicas, capital mobiliario/inmobiliario ' +
+    'y ganancias patrimoniales. Calcula el mínimo personal y familiar según hijos y edad. ' +
+    'Útil para: "¿Cuánto me devolverá Hacienda este año?", "¿Me conviene hacer la declaración?" ' +
+    '⚠️ Estimación orientativa — tramos estatales + autonómicos medios. Resultado exacto en Renta WEB (AEAT). ' +
+    'Encadenable con calcular_irpf, calcular_sueldo_neto, calcular_declaracion_conjunta.',
+    {
+      rendimientosTrabajoAnuales: z.number().min(0)
+        .describe('Salario bruto anual del trabajo por cuenta ajena (€), antes de retenciones'),
+      retencionesTrabajoAnuales: z.number().min(0).optional()
+        .describe('Retenciones IRPF practicadas por la empresa durante el año (€)'),
+      rendimientosActividadesEconomicas: z.number().min(0).optional()
+        .describe('Rendimientos netos de actividades económicas para autónomos (€). Por defecto 0.'),
+      retencionesActividadesEconomicas: z.number().min(0).optional()
+        .describe('Retenciones soportadas en facturas de actividades económicas (€)'),
+      pagosFraccionados: z.number().min(0).optional()
+        .describe('Pagos fraccionados abonados (Modelo 130) durante el año (€)'),
+      rendimientosCapitalMobiliario: z.number().min(0).optional()
+        .describe('Intereses, dividendos y otros rendimientos del capital mobiliario (€)'),
+      retencionesCapitalMobiliario: z.number().min(0).optional()
+        .describe('Retenciones sobre capital mobiliario (19-28%) (€)'),
+      rendimientosCapitalInmobiliario: z.number().min(0).optional()
+        .describe('Rendimientos netos del capital inmobiliario (alquiler, ya descontados gastos) (€)'),
+      retencionesCapitalInmobiliario: z.number().min(0).optional()
+        .describe('Retenciones sobre rendimientos de alquiler (€)'),
+      gananciasPatrimoniales: z.number().optional()
+        .describe('Ganancias netas por venta de acciones, fondos, inmuebles, etc. (€). Puede ser negativo.'),
+      edad: z.number().int().min(18).max(100).optional()
+        .describe('Edad del contribuyente (afecta al mínimo personal: 65+ o 75+ años)'),
+      numHijos: z.number().int().min(0).max(20).optional()
+        .describe('Número de hijos menores de 25 años a cargo'),
+      hijosMenures3: z.boolean().optional()
+        .describe('¿Hay algún hijo menor de 3 años? (aumento del mínimo familiar)'),
+      ascendientes65: z.number().int().min(0).optional()
+        .describe('Número de ascendientes (padres/abuelos) mayores de 65 años a cargo'),
+      discapacidad: z.enum(['ninguna', 'moderada', 'severa']).optional()
+        .describe('"ninguna" (sin discapacidad), "moderada" (33-65%), "severa" (>65%). Aumenta el mínimo.'),
+      deduccionMaternidad: z.number().min(0).optional()
+        .describe('Deducción por maternidad/paternidad (€). Hasta 1.200 €/año por hijo menor de 3 años.'),
+      deduccionesAutonimicas: z.number().min(0).optional()
+        .describe('Deducciones autonómicas aplicables (alquiler habitual, rehabilitación, etc.) (€)'),
+    },
+    async ({ rendimientosTrabajoAnuales, retencionesTrabajoAnuales, rendimientosActividadesEconomicas, retencionesActividadesEconomicas, pagosFraccionados, rendimientosCapitalMobiliario, retencionesCapitalMobiliario, rendimientosCapitalInmobiliario, retencionesCapitalInmobiliario, gananciasPatrimoniales, edad, numHijos, hijosMenures3, ascendientes65, discapacidad, deduccionMaternidad, deduccionesAutonimicas }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_devolucion_irpf', aiCaller);
+
+      let r;
+      try {
+        r = calcularDevolucionIRPF({
+          rendimientosTrabajoAnuales, retencionesTrabajoAnuales, rendimientosActividadesEconomicas,
+          retencionesActividadesEconomicas, pagosFraccionados, rendimientosCapitalMobiliario,
+          retencionesCapitalMobiliario, rendimientosCapitalInmobiliario, retencionesCapitalInmobiliario,
+          gananciasPatrimoniales, edad, numHijos, hijosMenures3, ascendientes65, discapacidad,
+          deduccionMaternidad, deduccionesAutonimicas,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const emoji = r.aDevolver ? '💚' : r.aPagar ? '🔴' : '⚖️';
+      const lineas = [
+        `${emoji} **Simulador Declaración IRPF — ${r.aDevolver ? 'A DEVOLVER' : r.aPagar ? 'A PAGAR' : 'RESULTADO CERO'}**`,
+        '',
+        `📊 Base imponible total: ${fmt(r.baseImponibleTotal)} €`,
+        `  🔹 General (trabajo + actividades + inmobiliario): ${fmt(r.baseImponibleGeneral)} €`,
+        r.baseImponibleAhorro > 0 ? `  🔹 Del ahorro (capital mobiliario + ganancias): ${fmt(r.baseImponibleAhorro)} €` : '',
+        '',
+        `👥 Mínimo personal y familiar: ${fmt(r.minimoPersonalFamiliar)} €`,
+        `📋 Cuota íntegra: ${fmt(r.cuotaIntegra)} € | Cuota líquida: **${fmt(r.cuotaLiquida)} €**`,
+        `📉 Tipo efectivo: ${r.tipoEfectivo.toFixed(2).replace('.', ',')}%`,
+        '',
+        `🔄 Retenciones e ingresos a cuenta: ${fmt(r.totalRetenciones)} €`,
+        '',
+        r.aDevolver
+          ? `💚 **RESULTADO: Hacienda devuelve ${fmt(r.importeADevolver)} €**`
+          : r.aPagar
+            ? `🔴 **RESULTADO: A ingresar ${fmt(r.importeAPagar)} €**`
+            : `⚖️ **RESULTADO: Liquidación a cero (${fmt(0)} €)**`,
+        '',
+        `⚠️ ${r.advertencia}`,
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_amortizacion_contable
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_amortizacion_contable',
+    'Genera la tabla de amortización contable y fiscal de un activo fijo (inmovilizado material o intangible). ' +
+    'Métodos disponibles según el Reglamento del IS (RIS 2004) y el RIRPF: ' +
+    '"lineal" (cuota constante), "porcentaje_constante" (degresiva sobre valor neto), "suma_digitos" (dígitos decrecientes). ' +
+    'Permite validar si los plazos son compatibles con los coeficientes máximos RIS para el grupo del activo ' +
+    '(equipos informáticos 25%, vehículos turismo 16%, mobiliario 10%, edificios 2-3%...). ' +
+    'Calcula el ahorro fiscal anual IS/IRPF de cada cuota. ' +
+    'Encadenable con comparar_autonomo_vs_sl, calcular_irpf, calcular_break_even.',
+    {
+      costeAdquisicion: z.number().positive()
+        .describe('Coste de adquisición del activo en euros (precio de compra + gastos de puesta en funcionamiento)'),
+      vidaUtil: z.number().int().min(1).max(100)
+        .describe('Vida útil estimada en años'),
+      valorResidual: z.number().min(0).optional()
+        .describe('Valor residual estimado al final de la vida útil (€). Por defecto 0.'),
+      metodo: z.enum(['lineal', 'porcentaje_constante', 'suma_digitos']).optional()
+        .describe('"lineal" (cuota constante, el más habitual), "porcentaje_constante" (degresiva, amortiza más al principio), "suma_digitos" (dígitos decrecientes). Por defecto lineal.'),
+      grupoRIS: z.enum([
+        'edificios_industriales', 'edificios_comerciales', 'instalaciones',
+        'maquinaria_general', 'maquinaria_especifica', 'vehiculos_turismo',
+        'vehiculos_transporte', 'mobiliario', 'equipos_informaticos',
+        'utillaje', 'sistemas_telecomunicaciones', 'otro',
+      ] as [GrupoRIS, ...GrupoRIS[]]).optional()
+        .describe('Grupo de amortización RIS 2004. Si se indica, valida que el plazo sea compatible con el coeficiente máximo fiscal.'),
+      tipoImpuesto: z.number().min(0).max(60).optional()
+        .describe('Tipo IS o IRPF del contribuyente (%) para calcular el ahorro fiscal de cada cuota. Por defecto 25%.'),
+      porcentajeConstante: z.number().min(1).max(100).optional()
+        .describe('Porcentaje de amortización para el método "porcentaje_constante" (%). Si no se indica, se usa el doble del coeficiente lineal.'),
+    },
+    async ({ costeAdquisicion, vidaUtil, valorResidual, metodo, grupoRIS, tipoImpuesto, porcentajeConstante }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_amortizacion_contable', aiCaller);
+
+      let r;
+      try {
+        r = calcularAmortizacionContable({
+          costeAdquisicion, vidaUtil, valorResidual,
+          metodo: metodo as MetodoAmortizacion | undefined,
+          grupoRIS: grupoRIS as GrupoRIS | undefined,
+          tipoImpuesto, porcentajeConstante,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const metodoLabel: Record<string, string> = {
+        lineal: 'Lineal (cuota constante)',
+        porcentaje_constante: 'Porcentaje constante (degresiva)',
+        suma_digitos: 'Suma de dígitos (dígitos decrecientes)',
+      };
+      // Mostrar solo primeros 10 años + resumen para no sobrecargar
+      const tablaResumen = r.tabla.slice(0, 10).map(f =>
+        `  Año ${f.anio}: cuota ${fmt(f.cuotaAmortizacion)} € | VNC final ${fmt(f.valorNetoFinal)} € | Ahorro fiscal ${fmt(f.ahorroFiscalEjercicio)} €`
+      );
+      const lineas = [
+        `📊 **Tabla de Amortización — ${metodoLabel[r.metodo]}**`,
+        '',
+        `💰 Coste adquisición: ${fmt(r.costeAdquisicion)} € | Valor amortizable: ${fmt(r.valorAmortizable)} €`,
+        `📅 Vida útil: ${vidaUtil} años | Cuota lineal referencia: ${fmt(r.cuotaLinealAnual)} €/año`,
+        r.coeficienteRISMax !== undefined
+          ? `📋 Coef. máx. RIS grupo "${grupoRIS}": ${r.coeficienteRISMax}% | ${r.compatibleRIS ? '✅ Plazo compatible' : '⚠️ Plazo no compatible con RIS'}`
+          : '',
+        '',
+        `📋 **Detalle año a año** (${Math.min(10, r.tabla.length)} de ${r.tabla.length}):`,
+        ...tablaResumen,
+        r.tabla.length > 10 ? `  ... (${r.tabla.length - 10} años más no mostrados)` : '',
+        '',
+        `💶 Total amortizado: **${fmt(r.totalAmortizado)} €**`,
+        `🏦 Total ahorro fiscal acumulado (${tipoImpuesto ?? 25}%): **${fmt(r.totalAhorroFiscal)} €**`,
+        '',
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_penalizacion_hipoteca
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_penalizacion_hipoteca',
+    'Calcula la comisión por amortización anticipada (total o parcial) de una hipoteca ' +
+    'según la Ley 5/2019 reguladora del crédito inmobiliario (LCCI). ' +
+    'LCCI variable: 0,25% los 3 primeros años, 0,15% años 4-5, 0% a partir del año 6. ' +
+    'LCCI fija: 2% primeros 10 años, 1,5% a partir del año 11. ' +
+    'También admite hipotecas mixtas y pre-LCCI (firmadas antes del 16/06/2019). ' +
+    'Encadenable con calcular_hipoteca, calcular_amortizacion_anticipada.',
+    {
+      capitalAmortizar: z.number().positive()
+        .describe('Capital que se quiere amortizar anticipadamente (€). Puede ser amortización parcial o total.'),
+      tipoHipoteca: z.enum(['variable', 'fija', 'mixta'])
+        .describe('"variable" (euríbor + diferencial), "fija" (tipo fijo toda la vida), "mixta" (fija X años + variable el resto)'),
+      anioVidaHipoteca: z.number().int().min(1)
+        .describe('Año de vida de la hipoteca en el momento de la amortización (1 = primer año desde la firma)'),
+      regulacion: z.enum(['lcci_2019', 'pre_lcci']).optional()
+        .describe('"lcci_2019" para hipotecas firmadas desde el 16/06/2019 (por defecto). "pre_lcci" para hipotecas anteriores.'),
+      aniosPeriodoFijo: z.number().int().min(1).optional()
+        .describe('Para hipotecas mixtas: duración del período inicial a tipo fijo (años). Ej: 10 para un mixto 10+variable.'),
+      comisionPactadaPct: z.number().min(0).optional()
+        .describe('Comisión pactada en escritura (%). Si es menor que el máximo legal, se aplica la pactada. No puede superar el máximo legal.'),
+    },
+    async ({ capitalAmortizar, tipoHipoteca, anioVidaHipoteca, regulacion, aniosPeriodoFijo, comisionPactadaPct }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_penalizacion_hipoteca', aiCaller);
+
+      let r;
+      try {
+        r = calcularPenalizacionHipoteca({
+          capitalAmortizar,
+          tipoHipoteca: tipoHipoteca as TipoHipotecaAmortizacion,
+          anioVidaHipoteca,
+          regulacion: regulacion as RegulacionHipoteca | undefined,
+          aniosPeriodoFijo,
+          comisionPactadaPct,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🏦 **Comisión Amortización Anticipada — Hipoteca ${tipoHipoteca.charAt(0).toUpperCase() + tipoHipoteca.slice(1)}**`,
+        '',
+        `💶 Capital a amortizar: ${fmt(r.capitalAmortizar)} €`,
+        `📅 Año ${r.anioVidaHipoteca} de vida de la hipoteca`,
+        `⚖️ Regulación: ${r.regulacion === 'lcci_2019' ? 'Ley 5/2019 (LCCI)' : 'Ley 41/2007 (pre-LCCI)'}`,
+        '',
+        `📋 Tramo aplicado: ${r.tramoAplicado}`,
+        `📊 Tipo máximo legal: **${r.porcentajeMaximoLegal.toFixed(2).replace('.', ',')}%**`,
+        comisionPactadaPct !== undefined ? `📝 Tipo pactado en escritura: ${comisionPactadaPct.toFixed(2).replace('.', ',')}%` : '',
+        `📊 Tipo efectivo aplicado: **${r.porcentajeEfectivo.toFixed(2).replace('.', ',')}%**`,
+        '',
+        r.sinComision
+          ? `✅ **Sin comisión: 0,00 €** (exento por ley en este tramo)`
+          : `🔴 **Comisión a pagar: ${fmt(r.comisionAPagar)} €**`,
+        '',
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_precio_venta
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_precio_venta',
+    'Calcula el precio de venta óptimo, margen comercial y markup para productos o servicios. ' +
+    'Tres modos: ' +
+    '"calcular_precio" (dado coste + margen objetivo → precio de venta), ' +
+    '"calcular_margen" (dado precio + coste → margen y markup), ' +
+    '"calcular_coste" (dado precio + margen → coste máximo admisible). ' +
+    '⚠️ Diferencia clave: margen = beneficio/precio×100; markup = beneficio/coste×100. ' +
+    'Incluye PVP con IVA, precio psicológico y punto de equilibrio si se dan costes fijos. ' +
+    'Encadenable con calcular_iva, calcular_break_even, calcular_roi_marketing.',
+    {
+      modo: z.enum(['calcular_precio', 'calcular_margen', 'calcular_coste'])
+        .describe(
+          '"calcular_precio": dado coste unitario + margen objetivo → precio de venta. ' +
+          '"calcular_margen": dado precio de venta + coste unitario → margen y markup. ' +
+          '"calcular_coste": dado precio de venta + margen objetivo → coste máximo admisible.'
+        ),
+      costeUnitario: z.number().min(0).optional()
+        .describe('Coste unitario del producto/servicio (€). Requerido en modos calcular_precio y calcular_margen.'),
+      precioVentaSinIVA: z.number().positive().optional()
+        .describe('Precio de venta sin IVA (€). Requerido en modos calcular_margen y calcular_coste.'),
+      margenObjetivoPct: z.number().min(-100).max(99.99).optional()
+        .describe('Margen objetivo sobre el precio de venta (%). Ej: 40 significa que el beneficio es el 40% del precio. Requerido en modos calcular_precio y calcular_coste.'),
+      tipoIVA: z.number().min(0).max(100).optional()
+        .describe('Tipo de IVA a añadir al precio (%). Por defecto 21. Usar 10 para reducido, 4 para superreducido, 0 para exento.'),
+      unidades: z.number().positive().optional()
+        .describe('Número de unidades vendidas (para calcular ingresos y beneficio totales). Por defecto 1.'),
+      costosFijosMensuales: z.number().min(0).optional()
+        .describe('Costes fijos mensuales (€). Si se indica, calcula el punto de equilibrio: unidades mínimas para cubrir costes fijos.'),
+    },
+    async ({ modo, costeUnitario, precioVentaSinIVA, margenObjetivoPct, tipoIVA, unidades, costosFijosMensuales }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_precio_venta', aiCaller);
+
+      let r;
+      try {
+        r = calcularPrecioVenta({
+          modo: modo as ModoPrecioVenta,
+          costeUnitario, precioVentaSinIVA, margenObjetivoPct, tipoIVA, unidades, costosFijosMensuales,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `💰 **Precio de Venta y Margen Comercial**`,
+        '',
+        `📦 Coste unitario: ${fmt(r.costeUnitario)} €`,
+        `🏷️ Precio de venta sin IVA: **${fmt(r.precioVentaSinIVA)} €**`,
+        `🧾 IVA (${r.tipoIVA}%): ${fmt(r.cuotaIVA)} € → **PVP: ${fmt(r.precioVentaConIVA)} €**`,
+        `💹 Precio psicológico sugerido: ${fmt(r.precioPsicologico)} €`,
+        '',
+        `📊 Beneficio unitario: **${fmt(r.beneficioUnitario)} €**`,
+        `📈 Margen (sobre precio): **${r.margenPct.toFixed(2).replace('.', ',')}%**`,
+        `📈 Markup (sobre coste): **${r.markupPct.toFixed(2).replace('.', ',')}%**`,
+        '',
+        (unidades ?? 1) > 1 ? `📦 Para ${(unidades ?? 1).toLocaleString('es-ES')} unidades: ingresos ${fmt(r.ingresosTotales)} € | beneficio **${fmt(r.beneficioTotal)} €**` : '',
+        r.puntoEquilibrioUnidades !== undefined ? `⚖️ Punto de equilibrio: **${r.puntoEquilibrioUnidades.toLocaleString('es-ES')} unidades/mes** (para cubrir ${fmt(costosFijosMensuales ?? 0)} € de costes fijos)` : '',
+        '',
+        `💡 ${r.interpretacion}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_modelo_303
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_modelo_303',
+    'Calcula la autoliquidación trimestral del IVA (Modelo 303) para autónomos y empresas. ' +
+    'Resultado: IVA devengado (repercutido en facturas emitidas) menos IVA soportado deducible (facturas recibidas) = cuota diferencial. ' +
+    'Si es positivo → a ingresar en Hacienda. Si es negativo → a compensar (o solicitar devolución en T4). ' +
+    'Fechas de presentación: T1 hasta 30 abril, T2 hasta 20 julio, T3 hasta 20 octubre, T4 hasta 30 enero. ' +
+    'Encadenable con calcular_iva, calcular_pago_fraccionado, calcular_cuota_autonomo.',
+    {
+      trimestre: z.enum(['T1', 'T2', 'T3', 'T4'])
+        .describe('Trimestre de la liquidación: T1 (ene-mar), T2 (abr-jun), T3 (jul-sep), T4 (oct-dic)'),
+      anioFiscal: z.number().int().min(2020).max(2030).optional()
+        .describe('Año fiscal de la liquidación. Por defecto el año actual.'),
+      baseImponibleEmitidas21: z.number().min(0).optional()
+        .describe('Base imponible de facturas emitidas al tipo general 21% (€)'),
+      baseImponibleEmitidas10: z.number().min(0).optional()
+        .describe('Base imponible de facturas emitidas al tipo reducido 10% (€)'),
+      baseImponibleEmitidas4: z.number().min(0).optional()
+        .describe('Base imponible de facturas emitidas al tipo superreducido 4% (€)'),
+      baseImponibleRecibidas21: z.number().min(0).optional()
+        .describe('Base imponible de facturas recibidas deducibles al 21% (€)'),
+      baseImponibleRecibidas10: z.number().min(0).optional()
+        .describe('Base imponible de facturas recibidas deducibles al 10% (€)'),
+      baseImponibleRecibidas4: z.number().min(0).optional()
+        .describe('Base imponible de facturas recibidas deducibles al 4% (€)'),
+      compensacionAnterior: z.number().min(0).optional()
+        .describe('Saldo a compensar de trimestres anteriores (resultado negativo previo no pedido a devolver) (€)'),
+    },
+    async ({ trimestre, anioFiscal, baseImponibleEmitidas21, baseImponibleEmitidas10, baseImponibleEmitidas4, baseImponibleRecibidas21, baseImponibleRecibidas10, baseImponibleRecibidas4, compensacionAnterior }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_modelo_303', aiCaller);
+
+      let r;
+      try {
+        r = calcularModelo303({
+          trimestre: trimestre as Trimestre303,
+          anioFiscal,
+          baseImponibleEmitidas21, baseImponibleEmitidas10, baseImponibleEmitidas4,
+          baseImponibleRecibidas21, baseImponibleRecibidas10, baseImponibleRecibidas4,
+          compensacionAnterior,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🧾 **Modelo 303 — IVA Trimestral ${r.trimestre} / ${r.anioFiscal}**`,
+        '',
+        `📤 **IVA devengado (repercutido)**`,
+        `  Base imponible facturas emitidas: ${fmt(r.baseImponibleDevengada)} €`,
+        `  IVA repercutido total: **${fmt(r.ivaDevengadoTotal)} €**`,
+        '',
+        `📥 **IVA deducible (soportado)**`,
+        `  Base imponible facturas recibidas: ${fmt(r.baseImponibleDeducible)} €`,
+        `  IVA soportado deducible: **${fmt(r.ivaSoportadoTotal)} €**`,
+        '',
+        `⚖️ Cuota diferencial: ${fmt(r.cuotaDiferencial)} €`,
+        r.compensacionAplicada > 0 ? `🔄 Compensación trimestre anterior: -${fmt(r.compensacionAplicada)} €` : '',
+        '',
+        r.aIngresar
+          ? `🔴 **RESULTADO: A ingresar ${fmt(r.resultadoFinal)} €**`
+          : r.aCompensar
+            ? r.puedesolicitarDevolucion
+              ? `💚 **RESULTADO: A devolver o compensar ${fmt(Math.abs(r.resultadoFinal))} €** (T4: puedes solicitar devolución a Hacienda)`
+              : `🔄 **RESULTADO: A compensar ${fmt(Math.abs(r.resultadoFinal))} €** (se traslada al siguiente trimestre)`
+            : `⚖️ **RESULTADO: Liquidación a cero**`,
+        '',
+        `📅 Fecha límite de presentación: **${r.fechaLimite}**`,
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_horas_efectivas
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_horas_efectivas',
+    'Calcula las horas realmente trabajadas al año, descontando vacaciones, festivos, bajas y ausencias. ' +
+    'Fundamental para freelances (para saber cuántas horas facturar y fijar tarifa correcta) ' +
+    'y para empresas (para conocer el coste hora real de un empleado). ' +
+    'Para freelances: descuenta también las horas no facturables (administración, ventas, formación) ' +
+    'y calcula la tarifa mínima por hora facturable para cubrir el salario/facturación objetivo. ' +
+    'Encadenable con calcular_tarifa_freelance, calcular_coste_empleado, calcular_sueldo_neto.',
+    {
+      perfil: z.enum(['empleado', 'freelance'])
+        .describe('"empleado" para trabajadores por cuenta ajena. "freelance" para autónomos que facturan por horas.'),
+      salarioBrutoAnual: z.number().positive()
+        .describe('Salario bruto anual en euros para empleados, o facturación neta anual objetivo para freelances'),
+      horasPorDia: z.number().positive().max(24).optional()
+        .describe('Horas de trabajo por día laboral. Por defecto 8.'),
+      diasVacaciones: z.number().min(0).max(60).optional()
+        .describe('Días de vacaciones pagadas al año. Por defecto 22 (mínimo legal en España).'),
+      festivos: z.number().min(0).max(30).optional()
+        .describe('Días festivos nacionales + autonómicos. Por defecto 14 (media España).'),
+      festivosLocales: z.number().min(0).max(10).optional()
+        .describe('Días festivos locales adicionales. Por defecto 2.'),
+      diasBaja: z.number().min(0).max(90).optional()
+        .describe('Días de baja médica estimados al año. Por defecto 5 (promedio nacional).'),
+      diasFormacion: z.number().min(0).max(30).optional()
+        .describe('Días dedicados a formación y cursos al año. Por defecto 0.'),
+      otrasAusencias: z.number().min(0).max(30).optional()
+        .describe('Otros días de ausencia: licencias, permisos, asuntos propios. Por defecto 0.'),
+      horasNoFacturablesSemanales: z.number().min(0).max(40).optional()
+        .describe('Solo freelance: horas semanales dedicadas a tareas no facturables (administración, marketing, reuniones comerciales). Por defecto 0.'),
+      pctTiempoSinFacturar: z.number().min(0).max(100).optional()
+        .describe('Solo freelance: porcentaje de tiempo sin trabajo o con impagos (%). Reduce las horas facturables efectivas. Por defecto 0.'),
+    },
+    async ({ perfil, salarioBrutoAnual, horasPorDia, diasVacaciones, festivos, festivosLocales, diasBaja, diasFormacion, otrasAusencias, horasNoFacturablesSemanales, pctTiempoSinFacturar }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_horas_efectivas', aiCaller);
+
+      let r;
+      try {
+        r = calcularHorasEfectivas({
+          perfil: perfil as PerfilHoras,
+          salarioBrutoAnual, horasPorDia, diasVacaciones, festivos, festivosLocales,
+          diasBaja, diasFormacion, otrasAusencias, horasNoFacturablesSemanales, pctTiempoSinFacturar,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `⏱️ **Horas Efectivas Anuales — ${perfil === 'freelance' ? 'Freelance' : 'Empleado'}**`,
+        '',
+        `📅 Días laborables brutos: ${r.diasLaborablesBrutos} días`,
+        `❌ Ausencias totales: ${r.totalAusenciasDias} días (vacaciones ${r.detalleAusencias.vacaciones} + festivos ${r.detalleAusencias.festivos + r.detalleAusencias.festivosLocales} + bajas ${r.detalleAusencias.bajas}${r.detalleAusencias.formacion > 0 ? ` + formación ${r.detalleAusencias.formacion}` : ''}${r.detalleAusencias.otros > 0 ? ` + otros ${r.detalleAusencias.otros}` : ''})`,
+        `✅ Días efectivos: **${r.diasEfectivos} días**`,
+        '',
+        `🕐 Horas brutas: ${r.horasBrutas} h/año | Horas ausencia: ${r.horasAusencia} h`,
+        `✅ **Horas efectivas: ${r.horasEfectivas} h/año** (${r.semanasLaborables.toFixed(1).replace('.', ',')} semanas)`,
+        r.horasFacturables !== undefined ? `💼 Horas facturables: **${r.horasFacturables} h/año**` : '',
+        '',
+        `💰 Coste/tarifa hora efectiva: **${fmt(r.costeHoraEfectiva)} €/h**`,
+        r.tarifaMinimaHora !== undefined ? `🎯 **Tarifa mínima hora facturable para cubrir objetivo: ${fmt(r.tarifaMinimaHora)} €/h**` : '',
+        '',
+        `💡 ${r.interpretacion}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_numero_pagos
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_numero_pagos',
+    'Calcula cuántos pagos (meses) quedan para liquidar un préstamo o hipoteca, ' +
+    'dado el capital pendiente, la cuota mensual y el tipo de interés. ' +
+    'También simula el efecto de un pago extraordinario (¿cuántos meses se acorta la deuda?) ' +
+    'y el efecto de aumentar la cuota mensual (¿cuánto se ahorra en intereses?). ' +
+    'Encadenable con calcular_hipoteca, calcular_prestamo, calcular_amortizacion_anticipada, calcular_penalizacion_hipoteca.',
+    {
+      capitalPendiente: z.number().positive()
+        .describe('Capital pendiente actual del préstamo/hipoteca (€)'),
+      cuotaMensual: z.number().positive()
+        .describe('Cuota mensual actual (€)'),
+      tasaAnual: z.number().min(0)
+        .describe('Tipo de interés anual (%). Para préstamos sin interés, usar 0.'),
+      pagoExtraordinario: z.number().min(0).optional()
+        .describe('Pago extraordinario adicional a realizar ahora (€). Calcula cuántos meses se acorta el plazo.'),
+      nuevaCuotaMensual: z.number().positive().optional()
+        .describe('Nueva cuota mensual si se sube la cuota (€). Debe ser mayor que la cuota actual. Simula el ahorro en tiempo e intereses.'),
+    },
+    async ({ capitalPendiente, cuotaMensual, tasaAnual, pagoExtraordinario, nuevaCuotaMensual }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_numero_pagos', aiCaller);
+
+      let r;
+      try {
+        r = calcularNumeroPagos({ capitalPendiente, cuotaMensual, tasaAnual, pagoExtraordinario, nuevaCuotaMensual });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📅 **Pagos Restantes del Préstamo**`,
+        '',
+        `💶 Capital pendiente: ${fmt(r.capitalPendiente)} € | Cuota: ${fmt(r.cuotaMensual)} €/mes | Interés: ${r.tasaAnual}% anual`,
+        '',
+        `✅ **Quedan ${r.pagosRestantes} pagos (${r.plazoRestante})**`,
+        `📅 Fecha estimada de liquidación: ${r.fechaLiquidacion}`,
+        `💸 Total a pagar: ${fmt(r.totalAPagar)} € | Intereses restantes: **${fmt(r.interesesRestantes)} €**`,
+        '',
+        r.pagosConExtraordinario !== undefined
+          ? [
+            `🎯 **Con pago extraordinario de ${fmt(pagoExtraordinario ?? 0)} €:**`,
+            r.pagosConExtraordinario === 0
+              ? `  ✅ La deuda queda liquidada`
+              : `  Quedan ${r.pagosConExtraordinario} pagos → ahorras **${r.mesesAhorradosConExtraordinario} mes(es)** e intereses por **${fmt(r.interesesAhorradosConExtraordinario ?? 0)} €**`,
+          ].join('\n')
+          : '',
+        r.pagosConNuevaCuota !== undefined
+          ? [
+            `🔼 **Con cuota aumentada a ${fmt(nuevaCuotaMensual ?? 0)} €/mes:**`,
+            `  Quedan ${r.pagosConNuevaCuota} pagos → ahorras **${r.mesesAhorradosConNuevaCuota} mes(es)** e intereses por **${fmt(r.interesesAhorradosConNuevaCuota ?? 0)} €**`,
+          ].join('\n')
+          : '',
+        '',
+        `💡 ${r.interpretacion}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_impuesto_matriculacion
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_impuesto_matriculacion',
+    'Calcula el Impuesto Especial sobre Determinados Medios de Transporte (IEDMT / impuesto de matriculación) ' +
+    'según la Ley 38/1992 y los tipos vigentes 2025 por tramos de emisiones CO₂ (WLTP). ' +
+    'Turismos: 0% (0-120 g/km), 4,75% (121-160 g/km), 9,75% (161-200 g/km), 14,75% (>200 g/km). ' +
+    'Vehículos eléctricos: exentos (0 emisiones). ' +
+    'Devuelve cuota IEDMT, IVA y coste total de adquisición. ' +
+    'Encadenable con calcular_leasing, calcular_prestamo, calcular_kilometraje.',
+    {
+      precioSinIVA: z.number().positive()
+        .describe('Precio del vehículo sin IVA en euros (base imponible del IEDMT)'),
+      emisionesCO2: z.number().min(0)
+        .describe('Emisiones de CO₂ en ciclo WLTP (g/km). Para vehículos eléctricos usar 0.'),
+      tipoVehiculo: z.enum(['turismo', 'moto', 'furgoneta', 'electrico', 'hibrido_enchufable']).optional()
+        .describe('"turismo" (por defecto), "moto", "furgoneta", "electrico" (BEV/FCEV, siempre exento), "hibrido_enchufable" (PHEV, se aplican tramos según emisiones WLTP)'),
+      tipoIVA: z.number().min(0).max(100).optional()
+        .describe('Tipo de IVA a aplicar (%). Por defecto 21. Empresas con IVA deducible pueden usar 0 para ver el precio sin IVA.'),
+    },
+    async ({ precioSinIVA, emisionesCO2, tipoVehiculo, tipoIVA }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_impuesto_matriculacion', aiCaller);
+
+      let r;
+      try {
+        r = calcularImpuestoMatriculacion({
+          precioSinIVA, emisionesCO2,
+          tipoVehiculo: tipoVehiculo as TipoVehiculoIEDMT | undefined,
+          tipoIVA,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🚗 **Impuesto de Matriculación (IEDMT) — ${r.emisionesCO2} g/km CO₂**`,
+        '',
+        `💶 Precio sin IVA (base IEDMT): ${fmt(r.precioSinIVA)} €`,
+        `📊 Tramo: ${r.tramoAplicado}`,
+        `🏷️ Tipo IEDMT: **${r.tipoIEDMT.toFixed(2).replace('.', ',')}%**`,
+        '',
+        `📋 **Desglose coste total:**`,
+        `  Precio sin IVA: ${fmt(r.desglose.precioSinIVA)} €`,
+        `  IVA (${r.tipoIVA}%): ${fmt(r.desglose.iva)} €`,
+        r.exento
+          ? `  IEDMT: ✅ 0,00 € (exento)`
+          : `  IEDMT (${r.tipoIEDMT}%): 🔴 ${fmt(r.desglose.iedmt)} €`,
+        `  ─────────────────────`,
+        `  **Coste total: ${fmt(r.desglose.total)} €**`,
+        '',
+        `💡 ${r.consejo}`,
+        `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
