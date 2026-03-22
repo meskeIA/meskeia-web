@@ -126,6 +126,14 @@ import { calcularDeduccionAutonomoIRPF, type ModalidadEstimacion } from '@/lib/c
 import { calcularComplementoBrechaGenero, type SexoBeneficiario, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
 import { calcularPlusNocturnidad } from '@/lib/calculadoras/plusNocturnidad';
 import { calcularMoratoriaHipoteca, type TipoCarenciaHipoteca } from '@/lib/calculadoras/moratoriaHipoteca';
+import { calcularImpuestoSociedades, type RegimenIS } from '@/lib/calculadoras/impuestoSociedades';
+import { calcularRetencionProfesional, type TipoActividadProfesional } from '@/lib/calculadoras/retencionProfesional';
+import { calcularIngresoMinimoVital } from '@/lib/calculadoras/ingresoMinimoVital';
+import { calcularSancionTributaria, type GradoInfraccion, type TipoInfraccion } from '@/lib/calculadoras/sancionTributaria';
+import { calcularRecargoPresentacionTardia } from '@/lib/calculadoras/recargoPresentacionTardia';
+import { calcularComplementoIT, type TipoContingenciaIT } from '@/lib/calculadoras/complementoIT';
+import { calcularVehiculoEmpresaFiscal, type TipoVehiculoEmpresa, type UsoVehiculo, type ActividadEspecialVehiculo, type ModalidadAdquisicion } from '@/lib/calculadoras/vehiculoEmpresaFiscal';
+import { calcularExcedenteCotizacionSS } from '@/lib/calculadoras/excedenteCotizacionSS';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -6146,6 +6154,443 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         `  Total pagado SIN carencia: ${fmt(r.totalPagadoSinCarencia)} €`,
         `  Total pagado CON carencia: ${fmt(r.totalPagadoConCarencia)} €`,
         `  💸 **Sobrecoste de la carencia: ${fmt(r.sobrecosteTotalCarencia)} €**`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote M: calcular_impuesto_sociedades ─────────────────────────────────────
+  servidor.tool(
+    'calcular_impuesto_sociedades',
+    'Calcula la cuota del Impuesto sobre Sociedades (IS) en España: tipo general (25%), PYME (23%), nueva empresa (15%), microempresa (20%). Incluye reserva de capitalización, reserva de nivelación, deducciones I+D+i, empleo discapacitados y resultado a ingresar/devolver.',
+    {
+      regimenFiscal: z.enum(['general', 'pyme', 'nueva_empresa', 'microempresa', 'cooperativa', 'sin_animo_lucro', 'credito_hidrocarburos']).describe('Régimen fiscal de la sociedad'),
+      baseImponible: z.number().describe('Base imponible del ejercicio (€) — resultado contable ± ajustes extracontables. Puede ser negativa (bases negativas a compensar).'),
+      cifraNegociosAnterior: z.number().min(0).optional().describe('Cifra de negocios del ejercicio anterior (€) — para verificar si aplica tipo PYME (< 1M€)'),
+      gastosIDi: z.number().min(0).optional().describe('Gastos en Investigación y Desarrollo del ejercicio (€) — para deducción art. 35 LIS'),
+      mediaGastosIDiAnteriores: z.number().min(0).optional().describe('Media de gastos I+D de los 2 ejercicios anteriores (€) — para calcular el exceso al 42%'),
+      gastosInnovacion: z.number().min(0).optional().describe('Gastos en innovación tecnológica (art. 35.2 LIS) (€) — deducción al 8%'),
+      trabajadoresDiscapacidadContratados: z.number().min(0).optional().describe('Número de trabajadores con discapacidad ≥ 33% contratados en el ejercicio (3.000 €/trabajador)'),
+      incrementoFondosPropios: z.number().min(0).optional().describe('Incremento de fondos propios para reserva de capitalización (€) — reduce base imponible al 10%'),
+      retencionesYPagosFraccionados: z.number().min(0).optional().describe('Retenciones y pagos fraccionados (modelo 202) ya realizados en el ejercicio (€)'),
+      tipoIS: z.number().min(0).max(50).optional().describe('Tipo impositivo IS (%) — si no se indica, se usa el del régimen seleccionado'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_impuesto_sociedades', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const regimenMap: Record<string, RegimenIS> = {
+        general: 'general', pyme: 'pyme', nueva_empresa: 'nueva_empresa', microempresa: 'microempresa',
+        cooperativa: 'cooperativa', sin_animo_lucro: 'sin_animo_lucro', credito_hidrocarburos: 'credito_hidrocarburos',
+      };
+      const r = calcularImpuestoSociedades({
+        regimenFiscal: regimenMap[args.regimenFiscal],
+        baseImponible: args.baseImponible,
+        cifraNegociosAnterior: args.cifraNegociosAnterior,
+        gastosIDi: args.gastosIDi,
+        mediaGastosIDiAnteriores: args.mediaGastosIDiAnteriores,
+        gastosInnovacion: args.gastosInnovacion,
+        trabajadoresDiscapacidadContratados: args.trabajadoresDiscapacidadContratados,
+        incrementoFondosPropios: args.incrementoFondosPropios,
+        retencionesYPagosFraccionados: args.retencionesYPagosFraccionados,
+      });
+      const regimenDesc: Record<string, string> = {
+        general: 'General (25%)', pyme: 'PYME (23%)', nueva_empresa: 'Nueva empresa (15%)',
+        microempresa: 'Microempresa (20%)', cooperativa: 'Cooperativa (20%)',
+        sin_animo_lucro: 'Sin ánimo de lucro (10%)', credito_hidrocarburos: 'Crédito/Hidrocarburos (30%)',
+      };
+      const lineas = [
+        `🏢 **Impuesto sobre Sociedades (IS) 2025**`,
+        '',
+        `Régimen: ${regimenDesc[r.regimenFiscal]} | Tipo: **${r.tipoGravamen}%**`,
+        `Base imponible: ${fmt(r.baseImponible)} €`,
+        r.reservaCapitalizacion > 0 ? `Reserva de capitalización: -${fmt(r.reservaCapitalizacion)} €` : null,
+        r.reservaNivelacion > 0 ? `Reserva de nivelación (PYME): -${fmt(r.reservaNivelacion)} €` : null,
+        r.reservaCapitalizacion > 0 || r.reservaNivelacion > 0 ? `Base liquidable: ${fmt(r.baseLiquidable)} €` : null,
+        `Cuota íntegra (${r.tipoGravamen}%): ${fmt(r.cuotaIntegra)} €`,
+        '',
+        r.deducciones.length > 0 ? [
+          `**Deducciones:**`,
+          ...r.deducciones.map(d => `  ${d.concepto}: -${fmt(d.importeDeduccion)} €`),
+          `Total deducciones: -${fmt(r.totalDeducciones)} €`,
+        ].join('\n') : null,
+        `💰 **Cuota líquida: ${fmt(r.cuotaLiquida)} €**`,
+        r.retencionesYPagosFraccionados > 0 ? `Retenciones y pagos fraccionados: -${fmt(r.retencionesYPagosFraccionados)} €` : null,
+        `**Cuota diferencial: ${r.cuotaDiferencial >= 0 ? 'A INGRESAR' : 'A DEVOLVER'} ${fmt(Math.abs(r.cuotaDiferencial))} €**`,
+        `Tipo efectivo: ${r.tipoEfectivo}%`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote M: calcular_retencion_profesional ───────────────────────────────────
+  servidor.tool(
+    'calcular_retencion_profesional',
+    'Calcula la retención de IRPF en facturas de autónomos profesionales: 15% tipo general o 7% tipo reducido para los primeros 3 años de actividad (RIRPF art. 95). Devuelve el desglose de la factura con base, IVA, retención y total a cobrar.',
+    {
+      tipoActividad: z.enum(['profesional_liberal', 'artistica_deportiva', 'conferenciante_autor', 'empresarial']).describe('Tipo de actividad: profesional_liberal (abogados, médicos, arquitectos...), artistica_deportiva, conferenciante_autor, o empresarial (sin retención)'),
+      baseImponibleFactura: z.number().positive().describe('Base imponible de la factura en € (sin IVA)'),
+      primerosAniosActividad: z.boolean().optional().describe('¿Está en los primeros 3 años desde el inicio de la actividad? Si es true, aplica tipo reducido del 7%.'),
+      anioInicioActividad: z.number().optional().describe('Año de inicio de la actividad (alternativa a primerosAniosActividad)'),
+      anioActual: z.number().optional().describe('Año actual del ejercicio (necesario si se indica anioInicioActividad)'),
+      tipoIVA: z.number().min(0).max(21).optional().describe('Tipo de IVA aplicable (%). Por defecto 21%.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_retencion_profesional', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const tipoActMap: Record<string, TipoActividadProfesional> = {
+        profesional_liberal: 'profesional_liberal', artistica_deportiva: 'artistica_deportiva',
+        conferenciante_autor: 'conferenciante_autor', empresarial: 'empresarial',
+      };
+      const r = calcularRetencionProfesional({
+        tipoActividad: tipoActMap[args.tipoActividad],
+        baseImponibleFactura: args.baseImponibleFactura,
+        primerosAniosActividad: args.primerosAniosActividad,
+        anioInicioActividad: args.anioInicioActividad,
+        anioActual: args.anioActual,
+        tipoIVA: args.tipoIVA,
+      });
+      const lineas = [
+        `🧾 **Retención IRPF en Facturas Profesionales — RIRPF art. 95**`,
+        '',
+        `Tipo de actividad: ${args.tipoActividad.replace(/_/g, ' ')}`,
+        `Sujeta a retención: ${r.sujetaRetencion ? '✅ Sí' : '❌ No'}`,
+        r.motivoNoSujecion ? `ℹ️ ${r.motivoNoSujecion}` : null,
+        '',
+        r.sujetaRetencion ? [
+          `Tipo de retención: **${r.tipoRetencion}%**${r.tipoReducidoAplicado ? ' (tipo reducido primeros 3 años)' : ' (tipo general)'}`,
+          r.motivoTipoReducido ? `ℹ️ ${r.motivoTipoReducido}` : null,
+          '',
+          `**Desglose de la factura:**`,
+          `  Base imponible: ${fmt(r.desgloseFactura.baseImponible)} €`,
+          `  IVA (${args.tipoIVA ?? 21}%): +${fmt(r.desgloseFactura.ivaImporte)} €`,
+          `  Retención IRPF (${r.tipoRetencion}%): -${fmt(r.desgloseFactura.retencionImporte)} €`,
+          `  💰 **Total a cobrar: ${fmt(r.desgloseFactura.totalACobrar)} €**`,
+        ].filter(Boolean).join('\n') : null,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote M: calcular_ingreso_minimo_vital ────────────────────────────────────
+  servidor.tool(
+    'calcular_ingreso_minimo_vital',
+    'Calcula la cuantía del Ingreso Mínimo Vital (IMV) según la composición de la unidad de convivencia (adultos y menores), el complemento de ayuda a la infancia (CAPI), el complemento monoparental y la compatibilidad con rentas del trabajo.',
+    {
+      numAdultos: z.number().min(1).describe('Número de adultos en la unidad de convivencia (incluye al solicitante)'),
+      menoresACargo: z.array(z.object({
+        edad: z.number().min(0).max(17).describe('Edad del menor (años, 0-17)'),
+      })).optional().describe('Lista de menores a cargo con su edad (necesaria para el CAPI)'),
+      esMonoparental: z.boolean().optional().describe('¿Es familia monoparental (un adulto con menores)? Aplica complemento del 22%.'),
+      rentasTrabajoAnuales: z.number().min(0).optional().describe('Rentas del trabajo anuales de toda la unidad de convivencia (€/año)'),
+      otrasRentasAnuales: z.number().min(0).optional().describe('Otras rentas anuales (capital, actividades económicas, prestaciones...) (€/año)'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_ingreso_minimo_vital', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const r = calcularIngresoMinimoVital({
+        numAdultos: args.numAdultos,
+        menoresACargo: args.menoresACargo,
+        esMonoparental: args.esMonoparental,
+        rentasTrabajoAnuales: args.rentasTrabajoAnuales,
+        otrasRentasAnuales: args.otrasRentasAnuales,
+      });
+      const lineas = [
+        `🏠 **Ingreso Mínimo Vital (IMV) 2025**`,
+        '',
+        `Composición: ${r.numAdultos} adulto(s) + ${r.numMenores} menor(es)`,
+        `Escala de equivalencia: ${r.escalaEquivalencia}`,
+        `Cuantía IMV garantizada: ${fmt(r.cuantiaIMVGarantizada)} €/mes`,
+        r.complementoMonoparental > 0 ? `  Complemento monoparental (+22%): +${fmt(r.complementoMonoparental)} €/mes` : null,
+        r.complementoInfanciaMensual > 0 ? [
+          `CAPI (Complemento Ayuda Infancia):`,
+          ...r.desgloseInfancia.filter(d => d.importe > 0).map(d => `  Menor ${d.edad} años: ${fmt(d.importe)} €/mes`),
+          `  Total CAPI: **${fmt(r.complementoInfanciaMensual)} €/mes**`,
+        ].join('\n') : null,
+        '',
+        r.tieneDerechoIMV ? [
+          r.reduccionCompatibilidadTrabajo > 0
+            ? `Reducción por rentas de trabajo: -${fmt(r.reduccionCompatibilidadTrabajo)} €/mes`
+            : null,
+          `💰 **IMV efectivo: ${fmt(r.cuantiaEfectivaMensual)} €/mes**`,
+          `💰 **Total mensual (IMV + CAPI): ${fmt(r.cuantiaTotal)} €/mes**`,
+          `Total anual: ${fmt(r.cuantiaAnual)} €/año`,
+        ].filter(Boolean).join('\n')
+          : `❌ **Sin derecho al IMV**: ${r.motivoPerdidaDerecho}`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote M: calcular_sancion_tributaria ──────────────────────────────────────
+  servidor.tool(
+    'calcular_sancion_tributaria',
+    'Calcula la sanción tributaria aplicable según la LGT: infracciones leves (50%), graves (50-100%) y muy graves (100-150%). Aplica reducciones por conformidad (30%) y pronto pago (25%), acumulables.',
+    {
+      tipoInfraccion: z.enum(['dejar_de_ingresar', 'no_presentar', 'obtener_devolucion_improcedente', 'acreditar_partidas_falsas']).describe('Tipo de infracción tributaria'),
+      gradoInfraccion: z.enum(['leve', 'grave', 'muy_grave']).describe('Grado de infracción (determinado por la Inspección)'),
+      cuotaDefraudada: z.number().min(0).describe('Cuota defraudada o dejada de ingresar (€) — base de cálculo de la sanción'),
+      huboOcultacion: z.boolean().optional().describe('¿Hubo ocultación de datos a la Administración? Agrava la calificación de leve a grave.'),
+      hayReiteracion: z.boolean().optional().describe('¿Hay reiteración? (sanción firme anterior en los 4 años previos). Añade +25% a la sanción.'),
+      conformidad: z.boolean().optional().describe('¿El infractor presta conformidad con la liquidación? Reduce la sanción un 30%.'),
+      prontoPago: z.boolean().optional().describe('¿Paga en período voluntario sin aplazamiento? Reduce la sanción un 25% adicional.'),
+      pctPerjuicioEconomico: z.number().min(0).max(100).optional().describe('Porcentaje del perjuicio económico (cuota defraudada / base imponible × 100). Para graduar infracciones graves.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_sancion_tributaria', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const gradoMap: Record<string, GradoInfraccion> = { leve: 'leve', grave: 'grave', muy_grave: 'muy_grave' };
+      const tipoMap: Record<string, TipoInfraccion> = {
+        dejar_de_ingresar: 'dejar_de_ingresar', no_presentar: 'no_presentar',
+        obtener_devolucion_improcedente: 'obtener_devolucion_improcedente', acreditar_partidas_falsas: 'acreditar_partidas_falsas',
+      };
+      const r = calcularSancionTributaria({
+        tipoInfraccion: tipoMap[args.tipoInfraccion],
+        gradoInfraccion: gradoMap[args.gradoInfraccion],
+        cuotaDefraudada: args.cuotaDefraudada,
+        huboOcultacion: args.huboOcultacion,
+        hayReiteracion: args.hayReiteracion,
+        conformidad: args.conformidad,
+        prontoPago: args.prontoPago,
+        pctPerjuicioEconomico: args.pctPerjuicioEconomico,
+      });
+      const lineas = [
+        `⚠️ **Sanción Tributaria — LGT arts. 191-206**`,
+        '',
+        `Infracción: ${args.tipoInfraccion.replace(/_/g, ' ')} | Grado: **${args.gradoInfraccion.toUpperCase()}**`,
+        `Cuota defraudada: ${fmt(r.cuotaDefraudada)} €`,
+        '',
+        `Porcentaje base: ${r.porcentajeBaseSancion}%`,
+        r.incrementoPerjuicioEconomico > 0 ? `+ Perjuicio económico: +${r.incrementoPerjuicioEconomico}%` : null,
+        r.incrementoReiteracion > 0 ? `+ Reiteración: +${r.incrementoReiteracion}%` : null,
+        `**Porcentaje total sanción: ${r.porcentajeTotalSancion}%**`,
+        `Sanción bruta: ${fmt(r.sancionBruta)} €`,
+        '',
+        r.reduccionConformidad > 0 ? `Reducción conformidad (30%): -${fmt(r.reduccionConformidad)} €` : null,
+        r.reduccionProntoPago > 0 ? `Reducción pronto pago (25%): -${fmt(r.reduccionProntoPago)} €` : null,
+        r.totalReducciones > 0 ? `Total reducciones: -${fmt(r.totalReducciones)} € (${r.pctReduccionTotal}% de reducción)` : null,
+        `💰 **Sanción final a pagar: ${fmt(r.sancionFinal)} €**`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote M: calcular_recargo_presentacion_tardia ─────────────────────────────
+  servidor.tool(
+    'calcular_recargo_presentacion_tardia',
+    'Calcula el recargo por presentación de declaraciones tributarias fuera de plazo sin requerimiento previo (LGT art. 27): 1%/mes hasta 12 meses, luego 15% + intereses de demora. Incluye reducción del 25% por pronto pago.',
+    {
+      cuotaAIngresar: z.number().min(0).describe('Cuota a ingresar fuera de plazo (€)'),
+      mesesRetraso: z.number().min(0).describe('Meses completos de retraso desde el fin del plazo voluntario de presentación'),
+      pagoEnVoluntario: z.boolean().optional().describe('¿Va a pagar en el período voluntario? Permite aplicar la reducción del 25% sobre el recargo. Por defecto: true.'),
+      diasRetraso: z.number().min(0).optional().describe('Días exactos de retraso (para cálculo preciso de intereses si supera 12 meses)'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_recargo_presentacion_tardia', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const r = calcularRecargoPresentacionTardia({
+        cuotaAIngresar: args.cuotaAIngresar,
+        mesesRetraso: args.mesesRetraso,
+        pagoEnVoluntario: args.pagoEnVoluntario,
+        diasRetraso: args.diasRetraso,
+      });
+      const lineas = [
+        `📅 **Recargo por Presentación Extemporánea — LGT art. 27**`,
+        '',
+        `Cuota a ingresar: ${fmt(r.cuotaAIngresar)} €`,
+        `Meses de retraso: ${r.mesesRetraso} meses`,
+        `Tipo de recargo: ${r.tipoRecargo === 'proporcional' ? 'Proporcional (1%/mes)' : 'Fijo 15% + intereses de demora'}`,
+        '',
+        `Porcentaje recargo: **${r.porcentajeRecargo}%**`,
+        `Recargo bruto: ${fmt(r.recargoBruto)} €`,
+        r.interesesDemora > 0 ? `Intereses de demora (${r.tipoInteresDemora}%): +${fmt(r.interesesDemora)} €` : null,
+        `Total antes de reducción: ${fmt(r.totalAntesReduccion)} €`,
+        r.reduccionProntoPago > 0 ? `Reducción pronto pago (25%): -${fmt(r.reduccionProntoPago)} €` : null,
+        `💰 **Recargo final: ${fmt(r.totalAPagar)} €**`,
+        `💰 **Deuda total (cuota + recargo): ${fmt(r.deudaTotalAPagar)} €**`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote M: calcular_complemento_it_empresa ──────────────────────────────────
+  servidor.tool(
+    'calcular_complemento_it_empresa',
+    'Calcula el complemento empresarial durante una baja por Incapacidad Temporal (IT): brecha entre la prestación SS y el salario real. Detalla los períodos (días espera, 4-15, 16-20, 21+) y el coste total para la empresa.',
+    {
+      tipoContingencia: z.enum(['enfermedad_comun', 'accidente_trabajo']).describe('Tipo de contingencia: enfermedad_comun o accidente_trabajo (AT/EP)'),
+      salarioBrutoMensual: z.number().positive().describe('Salario bruto mensual del trabajador (€)'),
+      baseCotizacionMensual: z.number().positive().describe('Base de cotización por contingencias comunes del mes anterior a la baja (€)'),
+      duracionBajaDias: z.number().positive().describe('Duración total de la baja en días naturales'),
+      pctComplementoEmpresa: z.number().min(0).max(200).describe('Porcentaje al que la empresa complementa el salario (%). 100% = paga el salario completo. 0% = sin complemento. Según convenio colectivo.'),
+      diasMesBaseCotizacion: z.number().optional().describe('Número de días del mes de la base de cotización (para el divisor diario). Por defecto 30.'),
+      complementoDiasDespera: z.boolean().optional().describe('¿El convenio obliga a pagar complemento los 3 primeros días (período de espera)? Por defecto false.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_complemento_it_empresa', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const contingenciaMap: Record<string, TipoContingenciaIT> = { enfermedad_comun: 'enfermedad_comun', accidente_trabajo: 'accidente_trabajo' };
+      const r = calcularComplementoIT({
+        tipoContingencia: contingenciaMap[args.tipoContingencia],
+        salarioBrutoMensual: args.salarioBrutoMensual,
+        baseCotizacionMensual: args.baseCotizacionMensual,
+        duracionBajaDias: args.duracionBajaDias,
+        pctComplementoEmpresa: args.pctComplementoEmpresa,
+        diasMesBaseCotizacion: args.diasMesBaseCotizacion,
+        complementoDiasDespera: args.complementoDiasDespera,
+      });
+      const lineas = [
+        `🏥 **Complemento Empresarial durante IT**`,
+        '',
+        `Contingencia: ${args.tipoContingencia === 'enfermedad_comun' ? 'Enfermedad Común' : 'Accidente de Trabajo/EP'}`,
+        `Salario bruto mensual: ${fmt(r.salarioBrutoMensual)} € | Salario diario: ${fmt(r.salarioDiarioReal)} €`,
+        `Base reguladora diaria: ${fmt(r.baseReguladoraDiaria)} €`,
+        `Duración baja: ${r.duracionBajaDias} días | Complemento empresa: ${r.pctComplementoEmpresa}%`,
+        '',
+        `**Desglose por períodos:**`,
+        ...r.detallesPeriodos.map(p =>
+          `  ${p.periodo} (${p.diasPeriodo} días): SS ${fmt(p.prestacionSSdiaria)} €/día + complemento ${fmt(p.complementoEmpresaDiario)} €/día = ${fmt(p.totalDiarioTrabajador)} €/día`
+        ),
+        '',
+        `📊 **Resumen total:**`,
+        `  Prestación SS total: ${fmt(r.totalPrestacionSS)} €`,
+        `  Complemento empresa total: **${fmt(r.totalComplementoEmpresa)} €**`,
+        `  Total cobrado por trabajador: ${fmt(r.totalCobradoTrabajador)} €`,
+        `  Salario si hubiera trabajado: ${fmt(r.totalSalarioSiTrabajara)} €`,
+        `  Brecha económica trabajador: ${fmt(r.brechaEconomicaTrabajador)} €`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote M: calcular_vehiculo_empresa_fiscal ─────────────────────────────────
+  servidor.tool(
+    'calcular_vehiculo_empresa_fiscal',
+    'Calcula el tratamiento fiscal completo del vehículo de empresa: IS (deducción 50%/100%), IRPF retribución en especie (20% normal, 15% eléctrico), IVA (50%/100% deducible). Incluye renting, leasing y actividades especiales con deducción completa.',
+    {
+      tipoVehiculo: z.enum(['turismo', 'comercial', 'electrico_bev', 'electrico_phev', 'furgoneta']).describe('Tipo de vehículo'),
+      usoVehiculo: z.enum(['mixto', 'exclusivo_actividad']).describe('Uso del vehículo: mixto (laboral+privado) o exclusivo_actividad (solo trabajo)'),
+      modalidadAdquisicion: z.enum(['compra', 'renting', 'leasing']).describe('Modalidad de adquisición del vehículo'),
+      costeAdquisicion: z.number().positive().describe('Coste de adquisición o valor de mercado del vehículo (€)'),
+      actividadEspecial: z.enum(['ninguna', 'agente_comercial', 'transporte_mercancias', 'transporte_viajeros', 'autoescuela', 'seguridad']).optional().describe('Actividad especial que permite deducción IS e IVA al 100% (LIS art. 15.1.e)'),
+      cuotaMensualRentingLeasing: z.number().positive().optional().describe('Cuota mensual de renting o leasing (€, sin IVA) — necesaria si modalidad es renting o leasing'),
+      tipoIVA: z.number().optional().describe('Tipo de IVA soportado (%). Por defecto 21%.'),
+      pctUsoPrivadoAcreditado: z.number().min(0).max(100).optional().describe('Porcentaje de uso privado real acreditado (%). Por defecto AEAT presume 100% privado si uso mixto.'),
+      vehiculoEficienteEnergeticamente: z.boolean().optional().describe('¿Es vehículo eficiente energéticamente? Aplica reducción del 30% en la retribución en especie IRPF.'),
+      tipoIS: z.number().optional().describe('Tipo IS de la empresa (%). Por defecto 25%.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_vehiculo_empresa_fiscal', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const tipoVehMap: Record<string, TipoVehiculoEmpresa> = { turismo: 'turismo', comercial: 'comercial', electrico_bev: 'electrico_bev', electrico_phev: 'electrico_phev', furgoneta: 'furgoneta' };
+      const usoMap: Record<string, UsoVehiculo> = { mixto: 'mixto', exclusivo_actividad: 'exclusivo_actividad' };
+      const actMap: Record<string, ActividadEspecialVehiculo> = { ninguna: 'ninguna', agente_comercial: 'agente_comercial', transporte_mercancias: 'transporte_mercancias', transporte_viajeros: 'transporte_viajeros', autoescuela: 'autoescuela', seguridad: 'seguridad' };
+      const modMap: Record<string, ModalidadAdquisicion> = { compra: 'compra', renting: 'renting', leasing: 'leasing' };
+      const r = calcularVehiculoEmpresaFiscal({
+        tipoVehiculo: tipoVehMap[args.tipoVehiculo],
+        usoVehiculo: usoMap[args.usoVehiculo],
+        modalidadAdquisicion: modMap[args.modalidadAdquisicion],
+        costeAdquisicion: args.costeAdquisicion,
+        actividadEspecial: args.actividadEspecial ? actMap[args.actividadEspecial] : undefined,
+        cuotaMensualRentingLeasing: args.cuotaMensualRentingLeasing,
+        tipoIVA: args.tipoIVA,
+        pctUsoPrivadoAcreditado: args.pctUsoPrivadoAcreditado,
+        vehiculoEficienteEnergeticamente: args.vehiculoEficienteEnergeticamente,
+        tipoIS: args.tipoIS,
+      });
+      const lineas = [
+        `🚗 **Vehículo de Empresa — Tratamiento Fiscal IS + IRPF + IVA**`,
+        '',
+        `Vehículo: ${args.tipoVehiculo.replace(/_/g, ' ')} | Uso: ${args.usoVehiculo.replace(/_/g, ' ')} | Adquisición: ${args.modalidadAdquisicion}`,
+        `Coste: ${fmt(args.costeAdquisicion)} €`,
+        '',
+        `**Impuesto sobre Sociedades (IS):**`,
+        `  Deducible: ${r.pctDeducibleIS}% del gasto anual`,
+        `  Gasto anual (amortización/cuotas): ${fmt(r.gastoAnualIS)} €`,
+        `  Gasto deducible: ${fmt(r.gastoDeducibleIS)} € | Ahorro fiscal IS: **${fmt(r.ahorroFiscalIS)} €/año**`,
+        '',
+        `**IRPF — Retribución en Especie:**`,
+        r.generaRetribucionEspecie ? [
+          `  % aplicado: ${r.pctIRPFRetribucion}% del coste`,
+          `  Retribución bruta: ${fmt(r.retribucionEspecieAnualBruta)} €/año`,
+          r.reduccionEficiencia > 0 ? `  Reducción eficiencia (-30%): -${fmt(r.reduccionEficiencia)} €` : null,
+          `  **Retribución efectiva: ${fmt(r.retribucionEspecieAnualEfectiva)} €/año** (suma al salario bruto del empleado)`,
+        ].filter(Boolean).join('\n') : `  ✅ Sin retribución en especie (uso exclusivo actividad)`,
+        '',
+        `**IVA:**`,
+        `  Deducible: ${r.pctIVADeducible}% de la cuota soportada`,
+        `  IVA soportado: ${fmt(r.ivaSoportadoAdquisicion)} € | Deducible: ${fmt(r.ivaDeducibleAdquisicion)} € | No deducible: ${fmt(r.ivaNoDeducible)} €`,
+        '',
+        `**Coste neto anual empresa:** ${fmt(r.costeNetoAnualEmpresa)} €`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote M: calcular_excedente_cotizacion_ss ─────────────────────────────────
+  servidor.tool(
+    'calcular_excedente_cotizacion_ss',
+    'Calcula la devolución por exceso de cotizaciones SS en pluriactividad (RGSS + RETA simultáneos): cuando la suma de cotizaciones de ambos regímenes supera el 53,26% de la base máxima anual, la TGSS devuelve el 50% del exceso (LGSS art. 313).',
+    {
+      cuotasCCAnualesRETA: z.number().min(0).describe('Cuotas de contingencias comunes pagadas en el RETA durante el año (€)'),
+      baseCotizacionAnualRGSS: z.number().min(0).optional().describe('Base de cotización anual total en el Régimen General (€) — para calcular las cuotas CC del RGSS (4,7%)'),
+      cuotasCCAnualesRGSS: z.number().min(0).optional().describe('Cuotas de contingencias comunes pagadas en el RGSS durante el año (€) — alternativa a baseCotizacionAnualRGSS'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_excedente_cotizacion_ss', aiCaller);
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const r = calcularExcedenteCotizacionSS({
+        cuotasCCAnualesRETA: args.cuotasCCAnualesRETA,
+        baseCotizacionAnualRGSS: args.baseCotizacionAnualRGSS,
+        cuotasCCAnualesRGSS: args.cuotasCCAnualesRGSS,
+      });
+      const lineas = [
+        `🔄 **Devolución Exceso Cotizaciones SS — Pluriactividad (LGSS art. 313)**`,
+        '',
+        `Base máxima anual 2025: ${fmt(r.baseMaximaAnual)} €`,
+        `Límite cotizaciones anuales (53,26%): ${fmt(r.limiteAnualCotizaciones)} €`,
+        '',
+        `Cuotas CC en RGSS (empleado): ${fmt(r.cuotasCCRGSSAnuales)} €`,
+        `Cuotas CC en RETA (autónomo): ${fmt(r.cuotasCCRETAAnuales)} €`,
+        `**Total cotizaciones ambos regímenes: ${fmt(r.totalCuotasCotizadas)} €**`,
+        '',
+        r.hayExceso ? [
+          `✅ **Hay exceso de cotización**`,
+          `Exceso sobre el límite: ${fmt(r.excesoCotizado)} €`,
+          `💰 **Importe a devolver (50% del exceso): ${fmt(r.importeADevolver)} €**`,
+          `Plazo de solicitud: ${r.plazoDeSolicitud}`,
+        ].join('\n') : `❌ **Sin exceso**: Las cotizaciones totales (${fmt(r.totalCuotasCotizadas)} €) no superan el límite (${fmt(r.limiteAnualCotizaciones)} €).`,
         '',
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
