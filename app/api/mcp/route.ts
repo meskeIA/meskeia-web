@@ -30,6 +30,15 @@ import {
   type NivelDiscapacidad,
   type IndicePatrimonio,
 } from '@/lib/calculadoras/donaciones';
+import { calcularIVA, type TipoIVA, type ModoIVA } from '@/lib/calculadoras/iva';
+import { calcularInteresDemora, type TipoInteres } from '@/lib/calculadoras/interesDemora';
+import { calcularPensionPublica } from '@/lib/calculadoras/pensionPublica';
+import {
+  calcularSucesion,
+  type GrupoParentescoIS,
+  type NivelDiscapacidadIS,
+  type IndicePatrimonioIS,
+} from '@/lib/calculadoras/sucesiones';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -568,6 +577,319 @@ function crearServidorMCP(): McpServer {
       lineas.push(
         '',
         '⚖️ *Estimación orientativa basada en normativa 2025 (Ley 29/1987 ISD). No constituye asesoramiento fiscal. Plazo de autoliquidación: 1 mes desde la donación (Modelo 651). Consulta con un asesor fiscal.*',
+      );
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_iva
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_iva',
+    'Calcula el IVA español (21%, 10%, 4% o 0%). ' +
+    'Puede añadir IVA a una base imponible o extraer la base de un precio con IVA incluido. ' +
+    'Devuelve base imponible, cuota de IVA y total con IVA.',
+    {
+      importe: z.number().positive()
+        .describe('Importe en euros sobre el que operar'),
+      tipoIVA: z.union([z.literal(21), z.literal(10), z.literal(4), z.literal(0)])
+        .describe('Tipo de IVA: 21 (general), 10 (reducido), 4 (superreducido) o 0 (exento)'),
+      modo: z.enum(['anadir', 'quitar'])
+        .describe(
+          '"anadir" = el importe es la base sin IVA y quieres saber el total con IVA. ' +
+          '"quitar" = el importe ya incluye IVA y quieres extraer la base y la cuota.'
+        ),
+    },
+    async ({ importe, tipoIVA, modo }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_iva', aiCaller);
+
+      let r;
+      try {
+        r = calcularIVA({ importe, tipoIVA: tipoIVA as TipoIVA, modo: modo as ModoIVA });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const texto = [
+        `🧾 **Calculadora de IVA (${r.tipoIVA}%)**`,
+        `ℹ️ ${r.descripcionTipo}`,
+        '',
+        `📦 Base imponible: **${fmt(r.baseImponible)} €**`,
+        `➕ Cuota IVA (${r.tipoIVA}%): **${fmt(r.cuotaIVA)} €**`,
+        `💶 Total con IVA: **${fmt(r.totalConIVA)} €**`,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: texto }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_interes_demora
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_interes_demora',
+    'Calcula intereses de demora en España con normativa actualizada 2026. ' +
+    'Tres modalidades: comercial (Ley 3/2004, facturas entre empresas), ' +
+    'legal (art. 1108 CC, deudas civiles) y tributario (LGT art. 26, liquidaciones AEAT). ' +
+    'El tipo comercial se desglose por semestres si abarca varios períodos BCE. ' +
+    '⚠️ Estimación orientativa — consultar con abogado o asesor para reclamaciones reales.',
+    {
+      importeDeuda: z.number().positive()
+        .describe('Importe de la deuda en euros'),
+      fechaInicio: z.string()
+        .describe('Fecha de inicio del devengo en formato YYYY-MM-DD (normalmente el día siguiente al vencimiento de la factura)'),
+      fechaFin: z.string()
+        .describe('Fecha de fin del cálculo en formato YYYY-MM-DD (normalmente hoy o la fecha de pago)'),
+      tipoInteres: z.enum(['comercial', 'legal', 'tributario'])
+        .describe(
+          '"comercial" = Ley 3/2004, facturas entre empresas o con Administración (BCE + 8 pp). ' +
+          '"legal" = art. 1108 CC, deudas civiles sin pacto de interés (3,25% en 2026). ' +
+          '"tributario" = LGT art. 26, liquidaciones con la AEAT (4,0625% en 2026).'
+        ),
+    },
+    async ({ importeDeuda, fechaInicio, fechaFin, tipoInteres }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_interes_demora', aiCaller);
+
+      let r;
+      try {
+        r = calcularInteresDemora({
+          importeDeuda,
+          fechaInicio,
+          fechaFin,
+          tipoInteres: tipoInteres as TipoInteres,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const lineas = [
+        `⏱️ **Intereses de Demora — ${tipoInteres === 'comercial' ? 'Comercial (Ley 3/2004)' : tipoInteres === 'legal' ? 'Legal (art. 1108 CC)' : 'Tributario (LGT art. 26)'}**`,
+        '',
+        `💶 Importe deuda: ${fmt(r.importeDeuda)} €`,
+        `📅 Período: ${fechaInicio} → ${fechaFin} (${r.diasTotales} días)`,
+        `📊 Tipo anual: ${r.tipoAnual.toFixed(4).replace('.', ',')}%`,
+        '',
+      ];
+
+      if (r.desglose.length > 1) {
+        lineas.push('📋 **Desglose por períodos:**');
+        for (const d of r.desglose) {
+          lineas.push(`  • ${d.periodo}: ${d.tipoAnual.toFixed(2).replace('.', ',')}% × ${d.dias} días = ${fmt(d.intereses)} €`);
+        }
+        lineas.push('');
+      }
+
+      lineas.push(
+        `➕ Total intereses: **${fmt(r.totalIntereses)} €**`,
+        `💰 Importe total (deuda + intereses): **${fmt(r.importeTotal)} €**`,
+        '',
+        `⚖️ *${r.nota}*`,
+        `📚 Fuente: ${r.fuenteDatos}`,
+      );
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_pension_publica
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_pension_publica',
+    'Estima la pensión pública de jubilación en España (Seguridad Social 2026). ' +
+    'Más exacto que el conocimiento general: aplica la fórmula oficial SS con tramos ' +
+    'de porcentaje (Ley 21/2021), base reguladora real (300 bases / 350) y límites ' +
+    'vigentes (mínima 888,70 €/mes, máxima 3.359,60 €/mes en 2026). ' +
+    'Resultado ORIENTATIVO — la SS calcula sobre el historial completo de cotización. ' +
+    '⚠️ No reemplaza consulta al simulador oficial de la Seguridad Social.',
+    {
+      baseCotizacionMensual: z.number().positive()
+        .describe(
+          'Base de cotización media mensual estimada de los últimos 25 años en euros. ' +
+          'Si no se conoce, usar el salario bruto mensual actual como aproximación.'
+        ),
+      anosCotizados: z.number().min(0).max(50)
+        .describe('Años totales cotizados a la Seguridad Social (puede ser decimal, ej: 35.5 para 35 años y 6 meses)'),
+      edadActual: z.number().int().min(16).max(80).optional()
+        .describe('Edad actual del trabajador en años (opcional, solo informativo para calcular años hasta jubilación)'),
+    },
+    async ({ baseCotizacionMensual, anosCotizados, edadActual }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_pension_publica', aiCaller);
+
+      let r;
+      try {
+        r = calcularPensionPublica({ baseCotizacionMensual, anosCotizados, edadActual });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const lineas = [
+        `🌅 **Estimación Pensión Pública de Jubilación (SS 2026)**`,
+        '',
+        `📊 Años cotizados: **${anosCotizados}**`,
+        `💶 Base cotización media mensual: ${fmt(baseCotizacionMensual)} €`,
+        `📦 Base reguladora estimada: ${fmt(r.baseReguladora)} € (= base × 300/350)`,
+        `📈 Porcentaje de pensión: **${r.porcentajePension.toFixed(2).replace('.', ',')}%**`,
+        '',
+      ];
+
+      if (r.aplicaMinimo) {
+        lineas.push(`⬆️ Se aplica **pensión mínima** (${fmt(r.pensionMinimaRef)} €/mes)`);
+      } else if (r.aplicaMaximo) {
+        lineas.push(`⬇️ Se aplica **pensión máxima** SS (${fmt(r.pensionMaxima)} €/mes)`);
+      }
+
+      lineas.push(
+        `💰 **Pensión mensual bruta estimada: ${fmt(r.pensionBrutaMensual)} €**`,
+        `📅 Pensión anual bruta (× 14 pagas): **${fmt(r.pensionBrutaAnual)} €**`,
+        '',
+        `🗓️ Edad ordinaria de jubilación: ${r.edadJubilacionOrdinaria}`,
+      );
+
+      if (r.mesesParaCien > 0) {
+        const anosParaCien = Math.floor(r.mesesParaCien / 12);
+        const mesesRestantes = r.mesesParaCien % 12;
+        lineas.push(`⏳ Para alcanzar el 100%: faltan ${anosParaCien > 0 ? `${anosParaCien} años y ` : ''}${mesesRestantes} meses más de cotización`);
+      }
+
+      lineas.push(
+        '',
+        `⚠️ *${r.nota}*`,
+        `📚 Fuente: ${r.fuenteDatos}`,
+      );
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_sucesiones
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_sucesiones',
+    'Calcula el Impuesto de Sucesiones (ISD) en España con precisión normativa 2025. ' +
+    'Aplica la tarifa estatal (7 tramos), la tarifa propia de Cataluña, reducciones ' +
+    'por parentesco, edad (menores de 21), discapacidad, vivienda habitual y seguro de vida, ' +
+    'coeficientes multiplicadores por patrimonio preexistente, y bonificaciones autonómicas ' +
+    'de las 17 CCAA incluyendo escalados y límites por cuantía. ' +
+    '⚠️ Estimación orientativa del impuesto del heredero individual — no incluye reparto de la masa hereditaria.',
+    {
+      baseImponible: z.number().positive()
+        .describe('Valor neto de la herencia recibida por este heredero en euros (parte alícuota del activo neto)'),
+      ccaa: z.enum([
+        'madrid', 'andalucia', 'galicia', 'murcia', 'valencia', 'extremadura',
+        'canarias', 'castilla-leon', 'rioja', 'castilla-mancha', 'cantabria',
+        'aragon', 'baleares', 'asturias', 'cataluna', 'pais-vasco', 'navarra',
+      ]).describe('Comunidad autónoma del causante (el fallecido). Mismas claves que en donaciones.'),
+      grupo: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III', 'IV'])
+        .describe(
+          'Grupo de parentesco del heredero respecto al causante: ' +
+          'I-conyuge = cónyuge o pareja de hecho, ' +
+          'I-descendiente = hijo/nieto menor de 21 años, ' +
+          'II = hijo/nieto mayor de 21 años u otro descendiente, ' +
+          'II-ascendiente = padre, madre, abuelo, ' +
+          'III = colateral 2º y 3er grado (hermano, tío, sobrino), ' +
+          'IV = colateral 4º grado o extraños'
+        ),
+      edadHeredero: z.number().int().min(0).max(120).optional()
+        .describe('Edad del heredero en años. Si es menor de 21 y Grupo I/II, se aplica reducción adicional por edad.'),
+      discapacidad: z.enum(['0', '33', '65']).optional()
+        .describe('Grado de discapacidad del heredero: "0" = sin discapacidad, "33" = grado 33%–64%, "65" = grado ≥65%. Por defecto "0".'),
+      patrimonioIdx: z.number().int().min(1).max(4).optional()
+        .describe('Índice patrimonio preexistente: 1 (hasta 402.678 €), 2 (hasta 2.007.380 €), 3 (hasta 4.020.770 €), 4 (más de 4.020.770 €). Por defecto 1.'),
+      viviendaHabitual: z.number().nonnegative().optional()
+        .describe('Valor de la vivienda habitual del causante incluida en la herencia. Se aplica reducción del 95% con tope de 122.606,47 €.'),
+      seguroVida: z.number().nonnegative().optional()
+        .describe('Importe del seguro de vida recibido. Para cónyuge/ascendientes/descendientes: reducción del 100% con tope de 9.195,49 €.'),
+      incluyeAjuar: z.boolean().optional()
+        .describe('Si la base imponible incluye ya el ajuar doméstico o si hay que sumarlo (3% de la masa hereditaria). Por defecto false.'),
+    },
+    async ({ baseImponible, ccaa, grupo, edadHeredero, discapacidad, patrimonioIdx, viviendaHabitual, seguroVida, incluyeAjuar }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_sucesiones', aiCaller);
+
+      let r;
+      try {
+        r = calcularSucesion({
+          baseImponible,
+          ccaa,
+          grupo: grupo as GrupoParentescoIS,
+          edadHeredero,
+          discapacidad: discapacidad as NivelDiscapacidadIS | undefined,
+          patrimonioIdx: patrimonioIdx as IndicePatrimonioIS | undefined,
+          viviendaHabitual,
+          seguroVida,
+          incluyeAjuar,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const lineas: string[] = [
+        `⚖️ **Impuesto de Sucesiones — ${r.ccaaNombre}**`,
+        `📋 Tarifa: ${r.tarifaAplicada}`,
+        '',
+        `💶 Base imponible (herencia recibida): **${fmt(r.baseImponible)} €**`,
+      ];
+
+      if (r.ajuarDomestico > 0) lineas.push(`➕ Ajuar doméstico (3%): ${fmt(r.ajuarDomestico)} €`);
+
+      if (r.totalReducciones > 0) {
+        lineas.push('', '➖ **Reducciones aplicadas:**');
+        if (r.reduccionParentesco > 0) lineas.push(`  • Por parentesco: ${fmt(r.reduccionParentesco)} €`);
+        if (r.reduccionEdadMenor21 > 0) lineas.push(`  • Por edad (menor 21): ${fmt(r.reduccionEdadMenor21)} €`);
+        if (r.reduccionDiscapacidad > 0) lineas.push(`  • Por discapacidad: ${fmt(r.reduccionDiscapacidad)} €`);
+        if (r.reduccionVivienda > 0) lineas.push(`  • Vivienda habitual (95%): ${fmt(r.reduccionVivienda)} €`);
+        if (r.reduccionSeguroVida > 0) lineas.push(`  • Seguro de vida: ${fmt(r.reduccionSeguroVida)} €`);
+        lineas.push(`  **Total reducciones: ${fmt(r.totalReducciones)} €**`);
+      }
+
+      lineas.push(
+        '',
+        `📦 Base liquidable: **${fmt(r.baseLiquidable)} €**`,
+        `🔢 Cuota íntegra: ${fmt(r.cuotaIntegra)} €`,
+      );
+
+      if (r.coeficienteMultiplicador !== 1) {
+        lineas.push(`✖️ Coeficiente multiplicador: ×${r.coeficienteMultiplicador}`);
+        lineas.push(`🔢 Cuota tributaria: ${fmt(r.cuotaTributaria)} €`);
+      }
+
+      if (r.bonificacionCcaa > 0) {
+        lineas.push(`➖ ${r.detalleBonificacion}: −${fmt(r.bonificacionCcaa)} €`);
+      } else {
+        lineas.push(`ℹ️ Bonificación: ${r.detalleBonificacion}`);
+      }
+
+      lineas.push(
+        '',
+        `💰 **Cuota a pagar: ${fmt(r.cuotaFinal)} €**`,
+        `📈 Tipo efectivo: **${r.tipoEfectivo.toFixed(2).replace('.', ',')}%**`,
+      );
+
+      if (r.esForal) {
+        lineas.push('', `⚠️ **Régimen foral**: ${r.notasCcaa}`);
+      } else if (r.notasCcaa) {
+        lineas.push('', `ℹ️ ${r.notasCcaa}`);
+      }
+
+      lineas.push(
+        '',
+        '⚖️ *Estimación orientativa basada en normativa 2025 (Ley 29/1987 ISD). No constituye asesoramiento fiscal ni jurídico. Plazo de autoliquidación: 6 meses desde el fallecimiento (prorrogable). Consulta con un asesor fiscal.*',
+        `📚 ${r.fuenteDatos}`,
       );
 
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
