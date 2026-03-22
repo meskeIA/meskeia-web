@@ -62,6 +62,14 @@ import { convertirEdadMascota, type TipoMascota, type TamanoPerro } from '@/lib/
 import { calcularReglaTres, type TipoRegla, type TipoRelacion } from '@/lib/calculadoras/reglaTres';
 import { compararAlquilerVsCompra } from '@/lib/calculadoras/alquilerVsCompra';
 import { calcularJubilacionAnticipada, type TipoJubilacionAnticipada } from '@/lib/calculadoras/jubilacionAnticipada';
+import { calcularSueldoNeto, type SituacionFamiliar } from '@/lib/calculadoras/sueldoNeto';
+import { calcularIRPF, type SituacionFamiliarIRPF } from '@/lib/calculadoras/irpf';
+import { calcularCuotaAutonomo } from '@/lib/calculadoras/cuotaAutonomo';
+import { calcularPlusvaliasIRPF, type TipoActivo } from '@/lib/calculadoras/plusvaliasIRPF';
+import { convertirUnidades, type CategoriaUnidad } from '@/lib/calculadoras/conversorUnidades';
+import { calcularMacros, type SexoBiologico, type NivelActividad, type ObjetivoNutricional } from '@/lib/calculadoras/macros';
+import { calcularInflacion } from '@/lib/calculadoras/inflacion';
+import { calcularMcdMcm } from '@/lib/calculadoras/mcdMcm';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -2097,6 +2105,503 @@ function crearServidorMCP(): McpServer {
         ),
         '',
         `⚖️ *Cálculo mensual orientativo. Los costes variables y fijos son estimaciones — verifica con tu contabilidad.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_sueldo_neto
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_sueldo_neto',
+    'Estima el sueldo neto mensual/anual a partir del salario bruto anual. ' +
+    'Calcula: cotización SS empleado (contingencias + desempleo + FP + MEI), ' +
+    'reducción por rendimientos del trabajo (hasta 6.498 €/año), ' +
+    'mínimo personal y familiar (hijos, situación), cuota IRPF estimada y tipo de retención. ' +
+    '⚠️ Estimación orientativa con tipo estatal + autonómico medio. ' +
+    'El tipo real depende de la CCAA del contribuyente y de otras deducciones específicas.',
+    {
+      brutoAnual: z.number().positive()
+        .describe('Salario bruto anual en euros'),
+      situacion: z.enum(['soltero', 'casado_sin_ingresos', 'casado_con_ingresos']).optional()
+        .describe('Situación familiar. Por defecto "soltero".'),
+      numHijos: z.number().int().min(0).max(20).optional()
+        .describe('Número total de hijos a cargo. Por defecto 0.'),
+      hijosMenores3: z.number().int().min(0).max(10).optional()
+        .describe('Número de hijos menores de 3 años (añade 2.800 €/hijo al mínimo familiar). Por defecto 0.'),
+      pagas: z.union([z.literal(12), z.literal(14)]).optional()
+        .describe('Número de pagas al año: 12 o 14. Por defecto 14.'),
+    },
+    async ({ brutoAnual, situacion, numHijos, hijosMenores3, pagas }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_sueldo_neto', aiCaller);
+
+      let r;
+      try {
+        r = calcularSueldoNeto({ brutoAnual, situacion: situacion as SituacionFamiliar, numHijos, hijosMenores3, pagas });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `💶 **Sueldo Neto Estimado 2025**`,
+        '',
+        `📊 Bruto anual: **${fmt(r.brutoAnual)} €**`,
+        `🏛️ Cotización SS (${((r.cuotaSSAnual / r.brutoAnual) * 100).toFixed(2).replace('.', ',')}%): ${fmt(r.cuotaSSAnual)} €`,
+        `📉 Reducción rendimientos trabajo: ${fmt(r.reduccionRNT)} €`,
+        `👨‍👩‍👧 Mínimo personal y familiar: ${fmt(r.minimoPersonalFamiliar)} €`,
+        `📋 Base liquidable: ${fmt(r.baseLiquidable)} €`,
+        '',
+        `📄 IRPF (tipo retención: **${r.tipoRetencion.toFixed(2).replace('.', ',')}%**): ${fmt(r.cuotaIRPF)} €`,
+        '',
+        `✅ **Neto anual: ${fmt(r.netoAnual)} €**`,
+        `✅ **Neto mensual (÷${r.pagas}): ${fmt(r.netoMensual)} €**`,
+        '',
+        `⚠️ *Estimación orientativa. El tipo real varía según CCAA, deducciones específicas y modelo 145. Verificar en la Agencia Tributaria.*`,
+        `📚 ${r.fuenteDatos}`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_irpf
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_irpf',
+    'Estima la cuota diferencial del IRPF (a pagar o a devolver) integrando ' +
+    'rendimientos del trabajo, capital mobiliario, capital inmobiliario ' +
+    'y ganancias/pérdidas patrimoniales. ' +
+    'Aplica gastos deducibles, reducción RNT (hasta 6.498 €), mínimo personal y familiar, ' +
+    'tramos de la base general (19-47%) y del ahorro (19-30%). ' +
+    '⚠️ Estimación orientativa con tipos estatales + autonómico medio. ' +
+    'La declaración real incluye deducciones autonómicas y circunstancias específicas.',
+    {
+      rendimientosTrabajo: z.number().min(0)
+        .describe('Rendimientos brutos del trabajo antes de SS (salario bruto). En euros.'),
+      rendimientosCapitalMobiliario: z.number().min(0).optional()
+        .describe('Dividendos, intereses de cuentas, bonos, etc. (€). Por defecto 0.'),
+      rendimientosCapitalInmobiliario: z.number().min(0).optional()
+        .describe('Rendimientos de alquiler (ya netos de gastos deducibles) (€). Por defecto 0.'),
+      gananciasPLargo: z.number().optional()
+        .describe('Ganancias patrimoniales a largo plazo (>12 meses): venta de acciones, fondos, inmuebles (€). Puede ser negativo si hay pérdidas.'),
+      gananciasPCorto: z.number().optional()
+        .describe('Ganancias patrimoniales a corto plazo (≤12 meses) (€). Tributan en base general.'),
+      retenciones: z.number().min(0).optional()
+        .describe('Total de retenciones ya practicadas a cuenta (nómina, dividendos, alquiler, etc.) (€). Por defecto 0.'),
+      situacion: z.enum(['soltero', 'casado_sin_ingresos', 'casado_con_ingresos']).optional()
+        .describe('Situación familiar. Por defecto "soltero".'),
+      numHijos: z.number().int().min(0).max(20).optional()
+        .describe('Número de hijos. Por defecto 0.'),
+      hijosMenores3: z.number().int().min(0).max(10).optional()
+        .describe('Hijos menores de 3 años. Por defecto 0.'),
+      esTrabajador: z.boolean().optional()
+        .describe('¿Tiene rendimientos del trabajo? Para aplicar gastos deducibles (2.000 €) y reducción RNT. Por defecto true.'),
+    },
+    async ({ rendimientosTrabajo, rendimientosCapitalMobiliario, rendimientosCapitalInmobiliario, gananciasPLargo, gananciasPCorto, retenciones, situacion, numHijos, hijosMenores3, esTrabajador }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_irpf', aiCaller);
+
+      let r;
+      try {
+        r = calcularIRPF({
+          rendimientosTrabajo, rendimientosCapitalMobiliario, rendimientosCapitalInmobiliario,
+          gananciasPLargo, gananciasPCorto, retenciones, situacion: situacion as SituacionFamiliarIRPF,
+          numHijos, hijosMenores3, esTrabajador,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const signo = r.cuotaDiferencial >= 0 ? '📤 A PAGAR' : '📥 A DEVOLVER';
+      const lineas = [
+        `📊 **Estimación IRPF 2025**`,
+        '',
+        `📋 Base imponible general: ${fmt(r.baseImponibleGeneral)} € | Base ahorro: ${fmt(r.baseImponibleAhorro)} €`,
+        `📉 Reducción RNT: ${fmt(r.reduccionRNT)} € | Mínimo personal/familiar: ${fmt(r.minimoPersonalFamiliar)} €`,
+        `📋 Base liquidable general: ${fmt(r.baseLiquidableGeneral)} €`,
+        '',
+        `💶 Cuota general (${r.tipoEfectivoGeneral.toFixed(2).replace('.', ',')}% efectivo): ${fmt(r.cuotaIntegraGeneral)} €`,
+        r.baseImponibleAhorro > 0 ? `💹 Cuota ahorro: ${fmt(r.cuotaIntegralAhorro)} €` : '',
+        `🏛️ Cuota íntegra total: **${fmt(r.cuotaIntegra)} €**`,
+        `✂️ Retenciones practicadas: ${fmt(r.retenciones)} €`,
+        '',
+        `**${signo}: ${fmt(Math.abs(r.cuotaDiferencial))} €**`,
+        '',
+        r.desgloseGeneral.length > 0 ? `📊 Desglose tramos generales:` : '',
+        ...r.desgloseGeneral.map(t => `  ${fmt(t.desde)}–${t.hasta === Infinity ? '∞' : fmt(t.hasta)} €: ${t.tipo}% → ${fmt(t.cuota)} €`),
+        '',
+        `⚠️ *Estimación con tipos estatal + autonómico medio. La declaración real incluye deducciones autonómicas y circunstancias adicionales.*`,
+        `📚 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_cuota_autonomo
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_cuota_autonomo',
+    'Calcula la cuota mensual de la Seguridad Social para autónomos según ' +
+    'el sistema de cotización por ingresos reales (Real Decreto-ley 13/2022). ' +
+    'Determina el tramo correspondiente (1-15), la base mínima y máxima del tramo, ' +
+    'la cuota a pagar y si aplica la tarifa plana de 80 €/mes para nuevos autónomos. ' +
+    '⚠️ La tabla de tramos está congelada para 2026 por RDL 16/2025. El tipo sube al 31,50% (MEI 0,90%).',
+    {
+      rendimientoNetoMensual: z.number().min(0)
+        .describe('Rendimiento neto mensual estimado (ingresos - gastos deducibles, sin descontar la cuota SS) en euros'),
+      esNuevoAutonomo: z.boolean().optional()
+        .describe('¿Dado de alta por primera vez como autónomo? Aplica tarifa plana de 80 €/mes durante 12 meses. Por defecto false.'),
+      baseElegida: z.enum(['minima', 'maxima']).optional()
+        .describe('"minima" (por defecto) o "maxima" — puedes elegir cualquier base dentro del rango del tramo, pero esta tool calcula para los extremos.'),
+    },
+    async ({ rendimientoNetoMensual, esNuevoAutonomo, baseElegida }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_cuota_autonomo', aiCaller);
+
+      let r;
+      try {
+        r = calcularCuotaAutonomo({ rendimientoNetoMensual, esNuevoAutonomo, baseElegida });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🧾 **Cuota Autónomo (RETA) 2026**`,
+        '',
+        `💶 Rendimiento neto mensual: **${fmt(r.rendimientoNetoMensual)} €**`,
+        `📊 Tramo: **${r.tramo}/15** | Base mínima: ${fmt(r.baseMinima)} € | Base máxima: ${fmt(r.baseMaxima)} €`,
+        `🔢 Base de cotización elegida: **${fmt(r.baseCotizacion)} €/mes**`,
+        `📈 Tipo de cotización: ${r.tipoCotizacion.toFixed(2).replace('.', ',')}% (RDL 16/2025)`,
+        '',
+        r.aplicaTarifaPlana
+          ? [
+            `🎉 **Tarifa plana (nuevo autónomo):** ${fmt(r.cuotaConTarifaPlana!)} €/mes (en lugar de ${fmt(r.cuotaMensualGeneral)} €/mes)`,
+            `📅 Vigente durante los primeros 12 meses desde el alta`,
+          ].join('\n')
+          : `💰 **Cuota mensual: ${fmt(r.cuotaMensualGeneral)} €/mes**`,
+        '',
+        `📅 Cuota anual estimada: **${fmt(r.cuotaAnual)} €/año**`,
+        '',
+        `⚠️ *El rendimiento neto real se calcula anualmente y puede requerir regularización al cierre del año. Verificar en la Sede Electrónica de la SS.*`,
+        `📚 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_plusvalias_irpf
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_plusvalias_irpf',
+    'Calcula el impuesto IRPF sobre la ganancia patrimonial por venta de activos ' +
+    '(acciones, fondos de inversión, inmuebles, etc.). ' +
+    'Determina: ganancia neta (precio transmisión - precio adquisición con gastos), ' +
+    'si es a largo plazo (>12 meses), tributación en la base del ahorro (tramos 19-30%), ' +
+    'tipo efectivo y ganancia neta después de impuestos. ' +
+    'Permite compensar saldos negativos de ejercicios anteriores.',
+    {
+      precioCompra: z.number().positive()
+        .describe('Precio de compra del activo en euros'),
+      gastosCompra: z.number().min(0).optional()
+        .describe('Gastos de compra: comisiones de broker, notaría (inmuebles), etc. (€). Por defecto 0.'),
+      precioVenta: z.number().positive()
+        .describe('Precio de venta del activo en euros'),
+      gastosVenta: z.number().min(0).optional()
+        .describe('Gastos de venta: comisiones de broker, notaría (inmuebles), etc. (€). Por defecto 0.'),
+      fechaCompra: z.string()
+        .describe('Fecha de compra en formato YYYY-MM-DD (ej: "2020-03-15")'),
+      fechaVenta: z.string()
+        .describe('Fecha de venta en formato YYYY-MM-DD (ej: "2025-06-01")'),
+      tipoActivo: z.enum(['acciones', 'fondos', 'inmueble', 'otro']).optional()
+        .describe('Tipo de activo vendido. Solo informativo.'),
+      saldoCompensacion: z.number().min(0).optional()
+        .describe('Pérdidas patrimoniales de ejercicios anteriores pendientes de compensar (€). Reducen la base imponible. Por defecto 0.'),
+    },
+    async ({ precioCompra, gastosCompra, precioVenta, gastosVenta, fechaCompra, fechaVenta, tipoActivo, saldoCompensacion }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_plusvalias_irpf', aiCaller);
+
+      let r;
+      try {
+        r = calcularPlusvaliasIRPF({ precioCompra, gastosCompra, precioVenta, gastosVenta, fechaCompra, fechaVenta, tipoActivo: tipoActivo as TipoActivo, saldoCompensacion });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const plazo = r.esLargoPlazo ? 'largo plazo (>12 meses)' : 'corto plazo (≤12 meses)';
+      const signoGanancia = r.esGanancia ? '📈 Ganancia' : '📉 Pérdida';
+      const lineas = [
+        `💹 **Plusvalías IRPF 2025** — ${tipoActivo ?? 'activo'}`,
+        '',
+        `📅 Días transcurridos: **${r.diasTranscurridos}** (${plazo})`,
+        `💶 Precio adquisición (+ gastos): ${fmt(r.precioAdquisicion)} €`,
+        `💰 Precio transmisión (- gastos): ${fmt(r.precioTransmision)} €`,
+        '',
+        `${signoGanancia} patrimonial neta: **${fmt(Math.abs(r.gananciaNeta))} €**`,
+        r.saldoCompensado > 0 ? `✂️ Saldo compensado: ${fmt(r.saldoCompensado)} €` : '',
+        r.esGanancia ? `📋 Base liquidable: ${fmt(r.baseLiquidable)} €` : '',
+        '',
+        r.esGanancia ? [
+          `🏛️ IRPF (tipo efectivo: **${r.tipoEfectivo.toFixed(2).replace('.', ',')}%**): ${fmt(r.cuotaIRPF)} €`,
+          `✅ **Ganancia neta después de impuestos: ${fmt(r.gananciaNeta_DI)} €**`,
+          `📊 Rentabilidad neta (sobre precio adquisición): ${r.rentabilidadNetaImpuestos.toFixed(2).replace('.', ',')}%`,
+        ].join('\n') : `✅ La pérdida patrimonial puede compensarse con ganancias de los próximos 4 ejercicios.`,
+        '',
+        r.desglose.length > 0 ? `📊 Desglose tramos del ahorro:` : '',
+        ...r.desglose.map(t => `  ${fmt(t.desde)}–${t.hasta >= 1e10 ? '∞' : fmt(t.hasta)} €: ${t.tipo}% → ${fmt(t.cuota)} €`),
+        '',
+        `⚠️ *Estimación orientativa. No incluye ajustes por homogeneización, coeficientes de abatimiento (acciones adquiridas antes de 1994) ni deducciones autonómicas.*`,
+        `📚 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: convertir_unidades
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'convertir_unidades',
+    'Convierte entre unidades de medida en 12 categorías: ' +
+    'longitud (m, km, cm, mm, mi, yd, ft, in, nmi, au, ly), ' +
+    'masa (kg, g, mg, t, lb, oz, st), ' +
+    'temperatura (C, F, K, R), ' +
+    'area (m2, km2, cm2, ha, acre, ft2), ' +
+    'volumen (l, ml, m3, gal, qt, pt), ' +
+    'tiempo (s, min, h, d, semana, mes, ano), ' +
+    'velocidad (ms, kmh, mph, kn, mach), ' +
+    'datos (b, B, KB, MB, GB, TB, Kb, Mb, Gb), ' +
+    'presion (Pa, kPa, bar, atm, psi, mmHg), ' +
+    'energia (J, kJ, cal, kcal, Wh, kWh, BTU, eV), ' +
+    'fuerza (N, kN, lbf, kgf), ' +
+    'potencia (W, kW, MW, hp, cv).',
+    {
+      valor: z.number()
+        .describe('Valor numérico a convertir'),
+      categoria: z.enum([
+        'longitud', 'masa', 'temperatura', 'area', 'volumen',
+        'tiempo', 'velocidad', 'datos', 'presion', 'energia', 'fuerza', 'potencia',
+      ]).describe('Categoría de la conversión'),
+      unidadOrigen: z.string()
+        .describe('Unidad de origen (ver listado en la descripción). Ejemplos: "km", "lb", "C", "ha", "kWh"'),
+      unidadDestino: z.string()
+        .describe('Unidad destino. Ejemplos: "mi", "kg", "F", "acre", "BTU"'),
+    },
+    async ({ valor, categoria, unidadOrigen, unidadDestino }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('convertir_unidades', aiCaller);
+
+      let r;
+      try {
+        r = convertirUnidades({ valor, categoria: categoria as CategoriaUnidad, unidadOrigen, unidadDestino });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmtNum = (n: number) => {
+        if (Math.abs(n) === 0) return '0';
+        if (Math.abs(n) >= 0.001 && Math.abs(n) < 1e9) {
+          return n.toLocaleString('es-ES', { maximumSignificantDigits: 8 });
+        }
+        return n.toExponential(4);
+      };
+
+      const lineas = [
+        `📐 **Conversión de ${r.categoria}**`,
+        '',
+        `**${fmtNum(r.valorOrigen)} ${r.unidadOrigen} = ${fmtNum(r.valorDestino)} ${r.unidadDestino}**`,
+        '',
+        r.factorConversion !== 0 ? `🔢 Factor de conversión: ${fmtNum(r.factorConversion)}` : '',
+        `📌 ${r.formula}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_macros
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_macros',
+    'Calcula las necesidades calóricas diarias y la distribución óptima de macronutrientes. ' +
+    'Usa la fórmula Mifflin-St Jeor para la TMB (Tasa Metabólica Basal) ' +
+    'y multiplica por el factor de actividad para obtener el TDEE. ' +
+    'Ajusta las calorías según el objetivo (definición -500 kcal, mantenimiento 0, volumen +400 kcal) ' +
+    'y distribuye en proteínas, carbohidratos y grasas. ' +
+    '⚠️ Orientativo — consultar con dietista-nutricionista titulado para planes personalizados.',
+    {
+      peso: z.number().positive().max(300)
+        .describe('Peso corporal en kilogramos'),
+      altura: z.number().positive().max(250)
+        .describe('Altura en centímetros'),
+      edad: z.number().int().positive().max(120)
+        .describe('Edad en años'),
+      sexo: z.enum(['hombre', 'mujer'])
+        .describe('Sexo biológico (determina la constante de la fórmula Mifflin-St Jeor)'),
+      nivelActividad: z.enum(['sedentario', 'ligero', 'moderado', 'activo', 'muy_activo'])
+        .describe(
+          '"sedentario" (sin ejercicio), "ligero" (1-3 días/semana), "moderado" (3-5 días), ' +
+          '"activo" (6-7 días), "muy_activo" (ejercicio intenso diario o 2x/día)'
+        ),
+      objetivo: z.enum(['definicion', 'mantenimiento', 'volumen'])
+        .describe(
+          '"definicion" (déficit -500 kcal, 30P/40C/30G%), "mantenimiento" (0 kcal, 25P/50C/25G%), ' +
+          '"volumen" (superávit +400 kcal, 25P/50C/25G%)'
+        ),
+    },
+    async ({ peso, altura, edad, sexo, nivelActividad, objetivo }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_macros', aiCaller);
+
+      let r;
+      try {
+        r = calcularMacros({
+          peso, altura, edad,
+          sexo: sexo as SexoBiologico,
+          nivelActividad: nivelActividad as NivelActividad,
+          objetivo: objetivo as ObjetivoNutricional,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const objLabel: Record<string, string> = {
+        definicion: '🔥 Definición (déficit)',
+        mantenimiento: '⚖️ Mantenimiento',
+        volumen: '💪 Volumen (superávit)',
+      };
+      const actLabel: Record<string, string> = {
+        sedentario: 'Sedentario (×1,2)',
+        ligero: 'Actividad ligera (×1,375)',
+        moderado: 'Actividad moderada (×1,55)',
+        activo: 'Activo (×1,725)',
+        muy_activo: 'Muy activo (×1,9)',
+      };
+      const lineas = [
+        `🥗 **Calculadora de Macros — ${objLabel[objetivo]}**`,
+        '',
+        `📊 TMB (Mifflin-St Jeor): **${r.tmb} kcal/día**`,
+        `🏃 ${actLabel[nivelActividad]} → TDEE: **${r.tdee} kcal/día**`,
+        `🎯 Calorías objetivo: **${r.caloriasObjetivo} kcal/día** (${r.ajusteKcal >= 0 ? '+' : ''}${r.ajusteKcal} kcal)`,
+        '',
+        `🍗 Proteínas (${r.ratios.proteinas}%): **${r.macros.proteinas} g/día** (${r.macros.caloriasProteinas} kcal)`,
+        `🍞 Carbohidratos (${r.ratios.carbohidratos}%): **${r.macros.carbohidratos} g/día** (${r.macros.caloriasCarbohidratos} kcal)`,
+        `🥑 Grasas (${r.ratios.grasas}%): **${r.macros.grasas} g/día** (${r.macros.caloriasGrasas} kcal)`,
+        '',
+        `📏 IMC aproximado: **${r.imc}**`,
+        '',
+        `⚠️ *Estimación orientativa basada en datos promedio. Consultar con dietista-nutricionista para un plan personalizado.*`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_inflacion
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_inflacion',
+    'Calcula el equivalente en poder adquisitivo de una cantidad monetaria ' +
+    'entre dos años cualquiera de la historia de España (1961-2025). ' +
+    'Usa el IPC histórico del INE (base 2021 = 100) para determinar: ' +
+    'el valor equivalente en el año destino, la inflación acumulada en el período ' +
+    'y la inflación media anual (CAGR). ' +
+    'Útil para comparar salarios, precios o inversiones entre épocas diferentes.',
+    {
+      cantidad: z.number().positive()
+        .describe('Cantidad monetaria en euros (o pesetas históricas, el resultado será proporcional)'),
+      anoOrigen: z.number().int().min(1961).max(2025)
+        .describe('Año de la cantidad original (1961-2025)'),
+      anoDestino: z.number().int().min(1961).max(2025)
+        .describe('Año al que se quiere convertir (1961-2025). Puede ser anterior al año origen para calcular hacia atrás.'),
+    },
+    async ({ cantidad, anoOrigen, anoDestino }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_inflacion', aiCaller);
+
+      let r;
+      try {
+        r = calcularInflacion({ cantidad, anoOrigen, anoDestino });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const signo = r.inflacionAcumulada >= 0 ? '📈' : '📉';
+      const haciaDonde = anoDestino > anoOrigen ? 'hacia el futuro' : 'hacia el pasado';
+      const lineas = [
+        `📊 **Calculadora de Inflación España (IPC INE)**`,
+        '',
+        `💶 ${fmt(cantidad)} € en **${anoOrigen}** equivalen a **${fmt(r.valorEquivalente)} €** en **${anoDestino}**`,
+        `(Conversión ${haciaDonde}, ${r.anos} año${r.anos !== 1 ? 's' : ''})`,
+        '',
+        `${signo} Inflación acumulada: **${r.inflacionAcumulada >= 0 ? '+' : ''}${r.inflacionAcumulada.toFixed(2).replace('.', ',')}%**`,
+        r.anos > 0 ? `📅 Inflación media anual (CAGR): **${r.inflacionMediaAnual >= 0 ? '+' : ''}${r.inflacionMediaAnual.toFixed(2).replace('.', ',')}%/año**` : '',
+        `📈 IPC ${anoOrigen}: ${r.ipcOrigen} | IPC ${anoDestino}: ${r.ipcDestino} (base 2021=100)`,
+        '',
+        anoDestino > anoOrigen
+          ? `💡 Lo que valía ${fmt(cantidad)} € en ${anoOrigen} ahora costaría **${fmt(r.valorEquivalente)} €** (diferencia: ${fmt(Math.abs(r.diferencia))} €)`
+          : `💡 Lo que vale ${fmt(cantidad)} € hoy, en ${anoDestino} valía **${fmt(r.valorEquivalente)} €**`,
+        '',
+        `📚 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_mcd_mcm
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_mcd_mcm',
+    'Calcula el Máximo Común Divisor (MCD) y el Mínimo Común Múltiplo (MCM) ' +
+    'de dos o más números enteros positivos. ' +
+    'Incluye: algoritmo de Euclides paso a paso (si son 2 números), ' +
+    'factorización en números primos de cada número, ' +
+    'factores del MCD (primos comunes con exponente mínimo) y del MCM (exponente máximo), ' +
+    'y lista de todos los divisores comunes.',
+    {
+      numeros: z.array(z.number().int().positive().max(1e12)).min(2).max(10)
+        .describe('Lista de 2 a 10 números enteros positivos. Ejemplo: [12, 18, 24]'),
+    },
+    async ({ numeros }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_mcd_mcm', aiCaller);
+
+      let r;
+      try {
+        r = calcularMcdMcm({ numeros });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmtFactores = (f: Record<number, number>) =>
+        Object.entries(f).map(([p, e]) => e === 1 ? p : `${p}^${e}`).join(' × ') || '1';
+
+      const lineas = [
+        `🔢 **MCD y MCM** de [${numeros.join(', ')}]`,
+        '',
+        `✅ **MCD = ${r.mcd}** (Máximo Común Divisor)`,
+        `✅ **MCM = ${r.mcm}** (Mínimo Común Múltiplo)`,
+        '',
+        `📊 Factorización en primos:`,
+        ...numeros.map(n => `  ${n} = ${fmtFactores(r.factorizaciones[n])}`),
+        '',
+        `🔍 Factores MCD: ${fmtFactores(r.factoresMcd)}`,
+        `🔍 Factores MCM: ${fmtFactores(r.factoresMcm)}`,
+        '',
+        `📋 Divisores comunes: ${r.divisoresComunes.join(', ')}`,
+        '',
+        r.pasosEuclides ? `📐 **Algoritmo de Euclides:**` : '',
+        ...(r.pasosEuclides ?? []).map(p => `  ${p}`),
       ].filter(l => l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
