@@ -150,6 +150,15 @@ import { calcularERTEReduccion, type MotivoERTE } from '@/lib/calculadoras/erteR
 import { calcularDietasIRPF, type TipoLocomocion, type ZonaDesplazamiento, type TipoDesplazamiento } from '@/lib/calculadoras/dietasIRPF';
 import { calcularDescuentoEfectos, type TipoOperacionCesion } from '@/lib/calculadoras/descuentoEfectos';
 import { calcularProvisionInsolvencias, type CausaDeducibilidadInsolvencia } from '@/lib/calculadoras/provisionInsolvencias';
+// ── Lote P:
+import { calcularGananciaCriptomonedas, type TipoOperacionCripto } from '@/lib/calculadoras/gananciaCriptomonedas';
+import { calcularBonificacionContratacion, type ColectivoBonificacion, type SexoTrabajador } from '@/lib/calculadoras/bonificacionContratacion';
+import { calcularDeduccionIdi } from '@/lib/calculadoras/deduccionIdi';
+import { calcularProrrataIVA, type TipoProrrata } from '@/lib/calculadoras/prorrataIVA';
+import { calcularModelo347 } from '@/lib/calculadoras/modelo347';
+import { calcularEmpresaFamiliarISD, type ComunidadAutonomaEF, type TipoTransmision as TipoTransmisionEF, type TipoParentesco } from '@/lib/calculadoras/empresaFamiliarISD';
+import { calcularRetribucionEspecie, type TipoRetribucionEspecie } from '@/lib/calculadoras/retribucionEspecie';
+import { calcularImpuestoGrandesFortunas } from '@/lib/calculadoras/impuestoGrandesfortunas';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -6612,6 +6621,212 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote P: criptomonedas, bonificacion contratacion, I+D+i, prorrata IVA, modelo 347, empresa familiar ISD, retribucion especie, grandes fortunas ──
+
+  servidor.tool(
+    'calcular_ganancia_criptomonedas',
+    'Calcula ganancias y pérdidas patrimoniales por transmisión de criptomonedas (IRPF art. 37.1.v). Aplica regla FIFO obligatoria. Incluye cuota escala del ahorro 2025 y compensación de pérdidas con rendimientos del capital mobiliario (25%). Informa sobre obligaciones Modelo 721/172/173.',
+    {
+      operaciones: z.array(z.object({
+        descripcion: z.string().optional().describe('Descripción de la operación'),
+        tipoOperacion: z.enum(['venta', 'permuta', 'pago', 'donacion']).describe('Tipo: venta (cripto→fiat), permuta (cripto→cripto), pago con cripto, donacion'),
+        unidades: z.number().positive().describe('Número de unidades transmitidas'),
+        precioAdquisicionUnitario: z.number().positive().describe('Precio de adquisición por unidad en EUR (FIFO — el más antiguo adquirido)'),
+        gastosAdquisicion: z.number().min(0).optional().describe('Gastos/comisiones de adquisición totales (EUR)'),
+        precioTransmisionUnitario: z.number().positive().describe('Precio/valor de transmisión por unidad en EUR (precio de venta o valor de mercado en permutas)'),
+        gastosTransmision: z.number().min(0).optional().describe('Gastos/comisiones de transmisión totales (EUR)'),
+      })).min(1).describe('Lista de operaciones de criptomonedas del período'),
+      saldoPositivoRCM: z.number().min(0).optional().describe('Saldo positivo de rendimientos del capital mobiliario del período (EUR) — para calcular compensación con pérdidas cripto'),
+      tipoMarginalIRPF: z.number().min(0).max(100).optional().describe('Tipo marginal IRPF del contribuyente (%) — solo informativo'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_ganancia_criptomonedas', aiCaller);
+      const resultado = calcularGananciaCriptomonedas(args as Parameters<typeof calcularGananciaCriptomonedas>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_bonificacion_contratacion',
+    'Calcula bonificaciones y reducciones en cuotas SS empresariales por contratación de colectivos (RDL 1/2023). Colectivos: discapacidad 33-65%+, víctimas violencia género/terrorismo, exclusión social, empleados hogar, contrato relevo, sustitución por nacimiento. Solo contratos indefinidos tras reforma laboral.',
+    {
+      colectivo: z.enum([
+        'discapacidad_33_64', 'discapacidad_65_mas', 'discapacidad_con_especiales',
+        'victima_violencia_genero', 'victima_violencia_genero_menor45', 'victima_terrorismo',
+        'exclusion_social_certificada', 'empleado_hogar', 'contrato_relevo', 'sustitucion_nacimiento',
+      ]).describe('Colectivo que da derecho a bonificación'),
+      sexo: z.enum(['hombre', 'mujer']).describe('Sexo del trabajador (relevante para cuantificar la bonificación en algunos colectivos)'),
+      salarioBrutoMensual: z.number().positive().describe('Salario bruto mensual del trabajador (EUR)'),
+      duracionMeses: z.number().positive().optional().describe('Duración del contrato en meses (omitir para indefinido sin límite)'),
+      tiempoParcial: z.boolean().optional().describe('¿Contrato a tiempo parcial?'),
+      pctJornada: z.number().min(1).max(99).optional().describe('Porcentaje de jornada en tiempo parcial (%) — solo si tiempoParcial=true'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_bonificacion_contratacion', aiCaller);
+      const resultado = calcularBonificacionContratacion(args as Parameters<typeof calcularBonificacionContratacion>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_deduccion_idi',
+    'Calcula la deducción fiscal por I+D+i en el Impuesto sobre Sociedades (LIS arts. 35-36). I+D: 25% base + 42% exceso sobre media 2 años + 17% personal investigador + 8% inmovilizado. Innovación tecnológica: 12%. Calcula límite sobre cuota (25%/35%) y opción de monetización (abono AEAT con descuento 20%).',
+    {
+      id: z.object({
+        gastosIDPeriodoActual: z.number().min(0).describe('Gastos totales de I+D del período actual (EUR)'),
+        mediaGastosIDEjerciciosAnteriores: z.number().min(0).optional().describe('Media de gastos I+D de los 2 ejercicios anteriores (EUR) — para bonus del 42% sobre exceso'),
+        gastosPersonalInvestigador: z.number().min(0).optional().describe('Gastos de personal investigador cualificado con dedicación exclusiva a I+D (EUR) — bonus adicional 17%'),
+        inversionInmovilizadoID: z.number().min(0).optional().describe('Inversiones en inmovilizado material/intangible afecto a I+D (EUR) — deducción 8%'),
+      }).optional().describe('Datos de actividades de I+D (investigación y desarrollo)'),
+      it: z.object({
+        gastosITPeriodoActual: z.number().min(0).describe('Gastos de innovación tecnológica del período (EUR) — deducción 12%'),
+      }).optional().describe('Datos de actividades de innovación tecnológica'),
+      cuotaIntegra: z.number().min(0).describe('Cuota íntegra ajustada del IS del período (EUR) — necesaria para calcular el límite de aplicación'),
+      solicitarMonetizacion: z.boolean().optional().describe('¿Solicitar abono AEAT (monetización) si no hay suficiente cuota? Descuento del 20% sobre importe monetizable'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_deduccion_idi', aiCaller);
+      const resultado = calcularDeduccionIdi(args as Parameters<typeof calcularDeduccionIdi>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_prorrata_iva',
+    'Calcula la prorrata del IVA (general o especial) cuando el sujeto pasivo realiza operaciones mixtas —con y sin derecho a deducción— (LIVA arts. 102-106). Determina el % de IVA soportado deducible, con redondeo al alza obligatorio. Incluye regularización anual si se aportó la prorrata provisional y el IVA deducido.',
+    {
+      tipoProrrata: z.enum(['general', 'especial']).describe('Tipo de prorrata: general (todo al %) o especial (por afectación de cada gasto)'),
+      operaciones: z.array(z.object({
+        descripcion: z.string().optional(),
+        importe: z.number().positive().describe('Importe de la operación (EUR)'),
+        conDerechoDeduccion: z.boolean().describe('¿Da derecho a deducción? (sujeta y no exenta)'),
+        excluirDenominador: z.boolean().optional().describe('Excluir del denominador (autoconsumos, subvenciones, inmobiliario/financiero ocasional)'),
+      })).min(1).describe('Operaciones del período para calcular la prorrata'),
+      cuotasSoportadas: z.array(z.object({
+        descripcion: z.string().optional(),
+        cuotaIVA: z.number().min(0).describe('Cuota de IVA soportada (EUR)'),
+        afectacion: z.enum(['exclusiva_deducible', 'exclusiva_no_deducible', 'comun']).describe('Afectación del gasto: exclusiva a operaciones deducibles, exclusiva a no deducibles, o gastos comunes'),
+      })).optional().describe('Cuotas de IVA soportado para calcular el importe deducible'),
+      prorrataProvisoriaAplicada: z.number().min(0).max(100).optional().describe('Prorrata provisional aplicada en los trimestres anteriores (%) — para calcular regularización anual'),
+      ivaDeducidoProvisional: z.number().min(0).optional().describe('IVA ya deducido en los trimestres anteriores con la prorrata provisional (EUR)'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_prorrata_iva', aiCaller);
+      const resultado = calcularProrrataIVA(args as Parameters<typeof calcularProrrataIVA>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_modelo_347',
+    'Determina qué operaciones con clientes/proveedores superan el umbral del Modelo 347 (3.005,06 EUR anuales por tercero, IVA incluido) y prepara el resumen por trimestres. Identifica operaciones en efectivo >6.000 EUR y las excluidas por otros modelos (180, 190, 349). Presentación en febrero.',
+    {
+      terceros: z.array(z.object({
+        nif: z.string().describe('NIF/CIF del tercero'),
+        nombre: z.string().describe('Nombre o razón social del tercero'),
+        operaciones: z.array(z.object({
+          descripcion: z.string().optional(),
+          trimestre: z.enum(['T1', 'T2', 'T3', 'T4']).describe('Trimestre natural de la operación'),
+          importeConIVA: z.number().positive().describe('Importe de la operación con IVA incluido (EUR)'),
+          tipoOperacion: z.enum(['compras', 'ventas', 'arrendamiento', 'subvencion', 'seguro']).describe('Tipo de operación'),
+          enEfectivo: z.boolean().optional().describe('¿Operación en efectivo?'),
+          excluida: z.boolean().optional().describe('¿Operación excluida del 347? (por figurar en Mod. 180, 190, 349...)'),
+          motivoExclusion: z.enum(['incluida_mod_190', 'incluida_mod_180', 'incluida_mod_349', 'importacion_exportacion', 'sin_exclusion']).optional(),
+        })).min(1),
+      })).min(1).describe('Lista de terceros con sus operaciones del año'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_modelo_347', aiCaller);
+      const resultado = calcularModelo347(args as Parameters<typeof calcularModelo347>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_empresa_familiar_isd',
+    'Calcula la reducción del 95% (o más en PV/Navarra) en el ISD por transmisión de empresa familiar o participaciones en entidades (LISD arts. 20.2.c y 20.6). Verifica requisitos: exención en IP, funciones de dirección, retribución >50% rendimientos, grado de parentesco. Informa sobre plazo de mantenimiento por CCAA.',
+    {
+      tipoTransmision: z.enum(['herencia', 'donacion']).describe('Modalidad: herencia (mortis causa) o donación (inter vivos)'),
+      ccaa: z.enum([
+        'madrid', 'cataluna', 'andalucia', 'galicia', 'valencia',
+        'pais_vasco', 'navarra', 'aragon', 'castilla_la_mancha',
+        'castilla_y_leon', 'extremadura', 'murcia', 'asturias',
+        'cantabria', 'la_rioja', 'baleares', 'canarias', 'estatal',
+      ]).describe('Comunidad Autónoma del causante/donante'),
+      tipoParentesco: z.enum([
+        'conyuge', 'descendiente', 'ascendiente',
+        'colateral_1er_grado', 'colateral_2o_grado', 'colateral_3er_grado', 'sin_parentesco',
+      ]).describe('Parentesco del adquirente con el causante/donante'),
+      valorEmpresaParticipaciones: z.number().positive().describe('Valor total de la empresa o de las participaciones (EUR)'),
+      pctParticipacion: z.number().min(0.01).max(100).describe('Porcentaje de participación transmitida (%)'),
+      estaExentaEnPatrimonio: z.boolean().describe('¿La empresa/participaciones están exentas en el Impuesto sobre el Patrimonio (IP)?'),
+      ejerceFuncionesDereccion: z.boolean().describe('¿El transmitente (o algún miembro del grupo familiar) ejerce funciones de dirección efectivas?'),
+      retribucionDireccionSuperior50pct: z.boolean().describe('¿La retribución por funciones de dirección supera el 50% de los rendimientos netos totales del transmitente?'),
+      tipoIS: z.number().min(0).max(50).optional().describe('Tipo IS de la empresa (%) — solo informativo'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_empresa_familiar_isd', aiCaller);
+      const resultado = calcularEmpresaFamiliarISD(args as Parameters<typeof calcularEmpresaFamiliarISD>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_retribucion_especie',
+    'Calcula la valoración IRPF de las retribuciones en especie más habituales (LIRPF arts. 42-43): uso de vivienda empresa (10%/5% catastral), vehículo de empresa (20% coste, -30% si eléctrico), préstamo a tipo reducido (diferencia con tipo legal 3,25%), seguros de vida/enfermedad, educación hijos, otros bienes/servicios. Calcula ingreso a cuenta.',
+    {
+      tipoRetribucion: z.enum([
+        'uso_vivienda', 'uso_vehiculo', 'prestamo_tipo_reducido',
+        'seguro_vida_o_enfermedad', 'educacion_hijos', 'otro',
+      ]).describe('Tipo de retribución en especie'),
+      descripcion: z.string().optional().describe('Descripción de la retribución'),
+      valorCatastralVivienda: z.number().positive().optional().describe('Valor catastral de la vivienda (EUR) — solo para uso_vivienda'),
+      catastroRevisadoReciente: z.boolean().optional().describe('¿El catastro fue revisado en los últimos 10 años? (tipo 5% vs 10%) — solo uso_vivienda'),
+      costeAdquisicionVehiculo: z.number().positive().optional().describe('Coste de adquisición del vehículo con IVA (EUR) — solo uso_vehiculo'),
+      esVehiculoElectrico: z.boolean().optional().describe('¿Es vehículo eléctrico? (reducción 30% en valoración)'),
+      pctUsoParticularVehiculo: z.number().min(1).max(100).optional().describe('Porcentaje de uso particular del vehículo (%) — si uso mixto trabajo+particular'),
+      capitalPrestamo: z.number().positive().optional().describe('Capital del préstamo (EUR) — solo prestamo_tipo_reducido'),
+      tipoInteresPrestamo: z.number().min(0).optional().describe('Tipo de interés aplicado al trabajador (%) — solo prestamo_tipo_reducido. Tipo legal 2025: 3,25%'),
+      primaAnualSeguro: z.number().positive().optional().describe('Prima anual del seguro pagada por la empresa (EUR) — solo seguro'),
+      costeAnualEducacion: z.number().positive().optional().describe('Coste anual de educación/guardería (EUR) — solo educacion_hijos'),
+      edadHijo: z.number().min(0).max(25).optional().describe('Edad del hijo en años — si <3 años la guardería está exenta'),
+      valorMercado: z.number().positive().optional().describe('Valor de mercado del bien o servicio (EUR) — solo para tipo otro'),
+      precioPagadoTrabajador: z.number().min(0).optional().describe('Precio pagado por el trabajador (EUR) — si paga algo'),
+      tipoRetencionTrabajador: z.number().min(0).max(50).optional().describe('Tipo de retención IRPF del trabajador (%) — para calcular el ingreso a cuenta. Default: 15%'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_retribucion_especie', aiCaller);
+      const resultado = calcularRetribucionEspecie(args as Parameters<typeof calcularRetribucionEspecie>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_impuesto_grandes_fortunas',
+    'Calcula la cuota del Impuesto Temporal de Solidaridad de las Grandes Fortunas (ITSGF, Ley 38/2022) para patrimonios netos >3 M EUR. Escala: 1,7% (3-5,3M), 2,1% (5,3-10,7M), 3,5% (>10,7M). Deduce cuota del IP autonómico. Aplica exenciones (vivienda habitual 300K EUR, empresa familiar, mínimo exento 700K EUR).',
+    {
+      patrimonioBruto: z.number().min(0).describe('Patrimonio bruto total — suma de todos los bienes y derechos (EUR)'),
+      valorViviendaHabitual: z.number().min(0).optional().describe('Valor de la vivienda habitual incluido en el patrimonio bruto (EUR) — exenta hasta 300.000 EUR'),
+      deudasDeducibles: z.number().min(0).optional().describe('Deudas y cargas deducibles del patrimonio (EUR)'),
+      valorEmpresaFamiliarExenta: z.number().min(0).optional().describe('Valor de empresa familiar u otras exenciones del art. 4 LIP (EUR)'),
+      cuotaIPAutonomicoLiquida: z.number().min(0).optional().describe('Cuota líquida ya pagada en el Impuesto sobre el Patrimonio autonómico (EUR) — se deduce del ITSGF'),
+      ccaaTieneIPEfectivo: z.boolean().optional().describe('¿La CCAA tiene IP vigente y efectivo (no bonificado al 100%)? Si true, la cuota IP reduce el ITSGF'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_impuesto_grandes_fortunas', aiCaller);
+      const resultado = calcularImpuestoGrandesFortunas(args as Parameters<typeof calcularImpuestoGrandesFortunas>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
     }
   );
 
