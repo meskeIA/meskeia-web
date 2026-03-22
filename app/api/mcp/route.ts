@@ -70,6 +70,14 @@ import { convertirUnidades, type CategoriaUnidad } from '@/lib/calculadoras/conv
 import { calcularMacros, type SexoBiologico, type NivelActividad, type ObjetivoNutricional } from '@/lib/calculadoras/macros';
 import { calcularInflacion } from '@/lib/calculadoras/inflacion';
 import { calcularMcdMcm } from '@/lib/calculadoras/mcdMcm';
+import { calcularCosteEmpleado, type TipoContrato, type SectorActividad } from '@/lib/calculadoras/costeEmpleado';
+import { calcularFiniquito, type MotivoFiniquito } from '@/lib/calculadoras/finiquito';
+import { calcularPensionDesempleo } from '@/lib/calculadoras/pensionDesempleo';
+import { calcularVentaInmueble } from '@/lib/calculadoras/ventaInmueble';
+import { calcularHerenciaConjunta, type HerederoInput } from '@/lib/calculadoras/herenciaConjunta';
+import { calcularSeguroVida } from '@/lib/calculadoras/seguroVida';
+import { compararAutonomoVsSL, type TipoIS as TipoISSL } from '@/lib/calculadoras/autonomoVsSL';
+import { calcularDeclaracionConjunta } from '@/lib/calculadoras/declaracionConjunta';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -2552,6 +2560,607 @@ function crearServidorMCP(): McpServer {
           : `💡 Lo que vale ${fmt(cantidad)} € hoy, en ${anoDestino} valía **${fmt(r.valorEquivalente)} €**`,
         '',
         `📚 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_coste_empleado
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_coste_empleado',
+    'Calcula el coste real total de contratar un empleado en España. ' +
+    'Suma al salario bruto las cuotas de Seguridad Social a cargo de la empresa: ' +
+    'contingencias comunes (23,60%), desempleo (5,50% indefinido / 6,70% temporal), ' +
+    'Formación Profesional (0,60%), FOGASA (0,20%) y Accidentes de Trabajo (según sector). ' +
+    'También puede incluir beneficios extra (seguro médico, tickets, etc.). ' +
+    'Útil para presupuestar el coste laboral real y calcular el break-even de contratar.',
+    {
+      salarioBrutoAnual: z.number().positive()
+        .describe('Salario bruto anual del empleado en euros'),
+      tipoContrato: z.enum(['indefinido', 'temporal']).optional()
+        .describe('"indefinido" (por defecto) o "temporal". El tipo de contrato afecta al tipo de desempleo de la empresa.'),
+      sector: z.enum(['oficina', 'comercio', 'industrial', 'construccion']).optional()
+        .describe('Sector de actividad para el tipo de AT/EP. Por defecto "oficina" (1,50%). "construccion" tiene el tipo más alto (6,70%).'),
+      beneficiosExtra: z.number().min(0).optional()
+        .describe('Beneficios extra anuales en euros: seguro médico, tickets restaurante, formación, etc. Por defecto 0.'),
+    },
+    async ({ salarioBrutoAnual, tipoContrato, sector, beneficiosExtra }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_coste_empleado', aiCaller);
+
+      let r;
+      try {
+        r = calcularCosteEmpleado({
+          salarioBrutoAnual,
+          tipoContrato: tipoContrato as TipoContrato,
+          sector: sector as SectorActividad,
+          beneficiosExtra,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `💼 **Coste Real de Contratar un Empleado 2025**`,
+        '',
+        `💶 Salario bruto anual: **${fmt(r.salarioBrutoAnual)} €**`,
+        `💶 Salario bruto mensual: ${fmt(r.salarioBrutoMensual)} €`,
+        `🏛️ Base de cotización: ${fmt(r.baseCotizacion)} €/mes`,
+        '',
+        `📊 **Cuotas SS empresa (tipo total: ${r.tipos.totalSS.toFixed(2).replace('.', ',')}%)**`,
+        `  Contingencias comunes (${r.tipos.contingenciasComunes}%): ${fmt(r.cuotas.contingenciasComunes)} €/año`,
+        `  Desempleo (${r.tipos.desempleo}%): ${fmt(r.cuotas.desempleo)} €/año`,
+        `  Formación Profesional (${r.tipos.formacionProfesional}%): ${fmt(r.cuotas.formacionProfesional)} €/año`,
+        `  FOGASA (${r.tipos.fogasa}%): ${fmt(r.cuotas.fogasa)} €/año`,
+        `  AT/EP sector ${sector ?? 'oficina'} (${r.tipos.accidentesTrabajo}%): ${fmt(r.cuotas.accidentesTrabajo)} €/año`,
+        `  **Total SS empresa: ${fmt(r.cuotas.total)} €/año**`,
+        r.beneficiosExtra > 0 ? `🎁 Beneficios extra: ${fmt(r.beneficiosExtra)} €/año` : '',
+        '',
+        `✅ **Coste total para la empresa: ${fmt(r.costeTotalAnual)} €/año**`,
+        `✅ **Coste total mensual: ${fmt(r.costeTotalMensual)} €/mes**`,
+        `📈 Sobrecoste sobre el bruto: **${r.sobrecoste.toFixed(2).replace('.', ',')}%**`,
+        '',
+        `💡 Por cada €1 de salario bruto, la empresa paga €${(r.costeTotalAnual / r.salarioBrutoAnual).toFixed(2).replace('.', ',')} en total.`,
+        '',
+        `📚 ${r.fuenteDatos}`,
+        `⚠️ *Estimación orientativa. El tipo exacto de AT/EP depende del CNAE de la empresa. No incluye otros costes variables (formación, EPI, dietas, etc.).*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_finiquito
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_finiquito',
+    'Calcula los conceptos del finiquito al terminar una relación laboral: ' +
+    'indemnización por despido (si aplica), vacaciones no disfrutadas, ' +
+    'parte proporcional de pagas extras y salarios pendientes del mes en curso. ' +
+    'Modalidades: despido improcedente (33 días/año, máx 24 mensualidades), ' +
+    'despido por causas objetivas (20 días/año, máx 12 mensualidades), ' +
+    'fin de contrato temporal (12 días/año), baja voluntaria (0€). ' +
+    'La indemnización por despido improcedente y objetivo está EXENTA de IRPF hasta 180.000€.',
+    {
+      salarioBrutoMensual: z.number().positive()
+        .describe('Salario bruto mensual del empleado en euros (última nómina completa)'),
+      motivoFiniquito: z.enum([
+        'despido_improcedente', 'despido_objetivo', 'despido_disciplinario',
+        'fin_contrato_temporal', 'baja_voluntaria', 'mutuo_acuerdo',
+      ]).describe(
+        '"despido_improcedente": 33 días/año · "despido_objetivo": 20 días/año (ETOP, art.52 ET) · ' +
+        '"despido_disciplinario": 0€ (si es procedente) · "fin_contrato_temporal": 12 días/año · ' +
+        '"baja_voluntaria": 0€ indemnización · "mutuo_acuerdo": lo que acuerden las partes'
+      ),
+      fechaInicio: z.string()
+        .describe('Fecha de inicio del contrato (YYYY-MM-DD, ej: "2019-03-01")'),
+      fechaBaja: z.string()
+        .describe('Fecha del último día trabajado / baja (YYYY-MM-DD, ej: "2025-06-30")'),
+      diasVacacionesAnuales: z.number().int().min(22).max(35).optional()
+        .describe('Días de vacaciones anuales según convenio (mínimo legal 22 días laborables). Por defecto 22.'),
+      diasVacacionesDisfrutados: z.number().int().min(0).optional()
+        .describe('Días de vacaciones ya disfrutados en el año actual. Por defecto 0.'),
+      pagas: z.number().int().min(12).max(14).optional()
+        .describe('Número de pagas totales al año: 12, 13 o 14. Por defecto 14.'),
+    },
+    async ({ salarioBrutoMensual, motivoFiniquito, fechaInicio, fechaBaja, diasVacacionesAnuales, diasVacacionesDisfrutados, pagas }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_finiquito', aiCaller);
+
+      let r;
+      try {
+        r = calcularFiniquito({
+          salarioBrutoMensual,
+          motivoFiniquito: motivoFiniquito as MotivoFiniquito,
+          fechaInicio,
+          fechaBaja,
+          diasVacacionesAnuales,
+          diasVacacionesDisfrutados,
+          pagas,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📋 **Cálculo de Finiquito**`,
+        '',
+        `👷 Antigüedad: **${r.antiguedadAnios} años y ${Math.round(r.antiguedadDias)} días**`,
+        `💶 Salario mensual bruto: ${fmt(salarioBrutoMensual)} € | Salario diario: ${fmt(salarioBrutoMensual / 30)} €`,
+        '',
+        r.indemnizacion > 0 ? [
+          `💰 **Indemnización (${r.diasIndemnizacionPorAnio} días/año):**`,
+          `   ${fmt(r.indemnizacion)} €${r.limitadoPorMensualidades ? ` (limitada a ${r.maxMensualidades} mensualidades)` : ''}`,
+        ].join('\n') : `ℹ️ Indemnización: 0 € (${motivoFiniquito.replace(/_/g, ' ')})`,
+        `🌴 Vacaciones no disfrutadas (${r.diasVacacionesPendientes.toFixed(1)} días): ${fmt(r.vacacionesPendientes)} €`,
+        `📅 Pagas extra proporcionales: ${fmt(r.pagasExtrasProporcionales)} €`,
+        `💳 Salarios pendientes mes en curso: ${fmt(r.salariosAtrasados)} €`,
+        '',
+        `✅ **TOTAL FINIQUITO BRUTO: ${fmt(r.totalFiniquitoBruto)} €**`,
+        '',
+        `⚖️ ${r.notaTributacion}`,
+        `📚 ${r.fuenteDatos}`,
+        `⚠️ *Cálculo orientativo. El finiquito exacto depende del convenio colectivo, pactos individuales y sentencia judicial si hay conflicto. Consultar con asesor laboral.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_pension_desempleo
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_pension_desempleo',
+    'Calcula la cuantía y duración de la prestación contributiva por desempleo (paro) en España. ' +
+    'Determina los días de prestación según días cotizados (mín. 360 días en los últimos 6 años), ' +
+    'la cuantía mensual (70% base reguladora los primeros 6 meses, 50% el resto) ' +
+    'y aplica los topes máximos y mínimos del IPREM 2025 según número de hijos. ' +
+    '⚠️ La base reguladora es el promedio de las bases de cotización de los 180 días anteriores al desempleo — ' +
+    'si no se sabe exactamente, usar el salario bruto mensual como aproximación.',
+    {
+      diasCotizados: z.number().int().min(0)
+        .describe('Días cotizados a desempleo en los últimos 6 años. Mínimo 360 días para acceder a la prestación.'),
+      baseReguladoraMensual: z.number().positive()
+        .describe('Base reguladora mensual en euros = promedio de las bases de cotización de los últimos 180 días. Aproximar con el salario bruto mensual si no se conoce el dato exacto.'),
+      numHijos: z.number().int().min(0).max(10).optional()
+        .describe('Número de hijos a cargo (afecta a los topes mínimos y máximos). Por defecto 0.'),
+    },
+    async ({ diasCotizados, baseReguladoraMensual, numHijos }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_pension_desempleo', aiCaller);
+
+      let r;
+      try {
+        r = calcularPensionDesempleo({ diasCotizados, baseReguladoraMensual, numHijos });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      if (!r.tieneDerechoPrestacion) {
+        return { content: [{ type: 'text', text: `❌ **Sin derecho a prestación contributiva**\n\n${r.motivoSinDerecho}\n\n💡 Con menos de 360 días puedes acceder al **subsidio por desempleo** si cumples los requisitos (agotamiento de prestación, rentas insuficientes, etc.). Consultar con el SEPE.` }] };
+      }
+
+      const lineas = [
+        `📋 **Prestación por Desempleo (Paro) 2025**`,
+        '',
+        `📅 Días cotizados: **${r.diasCotizados}**`,
+        `⏱️ Duración de la prestación: **${r.diasPrestacion} días (${r.mesesPrestacion} meses)**`,
+        `💶 Base reguladora: ${fmt(r.baseReguladora)} €/mes`,
+        '',
+        `💰 **Cuantías mensuales:**`,
+        `  Primeros 180 días (70% BR): ${fmt(r.cuantiaPrimeros6Meses)} €`,
+        `  A partir del día 181 (50% BR): ${fmt(r.cuantiaResto)} €`,
+        '',
+        `🎯 **Cuantía efectiva (tras topes IPREM):**`,
+        `  Primeros 6 meses: **${fmt(r.cuantiaEfectivaPrimeros6)} €/mes**`,
+        `  Resto: **${fmt(r.cuantiaEfectivaResto)} €/mes**`,
+        r.aplicaTopeMaximo ? `  ⬇️ Se aplica tope máximo (${fmt(r.topeMaximo)} €/mes)` : '',
+        r.aplicaTopeMinimo ? `  ⬆️ Se aplica tope mínimo (${fmt(r.topeMinimo)} €/mes)` : '',
+        '',
+        `💵 **Total prestación bruta estimada: ${fmt(r.totalPrestacionBruta)} €**`,
+        '',
+        `📚 ${r.fuenteDatos}`,
+        `⚠️ *La prestación tributa como rendimiento del trabajo en el IRPF. El SEPE calcula la cuantía exacta a partir de tu historial de cotización. Solicitar en el SEPE en los 15 días hábiles siguientes al cese.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_venta_inmueble
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_venta_inmueble',
+    'Calcula todos los costes e impuestos del VENDEDOR al vender un inmueble en España. ' +
+    'Incluye: Plusvalía Municipal (IIVTNU) por ambos métodos (objetivo y real, el más favorable), ' +
+    'IRPF sobre la ganancia patrimonial (tramos base del ahorro 19-30%), ' +
+    'comisión inmobiliaria y gestorías. ' +
+    'Calcula el neto real que recibe el vendedor y la rentabilidad neta de la inversión. ' +
+    'Exenciones: mayores de 65 años con vivienda habitual, y reinversión en vivienda habitual. ' +
+    '⚠️ Esta tool calcula los costes del VENDEDOR. Para costes del COMPRADOR, usar calcular_compraventa_inmueble.',
+    {
+      precioVenta: z.number().positive()
+        .describe('Precio de venta del inmueble en euros'),
+      precioCompra: z.number().positive()
+        .describe('Precio de compra original del inmueble en euros'),
+      gastosCompraOriginal: z.number().min(0).optional()
+        .describe('Gastos de compra en su día (ITP/IVA + notaría + registro + gestoría) en euros. Mejoran el valor de adquisición y reducen la ganancia patrimonial. Por defecto 0.'),
+      aniosTenencia: z.number().min(0).max(60)
+        .describe('Años de tenencia del inmueble (enteros). Se usa para calcular la plusvalía municipal.'),
+      valorCatastralSuelo: z.number().min(0).optional()
+        .describe('Valor catastral del suelo en euros (aparece en el recibo del IBI, en la sección "Suelo"). Necesario para calcular la plusvalía municipal. Si no se proporciona, la plusvalía no se calculará.'),
+      tipoMunicipalIIVTNU: z.number().min(0).max(30).optional()
+        .describe('Tipo impositivo que aplica el ayuntamiento a la plusvalía municipal (0-30%). Por defecto 25% orientativo. Consultar con el ayuntamiento el tipo exacto.'),
+      comisionInmobiliaria: z.number().min(0).max(10).optional()
+        .describe('Comisión de la agencia inmobiliaria en %. Por defecto 3%.'),
+      gastosGestoria: z.number().min(0).optional()
+        .describe('Gastos de gestoría, cancelación hipoteca y otros en euros. Por defecto 300€.'),
+      vendedorMayor65: z.boolean().optional()
+        .describe('¿El vendedor tiene más de 65 años? Si es vivienda habitual, la ganancia está exenta de IRPF. Por defecto false.'),
+      esViviendaHabitual: z.boolean().optional()
+        .describe('¿Es la vivienda habitual del vendedor? Relevante para la exención de mayores de 65 años. Por defecto false.'),
+      reinvierteTotalEnVivienda: z.boolean().optional()
+        .describe('¿El vendedor va a reinvertir el importe en una nueva vivienda habitual? Exención total o parcial del IRPF (art. 38 LIRPF, plazo de 2 años). Por defecto false.'),
+    },
+    async ({ precioVenta, precioCompra, gastosCompraOriginal, aniosTenencia, valorCatastralSuelo, tipoMunicipalIIVTNU, comisionInmobiliaria, gastosGestoria, vendedorMayor65, esViviendaHabitual, reinvierteTotalEnVivienda }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_venta_inmueble', aiCaller);
+
+      let r;
+      try {
+        r = calcularVentaInmueble({
+          precioVenta, precioCompra, gastosCompraOriginal, aniosTenencia,
+          valorCatastralSuelo, tipoMunicipalIIVTNU, comisionInmobiliaria,
+          gastosGestoria, vendedorMayor65, esViviendaHabitual, reinvierteTotalEnVivienda,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const gananciaLabel = r.hayGanancia ? `📈 Ganancia patrimonial` : `📉 Pérdida patrimonial`;
+      const lineas = [
+        `🏠 **Costes de Venta de Inmueble (vendedor)**`,
+        '',
+        `💶 Precio de venta: **${fmt(r.precioVenta)} €**`,
+        `📋 Valor adquisición (compra + gastos): ${fmt(r.valorAdquisicion)} €`,
+        `📋 Valor transmisión (venta - comisión - gestoría): ${fmt(r.valorTransmision)} €`,
+        `${gananciaLabel}: **${fmt(Math.abs(r.gananciaPatrimonial))} €**`,
+        '',
+        `📊 **Gastos del vendedor:**`,
+        `  🏡 Comisión inmobiliaria: ${fmt(r.comisionInmobiliaria)} €`,
+        `  📝 Gestoría y otros: ${fmt(r.gastosGestoria)} €`,
+        r.iivtnuCalculable
+          ? `  🏛️ Plusvalía municipal (IIVTNU): ${fmt(r.plusvaliaMunicipal)} € (${r.metodoPlusvalia})`
+          : `  ℹ️ Plusvalía municipal: no calculada (proporcionar valor catastral del suelo)`,
+        r.exentoIRPF
+          ? `  ✅ IRPF: EXENTO — ${r.motivoExencion}`
+          : `  💸 IRPF ganancia (${r.tipoEfectivoIRPF.toFixed(2).replace('.', ',')}% efectivo): ${fmt(r.irpfGanancia)} €`,
+        '',
+        `💰 **Total gastos e impuestos: ${fmt(r.totalGastosVendedor)} €**`,
+        `✅ **Neto recibido: ${fmt(r.netoVendedor)} €**`,
+        `📊 Rentabilidad neta sobre la inversión: **${r.rentabilidadNeta >= 0 ? '+' : ''}${r.rentabilidadNeta.toFixed(2).replace('.', ',')}%**`,
+        r.desgloseIRPF.length > 0 ? '' : '',
+        r.desgloseIRPF.length > 0 ? `📊 Desglose IRPF (base del ahorro):` : '',
+        ...r.desgloseIRPF.map(t => `  ${fmt(t.desde)}–${t.hasta >= 1e10 ? '∞' : fmt(t.hasta)} €: ${t.tipo}% → ${fmt(t.cuota)} €`),
+        '',
+        `📚 ${r.fuenteDatos}`,
+        `⚠️ *La plusvalía municipal usa el tipo máximo orientativo del 25%. Consultar con tu Ayuntamiento el tipo exacto. El IRPF puede variar si tienes pérdidas patrimoniales a compensar.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_herencia_conjunta
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_herencia_conjunta',
+    'Divide una masa hereditaria entre varios herederos y calcula el Impuesto de Sucesiones ' +
+    'de cada uno según su CCAA, grupo de parentesco, edad y patrimonio previo. ' +
+    'Soporta reparto igualitario (automático) o porcentajes personalizados. ' +
+    'Aplica todas las reducciones, coeficientes multiplicadores y bonificaciones autonómicas ' +
+    'de las 17 CCAA, igual que la tool calcular_sucesiones. ' +
+    'Ideal para comparar el impacto fiscal de diferentes repartos o CCAA.',
+    {
+      masaHereditaria: z.number().positive()
+        .describe('Masa hereditaria neta total en euros (activo: bienes y derechos - pasivo: deudas y cargas)'),
+      herederos: z.array(z.object({
+        nombre: z.string().describe('Nombre o referencia del heredero (ej: "Hijo 1", "Cónyuge")'),
+        grupo: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III', 'IV'])
+          .describe('Grupo de parentesco: I-conyuge (cónyuge/pareja), I-descendiente (hijo/nieto), II (hermanos, tíos, sobrinos), II-ascendiente (padres/abuelos), III (primos, colaterales 4º), IV (extraños)'),
+        ccaa: z.enum([
+          'madrid', 'andalucia', 'galicia', 'murcia', 'valencia', 'extremadura',
+          'canarias', 'castilla-leon', 'rioja', 'castilla-mancha', 'cantabria',
+          'aragon', 'baleares', 'asturias', 'cataluna', 'pais-vasco', 'navarra',
+        ]).describe('CCAA del causante (el fallecido). Determina el impuesto de sucesiones aplicable.'),
+        porcentaje: z.number().min(0).max(100).optional()
+          .describe('% de la masa hereditaria que recibe. Si no se indica para ningún heredero, se hace reparto igualitario.'),
+        edad: z.number().int().min(0).max(120).optional()
+          .describe('Edad del heredero (relevante para grupo I-descendiente < 21 años: reducción adicional de 3.990€ por año menos de 21).'),
+        discapacidad: z.enum(['ninguna', '33-65', '65-mas']).optional()
+          .describe('"ninguna" (por defecto), "33-65" (33-65%), "65-mas" (≥65% discapacidad).'),
+        patrimonioPrevio: z.enum(['hasta-402k', '402k-2M', '2M-4M', 'mas-4M']).optional()
+          .describe('Patrimonio preexistente del heredero (afecta al coeficiente multiplicador del impuesto). Por defecto "hasta-402k".'),
+        incluyeViviendaHabitual: z.boolean().optional()
+          .describe('¿Su parte incluye la vivienda habitual del causante? Aplicaría reducción del 95% (máx 122.606€ por heredero).'),
+        valorViviendaHabitual: z.number().min(0).optional()
+          .describe('Valor de la vivienda habitual incluida en su cuota hereditaria (€).'),
+      })).min(1).max(10)
+        .describe('Lista de herederos con sus datos. Mínimo 1, máximo 10.'),
+    },
+    async ({ masaHereditaria, herederos }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_herencia_conjunta', aiCaller);
+
+      let r;
+      try {
+        r = calcularHerenciaConjunta(masaHereditaria, herederos as HerederoInput[]);
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `⚖️ **Reparto de Herencia — ${r.numHerederos} herederos**`,
+        '',
+        `💰 Masa hereditaria total: **${fmt(r.masaHereditaria)} €**`,
+        '',
+        `📋 **Resultado por heredero:**`,
+        ...r.herederos.map(h =>
+          [
+            ``,
+            `👤 **${h.nombre}** (${h.grupo}, ${h.ccaa}) — ${h.porcentaje.toFixed(2).replace('.', ',')}%`,
+            `  💶 Cuota hereditaria: ${fmt(h.cuotaHereditaria)} €`,
+            h.reduccion > 0 ? `  ✂️ Reducción: ${fmt(h.reduccion)} €` : '',
+            h.reduccion > 0 ? `  📋 Base imponible: ${fmt(h.baseImponible)} €` : '',
+            `  🏛️ Impuesto sucesiones: **${fmt(h.impuesto)} €** (tipo efectivo: ${h.tipoEfectivo.toFixed(2).replace('.', ',')}%)`,
+            `  ✅ **Neto recibido: ${fmt(h.netoRecibido)} €**`,
+          ].filter(l => l !== '').join('\n')
+        ),
+        '',
+        `📊 **Totales:**`,
+        `  🏛️ Total impuesto pagado: **${fmt(r.totalImpuesto)} €** (${r.cargaFiscalTotal.toFixed(2).replace('.', ',')}% de la masa)`,
+        `  ✅ Total neto distribuido: **${fmt(r.totalNetoDistribuido)} €**`,
+        '',
+        `📚 ${r.fuenteDatos}`,
+        `⚠️ *Estimación orientativa. No incluye la plusvalía municipal sobre inmuebles (usar calcular_venta_inmueble para eso). El reparto real debe hacerse con notario/abogado. El impuesto se liquida en la CCAA del causante.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_seguro_vida
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_seguro_vida',
+    'Calcula el capital de seguro de vida necesario para proteger adecuadamente a la familia. ' +
+    'Determina tres niveles: capital mínimo (solo deudas + emergencias), ' +
+    'capital recomendado (sustitución de ingresos + deudas + educación de hijos + funerario + colchón) ' +
+    'y capital óptimo (+20% por inflación). ' +
+    'Evalúa si el seguro actual es suficiente y el gap a cubrir.',
+    {
+      edad: z.number().int().min(18).max(80)
+        .describe('Edad actual del asegurado en años'),
+      ingresoAnual: z.number().positive()
+        .describe('Ingreso anual bruto del asegurado en euros'),
+      edadJubilacion: z.number().int().min(55).max(75).optional()
+        .describe('Edad de jubilación objetivo. Por defecto 67 años.'),
+      ingresoConyuge: z.number().min(0).optional()
+        .describe('Ingreso anual del cónyuge/pareja en euros. Por defecto 0.'),
+      hipotecaPendiente: z.number().min(0).optional()
+        .describe('Capital pendiente de la hipoteca en euros. Por defecto 0.'),
+      otrasDeudas: z.number().min(0).optional()
+        .describe('Otras deudas: préstamos personales, coches, etc. en euros. Por defecto 0.'),
+      numHijos: z.number().int().min(0).max(10).optional()
+        .describe('Número de hijos a cargo. Por defecto 0.'),
+      edadHijoMenor: z.number().int().min(0).max(22).optional()
+        .describe('Edad del hijo más joven (para calcular años de educación hasta los 23). Por defecto 0.'),
+      ahorrosActuales: z.number().min(0).optional()
+        .describe('Ahorros e inversiones actuales del hogar en euros (reducen el capital necesario). Por defecto 0.'),
+      seguroVidaActual: z.number().min(0).optional()
+        .describe('Capital de seguros de vida existentes en euros. Por defecto 0.'),
+    },
+    async ({ edad, ingresoAnual, edadJubilacion, ingresoConyuge, hipotecaPendiente, otrasDeudas, numHijos, edadHijoMenor, ahorrosActuales, seguroVidaActual }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_seguro_vida', aiCaller);
+
+      let r;
+      try {
+        r = calcularSeguroVida({
+          edad, ingresoAnual, edadJubilacion, ingresoConyuge,
+          hipotecaPendiente, otrasDeudas, numHijos, edadHijoMenor,
+          ahorrosActuales, seguroVidaActual,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      const suficiencia = r.seguroActualSuficiente
+        ? '✅ Tu seguro actual es suficiente'
+        : `❌ Gap: necesitas ${fmt(r.capitalRecomendado - (seguroVidaActual ?? 0))} € más de cobertura`;
+
+      const lineas = [
+        `🛡️ **Capital de Seguro de Vida Necesario**`,
+        '',
+        `👤 ${edad} años | Ingresos: ${fmt(ingresoAnual)} €/año | ${r.anosCobertura} años hasta jubilación`,
+        '',
+        `📊 **Desglose de necesidades:**`,
+        `  💼 Sustitución de ingresos (${Math.min(r.anosCobertura, 15)} años × 70%): ${fmt(r.desglose.sustitucionIngresos)} €`,
+        r.desglose.hipoteca > 0 ? `  🏠 Hipoteca pendiente: ${fmt(r.desglose.hipoteca)} €` : '',
+        r.desglose.otrasDeudas > 0 ? `  💳 Otras deudas: ${fmt(r.desglose.otrasDeudas)} €` : '',
+        r.desglose.educacionHijos > 0 ? `  🎓 Educación hijos: ${fmt(r.desglose.educacionHijos)} €` : '',
+        `  ⚰️ Gastos funerarios: ${fmt(r.desglose.gastosFunerarios)} €`,
+        `  🛟 Colchón emergencia (6 meses): ${fmt(r.desglose.colchonEmergencia)} €`,
+        `  📉 Recursos disponibles: -${fmt(r.desglose.recursosDisponibles)} €`,
+        '',
+        `🎯 **Capital mínimo:** ${fmt(r.capitalMinimo)} €`,
+        `🎯 **Capital recomendado: ${fmt(r.capitalRecomendado)} €**`,
+        `🎯 Capital óptimo (+20% inflación): ${fmt(r.capitalOptimo)} €`,
+        '',
+        r.coberturaActualPct > 0 ? `📊 Cobertura actual: ${r.coberturaActualPct}% del recomendado` : '',
+        suficiencia,
+        '',
+        `⚠️ *Estimación metodología DINK ajustada. El capital real depende de tu situación familiar, gastos reales y expectativa de vida. Consultar con un corredor de seguros.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: comparar_autonomo_vs_sl
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'comparar_autonomo_vs_sl',
+    'Compara la carga fiscal total de operar como autónomo persona física frente a ' +
+    'constituir una Sociedad Limitada (SL). ' +
+    'Calcula para el autónomo: RETA por ingresos reales + IRPF. ' +
+    'Calcula para la SL: IS (15%/23%/25%) + cotización autónomo societario (514,99€/mes) + IRPF sobre dividendos. ' +
+    'Determina qué opción es más eficiente fiscalmente y a partir de qué nivel de beneficio conviene la SL. ' +
+    '⚠️ La SL tiene costes de constitución (~3.000-5.000€), obligaciones contables y de gestión adicionales.',
+    {
+      beneficioAnual: z.number().positive()
+        .describe('Beneficio bruto anual de la actividad en euros (ingresos totales antes de gastos)'),
+      gastosDeducibles: z.number().min(0).optional()
+        .describe('Gastos deducibles anuales en euros (suministros, material, vehículo, etc.). Por defecto 0.'),
+      tipoIS: z.enum(['general', 'micropyme', 'nueva_creacion']).optional()
+        .describe('"general" (25%, tipo estándar), "micropyme" (23%, si facturación < 1M€), "nueva_creacion" (15%, primeros 2 años con beneficio). Por defecto "general".'),
+      repartirDividendos: z.boolean().optional()
+        .describe('¿La SL va a repartir dividendos al socio? Si es false, el beneficio queda acumulado en la SL. Por defecto true.'),
+    },
+    async ({ beneficioAnual, gastosDeducibles, tipoIS, repartirDividendos }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('comparar_autonomo_vs_sl', aiCaller);
+
+      let r;
+      try {
+        r = compararAutonomoVsSL({
+          beneficioAnual,
+          gastosDeducibles,
+          tipoIS: tipoIS as TipoISSL,
+          repartirDividendos,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const ganador = r.convieneSL ? '🏆 **Fiscalmente conviene más la SL**' : '🏆 **Fiscalmente conviene más el autónomo**';
+      const lineas = [
+        `⚖️ **Autónomo vs SL — Comparativa Fiscal 2025**`,
+        '',
+        `💶 Beneficio bruto: **${fmt(beneficioAnual)} €** | Gastos deducibles: ${fmt(gastosDeducibles ?? 0)} € | IS aplicado: ${r.tipoISAplicado}%`,
+        '',
+        `👷 **AUTÓNOMO PERSONA FÍSICA**`,
+        `  🏛️ Cuota RETA: ${fmt(r.autonomo.cuotaSSAnual)} €/año`,
+        `  📄 IRPF: ${fmt(r.autonomo.cuotaImpuesto)} €`,
+        `  💰 Total cargas: **${fmt(r.autonomo.totalCargas)} €** (tipo efectivo: ${r.autonomo.tipoEfectivoTotal.toFixed(2).replace('.', ',')}%)`,
+        `  ✅ **Neto anual: ${fmt(r.autonomo.netoAnual)} €**`,
+        '',
+        `🏢 **SOCIEDAD LIMITADA**`,
+        `  🏛️ Cotización autónomo societario: ${fmt(r.sl.cuotaSSAnual)} €/año`,
+        `  📄 IS (${r.tipoISAplicado}%): ${fmt(r.sl.cuotaImpuesto)} €`,
+        r.sl.irpfDividendos > 0 ? `  💹 IRPF sobre dividendos: ${fmt(r.sl.irpfDividendos)} €` : `  ℹ️ Sin reparto de dividendos (quedan en la SL)`,
+        `  💰 Total cargas: **${fmt(r.sl.totalCargas)} €** (tipo efectivo: ${r.sl.tipoEfectivoTotal.toFixed(2).replace('.', ',')}%)`,
+        `  ✅ **Neto anual: ${fmt(r.sl.netoAnual)} €**`,
+        '',
+        ganador,
+        r.convieneSL
+          ? `💡 La SL ahorra **${fmt(r.ahorroCargasSL)} €/año** en cargas fiscales`
+          : `💡 El autónomo paga **${fmt(Math.abs(r.ahorroCargasSL))} €/año menos** en cargas fiscales`,
+        r.umbralSL > 0
+          ? `📊 La SL empieza a ser más eficiente a partir de ~${fmt(r.umbralSL)} €/año de beneficio`
+          : '',
+        '',
+        `⚠️ *La SL tiene costes adicionales: constitución (~3.000-5.000 €), contabilidad obligatoria (~1.500-3.000 €/año), modelo 200, etc. El umbral real de rentabilidad es mayor que el fiscal.*`,
+        `📚 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_declaracion_conjunta
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_declaracion_conjunta',
+    'Compara el IRPF total entre presentar la declaración de forma individual ' +
+    '(cada cónyuge por separado) o conjunta (unidad familiar con reducción especial de 3.400€). ' +
+    'Calcula cuál opción resulta más favorable y el ahorro o coste adicional. ' +
+    'Generalmente la conjunta conviene cuando un cónyuge tiene ingresos bajos o nulos. ' +
+    '⚠️ Estimación con tipos estatal + autonómico medio. No incluye deducciones específicas de cada CCAA.',
+    {
+      salarioBruto1: z.number().min(0)
+        .describe('Salario bruto anual del cónyuge 1 (el de más ingresos, normalmente) en euros'),
+      salarioBruto2: z.number().min(0)
+        .describe('Salario bruto anual del cónyuge 2 en euros. Puede ser 0 si no trabaja.'),
+      retenciones1: z.number().min(0).optional()
+        .describe('Retenciones practicadas al cónyuge 1 en euros. Por defecto 0.'),
+      retenciones2: z.number().min(0).optional()
+        .describe('Retenciones practicadas al cónyuge 2 en euros. Por defecto 0.'),
+      otrosRendimientos1: z.number().min(0).optional()
+        .describe('Otros rendimientos netos del cónyuge 1 (alquiler, dividendos, etc.) en euros. Por defecto 0.'),
+      otrosRendimientos2: z.number().min(0).optional()
+        .describe('Otros rendimientos netos del cónyuge 2 en euros. Por defecto 0.'),
+      numHijos: z.number().int().min(0).max(10).optional()
+        .describe('Número de hijos a cargo. Por defecto 0.'),
+      hijosMenores3: z.number().int().min(0).max(5).optional()
+        .describe('Número de hijos menores de 3 años. Por defecto 0.'),
+    },
+    async ({ salarioBruto1, salarioBruto2, retenciones1, retenciones2, otrosRendimientos1, otrosRendimientos2, numHijos, hijosMenores3 }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_declaracion_conjunta', aiCaller);
+
+      let r;
+      try {
+        r = calcularDeclaracionConjunta({
+          conyuge1: { salarioBruto: salarioBruto1, retenciones: retenciones1, otrosRendimientos: otrosRendimientos1 },
+          conyuge2: { salarioBruto: salarioBruto2, retenciones: retenciones2, otrosRendimientos: otrosRendimientos2 },
+          numHijos,
+          hijosMenores3,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const fmtDif = (n: number) => `${n >= 0 ? '+' : ''}${fmt(n)}`;
+      const ganador = r.convieneConjunta ? '✅ **CONVIENE declaración CONJUNTA**' : '✅ **CONVIENE declaración INDIVIDUAL**';
+      const lineas = [
+        `📊 **IRPF: Individual vs Conjunta**`,
+        '',
+        `💶 Cónyuge 1: ${fmt(salarioBruto1)} € bruto | Cónyuge 2: ${fmt(salarioBruto2)} € bruto`,
+        '',
+        `📋 **INDIVIDUAL (suma de ambas declaraciones)**`,
+        `  Base imponible: ${fmt(r.individual.baseImponible1 + r.individual.baseImponible2)} €`,
+        `  Base liquidable: ${fmt(r.individual.baseLiquidable)} €`,
+        `  Cuota IRPF total: **${fmt(r.individual.cuotaIRPF)} €**`,
+        `  Retenciones: ${fmt(r.individual.retenciones)} €`,
+        `  Cuota diferencial: ${fmtDif(r.individual.cuotaDiferencial)} € ${r.individual.cuotaDiferencial >= 0 ? '(a pagar)' : '(a devolver)'}`,
+        `  Tipo efectivo: ${r.individual.tipoEfectivo.toFixed(2).replace('.', ',')}%`,
+        '',
+        `📋 **CONJUNTA (unidad familiar)**`,
+        `  Base imponible: ${fmt(r.conjunta.baseImponible1 + r.conjunta.baseImponible2)} €`,
+        `  Reducción conjunta (art. 84): -3.400 €`,
+        `  Base liquidable: ${fmt(r.conjunta.baseLiquidable)} €`,
+        `  Cuota IRPF total: **${fmt(r.conjunta.cuotaIRPF)} €**`,
+        `  Retenciones: ${fmt(r.conjunta.retenciones)} €`,
+        `  Cuota diferencial: ${fmtDif(r.conjunta.cuotaDiferencial)} € ${r.conjunta.cuotaDiferencial >= 0 ? '(a pagar)' : '(a devolver)'}`,
+        `  Tipo efectivo: ${r.conjunta.tipoEfectivo.toFixed(2).replace('.', ',')}%`,
+        '',
+        `${ganador}`,
+        `💡 ${r.convieneConjunta ? 'Ahorro' : 'Coste adicional'} de la conjunta: **${fmt(r.ahorroCojunta)} €/año**`,
+        '',
+        `📚 ${r.fuenteDatos}`,
+        `⚠️ *Estimación con tipos estatal + autonómico medio. No incluye deducciones autonómicas ni circunstancias específicas. Verificar con Renta Web de la AEAT.*`,
       ].filter(l => l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
