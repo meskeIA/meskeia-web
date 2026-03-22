@@ -39,6 +39,14 @@ import {
   type NivelDiscapacidadIS,
   type IndicePatrimonioIS,
 } from '@/lib/calculadoras/sucesiones';
+import { calcularHipoteca, type TipoHipoteca } from '@/lib/calculadoras/hipoteca';
+import { calcularPrestamo, type SistemaAmortizacion } from '@/lib/calculadoras/prestamo';
+import {
+  calcularCompraventa,
+  type TipoTransmision as TipoTransmisionCompraventa,
+  type TipoInmuebleMCP,
+  type PerfilCompradorMCP,
+} from '@/lib/calculadoras/compraventa';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -890,6 +898,273 @@ function crearServidorMCP(): McpServer {
         '',
         '⚖️ *Estimación orientativa basada en normativa 2025 (Ley 29/1987 ISD). No constituye asesoramiento fiscal ni jurídico. Plazo de autoliquidación: 6 meses desde el fallecimiento (prorrogable). Consulta con un asesor fiscal.*',
         `📚 ${r.fuenteDatos}`,
+      );
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_hipoteca
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_hipoteca',
+    'Calcula una hipoteca española con sistema francés (cuota constante). ' +
+    'Soporta tipo fijo, variable (Euríbor + diferencial) e hipoteca mixta. ' +
+    'Devuelve cuota mensual, total de intereses, total pagado, ratio cuota/ingresos ' +
+    'y resumen anual de amortización. ' +
+    '⚠️ Estimación orientativa — no incluye TAE, seguros ni comisiones bancarias.',
+    {
+      precioVivienda: z.number().positive()
+        .describe('Precio de la vivienda en euros'),
+      entrada: z.number().nonnegative()
+        .describe('Importe de la entrada en euros (lo que aportas de tu bolsillo). Mínimo recomendado: 20% del precio.'),
+      plazoAnios: z.number().int().min(1).max(40)
+        .describe('Plazo de la hipoteca en años (habitualmente entre 15 y 30 años)'),
+      tipoHipoteca: z.enum(['fijo', 'variable', 'mixta'])
+        .describe('"fijo" = tipo constante todo el plazo. "variable" = Euríbor + diferencial. "mixta" = fase fija inicial + fase variable.'),
+      interesAnual: z.number().min(0).max(15).optional()
+        .describe('Tipo de interés fijo anual en % (para tipo "fijo" o fase fija de "mixta"). Ej: 3.5 para 3,5%.'),
+      euribor: z.number().min(-2).max(10).optional()
+        .describe('Euríbor actual anual en % (para tipo "variable" y fase variable de "mixta"). Ej: 2.5 para 2,5%.'),
+      diferencial: z.number().min(0).max(5).optional()
+        .describe('Diferencial del banco sobre Euríbor en % (para "variable" y "mixta"). Ej: 0.8 para 0,8%.'),
+      plazoFijoMixta: z.number().int().min(1).max(20).optional()
+        .describe('Años de fase fija en hipoteca mixta. Ej: 5 para los primeros 5 años a tipo fijo.'),
+      ingresosMensuales: z.number().positive().optional()
+        .describe('Ingresos netos mensuales del solicitante en euros. Permite calcular el ratio de endeudamiento (recomendable ≤30%).'),
+    },
+    async ({ precioVivienda, entrada, plazoAnios, tipoHipoteca, interesAnual, euribor, diferencial, plazoFijoMixta, ingresosMensuales }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_hipoteca', aiCaller);
+
+      let r;
+      try {
+        r = calcularHipoteca({
+          precioVivienda, entrada, plazoAnios,
+          tipoHipoteca: tipoHipoteca as TipoHipoteca,
+          interesAnual, euribor, diferencial, plazoFijoMixta, ingresosMensuales,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const lineas = [
+        `🏠 **Simulador de Hipoteca (Sistema Francés)**`,
+        '',
+        `💶 Precio vivienda: ${fmt(precioVivienda)} €`,
+        `💰 Entrada: ${fmt(entrada)} € (${r.porcentajeFinanciacion}% financiado)`,
+        `📦 Capital financiado: **${fmt(r.capital)} €**`,
+        `⏳ Plazo: ${plazoAnios} años`,
+        `📊 Tipo efectivo: ${r.tipoEfectivo.toFixed(2).replace('.', ',')}%${r.tipoEfectivFase2 ? ` → ${r.tipoEfectivFase2.toFixed(2).replace('.', ',')}% (fase variable)` : ''}`,
+        '',
+        `💳 **Cuota mensual: ${fmt(r.cuotaMensual)} €**`,
+      ];
+
+      if (r.cuotaMensualFase2) {
+        lineas.push(`💳 Cuota fase variable estimada: ${fmt(r.cuotaMensualFase2)} €`);
+      }
+
+      if (r.ratioCuotaIngresos !== null) {
+        const emoji = r.alertaRatio ? '⚠️' : '✅';
+        lineas.push(`${emoji} Ratio cuota/ingresos: **${r.ratioCuotaIngresos.toFixed(1).replace('.', ',')}%** (recomendable ≤30%)`);
+      }
+
+      lineas.push(
+        '',
+        `➕ Total intereses: ${fmt(r.totalIntereses)} € (${r.porcentajeInteresesSobreCapital.toFixed(1).replace('.', ',')}% sobre el capital)`,
+        `💰 **Total pagado: ${fmt(r.totalPagado)} €**`,
+        '',
+        '📋 **Resumen primeros 5 años:**',
+      );
+
+      for (const a of r.resumenAnual.slice(0, 5)) {
+        lineas.push(`  Año ${a.anio}: cuota anual ${fmt(a.cuotasAnuales)} € | intereses ${fmt(a.interesesAnio)} € | pendiente ${fmt(a.capitalPendiente)} €`);
+      }
+
+      lineas.push(
+        '',
+        `⚖️ *${r.nota}*`,
+      );
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_prestamo
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_prestamo',
+    'Calcula un préstamo personal o financiero con tres sistemas de amortización: ' +
+    'francés (cuota constante, el más habitual), alemán (amortización constante, cuotas decrecientes) ' +
+    'y americano/bullet (solo intereses durante el plazo, capital al final). ' +
+    'Incluye TAE aproximada, comparativa de costes y primeras cuotas desglosadas. ' +
+    '⚠️ Estimación orientativa — la TAE real depende de todos los gastos del contrato.',
+    {
+      capital: z.number().positive()
+        .describe('Importe del préstamo en euros'),
+      plazoMeses: z.number().int().min(1).max(600)
+        .describe('Plazo del préstamo en meses. Ej: 36 para 3 años, 60 para 5 años.'),
+      tin: z.number().min(0).max(50)
+        .describe('Tipo de interés nominal anual (TIN) en %. Ej: 7 para 7%.'),
+      sistema: z.enum(['frances', 'aleman', 'americano'])
+        .describe(
+          '"frances" = cuota fija (el más habitual). ' +
+          '"aleman" = amortización constante, cuota inicial más alta pero va bajando, menos intereses totales. ' +
+          '"americano" = solo intereses cada mes, capital devuelto de golpe al final (bullet).'
+        ),
+      comisionApertura: z.number().min(0).max(5).optional()
+        .describe('Comisión de apertura en % sobre el capital. Afecta al cálculo de TAE. Por defecto 0.'),
+    },
+    async ({ capital, plazoMeses, tin, sistema, comisionApertura }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_prestamo', aiCaller);
+
+      let r;
+      try {
+        r = calcularPrestamo({ capital, plazoMeses, tin, sistema: sistema as SistemaAmortizacion, comisionApertura });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const lineas = [
+        `💳 **Calculadora de Préstamos — ${r.nombreSistema}**`,
+        `ℹ️ ${r.descripcionSistema}`,
+        '',
+        `💶 Capital: ${fmt(capital)} €`,
+        `⏳ Plazo: ${plazoMeses} meses (${(plazoMeses / 12).toFixed(1).replace('.', ',')} años)`,
+        `📊 TIN: ${tin.toFixed(2).replace('.', ',')}%`,
+        r.comisionAperturaEuros > 0 ? `📋 Comisión apertura: ${fmt(r.comisionAperturaEuros)} €` : '',
+        `📈 **TAE aproximada: ${r.taeAproximada.toFixed(2).replace('.', ',')}%**`,
+        '',
+        `💳 Cuota inicial: **${fmt(r.cuotaInicial)} €**`,
+        sistema !== 'frances' ? `💳 Cuota final: **${fmt(r.cuotaFinal)} €**` : '',
+        '',
+        `➕ Total intereses: ${fmt(r.totalIntereses)} €`,
+        `💰 **Total pagado: ${fmt(r.totalPagado)} €**`,
+        '',
+        '📋 **Primeras cuotas (muestra):**',
+        `  Mes | Cuota | Interés | Amortización | Pendiente`,
+      ];
+
+      for (const c of r.muestraCuotas) {
+        lineas.push(`  ${c.mes.toString().padStart(3)} | ${fmt(c.cuota)} € | ${fmt(c.interes)} € | ${fmt(c.amortizacion)} € | ${fmt(c.pendiente)} €`);
+      }
+
+      lineas.push('', `✅ ${r.ventajas}`);
+
+      return { content: [{ type: 'text', text: lineas.filter(l => l !== '').join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_compraventa_inmueble
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_compraventa_inmueble',
+    'Calcula todos los gastos de compraventa de un inmueble en España con normativa 2025. ' +
+    'Para el COMPRADOR: ITP (segunda mano, por CCAA 4%-10%) o IVA (obra nueva 10%/4% VPO/21% local), ' +
+    'AJD, notaría, registro y gestoría. ' +
+    'Para el VENDEDOR (opcional): plusvalía municipal IIVTNU con coeficientes oficiales 2025 ' +
+    'e IRPF sobre la ganancia patrimonial con tramos 2025. ' +
+    '⚠️ Estimación orientativa — notaría y registro dependen del arancel exacto.',
+    {
+      precioInmueble: z.number().positive()
+        .describe('Precio de compraventa del inmueble en euros'),
+      ccaa: z.enum([
+        'madrid', 'andalucia', 'cataluna', 'valencia', 'galicia', 'castilla-leon',
+        'castilla-mancha', 'aragon', 'baleares', 'canarias', 'cantabria', 'asturias',
+        'extremadura', 'murcia', 'rioja', 'pais-vasco', 'navarra',
+      ]).describe('Comunidad autónoma donde se ubica el inmueble (determina el tipo de ITP)'),
+      tipoTransmision: z.enum(['segunda_mano', 'obra_nueva', 'vpo'])
+        .describe('"segunda_mano" = ITP (impuesto transmisiones patrimoniales). "obra_nueva" = IVA 10% residencial o 21% local. "vpo" = IVA superreducido 4%.'),
+      tipoInmueble: z.enum(['vivienda', 'garaje', 'local_comercial', 'terreno']).optional()
+        .describe('Tipo de inmueble. Afecta al IVA en obra nueva: vivienda/garaje=10%, local_comercial/terreno=21%. Por defecto "vivienda".'),
+      perfilComprador: z.enum(['general', 'joven', 'familia_numerosa', 'discapacidad']).optional()
+        .describe('Perfil del comprador. Puede aplicar tipo reducido de ITP en algunas CCAA. Por defecto "general".'),
+      precioCompraOriginal: z.number().positive().optional()
+        .describe('Precio al que compró el inmueble el vendedor (para calcular la ganancia patrimonial y el IRPF del vendedor)'),
+      aniosTenencia: z.number().int().min(0).max(50).optional()
+        .describe('Años que ha tenido el inmueble el vendedor (para calcular la plusvalía municipal IIVTNU)'),
+      valorCatastralSuelo: z.number().positive().optional()
+        .describe('Valor catastral del suelo del inmueble en euros (figura en el recibo del IBI). Necesario para calcular la plusvalía municipal.'),
+      vendedorMayor65: z.boolean().optional()
+        .describe('Si el vendedor tiene más de 65 años. Relevante para la exención de IRPF en vivienda habitual.'),
+      esViviendaHabitual: z.boolean().optional()
+        .describe('Si el inmueble es la vivienda habitual del vendedor. Relevante para exenciones de IRPF.'),
+      tipoMunicipalIIVTNU: z.number().min(0).max(30).optional()
+        .describe('Tipo impositivo que aplica el Ayuntamiento en la plusvalía municipal (0%-30%). Por defecto 25% orientativo si no se conoce.'),
+    },
+    async ({ precioInmueble, ccaa, tipoTransmision, tipoInmueble, perfilComprador, precioCompraOriginal, aniosTenencia, valorCatastralSuelo, vendedorMayor65, esViviendaHabitual, tipoMunicipalIIVTNU }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_compraventa_inmueble', aiCaller);
+
+      let r;
+      try {
+        r = calcularCompraventa({
+          precioInmueble, ccaa,
+          tipoTransmision: tipoTransmision as TipoTransmisionCompraventa,
+          tipoInmueble: tipoInmueble as TipoInmuebleMCP | undefined,
+          perfilComprador: perfilComprador as PerfilCompradorMCP | undefined,
+          precioCompraOriginal, aniosTenencia, valorCatastralSuelo,
+          vendedorMayor65, esViviendaHabitual, tipoMunicipalIIVTNU,
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const c = r.comprador;
+
+      const lineas = [
+        `🏘️ **Gastos de Compraventa Inmobiliaria — ${r.ccaaNombre}**`,
+        '',
+        `💶 Precio del inmueble: **${fmt(c.precioInmueble)} €**`,
+        '',
+        `🧾 **GASTOS DEL COMPRADOR**`,
+        `  📋 ${c.tipoImpuesto} (${c.porcentajeImpuesto}%): **${fmt(c.importeImpuesto)} €**`,
+        `     ℹ️ ${c.notaITP}`,
+        `  📝 AJD escritura: ${fmt(c.ajd)} €`,
+        `  ✍️ Notaría (estimación): ${fmt(c.notaria)} €`,
+        `  📚 Registro (estimación): ${fmt(c.registro)} €`,
+        `  🗂️ Gestoría (estimación): ${fmt(c.gestoria)} €`,
+        `  ─────────────────────────`,
+        `  💰 **Total gastos comprador: ${fmt(c.totalGastos)} €** (${((c.totalGastos / c.precioInmueble) * 100).toFixed(1).replace('.', ',')}% del precio)`,
+        `  🏠 **Total operación (precio + gastos): ${fmt(c.totalOperacion)} €**`,
+      ];
+
+      if (r.vendedor) {
+        const v = r.vendedor;
+        lineas.push('', `🏷️ **GASTOS DEL VENDEDOR**`);
+
+        if (v.plusvaliaMunicipal !== null) {
+          lineas.push(`  🏛️ Plusvalía municipal (IIVTNU): **${fmt(v.plusvaliaMunicipal)} €**`);
+          lineas.push(`     ℹ️ ${v.metodoPlusvalia}`);
+        }
+
+        if (v.gananciaPatrimonial !== null) {
+          lineas.push(`  📈 Ganancia patrimonial: ${fmt(v.gananciaPatrimonial)} €`);
+          if (v.exentoIRPF) {
+            lineas.push(`  ✅ IRPF: **EXENTO** — ${v.motivoExencion}`);
+          } else {
+            lineas.push(`  💸 IRPF sobre ganancia: **${fmt(v.irpfGananciaPatrimonial ?? 0)} €**`);
+          }
+        }
+
+        lineas.push(`  ─────────────────────────`);
+        lineas.push(`  💰 **Total gastos vendedor estimados: ${fmt(v.totalGastosVendedor)} €**`);
+        lineas.push(``, `  ⚠️ *${v.nota}*`);
+      }
+
+      lineas.push(
+        '',
+        `📚 Fuente: ${r.fuenteDatos}`,
+        `⚖️ *Estimación orientativa. Los aranceles de notaría y registro dependen de la operación exacta. Consulta con un gestor o notario antes de firmar.*`,
       );
 
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
