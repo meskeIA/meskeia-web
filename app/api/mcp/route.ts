@@ -24,6 +24,12 @@ import {
   type UnidadTiempo,
   type OperacionFecha,
 } from '@/lib/calculadoras/fechas';
+import {
+  calcularDonacion,
+  type GrupoParentesco,
+  type NivelDiscapacidad,
+  type IndicePatrimonio,
+} from '@/lib/calculadoras/donaciones';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -442,6 +448,129 @@ function crearServidorMCP(): McpServer {
       ].join('\n');
 
       return { content: [{ type: 'text', text: texto }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_donaciones
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_donaciones',
+    'Calcula el Impuesto de Donaciones (ISD) en España con precisión normativa 2025. ' +
+    'Más exacto que el conocimiento general: aplica la tarifa estatal (16 tramos), ' +
+    'la tarifa propia de Cataluña, los coeficientes multiplicadores por patrimonio ' +
+    'preexistente y las bonificaciones autonómicas de las 17 CCAA. ' +
+    'Devuelve la cuota a pagar, el tipo efectivo y el desglose completo del cálculo. ' +
+    '⚠️ Estimación orientativa — no reemplaza asesoramiento fiscal profesional.',
+    {
+      valorDonacion: z.number().positive()
+        .describe('Valor de la donación en euros (ej: 50000 para 50.000 €)'),
+      ccaa: z.enum([
+        'madrid', 'andalucia', 'galicia', 'murcia', 'valencia', 'extremadura',
+        'canarias', 'castilla-leon', 'rioja', 'castilla-mancha', 'cantabria',
+        'aragon', 'baleares', 'asturias', 'cataluna', 'pais-vasco', 'navarra',
+      ]).describe(
+        'Comunidad autónoma del donatario (quien recibe la donación). ' +
+        'Valores: madrid, andalucia, galicia, murcia, valencia, extremadura, ' +
+        'canarias, castilla-leon, rioja, castilla-mancha, cantabria, aragon, ' +
+        'baleares, asturias, cataluna, pais-vasco, navarra'
+      ),
+      grupo: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III', 'IV'])
+        .describe(
+          'Grupo de parentesco del donatario: ' +
+          'I-conyuge = cónyuge o pareja de hecho, ' +
+          'I-descendiente = hijo/nieto menor de 21 años, ' +
+          'II = hijo/nieto mayor de 21 años u otro descendiente/ascendiente, ' +
+          'II-ascendiente = padre, madre, abuelo, ' +
+          'III = colateral 2º y 3er grado (hermano, tío, sobrino), cónyuge de descendiente, ' +
+          'IV = colateral 4º grado, extraños'
+        ),
+      cargas: z.number().nonnegative().optional()
+        .describe('Cargas deducibles en euros (hipotecas u otras cargas reales sobre el bien donado). Por defecto 0.'),
+      escrituraPublica: z.boolean().optional()
+        .describe('Si la donación se formaliza en escritura pública notarial. Afecta a Cataluña (tarifa reducida) y Castilla-La Mancha (bonificación). Por defecto true.'),
+      discapacidad: z.enum(['0', '33', '65']).optional()
+        .describe('Grado de discapacidad del donatario: "0" = sin discapacidad, "33" = grado 33%–64%, "65" = grado ≥65%. Por defecto "0".'),
+      patrimonioIdx: z.number().int().min(1).max(4).optional()
+        .describe(
+          'Índice del patrimonio preexistente del donatario (afecta al coeficiente multiplicador): ' +
+          '1 = hasta 402.678 €, 2 = de 402.678 a 2.007.380 €, ' +
+          '3 = de 2.007.380 a 4.020.770 €, 4 = más de 4.020.770 €. Por defecto 1.'
+        ),
+    },
+    async ({ valorDonacion, ccaa, grupo, cargas, escrituraPublica, discapacidad, patrimonioIdx }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_donaciones', aiCaller);
+
+      let r;
+      try {
+        r = calcularDonacion({
+          valorDonacion,
+          ccaa,
+          grupo: grupo as GrupoParentesco,
+          cargas,
+          escrituraPublica,
+          discapacidad: discapacidad as NivelDiscapacidad | undefined,
+          patrimonioIdx: patrimonioIdx as IndicePatrimonio | undefined,
+        });
+      } catch (err) {
+        return {
+          content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }],
+        };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const lineas: string[] = [
+        `🏛️ **Impuesto de Donaciones — ${r.ccaaNombre}**`,
+        `📋 Tarifa: ${r.tarifaAplicada}`,
+        '',
+        `💶 Valor donación: **${fmt(r.baseImponible)} €**`,
+      ];
+
+      if (r.cargas > 0) lineas.push(`➖ Cargas deducibles: ${fmt(r.cargas)} €`);
+      lineas.push(`📦 Base liquidable: ${fmt(r.baseLiquidable)} €`);
+
+      if (r.reduccionParentesco > 0) lineas.push(`➖ Reducción parentesco: ${fmt(r.reduccionParentesco)} €`);
+      if (r.reduccionDiscapacidad > 0) lineas.push(`➖ Reducción discapacidad: ${fmt(r.reduccionDiscapacidad)} €`);
+      if (r.reduccionParentesco > 0 || r.reduccionDiscapacidad > 0) {
+        lineas.push(`📊 Base neta reducida: ${fmt(r.baseNetaReducida)} €`);
+      }
+
+      lineas.push(
+        '',
+        `🔢 Cuota íntegra: ${fmt(r.cuotaIntegra)} €`,
+      );
+
+      if (r.coeficienteMultiplicador !== 1) {
+        lineas.push(`✖️ Coeficiente multiplicador: ×${r.coeficienteMultiplicador}`);
+        lineas.push(`🔢 Cuota tributaria: ${fmt(r.cuotaTributaria)} €`);
+      }
+
+      if (r.bonificacionCcaa > 0) {
+        lineas.push(`➖ ${r.detalleBonificacion}: −${fmt(r.bonificacionCcaa)} €`);
+      } else if (r.porcentajeBonificacion === 0) {
+        lineas.push(`ℹ️ Bonificación: ${r.detalleBonificacion}`);
+      }
+
+      lineas.push(
+        '',
+        `💰 **Cuota a pagar: ${fmt(r.cuotaFinal)} €**`,
+        `📈 Tipo efectivo: **${r.tipoEfectivo.toFixed(2).replace('.', ',')}%**`,
+      );
+
+      if (r.esForal) {
+        lineas.push('', `⚠️ **Régimen foral**: ${r.notasCcaa}`);
+      } else if (r.notasCcaa) {
+        lineas.push('', `ℹ️ ${r.notasCcaa}`);
+      }
+
+      lineas.push(
+        '',
+        '⚖️ *Estimación orientativa basada en normativa 2025 (Ley 29/1987 ISD). No constituye asesoramiento fiscal. Plazo de autoliquidación: 1 mes desde la donación (Modelo 651). Consulta con un asesor fiscal.*',
+      );
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
   );
 
