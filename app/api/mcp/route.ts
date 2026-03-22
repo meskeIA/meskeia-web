@@ -78,6 +78,14 @@ import { calcularHerenciaConjunta, type HerederoInput } from '@/lib/calculadoras
 import { calcularSeguroVida } from '@/lib/calculadoras/seguroVida';
 import { compararAutonomoVsSL, type TipoIS as TipoISSL } from '@/lib/calculadoras/autonomoVsSL';
 import { calcularDeclaracionConjunta } from '@/lib/calculadoras/declaracionConjunta';
+import { calcularSubidaSalarial } from '@/lib/calculadoras/subidaSalarial';
+import { calcularPagoFraccionado, type Trimestre } from '@/lib/calculadoras/pagoFraccionado';
+import { calcularBajaMedica, type TipoBaja } from '@/lib/calculadoras/bajaMedica';
+import { calcularPeriodoCarencia, type TipoCarencia } from '@/lib/calculadoras/periodoCarencia';
+import { calcularKilometraje, type PerfilKilometraje } from '@/lib/calculadoras/kilometraje';
+import { calcularValorPresente, type ModoValorPresente, type TipoRenta, type Periodicidad } from '@/lib/calculadoras/valorPresente';
+import { calcularPlanPensiones } from '@/lib/calculadoras/planPensiones';
+import { calcularLeasing, type TipoFiscal as TipoFiscalLeasing } from '@/lib/calculadoras/leasing';
 import { calcularRentabilidadAlquiler } from '@/lib/calculadoras/rentabilidadAlquiler';
 import { calcularEstrategiaDeuda, type DeudaInput } from '@/lib/calculadoras/estrategiaDeuda';
 import { calcularCapacidadHipoteca } from '@/lib/calculadoras/capacidadHipoteca';
@@ -3169,6 +3177,493 @@ function crearServidorMCP(): McpServer {
         '',
         `📚 ${r.fuenteDatos}`,
         `⚠️ *Estimación con tipos estatal + autonómico medio. No incluye deducciones autonómicas ni circunstancias específicas. Verificar con Renta Web de la AEAT.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_subida_salarial
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_subida_salarial',
+    'Calcula el impacto real en el salario neto de una subida salarial bruta, ' +
+    'teniendo en cuenta la progresividad del IRPF y las cotizaciones a la Seguridad Social. ' +
+    'Devuelve cuánto sube el neto, qué porcentaje de la subida bruta llega al bolsillo ' +
+    'y cuánto se queda en IRPF y SS. ' +
+    'Encadenable con calcular_sueldo_neto, calcular_irpf. ' +
+    'Ideal para: "Me suben el sueldo 3.000€ brutos, ¿cuánto me sube el neto?"',
+    {
+      salarioBrutoActual: z.number().positive().describe('Salario bruto anual actual en euros.'),
+      salarioBrutoNuevo: z.number().positive().optional()
+        .describe('Salario bruto anual nuevo en euros. Indica este o subirBruto.'),
+      subirBruto: z.number().positive().optional()
+        .describe('Incremento del salario bruto en euros. Indica este o salarioBrutoNuevo.'),
+      pagas: z.number().int().min(12).max(14).optional()
+        .describe('Número de pagas al año (12 o 14). Por defecto 14.'),
+    },
+    async ({ salarioBrutoActual, salarioBrutoNuevo, subirBruto, pagas }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_subida_salarial', aiCaller);
+
+      let r;
+      try {
+        r = calcularSubidaSalarial({ salarioBrutoActual, salarioBrutoNuevo, subirBruto, pagas });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `💼 **Impacto de la Subida Salarial**`,
+        '',
+        `📊 **Situación actual → Nueva:**`,
+        `  Bruto anual: ${fmt(r.actual.brutoAnual)} € → **${fmt(r.nuevo.brutoAnual)} €** (+${fmt(r.incrementoBruto)} €)`,
+        `  SS trabajador: ${fmt(r.actual.cuotaSSAnual)} € → ${fmt(r.nuevo.cuotaSSAnual)} €`,
+        `  IRPF: ${fmt(r.actual.cuotaIRPF)} € (${r.actual.tipoEfectivoIRPF.toFixed(2).replace('.', ',')}%) → ${fmt(r.nuevo.cuotaIRPF)} € (${r.nuevo.tipoEfectivoIRPF.toFixed(2).replace('.', ',')}%)`,
+        `  **Neto anual: ${fmt(r.actual.netoAnual)} € → ${fmt(r.nuevo.netoAnual)} €**`,
+        `  **Neto mensual: ${fmt(r.actual.netoMensual)} € → ${fmt(r.nuevo.netoMensual)} €**`,
+        '',
+        `💡 **Subida de ${fmt(r.incrementoBruto)} € brutos:**`,
+        `  Sube el neto en: **+${fmt(r.incrementoNetoAnual)} €/año (+${fmt(r.incrementoNetoMensual)} €/mes)**`,
+        `  Se queda en SS: ${fmt(r.retenciones.ssAdicional)} € | En IRPF: ${fmt(r.retenciones.irpfAdicional)} €`,
+        `  → De cada 100 € de subida bruta, **${r.pctSubidaEfectiva.toFixed(1).replace('.', ',')} € llegan al neto** (${r.pctRetenidoFisco.toFixed(1).replace('.', ',')}% al fisco)`,
+        '',
+        `⚠️ *Estimación con tramos estatales + autonómicos medios sin deducciones personales.*`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_pago_fraccionado
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_pago_fraccionado',
+    'Calcula el pago fraccionado trimestral del IRPF para autónomos en estimación directa ' +
+    '(Modelo 130 AEAT). Fórmula: 20% × (ingresos - gastos - cuotas SS) - retenciones soportadas - pagos anteriores. ' +
+    'Devuelve el importe a ingresar o el saldo negativo a compensar en el siguiente trimestre. ' +
+    'Encadenable con calcular_cuota_autonomo, calcular_irpf. ' +
+    'Ideal para: "Soy autónomo, ¿cuánto tengo que pagar en el modelo 130 del segundo trimestre?"',
+    {
+      trimestre: z.number().int().min(1).max(4).describe('Trimestre a calcular (1, 2, 3 o 4).'),
+      ingresosAcumulados: z.number().min(0)
+        .describe('Ingresos brutos acumulados desde el 1 de enero hasta el fin del trimestre en euros.'),
+      gastosDeduciblesAcumulados: z.number().min(0)
+        .describe('Gastos deducibles acumulados desde el 1 de enero (sin incluir cuotas SS) en euros.'),
+      cuotasSSAcumuladas: z.number().min(0)
+        .describe('Cuotas RETA (SS) pagadas y acumuladas desde el 1 de enero en euros.'),
+      retencionesSoportadasAcumuladas: z.number().min(0).optional()
+        .describe('Retenciones soportadas acumuladas (facturas emitidas con retención 7% o 15%) en euros. Por defecto 0.'),
+      pagosFraccionadosAnteriores: z.number().min(0).optional()
+        .describe('Suma de pagos fraccionados ya ingresados en trimestres anteriores del mismo año en euros. Por defecto 0.'),
+      actividadAgricola: z.boolean().optional()
+        .describe('¿Actividad agrícola, ganadera, forestal o pesquera? Aplica 2% en lugar del 20%. Por defecto false.'),
+    },
+    async ({ trimestre, ingresosAcumulados, gastosDeduciblesAcumulados, cuotasSSAcumuladas, retencionesSoportadasAcumuladas, pagosFraccionadosAnteriores, actividadAgricola }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_pago_fraccionado', aiCaller);
+
+      let r;
+      try {
+        r = calcularPagoFraccionado({ trimestre: trimestre as Trimestre, ingresosAcumulados, gastosDeduciblesAcumulados, cuotasSSAcumuladas, retencionesSoportadasAcumuladas, pagosFraccionadosAnteriores, actividadAgricola });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📋 **Modelo 130 — ${r.trimestre}T IRPF Autónomos**`,
+        '',
+        `📊 **Acumulado enero → fin ${r.trimestre}T:**`,
+        `  Ingresos: ${fmt(ingresosAcumulados)} €`,
+        `  Gastos deducibles: -${fmt(gastosDeduciblesAcumulados)} €`,
+        `  Cuotas SS (RETA): -${fmt(cuotasSSAcumuladas)} €`,
+        `  **Rendimiento neto acumulado: ${fmt(r.rendimientoNetoAcumulado)} €**`,
+        '',
+        `🧮 **Cálculo del pago:**`,
+        `  ${r.porcentajeAplicado}% × ${fmt(r.baseCalculo)} € = ${fmt(r.cuotaPrevia)} €`,
+        r.retencionesSoportadas > 0 ? `  - Retenciones soportadas: -${fmt(r.retencionesSoportadas)} €` : '',
+        r.pagosFraccionadosAnteriores > 0 ? `  - Pagos anteriores (${r.trimestre > 1 ? `T${r.trimestre - 1} acumulado` : '—'}): -${fmt(r.pagosFraccionadosAnteriores)} €` : '',
+        '',
+        r.pagoAIngresar > 0
+          ? `💶 **A ingresar en Hacienda: ${fmt(r.pagoAIngresar)} €**`
+          : `✅ **Resultado: 0 € a ingresar** ${r.resultadoNegativo ? `(saldo negativo de ${fmt(r.saldoACompensarSiguienteT)} € a compensar en ${r.trimestre < 4 ? `T${r.trimestre + 1}` : 'la declaración anual'})` : ''}`,
+        '',
+        `📅 Fecha límite de presentación: **${r.fechaLimite}**`,
+        `📚 Fuente: LIRPF art. 99 + RD 439/2007 art. 110 — Modelo 130 AEAT`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_baja_medica
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_baja_medica',
+    'Calcula el subsidio por incapacidad temporal (baja médica) para trabajadores por cuenta ajena. ' +
+    'Cubre contingencia común (60% BC días 4-20, 75% día 21+) y accidente laboral (75% desde día 1). ' +
+    'Devuelve el subsidio diario, mensual y total para los días de baja, y la pérdida respecto al salario habitual. ' +
+    'Encadenable con calcular_sueldo_neto, calcular_pension_desempleo. ' +
+    'Ideal para: "¿Cuánto cobro si me pongo de baja 30 días?" o "¿Qué pierdo mensualmente si tengo un accidente?"',
+    {
+      salarioBrutoMensual: z.number().positive()
+        .describe('Salario bruto mensual del trabajador en euros.'),
+      tipoBaja: z.enum(['comun', 'accidente_laboral'])
+        .describe('"comun" = enfermedad común o accidente no laboral. "accidente_laboral" = accidente de trabajo o enfermedad profesional.'),
+      diasBaja: z.number().int().min(1).max(730).optional()
+        .describe('Número de días de baja a simular. Por defecto 30.'),
+      empresaPagaDiasEspera: z.boolean().optional()
+        .describe('¿La empresa cubre los 3 días de espera según convenio colectivo? Por defecto false.'),
+    },
+    async ({ salarioBrutoMensual, tipoBaja, diasBaja, empresaPagaDiasEspera }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_baja_medica', aiCaller);
+
+      let r;
+      try {
+        r = calcularBajaMedica({ salarioBrutoMensual, tipoBaja: tipoBaja as TipoBaja, diasBaja, empresaPagaDiasEspera });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const tipoTexto = tipoBaja === 'accidente_laboral' ? 'Accidente Laboral / EP' : 'Contingencia Común';
+      const lineas = [
+        `🏥 **Subsidio por Baja Médica — ${tipoTexto}**`,
+        '',
+        `💼 Salario bruto mensual: ${fmt(salarioBrutoMensual)} € | Base cotización diaria: ${fmt(r.baseCotizacionDiaria)} €`,
+        `📅 Días de baja simulados: ${r.diasBaja} días`,
+        '',
+        `📊 **Subsidio por período:**`,
+        ...r.desglose.map(d => d.pct === 0
+          ? `  ${d.periodo}: **sin subsidio** (${d.dias} días)`
+          : `  ${d.periodo}: ${fmt(d.importeDiario)} €/día × ${d.dias} días = **${fmt(d.total)} €**`
+        ),
+        '',
+        `💶 **Total subsidio en ${r.diasBaja} días: ${fmt(r.totalSubsidio)} €**`,
+        `📆 Subsidio mensual equivalente: ${fmt(r.subsidioMensualEquivalente)} €`,
+        `📉 Pérdida respecto al salario habitual: **${fmt(r.perdidaEstimada)} €/mes**`,
+        '',
+        `⚠️ *El subsidio no está sujeto a cotización SS durante la baja, pero sí tributa en el IRPF.*`,
+        `📚 Fuente: LGSS arts. 169-176`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_periodo_carencia
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_periodo_carencia',
+    'Calcula el impacto económico de un período de carencia en una hipoteca o préstamo. ' +
+    'Tipos: carencia total (solo pago de intereses, sin amortizar capital) o parcial (cuota reducida). ' +
+    'Devuelve: cuota durante la carencia, nueva cuota tras reincorporarse, sobrecoste total ' +
+    'y comparativa con/sin carencia. ' +
+    'Encadenable con calcular_hipoteca, calcular_prestamo. ' +
+    'Ideal para: "¿Cuánto me cuesta pedir 6 meses de carencia en la hipoteca?"',
+    {
+      capitalPendiente: z.number().positive().describe('Capital pendiente del préstamo o hipoteca en euros.'),
+      tasaAnual: z.number().min(0).describe('Tipo de interés anual en porcentaje.'),
+      plazoRestanteMeses: z.number().int().positive().describe('Plazo restante del préstamo en meses.'),
+      mesesCarencia: z.number().int().min(1).describe('Duración del período de carencia en meses.'),
+      tipoCarencia: z.enum(['total', 'parcial']).optional()
+        .describe('"total" = solo intereses durante la carencia. "parcial" = cuota reducida acordada con el banco. Por defecto "total".'),
+      cuotaCarenciaParcial: z.number().positive().optional()
+        .describe('Cuota mensual acordada durante la carencia parcial en euros. Solo para tipo "parcial".'),
+    },
+    async ({ capitalPendiente, tasaAnual, plazoRestanteMeses, mesesCarencia, tipoCarencia, cuotaCarenciaParcial }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_periodo_carencia', aiCaller);
+
+      let r;
+      try {
+        r = calcularPeriodoCarencia({ capitalPendiente, tasaAnual, plazoRestanteMeses, mesesCarencia, tipoCarencia: tipoCarencia as TipoCarencia | undefined, cuotaCarenciaParcial });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const tipoTexto = r.tipoCarencia === 'total' ? 'Carencia Total (solo intereses)' : 'Carencia Parcial';
+      const lineas = [
+        `⏸️ **Período de Carencia — ${tipoTexto}**`,
+        '',
+        `💰 Capital pendiente: ${fmt(r.capitalPendiente)} € | Tasa: ${tasaAnual}% | Plazo restante: ${plazoRestanteMeses} meses`,
+        '',
+        `📊 **Durante la carencia (${r.mesesCarencia} meses):**`,
+        `  Cuota mensual: **${fmt(r.cuotaDuranteCarencia)} €** (solo intereses${r.tipoCarencia === 'total' ? '' : ' + amortización parcial'})`,
+        `  Intereses pagados: ${fmt(r.interesesCarencia)} €`,
+        `  Capital amortizado: ${fmt(r.capitalAmortizadoCarencia)} €`,
+        `  Capital pendiente al terminar la carencia: ${fmt(r.capitalTrasCarencia)} €`,
+        '',
+        `📊 **Tras la carencia (${r.plazoTrasCarencia} meses restantes):**`,
+        `  Nueva cuota mensual: **${fmt(r.nuevaCuotaTrasCarencia)} €**`,
+        `  Cuota sin carencia habría sido: ${fmt(r.cuotaSinCarencia)} €`,
+        '',
+        `💸 **Comparativa de costes:**`,
+        `  Total pagado SIN carencia: ${fmt(r.totalSinCarencia)} €`,
+        `  Total pagado CON carencia: ${fmt(r.totalConCarencia)} €`,
+        `  **Sobrecoste de la carencia: +${fmt(r.sobrecostCarencia)} €**`,
+        '',
+        `⚠️ *La carencia alivia la carga a corto plazo pero incrementa el coste total del préstamo.*`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_kilometraje
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_kilometraje',
+    'Calcula la compensación o deducción fiscal por uso de vehículo propio en actividades económicas. ' +
+    'Para empleados: exención IRPF hasta 0,26 €/km (RIRPF art. 9.B.2 — módulo AEAT 2025). ' +
+    'Para autónomos: deducción en IRPF e IVA según exclusividad del uso del vehículo. ' +
+    'Encadenable con calcular_irpf, calcular_cuota_autonomo, comparar_autonomo_vs_sl. ' +
+    'Ideal para: "¿Cuánto me puedo deducir por usar el coche en el trabajo?" o ' +
+    '"Mi empresa me paga 0,20€/km, ¿es correcto?"',
+    {
+      perfil: z.enum(['empleado', 'autonomo']).describe('"empleado" = trabajador por cuenta ajena. "autonomo" = autónomo o profesional.'),
+      kmProfesionalesAnuales: z.number().min(0)
+        .describe('Kilómetros profesionales anuales (desplazamientos laborales o de la actividad económica).'),
+      compensacionRecibidaPorKm: z.number().min(0).optional()
+        .describe('Para empleados: compensación que paga la empresa por km en euros. Por defecto 0.'),
+      costeRealPorKm: z.number().min(0).optional()
+        .describe('Coste real del vehículo por km (combustible, amortización, seguro, etc.) en euros. Por defecto 0,20 €/km.'),
+      totalGastosVehiculo: z.number().min(0).optional()
+        .describe('Para autónomos: total de gastos del vehículo en el año (combustible, seguro, reparaciones, amortización) en euros.'),
+      usoExclusivoActividad: z.boolean().optional()
+        .describe('Para autónomos: ¿el vehículo está afecto exclusivamente a la actividad? (difícil de acreditar para turismos). Por defecto false.'),
+      tipoMarginalIRPF: z.number().min(0).max(50).optional()
+        .describe('Tipo marginal IRPF para calcular el ahorro fiscal en porcentaje. Por defecto 30%.'),
+    },
+    async ({ perfil, kmProfesionalesAnuales, compensacionRecibidaPorKm, costeRealPorKm, totalGastosVehiculo, usoExclusivoActividad, tipoMarginalIRPF }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_kilometraje', aiCaller);
+
+      let r;
+      try {
+        r = calcularKilometraje({ perfil: perfil as PerfilKilometraje, kmProfesionalesAnuales, compensacionRecibidaPorKm, costeRealPorKm, totalGastosVehiculo, usoExclusivoActividad, tipoMarginalIRPF });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const res = r.resultado;
+      let texto: string;
+
+      if (res.tipo === 'empleado') {
+        texto = [
+          `🚗 **Kilometraje Profesional — Empleado**`,
+          '',
+          `📍 ${kmProfesionalesAnuales.toLocaleString('es-ES')} km profesionales/año | Módulo AEAT 2025: ${res.moduloKm.toFixed(2).replace('.', ',')} €/km`,
+          '',
+          `💶 Compensación máxima exenta de IRPF: **${fmt(res.compensacionMaximaExenta)} €/año**`,
+          compensacionRecibidaPorKm ? `  Compensación recibida: ${fmt(res.compensacionRecibida)} €/año` : '',
+          res.importeSujetoIRPF > 0 ? `  ⚠️ Exceso sobre el límite sujeto a IRPF: ${fmt(res.importeSujetoIRPF)} €` : '',
+          costeRealPorKm ? `  Coste real del desplazamiento: ${fmt(res.costeRealDesplazamiento)} €/año` : '',
+          res.diferenciaSinCubrir > 0 ? `  Coste no cubierto por la empresa: ${fmt(res.diferenciaSinCubrir)} €/año` : '',
+          '',
+          `📚 Fuente: RIRPF art. 9.B.2 — módulo 0,26 €/km (2025)`,
+        ].filter(l => l !== '').join('\n');
+      } else {
+        const ra = res as import('@/lib/calculadoras/kilometraje').ResultadoAutonomo;
+        texto = [
+          `🚗 **Kilometraje Profesional — Autónomo**`,
+          '',
+          `📍 ${kmProfesionalesAnuales.toLocaleString('es-ES')} km profesionales/año | Deducción: ${ra.pctDeduccion}% ${ra.usoExclusivo ? '(uso exclusivo)' : '(uso parcial — criterio general Hacienda)'}`,
+          '',
+          `💶 Gastos deducibles IRPF: **${fmt(ra.gastosDeduciblesIRPF)} €**`,
+          `💶 IVA deducible: **${fmt(ra.ivaDeducible)} €**`,
+          `💚 Ahorro fiscal IRPF estimado: **${fmt(ra.ahorroFiscalIRPF)} €**`,
+          `💚 Ahorro IVA: **${fmt(ra.ahorroIVA)} €**`,
+          `💚 **Ahorro total: ${fmt(ra.ahorroTotal)} €**`,
+          '',
+          `⚠️ ${ra.advertencia}`,
+        ].filter(l => l !== '').join('\n');
+      }
+
+      return { content: [{ type: 'text', text: texto }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_valor_presente
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_valor_presente',
+    'Calcula el valor presente (valor actual) de: ' +
+    'A) Un capital futuro único (¿cuánto vale hoy 100.000€ recibidos en 10 años?), ' +
+    'B) Una renta periódica (anualidad ordinaria o anticipada), ' +
+    'C) Una perpetuidad (renta infinita). ' +
+    'También calcula el valor futuro dado un capital presente. ' +
+    'Encadenable con calcular_tir_van, calcular_interes_compuesto, calcular_regla_72. ' +
+    'Ideal para: "¿Cuánto vale hoy una renta de 500€/mes durante 20 años al 5%?"',
+    {
+      modo: z.enum(['capital_futuro', 'renta', 'perpetuidad'])
+        .describe('"capital_futuro" = descuenta un capital único. "renta" = valor presente de pagos periódicos. "perpetuidad" = renta infinita.'),
+      tasaAnual: z.number().min(0).describe('Tasa de descuento o interés anual en porcentaje.'),
+      importe: z.number().positive()
+        .describe('Para "capital_futuro": importe del capital futuro. Para "renta" o "perpetuidad": importe del pago periódico. En euros.'),
+      periodos: z.number().positive().optional()
+        .describe('Número de períodos. Para "capital_futuro": años. Para "renta": número de pagos. Obligatorio excepto para "perpetuidad".'),
+      periodicidad: z.enum(['mensual', 'trimestral', 'semestral', 'anual']).optional()
+        .describe('Frecuencia de los pagos para "renta" o "perpetuidad". Por defecto "anual".'),
+      tipoRenta: z.enum(['ordinaria', 'anticipada']).optional()
+        .describe('Para modo "renta": "ordinaria" = pagos al final del período. "anticipada" = pagos al inicio. Por defecto "ordinaria".'),
+      valorPresenteConocido: z.number().positive().optional()
+        .describe('Para calcular el valor futuro: capital presente conocido en euros.'),
+    },
+    async ({ modo, tasaAnual, importe, periodos, periodicidad, tipoRenta, valorPresenteConocido }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_valor_presente', aiCaller);
+
+      let r;
+      try {
+        r = calcularValorPresente({ modo: modo as ModoValorPresente, tasaAnual, importe, periodos, periodicidad: periodicidad as Periodicidad | undefined, tipoRenta: tipoRenta as TipoRenta | undefined, valorPresenteConocido });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📐 **Valor Presente / Valor Actual**`,
+        '',
+        r.interpretacion,
+        '',
+        `💶 **Valor presente: ${fmt(r.valorPresente)} €**`,
+        r.totalNominal ? `📊 Total nominal (sin descontar): ${fmt(r.totalNominal)} €` : '',
+        r.descuentoTotal ? `📉 Descuento total aplicado: ${fmt(r.descuentoTotal)} €` : '',
+        r.tasaPorPeriodo !== r.tasaAnual ? `📈 Tasa por período (${r.periodicidad}): ${r.tasaPorPeriodo.toFixed(4).replace('.', ',')}%` : '',
+        valorPresenteConocido && r.valorFuturo ? `\n🔮 Valor futuro de ${fmt(valorPresenteConocido)} € en ${periodos} años: **${fmt(r.valorFuturo)} €**` : '',
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_plan_pensiones
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_plan_pensiones',
+    'Calcula el ahorro fiscal anual por aportaciones a plan de pensiones privado y la proyección ' +
+    'del capital acumulado hasta la jubilación. ' +
+    'Aplica los límites 2025: máximo 1.500€ individual + 8.500€ empresarial deducibles (art. 51 LIRPF). ' +
+    'Incluye advertencia sobre la tributación del rescate como rendimiento del trabajo. ' +
+    'Encadenable con calcular_pension_complementaria, calcular_irpf, calcular_pension_publica. ' +
+    'Ideal para: "Si aporto 1.000€/año al plan de pensiones, ¿cuánto me ahorro en la declaración?"',
+    {
+      rendimientosNetos: z.number().positive()
+        .describe('Rendimientos netos del trabajo y actividades económicas en euros/año (base para el tipo marginal y límite porcentual).'),
+      aportacionIndividual: z.number().min(0)
+        .describe('Aportación individual anual al plan de pensiones en euros (límite deducible 1.500€).'),
+      aportacionEmpresarial: z.number().min(0).optional()
+        .describe('Aportación de la empresa al plan de pensiones del trabajador en euros/año (límite adicional 8.500€). Por defecto 0.'),
+      edadActual: z.number().int().min(18).max(70).describe('Edad actual del partícipe.'),
+      edadJubilacion: z.number().int().min(55).max(75).optional()
+        .describe('Edad prevista de jubilación. Por defecto 67.'),
+      rentabilidadAnual: z.number().min(0).max(15).optional()
+        .describe('Rentabilidad anual esperada del plan en porcentaje. Por defecto 4%.'),
+      capitalActual: z.number().min(0).optional()
+        .describe('Capital ya acumulado en el plan en euros. Por defecto 0.'),
+    },
+    async ({ rendimientosNetos, aportacionIndividual, aportacionEmpresarial, edadActual, edadJubilacion, rentabilidadAnual, capitalActual }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_plan_pensiones', aiCaller);
+
+      let r;
+      try {
+        r = calcularPlanPensiones({ rendimientosNetos, aportacionIndividual, aportacionEmpresarial, edadActual, edadJubilacion, rentabilidadAnual, capitalActual });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const fmtK = (n: number) => n >= 1000000 ? `${(n/1000000).toFixed(2).replace('.', ',')} M€` : `${Math.round(n).toLocaleString('es-ES')} €`;
+      const lineas = [
+        `🏦 **Plan de Pensiones — Ahorro Fiscal 2025**`,
+        '',
+        `💶 Aportación individual: ${fmt(r.aportacionIndividual)} € | Empresarial: ${fmt(r.aportacionEmpresarial)} €`,
+        `📊 Límite deducible: **${fmt(r.limiteDeducible)} €** | Base reducible efectiva: ${fmt(r.baseReducible)} €`,
+        r.superaLimite ? `⚠️ Exceso no deducible: ${fmt(r.excesoNoDeducible)} €` : '',
+        '',
+        `💚 **Ahorro fiscal anual: ${fmt(r.ahorroFiscalAnual)} €** (tipo marginal ${r.tipoMarginal}%)`,
+        `💸 Coste neto real de la aportación: **${fmt(r.costeNetoAnual)} €**`,
+        `   (aportas ${fmt(r.aportacionTotal)} € pero te cuesta ${fmt(r.costeNetoAnual)} € tras la deducción)`,
+        '',
+        `📈 **Proyección hasta jubilación (${r.anosAhorro} años, ${rentabilidadAnual ?? 4}% anual):**`,
+        `  Capital estimado: **${fmtK(r.capitalEstimadoJubilacion)}**`,
+        `  Renta mensual estimada (4% perpetuo): **${fmt(r.rentaMensualEstimada)} €/mes**`,
+        '',
+        `⚠️ ${r.advertenciaRescate}`,
+        `📚 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_leasing
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_leasing',
+    'Compara el coste total de adquirir un vehículo mediante leasing financiero, renting operativo ' +
+    'o compra (al contado o con préstamo). Calcula la cuota mensual, el total pagado, el valor final ' +
+    'del vehículo y el ahorro fiscal para autónomos y empresas. ' +
+    'Encadenable con calcular_kilometraje, comparar_autonomo_vs_sl, calcular_prestamo. ' +
+    'Ideal para: "¿Me conviene más el leasing o la compra del coche para mi empresa?"',
+    {
+      precioVehiculo: z.number().positive().describe('Precio del vehículo en euros.'),
+      mesesContrato: z.number().int().min(12).max(72).optional()
+        .describe('Duración del contrato de leasing o renting en meses. Por defecto 48.'),
+      cuotaLeasingMensual: z.number().positive().optional()
+        .describe('Cuota mensual del leasing financiero en euros (si tienes oferta concreta).'),
+      valorResidual: z.number().min(0).optional()
+        .describe('Valor residual del leasing al final del contrato en euros. Por defecto 15% del precio.'),
+      cuotaRentingMensual: z.number().positive().optional()
+        .describe('Cuota mensual del renting operativo en euros (todo incluido: seguro, mantenimiento, etc.).'),
+      entradaCompra: z.number().min(0).optional()
+        .describe('Entrada o pago inicial en la compra en euros. Por defecto 0.'),
+      tasaPrestamoCompra: z.number().min(0).optional()
+        .describe('Tipo de interés anual del préstamo de compra en porcentaje. Por defecto 6%.'),
+      tipoFiscal: z.enum(['particular', 'autonomo', 'empresa']).optional()
+        .describe('Perfil fiscal para calcular deducciones. Por defecto "particular".'),
+      tipoImpuesto: z.number().min(0).max(50).optional()
+        .describe('Tipo del IS o tipo marginal IRPF del autónomo en porcentaje para calcular ahorro fiscal. Por defecto 25%.'),
+      usoExclusivoActividad: z.boolean().optional()
+        .describe('¿El vehículo es de uso exclusivo para la actividad? Afecta al IVA deducible. Por defecto false.'),
+    },
+    async ({ precioVehiculo, mesesContrato, cuotaLeasingMensual, valorResidual, cuotaRentingMensual, entradaCompra, tasaPrestamoCompra, tipoFiscal, tipoImpuesto, usoExclusivoActividad }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_leasing', aiCaller);
+
+      let r;
+      try {
+        r = calcularLeasing({ precioVehiculo, mesesContrato, cuotaLeasingMensual, valorResidual, cuotaRentingMensual, entradaCompra, tasaPrestamoCompra, tipoFiscal: tipoFiscal as TipoFiscalLeasing | undefined, tipoImpuesto, usoExclusivoActividad });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+      }
+
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const fila = (m: typeof r.leasing) => m.disponible
+        ? `  ${m.nombre}: cuota ${fmt(m.cuotaMensual)} €/mes | total ${fmt(m.totalPagado)} € | valor final ${fmt(m.valorFinalVehiculo)} € | coste neto **${fmt(m.costeNeto)} €**${m.ahorroFiscal > 0 ? ` (ahorro fiscal: ${fmt(m.ahorroFiscal)} €)` : ''}${m.incluyeServicios ? ' ✅ todo incluido' : ''}`
+        : `  ${m.nombre}: no disponible (${m.razonNoDisponible})`;
+
+      const lineas = [
+        `🚗 **Leasing vs Renting vs Compra**`,
+        '',
+        `💶 Vehículo: ${fmt(precioVehiculo)} € | Duración: ${r.mesesContrato} meses | Perfil: ${r.tipoFiscal}`,
+        '',
+        fila(r.leasing),
+        fila(r.renting),
+        fila(r.compra),
+        '',
+        `✅ **Modalidad más económica: ${r.modalidadMasEconomica}**`,
+        r.diferenciaCosteMasBarata > 0 ? `   (Ahorra ${fmt(r.diferenciaCosteMasBarata)} € vs la opción más cara)` : '',
+        '',
+        `⚠️ *El renting incluye seguro y mantenimiento (comparación no directa). Coste neto para autónomos/empresas incluye ahorro fiscal estimado (IVA + IS/IRPF).*`,
       ].filter(l => l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
