@@ -110,6 +110,14 @@ import { calcularReequilibrioCartera, type EstrategiaReequilibrio } from '@/lib/
 import { calcularPagoAplazadoAEAT, type TipoSolicitante, type ModalidadAplazamiento } from '@/lib/calculadoras/pagoAplazadoAEAT';
 import { calcularPermisoParental, type SituacionLaboral as SituacionLaboralPermiso, type ModoDisfrute } from '@/lib/calculadoras/permisoParental';
 import { calcularStockOptions, type TipoRetribucionAcciones } from '@/lib/calculadoras/stockOptions';
+import { calcularExcedencia, type TipoExcedencia } from '@/lib/calculadoras/excedencia';
+import { calcularIndemnizacionDespido, type TipoDespido } from '@/lib/calculadoras/indemnizacionDespido';
+import { calcularHorasExtra, type TipoHorasExtra, type CompensacionHorasExtra } from '@/lib/calculadoras/horasExtra';
+import { calcularPlusDistancia, type TipoVehiculo } from '@/lib/calculadoras/plusDistancia';
+import { calcularReduccionJornada, type MotivoReduccionJornada } from '@/lib/calculadoras/reduccionJornada';
+import { calcularIRPFNoResidente, type TipoRentaNoResidente, type ResidenciaFiscal } from '@/lib/calculadoras/irpfNoResidente';
+import { calcularModelo130, type TrimestreModelo130 } from '@/lib/calculadoras/modelo130';
+import { calcularConceptosCotizables } from '@/lib/calculadoras/conceptosCotizables';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -5273,6 +5281,430 @@ Encadenable con: calcular_irpf, calcular_devolucion_irpf, calcular_plusvalias_ir
           '',
         ].join('\n') : '',
         `**✅ IRPF total: ${fmt(r.irpfTotal)} € | Neto total: ${fmt(r.netoTotal)} €**`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote K: calcular_excedencia ──────────────────────────────────────────────
+  servidor.tool(
+    'calcular_excedencia',
+    `Calcula los derechos y efectos de la excedencia laboral según el ET arts. 45-46.
+Tipos: voluntaria (4 meses–5 años, sin reserva de puesto, sin cotización SS), forzosa (cargo político/sindical, reserva puesto, cotización ficticia), cuidado de hijo (máx 3 años, primer año reserva puesto exacto, 3 años computables SS) y cuidado de familiar hasta 2.º grado (máx 2 años, 18 meses computables SS).
+Calcula el coste en ingresos no percibidos y el impacto en prestaciones futuras.
+Encadenable con: calcular_finiquito, calcular_pension_publica, calcular_baja_medica.`,
+    {
+      tipo: z.enum(['voluntaria', 'forzosa', 'cuidado_hijo', 'cuidado_familiar']).describe('Tipo de excedencia laboral'),
+      antiguedadAnios: z.number().min(0).describe('Antigüedad del trabajador en la empresa (años)'),
+      salarioBrutoMensual: z.number().positive().describe('Salario bruto mensual actual (€)'),
+      duracionMeses: z.number().int().positive().describe('Duración solicitada de la excedencia (meses)'),
+      edad: z.number().int().min(16).max(70).optional().describe('Edad del trabajador (para orientar sobre impacto en jubilación). Por defecto 35.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_excedencia', aiCaller);
+      const r = calcularExcedencia({
+        tipo: args.tipo as TipoExcedencia,
+        antiguedadAnios: args.antiguedadAnios,
+        salarioBrutoMensual: args.salarioBrutoMensual,
+        duracionMeses: args.duracionMeses,
+        edad: args.edad,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🏖️ **Excedencia ${r.tipo.replace('_', ' ')} — ${r.duracionSolicitadaMeses} meses**`,
+        '',
+        r.cumpleRequisitos
+          ? `✅ Cumple los requisitos de acceso`
+          : `❌ No cumple requisitos: ${r.motivoIncumplimiento}`,
+        '',
+        `📅 Duración permitida: ${r.duracionMinimaMeses}–${r.duracionMaximaMeses > 0 ? r.duracionMaximaMeses : '∞'} meses`,
+        `🔒 Reserva de puesto exacto: ${r.reservaPuestoExacto ? `Sí (${r.mesesReservaPuestoExacto} meses)` : 'No (solo preferencia de reingreso)'}`,
+        `🔒 Reserva grupo profesional: ${r.reservaGrupoProfesional ? 'Sí' : 'No'}`,
+        '',
+        `📊 Cotización SS durante excedencia: ${r.cotizaDurante ? '✅ Sí (ficticia)' : '❌ No'}`,
+        `⏱️ Meses computables a efectos SS: **${r.mesesComputablesSSTotal}** meses`,
+        `💡 ${r.detalleCotizacion}`,
+        '',
+        `💸 Salario mensual no percibido: ${fmt(r.salerioMensualPerdido)} €`,
+        `💰 Coste total en ingresos no percibidos: **${fmt(r.costeTotalIngresosNoPecibidos)} €**`,
+        r.plazoNuevaExcedenciaVoluntaria ? `⏰ Nueva excedencia voluntaria posible tras: ${r.plazoNuevaExcedenciaVoluntaria} meses (4 años)` : '',
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote K: calcular_indemnizacion_despido ───────────────────────────────────
+  servidor.tool(
+    'calcular_indemnizacion_despido',
+    `Calcula la indemnización por despido según el tipo y la antigüedad del trabajador, conforme al ET.
+Tipos: improcedente (33 días/año, máx 24 mensualidades; con doble tramo si hay antigüedad pre-12/02/2012), objetivo/colectivo ERE (20 días/año, máx 12 mensualidades), disciplinario procedente (0 €).
+Indica si la indemnización está exenta de IRPF y el preaviso legal.
+Encadenable con: calcular_finiquito, calcular_pension_desempleo, calcular_irpf.`,
+    {
+      tipoDespido: z.enum(['improcedente', 'objetivo', 'colectivo_ere', 'disciplinario_procedente']).describe('Tipo de despido'),
+      salarioBrutoAnual: z.number().positive().describe('Salario bruto anual total del trabajador (€), incluyendo pagas extras prorrateadas'),
+      fechaInicio: z.string().describe('Fecha de inicio de la relación laboral (YYYY-MM-DD)'),
+      fechaExtincion: z.string().optional().describe('Fecha de extinción del contrato (YYYY-MM-DD). Por defecto: hoy.'),
+      tieneAntiguedadPreReforma2012: z.boolean().optional().describe('¿El trabajador tenía antigüedad antes del 12/02/2012? (Activa el cálculo dual 45+33 días). Por defecto false.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_indemnizacion_despido', aiCaller);
+      const r = calcularIndemnizacionDespido({
+        tipoDespido: args.tipoDespido as TipoDespido,
+        salarioBrutoAnual: args.salarioBrutoAnual,
+        fechaInicio: args.fechaInicio,
+        fechaExtincion: args.fechaExtincion,
+        tieneAntiguedadPreReforma2012: args.tieneAntiguedadPreReforma2012,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `⚖️ **Indemnización por Despido ${r.tipoDespido.replace(/_/g, ' ')}**`,
+        `👤 Antigüedad: ${r.antiguedadAnios.toFixed(2).replace('.', ',')} años (${r.antiguedadDias} días)`,
+        `💶 Salario diario: ${fmt(r.salarioDiario)} €`,
+        '',
+        r.tipoDespido !== 'disciplinario_procedente' ? [
+          `📊 Días/año aplicados: **${r.diasPorAnio}**  |  Máx mensualidades: ${r.maxMensualidades}`,
+          r.indemnizacionPreReforma !== undefined ? `  Tramo pre-12/02/2012 (45 días/año): ${fmt(r.indemnizacionPreReforma ?? 0)} €` : '',
+          r.indemnizacionPostReforma !== undefined ? `  Tramo post-12/02/2012 (33 días/año): ${fmt(r.indemnizacionPostReforma ?? 0)} €` : '',
+          `  Indemnización sin tope: ${fmt(r.indemnizacionSinTope)} €`,
+          `  Tope máximo: ${fmt(r.topeMáximoEuros)} €`,
+          `✅ **Indemnización final: ${fmt(r.indemnizacionFinal)} €**${r.topeAplicado ? ' (tope aplicado)' : ''}`,
+        ].filter(Boolean).join('\n') : `ℹ️ Despido disciplinario procedente: **Sin indemnización**`,
+        '',
+        `🏛️ IRPF: ${r.exentaIRPF ? '✅ Exenta' : '❌ Tributa'}`,
+        `💡 ${r.detalleFiscal}`,
+        r.pravisoDias > 0 ? `📅 Preaviso legal: ${r.pravisoDias} días` : '',
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote K: calcular_horas_extra ─────────────────────────────────────────────
+  servidor.tool(
+    'calcular_horas_extra',
+    `Calcula el coste y los límites legales de las horas extraordinarias según el ET art. 35.
+Límite: 80 horas/año (no computan las compensadas con descanso en 4 meses). Cotización SS específica: empresa 12%/23,6% + trabajador 2%/4,7% según sean de fuerza mayor u ordinarias.
+Calcula el valor hora extra, la cotización SS, el coste total para la empresa y el neto del trabajador (antes de IRPF).
+Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
+    {
+      salarioBrutoAnual: z.number().positive().describe('Salario bruto anual del trabajador (€)'),
+      horasOrdinariasAnuales: z.number().positive().describe('Horas ordinarias anuales según contrato'),
+      horasExtraAnuales: z.number().min(0).describe('Número de horas extra realizadas en el año'),
+      tipoHorasExtra: z.enum(['estructural_fuerza_mayor', 'no_estructural']).optional().describe('Tipo: estructural/fuerza mayor (12% empresa, 2% trabajador) o no_estructural (23,6%/4,7%). Por defecto no_estructural.'),
+      compensacion: z.enum(['monetaria', 'descanso']).optional().describe('Compensación por horas extra: monetaria (pago) o descanso equivalente. Por defecto monetaria.'),
+      recargoSalarialPct: z.number().min(0).optional().describe('Recargo sobre el valor de la hora ordinaria (%). Ej: 25 para el 25%. Por defecto 0 (igual que hora ordinaria, mínimo legal).'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_horas_extra', aiCaller);
+      const r = calcularHorasExtra({
+        salarioBrutoAnual: args.salarioBrutoAnual,
+        horasOrdinariasAnuales: args.horasOrdinariasAnuales,
+        horasExtraAnuales: args.horasExtraAnuales,
+        tipoHorasExtra: args.tipoHorasExtra as TipoHorasExtra | undefined,
+        compensacion: args.compensacion as CompensacionHorasExtra | undefined,
+        recargoSalarialPct: args.recargoSalarialPct,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `⏰ **Horas Extra — ${r.horasExtra} horas/año**`,
+        r.superaLimiteAnual ? `❌ Supera el límite legal de 80 h/año en ${r.horasExcesoLimite} horas` : `✅ Dentro del límite legal (80 h/año)`,
+        '',
+        `💶 Valor hora ordinaria: ${fmt(r.valorHoraOrdinaria)} €/h`,
+        `💶 Valor hora extra${r.recargoAplicadoPct > 0 ? ` (+${r.recargoAplicadoPct}% recargo)` : ''}: **${fmt(r.valorHoraExtra)} €/h**`,
+        '',
+        r.compensacion === 'monetaria'
+          ? `💰 Importe total horas extra: **${fmt(r.importeTotalHorasExtra ?? 0)} €**`
+          : `🔄 Compensación por descanso: ${r.horasDescansoEquivalentes} horas de descanso equivalentes`,
+        '',
+        `📊 Cotización SS horas extra (${r.tipoHorasExtra === 'estructural_fuerza_mayor' ? 'fuerza mayor' : 'ordinarias'}):`,
+        `  Empresa: ${fmt(r.cotizacionSSEmpresa)} €`,
+        `  Trabajador: ${fmt(r.cotizacionSSTrabajador)} €`,
+        `💼 Coste total empresa: **${fmt(r.costeTotalEmpresa)} €**`,
+        `✅ Neto trabajador (antes IRPF): **${fmt(r.netoTrabajadorAntesIRPF)} €**`,
+        '',
+        `💡 ${r.interpretacion}`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote K: calcular_plus_distancia ──────────────────────────────────────────
+  servidor.tool(
+    'calcular_plus_distancia',
+    `Calcula los importes exentos de IRPF por gastos de locomoción (km en vehículo propio: 0,26 €/km desde 2023) y dietas de manutención y alojamiento, según el RIRPF art. 9.
+Límites 2025: km propio 0,26 €/km; dieta España sin pernoctar 26,67 €/día, pernoctando 53,34 €/día; extranjero sin pernoctar 48,08 €/día, pernoctando 91,35 €/día. Ticket restaurante: 11 €/día.
+Calcula el exceso sobre los límites que tributa como rendimiento del trabajo.
+Encadenable con: calcular_irpf, calcular_sueldo_neto, calcular_coste_empleado.`,
+    {
+      kmVehiculoPropio: z.number().min(0).optional().describe('Kilómetros recorridos con vehículo propio en el período (€)'),
+      tipoVehiculo: z.enum(['coche_propio', 'moto_propia', 'transporte_publico']).optional().describe('Tipo de vehículo propio. Por defecto coche_propio (0,26 €/km).'),
+      transportePublicoImporte: z.number().min(0).optional().describe('Importe de transporte público (€)'),
+      transportePublicoJustificado: z.boolean().optional().describe('¿Tiene justificante de transporte público? Por defecto false.'),
+      peajesParking: z.number().min(0).optional().describe('Peajes y parking con justificante (€)'),
+      diasEspaniaSinPernoctar: z.number().int().min(0).optional().describe('Días de desplazamiento en España sin pernoctar (dieta 26,67 €/día)'),
+      diasEspaniaPernoctando: z.number().int().min(0).optional().describe('Días de desplazamiento en España pernoctando (dieta 53,34 €/día)'),
+      diasExtranjerSinPernoctar: z.number().int().min(0).optional().describe('Días en extranjero sin pernoctar (dieta 48,08 €/día)'),
+      diasExtranjeroPernoctando: z.number().int().min(0).optional().describe('Días en extranjero pernoctando (dieta 91,35 €/día)'),
+      alojamientoConFactura: z.number().min(0).optional().describe('Gasto de alojamiento con factura (€) — exento 100%'),
+      alojamientoSinFactura: z.number().min(0).optional().describe('Gasto de alojamiento sin factura (€) — tributa íntegramente'),
+      dietasAbonadasTotal: z.number().min(0).optional().describe('Importe total abonado por la empresa en dietas (€) — para calcular el exceso tributable'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_plus_distancia', aiCaller);
+      const r = calcularPlusDistancia({
+        kmVehiculoPropio: args.kmVehiculoPropio,
+        tipoVehiculo: args.tipoVehiculo as TipoVehiculo | undefined,
+        transportePublicoImporte: args.transportePublicoImporte,
+        transportePublicoJustificado: args.transportePublicoJustificado,
+        peajesParking: args.peajesParking,
+        diasEspaniaSinPernoctar: args.diasEspaniaSinPernoctar,
+        diasEspaniaPernoctando: args.diasEspaniaPernoctando,
+        diasExtranjerSinPernoctar: args.diasExtranjerSinPernoctar,
+        diasExtranjeroPernoctando: args.diasExtranjeroPernoctando,
+        alojamientoConFactura: args.alojamientoConFactura,
+        alojamientoSinFactura: args.alojamientoSinFactura,
+        dietasAbonadasTotal: args.dietasAbonadasTotal,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🚗 **Gastos de Locomoción y Dietas — Exenciones IRPF 2025**`,
+        '',
+        r.exencionKmVehiculoPropio > 0 ? `🚗 Km vehículo propio: ${args.kmVehiculoPropio?.toLocaleString('es-ES')} km × ${r.limiteKmAplicado.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €/km = **${fmt(r.exencionKmVehiculoPropio)} €** exentos` : '',
+        r.exencionTransportePublico > 0 ? `🚌 Transporte público justificado: **${fmt(r.exencionTransportePublico)} €** exentos` : '',
+        r.exencionPeajesParking > 0 ? `🅿️ Peajes y parking: **${fmt(r.exencionPeajesParking)} €** exentos` : '',
+        r.totalExencionLocomocion > 0 ? `  → Total exención locomoción: ${fmt(r.totalExencionLocomocion)} €` : '',
+        '',
+        r.desgloseDietas.length > 0 ? `🍽️ **Dietas:**` : '',
+        ...r.desgloseDietas.map(d => `  ${d.concepto}: ${d.dias} días × ${d.limite.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €/día = ${fmt(d.exencion)} €`),
+        r.totalExencionDietas > 0 ? `  → Total exención dietas: ${fmt(r.totalExencionDietas)} €` : '',
+        '',
+        r.exencionAlojamiento > 0 ? `🏨 Alojamiento con factura: **${fmt(r.exencionAlojamiento)} €** exentos` : '',
+        '',
+        `✅ **Total exento IRPF: ${fmt(r.totalExencionIRPF)} €**`,
+        r.excesoTributable > 0 ? `❌ **Exceso tributable como rendimiento trabajo: ${fmt(r.excesoTributable)} €**` : '',
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote K: calcular_reduccion_jornada ───────────────────────────────────────
+  servidor.tool(
+    'calcular_reduccion_jornada',
+    `Calcula el impacto económico de la reducción de jornada por guarda legal (ET art. 37.6): cuidado hijo menor de 12 años, familiar dependiente o hijo con discapacidad grave.
+Reducción permitida: entre 1/8 (12,5%) y 1/2 (50%) de la jornada ordinaria. El salario es proporcional. Los primeros 24 meses la cotización SS mantiene la base de jornada completa (art. 237 LGSS).
+Encadenable con: calcular_baja_medica, calcular_permiso_parental, calcular_sueldo_neto.`,
+    {
+      motivo: z.enum(['hijo_menor_12', 'discapacidad_familiar', 'familiar_dependiente', 'hijo_discapacidad_grave', 'otro']).describe('Motivo de la reducción de jornada'),
+      salarioBrutoMensualCompleto: z.number().positive().describe('Salario bruto mensual a jornada completa (€)'),
+      horasSemanalesCompletas: z.number().positive().describe('Horas semanales a jornada completa según contrato'),
+      fraccionReduccion: z.number().min(0.01).max(0.99).describe('Fracción de reducción (entre 0 y 1). Ej: 0.5 para media jornada, 0.125 para 1/8 de jornada'),
+      menosDe24MesesEnReduccion: z.boolean().optional().describe('¿Lleva menos de 24 meses en reducción de jornada? (primeros 24 meses: cotización SS a base completa). Por defecto true.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_reduccion_jornada', aiCaller);
+      const r = calcularReduccionJornada({
+        motivo: args.motivo as MotivoReduccionJornada,
+        salarioBrutoMensualCompleto: args.salarioBrutoMensualCompleto,
+        horasSemanalesCompletas: args.horasSemanalesCompletas,
+        fraccionReduccion: args.fraccionReduccion,
+        menosDe24MesesEnReduccion: args.menosDe24MesesEnReduccion,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `⏱️ **Reducción de Jornada — ${r.pctJornadaReducida.toFixed(1).replace('.', ',')}% reducción (${r.pctJornadaTrabajada.toFixed(1).replace('.', ',')}% jornada)**`,
+        `📋 Motivo: ${r.motivo.replace(/_/g, ' ')} | Rango legal: ${r.reduccionMinimaPermitida}%–${r.reduccionMaximaPermitida}%`,
+        r.dentroRangoLegal ? `✅ Reducción dentro del rango legal` : `❌ Reducción fuera del rango legal permitido`,
+        '',
+        `⏰ Horas semanales: ${r.horasSemanalesTrasReduccion.toFixed(1).replace('.', ',')} h/sem (de ${args.horasSemanalesCompletas} h)`,
+        `💶 Salario bruto mensual reducido: **${fmt(r.salarioBrutoMensualReducido)} €**`,
+        `💸 Merma mensual bruta: -${fmt(r.mermaMensualBruta)} €`,
+        `💸 Merma anual bruta: **-${fmt(r.mermaAnualBruta)} €**`,
+        '',
+        `📊 Cotización SS: ${r.baseSSCompleta ? `✅ Base jornada COMPLETA (primeros 24 meses art. 237 LGSS)` : `⚠️ Base jornada REDUCIDA (tras 24 meses)`}`,
+        `💡 ${r.detalleCotizacionSS}`,
+        `📐 Base reguladora estimada para prestaciones: ${fmt(r.baseReguladoraEstimada)} €/mes`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote K: calcular_irpf_no_residente ───────────────────────────────────────
+  servidor.tool(
+    'calcular_irpf_no_residente',
+    `Calcula la cuota del IRNR (Impuesto sobre la Renta de No Residentes) para rentas obtenidas en España sin establecimiento permanente, según el TRLIRNR (RDLeg 5/2004).
+Tipos 2025: dividendos/intereses/ganancias 19% (todos los países); trabajo/pensiones/alquileres 19% (UE/EEE) o 24% (resto). Los residentes UE/EEE pueden deducir gastos en arrendamientos.
+Calcula cuota íntegra, retención correcta del pagador y cuota diferencial.
+Encadenable con: calcular_plusvalias_irpf, calcular_retencion_alquiler, calcular_irpf.`,
+    {
+      tipoRenta: z.enum(['trabajo', 'dividendos', 'intereses', 'ganancia_inmueble', 'ganancia_otros', 'alquiler_inmueble', 'pension', 'royalties', 'actividad_economica']).describe('Tipo de renta obtenida en España'),
+      importeBruto: z.number().positive().describe('Importe bruto de la renta (€)'),
+      residenciaFiscal: z.enum(['ue_eee', 'convenio_sin_reduccion', 'sin_convenio']).describe('Residencia fiscal: ue_eee (UE, Islandia, Noruega, Liechtenstein), convenio_sin_reduccion (país con CDI pero sin reducción de tipo), sin_convenio (país sin CDI con España)'),
+      gastosDeducibles: z.array(z.object({ concepto: z.string(), importe: z.number() })).optional().describe('[Solo UE/EEE en alquiler_inmueble] Gastos deducibles (IBI, intereses hipoteca, amortización, etc.)'),
+      retencionPracticada: z.number().min(0).optional().describe('Retención ya practicada por el pagador (€). Para calcular cuota diferencial.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_irpf_no_residente', aiCaller);
+      const r = calcularIRPFNoResidente({
+        tipoRenta: args.tipoRenta as TipoRentaNoResidente,
+        importeBruto: args.importeBruto,
+        residenciaFiscal: args.residenciaFiscal as ResidenciaFiscal,
+        gastosDeducibles: args.gastosDeducibles,
+        retencionPracticada: args.retencionPracticada,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `🌍 **IRNR — ${r.tipoRenta.replace(/_/g, ' ')} | ${r.residenciaFiscal.replace(/_/g, ' ')}**`,
+        '',
+        `💶 Importe bruto: ${fmt(r.importeBruto)} €`,
+        r.gastosDeduciblesTotal > 0 ? `💸 Gastos deducibles (UE/EEE): -${fmt(r.gastosDeduciblesTotal)} €` : '',
+        `📊 Base imponible: **${fmt(r.baseImponible)} €**`,
+        `🏷️ Tipo de gravamen: **${r.tipoGravamen}%**`,
+        `💰 Cuota íntegra IRNR: **${fmt(r.cuotaIntegra)} €**`,
+        '',
+        `🏦 Retención practicada: ${fmt(r.retencionPracticada)} €`,
+        `📋 Retención correcta (${r.tipoRetencionObligatorio}%): ${fmt(r.retencionCorrecta)} €`,
+        `${r.cuotaDiferencial >= 0 ? '💸 A ingresar' : '✅ A devolver'}: **${fmt(Math.abs(r.cuotaDiferencial))} €**`,
+        '',
+        `💡 ${r.explicacionTipo}`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote K: calcular_modelo_130 ───────────────────────────────────────────────
+  servidor.tool(
+    'calcular_modelo_130',
+    `Calcula el pago fraccionado trimestral del IRPF para autónomos en estimación directa (Modelo 130).
+Fórmula: 20% × rendimiento neto acumulado (ingresos - gastos) - retenciones acumuladas - pagos fraccionados anteriores del año.
+Si más del 70% de los ingresos provienen de clientes que retienen, no existe obligación de presentar el modelo.
+Encadenable con: calcular_irpf, calcular_cuota_autonomo, calcular_modelo_303.`,
+    {
+      trimestre: z.enum(['T1', 'T2', 'T3', 'T4']).describe('Trimestre al que corresponde el pago fraccionado'),
+      ingresosAcumulados: z.number().min(0).describe('Ingresos (facturación) acumulados desde el 1 de enero hasta el fin del trimestre (€)'),
+      gastosDeduciblesAcumulados: z.number().min(0).describe('Gastos deducibles acumulados desde el 1 de enero (€): compras, SS autónomo, alquileres, suministros, amortizaciones, etc.'),
+      retencionesAcumuladas: z.number().min(0).describe('Retenciones practicadas por clientes acumuladas en el período (€)'),
+      pagosFraccionadosAnteriores: z.number().min(0).describe('Suma de Modelo 130 ya ingresados en trimestres anteriores del mismo año (€)'),
+      masDeL70PctConRetencion: z.boolean().optional().describe('¿Más del 70% de los ingresos provienen de clientes obligados a retener? (exime de presentar el modelo 130). Por defecto false.'),
+      anioEjercicio: z.number().int().optional().describe('Año del ejercicio. Por defecto año actual.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_modelo_130', aiCaller);
+      const r = calcularModelo130({
+        trimestre: args.trimestre as TrimestreModelo130,
+        ingresosAcumulados: args.ingresosAcumulados,
+        gastosDeduciblesAcumulados: args.gastosDeduciblesAcumulados,
+        retencionesAcumuladas: args.retencionesAcumuladas,
+        pagosFraccionadosAnteriores: args.pagosFraccionadosAnteriores,
+        masDeL70PctConRetencion: args.masDeL70PctConRetencion,
+        anioEjercicio: args.anioEjercicio,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `📋 **Modelo 130 — Pago Fraccionado IRPF Autónomos ${r.trimestre}**`,
+        `📅 Plazo de presentación: ${r.plazoPresentacion}`,
+        '',
+        `💶 Ingresos acumulados: ${fmt(r.ingresosAcumulados)} €`,
+        `💸 Gastos deducibles acumulados: -${fmt(r.gastosDeduciblesAcumulados)} €`,
+        `📊 Rendimiento neto acumulado: **${fmt(r.rendimientoNetoAcumulado)} €**`,
+        '',
+        `🧮 Cuota bruta (20%): ${fmt(r.cuotaBruta)} €`,
+        `➖ Retenciones soportadas: -${fmt(r.retencionesAcumuladas)} €`,
+        `➖ Pagos fraccionados anteriores: -${fmt(r.pagosFraccionadosAnteriores)} €`,
+        '',
+        r.obligacionPresentar
+          ? `✅ **Cuota a ingresar (Modelo 130): ${fmt(r.cuotaAIngresar)} €**`
+          : `ℹ️ No obligación de presentar: ${r.motivoNoObligacion}`,
+        '',
+        `📈 Proyección anual (estimación): rendimiento ${fmt(r.rendimientoAnualEstimado)} € → pago fraccionado anual ~${fmt(r.cuotaAnualEstimada)} €`,
+        '',
+        ...r.advertencias.map(a => `⚠️ ${a}`),
+        `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote K: calcular_conceptos_cotizables ────────────────────────────────────
+  servidor.tool(
+    'calcular_conceptos_cotizables',
+    `Determina qué parte de las retribuciones en especie y complementos salariales están exentos de IRPF y SS, y qué parte tributa.
+Analiza: tickets restaurante (11 €/día), cheque guardería (100% exento), bono transporte (1.500 €/año), seguro médico (500 €/persona/año), vehículo empresa (20%/15% eléctrico del valor).
+Útil para planes de retribución flexible (flex comp). Estima el ahorro fiscal con tipo marginal orientativo del 30%.
+Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
+    {
+      ticketRestauranteDiario: z.number().min(0).optional().describe('Importe del ticket restaurante por día (€). Exento hasta 11 €/día.'),
+      diasHabilesConTicket: z.number().int().min(0).optional().describe('Días hábiles trabajados al año con ticket restaurante. Por defecto 220.'),
+      chequeGuarderiaAnual: z.number().min(0).optional().describe('Importe anual del cheque guardería (€). Exento íntegramente para hijos menores de 3 años.'),
+      bonoTransporteAnual: z.number().min(0).optional().describe('Importe anual del bono/tarjeta de transporte (€). Exento hasta 1.500 €/año.'),
+      seguroMedicoTrabajador: z.number().min(0).optional().describe('Prima anual del seguro médico para el trabajador (€). Exento hasta 500 €/año.'),
+      seguroMedicoFamiliares: z.number().min(0).optional().describe('Prima anual del seguro médico para cónyuge y descendientes (€).'),
+      numFamiliaresCubiertos: z.number().int().min(0).optional().describe('Número de familiares (cónyuge + hijos) cubiertos por el seguro médico.'),
+      familiaresConDiscapacidad: z.boolean().optional().describe('¿Algún familiar cubierto con discapacidad? (límite sube a 1.500 €/persona). Por defecto false.'),
+      valorVehiculo: z.number().min(0).optional().describe('Valor de adquisición o valor de mercado del vehículo de empresa (€).'),
+      vehiculoElectrico: z.boolean().optional().describe('¿Es vehículo eléctrico? (tipo reducido 15% en lugar de 20%). Por defecto false.'),
+      pctUsoPrivado: z.number().min(0).max(100).optional().describe('Porcentaje de uso privado del vehículo de empresa (%). Por defecto 100%.'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_conceptos_cotizables', aiCaller);
+      const r = calcularConceptosCotizables({
+        ticketRestauranteDiario: args.ticketRestauranteDiario,
+        diasHabilesConTicket: args.diasHabilesConTicket,
+        chequeGuarderiaAnual: args.chequeGuarderiaAnual,
+        bonoTransporteAnual: args.bonoTransporteAnual,
+        seguroMedicoTrabajador: args.seguroMedicoTrabajador,
+        seguroMedicoFamiliares: args.seguroMedicoFamiliares,
+        numFamiliaresCubiertos: args.numFamiliaresCubiertos,
+        familiaresConDiscapacidad: args.familiaresConDiscapacidad,
+        valorVehiculo: args.valorVehiculo,
+        vehiculoElectrico: args.vehiculoElectrico,
+        pctUsoPrivado: args.pctUsoPrivado,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `💼 **Retribuciones en Especie — Exenciones IRPF y SS 2025**`,
+        '',
+        ...r.conceptos.map(c => [
+          `**${c.concepto}**: ${fmt(c.importeTotal)} €`,
+          `  IRPF: exento ${fmt(c.exentoIRPF)} € | tributa ${fmt(c.tributaIRPF)} €`,
+          `  SS: ${c.exentoSS ? '✅ Exento' : '❌ Cotiza'}`,
+          `  💡 ${c.observacion}`,
+        ].join('\n')),
+        '',
+        `📊 **Resumen anual:**`,
+        `  Total retribución en especie: ${fmt(r.totalRetribucionEspecie)} €`,
+        `  Total exento IRPF: **${fmt(r.totalExentoIRPF)} €**`,
+        `  Total tributa IRPF: ${fmt(r.totalTributaIRPF)} €`,
+        `  Exento SS: ${fmt(r.totalExentoSS)} €  |  Cotiza SS: ${fmt(r.totalCotizaSS)} €`,
+        `  💰 Ahorro fiscal estimado (tipo marginal ~30%): **${fmt(r.ahorroFiscalEstimado)} €**`,
         '',
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
