@@ -159,6 +159,15 @@ import { calcularModelo347 } from '@/lib/calculadoras/modelo347';
 import { calcularEmpresaFamiliarISD, type ComunidadAutonomaEF, type TipoTransmision as TipoTransmisionEF, type TipoParentesco } from '@/lib/calculadoras/empresaFamiliarISD';
 import { calcularRetribucionEspecie, type TipoRetribucionEspecie } from '@/lib/calculadoras/retribucionEspecie';
 import { calcularImpuestoGrandesFortunas } from '@/lib/calculadoras/impuestoGrandesfortunas';
+// ── Lote Q:
+import { calcularRegimenImpatriados, type MotivoDesplazamiento } from '@/lib/calculadoras/regimenImpatriados';
+import { calcularRecargoEquivalencia, type TipoIVARecargo } from '@/lib/calculadoras/recargoEquivalencia';
+import { calcularReduccionIrregularIRPF, type TipoRendimientoIrregular, type OrigenRendimiento } from '@/lib/calculadoras/reduccionIrregularIRPF';
+import { calcularExencionReinversionVivienda, type SituacionReinversion } from '@/lib/calculadoras/exencionReinversionVivienda';
+import { calcularJubilacionParcial, type ModalidadJubilacionParcial } from '@/lib/calculadoras/jubilacionParcial';
+import { calcularMovilidadGeografica, type TipoMovilidadGeografica, type DecisionTrabajador } from '@/lib/calculadoras/movilidadGeografica';
+import { calcularDerechosAutorIRPF, type TipoRendimientoAutor } from '@/lib/calculadoras/derechosAutorIRPF';
+import { calcularCoeficientesAbatimiento, type TipoActivoAbatimiento } from '@/lib/calculadoras/coeficientesAbatimiento';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -6621,6 +6630,172 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote Q: impatriados, recargo equivalencia, irregulares IRPF, reinversion vivienda, jubilacion parcial, movilidad geografica, derechos autor, abatimiento ──
+
+  servidor.tool(
+    'calcular_regimen_impatriados',
+    'Calcula la tributación bajo el régimen especial de trabajadores desplazados a España (Ley Beckham, LIRPF art. 93 + Ley Startups). Tipos fijos IRNR: 24% hasta 600.000 EUR, 47% sobre exceso. Rentas de fuente extranjera exentas. Válido para contratos de trabajo, administradores, emprendedores y nómadas digitales durante 6 años.',
+    {
+      motivoDesplazamiento: z.enum(['contrato_trabajo', 'administrador_entidad', 'emprendedor', 'nomada_digital', 'investigacion_docencia']).describe('Motivo del desplazamiento a España'),
+      salarioBrutoAnualEspana: z.number().min(0).describe('Salario bruto anual de fuente española (EUR)'),
+      salarioFuenteExtranjera: z.number().min(0).optional().describe('Rentas del trabajo de fuente extranjera (EUR) — EXENTAS bajo este régimen'),
+      rendimientosCapitalMobiliario: z.number().min(0).optional().describe('Rendimientos del capital mobiliario — dividendos, intereses (EUR) — tributan a escala del ahorro'),
+      gananciasPatrimoniales: z.number().min(0).optional().describe('Ganancias patrimoniales del ahorro (EUR) — tributan a escala del ahorro'),
+      cuotaSSAnual: z.number().min(0).optional().describe('Cuota SS anual en España (EUR) — deducible del salario bruto'),
+      anoRegimen: z.number().min(1).max(6).optional().describe('Año del régimen (1-6) — para informar sobre duración restante'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_regimen_impatriados', aiCaller);
+      const resultado = calcularRegimenImpatriados(args as Parameters<typeof calcularRegimenImpatriados>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_recargo_equivalencia',
+    'Calcula el recargo de equivalencia del IVA que paga el comerciante minorista al proveedor (LIVA arts. 148-163). Tipos 2025: IVA 21%+5,2%, IVA 10%+1,4%, IVA 4%+0,5%. El recargo es un coste neto no recuperable; a cambio el comerciante no presenta Modelo 303. Calcula coste total al proveedor y margen comercial real.',
+    {
+      compras: z.array(z.object({
+        descripcion: z.string().optional(),
+        baseImponible: z.number().positive().describe('Base imponible de la compra (EUR)'),
+        tipoIVA: z.union([z.literal(0), z.literal(4), z.literal(10), z.literal(21)]).describe('Tipo de IVA aplicable (%)'),
+      })).min(1).describe('Líneas de compra al proveedor con su tipo de IVA'),
+      precioVentaPublicoConIVA: z.number().positive().optional().describe('Precio de venta al público con IVA incluido (EUR) — para calcular margen real'),
+      margenComercialPct: z.number().positive().optional().describe('Margen comercial bruto sobre el coste neto (%) — alternativa al precio de venta'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_recargo_equivalencia', aiCaller);
+      const resultado = calcularRecargoEquivalencia(args as Parameters<typeof calcularRecargoEquivalencia>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_reduccion_irregular_irpf',
+    'Calcula la reducción del 30% sobre rendimientos del trabajo o actividades económicas generados en más de 2 años (LIRPF arts. 18.2 y 32.1). Casos: indemnizaciones por despido no exentas, atrasos de convenio, derechos de imagen, premios, honorarios de proyectos plurianuales. Límite: 300.000 EUR de base (reducida si rendimiento >700.000 EUR).',
+    {
+      tipoRendimiento: z.enum(['indemnizacion_despido', 'atrasos_convenio', 'derechos_imagen', 'premios_literarios', 'honorarios_proyecto_largo', 'otro']).describe('Tipo de rendimiento irregular'),
+      origenRendimiento: z.enum(['trabajo', 'actividad_economica']).describe('Origen: rendimiento del trabajo o de actividades económicas'),
+      importeBruto: z.number().positive().describe('Importe bruto del rendimiento irregular (EUR)'),
+      periodosGeneracionAnos: z.number().positive().describe('Período de generación del rendimiento (años) — debe ser >2 para aplicar la reducción'),
+      gastosDeducibles: z.number().min(0).optional().describe('Gastos deducibles asociados al rendimiento (EUR)'),
+      tipoMarginal: z.number().min(0).max(50).optional().describe('Tipo marginal IRPF del contribuyente (%) — para calcular el ahorro fiscal estimado. Default: 37%'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_reduccion_irregular_irpf', aiCaller);
+      const resultado = calcularReduccionIrregularIRPF(args as Parameters<typeof calcularReduccionIrregularIRPF>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_exencion_reinversion_vivienda',
+    'Calcula la exención por reinversión en vivienda habitual (LIRPF art. 38.1). Si se reinvierte el 100% del precio de venta en una nueva vivienda habitual en los 2 años siguientes (o anteriores), la ganancia queda exenta. Si se reinvierte solo una parte, la exención es proporcional. Mayores de 65 años: exentos sin reinversión.',
+    {
+      precioTransmision: z.number().positive().describe('Precio de venta de la vivienda habitual (EUR)'),
+      valorAdquisicion: z.number().positive().describe('Valor de adquisición de la vivienda vendida (EUR)'),
+      gastosAdquisicion: z.number().min(0).optional().describe('Gastos de adquisición (notaría, ITP/AJD...) (EUR)'),
+      gastosTransmision: z.number().min(0).optional().describe('Gastos de transmisión (notaría, agencia, plusvalía municipal...) (EUR)'),
+      hipotecaPendiente: z.number().min(0).optional().describe('Capital pendiente de hipoteca asumido por el comprador (EUR) — reduce el importe a reinvertir'),
+      situacionReinversion: z.enum(['reinversion_total', 'reinversion_parcial', 'sin_reinversion', 'compra_previa_dos_anos']).describe('Situación: reinversión total, parcial, sin reinversión, o compra de la nueva vivienda en los 2 años previos a la venta'),
+      importeReinvertido: z.number().min(0).optional().describe('Importe reinvertido en la nueva vivienda (EUR) — solo si situacion=reinversion_parcial'),
+      mayor65anos: z.boolean().optional().describe('¿El vendedor tiene más de 65 años? → ganancia exenta sin necesidad de reinvertir'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_exencion_reinversion_vivienda', aiCaller);
+      const resultado = calcularExencionReinversionVivienda(args as Parameters<typeof calcularExencionReinversionVivienda>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_jubilacion_parcial',
+    'Calcula los efectos económicos de la jubilación parcial (LGSS arts. 215-219): pensión proporcional del SEPE, salario por horas trabajadas e ingreso total del trabajador. Dos modalidades: con contrato de relevo (reducción 25-75%, cotización ficta a jornada completa) y sin relevo (solo disponible al llegar a edad ordinaria, reducción 25-50%).',
+    {
+      modalidad: z.enum(['con_relevo', 'sin_relevo']).describe('Con contrato de relevo (antes de edad ordinaria) o sin relevo (al llegar a la edad ordinaria)'),
+      salarioBrutoMensual: z.number().positive().describe('Salario bruto mensual actual del trabajador (EUR)'),
+      pctReduccionJornada: z.number().min(1).max(99).describe('Porcentaje de reducción de jornada acordado (%). Con relevo: 25-75%. Sin relevo: 25-50%'),
+      pensionOrdinariaMensual: z.number().positive().describe('Pensión de jubilación ordinaria al 100% de jornada que le correspondería (EUR/mes) — la pensión parcial será proporcional a la reducción'),
+      baseCotizacionMensual: z.number().positive().optional().describe('Base de cotización mensual (EUR) — si difiere del salario bruto'),
+      edadTrabajador: z.number().min(55).max(70).optional().describe('Edad del trabajador (años) — para verificar requisitos de acceso'),
+      anosCotizados: z.number().min(0).max(50).optional().describe('Años cotizados — requisito mínimo 33 años (36 si el relevo es a tiempo parcial)'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_jubilacion_parcial', aiCaller);
+      const resultado = calcularJubilacionParcial(args as Parameters<typeof calcularJubilacionParcial>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_movilidad_geografica',
+    'Calcula los derechos y costes de la movilidad geográfica (ET art. 40): traslado definitivo (preaviso 30 días, opción rescisión con 20 días/año) y desplazamiento temporal (dietas y gastos de viaje). Si el trabajador rescinde, indemnización de 20 días/año máx. 12 meses. Gastos de traslado exentos de IRPF con factura.',
+    {
+      tipoMovilidad: z.enum(['traslado', 'desplazamiento_temporal']).describe('Traslado definitivo (cambia residencia) o desplazamiento temporal (<12 meses en 3 años)'),
+      salarioBrutoMensual: z.number().positive().describe('Salario bruto mensual del trabajador (EUR)'),
+      anosServicio: z.number().min(0).describe('Años de servicio en la empresa'),
+      decisionTrabajador: z.enum(['aceptar', 'rescindir', 'pendiente']).describe('Decisión del trabajador: aceptar el traslado, rescindir el contrato con indemnización, o pendiente de decidir'),
+      diasDesplazamiento: z.number().positive().optional().describe('Duración del desplazamiento temporal (días) — solo si tipo=desplazamiento_temporal'),
+      gastosTraslado: z.object({
+        mudanza: z.number().min(0).optional().describe('Mudanza y transporte de enseres (EUR)'),
+        viajesFamilia: z.number().min(0).optional().describe('Gastos de viaje del trabajador y familia (EUR)'),
+        alojamientoProvisional: z.number().min(0).optional().describe('Alojamiento provisional en destino (EUR)'),
+        otros: z.number().min(0).optional().describe('Otros gastos acordados (EUR)'),
+      }).optional().describe('Gastos del traslado a cargo de la empresa — si decisión = aceptar'),
+      zonaDestino: z.enum(['espana', 'extranjero']).optional().describe('Zona del destino para el cálculo de dietas exentas. Default: espana'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_movilidad_geografica', aiCaller);
+      const resultado = calcularMovilidadGeografica(args as Parameters<typeof calcularMovilidadGeografica>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_derechos_autor_irpf',
+    'Calcula la tributación IRPF de los ingresos por derechos de autor, propiedad intelectual e imagen (LIRPF arts. 25.4, 26.2, 27, 33, 92). Cuatro modalidades: cesión de derechos (capital mobiliario con reducción 60%), actividad económica habitual (sin reducción), transmisión plena (ganancia patrimonial, base ahorro), y derechos de imagen (régimen especial 19%).',
+    {
+      tipoRendimiento: z.enum(['cesion_derechos_capital_mobiliario', 'actividad_economica_habitual', 'transmision_plena_derechos', 'derechos_imagen']).describe('Tipo: cesion (autor cede explotacion, reduccion 60%), actividad_economica (habitual, sin reduccion), transmision_plena (venta derechos, ahorro 19-28%), derechos_imagen (art. 92, 19%)'),
+      ingresosBrutos: z.number().positive().describe('Ingresos brutos por derechos de autor/imagen (EUR)'),
+      gastosDeducibles: z.number().min(0).optional().describe('Gastos directamente relacionados y necesarios para obtener los rendimientos (EUR): cuotas de autor, agentes, produción, etc.'),
+      valorAdquisicionDerechos: z.number().min(0).optional().describe('Valor de adquisición de los derechos (EUR) — solo para transmision_plena_derechos (calcula ganancia patrimonial)'),
+      retencionesPracticadas: z.number().min(0).optional().describe('Retenciones ya practicadas por el pagador (EUR)'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_derechos_autor_irpf', aiCaller);
+      const resultado = calcularDerechosAutorIRPF(args as Parameters<typeof calcularDerechosAutorIRPF>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_coeficientes_abatimiento',
+    'Calcula la reducción por coeficientes de abatimiento sobre plusvalías de elementos patrimoniales adquiridos antes del 31/12/1994 (LIRPF DT 9.ª). Inmuebles: 11,11%/año; acciones cotizadas: 25%/año; otros: 14,28%/año (computados hasta 31/12/1996). Límite acumulado vitalicio: 400.000 EUR de valor de transmisión. Divide ganancia pre/post 20/01/2006.',
+    {
+      tipoActivo: z.enum(['inmueble', 'acciones_cotizadas', 'otros']).describe('Tipo de activo: inmueble (11,11%/año), acciones_cotizadas en mercado organizado (25%/año), otros bienes (14,28%/año)'),
+      fechaAdquisicion: z.string().describe('Fecha de adquisición del activo en formato YYYY-MM-DD (debe ser anterior al 31/12/1994)'),
+      fechaTransmision: z.string().describe('Fecha de transmisión/venta en formato YYYY-MM-DD'),
+      valorAdquisicion: z.number().positive().describe('Valor de adquisición del activo (EUR)'),
+      gastosAdquisicion: z.number().min(0).optional().describe('Gastos de adquisición (EUR): notaría, ITP, comisiones...'),
+      valorTransmision: z.number().positive().describe('Valor de transmisión/venta (EUR)'),
+      gastosTransmision: z.number().min(0).optional().describe('Gastos de transmisión (EUR): notaría, agencia, plusvalía municipal...'),
+      valorTransmisionesAnterioresConAbatimiento: z.number().min(0).optional().describe('Valor acumulado de transmisiones anteriores sobre las que ya se aplicó abatimiento (EUR) — para verificar el límite de 400.000 EUR'),
+    },
+    async (args, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_coeficientes_abatimiento', aiCaller);
+      const resultado = calcularCoeficientesAbatimiento(args as Parameters<typeof calcularCoeficientesAbatimiento>[0]);
+      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
     }
   );
 
