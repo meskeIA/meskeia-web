@@ -181,17 +181,18 @@ Las nuevas apps se crean **siempre en dos fases**. La fase 2 es inmediata, no op
 [ ] 3. Añadir URL en data/implemented-apps.ts
 [ ] 4. Añadir relaciones en data/app-relations.ts
 [ ] 5. Actualizar public/ai-index.json
-[ ] 6. Ejecutar npm run build (exit code 0)
+[ ] 6. Incluir <EducationalSection> con bloque educativo básico en page.tsx
+[ ] 7. Ejecutar npm run build (exit code 0)
 ```
 
 **Fase 2 — Profesionalización v2.0** (inmediatamente después del build):
 ```
-[ ] 7. Añadir bloque educativo completo dentro de <EducationalSection>
-[ ] 8. Verificar clase .warningBox en CSS Module (indicador de v2.0 completo)
-[ ] 9. Build final, commit y push a GitHub
+[ ] 8. Enriquecer el bloque educativo básico existente con el patrón v2.0 completo
+[ ] 9. Verificar clase .warningBox en CSS Module (indicador de v2.0 completo)
+[ ] 10. Build final, commit y push a GitHub
 ```
 
-**Excepción**: Cursos (`/curso-*`) y Guías (`/guia/*`) están excluidos del patrón v2.0 por tener estructura propia.
+**Excepción**: Cursos (`/curso-*`) y Guías (`/guia/*`) están excluidos del patrón v2.0 por tener estructura propia. Juegos y ocio → patrón lite (ver `PROFESIONALIZACION.md`).
 
 **Instrucciones técnicas completas del patrón v2.0**: `PROFESIONALIZACION.md`
 
