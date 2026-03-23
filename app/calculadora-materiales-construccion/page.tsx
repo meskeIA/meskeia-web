@@ -436,55 +436,237 @@ export default function CalculadoraMaterialesPage() {
           subtitle="Consejos y referencias para calcular bien antes de ir a la tienda"
         >
           <section className={styles.guideSection}>
-            <h2>¿Por qué es importante calcular bien los materiales?</h2>
+            <h2>¿Cómo calcular bien los materiales antes de ir a la tienda?</h2>
             <p>
-              Comprar de menos obliga a volver a la tienda y arriesga que el lote o color no coincida exactamente.
-              Comprar de más genera gasto innecesario. Un cálculo preciso con el porcentaje de desperdicio adecuado
-              es la base de cualquier reforma bien planificada.
+              Un error de cálculo puede obligarte a volver a la tienda y arriesgar que el lote o color no coincida.
+              Sigue estos pasos para no quedarte corto ni comprar de más.
             </p>
 
-            <h3>Azulejos y baldosas: ¿cuánto desperdicio añadir?</h3>
-            <table className={styles.tipTable}>
-              <thead>
-                <tr><th>Tipo de instalación</th><th>Desperdicio recomendado</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>Instalación recta (paralela a las paredes)</td><td>5 – 8%</td></tr>
-                <tr><td>Estándar (la más habitual)</td><td>10%</td></tr>
-                <tr><td>En diagonal (45°) o juntas de corte</td><td>12 – 15%</td></tr>
-                <tr><td>Espiga, mosaico pequeño o diseño complejo</td><td>15 – 20%</td></tr>
-              </tbody>
-            </table>
-            <p>
-              Recuerda que si la cerámica tiene <strong>variación de tono</strong>, es recomendable comprar un 5%
-              adicional y guardar algunas piezas para futuras reparaciones.
-            </p>
+            {/* Guía paso a paso */}
+            <h3>📋 Guía paso a paso para calcular materiales</h3>
+            <div className={styles.stepGuide}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <strong>Mide con precisión y añade los huecos</strong>
+                  <p>Mide el largo y ancho de la zona a cubrir. Para pintura, mide también la altura y cuenta puertas y ventanas para descontarlas. Un error de 10 cm en 4 m es solo el 2,5%, pero puede costarte una caja extra.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <strong>Elige el porcentaje de desperdicio adecuado</strong>
+                  <p>Instalación recta: 5–8%. Estándar: 10%. En diagonal: 12–15%. Diseño complejo o espiga: 15–20%. Si el material tiene variación de tono, suma otro 5% y guarda piezas para reparaciones.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <strong>Consulta la cobertura exacta del embalaje</strong>
+                  <p>El dato de m² por caja o paquete está en el embalaje físico, no siempre en la web. Asegúrate de usar el dato del lote exacto que vas a comprar, ya que puede variar entre modelos del mismo fabricante.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepContent}>
+                  <strong>Compra todo del mismo lote de fabricación</strong>
+                  <p>El número de lote (o &quot;shade number&quot;) garantiza que el tono es idéntico. Dos lotes distintos del mismo modelo pueden tener variaciones visibles de color o textura. Compra todo de una vez.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>5</div>
+                <div className={styles.stepContent}>
+                  <strong>Calcula el mortero o adhesivo aparte</strong>
+                  <p>El consumo de mortero es independiente de los azulejos: depende de la planitud del soporte y el tipo de adhesivo. Para suelos interiores en buen estado, cuenta 4–5 kg/m²; en exteriores irregulares, 6–8 kg/m².</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>6</div>
+                <div className={styles.stepContent}>
+                  <strong>Guarda material sobrante para futuras reparaciones</strong>
+                  <p>Aunque sobre alguna caja, guárdala. Si necesitas reparar en el futuro, el modelo puede estar descatalogado o con variación de tono. 1–2 cajas guardadas pueden evitar una reforma parcial completa.</p>
+                </div>
+              </div>
+            </div>
 
-            <h3>Pintura: claves del rendimiento</h3>
-            <p>
-              El rendimiento de la pintura (m²/litro) que indica el fabricante se mide normalmente en una sola mano
-              sobre superficie preparada. Para paredes con imprimación previa, usa el dato del envase. Sin imprimación
-              o sobre colores oscuros, necesitarás una mano extra.
-            </p>
-            <ul>
-              <li>Pintura mate interior: 8 – 12 m²/L</li>
-              <li>Pintura satinada o esmalte: 10 – 14 m²/L</li>
-              <li>Pintura de techo (blanca): 8 – 10 m²/L</li>
-            </ul>
+            {/* Tabla comparativa de desperdicios */}
+            <h3>⚖️ Comparativa: ¿qué porcentaje de desperdicio usar?</h3>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Tipo de instalación</th>
+                    <th>Desperdicio</th>
+                    <th>Cuándo usar</th>
+                    <th>Material más afectado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Recta básica</strong></td>
+                    <td>5 – 8%</td>
+                    <td>Habitaciones cuadradas, pocas paredes</td>
+                    <td>Tarima, grandes formatos</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Estándar</strong> ✅ Recomendado</td>
+                    <td>10%</td>
+                    <td>La mayoría de reformas</td>
+                    <td>Azulejos, tarima, mortero</td>
+                  </tr>
+                  <tr>
+                    <td><strong>En diagonal (45°)</strong></td>
+                    <td>12 – 15%</td>
+                    <td>Suelos con diseño en diagonal</td>
+                    <td>Azulejos, tarima</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Espiga / Herringbone</strong></td>
+                    <td>15 – 20%</td>
+                    <td>Tarima en espiga, mosaicos pequeños</td>
+                    <td>Tarima estrecha, mosaico</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Zonas muy irregulares</strong></td>
+                    <td>20%+</td>
+                    <td>Muchos recortes, columnas, escaleras</td>
+                    <td>Todos los materiales</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-            <h3>Tarima flotante: el porcentaje de corte</h3>
-            <p>
-              La tarima se vende en paquetes con una cantidad de m² determinada. Al instalarla, los cortes al final
-              de cada fila generan desperdicio. Si instalas en diagonal, el desperdicio se duplica aproximadamente.
-              Consulta siempre el dato del fabricante sobre m² por paquete antes de calcular.
-            </p>
+            {/* Casos de uso */}
+            <h3>💼 Casos de uso habituales</h3>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🛁</span>
+                  <strong>Reformar un baño completo</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Baño 2×2 m: ~4 m² suelo + ~20 m² paredes.<br/>
+                  Azulejo 30×60 cm: ~7 cajas suelo + ~35 cajas paredes.<br/>
+                  Adhesivo flexible: ~2 + ~9 bolsas 25 kg.
+                </div>
+                <p className={styles.escenarioTip}><strong>Consejo:</strong> En baños, usa siempre adhesivo flexible (C2) porque soporta mejor la humedad y las dilataciones térmicas que el estándar.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🛋️</span>
+                  <strong>Pintar un salón-cocina abierto</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Salón 5×4×2,5 m: ~40 m² paredes netas + 20 m² techo.<br/>
+                  Pintura mate (10 m²/L, 2 manos): ~12 L → 3 botes de 4 L.
+                </div>
+                <p className={styles.escenarioTip}><strong>Consejo:</strong> Si cambias de color oscuro a claro, añade una mano de imprimación. Te ahorrará una tercera mano de pintura y mejora la cobertura.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🪵</span>
+                  <strong>Tarima flotante en toda la planta</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Planta 80 m² con obstáculos (columnas, escalera).<br/>
+                  Tarima 2,13 m²/paquete + 15% desperdicio: ~44 paquetes.
+                </div>
+                <p className={styles.escenarioTip}><strong>Consejo:</strong> Con columnas y obstáculos, aumenta el desperdicio al 12–15%. Cada corte alrededor de un obstáculo genera más sobrante que una pared recta.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🏡</span>
+                  <strong>Terrazas y exteriores</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Terraza 6×3 m: 18 m² + 10% desperdicio = 19,8 m².<br/>
+                  Porcelánico 60×60: ~18 cajas. Mortero exterior: ~9 bolsas.
+                </div>
+                <p className={styles.escenarioTip}><strong>Consejo:</strong> En exterior usa mortero de cemento cola para exteriores (clasificación C2TE o mejor). El adhesivo estándar no resiste ciclos hielo-deshielo.</p>
+              </div>
+            </div>
 
-            <h3>Mortero y adhesivo cerámico</h3>
-            <p>
-              El consumo de mortero depende del grosor de la capa de adhesivo y de la planitud del soporte.
-              En suelos interiores con buena base, 4 – 5 kg/m² es habitual. En exteriores o sobre soportes
-              irregulares, puede subir a 6 – 8 kg/m². Revisa siempre las instrucciones del fabricante.
-            </p>
+            {/* Mejores prácticas */}
+            <h3>✅ Mejores prácticas de compra</h3>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🔢</span>
+                <strong>Redondea siempre hacia arriba</strong>
+                <p>Si necesitas 7,3 cajas, compra 8. Nunca redondees hacia abajo: quedarte sin material a mitad de obra es mucho más caro que tener una caja de sobra.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🏷️</span>
+                <strong>Verifica el número de lote</strong>
+                <p>El lote (shade/calibre) garantiza tono uniforme. Pide al vendedor que compruebe que todas las cajas son del mismo lote antes de facturar.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📦</span>
+                <strong>Compra el mortero al final</strong>
+                <p>El consumo real de mortero depende de la obra. Compra el 80% inicial y el resto al avanzar. Los sacos abiertos absorben humedad y pierden resistencia.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🎨</span>
+                <strong>Pide muestra física de pintura</strong>
+                <p>El color en pantalla puede diferir hasta un 20% del real. Pide una muestra o compra el bote más pequeño disponible antes de pintar toda la habitación.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📏</span>
+                <strong>Mide dos veces, compra una</strong>
+                <p>Mide la habitación en al menos 2 puntos distintos. Las habitaciones raramente son perfectamente cuadradas y la diferencia puede ser de 5–10 cm.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🏪</span>
+                <strong>Consulta la política de devolución</strong>
+                <p>Muchas tiendas de materiales aceptan devolución de material no abierto. Si compras 1-2 cajas extra y sobran, puedes devolverlas sin coste.</p>
+              </div>
+            </div>
+
+            {/* Warning box */}
+            <div className={styles.warningBoxV2}>
+              <div className={styles.warningHeader}>
+                <span>⚠️</span>
+                <span>Errores comunes que encarecen la reforma</span>
+              </div>
+              <ul className={styles.warningList}>
+                <li><strong>❌ Calcular sin desperdicio:</strong> Olvidar los cortes puede suponer quedarte corto en un 8–20%. Comprar material adicional de otra partida puede no coincidir en tono o calibre.</li>
+                <li><strong>❌ Comprar de distintos lotes:</strong> Aunque el modelo sea idéntico, lotes distintos pueden tener variaciones de color visibles. Pide siempre el mismo número de lote.</li>
+                <li><strong>❌ Usar adhesivo estándar en exteriores:</strong> El adhesivo C1 no está diseñado para ciclos de temperatura extremos. En terrazas y exteriores usa siempre C2TE o superior.</li>
+                <li><strong>❌ Pintar sobre superficie sin preparar:</strong> Pintar sobre humedad, polvo o paredes desconchadas reduce la vida útil a menos de 2 años. Imprimación y saneado previo son imprescindibles.</li>
+                <li><strong>❌ Comprar la tarima sin aclimatarla:</strong> La tarima debe reposar 48 h en la habitación donde se va a instalar para adaptarse a la temperatura y humedad del ambiente.</li>
+              </ul>
+            </div>
+
+            {/* FAQ */}
+            <h3>❓ Preguntas frecuentes</h3>
+            <div className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <strong>¿Cuántas cajas de azulejos necesito para un baño estándar?</strong>
+                <p>Un baño de 4–6 m² de suelo y 20–25 m² de pared necesita aproximadamente 5–8 cajas para el suelo y 35–45 cajas para las paredes, dependiendo del formato del azulejo y el porcentaje de desperdicio. Usa la calculadora introduciendo las dimensiones exactas para un cálculo preciso.</p>
+                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Para baños pequeños con muchos recortes alrededor de sanitarios, añade un 15% de desperdicio en lugar del 10% estándar.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Cuántos litros de pintura necesito para una habitación de 12 m²?</strong>
+                <p>Una habitación de 3×4 m con 2,5 m de altura tiene aproximadamente 35 m² de paredes netas (descontando puerta y ventana) más 12 m² de techo. Con 2 manos y rendimiento de 10 m²/L, necesitas unos 9,4 L → 2 botes de 5 L.</p>
+                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si pintas sobre un color oscuro, aplica primero una mano de pintura de imprimación o selladora para evitar que el color anterior traspase.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Qué es el &quot;calibre&quot; de los azulejos y cómo afecta al cálculo?</strong>
+                <p>El calibre indica las dimensiones reales del azulejo, que pueden variar ±2–3 mm respecto al tamaño nominal. Si mezclas distintos calibres, el resultado es visible en las juntas. Al calcular, usa el m² del embalaje (que ya incluye la junta estándar de 1,5–3 mm).</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Cuántos sacos de mortero necesito para alicatar 20 m²?</strong>
+                <p>Para azulejos cerámicos en interiores con adhesivo flexible (C2): aproximadamente 4,5 kg/m² × 20 m² = 90 kg → 4 sacos de 25 kg. En exteriores o con soportes irregulares, puede subir a 6 kg/m² → 5 sacos.</p>
+                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Compra 1 saco extra. El mortero sobrante sellado en bolsa puede conservarse 3–6 meses en lugar seco.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Puedo instalar tarima sobre tarima existente?</strong>
+                <p>Sí, si la tarima existente está bien fijada, sin crujidos y con menos de 3 mm de desnivel. Pero aumenta el desperdicio al 12–15% por las adaptaciones a la tarima existente, y necesitarás umbral de transición si hay diferencia de nivel con otras estancias.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Qué ocurre si me faltan 2–3 cajas después de empezar la obra?</strong>
+                <p>Si el modelo sigue disponible, pide el mismo número de lote. Si no hay stock del mismo lote, existe riesgo de variación de tono. En ese caso, usa las cajas nuevas en las zonas menos visibles (traseras, dentro de armarios) y las originales en zonas nobles.</p>
+              </div>
+            </div>
           </section>
         </EducationalSection>
 

@@ -378,56 +378,250 @@ export default function EficienciaEnergeticaPage() {
           subtitle="Qué mejoras tienen mayor impacto y cómo aprovechar las ayudas públicas"
         >
           <section className={styles.guideSection}>
-            <h2>¿Por dónde se escapa el calor de tu casa?</h2>
+            <h2>¿Cómo planificar una mejora de eficiencia energética en tu hogar?</h2>
             <p>
-              Según el IDAE (Instituto para la Diversificación y Ahorro de la Energía), una vivienda sin aislamiento
-              pierde calor principalmente por:
-            </p>
-            <table className={styles.tipTable}>
-              <thead>
-                <tr><th>Zona</th><th>Pérdida estimada</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>Tejado / cubierta</td><td>25 – 30%</td></tr>
-                <tr><td>Paredes</td><td>20 – 25%</td></tr>
-                <tr><td>Ventanas y puertas</td><td>15 – 20%</td></tr>
-                <tr><td>Suelo / forjado</td><td>10 – 15%</td></tr>
-                <tr><td>Puentes térmicos</td><td>10 – 15%</td></tr>
-              </tbody>
-            </table>
-
-            <h3>Aislamiento: prioridad por rentabilidad</h3>
-            <p>
-              El tejado es la mejora más rentable en la mayoría de viviendas unifamiliares españolas.
-              Un buen aislamiento de cubierta puede reducir la factura de calefacción entre un 25 y un 35%.
-              El coste orientativo del aislamiento por proyección de poliuretano o celulosa está entre 20 y 40 €/m².
+              Mejorar la eficiencia energética de tu vivienda puede reducir la factura entre un 20 y un 70%.
+              Pero no todas las mejoras tienen el mismo retorno. Sigue este orden para maximizar el impacto.
             </p>
 
-            <h3>Ventanas: cuándo merece la pena cambiarlas</h3>
-            <p>
-              Si tienes ventanas de vidrio simple o doble acristalamiento básico anterior a 2000,
-              el cambio a ventanas Low-E o triple puede reducir las pérdidas por huecos entre un 40 y un 60%.
-              El payback típico en España es de 10-20 años según la zona climática.
-            </p>
+            {/* Guía paso a paso */}
+            <h3>📋 Hoja de ruta para rehabilitar energéticamente tu vivienda</h3>
+            <div className={styles.stepGuide}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <strong>Obtén el Certificado de Eficiencia Energética actual</strong>
+                  <p>Es obligatorio para acceder a la mayoría de subvenciones y permite comparar antes/después. El coste oscila entre 100 y 300 €. Un técnico certificado realiza la visita y emite el informe oficial. Las viviendas E, F o G son las que mayor ahorro potencial tienen.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <strong>Prioriza el aislamiento de cubierta y fachada</strong>
+                  <p>El tejado es la mejora con mayor retorno en España: una cubierta mal aislada supone el 25–30% de las pérdidas caloríficas. El coste del aislamiento de cubierta (proyección de espuma o celulosa) está entre 20 y 40 €/m², con payback de 5–10 años.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <strong>Sustituye ventanas antiguas de vidrio simple</strong>
+                  <p>Las ventanas de vidrio simple tienen una transmitancia U de 5–6 W/m²K; las Low-E bajan a 1,1–1,4 W/m²K. El cambio puede reducir las pérdidas por huecos hasta un 60%. Prioriza las orientadas al norte, que reciben menos sol y tienen más pérdidas en invierno.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepContent}>
+                  <strong>Evalúa cambiar el sistema de calefacción</strong>
+                  <p>Con aislamiento mejorado, la demanda de calor baja y una bomba de calor puede resultar rentable incluso en zonas frías. Calcula el SCOP de la bomba según tu zona climática (zona A–E según el RITE) antes de decidir.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>5</div>
+                <div className={styles.stepContent}>
+                  <strong>Solicita las ayudas antes de contratar la obra</strong>
+                  <p>Muchas subvenciones (PREE 5000, Next Generation EU, deducciones IRPF) requieren solicitar la ayuda antes de iniciar los trabajos. Contrata una empresa instaladora registrada con el certificado RITE o REE correspondiente.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>6</div>
+                <div className={styles.stepContent}>
+                  <strong>Certifica la mejora y conserva la documentación</strong>
+                  <p>Tras la obra, emite el nuevo certificado energético. La mejora de letra (ej. de E a C) documenta el ahorro y aumenta el valor de tasación de la vivienda entre un 5 y un 15% según estudios del IDAE y el Banco de España.</p>
+                </div>
+              </div>
+            </div>
 
-            <h3>Bomba de calor: la alternativa al gas</h3>
-            <p>
-              Una bomba de calor aerotérmica con SCOP 3,0 produce 3 kWh de calor por cada 1 kWh de electricidad consumido.
-              Frente a una caldera de gas natural, el ahorro depende de la diferencia de precio entre gas y electricidad.
-              Con los precios actuales en España, el ahorro puede ser del 20-40% en zonas templadas.
-            </p>
+            {/* Tabla comparativa sistemas de calefacción */}
+            <h3>⚖️ Comparativa: sistemas de calefacción</h3>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Sistema</th>
+                    <th>Eficiencia</th>
+                    <th>Coste instalación</th>
+                    <th>Coste operación</th>
+                    <th>Ideal para</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Caldera gas (condensación)</strong></td>
+                    <td>~105%</td>
+                    <td>2.000 – 4.000 €</td>
+                    <td>Medio (gas ~0,10 €/kWh)</td>
+                    <td>Zonas frías, con gas de red</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Bomba calor aerotérmica</strong></td>
+                    <td>COP 2,5 – 4,0</td>
+                    <td>6.000 – 14.000 €</td>
+                    <td>Bajo-Medio (luz ~0,18 €/kWh)</td>
+                    <td>Zonas templadas, sin gas</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Caldera gasoil</strong></td>
+                    <td>~90%</td>
+                    <td>2.500 – 5.000 €</td>
+                    <td>Alto (gasoil ~0,11 €/kWh)</td>
+                    <td>Rural sin acceso a gas</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Bomba calor + suelo radiante</strong></td>
+                    <td>COP 3,5 – 5,0</td>
+                    <td>12.000 – 22.000 €</td>
+                    <td>Muy bajo</td>
+                    <td>Obra nueva, rehabilitación integral</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Radiadores eléctricos</strong></td>
+                    <td>100%</td>
+                    <td>200 – 800 €</td>
+                    <td>Muy alto (luz tarifa plena)</td>
+                    <td>Complemento o uso esporádico</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-            <h3>Ayudas y subvenciones (2025-2026)</h3>
-            <ul>
-              <li><strong>Plan de Recuperación (PERTE)</strong>: hasta el 40-80% para rehabilitación energética</li>
-              <li><strong>Programa PREE 5000</strong>: edificios con calificación E, F o G</li>
-              <li><strong>Deducción IRPF</strong>: hasta el 20-40% sobre la inversión en mejoras energéticas</li>
-              <li><strong>Comunidades Autónomas</strong>: consulta las ayudas específicas de tu región en el Portal de Financiación del IDAE</li>
-            </ul>
-            <p>
-              Recuerda que para muchas ayudas necesitarás el <strong>Certificado de Eficiencia Energética</strong>
-              antes y después de la reforma. El coste del certificado está entre 100 y 300 €.
-            </p>
+            {/* Casos de uso */}
+            <h3>💼 Escenarios habituales</h3>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🏠</span>
+                  <strong>Vivienda unifamiliar años 70–80</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Casa 150 m², letra G, caldera gasoil 20 años.<br/>
+                  Factura calefacción: 2.200 €/año.<br/>
+                  Mejora: aislamiento fachada + cubierta + ventanas Low-E + bomba calor.<br/>
+                  Ahorro estimado: ~1.400 €/año. Payback: 12–15 años.
+                </div>
+                <p className={styles.escenarioTip}><strong>Clave:</strong> Sin aislamiento previo, instalar solo la bomba de calor no es rentable. El orden correcto es primero aislar, luego cambiar el sistema.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🏢</span>
+                  <strong>Piso en bloque de los 90</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Piso 80 m², 4ª planta, letra D, calefacción central.<br/>
+                  Mejora individual: ventanas Low-E (8 ventanas).<br/>
+                  Inversión: ~5.600 €. Ahorro: ~250 €/año.<br/>
+                  Payback: ~22 años.
+                </div>
+                <p className={styles.escenarioTip}><strong>Clave:</strong> En pisos intermedios, el aislamiento de ventanas es la única mejora individual posible. La fachada y cubierta requieren acuerdo de comunidad.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🌊</span>
+                  <strong>Vivienda en zona costera (clima suave)</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Casa 120 m², Mediterráneo, caldera gas 15 años.<br/>
+                  SCOP bomba calor zona A: 4,0.<br/>
+                  Ahorro vs caldera gas: ~400 €/año.<br/>
+                  Inversión BC: 9.000 €. Payback: ~22 años.
+                </div>
+                <p className={styles.escenarioTip}><strong>Clave:</strong> En zonas cálidas el ahorro en calefacción es menor, pero la BC también refrigera en verano. Considera el ahorro anual total (calefacción + refrigeración).</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>❄️</span>
+                  <strong>Vivienda en zona fría (meseta norte)</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Casa 160 m², Castilla, letra E, gas natural.<br/>
+                  Aislamiento cubierta (90 m²): 3.200 €.<br/>
+                  Ahorro estimado: ~480 €/año (30% de 1.600 €).<br/>
+                  Payback: 6,7 años. ✅ Muy rentable.
+                </div>
+                <p className={styles.escenarioTip}><strong>Clave:</strong> En zonas frías con mucha demanda de calefacción, el aislamiento de cubierta tiene el payback más corto (5–8 años). Es la primera mejora a realizar.</p>
+              </div>
+            </div>
+
+            {/* Mejores prácticas */}
+            <h3>✅ Claves para maximizar el retorno de tu inversión</h3>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📋</span>
+                <strong>Solicita 3 presupuestos siempre</strong>
+                <p>Los precios de instalación de aislamiento y ventanas varían hasta un 40% entre empresas. Compara siempre al menos 3 presupuestos con las mismas especificaciones técnicas.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🏛️</span>
+                <strong>Aprovecha las deducciones IRPF</strong>
+                <p>Las mejoras que reducen la demanda en ≥30% tienen deducción del 40% en IRPF (hasta 7.500 €). Necesitas certificado energético antes y después. No lo dejes para la declaración siguiente.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📊</span>
+                <strong>Prioriza por payback, no por ahorro absoluto</strong>
+                <p>Un aislamiento que ahorra 300 €/año con inversión de 2.000 € (payback 6,7 años) es mejor inversión que unas ventanas que ahorran 400 €/año con inversión de 8.000 € (payback 20 años).</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>⚡</span>
+                <strong>Instala fotovoltaica después del aislamiento</strong>
+                <p>Si instalas placas antes de aislar, las sobredimensionas para una demanda que luego va a bajar. Primero reduce el consumo, luego genera tu propia energía.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🌡️</span>
+                <strong>Considera la refrigeración al calcular la BC</strong>
+                <p>En España, la bomba de calor también sirve como aire acondicionado. Si actualmente tienes splits de refrigeración, el ahorro total de la BC incluye también la sustitución del coste de refrigeración.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🏘️</span>
+                <strong>En comunidades, acuerda por mayoría simple</strong>
+                <p>Desde 2022, la Ley de Propiedad Horizontal permite aprobar obras de mejora energética con mayoría simple (antes 3/5). Es más fácil que nunca coordinar mejoras de fachada o cubierta comunitaria.</p>
+              </div>
+            </div>
+
+            {/* Warning box */}
+            <div className={styles.warningBoxV2}>
+              <div className={styles.warningHeader}>
+                <span>⚠️</span>
+                <span>Errores que reducen el retorno de tu inversión</span>
+              </div>
+              <ul className={styles.warningList}>
+                <li><strong>❌ Instalar la bomba de calor sin aislar primero:</strong> Una BC eficiente en una vivienda mal aislada trabaja al límite de su capacidad en días fríos y consume más de lo esperado. El ahorro real puede ser un 40% menor que el calculado.</li>
+                <li><strong>❌ No solicitar la subvención antes de comenzar la obra:</strong> La mayoría de ayudas PREE 5000 y Next Generation requieren resolución favorable antes de iniciar los trabajos. Comenzar sin ella implica perder la subvención por completo.</li>
+                <li><strong>❌ Comparar solo el precio de la caldera, no el coste total:</strong> Una caldera de condensación puede ser 1.000 € más cara que una convencional, pero su mayor eficiencia amortiza la diferencia en 2–3 años en climas fríos.</li>
+                <li><strong>❌ Ignorar los puentes térmicos al aislar:</strong> Aislar fachada y cubierta sin corregir puentes térmicos (pilares, forjados, dinteles) puede dejar un 15–20% de las pérdidas sin resolver y generar condensaciones locales.</li>
+                <li><strong>❌ Elegir el triple acristalamiento siempre:</strong> El triple acristalamiento solo compensa en zonas muy frías (zona D–E del RITE). En clima mediterráneo, el doble Low-E ofrece un payback 2–3 veces mejor con prestaciones similares.</li>
+              </ul>
+            </div>
+
+            {/* FAQ */}
+            <h3>❓ Preguntas frecuentes</h3>
+            <div className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <strong>¿Cuánto cuesta aislar el tejado de una casa de 100 m²?</strong>
+                <p>El aislamiento de cubierta plana o inclinada por proyección de poliuretano o celulosa oscila entre 2.000 y 4.000 € para 100 m² (20–40 €/m²). La proyección de celulosa suele ser más económica y tiene mejor comportamiento higrométrico. El ahorro anual en calefacción puede ser de 300–600 € según la zona climática.</p>
+                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si el tejado necesita renovación de impermeabilización, combina la obra: el sobrecoste del aislamiento se reduce al compartir andamiaje y mano de obra.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Es mejor bomba de calor aerotérmica o geotérmica?</strong>
+                <p>La geotérmica tiene COP más alto (4–6) pero requiere perforaciones o zanjas (10.000–30.000 € adicionales). En viviendas unifamiliares con jardín y demanda alta, puede ser rentable a muy largo plazo. Para la mayoría de casos en España, la aerotérmica ofrece mejor relación coste-beneficio con COP 3–4 y instalación 3–4 veces más barata.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Las mejoras energéticas aumentan el valor de mi vivienda?</strong>
+                <p>Sí. Según estudios del Banco de España y el IDAE, cada mejora de letra energética aumenta el valor de tasación entre un 3 y un 8%. Una vivienda que mejora de G a C puede incrementar su valor entre un 15 y un 25%, especialmente en el mercado de segunda mano donde los compradores ya incorporan el coste energético a su análisis.</p>
+                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si estás pensando en vender en los próximos años, una inversión en aislamiento puede ser más rentable que una reforma estética.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Qué zona climática tengo y cómo afecta al cálculo?</strong>
+                <p>España tiene 6 zonas climáticas según el RITE (α, A, B, C, D, E), de más cálido a más frío. Madrid es zona D, Barcelona zona C, Sevilla zona B y Burgos zona E. En zonas D–E, el payback del aislamiento se reduce a la mitad respecto a zonas A–B, porque la demanda de calefacción es mucho mayor.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Puedo deducirme las mejoras energéticas en el IRPF?</strong>
+                <p>Sí. La deducción por obras de mejora energética en vivienda habitual es del 20% (reducción demanda calefacción/refrigeración ≥7%), 40% (reducción ≥30%) o 60% (rehabilitación energética del edificio completo). El límite máximo es 7.500 € de deducción por contribuyente. Requiere certificado energético previo y posterior.</p>
+                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Coordina la obra con tu gestor fiscal. Las obras de diciembre pueden deducirse en la declaración del año siguiente.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Cuánto tarda en amortizarse el cambio de ventanas?</strong>
+                <p>Depende de la zona climática y el tipo de ventana actual. Cambiar de vidrio simple a doble Low-E en zona D (Madrid) tiene un payback de 12–18 años. En zona A (Canarias, costas) puede superar los 25 años. El mayor beneficio del cambio de ventanas en zonas cálidas es el confort en verano, no el ahorro económico.</p>
+              </div>
+            </div>
           </section>
         </EducationalSection>
 

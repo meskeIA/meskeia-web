@@ -337,6 +337,232 @@
   background: var(--hover);
 }
 
+/* === PROFESIONALIZACIÓN v2.0 === */
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.comparativaTable tr:hover td {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #374151;
+}
+
+[data-theme='dark'] .comparativaTable tr:hover td {
+  background: #1f2937;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.escenarioIcon {
+  font-size: 1.5rem;
+}
+
+.escenarioExample {
+  background: #f0f9ff;
+  border-left: 3px solid var(--primary);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: 0 0.25rem 0.25rem 0;
+  margin: 0.5rem 0;
+  color: var(--text-primary);
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+[data-theme='dark'] .escenarioCard {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: #1e3a5f;
+}
+
+.faqList {
+  margin: 1.5rem 0;
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+}
+
+.faqItem strong {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--primary);
+}
+
+.faqTip {
+  background: #f0fdf4;
+  border-left: 3px solid #22c55e;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  border-radius: 0 0.25rem 0.25rem 0;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .faqItem {
+  border-bottom-color: #374151;
+}
+
+[data-theme='dark'] .faqTip {
+  background: #14532d;
+}
+
+.stepGuide {
+  margin: 1.5rem 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  background: var(--primary);
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.stepContent strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.1rem;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.tipCard strong {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--text-primary);
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+[data-theme='dark'] .tipCard {
+  border-color: #374151;
+}
+
+.warningBoxV2 {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.warningList {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+.warningList li {
+  margin-bottom: 0.5rem;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .warningBoxV2 {
+  background: #451a03;
+  border-color: #d97706;
+}
+
 @media (max-width: 768px) {
   .hero {
     margin-top: 60px;
@@ -358,6 +584,11 @@
   .inputRow {
     grid-template-columns: 1fr;
   }
+
+  .escenariosGrid { grid-template-columns: 1fr; }
+  .tipsGrid { grid-template-columns: 1fr; }
+  .comparativaTable { font-size: 0.8rem; }
+  .comparativaTable th, .comparativaTable td { padding: 0.5rem 0.6rem; }
 }
 
 @media (max-width: 480px) {

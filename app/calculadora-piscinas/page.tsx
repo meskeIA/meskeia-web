@@ -312,64 +312,251 @@ export default function CalculadoraPiscinasPage() {
           subtitle="Todo lo que necesitas saber para mantener el agua en perfectas condiciones todo el año"
         >
           <section className={styles.guideSection}>
-            <h2>Los parámetros clave del agua de piscina</h2>
-            <table className={styles.tipTable}>
-              <thead>
-                <tr><th>Parámetro</th><th>Rango óptimo</th><th>Efecto fuera de rango</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>pH</td><td>7,2 – 7,6</td><td>Irritación piel/ojos, menor eficacia del cloro</td></tr>
-                <tr><td>Cloro libre</td><td>1 – 3 ppm (mg/L)</td><td>Riesgo bacteriológico o irritación</td></tr>
-                <tr><td>Alcalinidad total (TAC)</td><td>80 – 150 ppm</td><td>Fluctuaciones bruscas de pH</td></tr>
-                <tr><td>Dureza cálcica (TH)</td><td>200 – 400 ppm</td><td>Corrosión o incrustaciones calcáreas</td></tr>
-                <tr><td>Sal (piscinas salinas)</td><td>5 – 7 g/L</td><td>Clorador no genera suficiente cloro</td></tr>
-              </tbody>
-            </table>
-
-            <h3>Rutina de mantenimiento semanal</h3>
-            <ul>
-              <li>Mide pH y cloro con un kit de test o tiras reactivas</li>
-              <li>Ajusta el pH si está fuera de rango (primero el pH, luego el cloro)</li>
-              <li>Añade la dosis semanal de cloro granulado o líquido</li>
-              <li>Añade alguicida preventivo</li>
-              <li>Limpia el skimmer y el prefiltro de la bomba</li>
-              <li>Aspira el fondo si hay suciedad visible</li>
-            </ul>
-
-            <h3>Mantenimiento en invierno (piscina sin uso)</h3>
+            <h2>Todo lo que necesitas saber para mantener el agua de tu piscina</h2>
             <p>
-              Si la piscina queda llena durante el otoño e invierno, no basta con taparla.
-              Es necesario:
-            </p>
-            <ul>
-              <li>Añadir un tratamiento de invierno (alguicida de larga duración + floculante)</li>
-              <li>Reducir el filtrado a 2-4 h/día</li>
-              <li>Revisar el pH y el cloro cada 4-6 semanas</li>
-              <li>En zonas con heladas: vaciar parcialmente y purgar tuberías</li>
-            </ul>
-
-            <h3>¿Por qué el pH es tan importante?</h3>
-            <p>
-              El pH afecta directamente a la eficacia del cloro. A pH 7,0, el cloro actúa al 73% de su capacidad;
-              a pH 8,0, solo al 3%. Mantener el pH entre 7,2 y 7,6 es fundamental para que la desinfección
-              sea efectiva con menos producto químico.
+              El mantenimiento del agua no es complicado si conoces el orden correcto y las dosis adecuadas.
+              Un agua bien equilibrada protege la salud de los bañistas y alarga la vida de los equipos.
             </p>
 
-            <h3>Tratamiento de choque: cuándo y por qué</h3>
-            <p>
-              El choque de cloro es necesario cuando:
-            </p>
-            <ul>
-              <li>Se abre la piscina al inicio de la temporada</li>
-              <li>Hay presencia de algas (agua verde o turbia)</li>
-              <li>Tras un uso intensivo (fiesta, muchos bañistas)</li>
-              <li>Tras lluvias abundantes que diluyan los productos</li>
-              <li>El cloro libre cae por debajo de 0,5 ppm</li>
-            </ul>
-            <p>
-              Realiza el choque por la tarde-noche para que el cloro no se degrade por la luz solar.
-              No bañarse hasta que el cloro libre baje por debajo de 3 ppm.
-            </p>
+            {/* Guía paso a paso: apertura de temporada */}
+            <h3>📋 Apertura de temporada paso a paso</h3>
+            <div className={styles.stepGuide}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <strong>Limpia el fondo y el perímetro antes de encender la bomba</strong>
+                  <p>Retira hojas, suciedad y cualquier residuo del invierno con la manga de aspiración manual. No arranques la depuradora aún: el agua sucia puede obturar el filtro. Si el agua está muy verde, añade floculante primero y deja reposar 12–24 h.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <strong>Revisa y limpia el filtro de arena o cartucho</strong>
+                  <p>Realiza una contracorriente (backwash) de 3–5 minutos y luego enjuague. Si la arena del filtro tiene más de 5 años, cámbiala. Inspecciona también el skimmer, la bomba y las conexiones antes de encender.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <strong>Ajusta el pH entre 7,2 y 7,6</strong>
+                  <p>El pH es el parámetro más importante. Sin él en rango, el cloro apenas funciona. Mide con kit de test o tiras reactivas. Añade pH+ (carbonato sódico) o pH- (bisulfato sódico) según el resultado. Espera 4–6 horas antes de volver a medir.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepContent}>
+                  <strong>Realiza el choque de cloro (10 g/m³)</strong>
+                  <p>Hazlo por la tarde-noche para evitar que el sol degrade el cloro antes de actuar. Disuelve el cloro granulado en un cubo con agua antes de añadirlo. No te bañes hasta que el cloro libre baje por debajo de 3 ppm (mínimo 12–24 horas).</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>5</div>
+                <div className={styles.stepContent}>
+                  <strong>Añade alguicida de apertura</strong>
+                  <p>Aplica la dosis de choque de alguicida (100 mL/10 m³) después del cloro, nunca simultáneamente. El alguicida previene la aparición de algas durante semanas. A partir de ahí, mantén con dosis semanales de 20 mL/10 m³.</p>
+                </div>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>6</div>
+                <div className={styles.stepContent}>
+                  <strong>Establece la rutina de mantenimiento semanal</strong>
+                  <p>Mide pH y cloro cada semana. Añade la dosis de mantenimiento de cloro (2 g/m³) y alguicida preventivo. En días de mucho uso (más de 6 bañistas), añade media dosis extra de cloro esa misma tarde.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabla comparativa productos de cloro */}
+            <h3>⚖️ Comparativa: formas de clorar la piscina</h3>
+            <div className={styles.tableWrapper}>
+              <table className={styles.comparativaTable}>
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Concentración</th>
+                    <th>Ventajas</th>
+                    <th>Inconvenientes</th>
+                    <th>Ideal para</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Cloro granulado</strong></td>
+                    <td>60 – 70%</td>
+                    <td>Acción rápida, fácil de dosificar</td>
+                    <td>Sube el calcio, no apto en exceso para piscinas de sal</td>
+                    <td>Choque y mantenimiento general</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cloro líquido</strong></td>
+                    <td>12 – 15%</td>
+                    <td>Muy económico, sin residuos sólidos</td>
+                    <td>Se degrada rápido, transporte voluminoso</td>
+                    <td>Mantenimiento diario automatizado</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Pastillas tricloroisocianúrico</strong></td>
+                    <td>90%</td>
+                    <td>Liberación lenta, muy cómodo</td>
+                    <td>Baja el pH y sube el CYA; no usar para choque</td>
+                    <td>Mantenimiento en skimmer o flotador</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Electrólisis salina</strong></td>
+                    <td>Genera cloro in situ</td>
+                    <td>Agua más suave, sin compras periódicas</td>
+                    <td>Alta inversión inicial (1.200–3.000 €), ajuste de sal</td>
+                    <td>Piscinas privadas de uso frecuente</td>
+                  </tr>
+                  <tr>
+                    <td><strong>UV + cloro reducido</strong></td>
+                    <td>Complemento</td>
+                    <td>Reduce el cloro necesario un 50–70%</td>
+                    <td>Requiere instalación adicional</td>
+                    <td>Alérgicos o piscinas cubiertas</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Casos de uso */}
+            <h3>💼 Situaciones habituales de tratamiento</h3>
+            <div className={styles.escenariosGrid}>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🌿</span>
+                  <strong>Agua verde (algas)</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Piscina 40 m³ con agua verdosa.<br/>
+                  1. Choque cloro: 400 g granulado.<br/>
+                  2. Alguicida de choque: 400 mL.<br/>
+                  3. Floculante + aspiración fondo al día siguiente.<br/>
+                  4. Filtrado 24 h seguidas.
+                </div>
+                <p className={styles.escenarioTip}><strong>Clave:</strong> No añadas alguicida y cloro a la vez. Primero el cloro (mañana), luego el alguicida (tarde). Mezclarlos juntos reduce la eficacia de ambos.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🎉</span>
+                  <strong>Después de un uso intensivo</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Fiesta con 15 personas en piscina de 30 m³.<br/>
+                  Cloro después de la fiesta: +90 g (media dosis extra).<br/>
+                  Al día siguiente: medir pH y cloro libre.<br/>
+                  Si cloro &lt; 0,5 ppm: choque completo (300 g).
+                </div>
+                <p className={styles.escenarioTip}><strong>Clave:</strong> El sudor, la crema solar y la orina consumen el cloro muy rápido. Añade siempre media dosis extra después de una jornada con más de 6 bañistas.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🍂</span>
+                  <strong>Piscina en otoño-invierno</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Piscina 50 m³ sin uso, cubierta.<br/>
+                  Cada 4 semanas: medir pH + cloro.<br/>
+                  Alguicida invernal: 50 mL/10 m³ (cada 4–6 semanas).<br/>
+                  Reducir filtrado a 2 h/día.
+                </div>
+                <p className={styles.escenarioTip}><strong>Clave:</strong> Cubrir la piscina en invierno reduce el consumo de productos un 70%. Pero no la abandones: un tratamiento mínimo mensual evita tener que hacer un choque intensivo en primavera.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcon}>🧂</span>
+                  <strong>Primera carga de sal (electrólisis)</strong>
+                </div>
+                <div className={styles.escenarioExample}>
+                  Piscina 40 m³, nivel objetivo 6 g/L.<br/>
+                  Sal necesaria: 40 × 6 = 240 kg.<br/>
+                  Añadir en 3 tandas de 80 kg, disolviendo fuera.<br/>
+                  Esperar 24 h antes de encender el clorador.
+                </div>
+                <p className={styles.escenarioTip}><strong>Clave:</strong> Usa sal específica para piscinas (99,9% NaCl sin aditivos anti-apelmazantes). La sal de mesa o la de alimentación contienen yodo u otros aditivos que dañan el clorador.</p>
+              </div>
+            </div>
+
+            {/* Mejores prácticas */}
+            <h3>✅ Hábitos de mantenimiento que marcan la diferencia</h3>
+            <div className={styles.tipsGrid}>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🌅</span>
+                <strong>Añade el cloro por la tarde-noche</strong>
+                <p>La radiación UV degrada el cloro hasta un 90% en pocas horas. Añadirlo al atardecer permite que actúe toda la noche sin pérdidas.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>📊</span>
+                <strong>Ajusta el pH siempre antes del cloro</strong>
+                <p>A pH 8,0, el cloro solo tiene un 3% de eficacia. A pH 7,2, tiene un 73%. El orden correcto es: medir → ajustar pH → añadir cloro.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🔄</span>
+                <strong>Filtra al menos 8 horas al día en verano</strong>
+                <p>Una regla práctica: filtra 1 hora por cada 2 °C de temperatura del agua. Con 28 °C, filtra al menos 14 horas. El filtrado insuficiente es la causa más común de agua turbia.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🧪</span>
+                <strong>Test de agua completo cada 2 semanas</strong>
+                <p>Además de pH y cloro, mide TAC (alcalinidad) y dureza cálcica. Un TAC bajo causa oscilaciones bruscas de pH; un TH alto genera incrustaciones en el skimmer.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>🧹</span>
+                <strong>Limpia el filtro en contracorriente semanalmente</strong>
+                <p>Un filtro sucio reduce el caudal y la eficacia de la depuración. El backwash semanal de 3 minutos mantiene el filtro en óptimas condiciones durante toda la temporada.</p>
+              </div>
+              <div className={styles.tipCard}>
+                <span className={styles.tipIcon}>☁️</span>
+                <strong>Refuerza el cloro después de la lluvia</strong>
+                <p>La lluvia diluye los productos y puede aportarmateria orgánica. Después de lluvias abundantes, añade media dosis de cloro y revisa el pH, que tiende a bajar con el agua de lluvia.</p>
+              </div>
+            </div>
+
+            {/* Warning box */}
+            <div className={styles.warningBoxV2}>
+              <div className={styles.warningHeader}>
+                <span>⚠️</span>
+                <span>Errores de seguridad graves en el tratamiento de piscinas</span>
+              </div>
+              <ul className={styles.warningList}>
+                <li><strong>❌ Nunca mezcles cloro y alguicida directamente:</strong> La reacción puede generar gases tóxicos y reducir drásticamente la eficacia de ambos. Añádelos siempre por separado con al menos 4 horas de diferencia.</li>
+                <li><strong>❌ No añadas cloro con bañistas en el agua:</strong> El cloro granulado o líquido debe diluirse y actuar antes del baño. Espera al menos 30 minutos después de añadir la dosis de mantenimiento y 12–24 h tras un choque.</li>
+                <li><strong>❌ Nunca viertas agua sobre el hipoclorito, sino al revés:</strong> Al disolver cloro granulado, añade el producto al agua, no el agua al producto. El error inverso puede provocar salpicaduras cáusticas o reacciones violentas.</li>
+                <li><strong>❌ No guardes productos químicos mezclados ni en envases sin etiquetar:</strong> El cloro y el reductor de pH son incompatibles. Guardarlos juntos o en el mismo espacio puede provocar incendios o gases tóxicos.</li>
+                <li><strong>❌ No uses la piscina con cloro libre por encima de 5 ppm:</strong> Niveles altos irritan piel, ojos y vías respiratorias, especialmente en niños. Si el cloro sube por accidente, filtra con la cubierta abierta y espera a que baje de 3 ppm.</li>
+              </ul>
+            </div>
+
+            {/* FAQ */}
+            <h3>❓ Preguntas frecuentes</h3>
+            <div className={styles.faqList}>
+              <div className={styles.faqItem}>
+                <strong>¿Por qué el agua está turbia si tengo cloro suficiente?</strong>
+                <p>El agua turbia con cloro presente suele deberse a: pH fuera de rango (el cloro no actúa), filtrado insuficiente (menos de 8 h/día en verano), alcalinidad total (TAC) demasiado alta, o partículas muy finas que el filtro no retiene (solución: floculante). Revisa primero el pH y las horas de filtración antes de añadir más cloro.</p>
+                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si el agua está turbia pero el pH está bien, añade floculante líquido, activa la filtración 24 h y aspira el fondo al día siguiente con el filtro en posición &quot;vaciar&quot;.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Cada cuánto debo cambiar el agua de la piscina?</strong>
+                <p>No es necesario vaciar completamente la piscina cada año. El agua puede usarse varios años si se gestiona bien. Lo que sí hay que controlar es la concentración de cianúrico (CYA), que se acumula con las pastillas de tricloroisocianúrico. Si supera los 75 ppm, el cloro pierde eficacia y hay que renovar parcialmente el agua (20–30%).</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Es mejor la electrólisis salina que el cloro tradicional?</strong>
+                <p>La electrólisis salina genera cloro a partir de sal mediante corriente eléctrica. El agua resulta más suave al tacto y hay menos manipulación de productos. El coste inicial es alto (1.200–3.000 €), pero el coste operativo es menor. Es especialmente recomendable para piscinas de más de 30 m³ con uso frecuente. Para piscinas pequeñas o de uso esporádico, el cloro tradicional sigue siendo más económico.</p>
+                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Con electrólisis salina también necesitas controlar pH, TAC y niveles de sal. No es un sistema sin mantenimiento.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Qué hago si el agua se vuelve verde en pocas horas?</strong>
+                <p>El verdor rápido indica algas ya presentes o esporas activas. Necesitas un tratamiento de choque agresivo: 15–20 g/m³ de cloro granulado (el doble del choque normal) + 100 mL/10 m³ de alguicida de choque al día siguiente. Filtra sin parar 48 h y aspira el fondo. Si persiste, repite el ciclo.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿Cómo mantengo la piscina en invierno si no la vacío?</strong>
+                <p>Reduce el filtrado a 2–4 horas diarias. Añade alguicida de invierno (de larga duración, &gt;30 días de efecto) cada 4–6 semanas a dosis doble de la preventiva. Mide pH y cloro mensualmente. Cubre la piscina con una cubierta de burbujas o seguridad: reduce el consumo de productos un 70% y evita la proliferación de algas con la luz reducida.</p>
+                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> En zonas con riesgo de heladas, vacía el agua de tuberías y equipos. Un anti-hielo para la tubería es mucho más barato que reparar una tubería rota.</p>
+              </div>
+              <div className={styles.faqItem}>
+                <strong>¿El pH de la piscina puede afectar a la salud?</strong>
+                <p>Sí. Con pH por debajo de 7,0, el agua es corrosiva: irrita ojos y mucosas, corroe las partes metálicas de la bomba y puede dañar el revestimiento. Con pH por encima de 7,8, el cloro apenas actúa y pueden formarse incrustaciones calcáreas en el skimmer. El rango 7,2–7,6 garantiza tanto la eficacia del cloro como el confort de los bañistas.</p>
+              </div>
+            </div>
           </section>
         </EducationalSection>
 
