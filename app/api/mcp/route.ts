@@ -177,6 +177,15 @@ import { calcularModelo111, type CategoriaModelo111 } from '@/lib/calculadoras/m
 import { calcularPrestacionCeseActividad, type TipoCeseActividad } from '@/lib/calculadoras/prestacionCeseActividad';
 import { calcularModificacionSustancialCondiciones, type TipoMSCT, type DecisionTrabajadorMSCT } from '@/lib/calculadoras/modificacionSustancialCondiciones';
 import { calcularComplementoPensionBrechaGenero, type TipoPensionComplemento, type SexoBeneficiario as SexoBeneficiarioBG } from '@/lib/calculadoras/complementoPensionBrechaGenero';
+// ── Lote S:
+import { calcularRendimientoCapitalInmobiliario, type TipoInmuebleRCI } from '@/lib/calculadoras/rendimientoCapitalInmobiliario';
+import { calcularPensionAlimenticiaIRPF, type TipoPensionIRPF, type RolContribuyente } from '@/lib/calculadoras/pensionAlimenticiaIRPF';
+import { calcularDeduccionMaternidadIRPF } from '@/lib/calculadoras/deduccionMaternidadIRPF';
+import { calcularDeduccionFamiliaNumerosa, type GradoDiscapacidadFN } from '@/lib/calculadoras/deduccionFamiliaNumerosa';
+import { calcularAmortizacionIntangibles, type TipoActivoIntangible } from '@/lib/calculadoras/amortizacionIntangibles';
+import { calcularOperacionesVinculadas, type MetodoValoracionOV, type TipoOperacionOV } from '@/lib/calculadoras/operacionesVinculadas';
+import { calcularImpuestoPlasticos, type OperacionIPNR, type TipoEnvase } from '@/lib/calculadoras/impuestoPlasticos';
+import { calcularBeneficiosTributariosStartup } from '@/lib/calculadoras/beneficiosTributariosStartup';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -6637,6 +6646,328 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote S: rendimiento capital inmobiliario, pension alimenticia, deduccion maternidad, familia numerosa, intangibles, operaciones vinculadas, impuesto plasticos, startups ──
+
+  servidor.tool(
+    'calcular_rendimiento_capital_inmobiliario',
+    'Calcula el rendimiento neto del capital inmobiliario en IRPF (arrendamientos) — LIRPF arts. 22-24 + Ley 12/2023 (Vivienda). Deduce todos los gastos permitidos: intereses hipoteca, IBI, seguros, reparaciones (con límite al importe de los ingresos), comunidad, administración y amortización (3% del valor de construcción). Aplica las reducciones desde 2024: 90% (zona tensionada + reducción ≥5%), 70% (zona tensionada nueva/vulnerable), 60% (rehabilitación), 50% (vivienda habitual general).',
+    {
+      tipoInmueble: z.enum(['vivienda_habitual_arrendatario', 'vivienda_zona_tensionada_nueva', 'vivienda_rehabilitada', 'vivienda_tension_reduccion_5pct', 'no_vivienda'] as [TipoInmuebleRCI, ...TipoInmuebleRCI[]]).describe('Tipo de inmueble arrendado y reducción aplicable'),
+      ingresosIntegros: z.number().min(0).describe('Ingresos íntegros del arrendamiento en el ejercicio (EUR)'),
+      gastos: z.object({
+        interesesPrestamo: z.number().min(0).optional().describe('Intereses del préstamo hipotecario (EUR/año)'),
+        gastosFinanciacion: z.number().min(0).optional().describe('Otros gastos de financiación (EUR/año)'),
+        ibiYTributos: z.number().min(0).optional().describe('IBI, tasa de basuras y tributos locales (EUR/año)'),
+        seguros: z.number().min(0).optional().describe('Primas de seguros del inmueble (EUR/año)'),
+        reparacionConservacion: z.number().min(0).optional().describe('Gastos de reparación y conservación — NO mejoras (EUR/año)'),
+        comunidad: z.number().min(0).optional().describe('Cuotas de comunidad de propietarios (EUR/año)'),
+        administracion: z.number().min(0).optional().describe('Gastos de administración y gestión (EUR/año)'),
+        otros: z.number().min(0).optional().describe('Otros gastos necesarios (EUR/año)'),
+        amortizacionDirecta: z.number().min(0).optional().describe('Amortización directa si ya está calculada (EUR/año)'),
+        valorConstruccion: z.number().min(0).optional().describe('Valor de construcción del inmueble (EUR) — para calcular amortización al 3%'),
+      }).describe('Gastos deducibles del arrendamiento'),
+      excesoGastosPendientesAniosAnt: z.number().min(0).optional().describe('Exceso de intereses/reparación de años anteriores pendiente de compensar (EUR)'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_rendimiento_capital_inmobiliario', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularRendimientoCapitalInmobiliario(args as Parameters<typeof calcularRendimientoCapitalInmobiliario>[0]);
+      const lineas = [
+        '## Rendimiento del Capital Inmobiliario — IRPF',
+        '',
+        `- Tipo de inmueble: ${resultado.tipoInmueble}`,
+        `- Ingresos íntegros: ${resultado.ingresosIntegros.toLocaleString('es-ES')} EUR`,
+        `- Total gastos brutos: ${resultado.totalGastosBrutos.toLocaleString('es-ES')} EUR`,
+        resultado.amortizacionComputada > 0 ? `  - Amortización (3%): ${resultado.amortizacionComputada.toLocaleString('es-ES')} EUR` : null,
+        resultado.excesoNoDeducible > 0 ? `  - Exceso intereses/reparación no deducible: ${resultado.excesoNoDeducible.toLocaleString('es-ES')} EUR (trasladar 4 años)` : null,
+        `- Total gastos efectivos: ${resultado.totalGastosEfectivos.toLocaleString('es-ES')} EUR`,
+        `- Rendimiento neto: ${resultado.rendimientoNeto.toLocaleString('es-ES')} EUR`,
+        resultado.pctReduccion > 0 ? `- Reducción del ${resultado.pctReduccion}%: -${resultado.importeReduccion.toLocaleString('es-ES')} EUR` : null,
+        `- **Rendimiento neto reducido declarable: ${resultado.rendimientoNetoReducido.toLocaleString('es-ES')} EUR**`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_pension_alimenticia_irpf',
+    'Calcula el tratamiento fiscal en IRPF de las pensiones de alimentos y compensatorias tras divorcio o separación (LIRPF arts. 7.k, 55, 64). Para el pagador: anualidades por alimentos a hijos aplican la regla especial del art. 64 (tributan por separado del resto de la base, ahorrando tipo marginal); pensión compensatoria al cónyuge reduce la base imponible general. Para el receptor: alimentos a hijos EXENTOS; compensatoria tributa como rendimiento del trabajo.',
+    {
+      tipoPension: z.enum(['alimentos_hijos', 'compensatoria_periodica', 'compensatoria_capital'] as [TipoPensionIRPF, ...TipoPensionIRPF[]]).describe('Tipo de pensión'),
+      rol: z.enum(['pagador', 'receptor'] as [RolContribuyente, ...RolContribuyente[]]).describe('Rol del contribuyente'),
+      importeAnual: z.number().positive().describe('Importe anual de la pensión (EUR)'),
+      baseLiquidableGeneralPagador: z.number().min(0).optional().describe('Base liquidable general del pagador (sin descontar la pensión) — necesario para calcular el ahorro fiscal del art. 64 en alimentos a hijos'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_pension_alimenticia_irpf', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularPensionAlimenticiaIRPF(args);
+      const lineas = [
+        '## Pensión Alimenticia / Compensatoria — IRPF',
+        '',
+        `- Tipo: ${resultado.tipoPension} | Rol: **${resultado.rol}**`,
+        `- Importe anual: ${resultado.importeAnual.toLocaleString('es-ES')} EUR`,
+        resultado.reduccionBaseImponible > 0 ? `- **Reducción base imponible (art. 55): ${resultado.reduccionBaseImponible.toLocaleString('es-ES')} EUR**` : null,
+        resultado.importeExento > 0 ? `- **Importe exento (art. 7.k): ${resultado.importeExento.toLocaleString('es-ES')} EUR**` : null,
+        resultado.importeTributable > 0 ? `- Importe tributable: ${resultado.importeTributable.toLocaleString('es-ES')} EUR` : null,
+        resultado.pctRetencion > 0 ? `- Retención aplicable: ${resultado.pctRetencion}%` : null,
+        resultado.ahorroFiscalReglaEspecial > 0 ? `- Ahorro fiscal regla art. 64: ${resultado.ahorroFiscalReglaEspecial.toLocaleString('es-ES')} EUR` : null,
+        resultado.cuotaSinReglaEspecial > 0 ? `  - Cuota sin regla especial: ${resultado.cuotaSinReglaEspecial.toLocaleString('es-ES')} EUR` : null,
+        resultado.cuotaConReglaEspecial > 0 ? `  - Cuota con regla art. 64: ${resultado.cuotaConReglaEspecial.toLocaleString('es-ES')} EUR` : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_deduccion_maternidad_irpf',
+    'Calcula la deducción por maternidad (LIRPF art. 81 — Ley 31/2022) y el incremento adicional por gastos de guardería. Desde 2023: aplica a TODAS las madres con hijos menores de 3 años con derecho al mínimo (sin necesidad de estar trabajando). Cuantía: 1.200 EUR/año por hijo (100 EUR/mes). Guardería: hasta 1.000 EUR adicionales si la madre está dada de alta en SS. Descuenta el abono anticipado ya cobrado del modelo 140.',
+    {
+      hijos: z.array(z.object({
+        edadMesesInicioEjercicio: z.number().int().min(0).max(35).describe('Edad del hijo en meses al inicio del ejercicio (0-35)'),
+        mesesConDerechoEjercicio: z.number().int().min(1).max(12).describe('Meses del ejercicio en que el hijo es menor de 3 años (1-12)'),
+        gastosGuarderiaAnuales: z.number().min(0).optional().describe('Gastos pagados en guardería o centro de educación infantil por este hijo (EUR)'),
+      })).min(1).describe('Hijos con posible derecho a deducción'),
+      cotizacionesSSTotalesAnio: z.number().min(0).describe('Cotizaciones totales a la SS pagadas en el ejercicio por la madre (EUR)'),
+      madreEnActivoOPrestacion: z.boolean().optional().describe('¿La madre estaba trabajando o percibiendo prestaciones SEPE? (por defecto true; desde 2023 la deducción base aplica aunque no trabaje)'),
+      abonoAnticipado: z.boolean().optional().describe('¿Solicitó abono anticipado (modelo 140)?'),
+      importeAbonoAnticipadoCobrado: z.number().min(0).optional().describe('Importe ya cobrado como abono anticipado en el ejercicio (EUR)'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_deduccion_maternidad_irpf', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularDeduccionMaternidadIRPF(args as Parameters<typeof calcularDeduccionMaternidadIRPF>[0]);
+      const lineas = [
+        '## Deducción por Maternidad — IRPF (art. 81)',
+        '',
+        `- Hijos con derecho: ${resultado.numHijosConDerecho}`,
+        ...resultado.detalleHijos.map((h, i) =>
+          `  - Hijo ${i + 1}: ${h.mesesConDerecho} meses → ${h.deduccionBruta.toLocaleString('es-ES')} EUR base` +
+          (h.incrementoGuarderia > 0 ? ` + ${h.incrementoGuarderia.toLocaleString('es-ES')} EUR guardería` : '')
+        ),
+        `- Deducción maternidad efectiva: ${resultado.deduccionMaternidadEfectiva.toLocaleString('es-ES')} EUR`,
+        resultado.incrementoGuarderiaEfectivo > 0 ? `- Incremento guardería efectivo: ${resultado.incrementoGuarderiaEfectivo.toLocaleString('es-ES')} EUR` : null,
+        `- **Total deducción efectiva: ${resultado.totalDeduccionEfectiva.toLocaleString('es-ES')} EUR**`,
+        resultado.abonoAnticipadoCobrado > 0 ? `- Abono anticipado cobrado: -${resultado.abonoAnticipadoCobrado.toLocaleString('es-ES')} EUR` : null,
+        `- **Resultado en declaración: ${resultado.resultadoDeclaracion.toLocaleString('es-ES')} EUR** (${resultado.resultadoDeclaracion >= 0 ? 'a cobrar' : 'a devolver'})`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_deduccion_familia_numerosa',
+    'Calcula las deducciones en cuota del IRPF por familia numerosa y discapacidad (LIRPF art. 81 bis — Ley 31/2022). Incluye: familia numerosa general (1.200 EUR), especial (2.400 EUR), descendiente/ascendiente con discapacidad 33-64% (1.200 EUR) o ≥65% (2.400 EUR desde 2023), cónyuge con discapacidad (1.200 EUR) y ascendiente separado con hijos (1.200 EUR). Verifica el límite por cotizaciones SS y descuenta el abono anticipado del modelo 143.',
+    {
+      familiaNumerosaGeneral: z.boolean().optional().describe('¿Tiene título de familia numerosa de categoría general (3+ hijos)?'),
+      familiaNumerosaEspecial: z.boolean().optional().describe('¿Tiene título de familia numerosa de categoría especial (5+ hijos o 4+ si hay discapacidad)?'),
+      familiaresConDiscapacidad: z.array(z.object({
+        parentesco: z.enum(['hijo', 'ascendiente', 'conyuge']).describe('Relación con el contribuyente'),
+        gradoDiscapacidad: z.enum(['grado_33_64', 'grado_65_mas'] as [Exclude<GradoDiscapacidadFN, 'ninguno'>, ...Exclude<GradoDiscapacidadFN, 'ninguno'>[]]).describe('Grado de discapacidad'),
+        generaMinimo: z.boolean().describe('¿Genera mínimo por descendiente/ascendiente en la declaración?'),
+      })).optional().describe('Familiares con discapacidad que generan deducción'),
+      ascendienteSeparadoConHijos: z.boolean().optional().describe('¿Es ascendiente separado/viudo con 2+ hijos sin pensiones de alimentos?'),
+      cotizacionesSSTotales: z.number().min(0).describe('Cotizaciones SS totales del contribuyente en el ejercicio (EUR) — límite de las deducciones'),
+      importeAbonoAnticipadoCobrado: z.number().min(0).optional().describe('Importe ya cobrado como abono anticipado modelo 143 (EUR)'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_deduccion_familia_numerosa', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularDeduccionFamiliaNumerosa(args as Parameters<typeof calcularDeduccionFamiliaNumerosa>[0]);
+      const lineas = [
+        '## Deducciones por Familia Numerosa y Discapacidad — IRPF art. 81 bis',
+        '',
+        '### Líneas de deducción',
+        ...resultado.lineas.map(l => `- ${l.concepto}: **${l.importeAnual.toLocaleString('es-ES')} EUR/año**`),
+        resultado.lineas.length === 0 ? '- No se han identificado deducciones aplicables' : null,
+        '',
+        `- Total deducciones brutas: ${resultado.totalDeduccionBruta.toLocaleString('es-ES')} EUR`,
+        `- Límite por cotizaciones SS: ${resultado.limiteCotzaciones.toLocaleString('es-ES')} EUR`,
+        `- **Total deducción efectiva: ${resultado.totalDeduccionEfectiva.toLocaleString('es-ES')} EUR**`,
+        resultado.abonoAnticipadoCobrado > 0 ? `- Abono anticipado cobrado: -${resultado.abonoAnticipadoCobrado.toLocaleString('es-ES')} EUR` : null,
+        `- **Resultado en declaración: ${resultado.resultadoDeclaracion.toLocaleString('es-ES')} EUR**`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_amortizacion_intangibles',
+    'Calcula la amortización fiscal deducible de activos intangibles en el Impuesto sobre Sociedades (LIS art. 12). Fondo de comercio adquirido: 5% anual máx (20 años). Intangibles con vida útil indefinida (marcas): 10% anual máx (10 años). Vida útil definida (patentes, software, concesiones): cuota lineal según plazo. Detecta ajustes extracontables positivos cuando la amortización contable supera el máximo fiscal.',
+    {
+      tipoActivo: z.enum(['fondo_comercio', 'vida_util_indefinida', 'vida_util_definida', 'propiedad_intelectual', 'concesion_administrativa'] as [TipoActivoIntangible, ...TipoActivoIntangible[]]).describe('Tipo de activo intangible'),
+      valorAdquisicion: z.number().positive().describe('Valor de adquisición del activo intangible (EUR)'),
+      vidaUtilAnios: z.number().positive().optional().describe('Vida útil estimada (años) — obligatorio para vida_util_definida, propiedad_intelectual, concesion_administrativa'),
+      amortizacionContableEjercicio: z.number().min(0).optional().describe('Amortización contable registrada en el ejercicio (EUR) — para verificar si excede el máximo fiscal'),
+      anosTranscurridos: z.number().int().min(0).optional().describe('Años transcurridos desde la adquisición — para calcular el valor neto fiscal'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_amortizacion_intangibles', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularAmortizacionIntangibles(args as Parameters<typeof calcularAmortizacionIntangibles>[0]);
+      const lineas = [
+        '## Amortización Fiscal de Intangibles — IS (LIS art. 12)',
+        '',
+        `- Tipo de activo: ${resultado.tipoActivo}`,
+        `- Valor de adquisición: ${resultado.valorAdquisicion.toLocaleString('es-ES')} EUR`,
+        `- Vida útil fiscal: ${resultado.vidaUtilFiscalAnios} años (${resultado.pctAmortizacion}% anual)`,
+        `- **Cuota anual máxima deducible: ${resultado.cuotaAnualFiscal.toLocaleString('es-ES')} EUR/año**`,
+        `- Amortización contable ejercicio: ${resultado.amortizacionContableEjercicio.toLocaleString('es-ES')} EUR`,
+        `- Amortización contable deducible: ${resultado.amortizacionContableDeducible ? 'Sí' : 'No'}`,
+        resultado.ajusteExtracontable > 0 ? `- **Ajuste extracontable positivo necesario: ${resultado.ajusteExtracontable.toLocaleString('es-ES')} EUR**` : null,
+        args.anosTranscurridos ? `- Valor neto fiscal: ${resultado.valorNetoFiscal.toLocaleString('es-ES')} EUR` : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_operaciones_vinculadas',
+    'Analiza si una operación entre entidades vinculadas (LIS art. 18) tiene un precio de transferencia correcto y calcula el ajuste primario potencial. Identifica si se supera el umbral de documentación obligatoria (250.000 EUR por vinculado → Local File; grupo > 45M EUR → Master File). Señala la desviación entre el precio pactado y el valor de mercado estimado, y el impacto en la cuota IS del ajuste bilateral.',
+    {
+      tipoOperacion: z.enum(['compraventa_bienes', 'prestacion_servicios', 'prestamo_financiero', 'cesion_intangibles', 'arrendamiento_inmueble', 'garantia_aval', 'retribucion_administrador'] as [TipoOperacionOV, ...TipoOperacionOV[]]).describe('Tipo de operación vinculada'),
+      metodoValoracion: z.enum(['precio_comparable_no_controlado', 'precio_de_reventa', 'coste_mas_margen', 'margen_neto_transaccional', 'reparto_beneficios'] as [MetodoValoracionOV, ...MetodoValoracionOV[]]).describe('Método de valoración aplicado'),
+      valorPactado: z.number().min(0).describe('Valor pactado en la operación entre vinculados (EUR)'),
+      valorMercadoEstimado: z.number().min(0).describe('Valor de mercado estimado según el método de valoración (EUR)'),
+      superaUmbralDocumentacion: z.boolean().optional().describe('¿Las operaciones con este vinculado superan 250.000 EUR en el ejercicio?'),
+      grupoSuperaUmbralMasterFile: z.boolean().optional().describe('¿El grupo empresarial supera los 45 M EUR de facturación mundial?'),
+      tipoIS: z.number().min(0).max(100).optional().describe('Tipo IS del contribuyente (% — por defecto 25%)'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_operaciones_vinculadas', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularOperacionesVinculadas(args as Parameters<typeof calcularOperacionesVinculadas>[0]);
+      const lineas = [
+        '## Operaciones Vinculadas — Precios de Transferencia (LIS art. 18)',
+        '',
+        `- Tipo operación: ${resultado.tipoOperacion} | Método: ${resultado.metodoValoracion}`,
+        `- Valor pactado: ${resultado.valorPactado.toLocaleString('es-ES')} EUR`,
+        `- Valor mercado estimado: ${resultado.valorMercadoEstimado.toLocaleString('es-ES')} EUR`,
+        `- Diferencia: ${resultado.diferenciaValoracion.toLocaleString('es-ES')} EUR`,
+        `- **Desviación significativa**: ${resultado.existeDesviacion ? 'Sí' : 'No'}`,
+        resultado.existeDesviacion ? `- Ajuste primario en base IS: ${resultado.ajustePrimarioBaseImponible.toLocaleString('es-ES')} EUR` : null,
+        resultado.existeDesviacion ? `- **Impacto en cuota IS: ${resultado.impactoCuotaIS.toLocaleString('es-ES')} EUR**` : null,
+        `- Requiere Local File (documentación local): ${resultado.requiereDocumentacionLocal ? 'Sí' : 'No'}`,
+        `- Requiere Master File (grupo): ${resultado.requiereDocumentacionGrupo ? 'Sí' : 'No'}`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_impuesto_plasticos',
+    'Calcula el Impuesto Especial sobre Envases de Plástico No Reutilizables (Ley 7/2022) — tipo 0,45 EUR/kg de plástico NO reciclado. Aplica a fabricantes, importadores y adquirentes intracomunitarios. Sujetos: envases alimentación, higiene, industrial. Exentos: envases farmacéuticos/sanitarios y rollos agrícolas. El plástico reciclado postconsumo no tributa si está acreditado por entidad ENAC. Modelo 592 trimestral/mensual.',
+    {
+      tipoOperacion: z.enum(['fabricacion', 'importacion', 'adquisicion_intracomunitaria'] as [OperacionIPNR, ...OperacionIPNR[]]).describe('Tipo de operación sujeta al impuesto'),
+      periodoDeclarado: z.string().optional().describe('Período declarado (T1, T2, T3, T4 o MM/YYYY para mensual)'),
+      envases: z.array(z.object({
+        tipoEnvase: z.enum(['alimentacion_bebidas', 'higiene_limpieza', 'industrial_comercial', 'agricola_reciclado', 'farmaceutico_sanitario', 'otro'] as [TipoEnvase, ...TipoEnvase[]]).describe('Tipo de envase'),
+        descripcion: z.string().optional(),
+        pesoTotalPlasticoKg: z.number().min(0).describe('Peso total del plástico contenido en los envases (kg)'),
+        pctPlasticoRecicladoAcreditado: z.number().min(0).max(100).describe('Porcentaje de plástico reciclado postconsumo acreditado por entidad ENAC (0-100%)'),
+      })).min(1).describe('Líneas de envases a declarar'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_impuesto_plasticos', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularImpuestoPlasticos(args as Parameters<typeof calcularImpuestoPlasticos>[0]);
+      const lineas = [
+        '## Impuesto sobre Envases de Plástico No Reutilizables (Ley 7/2022)',
+        '',
+        `- Tipo de operación: ${resultado.tipoOperacion}`,
+        `- Tipo impositivo: ${resultado.tipoEurKg.toLocaleString('es-ES')} EUR/kg de plástico NO reciclado`,
+        '',
+        '### Detalle por tipo de envase',
+        ...resultado.detalleEnvases.map(e =>
+          `- **${e.descripcion}**: ${e.pesoTotalPlasticoKg.toLocaleString('es-ES')} kg total` +
+          (e.estaExento ? ' → **EXENTO**' :
+            ` | reciclado: ${e.pctPlasticoRecicladoAcreditado}% | sujeto: ${e.pesoNoRecicladoKg.toLocaleString('es-ES')} kg → **${e.cuotaImpuesto.toLocaleString('es-ES')} EUR**`)
+        ),
+        '',
+        '### Resumen',
+        `- Total kg plástico: ${resultado.totalKgPlastico.toLocaleString('es-ES')} kg`,
+        `- Kg reciclado (no tributa): ${resultado.totalKgReciclado.toLocaleString('es-ES')} kg`,
+        `- Kg no reciclado sujeto: ${resultado.totalKgNoReciclado.toLocaleString('es-ES')} kg`,
+        `- **Cuota total a ingresar: ${resultado.cuotaTotalImpuesto.toLocaleString('es-ES')} EUR**`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_beneficios_tributarios_startup',
+    'Calcula y resume los incentivos fiscales de la Ley de Startups (Ley 28/2022) para empresas emergentes acreditadas por ENISA. IS al 15% (4 primeros años con base positiva), diferimiento del IS (primeros 2 años sin garantías), deducción por inversión de persona física (50% sobre hasta 100.000 EUR), stock options exentas hasta 50.000 EUR/año y régimen Beckham ampliado para fundadores. Calcula el ahorro fiscal total.',
+    {
+      estaAcreditadaStartup: z.boolean().describe('¿La entidad está acreditada como empresa emergente (ENISA o entidad pública equivalente)?'),
+      anosConBasePositiva: z.number().int().min(0).describe('Años transcurridos desde el primer ejercicio con base imponible positiva (0 = este es el primero)'),
+      baseImponibleIS: z.number().describe('Base imponible IS del ejercicio (EUR, puede ser 0)'),
+      calcularDiferimiento: z.boolean().optional().describe('¿La empresa quiere evaluar el diferimiento del IS?'),
+      importeInversionPersonaFisica: z.number().min(0).optional().describe('Importe invertido por persona física en acciones/participaciones de la startup este ejercicio (EUR)'),
+      pctParticipacionPrevia: z.number().min(0).max(100).optional().describe('Porcentaje de participación del inversor antes de la inversión (%)'),
+      fondosPropiosStartup: z.number().min(0).optional().describe('Fondos propios de la startup al inicio del ejercicio (EUR)'),
+      valorAccionesEntregadasEmpleados: z.number().min(0).optional().describe('Valor de acciones/participaciones entregadas a empleados en el ejercicio (EUR)'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_beneficios_tributarios_startup', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularBeneficiosTributariosStartup(args as Parameters<typeof calcularBeneficiosTributariosStartup>[0]);
+      const lineas = [
+        '## Beneficios Tributarios para Startups (Ley 28/2022)',
+        '',
+        `- Empresa acreditada como startup: ${resultado.estaAcreditadaStartup ? 'Sí' : 'No'}`,
+        '',
+        '### IS Reducido',
+        `- Aplica tipo 15%: ${resultado.aplicaTipoReducido ? 'Sí' : 'No'}`,
+        resultado.aplicaTipoReducido ? `- Años restantes con tipo reducido: ${resultado.anosRestantesTipoReducido}` : null,
+        `- Cuota IS al 15%: ${resultado.cuotaISReducido.toLocaleString('es-ES')} EUR`,
+        `- Cuota IS sin beneficio (25%): ${resultado.cuotaISSinBeneficio.toLocaleString('es-ES')} EUR`,
+        `- **Ahorro IS por tipo reducido: ${resultado.ahorroISReducido.toLocaleString('es-ES')} EUR**`,
+        '',
+        resultado.aplicaDiferimiento ? '### Diferimiento IS' : null,
+        resultado.aplicaDiferimiento ? '- ✅ Aplica diferimiento del pago del IS sin garantías (primeros 2 años con base positiva)' : null,
+        resultado.deduccionInversionPF > 0 ? '### Deducción por Inversión (Persona Física)' : null,
+        resultado.deduccionInversionPF > 0 ? `- **Deducción: ${resultado.deduccionInversionPF.toLocaleString('es-ES')} EUR** (50% sobre inversión elegible)` : null,
+        resultado.excesoInversionPF > 0 ? `- Exceso no elegible: ${resultado.excesoInversionPF.toLocaleString('es-ES')} EUR (supera los 100.000 EUR)` : null,
+        resultado.stockOptionsExento > 0 ? '### Stock Options' : null,
+        resultado.stockOptionsExento > 0 ? `- Exento de IRPF: ${resultado.stockOptionsExento.toLocaleString('es-ES')} EUR` : null,
+        resultado.stockOptionsTributable > 0 ? `- Tributa como RDT: ${resultado.stockOptionsTributable.toLocaleString('es-ES')} EUR (exceso sobre 50.000 EUR)` : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
