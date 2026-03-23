@@ -168,6 +168,15 @@ import { calcularJubilacionParcial, type ModalidadJubilacionParcial } from '@/li
 import { calcularMovilidadGeografica, type TipoMovilidadGeografica, type DecisionTrabajador } from '@/lib/calculadoras/movilidadGeografica';
 import { calcularDerechosAutorIRPF, type TipoRendimientoAutor } from '@/lib/calculadoras/derechosAutorIRPF';
 import { calcularCoeficientesAbatimiento, type TipoActivoAbatimiento } from '@/lib/calculadoras/coeficientesAbatimiento';
+// ── Lote R:
+import { calcularImpuestoTransaccionesFinancieras, type TipoOperacionITF } from '@/lib/calculadoras/impuestoTransaccionesFinancieras';
+import { calcularInversionSujetoPasivoIVA, type SuperpuestoISP } from '@/lib/calculadoras/inversionSujetoPasivoIVA';
+import { calcularTransparenciaFiscalInternacional, type TipoRentaTFI } from '@/lib/calculadoras/transparenciaFiscalInternacional';
+import { calcularRegimenSimplificadoIVA, type TrimestreISP } from '@/lib/calculadoras/regimenSimplificadoIVA';
+import { calcularModelo111, type CategoriaModelo111 } from '@/lib/calculadoras/modelo111';
+import { calcularPrestacionCeseActividad, type TipoCeseActividad } from '@/lib/calculadoras/prestacionCeseActividad';
+import { calcularModificacionSustancialCondiciones, type TipoMSCT, type DecisionTrabajadorMSCT } from '@/lib/calculadoras/modificacionSustancialCondiciones';
+import { calcularComplementoPensionBrechaGenero, type TipoPensionComplemento, type SexoBeneficiario as SexoBeneficiarioBG } from '@/lib/calculadoras/complementoPensionBrechaGenero';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -6628,6 +6637,311 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote R: ITF, inversion sujeto pasivo IVA, TFI, simplificado IVA, modelo 111, cese actividad, MSCT, complemento brecha genero ──
+
+  servidor.tool(
+    'calcular_impuesto_transacciones_financieras',
+    'Calcula el Impuesto sobre Transacciones Financieras (ITF, "Tasa Tobin") — Ley 5/2020. Tipo: 0,2% sobre la adquisición onerosa de acciones españolas cotizadas cuya capitalización bursátil supera 1.000 millones EUR a 1 de diciembre del año anterior. Analiza múltiples operaciones, identifica las exentas (mercado primario, reestructuraciones, market making, intragrupo) y calcula la cuota total.',
+    {
+      operaciones: z.array(z.object({
+        descripcion: z.string().optional().describe('Descripción de la operación'),
+        tipoOperacion: z.enum(['compra_acciones', 'operacion_primaria', 'reestructuracion', 'intragrupo', 'market_making'] as [TipoOperacionITF, ...TipoOperacionITF[]]).describe('Tipo de operación'),
+        numAcciones: z.number().positive().describe('Número de acciones adquiridas'),
+        precioPorAccion: z.number().positive().describe('Precio por acción (EUR)'),
+        superaUmbralCapitalizacion: z.boolean().describe('La sociedad emisora tiene capitalización > 1.000 M EUR a 1 dic año anterior'),
+      })).min(1).describe('Lista de operaciones a analizar'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_impuesto_transacciones_financieras', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularImpuestoTransaccionesFinancieras({ operaciones: args.operaciones });
+      const lineas = [
+        '## Impuesto sobre Transacciones Financieras (ITF — Tasa Tobin)',
+        '',
+        '### Resumen',
+        `- Total operaciones analizadas: **${resultado.totalValorOperaciones.toLocaleString('es-ES')} EUR**`,
+        `- Valor sujeto a ITF: **${resultado.totalValorSujeto.toLocaleString('es-ES')} EUR**`,
+        `- Valor exento: **${resultado.totalValorExento.toLocaleString('es-ES')} EUR**`,
+        `- **Cuota total ITF: ${resultado.cuotaTotalITF.toLocaleString('es-ES')} EUR**`,
+        `- Tipo efectivo total: ${resultado.tipoEfectivoTotal}%`,
+        '',
+        '### Detalle de operaciones',
+        ...resultado.detalleOperaciones.map(op =>
+          `- **${op.descripcion}** (${op.tipoOperacion}): valor ${op.valorOperacion.toLocaleString('es-ES')} EUR` +
+          (op.sujetaITF ? ` → ITF: **${op.cuotaITF.toLocaleString('es-ES')} EUR**` :
+            ` → EXENTA: ${op.motivoExencion}`)
+        ),
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_inversion_sujeto_pasivo_iva',
+    'Determina si una operación está sujeta a inversión del sujeto pasivo (ISP) en IVA (LIVA art. 84.Uno.2.º) y calcula la cuota IVA autoliquidada por el receptor. Supuestos: inmuebles (renuncia exención, ejecución garantía), construcción/rehabilitación subcontratada, chatarra/reciclaje, oro, derechos CO2, electrónicos (revendedores o empresarios cuando factura > 5.000 EUR), servicios de prestador no establecido.',
+    {
+      supuesto: z.enum(['inmueble_renuncia_exencion', 'inmueble_ejecucion_garantia', 'construccion_subcontratacion', 'desechos_recuperacion', 'oro_inversion', 'derechos_emision_co2', 'electronicos_revendedor', 'electronicos_empresario', 'servicios_prestador_no_establecido'] as [SuperpuestoISP, ...SuperpuestoISP[]]).describe('Supuesto legal de ISP'),
+      baseImponible: z.number().positive().describe('Base imponible de la operación (EUR)'),
+      tipoIVA: z.union([z.literal(4), z.literal(10), z.literal(21)]).describe('Tipo de IVA aplicable (4, 10 o 21%)'),
+      porcentajeProrrataReceptor: z.number().min(0).max(100).optional().describe('Porcentaje de prorrata definitiva del receptor (0-100, por defecto 100%)'),
+      importeTotalFactura: z.number().positive().optional().describe('Importe total de la factura — requerido para supuesto electronicos_empresario'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_inversion_sujeto_pasivo_iva', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularInversionSujetoPasivoIVA(args as Parameters<typeof calcularInversionSujetoPasivoIVA>[0]);
+      const lineas = [
+        '## Inversión del Sujeto Pasivo IVA (LIVA art. 84)',
+        '',
+        `- **Supuesto**: ${resultado.descripcionSupuesto}`,
+        `- **Sujeta a ISP**: ${resultado.sujetaISP ? 'Sí' : 'No'}`,
+        resultado.motivoNoISP ? `- **Motivo no ISP**: ${resultado.motivoNoISP}` : null,
+        resultado.sujetaISP ? `- Base imponible: ${resultado.baseImponible.toLocaleString('es-ES')} EUR (tipo IVA: ${resultado.tipoIVA}%)` : null,
+        resultado.sujetaISP ? `- **Cuota IVA autoliquidada**: ${resultado.cuotaIVAautoliquidada.toLocaleString('es-ES')} EUR` : null,
+        resultado.sujetaISP ? `- IVA soportado deducible: ${resultado.ivaDeducible.toLocaleString('es-ES')} EUR` : null,
+        resultado.sujetaISP ? `- IVA no deducible (coste real): ${resultado.ivaNoDeducible.toLocaleString('es-ES')} EUR` : null,
+        resultado.sujetaISP ? `- Efecto neto en caja: ${resultado.efectoNeto.toLocaleString('es-ES')} EUR` : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_transparencia_fiscal_internacional',
+    'Calcula la imputación de rentas por Transparencia Fiscal Internacional (TFI — LIS art. 100) a los socios españoles con participación >= 25% en entidades no residentes que tributan a < 18,75% (= 75% del IS del 25%). Solo imputa rentas pasivas: arrendamientos, dividendos, servicios financieros intragrupo, seguros, royalties, derivados, comercio con vinculadas. Aplica deducciones por doble imposición internacional.',
+    {
+      nombreENR: z.string().optional().describe('Nombre de la entidad no residente (ENR)'),
+      paisENR: z.string().optional().describe('País de residencia de la ENR'),
+      porcentajeParticipacion: z.number().min(0.01).max(100).describe('Porcentaje de participación directa + indirecta en la ENR (%)'),
+      tipoNominalPaisENR: z.number().min(0).max(100).describe('Tipo nominal del impuesto sobre beneficios en el país de la ENR (%)'),
+      ingresosTodesENR: z.number().min(0).describe('Total ingresos de la ENR en el ejercicio (EUR equiv.)'),
+      rentasImputables: z.array(z.object({
+        tipo: z.enum(['inmobiliaria', 'dividendos_participaciones', 'servicios_financieros', 'seguros', 'propiedad_intelectual', 'derivados_financieros', 'comercio_vinculadas'] as [TipoRentaTFI, ...TipoRentaTFI[]]).describe('Tipo de renta pasiva'),
+        descripcion: z.string().optional(),
+        importeRenta: z.number().min(0).describe('Importe de la renta obtenida por la ENR (EUR equiv.)'),
+      })).describe('Rentas pasivas imputables de la ENR (art. 100.2 LIS)'),
+      impuestoPagadoExtranjero: z.number().min(0).optional().describe('Impuesto efectivamente pagado por la ENR en el extranjero sobre las rentas imputadas (EUR)'),
+      tieneSubstanciaEconomica: z.boolean().optional().describe('¿La ENR tiene sustancia económica real (medios, empleados propios)?'),
+      enUEconMotivosValidos: z.boolean().optional().describe('¿La ENR está en la UE/EEE con motivos económicos válidos?'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_transparencia_fiscal_internacional', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularTransparenciaFiscalInternacional(args as Parameters<typeof calcularTransparenciaFiscalInternacional>[0]);
+      const lineas = [
+        '## Transparencia Fiscal Internacional (TFI — LIS art. 100)',
+        '',
+        `- **Aplica TFI**: ${resultado.aplicaTFI ? 'Sí' : 'No'}`,
+        resultado.motivoNoAplicacion ? `- **Motivo**: ${resultado.motivoNoAplicacion}` : null,
+        `- Participación: ${resultado.porcentajeParticipacion}% | Tipo nominal ENR: ${resultado.tipoNominalPaisENR}%`,
+        `- Umbral baja tributación (<${resultado.umbralbajaTributacion}%): ${resultado.tipoNominalPaisENR < resultado.umbralbajaTributacion ? 'Cumplido' : 'No cumplido'}`,
+        `- Rentas pasivas: ${resultado.totalRentasPasivas.toLocaleString('es-ES')} EUR (${resultado.pctRentasPasivas}% ingresos ENR)`,
+        `- Excepción de minimis (<15%): ${resultado.aplicaMinimis ? 'Sí' : 'No'}`,
+        resultado.aplicaTFI ? `- **Renta imputable al socio**: ${resultado.totalRentaImputable.toLocaleString('es-ES')} EUR` : null,
+        resultado.aplicaTFI ? `- Cuota IS adicional bruta: ${resultado.cuotaISAdicional.toLocaleString('es-ES')} EUR` : null,
+        resultado.aplicaTFI ? `- Deducción doble imposición: ${resultado.deduccionDobleImposicion.toLocaleString('es-ES')} EUR` : null,
+        resultado.aplicaTFI ? `- **Cuota IS neta adicional: ${resultado.cuotaISNeta.toLocaleString('es-ES')} EUR**` : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_regimen_simplificado_iva',
+    'Calcula la cuota trimestral de IVA a ingresar en el Régimen Simplificado (módulos) — LIVA arts. 122-129 + Orden HFP/1166/2024. El contribuyente indica la cuota devengada anual (CDOC) de sus módulos y el IVA soportado del trimestre. Calcula la cuota a ingresar en el modelo 310 (T1-T3) o 370 (T4), respetando el mínimo del 1% de la CDOC. Verifica los límites de exclusión del régimen (250.000 EUR ingresos/compras).',
+    {
+      cuotaDevengadaAnual: z.number().positive().describe('Cuota devengada por operaciones corrientes ANUAL (EUR) — de los módulos de la actividad'),
+      ivaSoportadoTrimestre: z.number().min(0).describe('IVA soportado en operaciones corrientes del trimestre (EUR)'),
+      ivaSoportadoAdicionalAnual: z.number().min(0).optional().describe('IVA soportado adicional anual (solo para T4 — liquidación anual)'),
+      trimestre: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]).describe('Trimestre a liquidar (1, 2, 3 o 4)'),
+      volumenIngresosPrevio: z.number().min(0).optional().describe('Volumen de ingresos del ejercicio anterior (EUR) — para verificar límites'),
+      volumenComprasPrevio: z.number().min(0).optional().describe('Volumen de compras del ejercicio anterior (EUR)'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_regimen_simplificado_iva', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularRegimenSimplificadoIVA({ ...args, trimestre: args.trimestre as TrimestreISP });
+      const lineas = [
+        `## Régimen Simplificado IVA — Trimestre ${resultado.trimestre}`,
+        '',
+        `- Cuota devengada trimestral (CDOC/4): ${resultado.cuotaDevengadaTrimestral.toLocaleString('es-ES')} EUR`,
+        `- IVA soportado aplicado: ${resultado.ivaSoportadoAplicado.toLocaleString('es-ES')} EUR`,
+        `- **Cuota a ingresar (modelo 310/370): ${resultado.cuotaIngresar.toLocaleString('es-ES')} EUR**`,
+        `- Estimación cuota anual: ${resultado.cuotaAnualEstimada.toLocaleString('es-ES')} EUR`,
+        resultado.alertaLimite ? '- ⚠️ **Alerta: volumen de ingresos/compras próximo al límite de exclusión**' : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_modelo_111',
+    'Calcula el importe total a ingresar en el Modelo 111 (retenciones e ingresos a cuenta IRPF — trimestral). Admite múltiples categorías: rendimientos del trabajo (tipo variable — el usuario lo indica), profesionales/autónomos (15% general / 7% inicio actividad), administradores (35% / 19% empresa pequeña), premios (19%), propiedad intelectual (19% / 7%), impatriados (24%). Devuelve el total de retenciones por categoría.',
+    {
+      trimestre: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]).describe('Trimestre a declarar (1-4)'),
+      ejercicio: z.number().int().min(2020).describe('Ejercicio fiscal (año)'),
+      lineas: z.array(z.object({
+        categoria: z.enum(['trabajo', 'profesionales', 'profesionales_inicio', 'administradores', 'administradores_pequena_empresa', 'premios', 'propiedad_intelectual', 'propiedad_intelectual_reducida', 'impatriados'] as [CategoriaModelo111, ...CategoriaModelo111[]]).describe('Categoría de renta'),
+        descripcion: z.string().optional(),
+        numPerceptores: z.number().int().positive().describe('Número de perceptores en el trimestre'),
+        baseRetencion: z.number().min(0).describe('Base de retención total de todos los perceptores (EUR)'),
+        tipoRetencionAplicado: z.number().min(0).max(100).optional().describe('Tipo de retención efectivo aplicado (%). Obligatorio para categoría "trabajo"'),
+      })).min(1).describe('Líneas de retención a declarar'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_modelo_111', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularModelo111(args as Parameters<typeof calcularModelo111>[0]);
+      const lineas = [
+        `## Modelo 111 — Retenciones IRPF T${resultado.trimestre}/${resultado.ejercicio}`,
+        '',
+        '### Detalle por categoría',
+        ...resultado.detalle.map(d =>
+          `- **${d.descripcion}**: ${d.numPerceptores} perceptore(s), base ${d.baseRetencion.toLocaleString('es-ES')} EUR, tipo ${d.tipoAplicado}% → **${d.cuotaRetencion.toLocaleString('es-ES')} EUR**`
+        ),
+        '',
+        '### Totales',
+        `- Perceptores: ${resultado.totalPerceptores}`,
+        `- Base total: ${resultado.totalBase.toLocaleString('es-ES')} EUR`,
+        `- **Retenciones a ingresar: ${resultado.totalRetenciones.toLocaleString('es-ES')} EUR**`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_prestacion_cese_actividad',
+    'Calcula la prestación por cese de actividad de autónomos (equivalente al paro) — LGSS arts. 327-346. Verifica el periodo mínimo de cotización (12 meses), calcula la base reguladora (promedio 12 meses), aplica el 70%, y contrasta con mínimos (80-107% IPREM) y máximos (175-200% IPREM según hijos). Determina la duración según tabla legal (2 a 24 meses) y el importe total estimado.',
+    {
+      tipoCese: z.enum(['economico_perdidas', 'ejecucion_judicial', 'fuerza_mayor', 'perdida_licencia', 'violencia_genero', 'divorcio_empresa_familiar', 'bajos_ingresos'] as [TipoCeseActividad, ...TipoCeseActividad[]]).describe('Causa legal de cese de actividad'),
+      mesesCotizados: z.number().min(0).describe('Meses cotizados por cese de actividad en RETA (cotización específica para la contingencia)'),
+      sumaBases12Meses: z.number().min(0).describe('Suma de las bases de cotización por cese de los últimos 12 meses (EUR)'),
+      hijosACargo: z.number().int().min(0).describe('Número de hijos menores de 26 años a cargo (0, 1, 2 o más)'),
+      edad60oMas: z.boolean().optional().describe('¿El autónomo tiene 60 o más años en el momento del cese?'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_prestacion_cese_actividad', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularPrestacionCeseActividad(args);
+      const lineas = [
+        '## Prestación por Cese de Actividad de Autónomos',
+        '',
+        `- Causa de cese: ${resultado.tipoCese}`,
+        `- Meses cotizados: ${resultado.mesesCotizados}`,
+        `- **Cumple requisitos**: ${resultado.cumpleRequisitos ? 'Sí' : 'No'}`,
+        resultado.motivoIncumplimiento ? `- **Motivo denegación**: ${resultado.motivoIncumplimiento}` : null,
+        resultado.cumpleRequisitos ? `- Base reguladora mensual: ${resultado.baseReguladora.toLocaleString('es-ES')} EUR` : null,
+        resultado.cumpleRequisitos ? `- Cuantía bruta (70%): ${resultado.cuantiaBruta.toLocaleString('es-ES')} EUR/mes` : null,
+        resultado.cumpleRequisitos ? `- Mínimo: ${resultado.cuantiaMinima.toLocaleString('es-ES')} EUR/mes | Máximo: ${resultado.cuantiaMaxima.toLocaleString('es-ES')} EUR/mes` : null,
+        resultado.cumpleRequisitos ? `- **Cuantía mensual final: ${resultado.cuantiaMensual.toLocaleString('es-ES')} EUR/mes**` : null,
+        resultado.cumpleRequisitos ? `- **Duración: ${resultado.duracionMeses} meses**` : null,
+        resultado.cumpleRequisitos ? `- **Total estimado: ${resultado.importeTotalEstimado.toLocaleString('es-ES')} EUR**` : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_modificacion_sustancial_condiciones',
+    'Calcula los derechos económicos del trabajador ante una Modificación Sustancial de Condiciones de Trabajo (MSCT — ET art. 41). Si el trabajador decide rescindir el contrato: indemnización de 20 días/año de servicio con tope de 9 mensualidades (sin exención IRPF). Identifica si la MSCT es colectiva por superar umbrales legales. Informa del plazo de impugnación judicial (20 días hábiles).',
+    {
+      tiposMSCT: z.array(z.enum(['jornada', 'horario', 'turno', 'salario', 'sistema_trabajo', 'funciones'] as [TipoMSCT, ...TipoMSCT[]])).min(1).describe('Tipos de condiciones modificadas'),
+      decisionTrabajador: z.enum(['aceptar', 'rescindir', 'impugnar'] as [DecisionTrabajadorMSCT, ...DecisionTrabajadorMSCT[]]).describe('Decisión del trabajador'),
+      salarioBrutoMensual: z.number().positive().describe('Salario bruto mensual actual (EUR)'),
+      anosServicioCompletos: z.number().int().min(0).describe('Años completos de servicio'),
+      mesesServicioAdicionales: z.number().int().min(0).max(11).optional().describe('Meses adicionales de servicio (fracción del último año)'),
+      esColectiva: z.boolean().optional().describe('¿Es una MSCT colectiva (superando umbrales legales)?'),
+      plantillaEmpresa: z.number().int().positive().optional().describe('Plantilla total de la empresa (para calcular umbrales colectivos)'),
+      trabajadoresAfectados: z.number().int().positive().optional().describe('Número de trabajadores afectados por la MSCT'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_modificacion_sustancial_condiciones', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularModificacionSustancialCondiciones(args as Parameters<typeof calcularModificacionSustancialCondiciones>[0]);
+      const lineas = [
+        '## Modificación Sustancial de Condiciones de Trabajo (ET art. 41)',
+        '',
+        `- Tipos MSCT: ${resultado.tiposMSCT.join(', ')}`,
+        `- Decisión trabajador: **${resultado.decisionTrabajador}**`,
+        `- MSCT colectiva (por umbrales): ${resultado.esColectivaPorUmbrales ? 'Sí — requiere periodo de consultas' : 'No'}`,
+        `- Total años de servicio: ${resultado.totalAnosServicio}`,
+        `- Salario diario: ${resultado.salarioDiario.toLocaleString('es-ES')} EUR`,
+        '',
+        resultado.decisionTrabajador === 'rescindir' ? '### Indemnización por rescisión (ET art. 41.3)' : null,
+        resultado.decisionTrabajador === 'rescindir' ? `- Días de indemnización: ${resultado.diasIndemnizacion} días` : null,
+        resultado.decisionTrabajador === 'rescindir' ? `- Indemnización calculada: ${resultado.indemnizacionSinCap.toLocaleString('es-ES')} EUR` : null,
+        resultado.decisionTrabajador === 'rescindir' ? `- Tope 9 mensualidades: ${resultado.capMaximoMensualidades.toLocaleString('es-ES')} EUR` : null,
+        resultado.decisionTrabajador === 'rescindir' ? `- **Indemnización final: ${resultado.indemnizacionFinal.toLocaleString('es-ES')} EUR**` : null,
+        resultado.decisionTrabajador === 'impugnar' ? `- Plazo de impugnación: **${resultado.plazoImpugnacionDiasHabiles} días hábiles** desde la notificación` : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_complemento_pension_brecha_genero',
+    'Calcula el complemento de pensión por brecha de género (LGSS art. 60 — RDL 3/2021). Mujeres con 2+ hijos: complemento mensual por cada hijo a partir del 2.º (presunción legal de brecha por maternidad). Hombres con 2+ hijos: solo si interrumpieron jornada en los 2 años previos al nacimiento/adopción Y su pensión es inferior a la del cónyuge. Importe 2025: ~33,20 EUR/mes por hijo adicional, abonado en 14 pagas.',
+    {
+      tipoPension: z.enum(['jubilacion', 'incapacidad_permanente', 'viudedad'] as [TipoPensionComplemento, ...TipoPensionComplemento[]]).describe('Tipo de pensión del beneficiario'),
+      sexo: z.enum(['mujer', 'hombre'] as [SexoBeneficiarioBG, ...SexoBeneficiarioBG[]]).describe('Sexo del beneficiario'),
+      numHijos: z.number().int().min(0).describe('Número de hijos o hijas biológicos o adoptados'),
+      acreditaBrechaGenero: z.boolean().optional().describe('Para mujeres: ¿acredita brecha de género? (por defecto true — presunción legal)'),
+      hombresInterrumpioJornada: z.boolean().optional().describe('Para hombres: ¿interrumpió o redujo jornada en los 2 años previos al nacimiento/adopción?'),
+      pensionInferiorConyuge: z.boolean().optional().describe('Para hombres: ¿su pensión es inferior a la del cónyuge o pareja de hecho?'),
+      pensionMensualBase: z.number().positive().describe('Pensión contributiva mensual reconocida antes del complemento (EUR)'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_complemento_pension_brecha_genero', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularComplementoPensionBrechaGenero(args as Parameters<typeof calcularComplementoPensionBrechaGenero>[0]);
+      const lineas = [
+        '## Complemento de Pensión por Brecha de Género (LGSS art. 60)',
+        '',
+        `- Tipo de pensión: ${resultado.tipoPension} | Sexo: ${resultado.sexo}`,
+        `- Número de hijos: ${resultado.numHijos}`,
+        `- **Tiene derecho al complemento**: ${resultado.tieneDerechoComplemento ? 'Sí' : 'No'}`,
+        resultado.motivoDenegacion ? `- **Motivo denegación**: ${resultado.motivoDenegacion}` : null,
+        resultado.tieneDerechoComplemento ? `- Hijos que generan complemento (desde el 2.º): ${resultado.hijosQueGeneranComplemento}` : null,
+        resultado.tieneDerechoComplemento ? `- **Complemento mensual: ${resultado.cuotaComplementoMensual.toLocaleString('es-ES')} EUR/mes**` : null,
+        resultado.tieneDerechoComplemento ? `- Complemento anual (14 pagas): ${resultado.cuotaComplementoAnual.toLocaleString('es-ES')} EUR` : null,
+        resultado.tieneDerechoComplemento ? `- **Pensión total mensual: ${resultado.pensionTotalMensual.toLocaleString('es-ES')} EUR/mes**` : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
