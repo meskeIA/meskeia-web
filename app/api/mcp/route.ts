@@ -186,6 +186,15 @@ import { calcularAmortizacionIntangibles, type TipoActivoIntangible } from '@/li
 import { calcularOperacionesVinculadas, type MetodoValoracionOV, type TipoOperacionOV } from '@/lib/calculadoras/operacionesVinculadas';
 import { calcularImpuestoPlasticos, type OperacionIPNR, type TipoEnvase } from '@/lib/calculadoras/impuestoPlasticos';
 import { calcularBeneficiosTributariosStartup } from '@/lib/calculadoras/beneficiosTributariosStartup';
+// ── Lote T:
+import { calcularReduccionPlanPensionesIRPF, type PerfilContribuyentePP } from '@/lib/calculadoras/reduccionPlanPensionesIRPF';
+import { calcularCompensacionBasesNegativasIS } from '@/lib/calculadoras/compensacionBasesNegativasIS';
+import { calcularGastosDeduciblesAutonomo, type ModalidadEstimacionDirectaGA, type UsoVivienda, type ActividadTransporte } from '@/lib/calculadoras/gastosDeduciblesAutonomo';
+import { calcularRetencionDividendos, type TipoReceptorDividendo } from '@/lib/calculadoras/retencionDividendos';
+import { calcularIBI, type ClaseInmuebleIBI } from '@/lib/calculadoras/ibi';
+import { calcularModelo720, type CategoriaModelo720 } from '@/lib/calculadoras/modelo720';
+import { calcularRescatePlanPensiones, type FormaRescate, type ContingenciaRescate } from '@/lib/calculadoras/rescatePlanPensiones';
+import { calcularDeduccionDobleImposicionIS, type TipoRentaExtranjera, type MetodoEliminacionDI } from '@/lib/calculadoras/deduccionDobleImposicionIS';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -8377,6 +8386,467 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ── Lote T: reduccion plan pensiones IRPF, compensacion BINs IS, gastos deducibles autonomo, retencion dividendos, IBI, modelo 720, rescate plan pensiones, doble imposicion IS ──
+
+  servidor.tool(
+    'calcular_reduccion_plan_pensiones_irpf',
+    'Calcula la reducción de la base imponible general del IRPF por aportaciones a planes de pensiones, PPA, PIAS y planes de empleo (LIRPF arts. 51-52, Ley 12/2022). Límites 2025: 1.500 EUR propias + hasta 8.500 EUR empresa (total 10.000 EUR) + 4.250 EUR PPES autónomos. Incluye límite del 30% de rendimientos netos y aportaciones al cónyuge (hasta 1.000 EUR).',
+    {
+      perfil: z.enum(['trabajador_cuenta_ajena', 'autonomo_reta', 'trabajador_sin_empresa']).describe('Perfil del contribuyente: trabajador_cuenta_ajena (empleado con posible plan empresa), autonomo_reta (puede aportar a PPES), trabajador_sin_empresa (empleado sin plan de empresa)'),
+      aportacionesPropiasAnuales: z.number().min(0).describe('Aportaciones propias del contribuyente al plan de pensiones individual, PPA o PIAS (EUR/año)'),
+      contribucionEmpresaAnual: z.number().min(0).optional().describe('Contribuciones de la empresa al plan de empresa o EPSP (EUR/año). Solo trabajadores por cuenta ajena'),
+      aportacionesPPESAutonomo: z.number().min(0).optional().describe('Aportaciones al Plan de Pensiones de Empleo Simplificado para autónomos (EUR/año). Límite adicional 4.250 EUR/año. Solo perfil autonomo_reta'),
+      aportacionesConyuge: z.number().min(0).optional().describe('Aportaciones a favor del cónyuge (EUR/año). Reducción adicional hasta 1.000 EUR si el cónyuge obtiene rendimientos < 8.000 EUR'),
+      rendimientosNetosEjercicio: z.number().min(0).describe('Rendimientos netos del trabajo + actividades económicas del ejercicio (EUR). Base para calcular el límite del 30%'),
+      excesoAnterioresPendiente: z.number().min(0).optional().describe('Exceso de aportaciones no deducido en ejercicios anteriores (EUR). Puede trasladarse hasta 5 años'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_reduccion_plan_pensiones_irpf', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularReduccionPlanPensionesIRPF({
+        perfil: args.perfil as PerfilContribuyentePP,
+        aportacionesPropiasAnuales: args.aportacionesPropiasAnuales,
+        contribucionEmpresaAnual: args.contribucionEmpresaAnual,
+        aportacionesPPESAutonomo: args.aportacionesPPESAutonomo,
+        aportacionesConyuge: args.aportacionesConyuge,
+        rendimientosNetosEjercicio: args.rendimientosNetosEjercicio,
+        excesoAnterioresPendiente: args.excesoAnterioresPendiente,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        '## Reducción Plan de Pensiones — IRPF 2025',
+        '',
+        `- Perfil: ${resultado.perfil.replace(/_/g, ' ')}`,
+        `- Aportaciones propias: ${fmt(resultado.aportacionesPropias)} EUR`,
+        resultado.contribucionEmpresa > 0 ? `- Contribución empresa: ${fmt(resultado.contribucionEmpresa)} EUR` : null,
+        resultado.aportacionesPPES > 0 ? `- Aportaciones PPES (autónomo): ${fmt(resultado.aportacionesPPES)} EUR` : null,
+        resultado.aportacionesConyuge > 0 ? `- Aportaciones cónyuge: ${fmt(resultado.aportacionesConyuge)} EUR` : null,
+        `- Total aportaciones: ${fmt(resultado.totalAportaciones)} EUR`,
+        '',
+        '### Límites Aplicables',
+        `- Límite individual legal: ${fmt(resultado.limiteIndividualLegal)} EUR`,
+        resultado.limiteEmpresaLegal > 0 ? `- Límite empresa legal: ${fmt(resultado.limiteEmpresaLegal)} EUR` : null,
+        `- Límite por rendimientos (30%): ${fmt(resultado.limitePorRendimientos)} EUR`,
+        '',
+        '### Resultado',
+        `- **Reducción principal efectiva: ${fmt(resultado.reduccionPrincipalEfectiva)} EUR**`,
+        resultado.reduccionConyugeEfectiva > 0 ? `- Reducción cónyuge efectiva: ${fmt(resultado.reduccionConyugeEfectiva)} EUR` : null,
+        `- **TOTAL reducción base imponible: ${fmt(resultado.totalReduccion)} EUR**`,
+        resultado.excesoNoDeducible > 0 ? `- Exceso no deducible (traslado 5 años): ${fmt(resultado.excesoNoDeducible)} EUR` : null,
+        `- Ahorro fiscal estimado al 45%: ${fmt(resultado.ahorroFiscalEstimado45)} EUR`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_compensacion_bases_negativas_is',
+    'Calcula el importe de bases imponibles negativas (BINs) compensables en el Impuesto sobre Sociedades del ejercicio actual (LIS art. 26). Determina el régimen de límite según el volumen de operaciones del año anterior: sin límite (<20 M EUR), 50% (20-60 M EUR) o 25% (>60 M EUR), con mínimo siempre compensable de 1.000.000 EUR. Aplica criterio FIFO (primero las más antiguas). Calcula el ahorro fiscal.',
+    {
+      baseImponiblePositiva: z.number().positive().describe('Base imponible positiva del ejercicio actual antes de compensar BINs (EUR)'),
+      volumenOperacionesAnioAnterior: z.number().min(0).describe('Volumen de operaciones (cifra de negocios) del ejercicio anterior (EUR). Determina el límite de compensación'),
+      binsAnteriores: z.array(z.object({
+        ejercicio: z.number().int().describe('Año del ejercicio en que se generó la BIN'),
+        importeBIN: z.number().positive().describe('Importe de la BIN generada en ese ejercicio (EUR)'),
+        importeYaCompensado: z.number().min(0).optional().describe('Importe ya compensado en ejercicios anteriores (EUR)'),
+      })).min(1).describe('Lista de BINs pendientes de compensar, de ejercicios anteriores'),
+      tipoIS: z.number().min(1).max(35).optional().describe('Tipo del IS del contribuyente (%). Default: 25%'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_compensacion_bases_negativas_is', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularCompensacionBasesNegativasIS({
+        baseImponiblePositiva: args.baseImponiblePositiva,
+        volumenOperacionesAnioAnterior: args.volumenOperacionesAnioAnterior,
+        binsAnteriores: args.binsAnteriores,
+        tipoIS: args.tipoIS,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        '## Compensación de BINs — IS',
+        '',
+        `- Base imponible positiva: ${fmt(resultado.baseImponiblePositiva)} EUR`,
+        `- Volumen operaciones año anterior: ${fmt(resultado.volumenOperaciones)} EUR`,
+        `- Régimen de límite: ${resultado.regimenLimite.replace(/_/g, ' ')}`,
+        `- Máximo compensable este ejercicio: ${fmt(resultado.maxCompensableEjercicio)} EUR`,
+        `- Total BINs disponibles: ${fmt(resultado.totalBINsDisponibles)} EUR`,
+        '',
+        '### Detalle de Compensación (FIFO)',
+        ...resultado.detalleCompensacion.map(d =>
+          `- Ejercicio ${d.ejercicio}: disponible ${fmt(d.importeBINDisponible)} EUR → compensado ${fmt(d.importeCompensadoEsteAnio)} EUR | pendiente ${fmt(d.importePendienteTrasBanio)} EUR`
+        ),
+        '',
+        `- **Total compensado: ${fmt(resultado.totalCompensado)} EUR**`,
+        `- BINs pendientes para ejercicios futuros: ${fmt(resultado.totalBINsPendientesRestantes)} EUR`,
+        `- Base imponible tras BINs: ${fmt(resultado.baseImponibleTrasBins)} EUR`,
+        '',
+        `- Cuota IS sin compensación: ${fmt(resultado.cuotaISSinCompensacion)} EUR`,
+        `- Cuota IS tras compensación: ${fmt(resultado.cuotaISTrasCompensacion)} EUR`,
+        `- **Ahorro fiscal: ${fmt(resultado.ahorroFiscal)} EUR**`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_gastos_deducibles_autonomo',
+    'Calcula los gastos fiscalmente deducibles en el IRPF para un trabajador autónomo en Estimación Directa Normal o Simplificada (LIRPF arts. 28-30, RIRPF art. 22). Incluye reglas especiales: suministros de vivienda habitual (% afectación × 30%), vehículo (50% uso mixto / 100% transporte exclusivo), dietas (límites y requisitos), seguros médicos (500 EUR/persona), amortizaciones y provisión global 5% en ED Simplificada.',
+    {
+      modalidad: z.enum(['normal', 'simplificada']).describe('Modalidad de estimación directa: normal o simplificada'),
+      tipoLocal: z.enum(['local_independiente', 'vivienda_habitual']).describe('Tipo de local de trabajo: local_independiente (100% deducible) o vivienda_habitual (% por afectación)'),
+      pctViviendaAfecta: z.number().min(0).max(100).optional().describe('Solo si tipoLocal=vivienda_habitual: porcentaje de la vivienda destinado a la actividad (m² despacho / m² total × 100)'),
+      gastoLocal: z.number().min(0).optional().describe('Gastos de local o alquiler de oficina (EUR/año)'),
+      gastosSubministros: z.number().min(0).optional().describe('Gastos de suministros: luz, agua, gas, internet (EUR/año)'),
+      cuotaAutonomo: z.number().min(0).optional().describe('Cuota SS autónomo (RETA o SETA) pagada en el año (EUR/año). 100% deducible'),
+      gastosPersonal: z.number().min(0).optional().describe('Gastos de personal: nóminas de empleados + SS empresa (EUR/año)'),
+      gastosCompras: z.number().min(0).optional().describe('Compras de materiales y mercaderías (EUR/año)'),
+      gastosFinancieros: z.number().min(0).optional().describe('Gastos financieros: intereses de préstamos de la actividad, comisiones bancarias (EUR/año)'),
+      gastosPublicidad: z.number().min(0).optional().describe('Gastos de publicidad y marketing (EUR/año)'),
+      segurosPrivadosMedicos: z.number().min(0).optional().describe('Primas de seguros médicos privados del autónomo + familia (EUR/año). Límite: 500 EUR por persona'),
+      numFamiliaresSeguroMedico: z.number().int().min(0).optional().describe('Número de familiares adicionales (cónyuge + hijos < 25 años) sin discapacidad incluidos en el seguro médico'),
+      numFamiliaresDiscapacidad: z.number().int().min(0).optional().describe('Número de familiares con discapacidad incluidos en el seguro médico (límite 1.500 EUR por persona)'),
+      amortizaciones: z.number().min(0).optional().describe('Cuotas de amortización de inmovilizado: equipos informáticos, mobiliario, software (EUR/año)'),
+      otrosGastos: z.number().min(0).optional().describe('Otros gastos deducibles: formación, suscripciones profesionales, gestoría, etc. (EUR/año)'),
+      vehiculo: z.object({
+        totalGastosVehiculo: z.number().min(0).describe('Total gastos del vehículo: combustible, seguro, ITV, reparaciones (EUR/año)'),
+        amortizacionVehiculo: z.number().min(0).optional().describe('Cuota de amortización anual del vehículo si es de su propiedad (EUR/año)'),
+        tipoActividad: z.enum(['si_exclusivo', 'no_exclusivo']).describe('si_exclusivo: actividad exclusivamente de transporte/reparto (100% deducible). no_exclusivo: uso mixto (50% deducible)'),
+      }).optional().describe('Datos del vehículo si tiene gastos de automóvil'),
+      dietasPagadasConTarjeta: z.number().min(0).optional().describe('Importe de dietas pagadas con tarjeta/transferencia (fuera del municipio) ya aplicando los límites del RIRPF: 26,67 EUR/día sin pernocta, 53,34 EUR/día con pernocta (EUR/año)'),
+      saldoDeudoresFinAnio: z.number().min(0).optional().describe('Saldo de clientes/deudores al cierre del ejercicio (EUR). Solo para ED Simplificada: permite deducir provisión global del 5%'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_gastos_deducibles_autonomo', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularGastosDeduciblesAutonomo({
+        modalidad: args.modalidad as ModalidadEstimacionDirectaGA,
+        tipoLocal: args.tipoLocal as UsoVivienda,
+        pctViviendaAfecta: args.pctViviendaAfecta,
+        gastoLocal: args.gastoLocal,
+        gastosSubministros: args.gastosSubministros,
+        cuotaAutonomo: args.cuotaAutonomo,
+        gastosPersonal: args.gastosPersonal,
+        gastosCompras: args.gastosCompras,
+        gastosFinancieros: args.gastosFinancieros,
+        gastosPublicidad: args.gastosPublicidad,
+        segurosPrivadosMedicos: args.segurosPrivadosMedicos,
+        numFamiliaresSeguroMedico: args.numFamiliaresSeguroMedico,
+        numFamiliaresDiscapacidad: args.numFamiliaresDiscapacidad,
+        amortizaciones: args.amortizaciones,
+        otrosGastos: args.otrosGastos,
+        vehiculo: args.vehiculo ? {
+          totalGastosVehiculo: args.vehiculo.totalGastosVehiculo,
+          amortizacionVehiculo: args.vehiculo.amortizacionVehiculo,
+          tipoActividad: args.vehiculo.tipoActividad as ActividadTransporte,
+        } : undefined,
+        dietasPagadasConTarjeta: args.dietasPagadasConTarjeta,
+        saldoDeudoresFinAnio: args.saldoDeudoresFinAnio,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `## Gastos Deducibles Autónomo — ED ${resultado.modalidad.charAt(0).toUpperCase() + resultado.modalidad.slice(1)}`,
+        '',
+        '### Desglose por Concepto',
+        ...resultado.lineas.map(l =>
+          `- ${l.concepto}: ${fmt(l.gastoTotal)} EUR × ${l.porcentajeDeducible}% = **${fmt(l.importeDeducible)} EUR**${l.nota ? ` _(${l.nota})_` : ''}`
+        ),
+        '',
+        `- **Total gastos deducibles: ${fmt(resultado.totalGastosDeducibles)} EUR**`,
+        resultado.provisionGlobalED5pct > 0 ? `- Provisión global 5% ED Simplificada: ${fmt(resultado.provisionGlobalED5pct)} EUR` : null,
+        resultado.provisionGlobalED5pct > 0 ? `- **Total con provisión: ${fmt(resultado.totalGastosConProvision)} EUR**` : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_retencion_dividendos',
+    'Calcula la retención e IRPF/IS aplicable a dividendos según el tipo de receptor (LIRPF art. 25.1, LIS art. 21, LIRNR). Para persona física residente: retención 19%, escala del ahorro 19-28%, integración en base del ahorro. Para sociedad residente: exención art. 21 si participación ≥5% y tenencia ≥12 meses; si no, IS 25%. Para no residente: tipo general 19% o tipo CDI.',
+    {
+      tipoReceptor: z.enum(['persona_fisica_residente', 'sociedad_residente', 'no_residente']).describe('Tipo de receptor del dividendo'),
+      dividendoBruto: z.number().positive().describe('Importe bruto del dividendo acordado (EUR)'),
+      gastosAdministracion: z.number().min(0).optional().describe('Gastos de administración y depósito de valores (EUR). Solo deducibles para persona física. Reducen el rendimiento neto'),
+      porcentajeParticipacion: z.number().min(0).max(100).optional().describe('Para receptor sociedad: porcentaje de participación en la entidad pagadora (%). Determina exención art. 21 (≥5%) y exención retención (≥25%)'),
+      mesesTenencia: z.number().min(0).optional().describe('Para receptor sociedad: meses de tenencia de la participación. Se requieren ≥12 meses para la exención IS art. 21'),
+      tipoCDI: z.number().min(0).max(30).optional().describe('Para no residentes: tipo del CDI aplicable (%). Si no hay convenio, se aplica el tipo general del 19%'),
+      otrosRdtoAhorroEjercicio: z.number().min(0).optional().describe('Para persona física: otros rendimientos del capital mobiliario del ahorro en el ejercicio (EUR). Para calcular la escala progresiva acumulada'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_retencion_dividendos', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularRetencionDividendos({
+        tipoReceptor: args.tipoReceptor as TipoReceptorDividendo,
+        dividendoBruto: args.dividendoBruto,
+        gastosAdministracion: args.gastosAdministracion,
+        porcentajeParticipacion: args.porcentajeParticipacion,
+        mesesTenencia: args.mesesTenencia,
+        tipoCDI: args.tipoCDI,
+        otrosRdtoAhorroEjercicio: args.otrosRdtoAhorroEjercicio,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        '## Retención sobre Dividendos',
+        '',
+        `- Tipo de receptor: ${resultado.tipoReceptor.replace(/_/g, ' ')}`,
+        `- Dividendo bruto: ${fmt(resultado.dividendoBruto)} EUR`,
+        resultado.gastosDeducibles > 0 ? `- Gastos deducibles: ${fmt(resultado.gastosDeducibles)} EUR` : null,
+        `- Rendimiento neto: ${fmt(resultado.rendimientoNeto)} EUR`,
+        '',
+        resultado.aplicaExencionIS
+          ? `✅ **EXENCIÓN IS art. 21: dividendo exento de IS**`
+          : resultado.motivoNoExencion ? `- Exención IS: NO aplica — ${resultado.motivoNoExencion}` : null,
+        '',
+        `- Retención practicada: ${fmt(resultado.retencionPracticada)} EUR`,
+        `- Dividendo neto cobrado: ${fmt(resultado.dividendoNeto)} EUR`,
+        resultado.aplicaExencionIS ? null : `- Cuota impuesto: ${fmt(resultado.cuotaImpuesto)} EUR`,
+        resultado.aplicaExencionIS ? null : `- Tipo efectivo: ${resultado.tipoEfectivo}%`,
+        `- Cuota diferencial (cuota − retención): ${fmt(resultado.cuotaDiferencial)} EUR`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_ibi',
+    'Calcula el Impuesto sobre Bienes Inmuebles (IBI) a partir del valor catastral y el tipo impositivo municipal (TRLRHL arts. 60-77). Aplica bonificaciones (familia numerosa, VPO, vivienda habitual...) y el recargo por desocupación de la Ley 12/2023. Verifica que el tipo esté dentro de los límites legales (urbano: 0,4%-1,10%; rústico: 0,3%-0,90%).',
+    {
+      claseInmueble: z.enum(['urbano', 'rustico', 'caracteristicas_especiales']).describe('Clase de inmueble según el Catastro: urbano, rustico o caracteristicas_especiales (autopistas, embalses, centrales...)'),
+      valorCatastral: z.number().positive().describe('Valor catastral del inmueble (EUR). Figura en el recibo del IBI y en la sede electrónica del Catastro (sedecatastro.gob.es)'),
+      tipoImpositivo: z.number().positive().max(5).describe('Tipo impositivo municipal aplicado (%). Para urbano: generalmente 0,4%-1,10%. Lo fija el ayuntamiento en la ordenanza fiscal'),
+      inmuebleDesocupado: z.boolean().optional().describe('¿El inmueble está declarado desocupado con carácter permanente? (Ley 12/2023 — solo en municipios declarados tensionados)'),
+      pctRecargoBonificado: z.number().min(0).max(50).optional().describe('Porcentaje del recargo por desocupación establecido por el municipio (%). Máximo legal: 50% de la cuota líquida'),
+      bonificaciones: z.array(z.object({
+        descripcion: z.string().describe('Descripción de la bonificación (ej: familia numerosa, VPO)'),
+        porcentaje: z.number().min(0).max(100).describe('Porcentaje de bonificación sobre la cuota íntegra (%)'),
+      })).optional().describe('Lista de bonificaciones aplicables al inmueble. Se aplican de forma secuencial sobre la cuota restante'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_ibi', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularIBI({
+        claseInmueble: args.claseInmueble as ClaseInmuebleIBI,
+        valorCatastral: args.valorCatastral,
+        tipoImpositivo: args.tipoImpositivo,
+        inmuebleDesocupado: args.inmuebleDesocupado,
+        pctRecargoBonificado: args.pctRecargoBonificado,
+        bonificaciones: args.bonificaciones,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        '## Impuesto sobre Bienes Inmuebles (IBI)',
+        '',
+        `- Clase inmueble: ${resultado.claseInmueble}`,
+        `- Valor catastral: ${fmt(resultado.valorCatastral)} EUR`,
+        `- Tipo impositivo: ${resultado.tipoImpositivo}%`,
+        resultado.tipoEnLimites ? '- ✅ Tipo dentro de los límites legales' : '- ⚠️ Tipo fuera de los límites legales — verificar',
+        '',
+        `- Cuota íntegra: ${fmt(resultado.cuotaIntegra)} EUR`,
+        resultado.totalBonificaciones > 0 ? `- Total bonificaciones: −${fmt(resultado.totalBonificaciones)} EUR` : null,
+        `- Cuota líquida: ${fmt(resultado.cuotaLiquida)} EUR`,
+        resultado.recargoBonificado > 0 ? `- Recargo por desocupación: +${fmt(resultado.recargoBonificado)} EUR` : null,
+        `- **Cuota final a pagar: ${fmt(resultado.cuotaFinalAPagar)} EUR**`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_modelo720',
+    'Analiza la obligación de presentar el Modelo 720 (declaración de bienes y derechos en el extranjero, DA 18ª LGT). Evalúa si cada categoría de bienes supera el umbral de 50.000 EUR: cuentas bancarias (saldo 31/12 o media 4T), valores/seguros y bienes inmuebles. Determina si hay obligación de declarar en el año siguiente (plazo 1 enero - 31 marzo). Incluye régimen sancionador tras la Sentencia TJUE C-788/19 y Ley 5/2022.',
+    {
+      ejercicio: z.number().int().min(2013).max(2030).describe('Año del ejercicio a declarar (ej: 2024 para el 720 que se presenta en 2025)'),
+      bienes: z.array(z.object({
+        categoria: z.enum(['cuentas', 'valores_seguros', 'inmuebles']).describe('Categoría del bien: cuentas (bancarias), valores_seguros (acciones, fondos, seguros de vida), inmuebles'),
+        descripcion: z.string().describe('Descripción del bien (ej: Cuenta corriente Banco X Francia, Acciones Apple NASDAQ)'),
+        valorActual: z.number().min(0).describe('Valor del bien a 31 de diciembre del ejercicio (EUR)'),
+        saldoMedio4T: z.number().min(0).optional().describe('Solo para cuentas bancarias: saldo medio del 4º trimestre (EUR). Se compara con el saldo a 31/12 y se usa el mayor'),
+        valorUltimoDec: z.number().min(0).optional().describe('Valor declarado en el último Modelo 720 presentado (EUR). Para determinar si la variación supera 20.000 EUR'),
+        primeraDeclaracion: z.boolean().optional().describe('¿Es la primera vez que se declara este bien?'),
+      })).min(1).describe('Lista de bienes en el extranjero a evaluar'),
+      presentoAnosAnteriores: z.boolean().optional().describe('¿El contribuyente presentó el Modelo 720 en ejercicios anteriores?'),
+      bienesNoDeclaradosPrescripcion: z.number().min(0).optional().describe('Valor estimado de bienes que debieron declararse y no se declararon (EUR). Para análisis de riesgo de imputación como ganancia patrimonial no justificada'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_modelo720', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularModelo720({
+        ejercicio: args.ejercicio,
+        bienes: args.bienes.map(b => ({
+          categoria: b.categoria as CategoriaModelo720,
+          descripcion: b.descripcion,
+          valorActual: b.valorActual,
+          saldoMedio4T: b.saldoMedio4T,
+          valorUltimoDec: b.valorUltimoDec,
+          primeraDeclaracion: b.primeraDeclaracion,
+        })),
+        presentoAnosAnteriores: args.presentoAnosAnteriores,
+        bienesNoDeclaradosPrescripcion: args.bienesNoDeclaradosPrescripcion,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        `## Modelo 720 — Bienes en el Extranjero (Ejercicio ${resultado.ejercicio})`,
+        '',
+        resultado.obligacionPresentar
+          ? `✅ **HAY OBLIGACIÓN de presentar el Modelo 720** (plazo: ${resultado.plazoPresentacion})`
+          : `✅ **NO hay obligación de presentar** el Modelo 720 en este ejercicio`,
+        resultado.categoriasSuperanUmbral.length > 0
+          ? `- Categorías que superan 50.000 EUR: ${resultado.categoriasSuperanUmbral.join(', ')}`
+          : null,
+        resultado.totalDeclarable > 0 ? `- Total declarable: ${fmt(resultado.totalDeclarable)} EUR` : null,
+        '',
+        '### Análisis por Bien',
+        ...resultado.analisisBienes.map(b =>
+          `- **${b.descripcion}** (${b.categoria}): ${fmt(b.valorActual)} EUR | ` +
+          `${b.superaUmbral ? '⚠️ supera umbral' : '✅ bajo umbral'} | ` +
+          `${b.obligaDeclarar ? `Declarar — ${b.motivoDeclaracion}` : 'No requiere declarar'}`
+        ),
+        '',
+        resultado.sancionEstimadaNoPresenta > 0
+          ? `⚠️ Sanción si NO se presenta: ${resultado.sancionEstimadaNoPresenta} EUR fijos (Ley 5/2022)`
+          : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_rescate_plan_pensiones',
+    'Calcula la tributación del rescate de un plan de pensiones en IRPF (LIRPF art. 17.2.a, DA 12ª). Las prestaciones tributan siempre como rendimiento del trabajo (RDT) en la base general (escala progresiva, NO base del ahorro). Calcula la reducción del 40% sobre el capital acumulado antes de 31/12/2006 si se rescata en forma de capital dentro de los 2 años siguientes a la contingencia. Incluye análisis del impacto del rescate en capital vs. renta.',
+    {
+      formaRescate: z.enum(['capital', 'renta', 'mixta']).describe('Forma de cobrar la prestación: capital (pago único), renta (pagos periódicos), mixta (parte capital + parte renta)'),
+      contingencia: z.enum(['jubilacion', 'incapacidad', 'fallecimiento', 'dependencia', 'desempleo_larga_duracion', 'enfermedad_grave', 'liquidez_excepcional_10anios']).describe('Contingencia que permite el rescate. liquidez_excepcional_10anios: desde 2025 para aportaciones pre-01/01/2015 con ≥10 años en el plan'),
+      totalAcumulado: z.number().positive().describe('Importe total acumulado en el plan de pensiones (EUR)'),
+      capitalPre2007: z.number().min(0).optional().describe('Parte del capital correspondiente a aportaciones realizadas antes de 31/12/2006 (EUR). Base de la reducción del 40%'),
+      importeCapital: z.number().min(0).optional().describe('Importe que se rescata en forma de capital en el ejercicio actual (EUR). Si formaRescate=capital: igual al totalAcumulado'),
+      rentaAnual: z.number().min(0).optional().describe('Renta anual en caso de cobro periódico (EUR/año). Solo si formaRescate=renta o mixta'),
+      anosDesdeContingencia: z.number().min(0).optional().describe('Años transcurridos desde que ocurrió la contingencia. La reducción del 40% solo puede aplicarse en los 2 años siguientes'),
+      otrosRdtTrabajoEjercicio: z.number().min(0).optional().describe('Otros rendimientos del trabajo (nómina, pensión SS) en el mismo ejercicio (EUR). Para calcular el tipo marginal real del rescate'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_rescate_plan_pensiones', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularRescatePlanPensiones({
+        formaRescate: args.formaRescate as FormaRescate,
+        contingencia: args.contingencia as ContingenciaRescate,
+        totalAcumulado: args.totalAcumulado,
+        capitalPre2007: args.capitalPre2007,
+        importeCapital: args.importeCapital,
+        rentaAnual: args.rentaAnual,
+        anosDesdeContingencia: args.anosDesdeContingencia,
+        otrosRdtTrabajoEjercicio: args.otrosRdtTrabajoEjercicio,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        '## Rescate Plan de Pensiones — IRPF',
+        '',
+        `- Forma de rescate: ${resultado.formaRescate}`,
+        `- Contingencia: ${resultado.contingencia.replace(/_/g, ' ')}`,
+        `- Total acumulado: ${fmt(resultado.totalAcumulado)} EUR`,
+        resultado.importeCapital > 0 ? `- Importe en capital (este ejercicio): ${fmt(resultado.importeCapital)} EUR` : null,
+        resultado.rentaAnual > 0 ? `- Renta anual: ${fmt(resultado.rentaAnual)} EUR/año` : null,
+        '',
+        resultado.capitalPre2007 > 0 ? `- Capital pre-2007 declarado: ${fmt(resultado.capitalPre2007)} EUR` : null,
+        resultado.aplicaReduccion40pct
+          ? `✅ **Reducción 40% aplicable: −${fmt(resultado.importeReduccion)} EUR**`
+          : resultado.motivoNoReduccion ? `- Reducción 40%: NO aplica — ${resultado.motivoNoReduccion}` : null,
+        '',
+        `- **Base imponible (RDT) por capital: ${fmt(resultado.baseImponibleCapital)} EUR**`,
+        `- Tipo marginal estimado: ${resultado.tipoMarginalEstimado}%`,
+        `- Cuota IRPF estimada (capital): ${fmt(resultado.cuotaEstimadaCapital)} EUR`,
+        resultado.ahorroReduccion > 0 ? `- Ahorro por reducción 40%: ${fmt(resultado.ahorroReduccion)} EUR` : null,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  servidor.tool(
+    'calcular_deduccion_doble_imposicion_is',
+    'Calcula la eliminación de la doble imposición internacional en el Impuesto sobre Sociedades (LIS arts. 21, 22, 31, 32). Para dividendos y plusvalías de filiales extranjeras: exención art. 21 si participación ≥5% y tenencia ≥12 meses (con tributo ≥10% en el país origen). Para establecimientos permanentes: exención art. 22. Si no cumple exención: deducción directa (impuesto extranjero pagado, art. 31) o indirecta (impuesto subyacente, art. 32).',
+    {
+      tipoRenta: z.enum(['dividendo_filial', 'plusvalia_transmision', 'renta_ep']).describe('Tipo de renta extranjera: dividendo_filial (dividendo de participada extranjera), plusvalia_transmision (ganancia por venta de participación), renta_ep (renta de establecimiento permanente en el extranjero)'),
+      importeRenta: z.number().positive().describe('Importe bruto de la renta extranjera (EUR)'),
+      porcentajeParticipacion: z.number().min(0).max(100).describe('Porcentaje de participación en la entidad extranjera (%). Se requiere ≥5% para la exención art. 21'),
+      valorAdquisicion: z.number().min(0).optional().describe('Valor de adquisición de la participación (EUR). Alternativa al 5%: si el valor supera 20 millones EUR, también aplica la exención aunque el porcentaje sea inferior al 5%'),
+      mesesTenencia: z.number().min(0).describe('Meses de tenencia de la participación. Se requieren ≥12 meses (puede completarse después del cobro del dividendo)'),
+      tipoNominalPaisExtranjero: z.number().min(0).max(50).describe('Tipo nominal del impuesto sobre sociedades en el país de la filial/EP (%). Se requiere ≥10% para que se considere tributación análoga al IS español'),
+      esParaisoFiscal: z.boolean().optional().describe('¿El país de la filial/EP está catalogado como paraíso fiscal según la lista española? Si es true, la exención no aplica'),
+      impuestoExtranjeroPagado: z.number().min(0).optional().describe('Impuesto pagado/retenido en el país de origen sobre la renta (EUR). Para la deducción directa art. 31 si no aplica exención'),
+      impuestoSubyacente: z.number().min(0).optional().describe('IS pagado por la filial extranjera proporcional al dividendo distribuido (EUR). Para la deducción indirecta art. 32'),
+      tipoISEspanol: z.number().min(1).max(35).optional().describe('Tipo del IS español del contribuyente (%). Default: 25%'),
+    },
+    async (args, extra) => {
+      await registrarUsoMCP('calcular_deduccion_doble_imposicion_is', extra?.authInfo?.clientId ?? 'mcp-client');
+      const resultado = calcularDeduccionDobleImposicionIS({
+        tipoRenta: args.tipoRenta as TipoRentaExtranjera,
+        importeRenta: args.importeRenta,
+        porcentajeParticipacion: args.porcentajeParticipacion,
+        valorAdquisicion: args.valorAdquisicion,
+        mesesTenencia: args.mesesTenencia,
+        tipoNominalPaisExtranjero: args.tipoNominalPaisExtranjero,
+        esParaisoFiscal: args.esParaisoFiscal,
+        impuestoExtranjeroPagado: args.impuestoExtranjeroPagado,
+        impuestoSubyacente: args.impuestoSubyacente,
+        tipoISEspanol: args.tipoISEspanol,
+      });
+      const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const lineas = [
+        '## Doble Imposición Internacional — IS',
+        '',
+        `- Tipo de renta: ${resultado.tipoRenta.replace(/_/g, ' ')}`,
+        `- Importe renta extranjera: ${fmt(resultado.importeRenta)} EUR`,
+        `- Método aplicable: **${resultado.metodoAplicable.replace(/_/g, ' ')}**`,
+        '',
+        resultado.cumpleRequisitosExencion
+          ? `✅ **EXENCIÓN APLICABLE (LIS art. ${resultado.tipoRenta === 'renta_ep' ? '22' : '21'})**`
+          : `❌ No cumple requisitos de exención`,
+        ...resultado.motivosNoExencion.map(m => `  - ${m}`),
+        '',
+        resultado.importeExento > 0 ? `- Importe exento: ${fmt(resultado.importeExento)} EUR` : null,
+        resultado.importeGravado5pct > 0 ? `- Gravado (5% gastos gestión, art. 21.10): ${fmt(resultado.importeGravado5pct)} EUR` : null,
+        resultado.deduccionDirecta > 0 ? `- Deducción directa (art. 31): ${fmt(resultado.deduccionDirecta)} EUR` : null,
+        resultado.deduccionIndirecta > 0 ? `- Deducción indirecta (art. 32): ${fmt(resultado.deduccionIndirecta)} EUR` : null,
+        resultado.totalDeduccion > 0 ? `- Total deducción en cuota: ${fmt(resultado.totalDeduccion)} EUR` : null,
+        '',
+        `- Cuota IS sin deducción/exención: ${fmt(resultado.cuotaISSinDeduccion)} EUR`,
+        `- **Cuota neta tras eliminar DI: ${fmt(resultado.cuotaNetaTrasDeduccion)} EUR**`,
+        '',
+        '### Advertencias',
+        ...resultado.advertencias.map(a => `- ${a}`),
+        '',
+        `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
