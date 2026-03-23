@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-03-18
-> **Apps totales**: 260 | **Suites**: 13
+> **Última actualización**: 2026-03-23
+> **Apps totales**: 305 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -47,6 +47,9 @@
     - 🟢 `minimatch` CVE alto (ReDoS): solo en dependencias de `eslint` (dev-only, sin impacto en producción). Pendiente `npm audit fix` en sesión dedicada junto con dompurify. *(detectado: 2026-03-09)*
 
 - [x] **ai-index.json: texto desactualizado** — Corregido a 250 apps, suites actualizadas, fecha 2026-03-01. *(resuelto: 2026-03-01)*
+
+- [ ] **ai-index.json: 48 apps sin indexar** — El JSON tiene 288 slugs reales (`total_tools: 291` incorrecto) vs 305 en `implemented-apps.ts`. Faltan principalmente `estimador-*`, `orientador-*`, `quiz-*` y algunas guías añadidas desde la última actualización del índice. Requiere sesión dedicada para añadir las 48 entradas con nombre, descripción y categoría correctos. *(detectado auditoría: 2026-03-23)*
+  - Apps faltantes: `estimador-*` (26), `orientador-*` (14), `quiz-*` (3), otras: `adaptacion-hogar`, `residencia-vs-cuidado-en-casa`, `test-fragilidad`, `guia-reclamar-seguro-coche`, `optimizador-rentas-60`
 
 - [x] **Dark mode (verificado)** — Los 25 CSS modules sin `[data-theme]` son falsos positivos: usan colores de marca o semánticos intencionales (juegos, espejo, hero). Resto de interfaz usa variables CSS de globals.css. Dark mode funciona correctamente en toda la plataforma. *(verificado: 2026-03-01)*
 
@@ -96,8 +99,9 @@
 ## 🟣 PROFESIONALIZACIÓN DE APPS EXISTENTES
 
 > Aplicar el patrón v2.0: tabla comparativa, casos de uso, FAQ, guía paso a paso, tips, warning box.
-> **Estado actual**: ~170 apps profesionalizadas de 254 (~67%). *(actualizado: 2026-03-15 — pendientes confirmados: 94 en inventario, muchos son cursos/triviales)*
+> **Estado actual**: ✅ CICLO COMPLETO — todas las apps elegibles profesionalizadas. *(verificado auditoría: 2026-03-23)*
 > **No aplica a**: juegos, cursos, guías (sub-apps), utilidades triviales (cronómetro, dado, espejo, lupa, diapasón, notas, contador-manual, ruleta, radio).
+> **Nuevas apps**: aplicar patrón v2.0 en Fase 2 del ciclo de creación según CLAUDE.md.
 
 ### 🔴 Candidatos prioritarios (top uso real en analytics — 2026-03-15)
 
@@ -144,22 +148,22 @@
 - [x] **calculadora-descuentos** — EducationalSection añadida: tipos de descuento, trampas marketing, FAQ, guía 5 pasos, 6 tips, warning. *(2026-03-01)*
 - [x] **calculadora-pintura** — EducationalSection añadida: tipos de pintura, casos por estancia, FAQ, guía 5 pasos, 6 tips, warning. *(2026-03-01)*
 - [x] **calculadora-porciones** — EducationalSection añadida: métodos medición, situaciones vitales, FAQ ración vs porción, guía 5 pasos, 6 hábitos, warning. *(2026-03-01)*
-- [ ] **generador-carruseles** — Marketing/RRSS: anatomía del carrusel perfecto, tabla comparativa formatos por plataforma.
+- [x] **generador-carruseles** — ✅ Ya profesionalizada (verificado auditoría 2026-03-23).
 - [x] **contador-silabas** — ✅ Profesionalizada: tabla fenómenos fonéticos (diptongo/hiato/sinalefa), 4 casos uso, 8 FAQs, guía análisis métrico 6 pasos, 6 tips, warning. *(2026-03-16)*
 - [x] **test-velocidad-escritura** — ✅ Profesionalizada: tabla WPM por nivel/profesión, 4 casos uso, 8 FAQs, guía plan 6 semanas, 6 tips, warning. *(2026-03-16)*
 - [x] **generador-tipografias** — ✅ Profesionalizada: tabla 5 familias tipográficas, 4 casos uso, 8 FAQs, guía elección 6 pasos, 6 principios, warning. *(2026-03-16)*
 - [x] **comparador-textos** — ✅ Profesionalizada: tabla 5 tipos comparación (diff/similitud/hash/semántica), 4 casos uso, 8 FAQs, guía 6 pasos, 6 tips, warning. *(2026-03-16)*
 - [x] **conversor-imagenes** — ✅ Profesionalizada: tabla 5 formatos imagen (JPEG/PNG/WebP/GIF/SVG), 4 casos uso, 8 FAQs, guía elección 6 pasos, 6 tips, warning. *(2026-03-16)*
 - [x] **test-habitos-saludables** — ✅ Profesionalizada: tabla 5 áreas hábitos, 4 perfiles beneficiarios, 8 FAQs (evidencia científica), guía plan 6 semanas, 6 claves, warning. *(2026-03-16)*
-- [ ] **planificador-mudanzas** — Hogar: fases de una mudanza, checklist por semanas, tabla comparativa contratar empresa vs mudanza propia.
-- [ ] **calculadora-percentiles** — Estadística/salud: qué es un percentil, uso en pediatría/estadística, tabla interpretación.
+- [x] **planificador-mudanzas** — ✅ Ya profesionalizada (verificado auditoría 2026-03-23).
+- [ ] **calculadora-percentiles** — ⚠️ App aún no creada (propuesta futura, no pendiente de profesionalización).
 
 **Potencial educativo específico**:
 - [x] **conversor-binario** — Tabla comparativa sistemas numéricos, EducationalSection añadida. *(2026-03-09 — verificado commit 336e1be)*
-- [ ] **calculadora-sistemas-numericos** — Similar a anterior; ver si se pueden fusionar o son suficientemente distintas.
-- [ ] **conversor-morse** — Cultura: historia del código Morse, uso real hoy, tabla comparativa alfabeto/código.
-- [ ] **calculadora-edad-mascotas** — Salud mascotas: mito "1 año = 7 perro", diferencia por razas, tabla etapas vitales.
-- [ ] **calculadora-aspectos** — Diseño: relaciones de aspecto estándar (16:9/4:3/1:1), casos de uso (cine/TV/RRSS/impresión).
+- [x] **calculadora-sistemas-numericos** — ✅ Ya profesionalizada (verificado auditoría 2026-03-23).
+- [x] **conversor-morse** — ✅ Ya profesionalizada (verificado auditoría 2026-03-23).
+- [x] **calculadora-edad-mascotas** — ✅ Ya profesionalizada (verificado auditoría 2026-03-23).
+- [x] **calculadora-aspectos** — ✅ Ya profesionalizada (verificado auditoría 2026-03-23).
 
 ### ✅ Verificadas como ya profesionalizadas (barrido 2026-03-01)
 
