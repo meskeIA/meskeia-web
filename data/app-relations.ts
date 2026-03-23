@@ -450,6 +450,17 @@ const hogarApps: RelatedApp[] = [
 ];
 
 // ==========================================
+// FAMILIA: BRICOLAJE Y REFORMAS
+// ==========================================
+const bricolajeApps: RelatedApp[] = [
+  { url: '/calculadora-materiales-construccion/', icon: '🧱', name: 'Materiales de Construcción', description: 'Azulejos, pintura, tarima y mortero' },
+  { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
+  { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios para pintar' },
+  { url: '/estimador-reformas-hogar/', icon: '🏗️', name: 'Estimador Reformas', description: 'Presupuesto por tipo de reforma' },
+  { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },
+];
+
+// ==========================================
 // FAMILIA: FAMILIA Y NIÑOS
 // ==========================================
 const familiaApps: RelatedApp[] = [
@@ -785,9 +796,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'calculadora-reformas-hogar': [
     { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios por m²' },
-    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
-    { url: '/estimador-coste-vivienda/', icon: '🏠', name: 'Coste Real Vivienda', description: 'Gasto mensual total del hogar' },
-    { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
+    { url: '/calculadora-materiales-construccion/', icon: '🧱', name: 'Materiales de Construcción', description: 'Azulejos, tarima y mortero' },
+    { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro con mejoras energéticas' },
+    { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
+  ],
+
+  // BRICOLAJE Y REFORMAS
+  'calculadora-materiales-construccion': bricolajeApps.filter(a => a.url !== '/calculadora-materiales-construccion/').slice(0, 4),
+  'calculadora-eficiencia-energetica': [
+    { url: '/calculadora-materiales-construccion/', icon: '🧱', name: 'Materiales de Construcción', description: 'Azulejos, pintura, tarima y mortero' },
+    { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },
+    { url: '/estimador-reformas-hogar/', icon: '🏗️', name: 'Estimador Reformas', description: 'Presupuesto por tipo de reforma' },
+    { url: '/calculadora-huella-carbono/', icon: '🌍', name: 'Huella de Carbono', description: 'Tu impacto ambiental' },
+  ],
+  'calculadora-piscinas': [
+    { url: '/calculadora-materiales-construccion/', icon: '🧱', name: 'Materiales de Construcción', description: 'Azulejos, pintura, tarima y mortero' },
+    { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro con mejoras en el hogar' },
+    { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de equipos' },
+    { url: '/calculadora-huella-carbono/', icon: '🌍', name: 'Huella de Carbono', description: 'Tu impacto ambiental' },
   ],
 
   // FAMILIA

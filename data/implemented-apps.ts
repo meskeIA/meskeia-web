@@ -359,6 +359,11 @@ export const implementedAppsUrls = [
   "/quiz-historia-espana/",                 // Quiz Historia de España — 81 preguntas, 3 niveles
   "/quiz-geografia-espana/",               // Quiz Geografía de España — 75 preguntas, provincias, ríos, CCAA
   "/test-madurez-digital/",                // Test Madurez Digital — 15 preguntas, 5 perfiles, recomendaciones
+
+  // Nuevas apps hogar y bricolaje (2026-03-23)
+  "/calculadora-materiales-construccion/",  // Azulejos, pintura, tarima y mortero con desperdicio y coste
+  "/calculadora-eficiencia-energetica/",   // Ahorro y amortización: aislamiento, ventanas y bomba de calor
+  "/calculadora-piscinas/",                // Volumen + dosis cloro, pH, alguicida y sal
 ];
 
 /**

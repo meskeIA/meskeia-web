@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 297,
+  "total_tools": 300,
   "updated": "2026-03-23",
   "features": {
     "all_free": true,
@@ -151,6 +151,24 @@
           "slug": "estimador-reformas-hogar",
           "url": "https://meskeia.com/estimador-reformas-hogar/",
           "description": "Estima el presupuesto de tu reforma en España: cocina, baño, pintura, suelos, electricidad"
+        },
+        {
+          "name": "Calculadora de Materiales de Construcción",
+          "slug": "calculadora-materiales-construccion",
+          "url": "https://meskeia.com/calculadora-materiales-construccion/",
+          "description": "Calcula azulejos, pintura, tarima y mortero para tus reformas. Incluye porcentaje de desperdicio y coste estimado"
+        },
+        {
+          "name": "Calculadora de Eficiencia Energética",
+          "slug": "calculadora-eficiencia-energetica",
+          "url": "https://meskeia.com/calculadora-eficiencia-energetica/",
+          "description": "Calcula el ahorro y la amortización de mejoras energéticas: aislamiento, ventanas y bomba de calor"
+        },
+        {
+          "name": "Calculadora de Piscinas",
+          "slug": "calculadora-piscinas",
+          "url": "https://meskeia.com/calculadora-piscinas/",
+          "description": "Calcula el volumen de tu piscina y las dosis de cloro, pH, alguicida y sal para el mantenimiento"
         }
       ]
     },
