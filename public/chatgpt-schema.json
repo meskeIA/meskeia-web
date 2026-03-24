@@ -1,0 +1,158 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Calculadoras para España",
+    "description": "Herramientas de cálculo especializadas para el sistema fiscal, laboral y de Seguridad Social español. Datos oficiales actualizados para 2026.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://meskeia.com"
+    }
+  ],
+  "paths": {
+    "/api/chatgpt/cuota-autonomo": {
+      "post": {
+        "operationId": "calcularCuotaAutonomo",
+        "summary": "Calcular cuota mensual de autónomo en España (RETA 2026)",
+        "description": "Calcula la cuota mensual exacta a pagar a la Seguridad Social como trabajador autónomo en España. Usa los 15 tramos oficiales de la tabla RETA 2026 (congelada por RDL 16/2025). Detecta automáticamente si aplica la tarifa plana de 80€/mes para nuevos autónomos. Incluye cuota anual estimada y base de cotización efectiva.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InputCuotaAutonomo"
+              },
+              "examples": {
+                "autonomo_medio": {
+                  "summary": "Autónomo con 1.800€/mes de rendimiento neto",
+                  "value": {
+                    "rendimientoNetoMensual": 1800,
+                    "esNuevoAutonomo": false,
+                    "baseElegida": "minima"
+                  }
+                },
+                "nuevo_autonomo": {
+                  "summary": "Nuevo autónomo con tarifa plana",
+                  "value": {
+                    "rendimientoNetoMensual": 1200,
+                    "esNuevoAutonomo": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado del cálculo con cuota mensual, anual y detalle del tramo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoCuotaAutonomo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "InputCuotaAutonomo": {
+        "type": "object",
+        "required": ["rendimientoNetoMensual"],
+        "properties": {
+          "rendimientoNetoMensual": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Rendimiento neto mensual estimado en euros. Es la diferencia entre ingresos y gastos deducibles, SIN descontar la cuota de la Seguridad Social. Ejemplo: si facturas 2.500€ y tienes 500€ de gastos, el valor es 2000.",
+            "example": 1800
+          },
+          "esNuevoAutonomo": {
+            "type": "boolean",
+            "default": false,
+            "description": "Indica si es nuevo autónomo (primera alta o alta tras más de 2 años de baja). Si es true, se aplica la tarifa plana de 80€/mes durante los primeros 12 meses."
+          },
+          "baseElegida": {
+            "type": "string",
+            "enum": ["minima", "maxima"],
+            "default": "minima",
+            "description": "Base de cotización a aplicar dentro del tramo. 'minima' resulta en la cuota más baja (recomendada para la mayoría). 'maxima' ofrece mayor protección social (pensión futura más alta) pero implica mayor cuota mensual."
+          }
+        }
+      },
+      "ResultadoCuotaAutonomo": {
+        "type": "object",
+        "properties": {
+          "rendimientoNetoMensual": {
+            "type": "number",
+            "description": "Rendimiento neto mensual introducido (en euros)"
+          },
+          "tramo": {
+            "type": "integer",
+            "description": "Tramo de cotización asignado según la tabla RETA 2026 (1 = más bajo, 15 = más alto)"
+          },
+          "baseMinima": {
+            "type": "number",
+            "description": "Base de cotización mínima del tramo (en euros)"
+          },
+          "baseMaxima": {
+            "type": "number",
+            "description": "Base de cotización máxima del tramo (en euros)"
+          },
+          "baseCotizacion": {
+            "type": "number",
+            "description": "Base de cotización efectiva aplicada (en euros)"
+          },
+          "cuotaMensualGeneral": {
+            "type": "number",
+            "description": "Cuota mensual sin tarifa plana (en euros)"
+          },
+          "cuotaConTarifaPlana": {
+            "type": ["number", "null"],
+            "description": "Cuota con tarifa plana (80€). Solo tiene valor si aplicaTarifaPlana es true."
+          },
+          "aplicaTarifaPlana": {
+            "type": "boolean",
+            "description": "Indica si se aplica la tarifa plana de 80€/mes"
+          },
+          "cuotaEfectiva": {
+            "type": "number",
+            "description": "Cuota mensual real a pagar (en euros). Usa tarifa plana si aplica."
+          },
+          "cuotaAnual": {
+            "type": "number",
+            "description": "Coste anual estimado de la cuota (cuotaEfectiva × 12, en euros)"
+          },
+          "tipoCotizacion": {
+            "type": "number",
+            "description": "Tipo de cotización total aplicado en porcentaje (31,50% en 2026)"
+          },
+          "fuenteDatos": {
+            "type": "string",
+            "description": "Normativa y fecha de verificación de los datos utilizados"
+          },
+          "aviso_legal": {
+            "type": "string",
+            "description": "Aviso legal: el resultado es orientativo y no constituye asesoramiento fiscal"
+          }
+        }
+      }
+    }
+  }
+}
