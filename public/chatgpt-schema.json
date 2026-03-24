@@ -22,23 +22,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/InputCuotaAutonomo"
-              },
-              "examples": {
-                "autonomo_medio": {
-                  "summary": "Autónomo con 1.800€/mes de rendimiento neto",
-                  "value": {
-                    "rendimientoNetoMensual": 1800,
-                    "esNuevoAutonomo": false,
-                    "baseElegida": "minima"
-                  }
-                },
-                "nuevo_autonomo": {
-                  "summary": "Nuevo autónomo con tarifa plana",
-                  "value": {
-                    "rendimientoNetoMensual": 1200,
-                    "esNuevoAutonomo": true
-                  }
-                }
               }
             }
           }
@@ -53,25 +36,11 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Parámetros incorrectos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": { "type": "string" }
-                  }
-                }
-              }
-            }
           }
         }
       }
-    }
-  },
-      "/api/chatgpt/sueldo-neto": {
+    },
+    "/api/chatgpt/sueldo-neto": {
       "post": {
         "operationId": "calcularSueldoNeto",
         "summary": "Calcular sueldo neto mensual a partir del bruto anual (España 2025)",
@@ -82,26 +51,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/InputSueldoNeto"
-              },
-              "examples": {
-                "soltero_30k": {
-                  "summary": "Soltero sin hijos con 30.000€ brutos",
-                  "value": {
-                    "brutoAnual": 30000,
-                    "situacion": "soltero",
-                    "numHijos": 0,
-                    "pagas": 14
-                  }
-                },
-                "casado_2hijos": {
-                  "summary": "Casado con 2 hijos y 40.000€ brutos",
-                  "value": {
-                    "brutoAnual": 40000,
-                    "situacion": "casado_con_ingresos",
-                    "numHijos": 2,
-                    "pagas": 14
-                  }
-                }
               }
             }
           }
@@ -130,20 +79,33 @@
           "rendimientoNetoMensual": {
             "type": "number",
             "minimum": 0,
-            "description": "Rendimiento neto mensual estimado en euros. Es la diferencia entre ingresos y gastos deducibles, SIN descontar la cuota de la Seguridad Social. Ejemplo: si facturas 2.500€ y tienes 500€ de gastos, el valor es 2000.",
+            "description": "Rendimiento neto mensual en euros (ingresos - gastos deducibles, SIN descontar la cuota SS). Ejemplo: si facturas 2.500€ y tienes 500€ de gastos, el valor es 2000.",
             "example": 1800
           },
           "esNuevoAutonomo": {
             "type": "boolean",
             "default": false,
-            "description": "Indica si es nuevo autónomo (primera alta o alta tras más de 2 años de baja). Si es true, se aplica la tarifa plana de 80€/mes durante los primeros 12 meses."
+            "description": "true si es nuevo autónomo (primera alta o tras más de 2 años de baja). Aplica tarifa plana de 80€/mes durante 12 meses."
           },
           "baseElegida": {
             "type": "string",
             "enum": ["minima", "maxima"],
             "default": "minima",
-            "description": "Base de cotización a aplicar dentro del tramo. 'minima' resulta en la cuota más baja (recomendada para la mayoría). 'maxima' ofrece mayor protección social (pensión futura más alta) pero implica mayor cuota mensual."
+            "description": "'minima' = cuota más baja. 'maxima' = mayor protección social pero cuota más alta."
           }
+        }
+      },
+      "ResultadoCuotaAutonomo": {
+        "type": "object",
+        "properties": {
+          "tramo": { "type": "integer", "description": "Tramo RETA 2026 (1-15)" },
+          "baseCotizacion": { "type": "number", "description": "Base de cotización efectiva (€)" },
+          "cuotaEfectiva": { "type": "number", "description": "Cuota mensual a pagar (€)" },
+          "cuotaAnual": { "type": "number", "description": "Cuota anual estimada (€)" },
+          "aplicaTarifaPlana": { "type": "boolean", "description": "true si aplica tarifa plana de 80€/mes" },
+          "tipoCotizacion": { "type": "number", "description": "Tipo de cotización total (%)" },
+          "fuenteDatos": { "type": "string" },
+          "aviso_legal": { "type": "string" }
         }
       },
       "InputSueldoNeto": {
@@ -160,7 +122,7 @@
             "type": "string",
             "enum": ["soltero", "casado_sin_ingresos", "casado_con_ingresos"],
             "default": "soltero",
-            "description": "Situación familiar: 'soltero' (también soltero/a, divorciado/a, viudo/a), 'casado_sin_ingresos' (cónyuge sin ingresos), 'casado_con_ingresos' (ambos trabajan)."
+            "description": "'soltero' (también divorciado/a, viudo/a), 'casado_sin_ingresos' (cónyuge sin ingresos), 'casado_con_ingresos' (ambos trabajan)."
           },
           "numHijos": {
             "type": "integer",
@@ -178,106 +140,22 @@
             "type": "integer",
             "enum": [12, 14],
             "default": 14,
-            "description": "Número de pagas al año. 14 es lo más habitual en España (incluye paga de verano y Navidad)."
+            "description": "Número de pagas al año. 14 es lo más habitual en España."
           }
         }
       },
       "ResultadoSueldoNeto": {
         "type": "object",
         "properties": {
-          "brutoAnual": {
-            "type": "number",
-            "description": "Salario bruto anual introducido (en euros)"
-          },
-          "cuotaSSAnual": {
-            "type": "number",
-            "description": "Cotización anual a la Seguridad Social a cargo del empleado (en euros)"
-          },
-          "cuotaIRPF": {
-            "type": "number",
-            "description": "Retención anual de IRPF (en euros)"
-          },
-          "tipoRetencion": {
-            "type": "number",
-            "description": "Tipo de retención efectivo de IRPF (%)"
-          },
-          "netoAnual": {
-            "type": "number",
-            "description": "Sueldo neto anual tras descontar SS e IRPF (en euros)"
-          },
-          "netoMensual": {
-            "type": "number",
-            "description": "Sueldo neto por paga (en euros). Depende del número de pagas."
-          },
-          "pagas": {
-            "type": "number",
-            "description": "Número de pagas aplicado al cálculo"
-          },
-          "fuenteDatos": {
-            "type": "string",
-            "description": "Normativa y fecha de verificación"
-          },
-          "aviso_legal": {
-            "type": "string",
-            "description": "Aviso legal sobre el carácter orientativo del resultado"
-          }
-        }
-      },
-      "ResultadoCuotaAutonomo": {
-        "type": "object",
-        "properties": {
-          "rendimientoNetoMensual": {
-            "type": "number",
-            "description": "Rendimiento neto mensual introducido (en euros)"
-          },
-          "tramo": {
-            "type": "integer",
-            "description": "Tramo de cotización asignado según la tabla RETA 2026 (1 = más bajo, 15 = más alto)"
-          },
-          "baseMinima": {
-            "type": "number",
-            "description": "Base de cotización mínima del tramo (en euros)"
-          },
-          "baseMaxima": {
-            "type": "number",
-            "description": "Base de cotización máxima del tramo (en euros)"
-          },
-          "baseCotizacion": {
-            "type": "number",
-            "description": "Base de cotización efectiva aplicada (en euros)"
-          },
-          "cuotaMensualGeneral": {
-            "type": "number",
-            "description": "Cuota mensual sin tarifa plana (en euros)"
-          },
-          "cuotaConTarifaPlana": {
-            "type": ["number", "null"],
-            "description": "Cuota con tarifa plana (80€). Solo tiene valor si aplicaTarifaPlana es true."
-          },
-          "aplicaTarifaPlana": {
-            "type": "boolean",
-            "description": "Indica si se aplica la tarifa plana de 80€/mes"
-          },
-          "cuotaEfectiva": {
-            "type": "number",
-            "description": "Cuota mensual real a pagar (en euros). Usa tarifa plana si aplica."
-          },
-          "cuotaAnual": {
-            "type": "number",
-            "description": "Coste anual estimado de la cuota (cuotaEfectiva × 12, en euros)"
-          },
-          "tipoCotizacion": {
-            "type": "number",
-            "description": "Tipo de cotización total aplicado en porcentaje (31,50% en 2026)"
-          },
-          "fuenteDatos": {
-            "type": "string",
-            "description": "Normativa y fecha de verificación de los datos utilizados"
-          },
-          "aviso_legal": {
-            "type": "string",
-            "description": "Aviso legal: el resultado es orientativo y no constituye asesoramiento fiscal"
-          }
+          "brutoAnual": { "type": "number", "description": "Bruto anual introducido (€)" },
+          "cuotaSSAnual": { "type": "number", "description": "Cotización SS anual empleado (€)" },
+          "cuotaIRPF": { "type": "number", "description": "Retención IRPF anual (€)" },
+          "tipoRetencion": { "type": "number", "description": "Tipo de retención efectivo (%)" },
+          "netoAnual": { "type": "number", "description": "Sueldo neto anual (€)" },
+          "netoMensual": { "type": "number", "description": "Sueldo neto por paga (€)" },
+          "pagas": { "type": "number", "description": "Número de pagas aplicado" },
+          "fuenteDatos": { "type": "string" },
+          "aviso_legal": { "type": "string" }
         }
       }
     }
