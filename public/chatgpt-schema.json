@@ -15,7 +15,7 @@
       "post": {
         "operationId": "calcularCuotaAutonomo",
         "summary": "Calcular cuota mensual de autónomo en España (RETA 2026)",
-        "description": "Calcula la cuota mensual exacta a pagar a la Seguridad Social como trabajador autónomo en España. Usa los 15 tramos oficiales de la tabla RETA 2026 (congelada por RDL 16/2025). Detecta automáticamente si aplica la tarifa plana de 80€/mes para nuevos autónomos. Incluye cuota anual estimada y base de cotización efectiva.",
+        "description": "Calcula la cuota mensual de la Seguridad Social para autónomos en España. Usa los 15 tramos RETA 2026 oficiales. Aplica tarifa plana de 80€/mes para nuevos autónomos. Devuelve cuota mensual, anual y base de cotización efectiva.",
         "requestBody": {
           "required": true,
           "content": {
