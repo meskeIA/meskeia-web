@@ -71,6 +71,56 @@
       }
     }
   },
+      "/api/chatgpt/sueldo-neto": {
+      "post": {
+        "operationId": "calcularSueldoNeto",
+        "summary": "Calcular sueldo neto mensual a partir del bruto anual (España 2025)",
+        "description": "Calcula el sueldo neto mensual y anual de un trabajador en España. Aplica IRPF 2025 y cotizaciones SS cuenta ajena. Tiene en cuenta situación familiar e hijos.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InputSueldoNeto"
+              },
+              "examples": {
+                "soltero_30k": {
+                  "summary": "Soltero sin hijos con 30.000€ brutos",
+                  "value": {
+                    "brutoAnual": 30000,
+                    "situacion": "soltero",
+                    "numHijos": 0,
+                    "pagas": 14
+                  }
+                },
+                "casado_2hijos": {
+                  "summary": "Casado con 2 hijos y 40.000€ brutos",
+                  "value": {
+                    "brutoAnual": 40000,
+                    "situacion": "casado_con_ingresos",
+                    "numHijos": 2,
+                    "pagas": 14
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado con neto mensual, anual, retención IRPF y cuota SS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoSueldoNeto"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
   "components": {
     "schemas": {
       "InputCuotaAutonomo": {
@@ -93,6 +143,83 @@
             "enum": ["minima", "maxima"],
             "default": "minima",
             "description": "Base de cotización a aplicar dentro del tramo. 'minima' resulta en la cuota más baja (recomendada para la mayoría). 'maxima' ofrece mayor protección social (pensión futura más alta) pero implica mayor cuota mensual."
+          }
+        }
+      },
+      "InputSueldoNeto": {
+        "type": "object",
+        "required": ["brutoAnual"],
+        "properties": {
+          "brutoAnual": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Salario bruto anual en euros. Ejemplo: 30000 para 30.000€/año.",
+            "example": 30000
+          },
+          "situacion": {
+            "type": "string",
+            "enum": ["soltero", "casado_sin_ingresos", "casado_con_ingresos"],
+            "default": "soltero",
+            "description": "Situación familiar: 'soltero' (también soltero/a, divorciado/a, viudo/a), 'casado_sin_ingresos' (cónyuge sin ingresos), 'casado_con_ingresos' (ambos trabajan)."
+          },
+          "numHijos": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "description": "Número total de hijos a cargo."
+          },
+          "hijosMenores3": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "description": "Número de hijos menores de 3 años (tienen deducción adicional)."
+          },
+          "pagas": {
+            "type": "integer",
+            "enum": [12, 14],
+            "default": 14,
+            "description": "Número de pagas al año. 14 es lo más habitual en España (incluye paga de verano y Navidad)."
+          }
+        }
+      },
+      "ResultadoSueldoNeto": {
+        "type": "object",
+        "properties": {
+          "brutoAnual": {
+            "type": "number",
+            "description": "Salario bruto anual introducido (en euros)"
+          },
+          "cuotaSSAnual": {
+            "type": "number",
+            "description": "Cotización anual a la Seguridad Social a cargo del empleado (en euros)"
+          },
+          "cuotaIRPF": {
+            "type": "number",
+            "description": "Retención anual de IRPF (en euros)"
+          },
+          "tipoRetencion": {
+            "type": "number",
+            "description": "Tipo de retención efectivo de IRPF (%)"
+          },
+          "netoAnual": {
+            "type": "number",
+            "description": "Sueldo neto anual tras descontar SS e IRPF (en euros)"
+          },
+          "netoMensual": {
+            "type": "number",
+            "description": "Sueldo neto por paga (en euros). Depende del número de pagas."
+          },
+          "pagas": {
+            "type": "number",
+            "description": "Número de pagas aplicado al cálculo"
+          },
+          "fuenteDatos": {
+            "type": "string",
+            "description": "Normativa y fecha de verificación"
+          },
+          "aviso_legal": {
+            "type": "string",
+            "description": "Aviso legal sobre el carácter orientativo del resultado"
           }
         }
       },
