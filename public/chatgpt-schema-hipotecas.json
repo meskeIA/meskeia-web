@@ -1,0 +1,287 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Hipotecas España",
+    "description": "Calculadoras hipotecarias para España: simulador de hipoteca, capacidad de compra, amortización anticipada y gastos de compraventa por CCAA.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://meskeia.com" }],
+  "paths": {
+    "/api/chatgpt/hipoteca": {
+      "post": {
+        "operationId": "calcularHipoteca",
+        "summary": "Simular hipoteca: cuota mensual, total intereses y ratio de endeudamiento",
+        "description": "Calcula la cuota mensual de una hipoteca en España (fija, variable o mixta) usando el sistema francés estándar bancario. Devuelve cuota, total intereses, TAE efectiva y ratio deuda/ingresos.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputHipoteca" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cuota mensual, total intereses, porcentaje financiación y ratio de endeudamiento",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoHipoteca" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/capacidad-hipoteca": {
+      "post": {
+        "operationId": "calcularCapacidadHipoteca",
+        "summary": "Calcular cuánta hipoteca puedo permitirme según el Banco de España",
+        "description": "Estima el máximo préstamo hipotecario sostenible aplicando la regla del Banco de España (cuota ≤ 30% ingresos netos). Devuelve precio máximo de vivienda, capital financiable y entrada disponible.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputCapacidadHipoteca" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Capital máximo, precio máximo vivienda y esfuerzo hipotecario",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoCapacidadHipoteca" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/amortizacion-anticipada": {
+      "post": {
+        "operationId": "calcularAmortizacionAnticipada",
+        "summary": "Comparar amortización anticipada: reducir cuota vs reducir plazo",
+        "description": "Compara el ahorro en intereses entre reducir la cuota mensual o reducir el plazo al amortizar capital anticipadamente. Incluye recomendación entre ambas opciones.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputAmortizacion" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ahorro en intereses, nueva cuota y nuevo plazo para cada opción",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoAmortizacion" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/compraventa": {
+      "post": {
+        "operationId": "calcularGastosCompraventa",
+        "summary": "Calcular gastos de compraventa de vivienda por CCAA en España",
+        "description": "Calcula los gastos totales del comprador (ITP o IVA, AJD, notaría, registro, gestoría) según la CCAA. Opcionalmente calcula plusvalía municipal e IRPF del vendedor.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputCompraventa" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gastos detallados del comprador y opcionalmente del vendedor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoCompraventa" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "InputHipoteca": {
+        "type": "object",
+        "required": ["precioVivienda", "entrada", "plazoAnios"],
+        "properties": {
+          "precioVivienda": { "type": "number", "minimum": 1, "description": "Precio de la vivienda en euros.", "example": 250000 },
+          "entrada": { "type": "number", "minimum": 0, "description": "Importe de la entrada en euros. Mínimo recomendado 20% del precio.", "example": 50000 },
+          "plazoAnios": { "type": "integer", "minimum": 1, "maximum": 40, "description": "Plazo de la hipoteca en años.", "example": 30 },
+          "tipoHipoteca": {
+            "type": "string",
+            "enum": ["fijo", "variable", "mixta"],
+            "default": "fijo",
+            "description": "'fijo' = tipo fijo toda la vida, 'variable' = euribor + diferencial, 'mixta' = fase fija + fase variable."
+          },
+          "interesAnual": { "type": "number", "minimum": 0, "description": "Tipo de interés anual fijo (%). Para hipoteca fija o fase fija de mixta. Ejemplo: 3.5 para 3,5%.", "example": 3.5 },
+          "euribor": { "type": "number", "description": "Euríbor actual anual (%). Para hipoteca variable o fase variable de mixta.", "example": 2.5 },
+          "diferencial": { "type": "number", "description": "Diferencial del banco sobre el Euríbor (%). Ejemplo: 0.99 para +0,99%.", "example": 0.99 },
+          "plazoFijoMixta": { "type": "integer", "description": "Años de fase fija en hipoteca mixta.", "example": 10 },
+          "ingresosMensuales": { "type": "number", "description": "Ingresos netos mensuales del solicitante (€). Permite calcular el ratio de endeudamiento.", "example": 3000 }
+        }
+      },
+      "InputCapacidadHipoteca": {
+        "type": "object",
+        "required": ["ingresosMensualesNetos", "ahorrosDisponibles"],
+        "properties": {
+          "ingresosMensualesNetos": { "type": "number", "minimum": 1, "description": "Ingresos netos mensuales del hogar en euros (suma de todos los miembros).", "example": 3500 },
+          "ahorrosDisponibles": { "type": "number", "minimum": 0, "description": "Ahorros disponibles para la operación en euros.", "example": 60000 },
+          "otrasDeudasMensuales": { "type": "number", "minimum": 0, "default": 0, "description": "Otras deudas mensuales existentes (cuotas de préstamos, etc.) en euros.", "example": 200 },
+          "tasaInteres": { "type": "number", "minimum": 0, "default": 3.5, "description": "Tipo de interés anual para la simulación (%). Por defecto 3,5%." },
+          "plazo": { "type": "integer", "minimum": 1, "maximum": 40, "default": 30, "description": "Plazo de la hipoteca en años. Por defecto 30." },
+          "umbralEsfuerzo": { "type": "number", "minimum": 1, "maximum": 50, "default": 30, "description": "Umbral máximo de esfuerzo hipotecario (%). Banco de España recomienda ≤30%." }
+        }
+      },
+      "InputAmortizacion": {
+        "type": "object",
+        "required": ["capitalInicial", "plazoAnios", "tin", "importeAmortizacion"],
+        "properties": {
+          "capitalInicial": { "type": "number", "minimum": 1, "description": "Capital original del préstamo hipotecario en euros.", "example": 200000 },
+          "plazoAnios": { "type": "integer", "minimum": 1, "description": "Plazo original de la hipoteca en años.", "example": 30 },
+          "tin": { "type": "number", "minimum": 0, "description": "Tipo de interés nominal anual (TIN) en %. Ejemplo: 3.5 para 3,5%.", "example": 3.5 },
+          "importeAmortizacion": { "type": "number", "minimum": 1, "description": "Importe que se quiere amortizar anticipadamente en euros.", "example": 20000 },
+          "mesesTranscurridos": { "type": "integer", "minimum": 0, "description": "Meses transcurridos desde el inicio de la hipoteca hasta hoy.", "example": 60 }
+        }
+      },
+      "InputCompraventa": {
+        "type": "object",
+        "required": ["precioInmueble", "ccaa"],
+        "properties": {
+          "precioInmueble": { "type": "number", "minimum": 1, "description": "Precio de compraventa del inmueble en euros.", "example": 200000 },
+          "ccaa": {
+            "type": "string",
+            "description": "Comunidad autónoma donde se ubica el inmueble. Valores: andalucia, aragon, asturias, baleares, canarias, cantabria, castilla-la-mancha, castilla-leon, cataluna, extremadura, galicia, la-rioja, madrid, murcia, navarra, pais-vasco, valencia.",
+            "example": "madrid"
+          },
+          "tipoTransmision": {
+            "type": "string",
+            "enum": ["segunda_mano", "obra_nueva", "vpo"],
+            "default": "segunda_mano",
+            "description": "'segunda_mano' aplica ITP, 'obra_nueva' aplica IVA + AJD, 'vpo' aplica IVA reducido."
+          },
+          "tipoInmueble": {
+            "type": "string",
+            "enum": ["vivienda", "local_comercial", "garaje", "terreno"],
+            "default": "vivienda",
+            "description": "Tipo de inmueble. Afecta al tipo de IVA en obra nueva."
+          },
+          "perfilComprador": {
+            "type": "string",
+            "enum": ["general", "joven", "familia_numerosa", "discapacidad"],
+            "default": "general",
+            "description": "Perfil del comprador. Algunos perfiles tienen tipo reducido de ITP en ciertas CCAA."
+          }
+        }
+      },
+      "ResultadoHipoteca": {
+        "type": "object",
+        "properties": {
+          "capital": { "type": "number", "description": "Capital financiado (precio - entrada) (€)" },
+          "porcentajeFinanciacion": { "type": "number", "description": "Porcentaje financiado sobre el precio (%)" },
+          "cuotaMensual": { "type": "number", "description": "Cuota mensual inicial (€)" },
+          "tipoEfectivo": { "type": "number", "description": "Tipo de interés efectivo aplicado (%)" },
+          "totalIntereses": { "type": "number", "description": "Total de intereses pagados en toda la vida del préstamo (€)" },
+          "totalPagado": { "type": "number", "description": "Total pagado (capital + intereses) (€)" },
+          "ratioCuotaIngresos": { "type": "number", "nullable": true, "description": "Ratio cuota/ingresos (%)" },
+          "alertaRatio": { "type": "boolean", "description": "true si el ratio supera el 30% recomendado por el Banco de España" },
+          "nota": { "type": "string", "description": "Nota sobre el cálculo" },
+          "aviso_legal": { "type": "string", "description": "Aviso legal obligatorio" }
+        }
+      },
+      "ResultadoCapacidadHipoteca": {
+        "type": "object",
+        "properties": {
+          "cuotaMaximaMensual": { "type": "number", "description": "Cuota máxima mensual sostenible (€)" },
+          "capitalMaximo": { "type": "number", "description": "Capital máximo financiable (€)" },
+          "entradaDisponible": { "type": "number", "description": "Ahorros disponibles para la entrada tras reservar gastos (€)" },
+          "gastosCompraReservados": { "type": "number", "description": "Gastos de compra estimados reservados (€)" },
+          "precioMaximoVivienda": { "type": "number", "description": "Precio máximo de vivienda que puede comprar (€)" },
+          "porcentajeFinanciacion": { "type": "number", "description": "Porcentaje de financiación sobre el precio (%)" },
+          "esfuerzoHipotecario": { "type": "number", "description": "Esfuerzo hipotecario real cuota/ingresos (%)" },
+          "cumpleRecomendacionBDE": { "type": "boolean", "description": "true si cumple la recomendación del Banco de España (≤30%)" },
+          "advertencias": { "type": "array", "items": { "type": "string" }, "description": "Advertencias sobre viabilidad" },
+          "aviso_legal": { "type": "string", "description": "Aviso legal obligatorio" }
+        }
+      },
+      "ResultadoAmortizacion": {
+        "type": "object",
+        "properties": {
+          "saldoAntes": { "type": "number", "description": "Saldo pendiente antes de amortizar (€)" },
+          "saldoDespues": { "type": "number", "description": "Saldo pendiente después de amortizar (€)" },
+          "cuotaOriginal": { "type": "number", "description": "Cuota mensual original (€)" },
+          "nuevaCuota": { "type": "number", "description": "Nueva cuota si se elige reducir cuota (€)" },
+          "reduccionCuota": { "type": "number", "description": "Reducción de cuota mensual (€)" },
+          "ahorroInteresesCuota": { "type": "number", "description": "Ahorro en intereses con opción reducir cuota (€)" },
+          "nuevoPlazoMeses": { "type": "integer", "description": "Nuevo plazo si se elige reducir plazo (meses)" },
+          "reduccionMeses": { "type": "integer", "description": "Meses que se adelanta el fin de la hipoteca" },
+          "ahorroInteresesPlazo": { "type": "number", "description": "Ahorro en intereses con opción reducir plazo (€)" },
+          "recomendacion": { "type": "string", "description": "Recomendación entre las dos opciones" },
+          "aviso_legal": { "type": "string", "description": "Aviso legal obligatorio" }
+        }
+      },
+      "ResultadoCompraventa": {
+        "type": "object",
+        "properties": {
+          "comprador": {
+            "type": "object",
+            "properties": {
+              "tipoImpuesto": { "type": "string", "description": "ITP o IVA según el tipo de transmisión" },
+              "porcentajeImpuesto": { "type": "number", "description": "Porcentaje aplicado (%)" },
+              "importeImpuesto": { "type": "number", "description": "Importe del impuesto principal (€)" },
+              "ajd": { "type": "number", "description": "Actos Jurídicos Documentados (€)" },
+              "notaria": { "type": "number", "description": "Gastos de notaría estimados (€)" },
+              "registro": { "type": "number", "description": "Gastos de registro estimados (€)" },
+              "gestoria": { "type": "number", "description": "Gastos de gestoría estimados (€)" },
+              "totalGastos": { "type": "number", "description": "Total gastos adicionales al precio (€)" },
+              "totalOperacion": { "type": "number", "description": "Precio + todos los gastos (€)" },
+              "notaITP": { "type": "string", "description": "Nota sobre el ITP aplicado en la CCAA" }
+            }
+          },
+          "aviso_legal": { "type": "string", "description": "Aviso legal obligatorio" }
+        }
+      }
+    }
+  }
+}
