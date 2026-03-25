@@ -1,0 +1,306 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Herencias y Donaciones España",
+    "description": "Calculadoras de Impuesto de Sucesiones, Donaciones y Legítimas para las 17 CCAA españolas. Datos oficiales Ley 29/1987 ISD actualizados 2025.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "https://meskeia.com" }],
+  "paths": {
+    "/api/chatgpt/sucesiones": {
+      "post": {
+        "operationId": "calcularSucesiones",
+        "summary": "Calcular Impuesto de Sucesiones por CCAA en España (ISD 2025)",
+        "description": "Calcula el Impuesto de Sucesiones para un heredero en España según su CCAA. Aplica reducciones por parentesco, discapacidad y vivienda habitual. Incluye bonificaciones autonómicas de las 17 CCAA.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputSucesiones" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado con cuota final, reducciones y bonificación autonómica",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoSucesiones" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/donaciones": {
+      "post": {
+        "operationId": "calcularDonaciones",
+        "summary": "Calcular Impuesto de Donaciones por CCAA en España (ISD 2025)",
+        "description": "Calcula el Impuesto de Donaciones para el donatario en España según su CCAA. Aplica reducciones por parentesco y discapacidad. Incluye bonificaciones autonómicas y tarifa propia de Cataluña.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputDonaciones" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado con cuota final, reducciones y bonificación autonómica",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoDonaciones" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/legitimas": {
+      "post": {
+        "operationId": "calcularLegitimas",
+        "summary": "Calcular legítimas hereditarias por régimen civil en España",
+        "description": "Calcula la herencia forzosa (legítima) según el régimen de derecho civil: Derecho Común, Cataluña, Aragón, Galicia, Baleares, País Vasco o Navarra. Incluye derechos del cónyuge.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputLegitimas" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado con legítima total, por hijo, libre disposición y derechos del cónyuge",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoLegitimas" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "InputSucesiones": {
+        "type": "object",
+        "required": ["baseImponible", "ccaa", "grupo"],
+        "properties": {
+          "baseImponible": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Valor neto de la herencia recibida por este heredero en euros. Ejemplo: 150000 para 150.000€.",
+            "example": 150000
+          },
+          "ccaa": {
+            "type": "string",
+            "description": "Comunidad autónoma del causante (fallecido). Valores: andalucia, aragon, asturias, baleares, canarias, cantabria, castilla-la-mancha, castilla-leon, cataluna, extremadura, galicia, la-rioja, madrid, murcia, navarra, pais-vasco, valencia.",
+            "example": "madrid"
+          },
+          "grupo": {
+            "type": "string",
+            "enum": ["I-conyuge", "I-descendiente", "II", "II-ascendiente", "III", "IV"],
+            "description": "Grupo de parentesco: 'I-conyuge' (cónyuge), 'I-descendiente' (hijo/nieto), 'II' (hermano/sobrino), 'II-ascendiente' (padre/madre), 'III' (tío/primo), 'IV' (extraño).",
+            "example": "I-descendiente"
+          },
+          "edadHeredero": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Edad del heredero en años. Relevante si es menor de 21 para aplicar reducción adicional."
+          },
+          "discapacidad": {
+            "type": "string",
+            "enum": ["0", "33", "65"],
+            "default": "0",
+            "description": "Grado de discapacidad reconocida: '0' = ninguna, '33' = igual o superior al 33%, '65' = igual o superior al 65%."
+          },
+          "patrimonioIdx": {
+            "type": "integer",
+            "enum": [1, 2, 3, 4],
+            "default": 1,
+            "description": "Índice de patrimonio preexistente del heredero: 1 = menos de 402.678€ (la mayoría), 2 = hasta 2.007.380€, 3 = hasta 4.020.770€, 4 = más de 4.020.770€."
+          },
+          "viviendaHabitual": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Valor de la vivienda habitual del causante incluida en la herencia (€). Permite aplicar reducción del 95% hasta 122.606€."
+          },
+          "seguroVida": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Importe del seguro de vida recibido (€). Reducción de hasta 9.195,49€ para cónyuge, descendientes y ascendientes."
+          },
+          "incluyeAjuar": {
+            "type": "boolean",
+            "default": false,
+            "description": "Si se incluye el ajuar doméstico en la base imponible (3% de la masa hereditaria). Normalmente solo si hay inmuebles."
+          }
+        }
+      },
+      "InputDonaciones": {
+        "type": "object",
+        "required": ["valorDonacion", "ccaa", "grupo"],
+        "properties": {
+          "valorDonacion": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Valor de la donación en euros.",
+            "example": 50000
+          },
+          "ccaa": {
+            "type": "string",
+            "description": "Comunidad autónoma del donatario (quien recibe). Valores: andalucia, aragon, asturias, baleares, canarias, cantabria, castilla-la-mancha, castilla-leon, cataluna, extremadura, galicia, la-rioja, madrid, murcia, navarra, pais-vasco, valencia.",
+            "example": "madrid"
+          },
+          "grupo": {
+            "type": "string",
+            "enum": ["I-conyuge", "I-descendiente", "II", "II-ascendiente", "III", "IV"],
+            "description": "Grupo de parentesco: 'I-conyuge' (cónyuge), 'I-descendiente' (hijo/nieto), 'II' (hermano/sobrino), 'II-ascendiente' (padre/madre), 'III' (tío/primo), 'IV' (extraño).",
+            "example": "I-descendiente"
+          },
+          "cargas": {
+            "type": "number",
+            "minimum": 0,
+            "default": 0,
+            "description": "Cargas deducibles en euros (hipotecas u otras cargas reales sobre el bien donado)."
+          },
+          "escrituraPublica": {
+            "type": "boolean",
+            "default": true,
+            "description": "Si la donación se formaliza en escritura pública notarial. Relevante en Cataluña y Castilla-La Mancha para aplicar bonificaciones."
+          },
+          "discapacidad": {
+            "type": "string",
+            "enum": ["0", "33", "65"],
+            "default": "0",
+            "description": "Grado de discapacidad del donatario: '0' = ninguna, '33' = ≥33%, '65' = ≥65%."
+          },
+          "patrimonioIdx": {
+            "type": "integer",
+            "enum": [1, 2, 3, 4],
+            "default": 1,
+            "description": "Índice de patrimonio preexistente del donatario: 1 = menos de 402.678€ (la mayoría)."
+          }
+        }
+      },
+      "InputLegitimas": {
+        "type": "object",
+        "required": ["patrimonioNeto", "regimen", "numHijos"],
+        "properties": {
+          "patrimonioNeto": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Patrimonio neto del fallecido en euros (activos menos deudas).",
+            "example": 300000
+          },
+          "regimen": {
+            "type": "string",
+            "enum": ["comun", "cataluna", "aragon", "galicia", "baleares", "pais-vasco", "navarra"],
+            "description": "Régimen civil: 'comun' (Madrid, Andalucía, Castilla, Canarias...), 'cataluna', 'aragon', 'galicia', 'baleares', 'pais-vasco' (Bizkaia/Álava), 'navarra'.",
+            "example": "comun"
+          },
+          "numHijos": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20,
+            "description": "Número de hijos o descendientes del fallecido.",
+            "example": 2
+          },
+          "tieneConyuge": {
+            "type": "boolean",
+            "default": false,
+            "description": "Si hay cónyuge o pareja superviviente. Determina el derecho de usufructo viudal."
+          }
+        }
+      },
+      "ResultadoSucesiones": {
+        "type": "object",
+        "properties": {
+          "ccaaNombre": { "type": "string", "description": "Nombre de la CCAA aplicada" },
+          "baseImponible": { "type": "number", "description": "Base imponible (€)" },
+          "totalReducciones": { "type": "number", "description": "Total reducciones aplicadas (€)" },
+          "baseLiquidable": { "type": "number", "description": "Base liquidable tras reducciones (€)" },
+          "cuotaIntegra": { "type": "number", "description": "Cuota íntegra antes de coeficiente (€)" },
+          "coeficienteMultiplicador": { "type": "number", "description": "Coeficiente por patrimonio preexistente" },
+          "cuotaTributaria": { "type": "number", "description": "Cuota tributaria (€)" },
+          "porcentajeBonificacion": { "type": "number", "description": "Bonificación autonómica (%)" },
+          "detalleBonificacion": { "type": "string", "description": "Descripción de la bonificación aplicada" },
+          "cuotaFinal": { "type": "number", "description": "Impuesto final a pagar (€)" },
+          "tipoEfectivo": { "type": "number", "description": "Tipo efectivo sobre la herencia (%)" },
+          "tarifaAplicada": { "type": "string", "description": "Tarifa fiscal utilizada" },
+          "notasCcaa": { "type": "string", "description": "Notas específicas de la CCAA" },
+          "fuenteDatos": { "type": "string", "description": "Normativa y fecha de verificación" },
+          "aviso_legal": { "type": "string", "description": "Aviso legal obligatorio" }
+        }
+      },
+      "ResultadoDonaciones": {
+        "type": "object",
+        "properties": {
+          "ccaaNombre": { "type": "string", "description": "Nombre de la CCAA aplicada" },
+          "baseImponible": { "type": "number", "description": "Valor bruto de la donación (€)" },
+          "baseLiquidable": { "type": "number", "description": "Base liquidable tras cargas (€)" },
+          "reduccionParentesco": { "type": "number", "description": "Reducción por parentesco (€)" },
+          "baseNetaReducida": { "type": "number", "description": "Base sobre la que se aplica la tarifa (€)" },
+          "cuotaIntegra": { "type": "number", "description": "Cuota íntegra (€)" },
+          "coeficienteMultiplicador": { "type": "number", "description": "Coeficiente por patrimonio preexistente" },
+          "cuotaTributaria": { "type": "number", "description": "Cuota tributaria (€)" },
+          "porcentajeBonificacion": { "type": "number", "description": "Bonificación autonómica (%)" },
+          "detalleBonificacion": { "type": "string", "description": "Descripción de la bonificación aplicada" },
+          "cuotaFinal": { "type": "number", "description": "Impuesto final a pagar (€)" },
+          "tipoEfectivo": { "type": "number", "description": "Tipo efectivo sobre el valor donado (%)" },
+          "tarifaAplicada": { "type": "string", "description": "Tarifa fiscal utilizada" },
+          "notasCcaa": { "type": "string", "description": "Notas específicas de la CCAA" },
+          "aviso_legal": { "type": "string", "description": "Aviso legal obligatorio" }
+        }
+      },
+      "ResultadoLegitimas": {
+        "type": "object",
+        "properties": {
+          "nombreRegimen": { "type": "string", "description": "Nombre del régimen civil aplicado" },
+          "ccaas": { "type": "string", "description": "CCAA donde aplica este régimen" },
+          "patrimonioNeto": { "type": "number", "description": "Patrimonio neto del causante (€)" },
+          "legitimaTotal": { "type": "number", "description": "Legítima total (herencia forzosa mínima) (€)" },
+          "fraccionLegitima": { "type": "string", "description": "Fracción del patrimonio que representa la legítima" },
+          "legitimaPorHijo": { "type": "number", "nullable": true, "description": "Legítima individual por hijo (€)" },
+          "tercioMejora": { "type": "number", "nullable": true, "description": "Tercio de mejora — solo Derecho Común (€)" },
+          "libreDisposicion": { "type": "number", "description": "Parte de libre disposición del testador (€)" },
+          "derechoConyuge": { "type": "number", "nullable": true, "description": "Valor del derecho del cónyuge superviviente (€)" },
+          "descripcionDerechoConyuge": { "type": "string", "description": "Descripción del derecho del cónyuge" },
+          "esLegitivaColectiva": { "type": "boolean", "description": "Si la legítima puede distribuirse libremente entre descendientes" },
+          "esNavarra": { "type": "boolean", "description": "Si es Navarra (legítima puramente formal = 0€)" },
+          "notas": { "type": "array", "items": { "type": "string" }, "description": "Notas y advertencias del régimen" },
+          "fuenteNormativa": { "type": "string", "description": "Normativa aplicada" },
+          "aviso_legal": { "type": "string", "description": "Aviso legal obligatorio" }
+        }
+      }
+    }
+  }
+}
