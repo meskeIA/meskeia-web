@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       cargas:          body.cargas !== undefined ? Number(body.cargas) : 0,
       escrituraPublica: body.escrituraPublica ?? true,
       discapacidad:    body.discapacidad ?? '0',
-      patrimonioIdx:   body.patrimonioIdx !== undefined ? Number(body.patrimonioIdx) : 1,
+      patrimonioIdx:   body.patrimonioIdx !== undefined ? Number(body.patrimonioIdx) as 1 | 2 | 3 | 4 : 1,
     });
 
     // Registrar en analytics

@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       grupo:            body.grupo,
       edadHeredero:     body.edadHeredero !== undefined ? Number(body.edadHeredero) : undefined,
       discapacidad:     body.discapacidad ?? '0',
-      patrimonioIdx:    body.patrimonioIdx !== undefined ? Number(body.patrimonioIdx) : 1,
+      patrimonioIdx:    body.patrimonioIdx !== undefined ? Number(body.patrimonioIdx) as 1 | 2 | 3 | 4 : 1,
       viviendaHabitual: body.viviendaHabitual !== undefined ? Number(body.viviendaHabitual) : undefined,
       seguroVida:       body.seguroVida !== undefined ? Number(body.seguroVida) : undefined,
       incluyeAjuar:     body.incluyeAjuar ?? false,
