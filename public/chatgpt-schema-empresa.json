@@ -1,0 +1,396 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Emprender en España",
+    "description": "Calculadoras para emprendedores españoles: comparar autónomo vs SL, Impuesto Sociedades, coste de contratar empleados, ROI de marketing, VAN/TIR de inversiones y punto de equilibrio.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://meskeia.com"
+    }
+  ],
+  "paths": {
+    "/api/chatgpt/autonomo-vs-sl": {
+      "post": {
+        "operationId": "compararAutonomoVsSL",
+        "summary": "Compara la carga fiscal de operar como autónomo vs constituir una SL",
+        "description": "Calcula y compara SS+IRPF (autónomo) frente a IS+dividendos (SL) con datos RETA 2026, IRPF 2025 e IS 2025. Indica si conviene la SL y a partir de qué umbral de beneficio.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["beneficioAnual"],
+                "properties": {
+                  "beneficioAnual": {
+                    "type": "number",
+                    "description": "Beneficio bruto anual de la actividad en euros (ingresos totales antes de gastos). Ejemplo: 65000"
+                  },
+                  "gastosDeducibles": {
+                    "type": "number",
+                    "description": "Gastos deducibles anuales en euros (cuota autónomo, alquiler, suministros, etc.). Si no se indica, se calcula sin gastos adicionales."
+                  },
+                  "tipoIS": {
+                    "type": "string",
+                    "enum": ["general", "micropyme", "nueva_creacion"],
+                    "description": "'general' (25%), 'micropyme' (23%, CN<1M€), 'nueva_creacion' (15%, primeros 2 años con base positiva). Por defecto 'general'."
+                  },
+                  "repartirDividendos": {
+                    "type": "boolean",
+                    "description": "¿La SL repartirá dividendos al socio? Añade la tributación en la base del ahorro (19-28%). Por defecto false."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comparativa autónomo vs SL calculada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "autonomo": {
+                      "type": "object",
+                      "description": "Resultado fiscal como autónomo: cuota SS, IRPF, neto anual y tipo efectivo total"
+                    },
+                    "sl": {
+                      "type": "object",
+                      "description": "Resultado fiscal como SL: IS, dividendos (si aplica), neto anual y tipo efectivo total"
+                    },
+                    "ahorroCargasSL": { "type": "number", "description": "Diferencia de cargas: positivo = SL ahorra respecto a autónomo (€)" },
+                    "convieneSL": { "type": "boolean", "description": "¿Conviene fiscalmente la SL con este nivel de beneficio?" },
+                    "umbralSL": { "type": "number", "description": "Umbral aproximado de beneficio anual a partir del cual conviene la SL (€)" },
+                    "tipoISAplicado": { "type": "number", "description": "Tipo IS aplicado en la comparativa (%)" },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/impuesto-sociedades": {
+      "post": {
+        "operationId": "calcularImpuestoSociedades",
+        "summary": "Calcula el Impuesto sobre Sociedades de una empresa española",
+        "description": "Calcula la cuota del IS con los tipos 2025: 15% nueva empresa, 20% microempresa, 23% PYME, 25% general. Incluye reserva de capitalización, nivelación y deducciones por I+D+i y empleo.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["regimenFiscal", "baseImponible"],
+                "properties": {
+                  "regimenFiscal": {
+                    "type": "string",
+                    "enum": ["general", "pyme", "nueva_empresa", "microempresa", "cooperativa", "sin_animo_lucro", "credito_hidrocarburos"],
+                    "description": "Régimen fiscal: 'general' (25%), 'pyme' (23%, CN<1M€), 'nueva_empresa' (15%, primeros 2 años), 'microempresa' (20%, CN<1M€ y <10 empleados)."
+                  },
+                  "baseImponible": {
+                    "type": "number",
+                    "description": "Base imponible del ejercicio en euros (resultado contable antes de ajustes). Puede ser negativo si hay pérdidas. Ejemplo: 40000"
+                  },
+                  "cifraNegociosAnterior": {
+                    "type": "number",
+                    "description": "Cifra de negocios del ejercicio anterior en euros. Necesario para verificar el umbral de PYME (< 1.000.000€)."
+                  },
+                  "esNuevaEmpresa": {
+                    "type": "boolean",
+                    "description": "¿Es el primer o segundo ejercicio con base imponible positiva? Activa el tipo del 15%."
+                  },
+                  "incrementoFondosPropios": {
+                    "type": "number",
+                    "description": "Incremento de fondos propios para aplicar la reserva de capitalización (art. 25 LIS). Reduce la base en un 10%."
+                  },
+                  "gastosIDi": {
+                    "type": "number",
+                    "description": "Gastos en I+D del ejercicio en euros para calcular la deducción (art. 35 LIS)."
+                  },
+                  "retencionesYPagosFraccionados": {
+                    "type": "number",
+                    "description": "Retenciones soportadas y pagos fraccionados (modelo 202) ya realizados en euros."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cálculo del Impuesto sobre Sociedades completado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tipoGravamen": { "type": "number", "description": "Tipo de gravamen aplicado (%)" },
+                    "baseImponible": { "type": "number", "description": "Base imponible (€)" },
+                    "reservaCapitalizacion": { "type": "number", "description": "Reserva de capitalización aplicada (€)" },
+                    "baseLiquidable": { "type": "number", "description": "Base liquidable tras reducciones (€)" },
+                    "cuotaIntegra": { "type": "number", "description": "Cuota íntegra antes de deducciones (€)" },
+                    "totalDeducciones": { "type": "number", "description": "Total deducciones aplicadas (€)" },
+                    "cuotaLiquida": { "type": "number", "description": "Cuota líquida a ingresar (€)" },
+                    "cuotaDiferencial": { "type": "number", "description": "Cuota diferencial tras retenciones y pagos (€)" },
+                    "tipoEfectivo": { "type": "number", "description": "Tipo efectivo real sobre la base imponible (%)" },
+                    "advertencias": { "type": "array", "items": { "type": "string" } },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/coste-empleado": {
+      "post": {
+        "operationId": "calcularCosteEmpleado",
+        "summary": "Calcula el coste real de contratar un empleado en España",
+        "description": "Calcula el coste total para el empleador: salario bruto + cuotas SS patronales (contingencias comunes 23,6%, desempleo, FP, FOGASA, AT/EP por sector). Datos SS 2025.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["salarioBrutoAnual"],
+                "properties": {
+                  "salarioBrutoAnual": {
+                    "type": "number",
+                    "description": "Salario bruto anual del empleado en euros. Ejemplo: 24000"
+                  },
+                  "tipoContrato": {
+                    "type": "string",
+                    "enum": ["indefinido", "temporal"],
+                    "description": "Tipo de contrato. Afecta al tipo de desempleo (5,5% indefinido vs 6,7% temporal). Por defecto 'indefinido'."
+                  },
+                  "sector": {
+                    "type": "string",
+                    "enum": ["oficina", "comercio", "industrial", "construccion"],
+                    "description": "Sector de actividad para el tipo AT/EP: 'oficina' (1,5%), 'comercio' (1,8%), 'industrial' (2,8%), 'construccion' (6,7%). Por defecto 'oficina'."
+                  },
+                  "beneficiosExtra": {
+                    "type": "number",
+                    "description": "Beneficios extra anuales en euros (seguro médico, tickets restaurante, etc.)."
+                  },
+                  "pagas": {
+                    "type": "number",
+                    "enum": [12, 14],
+                    "description": "Número de pagas del empleado: 12 o 14 (con pagas extra). Por defecto 14."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Coste de empleado calculado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "salarioBrutoAnual": { "type": "number", "description": "Salario bruto anual del empleado (€)" },
+                    "salarioBrutoMensual": { "type": "number", "description": "Salario bruto mensual (€)" },
+                    "costeTotalAnual": { "type": "number", "description": "Coste total anual para la empresa: salario + SS patronal + beneficios extra (€)" },
+                    "costeTotalMensual": { "type": "number", "description": "Coste total mensual para la empresa (€)" },
+                    "sobrecoste": { "type": "number", "description": "Porcentaje que supone la SS patronal sobre el salario bruto (%)" },
+                    "cuotas": { "type": "object", "description": "Desglose de cuotas SS patronales: contingencias, desempleo, FP, FOGASA, AT/EP (€)" },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/roi-marketing": {
+      "post": {
+        "operationId": "calcularROIMarketing",
+        "summary": "Calcula el ROI por canal de marketing y compara su rentabilidad",
+        "description": "Calcula ROI, CAC, ROAS y ratio CLV/CAC para cada canal de marketing (Google Ads, redes sociales, email...). Identifica el canal más y menos rentable y da recomendaciones de acción.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["canales"],
+                "properties": {
+                  "canales": {
+                    "type": "array",
+                    "maxItems": 15,
+                    "description": "Array de canales de marketing a analizar.",
+                    "items": {
+                      "type": "object",
+                      "required": ["nombre", "inversion", "clientes", "ingresoPorCliente"],
+                      "properties": {
+                        "nombre": { "type": "string", "description": "Nombre del canal (ej: 'Google Ads', 'Instagram', 'Email Marketing')" },
+                        "inversion": { "type": "number", "description": "Inversión en el canal en euros (€)" },
+                        "clientes": { "type": "number", "description": "Número de clientes captados gracias a este canal" },
+                        "ingresoPorCliente": { "type": "number", "description": "Ingreso medio generado por cada cliente captado (€)" }
+                      }
+                    }
+                  },
+                  "valorVidaCliente": {
+                    "type": "number",
+                    "description": "Valor de vida del cliente (CLV) en euros. Si se indica, se calcula el ratio CLV/CAC por canal."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ROI de marketing calculado por canal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "canales": {
+                      "type": "array",
+                      "description": "Resultado por canal: ROI, beneficio, CAC, ROAS, recomendación"
+                    },
+                    "inversionTotal": { "type": "number", "description": "Inversión total en todos los canales (€)" },
+                    "ingresosTotal": { "type": "number", "description": "Ingresos totales generados (€)" },
+                    "beneficioTotal": { "type": "number", "description": "Beneficio total (€)" },
+                    "roiTotal": { "type": "number", "description": "ROI global (%)" },
+                    "mejorCanal": { "type": "string", "description": "Canal con mayor ROI" },
+                    "peorCanal": { "type": "string", "description": "Canal con menor ROI" },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/tir-van": {
+      "post": {
+        "operationId": "calcularTIRVAN",
+        "summary": "Calcula el VAN, TIR y payback de una inversión de negocio",
+        "description": "Evalúa la rentabilidad de una inversión: Valor Actual Neto (VAN), Tasa Interna de Retorno (TIR) y período de recuperación descontado. Indica si la inversión crea o destruye valor.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["inversionInicial", "tasaDescuento", "flujosCaja"],
+                "properties": {
+                  "inversionInicial": {
+                    "type": "number",
+                    "description": "Inversión inicial en euros (valor positivo). Ejemplo: 20000"
+                  },
+                  "tasaDescuento": {
+                    "type": "number",
+                    "description": "Tasa de descuento anual en % para calcular el VAN (coste de oportunidad o rentabilidad mínima exigida). Ejemplo: 8"
+                  },
+                  "flujosCaja": {
+                    "type": "array",
+                    "items": { "type": "number" },
+                    "description": "Array de flujos de caja anuales en euros (pueden ser negativos). Ejemplo: [5000, 8000, 12000, 15000] para 4 años."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Análisis de inversión completado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "van": { "type": "number", "description": "Valor Actual Neto (€). Positivo = inversión rentable" },
+                    "tir": { "type": "number", "description": "Tasa Interna de Retorno (%). Null si no converge" },
+                    "tirEncontrada": { "type": "boolean", "description": "Si se pudo calcular la TIR" },
+                    "payback": { "type": "number", "description": "Período de recuperación descontado en años. Null si no se recupera en el horizonte" },
+                    "totalRetornos": { "type": "number", "description": "Suma total de flujos de caja (€)" },
+                    "rentabilidadBruta": { "type": "number", "description": "Rentabilidad bruta total (%)" },
+                    "interpretacion": { "type": "string", "description": "Interpretación del resultado de la inversión" },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/break-even": {
+      "post": {
+        "operationId": "calcularBreakEven",
+        "summary": "Calcula el punto de equilibrio del negocio",
+        "description": "Calcula cuántas unidades o ingresos necesita el negocio para cubrir costes fijos y empezar a ser rentable. Incluye análisis de situación actual y objetivo de ganancia.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["precioVenta", "costoVariable", "costosFijos"],
+                "properties": {
+                  "precioVenta": {
+                    "type": "number",
+                    "description": "Precio de venta por unidad/servicio en euros. Ejemplo: 500 por proyecto o 50 por hora."
+                  },
+                  "costoVariable": {
+                    "type": "number",
+                    "description": "Coste variable por unidad en euros (materiales, comisiones, subcontratación). Puede ser 0 para servicios puros."
+                  },
+                  "costosFijos": {
+                    "type": "number",
+                    "description": "Total costes fijos mensuales en euros (alquiler, nóminas fijas, cuota autónomo, seguros...). Ejemplo: 2000"
+                  },
+                  "ventasActuales": {
+                    "type": "number",
+                    "description": "Unidades/servicios vendidos actualmente al mes. Opcional, para comparar con el break-even."
+                  },
+                  "objetivoGanancia": {
+                    "type": "number",
+                    "description": "Ganancia mensual deseada en euros. Opcional, para calcular cuántas unidades se necesitan."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Break-even calculado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "breakEvenUnidades": { "type": "number", "description": "Unidades/servicios necesarios para cubrir costes fijos" },
+                    "breakEvenEuros": { "type": "number", "description": "Ingresos mensuales necesarios para el break-even (€)" },
+                    "margenContribucion": { "type": "number", "description": "Margen de contribución por unidad (€)" },
+                    "gananciaActual": { "type": "number", "description": "Ganancia/pérdida con las ventas actuales (€)" },
+                    "esRentable": { "type": "boolean", "description": "¿El negocio es actualmente rentable?" },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
