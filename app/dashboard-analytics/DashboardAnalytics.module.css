@@ -937,6 +937,29 @@
   background: rgba(150, 150, 150, 0.04);
 }
 
+.filtroModoActivoChatGPT {
+  background: #10A37F;
+  color: #fff;
+  border-color: #10A37F;
+}
+
+.badgeChatGPT {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  background: rgba(16, 163, 127, 0.12);
+  color: #10A37F;
+}
+
+.rowChatGPT {
+  background: rgba(16, 163, 127, 0.04);
+}
+
+[data-theme='dark'] .rowChatGPT {
+  background: rgba(16, 163, 127, 0.08);
+}
+
 [data-theme='dark'] .rowBot {
   background: rgba(150, 150, 150, 0.07);
 }

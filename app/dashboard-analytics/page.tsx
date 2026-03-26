@@ -117,7 +117,7 @@ export default function DashboardAnalyticsPage() {
   const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros' | 'resumen'>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
-  const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'referral-ia' | 'mcp' | 'bot'>('todos');
+  const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'referral-ia' | 'chatgpt' | 'mcp' | 'bot'>('todos');
 
   // Ref para control de inicialización
   const iniciado = useRef(false);
@@ -1048,7 +1048,7 @@ export default function DashboardAnalyticsPage() {
                   className={`${styles.filtroModoBtn} ${filtroModo === 'web' ? styles.filtroModoActivo : ''}`}
                   onClick={() => setFiltroModo('web')}
                 >
-                  🌐 Web ({datos.data.filter((r: any) => r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot').length})
+                  🌐 Web ({datos.data.filter((r: any) => r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot' && r.modo !== 'chatgpt').length})
                 </button>
                 <button
                   type="button"
@@ -1056,6 +1056,13 @@ export default function DashboardAnalyticsPage() {
                   onClick={() => setFiltroModo('referral-ia')}
                 >
                   🔗 Desde IA ({datos.data.filter((r: any) => r.modo === 'referral-ia').length})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.filtroModoBtn} ${filtroModo === 'chatgpt' ? styles.filtroModoActivoChatGPT : ''}`}
+                  onClick={() => setFiltroModo('chatgpt')}
+                >
+                  💬 ChatGPT ({datos.data.filter((r: any) => r.modo === 'chatgpt').length})
                 </button>
                 <button
                   type="button"
@@ -1089,8 +1096,9 @@ export default function DashboardAnalyticsPage() {
                 <tbody>
                   {datos.data
                     .filter((r: any) => {
-                      if (filtroModo === 'web') return r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot';
+                      if (filtroModo === 'web') return r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot' && r.modo !== 'chatgpt';
                       if (filtroModo === 'referral-ia') return r.modo === 'referral-ia';
+                      if (filtroModo === 'chatgpt') return r.modo === 'chatgpt';
                       if (filtroModo === 'mcp') return r.modo === 'mcp';
                       if (filtroModo === 'bot') return r.modo === 'bot';
                       return true;
@@ -1099,6 +1107,7 @@ export default function DashboardAnalyticsPage() {
                     .map((registro: any) => (
                       <tr key={registro.id} className={
                         registro.modo === 'mcp' ? styles.rowMCP :
+                        registro.modo === 'chatgpt' ? styles.rowChatGPT :
                         registro.modo === 'referral-ia' ? styles.rowReferral :
                         registro.modo === 'bot' ? styles.rowBot : ''
                       }>
@@ -1107,6 +1116,8 @@ export default function DashboardAnalyticsPage() {
                         <td>
                           {registro.modo === 'mcp'
                             ? <span className={styles.badgeMCP}>🤖 MCP</span>
+                            : registro.modo === 'chatgpt'
+                            ? <span className={styles.badgeChatGPT}>💬 ChatGPT</span>
                             : registro.modo === 'referral-ia'
                             ? <span className={styles.badgeReferral}>🔗 Desde IA</span>
                             : registro.modo === 'bot'
