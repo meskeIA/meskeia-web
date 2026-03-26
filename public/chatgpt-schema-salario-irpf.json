@@ -1,0 +1,252 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Salario e IRPF España",
+    "description": "Calculadoras fiscales para trabajadores asalariados en España: sueldo neto desde bruto, estimación de cuota IRPF 2025, simulación de devolución o pago en la declaración de la renta, y análisis del impacto del segundo pagador en las retenciones.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://meskeia.com"
+    }
+  ],
+  "paths": {
+    "/api/chatgpt/sueldo-neto": {
+      "post": {
+        "operationId": "calcularSueldoNeto",
+        "summary": "Calcula el sueldo neto mensual a partir del salario bruto anual",
+        "description": "Calcula el sueldo neto mensual deduciendo cotizaciones a la Seguridad Social del trabajador y la retención de IRPF estimada. Útil para responder '¿cuánto me queda al mes si mi sueldo bruto es X€?'",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["salarioBrutoAnual"],
+                "properties": {
+                  "salarioBrutoAnual": {
+                    "type": "number",
+                    "description": "Salario bruto anual en euros. Ejemplo: 30000."
+                  },
+                  "pagas": {
+                    "type": "number",
+                    "enum": [12, 14],
+                    "description": "Número de pagas anuales: 12 (sin pagas extra) o 14 (con dos pagas extra). Por defecto 14."
+                  },
+                  "edad": {
+                    "type": "number",
+                    "description": "Edad del trabajador. Afecta al mínimo personal IRPF."
+                  },
+                  "numHijos": {
+                    "type": "number",
+                    "description": "Número de hijos a cargo menores de 25 años. Por defecto 0."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sueldo neto mensual, retención IRPF y cotizaciones SS desglosadas."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/irpf": {
+      "post": {
+        "operationId": "calcularIRPF",
+        "summary": "Estima la cuota IRPF anual de un contribuyente",
+        "description": "Calcula la cuota íntegra, la cuota diferencial y el tipo efectivo IRPF aplicando tramos 2025, gastos deducibles del trabajo, reducción por rendimientos del trabajo (RNT) y mínimos personales y familiares. El campo rendimientosTrabajo debe ser el salario bruto menos las cotizaciones SS del trabajador (aproximadamente el 6,6% del bruto).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["rendimientosTrabajo"],
+                "properties": {
+                  "rendimientosTrabajo": {
+                    "type": "number",
+                    "description": "Rendimientos del trabajo netos de SS (€ anuales = salario bruto menos cotizaciones trabajador SS). Ejemplo: si el bruto es 30.000€, resta ~1.980€ de SS → 28.020."
+                  },
+                  "rendimientosCapitalMobiliario": {
+                    "type": "number",
+                    "description": "Rendimientos del capital mobiliario (intereses, dividendos...) en euros. Por defecto 0."
+                  },
+                  "rendimientosCapitalInmobiliario": {
+                    "type": "number",
+                    "description": "Rendimientos del capital inmobiliario (alquiler neto...) en euros. Por defecto 0."
+                  },
+                  "gananciasPLargo": {
+                    "type": "number",
+                    "description": "Ganancias patrimoniales a largo plazo (>12 meses) en euros. Por defecto 0."
+                  },
+                  "gananciasPCorto": {
+                    "type": "number",
+                    "description": "Ganancias patrimoniales a corto plazo (≤12 meses) en euros. Por defecto 0."
+                  },
+                  "retenciones": {
+                    "type": "number",
+                    "description": "Total de retenciones ya practicadas en el año en euros. Para calcular la cuota diferencial (a pagar o devolver)."
+                  },
+                  "situacion": {
+                    "type": "string",
+                    "enum": ["soltero", "casado_sin_ingresos", "casado_con_ingresos"],
+                    "description": "Situación familiar. Por defecto 'soltero'."
+                  },
+                  "numHijos": {
+                    "type": "number",
+                    "description": "Número de hijos menores de 25 años a cargo. Por defecto 0."
+                  },
+                  "hijosMenores3": {
+                    "type": "number",
+                    "description": "Número de hijos menores de 3 años (mínimo por descendiente más alto). Por defecto 0."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Base imponible, cuota íntegra, mínimos aplicados, cuota diferencial y tipo efectivo."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/devolucion-irpf": {
+      "post": {
+        "operationId": "simularDevolucionIRPF",
+        "summary": "Simula si la declaración de la renta saldrá a devolver o a pagar",
+        "description": "Compara la cuota IRPF calculada sobre todos los rendimientos del año con las retenciones ya practicadas. Si las retenciones superan la cuota → devolución. Si son inferiores → deuda con Hacienda. Incluye rendimientos del trabajo, actividades económicas, capital mobiliario e inmobiliario y ganancias patrimoniales.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["rendimientosTrabajoAnuales"],
+                "properties": {
+                  "rendimientosTrabajoAnuales": {
+                    "type": "number",
+                    "description": "Salario bruto anual en euros, antes de retenciones y cotizaciones SS. Ejemplo: 30000."
+                  },
+                  "retencionesTrabajoAnuales": {
+                    "type": "number",
+                    "description": "Total de retenciones IRPF practicadas por la empresa durante el año en euros. Aparece en la nómina de diciembre o en el certificado de retenciones."
+                  },
+                  "rendimientosActividadesEconomicas": {
+                    "type": "number",
+                    "description": "Rendimientos netos de actividades económicas (autónomos) en euros. Por defecto 0."
+                  },
+                  "retencionesActividadesEconomicas": {
+                    "type": "number",
+                    "description": "Retenciones soportadas en facturas de actividades económicas en euros. Por defecto 0."
+                  },
+                  "pagosFraccionados": {
+                    "type": "number",
+                    "description": "Pagos fraccionados abonados (Modelo 130) durante el año en euros. Por defecto 0."
+                  },
+                  "rendimientosCapitalMobiliario": {
+                    "type": "number",
+                    "description": "Rendimientos brutos del capital mobiliario (intereses, dividendos) en euros. Por defecto 0."
+                  },
+                  "retencionesCapitalMobiliario": {
+                    "type": "number",
+                    "description": "Retenciones sobre capital mobiliario en euros. Por defecto 0."
+                  },
+                  "rendimientosCapitalInmobiliario": {
+                    "type": "number",
+                    "description": "Rendimientos netos del capital inmobiliario (alquiler) en euros. Por defecto 0."
+                  },
+                  "gananciasPatrimoniales": {
+                    "type": "number",
+                    "description": "Ganancias patrimoniales netas del año (venta de acciones, fondos, etc.) en euros. Por defecto 0."
+                  },
+                  "edad": {
+                    "type": "number",
+                    "description": "Edad del contribuyente. Afecta al mínimo personal IRPF."
+                  },
+                  "numHijos": {
+                    "type": "number",
+                    "description": "Número de hijos menores de 25 años a cargo. Por defecto 0."
+                  },
+                  "tieneHijoMenor3": {
+                    "type": "boolean",
+                    "description": "¿Tiene algún hijo menor de 3 años? Aplica mínimo por descendiente más alto. Por defecto false."
+                  },
+                  "ascendientes65": {
+                    "type": "number",
+                    "description": "Número de ascendientes mayores de 65 años a cargo. Por defecto 0."
+                  },
+                  "discapacidad": {
+                    "type": "string",
+                    "enum": ["ninguna", "moderada", "severa"],
+                    "description": "Grado de discapacidad del contribuyente: 'ninguna', 'moderada' (33-65%), 'severa' (>65%). Por defecto 'ninguna'."
+                  },
+                  "deduccionMaternidad": {
+                    "type": "number",
+                    "description": "Deducción por maternidad aplicable en euros (hasta 1.200€/hijo menor de 3 años). Por defecto 0."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cuota IRPF estimada, total retenciones, resultado (devolución o pago) e importe."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/irpf-segundo-pagador": {
+      "post": {
+        "operationId": "calcularIRPFSegundoPagador",
+        "summary": "Analiza el impacto fiscal de tener dos o más pagadores",
+        "description": "Cuando se trabaja en dos empresas, se combina empleo con prestación del SEPE o con una pensión, cada pagador retiene solo sobre su parte sin conocer los demás ingresos. Esto genera infrarretención y una deuda inesperada en la declaración de la renta. Determina si existe obligación de declarar y estima la deuda o devolución resultante.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["pagadores"],
+                "properties": {
+                  "pagadores": {
+                    "type": "array",
+                    "description": "Lista de todos los pagadores del año. El primero debe ser el de mayor importe. Máximo 10.",
+                    "items": {
+                      "type": "object",
+                      "required": ["descripcion", "importeBruto", "retencionesPracticadas"],
+                      "properties": {
+                        "descripcion": {
+                          "type": "string",
+                          "description": "Nombre o descripción del pagador. Ejemplo: 'Empresa principal', 'SEPE', 'Segunda empresa'."
+                        },
+                        "importeBruto": {
+                          "type": "number",
+                          "description": "Rendimientos brutos percibidos de este pagador en el año en euros."
+                        },
+                        "retencionesPracticadas": {
+                          "type": "number",
+                          "description": "Retenciones IRPF practicadas por este pagador durante el año en euros."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Obligación de declarar, total retenciones, cuota IRPF real y deuda o devolución estimada."
+          }
+        }
+      }
+    }
+  }
+}
