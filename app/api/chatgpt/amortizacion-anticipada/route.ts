@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       await fetch(`${req.nextUrl.origin}/api/analytics/track`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ appName: 'amortizacion-anticipada', mode: 'chatgpt' }),
+        body: JSON.stringify({ aplicacion: 'amortizacion-anticipada', modo: 'chatgpt' }),
       });
     } catch { /* analytics no crítico */ }
 
