@@ -87,6 +87,26 @@ export async function initializeDatabase() {
     )
   `);
 
+  // Tabla de violaciones CSP (Content-Security-Policy)
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS csp_violations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      pagina TEXT,
+      bloqueado TEXT,
+      directiva TEXT,
+      archivo TEXT,
+      linea INTEGER,
+      user_agent TEXT,
+      created_at TEXT DEFAULT (datetime('now', 'localtime'))
+    )
+  `);
+  await client.execute(
+    'CREATE INDEX IF NOT EXISTS idx_csp_created_at ON csp_violations(created_at)'
+  );
+  await client.execute(
+    'CREATE INDEX IF NOT EXISTS idx_csp_directiva ON csp_violations(directiva)'
+  );
+
   // Migración: añadir columna es_propio para marcar visitas del propietario
   // Permite filtrar historial aunque la IP dinámica haya cambiado
   try {

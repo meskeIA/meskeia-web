@@ -5,21 +5,12 @@
  * El navegador envía automáticamente un POST a este endpoint cuando detecta
  * una violación CSP (mientras la política esté en Report-Only o enforcement).
  *
- * Formato del body (application/csp-report):
- * {
- *   "csp-report": {
- *     "document-uri": "https://meskeia.com/mi-app/",
- *     "blocked-uri": "https://dominio-externo.com/recurso",
- *     "violated-directive": "connect-src",
- *     "effective-directive": "connect-src",
- *     "original-policy": "..."
- *   }
- * }
- *
- * Las violaciones se registran en los logs de Vercel para su análisis.
+ * Las violaciones se guardan en Turso (tabla csp_violations) para su análisis
+ * en la auditoría semanal via /api/analytics/csp-violations.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getTursoClient, initializeDatabase } from '@/lib/turso';
 
 interface CspViolation {
   'document-uri'?: string;
@@ -41,8 +32,6 @@ interface CspReport {
 
 export async function POST(request: NextRequest) {
   try {
-    // El navegador envía content-type: application/csp-report
-    // que es JSON válido, podemos parsearlo directamente
     const body = await request.text();
     const report = JSON.parse(body) as CspReport;
     const violation = report['csp-report'];
@@ -51,19 +40,47 @@ export async function POST(request: NextRequest) {
       return new NextResponse(null, { status: 204 });
     }
 
-    // Registrar en logs de Vercel (visible en el dashboard)
-    console.warn('[CSP-VIOLATION]', {
-      pagina: violation['document-uri'],
-      bloqueado: violation['blocked-uri'],
-      directiva: violation['effective-directive'] || violation['violated-directive'],
-      archivo: violation['source-file'],
-      linea: violation['line-number'],
-    });
+    const pagina = violation['document-uri'] ?? null;
+    const bloqueado = violation['blocked-uri'] ?? null;
+    const directiva = violation['effective-directive'] ?? violation['violated-directive'] ?? null;
+    const archivo = violation['source-file'] ?? null;
+    const linea = violation['line-number'] ?? null;
+    const userAgent = request.headers.get('user-agent') ?? null;
 
-    // 204 No Content: respuesta estándar para endpoints de CSP report
+    // Log en Vercel (para depuración inmediata)
+    console.warn('[CSP-VIOLATION]', { pagina, bloqueado, directiva, archivo, linea });
+
+    // Guardar en Turso de forma asíncrona — no bloquea la respuesta 204
+    guardarViolacion({ pagina, bloqueado, directiva, archivo, linea, userAgent }).catch(
+      (err) => console.error('[CSP-VIOLATION] Error al guardar en Turso:', err)
+    );
+
     return new NextResponse(null, { status: 204 });
   } catch {
-    // Si el body no es JSON válido, ignorar silenciosamente
     return new NextResponse(null, { status: 204 });
   }
+}
+
+async function guardarViolacion(datos: {
+  pagina: string | null;
+  bloqueado: string | null;
+  directiva: string | null;
+  archivo: string | null;
+  linea: number | null;
+  userAgent: string | null;
+}): Promise<void> {
+  await initializeDatabase();
+  const client = getTursoClient();
+  await client.execute({
+    sql: `INSERT INTO csp_violations (pagina, bloqueado, directiva, archivo, linea, user_agent)
+          VALUES (?, ?, ?, ?, ?, ?)`,
+    args: [
+      datos.pagina,
+      datos.bloqueado,
+      datos.directiva,
+      datos.archivo,
+      datos.linea,
+      datos.userAgent,
+    ],
+  });
 }
