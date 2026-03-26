@@ -1,0 +1,281 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Inmobiliaria y Alquiler España",
+    "description": "Calculadoras para propietarios e inversores inmobiliarios en España: rentabilidad del alquiler, plusvalía municipal (IIVTNU, métodos objetivo y real), IRPF sobre ingresos de alquiler con reducciones Ley de Vivienda 2023, e imputación de rentas por segunda vivienda vacía.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://meskeia.com"
+    }
+  ],
+  "paths": {
+    "/api/chatgpt/rentabilidad-alquiler": {
+      "post": {
+        "operationId": "calcularRentabilidadAlquiler",
+        "summary": "Calcula la rentabilidad bruta y neta de un piso en alquiler",
+        "description": "Calcula rentabilidad bruta, neta, cash flow mensual y años de recuperación de la inversión. Incluye todos los gastos (IBI, comunidad, seguro, mantenimiento) y opción con hipoteca. No incluye el impacto fiscal en el IRPF.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["precioCompra", "alquilerMensual"],
+                "properties": {
+                  "precioCompra": {
+                    "type": "number",
+                    "description": "Precio de compra del inmueble en euros. Ejemplo: 150000."
+                  },
+                  "alquilerMensual": {
+                    "type": "number",
+                    "description": "Renta de alquiler mensual esperada en euros. Ejemplo: 800."
+                  },
+                  "porcentajeGastosCompra": {
+                    "type": "number",
+                    "description": "Porcentaje de gastos de compra sobre el precio (ITP/AJD, notaría, registro). Por defecto 10%."
+                  },
+                  "reforma": {
+                    "type": "number",
+                    "description": "Coste de reforma e inversión inicial adicional en euros. Por defecto 0."
+                  },
+                  "tasaOcupacion": {
+                    "type": "number",
+                    "description": "Porcentaje de ocupación esperada (%). Por defecto 95."
+                  },
+                  "ibi": {
+                    "type": "number",
+                    "description": "IBI anual en euros. Por defecto 0."
+                  },
+                  "comunidad": {
+                    "type": "number",
+                    "description": "Gastos de comunidad anuales en euros. Por defecto 0."
+                  },
+                  "seguro": {
+                    "type": "number",
+                    "description": "Seguro de hogar anual en euros. Por defecto 0."
+                  },
+                  "mantenimiento": {
+                    "type": "number",
+                    "description": "Mantenimiento y reparaciones anuales estimados en euros. Por defecto 0."
+                  },
+                  "conHipoteca": {
+                    "type": "boolean",
+                    "description": "¿El inmueble tiene hipoteca? Por defecto false."
+                  },
+                  "capitalHipoteca": {
+                    "type": "number",
+                    "description": "Capital hipotecario pendiente en euros. Solo si conHipoteca = true."
+                  },
+                  "tasaHipoteca": {
+                    "type": "number",
+                    "description": "Tipo de interés anual de la hipoteca en %. Por defecto 3,5."
+                  },
+                  "aniosHipoteca": {
+                    "type": "number",
+                    "description": "Plazo restante de la hipoteca en años. Por defecto 25."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inversión total, rentabilidad bruta, rentabilidad neta, cash flow mensual y años de recuperación."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/plusvalia-municipal": {
+      "post": {
+        "operationId": "calcularPlusvalidMunicipal",
+        "summary": "Calcula la plusvalía municipal al vender un inmueble",
+        "description": "Calcula el IIVTNU (plusvalía municipal) con los dos métodos tras STC 182/2021: método objetivo (coeficiente × valor catastral suelo) y método real (incremento real × ratio suelo). Muestra ambos y cuál es más favorable.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["valorCatastralSuelo", "valorCatastralTotal", "aniosTenencia"],
+                "properties": {
+                  "valorCatastralSuelo": {
+                    "type": "number",
+                    "description": "Valor catastral del suelo en euros (figura en el recibo del IBI). Ejemplo: 40000."
+                  },
+                  "valorCatastralTotal": {
+                    "type": "number",
+                    "description": "Valor catastral total del inmueble (suelo + construcción) en euros (figura en el IBI). Ejemplo: 90000."
+                  },
+                  "aniosTenencia": {
+                    "type": "number",
+                    "description": "Años completos desde la compra hasta la venta. Ejemplo: 8."
+                  },
+                  "precioAdquisicion": {
+                    "type": "number",
+                    "description": "Precio de compra original del inmueble en euros. Necesario para calcular el método real. Ejemplo: 120000."
+                  },
+                  "precioTransmision": {
+                    "type": "number",
+                    "description": "Precio de venta del inmueble en euros. Necesario para el método real. Ejemplo: 180000."
+                  },
+                  "tipoImpositivo": {
+                    "type": "number",
+                    "description": "Tipo impositivo municipal en % (máximo legal 30%). Si no se indica, se usa el 30%. Consultar con el ayuntamiento."
+                  },
+                  "coeficienteMunicipal": {
+                    "type": "number",
+                    "description": "Coeficiente municipal si el ayuntamiento aplica uno inferior al máximo estatal. Si no se indica, se usa el máximo estatal."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cuota por método objetivo, cuota por método real, método más favorable y cuota a pagar."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/rendimiento-capital-inmobiliario": {
+      "post": {
+        "operationId": "calcularRendimientoCapitalInmobiliario",
+        "summary": "Calcula el IRPF sobre los ingresos de alquiler",
+        "description": "Calcula el rendimiento neto del capital inmobiliario: deduce IBI, intereses, seguros, amortización, comunidad y otros gastos. Aplica reducciones Ley de Vivienda 2023: 50% general, 60% rehabilitada, 70% zona tensionada, 90% zona tensionada con reducción ≥5%.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["tipoInmueble", "ingresosIntegros"],
+                "properties": {
+                  "tipoInmueble": {
+                    "type": "string",
+                    "enum": [
+                      "vivienda_habitual_arrendatario",
+                      "vivienda_zona_tensionada_nueva",
+                      "vivienda_rehabilitada",
+                      "vivienda_tension_reduccion_5pct",
+                      "no_vivienda"
+                    ],
+                    "description": "Tipo de arrendamiento: 'vivienda_habitual_arrendatario' (reducción 50%), 'vivienda_zona_tensionada_nueva' (70%), 'vivienda_rehabilitada' (60%), 'vivienda_tension_reduccion_5pct' (90%), 'no_vivienda' (local/garaje, sin reducción)."
+                  },
+                  "ingresosIntegros": {
+                    "type": "number",
+                    "description": "Ingresos brutos anuales por el alquiler en euros. Ejemplo: 9600 si cobras 800€/mes."
+                  },
+                  "interesesPrestamo": {
+                    "type": "number",
+                    "description": "Intereses del préstamo hipotecario sobre el inmueble en euros/año."
+                  },
+                  "ibiYTributos": {
+                    "type": "number",
+                    "description": "IBI, tasa de basuras y tributos locales en euros/año."
+                  },
+                  "seguros": {
+                    "type": "number",
+                    "description": "Primas de seguros del inmueble en euros/año."
+                  },
+                  "reparacionConservacion": {
+                    "type": "number",
+                    "description": "Gastos de reparación y conservación (no mejoras) en euros/año."
+                  },
+                  "comunidad": {
+                    "type": "number",
+                    "description": "Cuotas de comunidad de propietarios en euros/año."
+                  },
+                  "administracion": {
+                    "type": "number",
+                    "description": "Gastos de administración y gestión (agencia inmobiliaria, administrador) en euros/año."
+                  },
+                  "otros": {
+                    "type": "number",
+                    "description": "Otros gastos necesarios (formalización de contrato, etc.) en euros/año."
+                  },
+                  "valorConstruccion": {
+                    "type": "number",
+                    "description": "Valor de la construcción del inmueble en euros (para calcular amortización del 3% anual). Si no se indica, no se computa amortización automática."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gastos deducibles, rendimiento neto, reducción aplicada y rendimiento neto reducido declarable en IRPF."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/imputacion-rentas": {
+      "post": {
+        "operationId": "calcularImputacionRentas",
+        "summary": "Calcula la renta a declarar por segunda vivienda vacía",
+        "description": "Si tienes un inmueble urbano que no es tu vivienda habitual y no está en alquiler, Hacienda te obliga a imputar una renta en el IRPF: 1,1% del valor catastral si fue revisado en los últimos 10 años, o 2% si no fue revisado. Máximo 10 inmuebles.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["inmuebles"],
+                "properties": {
+                  "inmuebles": {
+                    "type": "array",
+                    "description": "Lista de inmuebles sujetos a imputación. Máximo 10.",
+                    "items": {
+                      "type": "object",
+                      "required": ["situacionCatastral"],
+                      "properties": {
+                        "descripcion": {
+                          "type": "string",
+                          "description": "Descripción del inmueble (referencia). Ejemplo: 'Piso en Valencia'."
+                        },
+                        "situacionCatastral": {
+                          "type": "string",
+                          "enum": ["revisado_reciente", "no_revisado", "sin_valor_catastral"],
+                          "description": "'revisado_reciente': valor catastral revisado en los últimos 10 años (→ 1,1%). 'no_revisado': no revisado (→ 2%). 'sin_valor_catastral': sin valor catastral asignado (→ requiere valorAdquisicion)."
+                        },
+                        "valorCatastral": {
+                          "type": "number",
+                          "description": "Valor catastral del inmueble en euros (figura en el recibo del IBI). Necesario si situacionCatastral ≠ 'sin_valor_catastral'."
+                        },
+                        "valorAdquisicion": {
+                          "type": "number",
+                          "description": "Precio de compra del inmueble en euros. Solo necesario si situacionCatastral = 'sin_valor_catastral'."
+                        },
+                        "pctTitularidad": {
+                          "type": "number",
+                          "description": "Porcentaje de titularidad del contribuyente (%). Por defecto 100. Si hay copropiedad, indica la parte correspondiente."
+                        },
+                        "diasImputacion": {
+                          "type": "number",
+                          "description": "Días del año en que el inmueble estuvo sujeto a imputación (1-366). Por defecto 365."
+                        }
+                      }
+                    }
+                  },
+                  "tipoMarginalIRPF": {
+                    "type": "number",
+                    "description": "Tipo marginal IRPF del contribuyente en % para estimar la cuota fiscal. Si no se indica, se usa el tipo del primer tramo (19%)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Renta imputada por inmueble, total a integrar en la base imponible general y cuota estimada."
+          }
+        }
+      }
+    }
+  }
+}
