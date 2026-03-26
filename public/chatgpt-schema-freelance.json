@@ -1,0 +1,462 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Freelance España",
+    "description": "Calculadoras especializadas para autónomos y freelances españoles: tarifa hora, horas facturables, Modelo 130, gastos deducibles IRPF, IVA y break-even.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://meskeia.com"
+    }
+  ],
+  "paths": {
+    "/api/chatgpt/tarifa-freelance": {
+      "post": {
+        "operationId": "calcularTarifaFreelance",
+        "summary": "Calcula la tarifa hora/día ideal para un freelance español",
+        "description": "Calcula tarifa hora y día neta y con IVA para alcanzar el ingreso neto mensual deseado, considerando IRPF, IVA, gastos fijos, vacaciones y porcentaje de ocupación real.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["ingresoNetoMensual"],
+                "properties": {
+                  "ingresoNetoMensual": {
+                    "type": "number",
+                    "description": "Ingreso neto mensual deseado en euros (lo que quieres llevarte a casa). Ejemplo: 2500"
+                  },
+                  "horasSemanales": {
+                    "type": "number",
+                    "description": "Horas de trabajo a la semana. Por defecto 40."
+                  },
+                  "diasVacaciones": {
+                    "type": "number",
+                    "description": "Días de vacaciones al año. Por defecto 22 (mínimo legal)."
+                  },
+                  "porcentajeOcupacion": {
+                    "type": "number",
+                    "description": "% de días facturables sobre los disponibles (no siempre tienes clientes). Por defecto 70%."
+                  },
+                  "tipoIRPF": {
+                    "type": "number",
+                    "description": "Tipo estimado de IRPF en %. Por defecto 21%."
+                  },
+                  "tipoIVA": {
+                    "type": "number",
+                    "description": "Tipo de IVA en facturas en %. Por defecto 21%."
+                  },
+                  "gastosFijosMensuales": {
+                    "type": "number",
+                    "description": "Total gastos fijos mensuales en euros (cuota autónomo, seguros, software, oficina...). Ejemplo: 400"
+                  },
+                  "gastosVariablesMensuales": {
+                    "type": "number",
+                    "description": "Total gastos variables mensuales en euros (formación, materiales, viajes...). Ejemplo: 100"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cálculo de tarifa freelance completado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tarifaHora": { "type": "number", "description": "Tarifa por hora sin IVA (€)" },
+                    "tarifaDia": { "type": "number", "description": "Tarifa por día sin IVA (€)" },
+                    "tarifaHoraConIVA": { "type": "number", "description": "Tarifa por hora con IVA (€)" },
+                    "tarifaDiaConIVA": { "type": "number", "description": "Tarifa por día con IVA (€)" },
+                    "facturacionMensualNecesaria": { "type": "number", "description": "Facturación bruta mensual necesaria (€)" },
+                    "horasFacturablesMes": { "type": "number", "description": "Horas facturables reales al mes" },
+                    "totalGastosMensuales": { "type": "number", "description": "Total gastos mensuales (€)" },
+                    "facturacionAnual": { "type": "number", "description": "Facturación anual estimada (€)" },
+                    "irpfAnual": { "type": "number", "description": "IRPF anual estimado (€)" },
+                    "beneficioNetoAnual": { "type": "number", "description": "Beneficio neto anual estimado (€)" },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/horas-facturables": {
+      "post": {
+        "operationId": "calcularHorasFacturables",
+        "summary": "Calcula las horas realmente facturables de un freelance al mes",
+        "description": "Calcula horas facturables reales anuales y mensuales descontando vacaciones, festivos, bajas y horas no facturables (administración, reuniones, formación). Devuelve tarifa mínima/hora.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["facturacionAnual"],
+                "properties": {
+                  "facturacionAnual": {
+                    "type": "number",
+                    "description": "Facturación o ingresos anuales objetivos en euros. Ejemplo: 36000"
+                  },
+                  "horasPorDia": {
+                    "type": "number",
+                    "description": "Horas de trabajo por día laboral. Por defecto 8."
+                  },
+                  "diasVacaciones": {
+                    "type": "number",
+                    "description": "Días de vacaciones al año. Por defecto 22."
+                  },
+                  "diasBaja": {
+                    "type": "number",
+                    "description": "Días de baja médica estimados al año. Por defecto 5."
+                  },
+                  "diasFormacion": {
+                    "type": "number",
+                    "description": "Días de formación/cursos al año. Por defecto 0."
+                  },
+                  "horasNoFacturablesSemanales": {
+                    "type": "number",
+                    "description": "Horas semanales en tareas no facturables (admin, marketing, reuniones comerciales). Por defecto 0."
+                  },
+                  "pctTiempoSinFacturar": {
+                    "type": "number",
+                    "description": "% de tiempo sin clientes o con impagos. Por defecto 0."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cálculo de horas facturables completado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "horasEfectivas": { "type": "number", "description": "Horas trabajadas efectivas al año" },
+                    "horasFacturables": { "type": "number", "description": "Horas facturables reales al año" },
+                    "tarifaMinimaHora": { "type": "number", "description": "Tarifa mínima por hora para cubrir la facturación objetivo (€/h)" },
+                    "diasEfectivos": { "type": "number", "description": "Días efectivos trabajados al año" },
+                    "semanasLaborables": { "type": "number", "description": "Semanas laborables al año" },
+                    "interpretacion": { "type": "string", "description": "Análisis de disponibilidad" },
+                    "detalleAusencias": {
+                      "type": "object",
+                      "description": "Distribución detallada de ausencias en días"
+                    },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/modelo130": {
+      "post": {
+        "operationId": "calcularModelo130",
+        "summary": "Calcula el pago fraccionado IRPF trimestral del autónomo (Modelo 130)",
+        "description": "Calcula la cuota a ingresar en el Modelo 130 por trimestre. Usa ingresos y gastos ACUMULADOS desde el 1 de enero. Incluye regla del 70%, proyección anual y plazos de presentación.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["trimestre", "ingresosAcumulados", "gastosDeduciblesAcumulados"],
+                "properties": {
+                  "trimestre": {
+                    "type": "string",
+                    "enum": ["T1", "T2", "T3", "T4"],
+                    "description": "Trimestre: T1=ene-mar, T2=abr-jun, T3=jul-sep, T4=oct-dic"
+                  },
+                  "ingresosAcumulados": {
+                    "type": "number",
+                    "description": "Total facturado acumulado desde el 1 de enero hasta fin del trimestre (€). Ejemplo: para T2, suma de enero a junio."
+                  },
+                  "gastosDeduciblesAcumulados": {
+                    "type": "number",
+                    "description": "Total gastos deducibles acumulados desde el 1 de enero (€). Incluye cuotas SS, alquiler, suministros, asesoría, etc."
+                  },
+                  "retencionesAcumuladas": {
+                    "type": "number",
+                    "description": "Retenciones de IRPF que te han practicado los clientes acumuladas (€). Por defecto 0."
+                  },
+                  "pagosFraccionadosAnteriores": {
+                    "type": "number",
+                    "description": "Suma de los pagos ya realizados en trimestres anteriores del mismo año (€). Por defecto 0."
+                  },
+                  "masDeL70PctConRetencion": {
+                    "type": "boolean",
+                    "description": "¿Más del 70% de tus ingresos vienen de clientes que te retienen IRPF? Si es true, puede no existir obligación de presentar el 130."
+                  },
+                  "anioEjercicio": {
+                    "type": "number",
+                    "description": "Año del ejercicio. Por defecto el año actual."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cálculo del Modelo 130 completado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cuotaAIngresar": { "type": "number", "description": "Cuota a ingresar en el Modelo 130 este trimestre (€)" },
+                    "rendimientoNetoAcumulado": { "type": "number", "description": "Rendimiento neto acumulado = ingresos - gastos (€)" },
+                    "cuotaBruta": { "type": "number", "description": "Cuota bruta (20% del rendimiento neto) (€)" },
+                    "obligacionPresentar": { "type": "boolean", "description": "¿Existe obligación de presentar el Modelo 130?" },
+                    "motivoNoObligacion": { "type": "string", "description": "Motivo de no obligación si aplica" },
+                    "plazoPresentacion": { "type": "string", "description": "Plazo de presentación del trimestre" },
+                    "rendimientoAnualEstimado": { "type": "number", "description": "Proyección del rendimiento neto anual (€)" },
+                    "advertencias": { "type": "array", "items": { "type": "string" }, "description": "Advertencias importantes" },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/gastos-deducibles": {
+      "post": {
+        "operationId": "calcularGastosDeducibles",
+        "summary": "Calcula los gastos deducibles en el IRPF para autónomos españoles",
+        "description": "Calcula el total de gastos deducibles IRPF en estimación directa simplificada o normal: cuotas SS, suministros hogar (fórmula 30%), dietas con límites legales, asesoría, seguros y gastos de difícil justificación.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["modalidadEstimacion", "ingresosBrutos"],
+                "properties": {
+                  "modalidadEstimacion": {
+                    "type": "string",
+                    "enum": ["simplificada", "directa_normal"],
+                    "description": "Modalidad de estimación directa. La mayoría usa 'simplificada' (facturación < 600.000€/año)."
+                  },
+                  "ingresosBrutos": {
+                    "type": "number",
+                    "description": "Ingresos brutos anuales de la actividad en euros. Ejemplo: 40000"
+                  },
+                  "cuotasSSAutonomo": {
+                    "type": "number",
+                    "description": "Cuotas SS autónomo (RETA) anuales pagadas en euros. Deducibles al 100%."
+                  },
+                  "alquilerLocal": {
+                    "type": "number",
+                    "description": "Alquiler de oficina o local exterior anual en euros. Deducible al 100% si uso exclusivo."
+                  },
+                  "gastosSupministrosHogar": {
+                    "type": "number",
+                    "description": "Gasto anual en suministros del domicilio habitual (luz, agua, internet, teléfono) en euros."
+                  },
+                  "pctSuperficieActividadHogar": {
+                    "type": "number",
+                    "description": "% de la superficie del hogar dedicada a la actividad (0-100). Necesario para deducir suministros."
+                  },
+                  "gastosAsesoria": {
+                    "type": "number",
+                    "description": "Gastos de asesoría/gestoría anuales en euros. Deducibles al 100%."
+                  },
+                  "gastosSeguros": {
+                    "type": "number",
+                    "description": "Seguros de RC, accidentes, salud, etc. anuales en euros. Deducibles al 100%."
+                  },
+                  "otrosGastos": {
+                    "type": "number",
+                    "description": "Material de oficina, publicidad, formación, software, etc. en euros."
+                  },
+                  "gastosDietas": {
+                    "type": "number",
+                    "description": "Gastos reales en dietas en hostelería (pagados con tarjeta) anuales en euros."
+                  },
+                  "diasDietasEspaniaSinPernoctar": {
+                    "type": "number",
+                    "description": "Días de dietas en España sin pernoctar (límite 26,67€/día)."
+                  },
+                  "diasDietasEspaniaPernoctando": {
+                    "type": "number",
+                    "description": "Días de dietas en España pernoctando (límite 53,34€/día)."
+                  },
+                  "diasDietasExtranjeroSinPernoctar": {
+                    "type": "number",
+                    "description": "Días de dietas en extranjero sin pernoctar (límite 48,08€/día)."
+                  },
+                  "diasDietasExtranjeroPernoctando": {
+                    "type": "number",
+                    "description": "Días de dietas en extranjero pernoctando (límite 91,35€/día)."
+                  },
+                  "otrosGastosAcreditados": {
+                    "type": "number",
+                    "description": "Otros gastos deducibles acreditados (amortizaciones, compras de mercancías, etc.) en euros."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cálculo de gastos deducibles completado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalGastosDeducibles": { "type": "number", "description": "Total de gastos deducibles (€)" },
+                    "rendimientoNetoPrevio": { "type": "number", "description": "Rendimiento neto previo = ingresos - gastos (€)" },
+                    "deduccionDificilJustificacion": { "type": "number", "description": "Deducción por gastos de difícil justificación (solo EDS, máx 2.000€) (€)" },
+                    "rendimientoNetoActividad": { "type": "number", "description": "Rendimiento neto de la actividad (base IRPF) (€)" },
+                    "tipoIRPFEstimado": { "type": "number", "description": "Tipo estimado de IRPF (%)" },
+                    "cuotaIRPFEstimada": { "type": "number", "description": "Cuota IRPF estimada (€)" },
+                    "gastos": {
+                      "type": "array",
+                      "description": "Detalle de cada gasto deducible con importe, % deducción y observación legal"
+                    },
+                    "advertencias": { "type": "array", "items": { "type": "string" } },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/iva-factura": {
+      "post": {
+        "operationId": "calcularIVAFactura",
+        "summary": "Calcula el desglose de IVA en facturas para autónomos",
+        "description": "Añade IVA a una base imponible o extrae la base de un total con IVA. Tipos vigentes España 2025: 21% general, 10% reducido, 4% superreducido, 0% exento.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["importe", "tipoIVA", "modo"],
+                "properties": {
+                  "importe": {
+                    "type": "number",
+                    "description": "Importe en euros sobre el que operar. Ejemplo: 1000"
+                  },
+                  "tipoIVA": {
+                    "type": "number",
+                    "enum": [21, 10, 4, 0],
+                    "description": "Tipo de IVA a aplicar: 21 (general), 10 (reducido), 4 (superreducido), 0 (exento)."
+                  },
+                  "modo": {
+                    "type": "string",
+                    "enum": ["anadir", "quitar"],
+                    "description": "'anadir': el importe es sin IVA, calcular total con IVA. 'quitar': el importe ya incluye IVA, extraer base imponible."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cálculo de IVA completado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "baseImponible": { "type": "number", "description": "Base imponible (sin IVA) en euros" },
+                    "tipoIVA": { "type": "number", "description": "Tipo de IVA aplicado (%)" },
+                    "cuotaIVA": { "type": "number", "description": "Cuota de IVA en euros" },
+                    "totalConIVA": { "type": "number", "description": "Total con IVA en euros" },
+                    "descripcionTipo": { "type": "string", "description": "Descripción del tipo de IVA aplicado" },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/break-even": {
+      "post": {
+        "operationId": "calcularBreakEven",
+        "summary": "Calcula el punto de equilibrio (break-even) para un freelance",
+        "description": "Calcula cuántos proyectos/horas/ingresos necesita un freelance para cubrir sus costes fijos y empezar a ganar dinero. Incluye análisis de rentabilidad actual y objetivo de ganancia.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["precioVenta", "costoVariable", "costosFijos"],
+                "properties": {
+                  "precioVenta": {
+                    "type": "number",
+                    "description": "Precio cobrado por proyecto, servicio o unidad en euros. Ejemplo: 1500 por proyecto o 75 por hora."
+                  },
+                  "costoVariable": {
+                    "type": "number",
+                    "description": "Coste directo variable por proyecto/unidad en euros (subcontratación, materiales...). Para servicios puros suele ser 0."
+                  },
+                  "costosFijos": {
+                    "type": "number",
+                    "description": "Total costes fijos mensuales en euros (cuota autónomo + alquiler + software + seguros...). Ejemplo: 800"
+                  },
+                  "ventasActuales": {
+                    "type": "number",
+                    "description": "Proyectos/unidades actuales al mes para comparar con el break-even. Opcional."
+                  },
+                  "objetivoGanancia": {
+                    "type": "number",
+                    "description": "Ganancia mensual deseada en euros. Calcula cuántos proyectos/unidades necesitas. Opcional."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cálculo de break-even completado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "breakEvenUnidades": { "type": "number", "description": "Proyectos/unidades necesarios para cubrir costes fijos" },
+                    "breakEvenEuros": { "type": "number", "description": "Ingresos mensuales necesarios para break-even (€)" },
+                    "margenContribucion": { "type": "number", "description": "Margen de contribución por proyecto (€)" },
+                    "margenContribucionPorcentaje": { "type": "number", "description": "Margen de contribución (%)" },
+                    "unidadesParaObjetivo": { "type": "number", "description": "Proyectos necesarios para alcanzar el objetivo de ganancia (si se indicó)" },
+                    "ventasParaObjetivo": { "type": "number", "description": "Ingresos necesarios para alcanzar el objetivo (€)" },
+                    "gananciaActual": { "type": "number", "description": "Ganancia/pérdida con las ventas actuales (€) (si se indicaron)" },
+                    "esRentable": { "type": "boolean", "description": "¿La situación actual es rentable?" },
+                    "margenSeguridadPorcentaje": { "type": "number", "description": "Margen de seguridad sobre el break-even (%)" },
+                    "aviso_legal": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
