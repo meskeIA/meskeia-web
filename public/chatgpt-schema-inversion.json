@@ -1,0 +1,335 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Inversión y Ahorro España",
+    "description": "Calculadoras financieras para inversores y ahorradores en España: interés compuesto, objetivos de ahorro, plusvalías IRPF 2025, reequilibrio de cartera, planes de pensiones y retención sobre dividendos.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://meskeia.com"
+    }
+  ],
+  "paths": {
+    "/api/chatgpt/interes-compuesto": {
+      "post": {
+        "operationId": "simularInteresCompuesto",
+        "summary": "Simula el crecimiento de un capital con interés compuesto",
+        "description": "Calcula el capital final, el total aportado y los intereses generados a lo largo de un horizonte de inversión. Acepta aportaciones periódicas (mensuales) y distintas frecuencias de capitalización. Útil para fondos indexados, depósitos, ETFs y cualquier producto de ahorro.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["capitalInicial", "tasaAnual", "anos"],
+                "properties": {
+                  "capitalInicial": {
+                    "type": "number",
+                    "description": "Capital de partida en euros (>= 0). Ejemplo: 10000."
+                  },
+                  "tasaAnual": {
+                    "type": "number",
+                    "description": "Rentabilidad anual esperada en % (0-100). Ejemplo: 7 para el MSCI World histórico."
+                  },
+                  "anos": {
+                    "type": "number",
+                    "description": "Número de años de inversión (1-100). Ejemplo: 20."
+                  },
+                  "aportacionPeriodica": {
+                    "type": "number",
+                    "description": "Aportación mensual adicional en euros. Por defecto 0."
+                  },
+                  "frecuenciaCapitalizacion": {
+                    "type": "string",
+                    "enum": ["anual", "semestral", "trimestral", "mensual"],
+                    "description": "Frecuencia de capitalización. Por defecto 'mensual'."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Capital final, total aportado, intereses generados y rentabilidad total."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/objetivo-ahorro": {
+      "post": {
+        "operationId": "calcularObjetivoAhorro",
+        "summary": "Calcula plazo o cuota mensual para alcanzar un objetivo de ahorro",
+        "description": "Responde dos preguntas: A) dado un ahorro mensual, ¿cuántos meses necesito para llegar a X€? B) dado un plazo en meses, ¿cuánto debo ahorrar al mes? Incluye rentabilidad del ahorro y capital inicial disponible.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["objetivoEuros"],
+                "properties": {
+                  "objetivoEuros": {
+                    "type": "number",
+                    "description": "Objetivo de ahorro a alcanzar en euros. Ejemplo: 20000 para un coche o fondo de emergencia."
+                  },
+                  "ahorroMensual": {
+                    "type": "number",
+                    "description": "Ahorro mensual disponible en euros. Proporciona este campo O mesesObjetivo, nunca los dos."
+                  },
+                  "mesesObjetivo": {
+                    "type": "number",
+                    "description": "Meses en los que quieres alcanzar el objetivo. Proporciona este campo O ahorroMensual, nunca los dos."
+                  },
+                  "rentabilidadAnual": {
+                    "type": "number",
+                    "description": "Rentabilidad anual del ahorro en % (cuenta remunerada, fondo monetario). Por defecto 0."
+                  },
+                  "capitalInicial": {
+                    "type": "number",
+                    "description": "Capital inicial ya disponible en euros. Por defecto 0."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ahorro mensual necesario o plazo en meses para alcanzar el objetivo."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/plusvalias-irpf": {
+      "post": {
+        "operationId": "calcularPlusvaliasIRPF",
+        "summary": "Calcula el IRPF a pagar por la venta de acciones, fondos u otros activos",
+        "description": "Aplica los tramos del ahorro IRPF 2025 (19%/21%/23%/27%/30%) sobre la ganancia patrimonial neta. Distingue entre largo plazo (>1 año) y corto plazo. Permite compensar pérdidas pendientes de años anteriores.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["precioCompra", "precioVenta", "fechaCompra", "fechaVenta"],
+                "properties": {
+                  "precioCompra": {
+                    "type": "number",
+                    "description": "Precio de compra del activo en euros. Ejemplo: 5000."
+                  },
+                  "precioVenta": {
+                    "type": "number",
+                    "description": "Precio de venta del activo en euros. Ejemplo: 8000."
+                  },
+                  "fechaCompra": {
+                    "type": "string",
+                    "description": "Fecha de compra en formato YYYY-MM-DD. Ejemplo: '2020-03-15'."
+                  },
+                  "fechaVenta": {
+                    "type": "string",
+                    "description": "Fecha de venta en formato YYYY-MM-DD. Ejemplo: '2025-06-10'."
+                  },
+                  "gastosCompra": {
+                    "type": "number",
+                    "description": "Gastos de compra (comisiones, etc.) en euros. Por defecto 0."
+                  },
+                  "gastosVenta": {
+                    "type": "number",
+                    "description": "Gastos de venta (comisiones, etc.) en euros. Por defecto 0."
+                  },
+                  "tipoActivo": {
+                    "type": "string",
+                    "enum": ["acciones", "fondos", "inmueble", "otro"],
+                    "description": "Tipo de activo vendido. Por defecto 'acciones'."
+                  },
+                  "saldoCompensacion": {
+                    "type": "number",
+                    "description": "Pérdidas patrimoniales pendientes de compensar de años anteriores en euros. Por defecto 0."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ganancia neta, cuota IRPF, tipo efectivo y resultado de compensación de pérdidas."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/reequilibrio-cartera": {
+      "post": {
+        "operationId": "calcularReequilibrioCartera",
+        "summary": "Calcula cómo rebalancear una cartera de inversión",
+        "description": "Determina las operaciones de compra/venta necesarias para ajustar los pesos reales de la cartera a los pesos objetivo. Soporta estrategia con ventas o solo con nuevo capital (para evitar tributar plusvalías). Máximo 20 activos.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["activos"],
+                "properties": {
+                  "activos": {
+                    "type": "array",
+                    "description": "Lista de activos de la cartera. Los pesos objetivo deben sumar 100.",
+                    "items": {
+                      "type": "object",
+                      "required": ["nombre", "valorActual", "pesoObjetivoPct"],
+                      "properties": {
+                        "nombre": {
+                          "type": "string",
+                          "description": "Nombre del activo o categoría. Ejemplo: 'Renta Variable Global'."
+                        },
+                        "valorActual": {
+                          "type": "number",
+                          "description": "Valor actual de mercado en euros."
+                        },
+                        "pesoObjetivoPct": {
+                          "type": "number",
+                          "description": "Peso objetivo en la cartera en %. Todos los activos deben sumar 100."
+                        },
+                        "costeMedio": {
+                          "type": "number",
+                          "description": "Coste de adquisición medio en euros. Para estimar plusvalías si se vende."
+                        }
+                      }
+                    }
+                  },
+                  "estrategia": {
+                    "type": "string",
+                    "enum": ["comprar_vender", "solo_comprar"],
+                    "description": "Estrategia de reequilibrio. 'comprar_vender' ajusta vendiendo y comprando. 'solo_comprar' solo aporta nuevo capital. Por defecto 'comprar_vender'."
+                  },
+                  "nuevoCapital": {
+                    "type": "number",
+                    "description": "Nuevo capital disponible para aportar en euros. Relevante para estrategia 'solo_comprar'. Por defecto 0."
+                  },
+                  "umbralDesviacion": {
+                    "type": "number",
+                    "description": "Desviación mínima en puntos porcentuales para activar una operación. Por defecto 5."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Operaciones de compra/venta por activo, totales y si el reequilibrio es necesario."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/plan-pensiones": {
+      "post": {
+        "operationId": "calcularPlanPensiones",
+        "summary": "Calcula el ahorro fiscal y capital proyectado de un plan de pensiones",
+        "description": "Determina la aportación deducible (límite 2025: 1.500€ individual + hasta 8.500€ empresarial), el ahorro fiscal anual según el tipo marginal IRPF y el capital estimado al jubilar con interés compuesto.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["rendimientosNetos", "aportacionIndividual", "edadActual"],
+                "properties": {
+                  "rendimientosNetos": {
+                    "type": "number",
+                    "description": "Rendimientos netos anuales del trabajo o actividad económica en euros. Ejemplo: 35000."
+                  },
+                  "aportacionIndividual": {
+                    "type": "number",
+                    "description": "Aportación individual anual al plan de pensiones en euros. Límite deducible 2025: 1.500€. Ejemplo: 1500."
+                  },
+                  "edadActual": {
+                    "type": "number",
+                    "description": "Edad actual del partícipe (18-70). Ejemplo: 40."
+                  },
+                  "aportacionEmpresarial": {
+                    "type": "number",
+                    "description": "Aportación de la empresa al plan del trabajador en euros/año. Máximo deducible 2025: 8.500€. Por defecto 0."
+                  },
+                  "edadJubilacion": {
+                    "type": "number",
+                    "description": "Edad prevista de jubilación. Por defecto 67."
+                  },
+                  "rentabilidadAnual": {
+                    "type": "number",
+                    "description": "Rentabilidad anual esperada del plan en %. Por defecto 4."
+                  },
+                  "capitalActual": {
+                    "type": "number",
+                    "description": "Capital ya acumulado en el plan en euros. Por defecto 0."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Aportación deducible, ahorro fiscal anual, tipo marginal IRPF y capital estimado al jubilarse."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/retencion-dividendos": {
+      "post": {
+        "operationId": "calcularRetencionDividendos",
+        "summary": "Calcula la retención e IRPF sobre dividendos recibidos",
+        "description": "Calcula la retención a cuenta del 19%, la cuota IRPF real según los tramos del ahorro 2025 para personas físicas residentes, y la posible exención IS art. 21 para sociedades con participación ≥ 5% durante ≥ 12 meses.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["dividendoBruto", "tipoReceptor"],
+                "properties": {
+                  "dividendoBruto": {
+                    "type": "number",
+                    "description": "Importe bruto del dividendo en euros. Ejemplo: 1000."
+                  },
+                  "tipoReceptor": {
+                    "type": "string",
+                    "enum": ["persona_fisica_residente", "sociedad_residente", "no_residente"],
+                    "description": "Tipo de receptor: 'persona_fisica_residente' (inversor particular en España), 'sociedad_residente' (empresa española), 'no_residente'."
+                  },
+                  "gastosAdministracion": {
+                    "type": "number",
+                    "description": "Gastos de administración y depósito en euros (solo personas físicas). Por defecto 0."
+                  },
+                  "otrosRdtoAhorroEjercicio": {
+                    "type": "number",
+                    "description": "Otros rendimientos del ahorro ya computados en el ejercicio (para calcular el tramo acumulado). Por defecto 0."
+                  },
+                  "porcentajeParticipacion": {
+                    "type": "number",
+                    "description": "Porcentaje de participación en la entidad pagadora (solo sociedades). Relevante para exención IS art. 21 si >= 5%."
+                  },
+                  "mesesTenencia": {
+                    "type": "number",
+                    "description": "Meses de tenencia de la participación (solo sociedades). Exención IS art. 21 requiere >= 12 meses."
+                  },
+                  "tipoCDI": {
+                    "type": "number",
+                    "description": "Tipo reducido del Convenio de Doble Imposición aplicable en % (solo no residentes). Si no se indica, se aplica el tipo general del 19%."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Retención practicada, cuota IRPF real, tipo efectivo y resultado exención IS si aplica."
+          }
+        }
+      }
+    }
+  }
+}
