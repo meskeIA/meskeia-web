@@ -1,0 +1,264 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Jubilación España",
+    "description": "Calculadoras de planificación de jubilación para trabajadores en España: estimación de pensión pública SS 2025, jubilación anticipada, brecha de jubilación, pensión complementaria privada y tributación del rescate de planes de pensiones.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://meskeia.com"
+    }
+  ],
+  "paths": {
+    "/api/chatgpt/pension-publica": {
+      "post": {
+        "operationId": "calcularPensionPublica",
+        "summary": "Estima la pensión pública de jubilación de la Seguridad Social",
+        "description": "Calcula la pensión bruta estimada según la fórmula SS: base reguladora × porcentaje por años cotizados (LGSS RDL 8/2015 + Ley 21/2021). Aplica pensión mínima y máxima SS 2025. Resultado orientativo — la SS calcula a partir del historial completo de cotización.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["baseCotizacionMensual", "anosCotizados"],
+                "properties": {
+                  "baseCotizacionMensual": {
+                    "type": "number",
+                    "description": "Base de cotización media mensual estimada de los últimos 25 años (€). Si no la conoces, usa el salario bruto mensual actual. Ejemplo: 2200."
+                  },
+                  "anosCotizados": {
+                    "type": "number",
+                    "description": "Años totales cotizados a la Seguridad Social (0-50). Ejemplo: 35."
+                  },
+                  "edadActual": {
+                    "type": "number",
+                    "description": "Edad actual del trabajador. Para informar sobre la edad ordinaria de jubilación aplicable."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pensión mensual y anual estimada, base reguladora, porcentaje aplicado y edad ordinaria de jubilación."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/jubilacion-anticipada": {
+      "post": {
+        "operationId": "calcularJubilacionAnticipada",
+        "summary": "Calcula la reducción de pensión por jubilarse antes de la edad ordinaria",
+        "description": "Determina si es posible la jubilación anticipada y cuánto se reduce la pensión. Voluntaria: hasta 2 años antes, requiere ≥ 35 años cotizados. Involuntaria (despido, ERTE): hasta 4 años antes, requiere ≥ 33 años. La reducción es permanente.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["anosCotizados", "mesesAnticipacion", "pensionOrdinaria"],
+                "properties": {
+                  "anosCotizados": {
+                    "type": "number",
+                    "description": "Años cotizados a la Seguridad Social (0-50). Ejemplo: 36."
+                  },
+                  "mesesAnticipacion": {
+                    "type": "number",
+                    "description": "Meses de anticipación respecto a la edad ordinaria de jubilación (1-48). Ejemplo: 24 para jubilarse 2 años antes."
+                  },
+                  "tipo": {
+                    "type": "string",
+                    "enum": ["voluntaria", "involuntaria"],
+                    "description": "'voluntaria' si la iniciativa es del trabajador. 'involuntaria' si es por despido, ERTE u otras causas ajenas. Por defecto 'voluntaria'."
+                  },
+                  "pensionOrdinaria": {
+                    "type": "number",
+                    "description": "Pensión estimada a la edad ordinaria de jubilación (€/mes). Usa primero calcularPensionPublica. Ejemplo: 1800."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Si la jubilación anticipada es posible, reducción aplicada (%) y pensión resultante tras la reducción."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/brecha-jubilacion": {
+      "post": {
+        "operationId": "calcularBrechaJubilacion",
+        "summary": "Calcula la diferencia entre tu sueldo actual y tu futura pensión",
+        "description": "Determina cuánto dinero mensual perderás al jubilarte (brecha), el capital total necesario para cubrirla durante los años de jubilación y el ahorro mensual necesario desde hoy para acumularlo.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["sueldoNetoMensual", "pensionEstimadaMensual", "edadActual"],
+                "properties": {
+                  "sueldoNetoMensual": {
+                    "type": "number",
+                    "description": "Sueldo neto mensual actual en euros. Ejemplo: 1800."
+                  },
+                  "pensionEstimadaMensual": {
+                    "type": "number",
+                    "description": "Pensión pública estimada en euros/mes. Usa calcularPensionPublica si no la conoces. Ejemplo: 1200."
+                  },
+                  "edadActual": {
+                    "type": "number",
+                    "description": "Edad actual en años (18-80). Ejemplo: 45."
+                  },
+                  "edadJubilacion": {
+                    "type": "number",
+                    "description": "Edad prevista de jubilación. Por defecto 67."
+                  },
+                  "anosJubilado": {
+                    "type": "number",
+                    "description": "Años previstos de jubilación (para calcular el capital necesario). Por defecto 20."
+                  },
+                  "rentabilidadAnual": {
+                    "type": "number",
+                    "description": "Rentabilidad anual esperada del ahorro en %. Por defecto 4."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Brecha mensual y anual, capital necesario para cubrirla y ahorro mensual requerido desde hoy."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/pension-complementaria": {
+      "post": {
+        "operationId": "calcularPensionComplementaria",
+        "summary": "Calcula cuánto ahorrar para complementar la pensión pública",
+        "description": "Determina el capital privado necesario para alcanzar la renta mensual deseada en jubilación (complementando la pensión pública) y el ahorro mensual requerido desde hoy para acumularlo. Usa el método de anualidad o la regla del 4%.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["rentaDeseadaMensual", "pensionPublicaEstimada", "edadActual"],
+                "properties": {
+                  "rentaDeseadaMensual": {
+                    "type": "number",
+                    "description": "Renta mensual neta total que quieres tener en jubilación (€). Ejemplo: 2000."
+                  },
+                  "pensionPublicaEstimada": {
+                    "type": "number",
+                    "description": "Pensión pública estimada neta (€/mes). Usa calcularPensionPublica. Ejemplo: 1200."
+                  },
+                  "edadActual": {
+                    "type": "number",
+                    "description": "Edad actual en años (18-80). Ejemplo: 45."
+                  },
+                  "edadJubilacion": {
+                    "type": "number",
+                    "description": "Edad objetivo de jubilación. Por defecto 67."
+                  },
+                  "esperanzaVida": {
+                    "type": "number",
+                    "description": "Esperanza de vida estimada en años. Por defecto 85."
+                  },
+                  "rentabilidadAcumulacion": {
+                    "type": "number",
+                    "description": "Rentabilidad anual durante la fase de ahorro/acumulación (%). Por defecto 5."
+                  },
+                  "rentabilidadRetiro": {
+                    "type": "number",
+                    "description": "Rentabilidad anual durante la fase de retiro (%). Por defecto 3."
+                  },
+                  "capitalYaAcumulado": {
+                    "type": "number",
+                    "description": "Capital privado ya acumulado para jubilación (planes de pensiones, fondos...) en euros. Por defecto 0."
+                  },
+                  "metodo": {
+                    "type": "string",
+                    "enum": ["regla4", "anualidad"],
+                    "description": "'anualidad' calcula el valor presente exacto. 'regla4' usa la regla del 4% (capital = brecha anual / 0,04). Por defecto 'anualidad'."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Capital privado necesario, ahorro mensual requerido y brecha mensual a cubrir."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/rescate-plan-pensiones": {
+      "post": {
+        "operationId": "calcularRescatePlanPensiones",
+        "summary": "Calcula el IRPF al rescatar un plan de pensiones",
+        "description": "Las prestaciones de planes de pensiones tributan como Rendimiento del Trabajo en la base general del IRPF. Calcula la cuota estimada, la reducción del 40% para aportaciones pre-2007 (DA 12.ª LIRPF) si el cobro es en capital, y el neto a cobrar.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["formaRescate", "contingencia", "totalAcumulado"],
+                "properties": {
+                  "formaRescate": {
+                    "type": "string",
+                    "enum": ["capital", "renta", "mixta"],
+                    "description": "'capital': cobro único de todo el plan. 'renta': pagos periódicos. 'mixta': parte en capital y parte en renta."
+                  },
+                  "contingencia": {
+                    "type": "string",
+                    "enum": ["jubilacion", "incapacidad", "fallecimiento", "dependencia", "desempleo_larga_duracion", "enfermedad_grave", "liquidez_excepcional_10anios"],
+                    "description": "Motivo del rescate. 'jubilacion' es el más habitual."
+                  },
+                  "totalAcumulado": {
+                    "type": "number",
+                    "description": "Total acumulado en el plan de pensiones en euros. Ejemplo: 80000."
+                  },
+                  "capitalPre2007": {
+                    "type": "number",
+                    "description": "Parte del capital correspondiente a aportaciones realizadas antes del 31/12/2006 (€). Relevante para la reducción del 40% si el cobro es en capital."
+                  },
+                  "importeCapital": {
+                    "type": "number",
+                    "description": "Para forma 'mixta': importe que se rescata en forma de capital (€). Para 'capital', se usa totalAcumulado automáticamente."
+                  },
+                  "rentaAnual": {
+                    "type": "number",
+                    "description": "Para forma 'renta' o 'mixta': renta anual periódica en euros."
+                  },
+                  "anosDesdeContingencia": {
+                    "type": "number",
+                    "description": "Años transcurridos desde que se produjo la contingencia (jubilación, etc.). Relevante para validar el plazo de la reducción del 40%."
+                  },
+                  "otrosRdtTrabajoEjercicio": {
+                    "type": "number",
+                    "description": "Otros rendimientos del trabajo en el mismo ejercicio fiscal (€), como la pensión pública. Necesario para calcular el tipo marginal efectivo."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Base imponible, reducción 40% si aplica, cuota IRPF estimada y neto a cobrar."
+          }
+        }
+      }
+    }
+  }
+}
