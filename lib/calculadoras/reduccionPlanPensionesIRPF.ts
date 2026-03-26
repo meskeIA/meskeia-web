@@ -45,6 +45,8 @@
  * Encadenable con: calcular_irpf, calcular_rescate_plan_pensiones, calcular_autonomos_cuota_ss
  */
 
+import { tipoMarginalDesdeRNT } from '@/data/fiscal';
+
 // --- Constantes ---
 
 const LIMITE_INDIVIDUAL_2025 = 1_500;          // EUR/ano (aportaciones propias PP individual/PPA/PIAS)
@@ -113,8 +115,10 @@ export interface ResultadoReduccionPlanPensionesIRPF {
   totalReduccion: number;
   /** Exceso de aportaciones no deducible este ano (trasladar 5 anos) */
   excesoNoDeducible: number;
-  /** Ahorro fiscal estimado al tipo marginal del 45% (EUR) */
-  ahorroFiscalEstimado45: number;
+  /** Tipo marginal IRPF estimado a partir de los rendimientos netos del ejercicio (%) */
+  tipoMarginalEstimado: number;
+  /** Ahorro fiscal estimado al tipo marginal estimado (EUR) */
+  ahorroFiscalEstimado: number;
   advertencias: string[];
   fuenteDatos: string;
 }
@@ -166,7 +170,8 @@ export function calcularReduccionPlanPensionesIRPF(
 
   const totalReduccion = r(reduccionPrincipalEfectiva + reduccionConyugeEfectiva);
   const totalAportaciones = r(aportacionesPropias + contribucionEmpresa + aportacionesPPES + aportConyuge);
-  const ahorroFiscalEstimado45 = r(totalReduccion * 0.45);
+  const tipoMarginalEstimado = tipoMarginalDesdeRNT(p.rendimientosNetosEjercicio);
+  const ahorroFiscalEstimado = r(totalReduccion * tipoMarginalEstimado / 100);
 
   // Advertencias
   if (aportacionesPropias > limiteIndividualLegal) {
@@ -222,7 +227,8 @@ export function calcularReduccionPlanPensionesIRPF(
     reduccionConyugeEfectiva,
     totalReduccion,
     excesoNoDeducible,
-    ahorroFiscalEstimado45,
+    tipoMarginalEstimado,
+    ahorroFiscalEstimado,
     advertencias,
     fuenteDatos: 'LIRPF arts. 51-52 (Ley 12/2022) — vigente 2025',
   };

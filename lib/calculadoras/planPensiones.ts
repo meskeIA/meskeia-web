@@ -15,8 +15,8 @@
  */
 
 import {
-  TRAMOS_IRPF_2025,
   FISCAL_IRPF_META,
+  tipoMarginalDesdeRendimientosBrutos,
 } from '@/data/fiscal';
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
@@ -77,20 +77,6 @@ export interface ResultadoPlanPensiones {
   fuenteDatos: string;
 }
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-
-function tipoMarginalIRPF(rendimientosNetos: number): number {
-  let anterior = 0;
-  let tipo = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (rendimientosNetos > anterior) {
-      tipo = tramo.tipo;
-    }
-    anterior = tramo.hasta;
-  }
-  return tipo;
-}
-
 // ─── Función principal ─────────────────────────────────────────────────────────
 
 export function calcularPlanPensiones(p: ParametrosPlanPensiones): ResultadoPlanPensiones {
@@ -115,8 +101,8 @@ export function calcularPlanPensiones(p: ParametrosPlanPensiones): ResultadoPlan
   const excesoNoDeducible = r(Math.max(0, aportacionTotal - baseReducible));
   const superaLimite = excesoNoDeducible > 0;
 
-  // Ahorro fiscal
-  const tipo = tipoMarginalIRPF(p.rendimientosNetos);
+  // Ahorro fiscal — tipo marginal estimado desde sueldo bruto (SS + art.19 + art.20)
+  const tipo = tipoMarginalDesdeRendimientosBrutos(p.rendimientosNetos);
   const ahorroFiscalAnual = r(baseReducible * (tipo / 100));
   const costeNetoAnual = r(aportacionTotal - ahorroFiscalAnual);
 

@@ -100,3 +100,45 @@ export const REDUCCION_RENDIMIENTOS_TRABAJO_2025 = {
   reduccion2:             2364,   // €/año de reducción
   factorInterpolacion:    1.14,   // Factor interpolación entre límite1 y límite2
 };
+
+// ─── Helpers: estimación tipo marginal ────────────────────────────────────────
+
+/**
+ * Estima el tipo marginal IRPF a partir de los rendimientos brutos del trabajo.
+ * Aplica: cotizaciones SS trabajador → gastos deducibles art. 19 → reducción art. 20 → tramos.
+ * Orientativo: no incluye mínimo personal ni otras circunstancias personales/familiares.
+ */
+export function tipoMarginalDesdeRendimientosBrutos(brutos: number): number {
+  const totalSS =
+    COTIZACIONES_SS_2025.contingenciasComunes +
+    COTIZACIONES_SS_2025.desempleo +
+    COTIZACIONES_SS_2025.formacionProfesional +
+    COTIZACIONES_SS_2025.mef;
+  const gastosSS = brutos * (totalSS / 100);
+  const rnt = Math.max(0, brutos - gastosSS - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
+  return tipoMarginalDesdeRNT(rnt);
+}
+
+/**
+ * Estima el tipo marginal IRPF a partir del rendimiento neto del trabajo (RNT).
+ * El RNT es el ingreso ya descontadas cotizaciones SS y gastos deducibles art. 19,
+ * pero antes de la reducción art. 20.
+ * Aplica: reducción art. 20 → tramos.
+ * Orientativo: no incluye mínimo personal ni otras circunstancias.
+ */
+export function tipoMarginalDesdeRNT(rnt: number): number {
+  const rd = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
+  let reduccion: number;
+  if (rnt <= rd.limite1) {
+    reduccion = rd.reduccion1;
+  } else if (rnt < rd.limite2) {
+    reduccion = rd.reduccion1 - rd.factorInterpolacion * (rnt - rd.limite1);
+  } else {
+    reduccion = rd.reduccion2;
+  }
+  const baseImponible = Math.max(0, rnt - reduccion);
+  for (const tramo of TRAMOS_IRPF_2025) {
+    if (baseImponible <= tramo.hasta) return tramo.tipo;
+  }
+  return 47;
+}
