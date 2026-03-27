@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 303,
+  "total_tools": 304,
   "updated": "2026-03-27",
   "features": {
     "all_free": true,
@@ -527,6 +527,12 @@
           "slug": "calculadora-roommates",
           "url": "https://meskeia.com/calculadora-roommates/",
           "description": "Divide gastos del piso compartido entre compañeros"
+        },
+        {
+          "name": "Asesor de Smartphone",
+          "slug": "asesor-smartphone",
+          "url": "https://meskeia.com/asesor-smartphone/",
+          "description": "Test de 10 preguntas para descubrir qué smartphone conviene según uso, presupuesto y prioridades. Recomienda sistema operativo (iOS o Android), gama (básica, media, alta, pro) y modelos de referencia actualizados con precios orientativos"
         },
         {
           "name": "Asesor de Tipo de Vehículo",

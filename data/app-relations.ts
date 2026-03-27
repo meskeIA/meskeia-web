@@ -518,7 +518,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/estimador-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
   'calculadora-coste-plazos': finanzasPersonalesApps.filter(a => a.url !== '/estimador-coste-plazos/').slice(0, 4),
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
+  'asesor-smartphone': [
+    { url: '/asesor-vehiculo/', icon: '🚗', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+    { url: '/test-madurez-digital/', icon: '🤖', name: 'Test Madurez Digital', description: 'Nivel de digitalización de tu empresa' },
+    { url: '/calculadora-suscripciones/', icon: '📱', name: 'Calculadora Suscripciones', description: 'Controla lo que gastas al mes' },
+    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Seguros', description: 'Guía de seguros en España' },
+  ],
   'asesor-vehiculo': [
+    { url: '/asesor-smartphone/', icon: '📱', name: 'Asesor de Smartphone', description: '¿Qué móvil te conviene?' },
     { url: '/comparador-electrico/', icon: '⚡', name: 'Comparador Eléctrico vs Gasolina', description: '¿Cuándo compensa el eléctrico?' },
     { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
     { url: '/etiqueta-dgt/', icon: '🏷️', name: 'Etiqueta DGT y ZBE', description: '¿Puedes entrar en las zonas de bajas emisiones?' },
@@ -1354,6 +1361,9 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'comparador-autonomo-vs-sl': { title: 'Herramientas para emprendedores', icon: '⚖️' },
     'estimador-plusvalia-municipal': { title: 'Más herramientas legales y fiscales', icon: '🏙️' },
     'orientador-intereses-demora': { title: 'Más herramientas para autónomos', icon: '📄' },
+
+    // Smartphones y tecnología
+    'asesor-smartphone': { title: 'Más herramientas de tecnología', icon: '📱' },
 
     // Vehículos
     'asesor-vehiculo': { title: 'Más herramientas para comprar coche', icon: '🚗' },

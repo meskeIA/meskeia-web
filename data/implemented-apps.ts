@@ -366,6 +366,7 @@ export const implementedAppsUrls = [
   "/calculadora-piscinas/",                // Volumen + dosis cloro, pH, alguicida y sal
 
   // Asesor vehículo (2026-03-26)
+  "/asesor-smartphone/",                   // Test 10 preguntas: iOS/Android, gama y modelos de referencia
   "/asesor-vehiculo/",                     // Test 9 preguntas: segmento + motorización + costes anuales comparados
 
   // Herramientas de decisión de vehículo (2026-03-27)
