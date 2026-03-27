@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 301,
-  "updated": "2026-03-23",
+  "total_tools": 303,
+  "updated": "2026-03-27",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -533,6 +533,18 @@
           "slug": "asesor-vehiculo",
           "url": "https://meskeia.com/asesor-vehiculo/",
           "description": "Test de 9 preguntas para descubrir qué tipo de coche conviene según uso, presupuesto y estilo de vida. Recomienda segmento (urbano, compacto, SUV, familiar) y motorización (gasolina, diésel, híbrido, eléctrico) con comparativa de costes anuales"
+        },
+        {
+          "name": "Comparador Eléctrico vs Combustión",
+          "slug": "comparador-electrico",
+          "url": "https://meskeia.com/comparador-electrico/",
+          "description": "Calcula el punto de equilibrio entre un coche eléctrico y uno de gasolina. Introduce precios, km anuales, consumos y subsidio MOVES III. Muestra el año exacto en que el eléctrico empieza a ser más barato con proyección a 10 años"
+        },
+        {
+          "name": "Etiqueta DGT y Zonas de Bajas Emisiones",
+          "slug": "etiqueta-dgt",
+          "url": "https://meskeia.com/etiqueta-dgt/",
+          "description": "Descubre la etiqueta medioambiental DGT de tu vehículo (CERO, ECO, C, B o sin etiqueta) y comprueba si puedes circular por las ZBE de Madrid, Barcelona, Valencia, Sevilla, Zaragoza, Valladolid y Bilbao"
         },
         {
           "name": "Comparador Compra Vehículos",

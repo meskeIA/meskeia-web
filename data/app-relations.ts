@@ -519,16 +519,28 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-coste-plazos': finanzasPersonalesApps.filter(a => a.url !== '/estimador-coste-plazos/').slice(0, 4),
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
   'asesor-vehiculo': [
+    { url: '/comparador-electrico/', icon: '⚡', name: 'Comparador Eléctrico vs Gasolina', description: '¿Cuándo compensa el eléctrico?' },
     { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
+    { url: '/etiqueta-dgt/', icon: '🏷️', name: 'Etiqueta DGT y ZBE', description: '¿Puedes entrar en las zonas de bajas emisiones?' },
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
-    { url: '/estimador-prestamos/', icon: '🏦', name: 'Simulador de Préstamos', description: 'Cuota y coste total de financiación' },
-    { url: '/guia-reclamar-seguro-coche/', icon: '🛡️', name: 'Guía Seguro Coche', description: 'Cuándo reclamar al seguro' },
   ],
   'comparador-vehiculos': [
     { url: '/asesor-vehiculo/', icon: '🔍', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche me conviene?' },
+    { url: '/comparador-electrico/', icon: '⚡', name: 'Comparador Eléctrico vs Gasolina', description: 'Break-even y ahorro a 10 años' },
     { url: '/estimador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas de amortización' },
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
-    { url: '/estimador-coste-plazos/', icon: '💳', name: 'Coste Real a Plazos', description: 'TAE e intereses ocultos' },
+  ],
+  'comparador-electrico': [
+    { url: '/asesor-vehiculo/', icon: '🔍', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche me conviene?' },
+    { url: '/etiqueta-dgt/', icon: '🏷️', name: 'Etiqueta DGT y ZBE', description: 'Etiqueta medioambiental y acceso a ZBE' },
+    { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
+    { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
+  ],
+  'etiqueta-dgt': [
+    { url: '/comparador-electrico/', icon: '⚡', name: 'Comparador Eléctrico vs Gasolina', description: '¿Cuándo compensa el eléctrico?' },
+    { url: '/asesor-vehiculo/', icon: '🔍', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+    { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
+    { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
   ],
   'calculadora-seguro-vida': [
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
@@ -1346,6 +1358,8 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     // Vehículos
     'asesor-vehiculo': { title: 'Más herramientas para comprar coche', icon: '🚗' },
     'comparador-vehiculos': { title: 'Más herramientas para comprar coche', icon: '🚗' },
+    'comparador-electrico': { title: 'Más herramientas de vehículos', icon: '⚡' },
+    'etiqueta-dgt': { title: 'Más herramientas de vehículos', icon: '🏷️' },
     'calculadora-combustible': { title: 'Más herramientas de vehículos', icon: '⛽' },
   };
 

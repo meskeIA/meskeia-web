@@ -45,13 +45,31 @@ const tools = [
     step: 4,
   },
   {
+    id: 'comparador-electrico',
+    name: 'Comparador Eléctrico vs Combustión',
+    icon: '⚡',
+    url: '/comparador-electrico/',
+    question: '¿Cuándo me compensa el eléctrico? ¿En qué año recupero la diferencia?',
+    description: 'Calcula el punto de equilibrio entre un eléctrico y un gasolina. Introduce precios, km anuales, consumos y subsidio MOVES III. Proyección de ahorro a 10 años.',
+    step: 5,
+  },
+  {
+    id: 'etiqueta-dgt',
+    name: 'Etiqueta DGT y Zonas ZBE',
+    icon: '🏷️',
+    url: '/etiqueta-dgt/',
+    question: '¿Qué etiqueta DGT tiene el coche que me interesa? ¿Puedo circular por la ZBE?',
+    description: 'Comprueba la etiqueta medioambiental (CERO, ECO, C, B) y el acceso a las Zonas de Bajas Emisiones de Madrid, Barcelona, Valencia y otras ciudades.',
+    step: 6,
+  },
+  {
     id: 'seguro-vida',
     name: 'Calculadora de Seguro de Vida',
     icon: '🛡️',
     url: '/orientador-seguro-vida/',
     question: '¿Necesito seguro de vida si financio el coche?',
     description: 'Si financias el vehículo con un préstamo, valora si necesitas un seguro de vida vinculado. Calcula la cobertura mínima recomendada.',
-    step: 5,
+    step: 7,
   },
 ];
 

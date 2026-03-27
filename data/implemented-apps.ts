@@ -367,6 +367,10 @@ export const implementedAppsUrls = [
 
   // Asesor vehículo (2026-03-26)
   "/asesor-vehiculo/",                     // Test 9 preguntas: segmento + motorización + costes anuales comparados
+
+  // Herramientas de decisión de vehículo (2026-03-27)
+  "/comparador-electrico/",               // Break-even eléctrico vs gasolina, MOVES III, proyección 10 años
+  "/etiqueta-dgt/",                       // Etiqueta DGT (CERO/ECO/C/B) + acceso ZBE 7 ciudades
 ];
 
 /**
