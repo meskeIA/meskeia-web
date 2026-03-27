@@ -537,6 +537,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-suscripciones/', icon: '📱', name: 'Calculadora Suscripciones', description: 'Controla lo que gastas al mes' },
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Seguros', description: 'Guía de seguros en España' },
   ],
+  'asesor-mascota': [
+    { url: '/asesor-seguro-salud/', icon: '🏥', name: 'Asesor Seguro de Salud', description: '¿Necesitas seguro médico privado?' },
+    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Seguros', description: 'Guía de seguros en España' },
+    { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
+    { url: '/asesor-vehiculo/', icon: '🚗', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+  ],
+  'asesor-seguro-salud': [
+    { url: '/asesor-mascota/', icon: '🐾', name: 'Asesor de Mascota', description: '¿Qué animal se adapta a tu vida?' },
+    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador de Seguros', description: 'Guía de todos los seguros en España' },
+    { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
+    { url: '/calculadora-salario-neto/', icon: '💰', name: 'Calculadora Salario Neto', description: 'Tu sueldo neto real tras IRPF y SS' },
+  ],
   'asesor-vehiculo': [
     { url: '/asesor-smartphone/', icon: '📱', name: 'Asesor de Smartphone', description: '¿Qué móvil te conviene?' },
     { url: '/comparador-electrico/', icon: '⚡', name: 'Comparador Eléctrico vs Gasolina', description: '¿Cuándo compensa el eléctrico?' },
@@ -1381,6 +1393,10 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
 
     // Calefacción y hogar
     'asesor-calefaccion': { title: 'Más herramientas para el hogar', icon: '🏠' },
+
+    // Mascotas y salud
+    'asesor-mascota': { title: 'Más herramientas de salud y bienestar', icon: '🐾' },
+    'asesor-seguro-salud': { title: 'Más herramientas de salud y finanzas', icon: '🏥' },
 
     // Vehículos
     'asesor-vehiculo': { title: 'Más herramientas para comprar coche', icon: '🚗' },
