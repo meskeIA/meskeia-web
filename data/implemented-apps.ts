@@ -366,6 +366,8 @@ export const implementedAppsUrls = [
   "/calculadora-piscinas/",                // Volumen + dosis cloro, pH, alguicida y sal
 
   // Asesor vehículo (2026-03-26)
+  "/asesor-calefaccion/",                  // Test 10 preguntas: aerotermia, bomba de calor, gas, pellet o eléctrico
+  "/asesor-portatil/",                     // Test 10 preguntas: formato, OS, gama y modelos de referencia
   "/asesor-smartphone/",                   // Test 10 preguntas: iOS/Android, gama y modelos de referencia
   "/asesor-vehiculo/",                     // Test 9 preguntas: segmento + motorización + costes anuales comparados
 

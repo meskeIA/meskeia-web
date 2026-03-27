@@ -518,7 +518,20 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/estimador-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
   'calculadora-coste-plazos': finanzasPersonalesApps.filter(a => a.url !== '/estimador-coste-plazos/').slice(0, 4),
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
+  'asesor-calefaccion': [
+    { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
+    { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },
+    { url: '/estimador-reformas-hogar/', icon: '🏗️', name: 'Estimador Reformas', description: 'Presupuesto por tipo de reforma' },
+    { url: '/calculadora-huella-carbono/', icon: '🌍', name: 'Huella de Carbono', description: 'Tu impacto ambiental' },
+  ],
+  'asesor-portatil': [
+    { url: '/asesor-smartphone/', icon: '📱', name: 'Asesor de Smartphone', description: '¿Qué móvil te conviene?' },
+    { url: '/test-madurez-digital/', icon: '🤖', name: 'Test Madurez Digital', description: 'Nivel de digitalización de tu empresa' },
+    { url: '/calculadora-suscripciones/', icon: '📱', name: 'Calculadora Suscripciones', description: 'Controla lo que gastas al mes' },
+    { url: '/asesor-vehiculo/', icon: '🚗', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+  ],
   'asesor-smartphone': [
+    { url: '/asesor-portatil/', icon: '💻', name: 'Asesor de Portátil y PC', description: '¿Qué ordenador te conviene?' },
     { url: '/asesor-vehiculo/', icon: '🚗', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
     { url: '/test-madurez-digital/', icon: '🤖', name: 'Test Madurez Digital', description: 'Nivel de digitalización de tu empresa' },
     { url: '/calculadora-suscripciones/', icon: '📱', name: 'Calculadora Suscripciones', description: 'Controla lo que gastas al mes' },
@@ -1364,6 +1377,10 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
 
     // Smartphones y tecnología
     'asesor-smartphone': { title: 'Más herramientas de tecnología', icon: '📱' },
+    'asesor-portatil': { title: 'Más herramientas de tecnología', icon: '💻' },
+
+    // Calefacción y hogar
+    'asesor-calefaccion': { title: 'Más herramientas para el hogar', icon: '🏠' },
 
     // Vehículos
     'asesor-vehiculo': { title: 'Más herramientas para comprar coche', icon: '🚗' },
