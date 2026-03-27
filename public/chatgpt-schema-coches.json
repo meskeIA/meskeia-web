@@ -1,0 +1,411 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Coches España",
+    "description": "Herramientas para decisiones de compra de vehículo en España: recomienda tipo de coche, compara eléctrico vs gasolina, consulta etiqueta DGT, compara formas de adquisición y calcula coste de combustible.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://meskeia.com" }
+  ],
+  "paths": {
+    "/api/chatgpt/recomendar-vehiculo": {
+      "post": {
+        "operationId": "recomendarTipoVehiculo",
+        "summary": "Recomienda el segmento y motorización de coche según perfil de uso, km anuales, pasajeros y presupuesto.",
+        "description": "Analiza el perfil del usuario (km, uso, pasajeros, presupuesto, zona) y recomienda el segmento (urbano/compacto/SUV/familiar) y motorización (gasolina/diésel/híbrido/eléctrico) óptimos, con alertas ZBE y coste anual estimado.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputRecomendarVehiculo" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Segmento y motorización recomendados con razón principal, coste estimado y alertas.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoRecomendarVehiculo" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/breakeven-electrico": {
+      "post": {
+        "operationId": "calcularBreakevenElectrico",
+        "summary": "Calcula el año en que un coche eléctrico empieza a ser más barato que uno de gasolina.",
+        "description": "Compara el coste total acumulado de un eléctrico vs gasolina considerando diferencia de precio, subsidio MOVES III, consumos, precio de luz y gasolina, y coste de cargador doméstico. Devuelve el año de break-even y ahorro anual.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputBreakevenElectrico" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Año de break-even, ahorro anual estimado, inversión neta extra y coste por km de cada opción.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoBreakevenElectrico" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/etiqueta-dgt": {
+      "post": {
+        "operationId": "consultarEtiquetaDgt",
+        "summary": "Consulta la etiqueta DGT de un vehículo y su acceso a las ZBE de 7 ciudades españolas.",
+        "description": "Calcula la etiqueta medioambiental DGT (CERO, ECO, C, B o Sin etiqueta) según combustible y año de matriculación. Devuelve acceso detallado a ZBE de Madrid, Barcelona, Valencia, Sevilla, Zaragoza, Valladolid y Bilbao.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputEtiquetaDgt" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Etiqueta DGT, descripción, acceso ZBE por ciudad y recomendación.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoEtiquetaDgt" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/adquisicion-vehiculo": {
+      "post": {
+        "operationId": "compararAdquisicionVehiculo",
+        "summary": "Compara el coste total de comprar un coche al contado, con financiación y con renting.",
+        "description": "Calcula y compara las 3 formas principales de adquisición: contado (coste total + gastos), financiación bancaria (cuota mensual, intereses totales, TAE) y renting (cuota estimada, coste del período). Incluye recomendación según perfil.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputAdquisicionVehiculo" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comparativa detallada de contado, financiación y renting con recomendación.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoAdquisicionVehiculo" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/coste-combustible": {
+      "post": {
+        "operationId": "calcularCosteCombustible",
+        "summary": "Calcula el coste anual de combustible de un vehículo y compara los 4 tipos de motorización.",
+        "description": "Calcula el gasto anual en combustible o electricidad según km, tipo de motor y consumo real. Incluye comparativa automática entre gasolina, diésel, híbrido y eléctrico para los mismos kilómetros, y emisiones de CO2 estimadas.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InputCosteCombustible" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Coste anual, coste por km, emisiones CO2 y comparativa entre motorizaciones.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ResultadoCosteCombustible" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "InputRecomendarVehiculo": {
+        "type": "object",
+        "required": ["kmAnuales"],
+        "properties": {
+          "kmAnuales": {
+            "type": "number",
+            "description": "Kilómetros que conduces al año.",
+            "example": 15000
+          },
+          "usoPrincipal": {
+            "type": "string",
+            "enum": ["urbano", "mixto", "carretera"],
+            "description": "'urbano': mayoría en ciudad. 'mixto': ciudad y carretera. 'carretera': mayoría en autopista/carretera.",
+            "default": "mixto"
+          },
+          "pasajeros": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 9,
+            "description": "Número habitual de ocupantes del vehículo incluyendo el conductor.",
+            "default": 4
+          },
+          "presupuesto": {
+            "type": "string",
+            "enum": ["menos15k", "15k_25k", "25k_40k", "mas40k"],
+            "description": "Presupuesto disponible: menos15k (<15.000€), 15k_25k (15.000-25.000€), 25k_40k (25.000-40.000€), mas40k (>40.000€).",
+            "default": "15k_25k"
+          },
+          "carga": {
+            "type": "string",
+            "enum": ["poca", "normal", "mucha"],
+            "description": "Necesidad habitual de maletero: 'poca' (solo lo básico), 'normal', 'mucha' (mudanzas, deportes, mascotas).",
+            "default": "normal"
+          },
+          "zona": {
+            "type": "string",
+            "enum": ["ciudad", "suburbio", "pueblo"],
+            "description": "Zona principal de residencia y uso del vehículo.",
+            "default": "ciudad"
+          },
+          "zbe": {
+            "type": "boolean",
+            "description": "true si tu ciudad tiene Zona de Bajas Emisiones activa (Madrid, Barcelona, Valencia...).",
+            "default": false
+          }
+        }
+      },
+      "ResultadoRecomendarVehiculo": {
+        "type": "object",
+        "properties": {
+          "segmento": { "type": "string", "description": "Segmento recomendado: Urbano, Compacto, SUV / Crossover, Familiar/Berlina o Monovolumen." },
+          "motorizacion": { "type": "string", "description": "Motorización recomendada: Gasolina, Diésel, Híbrido o Eléctrico." },
+          "razon_principal": { "type": "string", "description": "Explicación de la recomendación adaptada al perfil." },
+          "coste_anual_estimado": { "type": "number", "description": "Coste operativo anual estimado en euros (combustible + mantenimiento + fijos)." },
+          "alertas": { "type": "array", "items": { "type": "string" }, "description": "Advertencias contextuales relevantes para el perfil (ZBE, km bajos con diésel, etc.)." },
+          "aviso_legal": { "type": "string" }
+        }
+      },
+      "InputBreakevenElectrico": {
+        "type": "object",
+        "required": ["precioElectrico", "precioGasolina", "kmAnuales"],
+        "properties": {
+          "precioElectrico": { "type": "number", "description": "Precio del coche eléctrico en euros.", "example": 32000 },
+          "precioGasolina": { "type": "number", "description": "Precio del coche de gasolina equivalente en euros.", "example": 22000 },
+          "kmAnuales": { "type": "number", "description": "Kilómetros anuales recorridos.", "example": 15000 },
+          "subsidioMoves": { "type": "number", "description": "Subsidio MOVES III: 0 (sin subsidio), 4500 (sin achatarramiento) o 7000 (con achatarramiento).", "default": 0, "enum": [0, 4500, 7000] },
+          "consumoElectrico": { "type": "number", "description": "Consumo del eléctrico en kWh/100km.", "default": 16 },
+          "consumoGasolina": { "type": "number", "description": "Consumo del gasolina en L/100km.", "default": 7 },
+          "precioLuz": { "type": "number", "description": "Precio de la electricidad doméstica en €/kWh.", "default": 0.18 },
+          "precioGasolinaLitro": { "type": "number", "description": "Precio de la gasolina en €/L.", "default": 1.65 },
+          "costeCargador": { "type": "number", "description": "Coste de instalación del cargador doméstico en euros.", "default": 800 }
+        }
+      },
+      "ResultadoBreakevenElectrico": {
+        "type": "object",
+        "properties": {
+          "anio_breakeven": { "type": ["integer", "null"], "description": "Año en que el eléctrico empieza a ser más barato. null si no se alcanza en 15 años." },
+          "mensaje_breakeven": { "type": "string", "description": "Mensaje explicativo sobre el punto de equilibrio." },
+          "ahorro_anual_estimado": { "type": "number", "description": "Ahorro anual estimado del eléctrico vs gasolina en euros." },
+          "inversion_neta_extra": { "type": "number", "description": "Dinero extra que cuesta el eléctrico respecto al gasolina (tras subsidio MOVES)." },
+          "coste_km_electrico": { "type": "number", "description": "Coste de energía por km del eléctrico en euros." },
+          "coste_km_gasolina": { "type": "number", "description": "Coste de combustible por km del gasolina en euros." },
+          "aviso_legal": { "type": "string" }
+        }
+      },
+      "InputEtiquetaDgt": {
+        "type": "object",
+        "required": ["combustible", "anioMatriculacion"],
+        "properties": {
+          "combustible": {
+            "type": "string",
+            "enum": ["electrico", "phev", "hibrido", "gnc_glp", "gasolina", "diesel"],
+            "description": "'electrico': BEV. 'phev': híbrido enchufable. 'hibrido': híbrido convencional. 'gnc_glp': gas natural/propano. 'gasolina' o 'diesel'."
+          },
+          "anioMatriculacion": {
+            "type": "integer",
+            "minimum": 1980,
+            "maximum": 2025,
+            "description": "Año de primera matriculación del vehículo.",
+            "example": 2018
+          },
+          "autonomiaPhevKm": {
+            "type": "number",
+            "description": "Solo para PHEV: autonomía en modo eléctrico en km. Si es ≥40km → etiqueta CERO, si <40km → ECO.",
+            "default": 0
+          }
+        }
+      },
+      "ResultadoEtiquetaDgt": {
+        "type": "object",
+        "properties": {
+          "etiqueta": { "type": "string", "description": "Etiqueta DGT: CERO, ECO, C, B o Sin etiqueta." },
+          "descripcion": { "type": "string", "description": "Descripción de qué significa esa etiqueta." },
+          "recomendacion": { "type": "string", "description": "Consejo sobre implicaciones prácticas de la etiqueta." },
+          "acceso_zbe": {
+            "type": "array",
+            "description": "Acceso detallado a ZBE de las 7 principales ciudades.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ciudad": { "type": "string" },
+                "acceso": { "type": "string", "enum": ["libre", "restriccion", "prohibido"] },
+                "detalle": { "type": "string" }
+              }
+            }
+          },
+          "ciudades_libres": { "type": "array", "items": { "type": "string" }, "description": "Ciudades con acceso libre." },
+          "ciudades_restriccion": { "type": "array", "items": { "type": "string" }, "description": "Ciudades con acceso restringido." },
+          "ciudades_prohibido": { "type": "array", "items": { "type": "string" }, "description": "Ciudades donde está prohibido circular." },
+          "aviso_legal": { "type": "string" }
+        }
+      },
+      "InputAdquisicionVehiculo": {
+        "type": "object",
+        "required": ["precioVehiculo"],
+        "properties": {
+          "precioVehiculo": { "type": "number", "description": "Precio del vehículo en euros.", "example": 22000 },
+          "entrada": { "type": "number", "description": "Entrada o pago inicial en euros para la financiación.", "default": 0 },
+          "tasaFinanciacion": { "type": "number", "description": "TAE anual del préstamo de coche en porcentaje.", "default": 6.5, "example": 6.5 },
+          "plazoMeses": { "type": "integer", "description": "Plazo de la financiación en meses.", "default": 60, "example": 60 },
+          "cuotaRentingMensual": { "type": "number", "description": "Cuota mensual del renting si ya la conoces. Si no se indica, se estima automáticamente." },
+          "plazoRentingMeses": { "type": "integer", "description": "Plazo del contrato de renting en meses.", "default": 36 }
+        }
+      },
+      "ResultadoAdquisicionVehiculo": {
+        "type": "object",
+        "properties": {
+          "contado": {
+            "type": "object",
+            "properties": {
+              "coste_total": { "type": "number", "description": "Coste total al contado incluyendo gastos de matriculación estimados." },
+              "gastos_matriculacion_estimados": { "type": "number" },
+              "descripcion": { "type": "string" }
+            }
+          },
+          "financiacion": {
+            "type": "object",
+            "properties": {
+              "capital_financiado": { "type": "number" },
+              "cuota_mensual": { "type": "number" },
+              "plazo_meses": { "type": "integer" },
+              "intereses_totales": { "type": "number" },
+              "coste_total": { "type": "number" },
+              "tae_aplicado": { "type": "number" },
+              "descripcion": { "type": "string" }
+            }
+          },
+          "renting": {
+            "type": "object",
+            "properties": {
+              "cuota_mensual_estimada": { "type": "number" },
+              "plazo_meses": { "type": "integer" },
+              "coste_periodo": { "type": "number" },
+              "incluye": { "type": "string" },
+              "descripcion": { "type": "string" }
+            }
+          },
+          "recomendacion": { "type": "string", "description": "Recomendación personalizada según los datos introducidos." },
+          "aviso_legal": { "type": "string" }
+        }
+      },
+      "InputCosteCombustible": {
+        "type": "object",
+        "required": ["kmAnuales"],
+        "properties": {
+          "kmAnuales": { "type": "number", "description": "Kilómetros recorridos al año.", "example": 15000 },
+          "tipoCombustible": {
+            "type": "string",
+            "enum": ["gasolina", "diesel", "hibrido", "electrico"],
+            "description": "Tipo de motorización del vehículo.",
+            "default": "gasolina"
+          },
+          "consumo": {
+            "type": "number",
+            "description": "Consumo real del vehículo: L/100km para gasolina/diésel/híbrido, kWh/100km para eléctrico. Si no se indica, se usa el valor medio de referencia."
+          },
+          "precioUnitario": {
+            "type": "number",
+            "description": "Precio del combustible en €/L (gasolina/diésel) o €/kWh (eléctrico). Si no se indica, se usan precios medios 2025."
+          }
+        }
+      },
+      "ResultadoCosteCombustible": {
+        "type": "object",
+        "properties": {
+          "tipo_combustible": { "type": "string" },
+          "km_anuales": { "type": "number" },
+          "consumo_usado": { "type": "string", "description": "Consumo aplicado en el cálculo con su unidad." },
+          "precio_unitario_usado": { "type": "number", "description": "Precio por litro o kWh aplicado." },
+          "coste_combustible_anual": { "type": "number", "description": "Coste anual de combustible/energía en euros." },
+          "coste_por_km": { "type": "number", "description": "Coste de combustible por km en euros." },
+          "emisiones_co2_g_km": { "type": "number", "description": "Emisiones de CO2 estimadas en g/km (0 para eléctrico puro)." },
+          "comparativa_tipos": {
+            "type": "array",
+            "description": "Comparativa con los 4 tipos de motorización para los mismos km.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tipo": { "type": "string" },
+                "consumo_referencia": { "type": "string" },
+                "coste_anual": { "type": "number" },
+                "coste_km": { "type": "number" }
+              }
+            }
+          },
+          "nota_comparativa": { "type": "string" },
+          "aviso_legal": { "type": "string" }
+        }
+      }
+    }
+  }
+}
