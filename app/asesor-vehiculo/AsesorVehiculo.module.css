@@ -575,6 +575,159 @@
 .btnReiniciar:hover { border-color: var(--primary); color: var(--primary); }
 .btnReiniciar:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
+/* ─── Etiqueta DGT ────────────────────────────────────────────── */
+.dgtWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 0.75rem 0 0.5rem;
+  flex-wrap: wrap;
+}
+
+.etiquetaDGT {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.dgt_cero  { background: #22c55e; }
+.dgt_eco   { background: #48A9A6; }
+.dgt_c     { background: #f59e0b; }
+.dgt_b     { background: #f97316; }
+
+.dgtDesc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* ─── Rango de precio ──────────────────────────────────────────── */
+.rangoPrecio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.rangoPrecioItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.rangoPrecioLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.rangoPrecioValor {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.rangoPrecioValorSm {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--secondary);
+  white-space: nowrap;
+}
+
+/* ─── Modelos de referencia ────────────────────────────────────── */
+.modelosWrap {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  text-align: left;
+}
+
+.modelosLabel {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.modelosList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.modeloBadge {
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 5px;
+  padding: 0.2rem 0.55rem;
+  white-space: nowrap;
+}
+
+/* ─── Por qué esta recomendación ───────────────────────────────── */
+.razonesSection {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.75rem;
+  border-left: 4px solid var(--primary);
+}
+
+.razonesTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.razonesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.razonItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.razonCheck {
+  color: var(--secondary);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+/* ─── Coste 5 años ─────────────────────────────────────────────── */
+.celTotal5 {
+  font-weight: 600;
+  color: var(--primary) !important;
+  font-size: 0.95rem;
+}
+
 /* ─── Sección educativa: warningBox ───────────────────────────── */
 .warningBox {
   background: rgba(255, 193, 7, 0.12);
@@ -633,6 +786,23 @@
 
 [data-theme='dark'] .fila_electrico { border-left-color: #4ade80; }
 [data-theme='dark'] .fila_gasolina { border-left-color: #fbbf24; }
+
+[data-theme='dark'] .modeloBadge {
+  background: rgba(46, 134, 171, 0.15);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .razonesSection {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .rangoPrecio {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .modelosWrap {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
 
 /* ─── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 640px) {
