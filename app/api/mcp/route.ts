@@ -8852,6 +8852,238 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
     }
   );
 
+  // TOOL: recomendar_vehiculo
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'recomendar_vehiculo',
+    'Recomienda el segmento (urbano, compacto, SUV, familiar) y la motorización (gasolina, diésel, híbrido, eléctrico) más adecuados según el perfil del usuario. ' +
+    'Necesita al menos los km anuales. Opcionales: uso principal, pasajeros, presupuesto, zona y si hay ZBE. ' +
+    'Devuelve segmento recomendado, motorización, razón principal, coste anual estimado y alertas contextuales.',
+    {
+      kmAnuales: z.number().positive()
+        .describe('Kilómetros que conduce al año (ej: 15000)'),
+      usoPrincipal: z.enum(['urbano', 'mixto', 'carretera']).optional()
+        .describe('urbano = mayoría en ciudad | mixto = ciudad+carretera | carretera = mayoría autopista. Por defecto: mixto'),
+      pasajeros: z.number().int().min(2).max(9).optional()
+        .describe('Número habitual de ocupantes incluyendo el conductor. Por defecto: 4'),
+      presupuesto: z.enum(['menos15k', '15k_25k', '25k_40k', 'mas40k']).optional()
+        .describe('Presupuesto disponible para la compra. Por defecto: 15k_25k'),
+      carga: z.enum(['poca', 'normal', 'mucha']).optional()
+        .describe('Necesidad de maletero: poca/normal/mucha. Por defecto: normal'),
+      zona: z.enum(['ciudad', 'suburbio', 'pueblo']).optional()
+        .describe('Zona principal de uso del vehículo. Por defecto: ciudad'),
+      zbe: z.boolean().optional()
+        .describe('true si la ciudad tiene Zona de Bajas Emisiones activa (Madrid, Barcelona, Valencia...). Por defecto: false'),
+    },
+    async ({ kmAnuales, usoPrincipal, pasajeros, presupuesto, carga, zona, zbe }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('recomendar_vehiculo', aiCaller);
+
+      const uso = usoPrincipal ?? 'mixto';
+      const pax = pasajeros ?? 4;
+      const budget = presupuesto ?? '15k_25k';
+      const cargaV = carga ?? 'normal';
+      const zbeV = zbe ?? false;
+
+      // Segmento
+      let segmento = 'Compacto';
+      if (pax >= 5 || cargaV === 'mucha') {
+        segmento = budget === 'menos15k' ? 'Monovolumen' : 'Familiar / Berlina';
+      } else if (uso === 'carretera' || (uso === 'mixto' && budget !== 'menos15k')) {
+        segmento = 'SUV / Crossover';
+      } else if (uso === 'urbano' && budget === 'menos15k') {
+        segmento = 'Urbano';
+      }
+
+      // Motorización
+      let motor = 'Gasolina';
+      if (budget === 'mas40k' && kmAnuales < 20000) motor = 'Eléctrico';
+      else if (kmAnuales >= 20000 && uso === 'carretera') motor = 'Diésel';
+      else if (kmAnuales >= 12000 && budget !== 'menos15k') motor = 'Híbrido';
+      else if (uso === 'urbano' && budget === 'mas40k') motor = 'Eléctrico';
+
+      // Alertas
+      const alertas: string[] = [];
+      if (zbeV && (motor === 'Diésel' || motor === 'Gasolina')) {
+        alertas.push('⚠️ Tu ciudad tiene ZBE activa. Valora etiqueta ECO o CERO para circular sin restricciones.');
+      }
+      if (kmAnuales < 8000 && motor === 'Diésel') {
+        alertas.push('⚠️ Con menos de 8.000 km/año el diésel raramente compensa. Considera gasolina o híbrido.');
+      }
+      if (motor === 'Eléctrico' && (zona ?? 'ciudad') === 'pueblo') {
+        alertas.push('⚠️ En zona rural verifica disponibilidad de puntos de carga antes de optar por eléctrico puro.');
+      }
+
+      // Coste anual estimado
+      const bases: Record<string, number> = { Gasolina: 3800, Diésel: 3600, Híbrido: 3200, Eléctrico: 2800 };
+      const costeAnual = Math.round((bases[motor] ?? 3800) * (kmAnuales / 15000));
+
+      const razonUso = uso === 'urbano' ? 'uso principalmente urbano' : uso === 'carretera' ? 'uso principalmente en carretera' : 'uso mixto ciudad/carretera';
+      const lineas = [
+        `🚗 **Recomendación de vehículo para tu perfil**`,
+        ``,
+        `📐 **Segmento**: ${segmento}`,
+        `⚙️ **Motorización**: ${motor}`,
+        ``,
+        `💡 **Por qué**: Con ${kmAnuales.toLocaleString('es-ES')} km/año, ${razonUso} y ${pax} ocupantes habituales, el ${segmento} ${motor} ofrece el mejor equilibrio entre coste y funcionalidad.`,
+        ``,
+        `💶 **Coste operativo anual estimado**: ${costeAnual.toLocaleString('es-ES')} € (combustible + mantenimiento + fijos)`,
+        alertas.length > 0 ? `\n${alertas.join('\n')}` : '',
+        ``,
+        `⚠️ Recomendación orientativa. La decisión final debe considerar pruebas de conducción y tus necesidades específicas.`,
+      ].filter(l => l !== null);
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // TOOL: calcular_breakeven_electrico
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_breakeven_electrico',
+    'Calcula el año en que un coche eléctrico empieza a ser más barato que uno de gasolina equivalente (punto de equilibrio). ' +
+    'Necesita los precios de ambos coches y los km anuales. ' +
+    'Opcionales: subsidio MOVES III (0/4500/7000€), consumos, precio luz y gasolina, coste cargador. ' +
+    'Devuelve año de break-even, ahorro anual estimado, inversión neta extra y coste por km de cada opción.',
+    {
+      precioElectrico: z.number().positive()
+        .describe('Precio del coche eléctrico en euros (ej: 32000)'),
+      precioGasolina: z.number().positive()
+        .describe('Precio del coche de gasolina equivalente en euros (ej: 22000)'),
+      kmAnuales: z.number().positive()
+        .describe('Kilómetros que se conducen al año (ej: 15000)'),
+      subsidioMoves: z.number().min(0).optional()
+        .describe('Subsidio MOVES III aplicable: 0 (sin subsidio), 4500 (sin achatarramiento) o 7000 (con achatarramiento). Por defecto: 0'),
+      consumoElectrico: z.number().positive().optional()
+        .describe('Consumo del eléctrico en kWh/100km. Por defecto: 16'),
+      consumoGasolina: z.number().positive().optional()
+        .describe('Consumo del gasolina en L/100km. Por defecto: 7'),
+      precioLuz: z.number().positive().optional()
+        .describe('Precio de la electricidad doméstica en €/kWh. Por defecto: 0,18'),
+      precioGasolinaLitro: z.number().positive().optional()
+        .describe('Precio de la gasolina en €/L. Por defecto: 1,65'),
+      costeCargador: z.number().min(0).optional()
+        .describe('Coste de instalación del cargador doméstico en euros. Por defecto: 800'),
+    },
+    async ({ precioElectrico, precioGasolina, kmAnuales, subsidioMoves, consumoElectrico, consumoGasolina, precioLuz, precioGasolinaLitro, costeCargador }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_breakeven_electrico', aiCaller);
+
+      const consEV = consumoElectrico ?? 16;
+      const consGas = consumoGasolina ?? 7;
+      const pLuz = precioLuz ?? 0.18;
+      const pGas = precioGasolinaLitro ?? 1.65;
+      const subsidio = subsidioMoves ?? 0;
+      const cargador = costeCargador ?? 800;
+
+      const costeEnergiaEV = (kmAnuales / 100) * consEV * pLuz;
+      const costeEnergiaGas = (kmAnuales / 100) * consGas * pGas;
+      const ahorroAnual = (costeEnergiaGas - costeEnergiaEV) + 200; // +200€ ahorro mantenimiento EV
+      const inversionNeta = (precioElectrico - subsidio) - precioGasolina;
+      const cargadorAnual = cargador / 10;
+
+      let breakEvenAnio: number | null = null;
+      let acumulado = 0;
+      for (let a = 1; a <= 15; a++) {
+        acumulado += ahorroAnual - cargadorAnual;
+        if (acumulado >= inversionNeta && breakEvenAnio === null) { breakEvenAnio = a; break; }
+      }
+
+      const costePorKmEV = parseFloat(((consEV / 100) * pLuz).toFixed(4));
+      const costePorKmGas = parseFloat(((consGas / 100) * pGas).toFixed(4));
+
+      const lineas = [
+        `⚡ **Break-even: Eléctrico vs Gasolina**`,
+        ``,
+        `💰 Diferencia de precio: ${precioElectrico.toLocaleString('es-ES')} € (EV) vs ${precioGasolina.toLocaleString('es-ES')} € (gasolina)`,
+        subsidio > 0 ? `🎁 Subsidio MOVES III: -${subsidio.toLocaleString('es-ES')} €` : '',
+        `📊 Inversión neta extra del eléctrico: **${Math.round(inversionNeta).toLocaleString('es-ES')} €**`,
+        ``,
+        `⛽ Ahorro anual estimado: **${Math.round(ahorroAnual).toLocaleString('es-ES')} €/año**`,
+        `   (energía + mantenimiento diferencial)`,
+        ``,
+        breakEvenAnio
+          ? `✅ **Punto de equilibrio: año ${breakEvenAnio}** — A partir de ese año el eléctrico es más barato en total.`
+          : `❌ **No se alcanza el break-even en 15 años** con estos datos. El eléctrico no compensa económicamente en este horizonte.`,
+        ``,
+        `🔑 Coste por km — EV: ${costePorKmEV} €/km | Gasolina: ${costePorKmGas} €/km`,
+        ``,
+        `⚠️ Cálculo orientativo. No incluye depreciación diferencial ni carga en puntos públicos (0,45-0,65 €/kWh). El subsidio MOVES III tiene fondos limitados, verificar disponibilidad.`,
+      ].filter(l => l !== null && l !== '');
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // TOOL: consultar_etiqueta_dgt
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'consultar_etiqueta_dgt',
+    'Calcula la etiqueta medioambiental DGT (CERO, ECO, C, B o Sin etiqueta) de un vehículo según su combustible y año de matriculación. ' +
+    'También informa del acceso a las Zonas de Bajas Emisiones (ZBE) de Madrid, Barcelona, Valencia, Sevilla, Zaragoza, Valladolid y Bilbao. ' +
+    'Encadenable con recomendar_vehiculo para completar el perfil de un vehículo en consideración.',
+    {
+      combustible: z.enum(['electrico', 'phev', 'hibrido', 'gnc_glp', 'gasolina', 'diesel'])
+        .describe('electrico = BEV | phev = híbrido enchufable | hibrido = híbrido convencional HEV | gnc_glp = gas natural/propano | gasolina | diesel'),
+      anioMatriculacion: z.number().int().min(1980).max(2025)
+        .describe('Año de primera matriculación del vehículo (ej: 2018)'),
+      autonomiaPhevKm: z.number().min(0).optional()
+        .describe('Solo para PHEV: autonomía eléctrica en km. ≥40km → etiqueta CERO, <40km → ECO. Por defecto: 0'),
+    },
+    async ({ combustible, anioMatriculacion, autonomiaPhevKm }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('consultar_etiqueta_dgt', aiCaller);
+
+      const autPhev = autonomiaPhevKm ?? 0;
+
+      // Calcular etiqueta
+      let etiqueta = 'Sin etiqueta';
+      if (combustible === 'electrico' || combustible === 'gnc_glp') etiqueta = 'CERO';
+      else if (combustible === 'phev') etiqueta = autPhev >= 40 ? 'CERO' : 'ECO';
+      else if (combustible === 'hibrido') etiqueta = 'ECO';
+      else if (combustible === 'gasolina') {
+        if (anioMatriculacion >= 2006) etiqueta = 'C';
+        else if (anioMatriculacion >= 2001) etiqueta = 'B';
+      } else if (combustible === 'diesel') {
+        if (anioMatriculacion >= 2015) etiqueta = 'C';
+        else if (anioMatriculacion >= 2006) etiqueta = 'B';
+      }
+
+      // Acceso ZBE por etiqueta
+      const zbeData: Record<string, { madrid: string; barcelona: string; otras: string }> = {
+        'CERO':        { madrid: '✅ Libre', barcelona: '✅ Libre', otras: '✅ Libre en todas' },
+        'ECO':         { madrid: '✅ Libre', barcelona: '✅ Libre', otras: '✅ Libre en todas' },
+        'C':           { madrid: '⚠️ Libre salvo episodios contaminación', barcelona: '✅ Libre', otras: '✅ Libre en la mayoría' },
+        'B':           { madrid: '⚠️ Solo residentes en Distrito Centro', barcelona: '⚠️ Restringido L-V 7h-20h', otras: '⚠️ Restricciones en Zaragoza y Bilbao' },
+        'Sin etiqueta':{ madrid: '❌ Prohibido (multa 90-500€)', barcelona: '❌ Prohibido (cámaras automáticas)', otras: '❌ Prohibido en Zaragoza y Bilbao' },
+      };
+
+      const recomendaciones: Record<string, string> = {
+        'CERO': 'Máxima categoría. Accedes a todos los beneficios ZBE, carril BUS+VAO y aparcamiento bonificado en muchos municipios.',
+        'ECO': 'Buena etiqueta. Acceso sin restricciones en la mayoría de ZBE. Considera que las normativas se van endureciendo.',
+        'C': 'Etiqueta válida. En episodios de contaminación alta pueden activarse restricciones adicionales en Madrid.',
+        'B': 'Etiqueta limitada. Las ZBE se están endureciendo: en 2025-2026 la B puede quedar restringida en horario punta en más ciudades.',
+        'Sin etiqueta': 'Tu vehículo ya no puede circular en las ZBE de las principales ciudades. Si lo usas habitualmente en zona urbana, valora la renovación.',
+      };
+
+      const iconos: Record<string, string> = { 'CERO': '🟢', 'ECO': '🔵', 'C': '🟡', 'B': '🟩', 'Sin etiqueta': '⬛' };
+      const zbe = zbeData[etiqueta];
+
+      const lineas = [
+        `🏷️ **Etiqueta DGT: ${iconos[etiqueta]} ${etiqueta}**`,
+        `   Vehículo: ${combustible} · Año matriculación: ${anioMatriculacion}`,
+        ``,
+        `🏙️ **Acceso a Zonas de Bajas Emisiones**`,
+        `   • Madrid: ${zbe.madrid}`,
+        `   • Barcelona: ${zbe.barcelona}`,
+        `   • Valencia, Sevilla, Valladolid: ${zbe.otras}`,
+        ``,
+        `💡 ${recomendaciones[etiqueta]}`,
+        ``,
+        `⚠️ Normativa orientativa a 2025. Las restricciones concretas (horarios, episodios) varían por ciudad. Consulta el portal oficial de tu municipio.`,
+      ];
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
   return servidor;
 }
 
