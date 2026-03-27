@@ -364,6 +364,9 @@ export const implementedAppsUrls = [
   "/calculadora-materiales-construccion/",  // Azulejos, pintura, tarima y mortero con desperdicio y coste
   "/calculadora-eficiencia-energetica/",   // Ahorro y amortización: aislamiento, ventanas y bomba de calor
   "/calculadora-piscinas/",                // Volumen + dosis cloro, pH, alguicida y sal
+
+  // Asesor vehículo (2026-03-26)
+  "/asesor-vehiculo/",                     // Test 9 preguntas: segmento + motorización + costes anuales comparados
 ];
 
 /**

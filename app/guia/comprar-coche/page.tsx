@@ -9,13 +9,22 @@ import { getRelatedApps } from '@/data/app-relations';
 // Herramientas disponibles para comprar un coche
 const tools = [
   {
+    id: 'asesor-vehiculo',
+    name: 'Asesor de Tipo de Vehículo',
+    icon: '🔍',
+    url: '/asesor-vehiculo/',
+    question: '¿Qué tipo de coche me conviene? ¿Compacto, SUV? ¿Gasolina, eléctrico?',
+    description: 'Test de 9 preguntas que analiza tu uso real, presupuesto y estilo de vida. Recomienda el segmento y la motorización más adecuados, con comparativa de costes anuales estimados.',
+    step: 1,
+  },
+  {
     id: 'comparador-vehiculos',
     name: 'Comparador de Vehículos',
     icon: '🚗',
     url: '/comparador-vehiculos/',
     question: '¿Me conviene más comprarlo, financiarlo, hacer renting o leasing?',
     description: 'Compara el coste total real de cada forma de adquisición: contado, financiación, renting y leasing. Incluye todos los gastos ocultos.',
-    step: 1,
+    step: 2,
   },
   {
     id: 'estimador-prestamos',
@@ -24,7 +33,7 @@ const tools = [
     url: '/estimador-prestamos/',
     question: '¿Cuánto pagaré de cuota mensual si lo financio?',
     description: 'Simula el préstamo del coche: cuota mensual, intereses totales, TAE real y coste final. Compara distintos plazos y tipos de interés.',
-    step: 2,
+    step: 3,
   },
   {
     id: 'combustible',
@@ -33,7 +42,7 @@ const tools = [
     url: '/calculadora-combustible/',
     question: '¿Cuánto me costará el combustible al año?',
     description: 'Calcula el consumo real en L/100km y el coste anual según tus kilómetros habituales. Compara gasolina, diésel e híbrido.',
-    step: 3,
+    step: 4,
   },
   {
     id: 'seguro-vida',
@@ -42,7 +51,7 @@ const tools = [
     url: '/orientador-seguro-vida/',
     question: '¿Necesito seguro de vida si financio el coche?',
     description: 'Si financias el vehículo con un préstamo, valora si necesitas un seguro de vida vinculado. Calcula la cobertura mínima recomendada.',
-    step: 4,
+    step: 5,
   },
 ];
 

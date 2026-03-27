@@ -518,10 +518,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/estimador-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
   'calculadora-coste-plazos': finanzasPersonalesApps.filter(a => a.url !== '/estimador-coste-plazos/').slice(0, 4),
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
+  'asesor-vehiculo': [
+    { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
+    { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
+    { url: '/estimador-prestamos/', icon: '🏦', name: 'Simulador de Préstamos', description: 'Cuota y coste total de financiación' },
+    { url: '/guia-reclamar-seguro-coche/', icon: '🛡️', name: 'Guía Seguro Coche', description: 'Cuándo reclamar al seguro' },
+  ],
   'comparador-vehiculos': [
+    { url: '/asesor-vehiculo/', icon: '🔍', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche me conviene?' },
     { url: '/estimador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas de amortización' },
+    { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
     { url: '/estimador-coste-plazos/', icon: '💳', name: 'Coste Real a Plazos', description: 'TAE e intereses ocultos' },
-    { url: '/estimador-tir-van/', icon: '📉', name: 'TIR y VAN', description: 'Análisis de inversiones' },
   ],
   'calculadora-seguro-vida': [
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
@@ -927,10 +934,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento de Hábitos', description: 'Crea hábitos duraderos' },
   ],
   'guia-comprar-coche': [
+    { url: '/asesor-vehiculo/', icon: '🔍', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
     { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
-    { url: '/estimador-prestamos/', icon: '🏦', name: 'Estimador de Préstamos', description: 'Cuota y coste total' },
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
-    { url: '/orientador-seguro-vida/', icon: '🛡️', name: 'Seguro de Vida', description: 'Cobertura para tu préstamo' },
+    { url: '/estimador-prestamos/', icon: '🏦', name: 'Estimador de Préstamos', description: 'Cuota y coste total' },
   ],
   'guia-montar-negocio': [
     { url: '/estimador-break-even/', icon: '⚖️', name: 'Break-Even', description: 'Punto de equilibrio del negocio' },
@@ -1335,6 +1342,11 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'comparador-autonomo-vs-sl': { title: 'Herramientas para emprendedores', icon: '⚖️' },
     'estimador-plusvalia-municipal': { title: 'Más herramientas legales y fiscales', icon: '🏙️' },
     'orientador-intereses-demora': { title: 'Más herramientas para autónomos', icon: '📄' },
+
+    // Vehículos
+    'asesor-vehiculo': { title: 'Más herramientas para comprar coche', icon: '🚗' },
+    'comparador-vehiculos': { title: 'Más herramientas para comprar coche', icon: '🚗' },
+    'calculadora-combustible': { title: 'Más herramientas de vehículos', icon: '⛽' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };
