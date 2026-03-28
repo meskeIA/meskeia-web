@@ -372,6 +372,10 @@ export const implementedAppsUrls = [
   "/selector-vehiculo/",                     // Test 9 preguntas: segmento + motorización + costes anuales comparados
   "/selector-mascota/",                      // Test 10 preguntas: perro, gato, roedor, pez, pájaro o reptil
   "/selector-seguro-salud/",                 // Test 10 preguntas: sanidad pública, complementario o seguro completo
+  "/selector-alquiler-vs-compra/",           // Test 10 preguntas: situación vital, estabilidad, horizonte — ¿alquilar o comprar?
+  "/selector-dieta/",                        // Test 10 preguntas: mediterránea, vegetariana, vegana, cetogénica, DASH, ayuno
+  "/selector-ejercicio/",                    // Test 10 preguntas: gimnasio, running, natación, ciclismo, yoga, casa
+  "/selector-seguro-hogar/",                 // Test 10 preguntas: cobertura básica, estándar o completa
 
   // Herramientas de decisión de vehículo (2026-03-27)
   "/comparador-electrico/",               // Break-even eléctrico vs gasolina, MOVES III, proyección 10 años

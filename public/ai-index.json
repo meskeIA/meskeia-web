@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 308,
+  "total_tools": 312,
   "updated": "2026-03-27",
   "features": {
     "all_free": true,
@@ -557,6 +557,30 @@
           "slug": "selector-seguro-salud",
           "url": "https://meskeia.com/selector-seguro-salud/",
           "description": "Test de 10 preguntas para saber si conviene un seguro de salud privado: sanidad pública es suficiente, seguro complementario o seguro completo. Con orientación de precios, coberturas y cuándo compensa contratar"
+        },
+        {
+          "name": "Selector de Alquiler o Compra",
+          "slug": "selector-alquiler-vs-compra",
+          "url": "https://meskeia.com/selector-alquiler-vs-compra/",
+          "description": "Test de 10 preguntas para saber si conviene más alquilar o comprar vivienda según estabilidad laboral, horizonte vital y situación financiera. Fase previa y complementaria a los cálculos económicos detallados"
+        },
+        {
+          "name": "Selector de Dieta",
+          "slug": "selector-dieta",
+          "url": "https://meskeia.com/selector-dieta/",
+          "description": "Test de 10 preguntas para descubrir qué tipo de alimentación se adapta al estilo de vida, objetivos y preferencias: mediterránea, vegetariana, vegana, cetogénica, DASH o ayuno intermitente"
+        },
+        {
+          "name": "Selector de Ejercicio",
+          "slug": "selector-ejercicio",
+          "url": "https://meskeia.com/selector-ejercicio/",
+          "description": "Test de 10 preguntas para descubrir qué tipo de ejercicio se adapta mejor a la condición física, objetivos y disponibilidad: gimnasio, running, natación, ciclismo, yoga-pilates o entrenamiento en casa"
+        },
+        {
+          "name": "Selector de Seguro de Hogar",
+          "slug": "selector-seguro-hogar",
+          "url": "https://meskeia.com/selector-seguro-hogar/",
+          "description": "Test de 10 preguntas para saber qué nivel de cobertura de seguro de hogar conviene: básica, estándar o completa. Analiza tipo de vivienda, tenencia, valor del contenido y nivel de riesgo"
         },
         {
           "name": "Selector de Tipo de Vehículo",

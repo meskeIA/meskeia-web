@@ -549,6 +549,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
     { url: '/calculadora-salario-neto/', icon: '💰', name: 'Calculadora Salario Neto', description: 'Tu sueldo neto real tras IRPF y SS' },
   ],
+  'selector-seguro-hogar': [
+    { url: '/selector-seguro-salud/', icon: '🏥', name: 'Selector Seguro de Salud', description: '¿Necesitas seguro médico privado?' },
+    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador de Seguros', description: 'Guía de todos los seguros en España' },
+    { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
+    { url: '/calculadora-hipoteca/', icon: '🏦', name: 'Calculadora de Hipoteca', description: 'Cuota mensual y coste total de tu préstamo' },
+  ],
+  'selector-alquiler-vs-compra': [
+    { url: '/orientador-alquiler-vs-compra/', icon: '📊', name: 'Orientador Alquiler vs Compra', description: 'Cálculo financiero detallado con tus cifras reales' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Estimador de Hipoteca', description: 'Cuota mensual y coste total de tu préstamo' },
+    { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Gastos totales al comprar una vivienda' },
+    { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Selector Seguro de Hogar', description: '¿Qué cobertura de seguro necesitas?' },
+  ],
+  'selector-dieta': [
+    { url: '/orientador-imc/', icon: '⚖️', name: 'Orientador IMC', description: 'Calcula tu índice de masa corporal' },
+    { url: '/selector-ejercicio/', icon: '🏋️', name: 'Selector de Ejercicio', description: '¿Qué tipo de actividad física te conviene?' },
+    { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tus hábitos de vida' },
+    { url: '/orientador-tension-arterial/', icon: '🩺', name: 'Orientador Tensión Arterial', description: 'Interpreta tus cifras de tensión' },
+  ],
+  'selector-ejercicio': [
+    { url: '/selector-dieta/', icon: '🥗', name: 'Selector de Dieta', description: '¿Qué tipo de alimentación te conviene?' },
+    { url: '/orientador-imc/', icon: '⚖️', name: 'Orientador IMC', description: 'Calcula tu índice de masa corporal' },
+    { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tus hábitos de vida' },
+    { url: '/orientador-colesterol/', icon: '🩺', name: 'Orientador Colesterol', description: 'Interpreta tus niveles de colesterol' },
+  ],
   'selector-vehiculo': [
     { url: '/selector-smartphone/', icon: '📱', name: 'Selector de Smartphone', description: '¿Qué móvil te conviene?' },
     { url: '/comparador-electrico/', icon: '⚡', name: 'Comparador Eléctrico vs Gasolina', description: '¿Cuándo compensa el eléctrico?' },
@@ -1397,6 +1421,10 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     // Mascotas y salud
     'selector-mascota': { title: 'Más herramientas de salud y bienestar', icon: '🐾' },
     'selector-seguro-salud': { title: 'Más herramientas de salud y finanzas', icon: '🏥' },
+    'selector-seguro-hogar': { title: 'Más herramientas para el hogar y seguros', icon: '🏠' },
+    'selector-alquiler-vs-compra': { title: 'Más herramientas para decidir sobre vivienda', icon: '🏠' },
+    'selector-dieta': { title: 'Más herramientas de salud y bienestar', icon: '🥗' },
+    'selector-ejercicio': { title: 'Más herramientas de salud y bienestar', icon: '🏋️' },
 
     // Vehículos
     'selector-vehiculo': { title: 'Más herramientas para comprar coche', icon: '🚗' },
