@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './SelectorSeguroHogar.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
@@ -346,6 +346,7 @@ export default function SelectorSeguroHogar() {
       )}
 
       <LegalNotice />
+      <DisclaimerCard variant="general" severity="medium" />
 
       {/* ── Pantalla de inicio ── */}
       {pantalla === 'inicio' && (
@@ -562,19 +563,12 @@ export default function SelectorSeguroHogar() {
             Compara siempre varias pólizas antes de contratar.
           </div>
 
-          <ShareCard appName="selector-seguro-hogar" />
-          <RelatedApps apps={getRelatedApps('selector-seguro-hogar')} />
-          <Footer appName="selector-seguro-hogar" />
         </div>
       )}
 
-      {pantalla !== 'resultado' && (
-        <>
-          <RelatedApps apps={getRelatedApps('selector-seguro-hogar')} />
-          <ShareCard appName="selector-seguro-hogar" />
-          <Footer appName="selector-seguro-hogar" />
-        </>
-      )}
+      <ShareCard appName="selector-seguro-hogar" />
+      <RelatedApps apps={getRelatedApps('selector-seguro-hogar')} />
+      <Footer appName="selector-seguro-hogar" />
     </div>
   );
 }

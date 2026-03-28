@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './SelectorEjercicio.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
@@ -348,6 +348,7 @@ export default function SelectorEjercicio() {
       )}
 
       <LegalNotice />
+      <DisclaimerCard variant="medical" severity="high" />
 
       {/* ── Pantalla de inicio ── */}
       {pantalla === 'inicio' && (
@@ -571,11 +572,11 @@ export default function SelectorEjercicio() {
             </p>
           </EducationalSection>
 
-          <ShareCard appName="selector-ejercicio" />
-          <RelatedApps apps={getRelatedApps('selector-ejercicio')} />
         </div>
       )}
 
+      <ShareCard appName="selector-ejercicio" />
+      <RelatedApps apps={getRelatedApps('selector-ejercicio')} />
       <Footer appName="selector-ejercicio" />
     </div>
   );

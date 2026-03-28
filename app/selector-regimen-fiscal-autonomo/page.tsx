@@ -451,6 +451,7 @@ export default function SelectorRegimenFiscalAutonomo() {
       </header>
 
       <LegalNotice />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* QUIZ O RESULTADO */}
       {!mostrarResultado ? (
@@ -515,9 +516,6 @@ export default function SelectorRegimenFiscalAutonomo() {
         </section>
       ) : rec !== null ? (
         <section className={styles.resultado} aria-label="Resultado orientativo">
-          {/* Disclaimer CRÍTICO — nivel 1: no colapsable, materia fiscal */}
-          <DisclaimerCard variant="financial" severity="critical" />
-
           <div className={styles.warningBox} role="alert">
             <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <p>

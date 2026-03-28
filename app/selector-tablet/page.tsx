@@ -394,19 +394,12 @@ export default function SelectorTabletPage() {
             </p>
           </EducationalSection>
 
-          <RelatedApps apps={getRelatedApps('selector-tablet')} />
-          <ShareCard appName="selector-tablet" />
-          <Footer appName="selector-tablet" />
         </main>
       )}
 
-      {!resultado && (
-        <>
-          <RelatedApps apps={getRelatedApps('selector-tablet')} />
-          <ShareCard appName="selector-tablet" />
-          <Footer appName="selector-tablet" />
-        </>
-      )}
+      <RelatedApps apps={getRelatedApps('selector-tablet')} />
+      <ShareCard appName="selector-tablet" />
+      <Footer appName="selector-tablet" />
     </div>
   );
 }

@@ -284,6 +284,7 @@ export default function SelectorSeguroSalud() {
       )}
 
       <LegalNotice />
+      <DisclaimerCard variant="general" severity="high" />
 
       {pantalla === 'intro' && (
         <div className={styles.introContainer}>
@@ -353,8 +354,6 @@ export default function SelectorSeguroSalud() {
 
       {pantalla === 'resultado' && resultado && (
         <div className={styles.resultadosContainer}>
-
-          <DisclaimerCard variant="general" severity="medium" />
 
           <div className={`${styles.veredictoCard} ${styles[`veredicto_${resultado.veredicto}`]}`}>
             <span className={styles.veredictoIcon} aria-hidden="true">{VEREDICTOS[resultado.veredicto].icon}</span>

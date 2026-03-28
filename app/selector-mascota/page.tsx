@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './SelectorMascota.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
@@ -374,6 +374,7 @@ export default function SelectorMascota() {
       )}
 
       <LegalNotice />
+      <DisclaimerCard variant="educational" severity="low" />
 
       {pantalla === 'intro' && (
         <div className={styles.introContainer}>

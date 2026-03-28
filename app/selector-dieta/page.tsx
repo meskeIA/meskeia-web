@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './SelectorDieta.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
@@ -356,6 +356,7 @@ export default function SelectorDieta() {
       )}
 
       <LegalNotice />
+      <DisclaimerCard variant="medical" severity="high" />
 
       {/* ── Pantalla inicio ──────────────────────── */}
       {pantalla === 'inicio' && (
@@ -556,11 +557,12 @@ export default function SelectorDieta() {
             🔄 Repetir el test
           </button>
 
-          <ShareCard appName="selector-dieta" />
-          <RelatedApps apps={getRelatedApps('selector-dieta')} />
-          <Footer appName="selector-dieta" />
         </main>
       )}
+
+      <ShareCard appName="selector-dieta" />
+      <RelatedApps apps={getRelatedApps('selector-dieta')} />
+      <Footer appName="selector-dieta" />
     </div>
   );
 }
