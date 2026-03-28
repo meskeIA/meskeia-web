@@ -405,6 +405,12 @@ export const implementedAppsUrls = [
   "/selector-carrera-universitaria/",    // Test 10 preguntas: ciencias/ingeniería, salud, humanidades, tecnología, arte/diseño
   "/selector-herramienta-productividad/", // Test 10 preguntas: GTD, Pomodoro, Kanban, Timeboxing, Inbox Zero
   "/selector-seguro-vida/",              // Test 10 preguntas: temporal, ahorro/vida entera, mixto o ninguno por ahora
+  "/selector-formacion-postgrado/",      // Test 10 preguntas: máster, FP superior, bootcamp, oposiciones, certificación
+  "/selector-seguro-coche/",             // Test 10 preguntas: terceros básico, terceros ampliado, todo riesgo c/s franquicia
+  "/selector-idioma/",                   // Test 10 preguntas: inglés, francés, alemán, portugués, chino/japonés
+  "/selector-estilo-decoracion/",        // Test 10 preguntas: minimalista, clásico, industrial, nórdico, mediterráneo
+  "/selector-vehiculo-electrico/",       // Test 10 preguntas: BEV, PHEV, HEV, moto eléctrica, esperar
+  "/selector-metodo-estudio/",           // Test 10 preguntas: repetición espaciada, mapas mentales, proyectos, Pomodoro, clases
 ];
 
 /**

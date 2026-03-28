@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 323,
+  "total_tools": 329,
   "updated": "2026-03-28",
   "features": {
     "all_free": true,
@@ -1004,6 +1004,42 @@
           "slug": "selector-inversiones",
           "url": "https://meskeia.com/selector-inversiones/",
           "description": "Test de 10 preguntas para saber qué vehículo de inversión se adapta mejor al perfil: fondos indexados, acciones directas, renta fija, inversión inmobiliaria o plan de pensiones/PPI. Análisis según horizonte temporal, tolerancia al riesgo y conocimiento financiero"
+        },
+        {
+          "name": "Selector de Formación Postgrado",
+          "slug": "selector-formacion-postgrado",
+          "url": "https://meskeia.com/selector-formacion-postgrado/",
+          "description": "Test de 10 preguntas para saber qué formación postgrado elegir: máster universitario, FP de grado superior, bootcamp online, oposiciones o certificación profesional"
+        },
+        {
+          "name": "Selector de Seguro de Coche",
+          "slug": "selector-seguro-coche",
+          "url": "https://meskeia.com/selector-seguro-coche/",
+          "description": "Test de 10 preguntas para elegir la modalidad de seguro de coche: terceros básico, terceros ampliado, todo riesgo con franquicia o todo riesgo sin franquicia"
+        },
+        {
+          "name": "Selector de Idioma",
+          "slug": "selector-idioma",
+          "url": "https://meskeia.com/selector-idioma/",
+          "description": "Test de 10 preguntas para saber qué idioma extranjero aprender según objetivos: inglés, francés, alemán, portugués o chino/japonés"
+        },
+        {
+          "name": "Selector de Estilo de Decoración",
+          "slug": "selector-estilo-decoracion",
+          "url": "https://meskeia.com/selector-estilo-decoracion/",
+          "description": "Test de 10 preguntas para descubrir el estilo decorativo del hogar: moderno/minimalista, clásico/tradicional, industrial, nórdico/escandinavo o mediterráneo"
+        },
+        {
+          "name": "Selector de Vehículo Eléctrico",
+          "slug": "selector-vehiculo-electrico",
+          "url": "https://meskeia.com/selector-vehiculo-electrico/",
+          "description": "Test de 10 preguntas para elegir el tipo de vehículo eléctrico o híbrido: BEV puro, PHEV enchufable, HEV híbrido suave, moto eléctrica o esperar"
+        },
+        {
+          "name": "Selector de Método de Estudio",
+          "slug": "selector-metodo-estudio",
+          "url": "https://meskeia.com/selector-metodo-estudio/",
+          "description": "Test de 10 preguntas para elegir el método de estudio según la forma de aprender: repetición espaciada, mapas mentales, proyectos prácticos, Pomodoro con libros o clases particulares"
         },
         {
           "name": "Estimador Impuesto de Sucesiones",

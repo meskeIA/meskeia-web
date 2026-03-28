@@ -1415,6 +1415,54 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
     { url: '/selector-tipo-ahorro/', icon: '💰', name: 'Selector Tipo de Ahorro', description: '¿Dónde poner tus ahorros?' },
   ],
+
+  // Formación postgrado
+  'selector-formacion-postgrado': [
+    { url: '/selector-carrera-universitaria/', icon: '🎓', name: 'Selector Carrera Universitaria', description: '¿Qué rama universitaria elegir?' },
+    { url: '/selector-metodo-estudio/', icon: '📚', name: 'Selector Método de Estudio', description: '¿Cómo aprendes mejor?' },
+    { url: '/selector-herramienta-productividad/', icon: '⚡', name: 'Selector Método de Productividad', description: 'GTD, Pomodoro, Kanban...' },
+    { url: '/selector-contrato-trabajo/', icon: '📋', name: 'Selector Contrato de Trabajo', description: '¿Qué tipo de contrato te conviene?' },
+  ],
+
+  // Seguro de coche
+  'selector-seguro-coche': [
+    { url: '/selector-coche-nuevo-usado/', icon: '🚗', name: 'Selector Coche Nuevo o Usado', description: '¿Nuevo, seminuevo o de ocasión?' },
+    { url: '/selector-seguro-vida/', icon: '🛡️', name: 'Selector Seguro de Vida', description: '¿Qué tipo de seguro de vida necesitas?' },
+    { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora de Combustible', description: 'Coste real de tus desplazamientos' },
+    { url: '/selector-vehiculo-electrico/', icon: '⚡', name: 'Selector Vehículo Eléctrico', description: '¿BEV, PHEV o híbrido?' },
+  ],
+
+  // Idioma a aprender
+  'selector-idioma': [
+    { url: '/selector-formacion-postgrado/', icon: '🎓', name: 'Selector Formación Postgrado', description: '¿Máster, bootcamp u oposiciones?' },
+    { url: '/selector-carrera-universitaria/', icon: '🏛️', name: 'Selector Carrera Universitaria', description: '¿Qué rama universitaria elegir?' },
+    { url: '/selector-metodo-estudio/', icon: '📚', name: 'Selector Método de Estudio', description: '¿Cómo aprendes mejor?' },
+    { url: '/selector-vacaciones/', icon: '✈️', name: 'Selector de Vacaciones', description: 'Descubre tu tipo de viaje ideal' },
+  ],
+
+  // Estilo decoración
+  'selector-estilo-decoracion': [
+    { url: '/selector-tipo-vivienda/', icon: '🏠', name: 'Selector Tipo de Vivienda', description: 'Piso, casa, ático o estudio' },
+    { url: '/selector-zona-residencia/', icon: '📍', name: 'Selector Zona de Residencia', description: 'Centro, extrarradio o pueblo' },
+    { url: '/presupuesto-reforma/', icon: '🔨', name: 'Presupuesto de Reforma', description: 'Estima el coste de tu reforma' },
+    { url: '/selector-alquiler-vs-compra/', icon: '🏘️', name: 'Selector Alquiler vs Compra', description: '¿Comprar o alquilar?' },
+  ],
+
+  // Vehículo eléctrico
+  'selector-vehiculo-electrico': [
+    { url: '/selector-coche-nuevo-usado/', icon: '🚗', name: 'Selector Coche Nuevo o Usado', description: '¿Nuevo, seminuevo o de ocasión?' },
+    { url: '/selector-seguro-coche/', icon: '🛡️', name: 'Selector Seguro de Coche', description: '¿Terceros o todo riesgo?' },
+    { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora de Combustible', description: 'Coste real de tus desplazamientos' },
+    { url: '/selector-tipo-prestamo/', icon: '💳', name: 'Selector Tipo de Préstamo', description: '¿Qué financiación elegir?' },
+  ],
+
+  // Método de estudio
+  'selector-metodo-estudio': [
+    { url: '/selector-formacion-postgrado/', icon: '🎓', name: 'Selector Formación Postgrado', description: '¿Máster, bootcamp u oposiciones?' },
+    { url: '/selector-carrera-universitaria/', icon: '🏛️', name: 'Selector Carrera Universitaria', description: '¿Qué rama universitaria elegir?' },
+    { url: '/selector-herramienta-productividad/', icon: '⚡', name: 'Selector Método de Productividad', description: 'GTD, Pomodoro, Kanban...' },
+    { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Temporizador Pomodoro', description: 'Técnica de concentración 25/5' },
+  ],
 };
 
 /**
@@ -1566,6 +1614,18 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
 
     // Productividad — métodos
     'selector-herramienta-productividad': { title: 'Más herramientas de productividad', icon: '⚡' },
+
+    // Formación y estudio
+    'selector-formacion-postgrado': { title: 'Más herramientas para estudiantes', icon: '🎓' },
+    'selector-idioma': { title: 'Más herramientas de aprendizaje', icon: '🌍' },
+    'selector-metodo-estudio': { title: 'Más herramientas de estudio y productividad', icon: '📚' },
+
+    // Vehículos y seguros
+    'selector-seguro-coche': { title: 'Más herramientas de vehículos y seguros', icon: '🚗' },
+    'selector-vehiculo-electrico': { title: 'Más herramientas sobre vehículos', icon: '⚡' },
+
+    // Hogar y decoración
+    'selector-estilo-decoracion': { title: 'Más herramientas sobre el hogar', icon: '🏡' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };
