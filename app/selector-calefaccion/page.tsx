@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -400,6 +401,7 @@ export default function SelectorCalefaccion() {
       )}
 
       <LegalNotice />
+      <DisclaimerCard variant="technical" severity="low" />
 
       {/* ── INTRO ── */}
       {pantalla === 'intro' && (

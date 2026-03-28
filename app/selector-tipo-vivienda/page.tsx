@@ -246,10 +246,10 @@ const RECOMENDACIONES: Record<RecomendacionKey, Recomendacion> = {
 /* ── Colores por tipo ── */
 const COLORES: Record<RecomendacionKey, string> = {
   piso: '#2E86AB',
-  casa: '#6aaa5e',
+  casa: '#5b9e6f',
   atico: '#e8a020',
   estudio: '#48A9A6',
-  compartido: '#9b59b6',
+  compartido: '#c0392b',
 };
 
 /* ── Componente principal ── */

@@ -299,7 +299,7 @@ const RECOMENDACIONES: Record<RecomendacionKey, Recomendacion> = {
 const COLOR_BARRAS: Record<RecomendacionKey, string> = {
   ciencias: '#2E86AB',
   salud: '#e74c3c',
-  humanidades: '#9b59b6',
+  humanidades: '#8b7355',
   tecnologia: '#48A9A6',
   arte: '#e8a020',
 };
