@@ -751,6 +751,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'planificador-cashflow': [...negociosApps.filter(a => a.url !== '/planificador-cashflow/').slice(0, 2), ...freelanceApps.slice(0, 2)],
   'generador-nombres-empresa': negociosApps.filter(a => a.url !== '/generador-nombres-empresa/'),
   'generador-carruseles': [...negociosApps.filter(a => a.url !== '/generador-carruseles/').slice(0, 2), ...seoApps.slice(0, 2)],
+  'selector-modelo-negocio': [
+    { url: '/estimador-break-even/', icon: '⚖️', name: 'Break-Even', description: 'Punto de equilibrio del negocio' },
+    { url: '/planificador-cashflow/', icon: '💸', name: 'Planificador Cashflow', description: 'Flujo de caja mensual' },
+    { url: '/generador-nombres-empresa/', icon: '✨', name: 'Nombres Empresa', description: 'Ideas de nombres para tu negocio' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Cuánto cobrar por tu trabajo' },
+  ],
 
   // MATEMÁTICAS
   'calculadora-matematica': matematicasBasicasApps.filter(a => a.url !== '/calculadora-matematica/'),
@@ -1345,6 +1351,34 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto necesitas ahorrar' },
     { url: '/selector-plan-pensiones/', icon: '🏦', name: 'Selector Plan de Pensiones', description: 'Test: ¿te conviene contratar uno?' },
   ],
+  'selector-tipo-prestamo': [
+    { url: '/estimador-prestamos/', icon: '🏦', name: 'Simulador de Préstamos', description: 'Calcula cuota y coste total' },
+    { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/amortizacion-hipoteca/', icon: '💰', name: 'Amortización Anticipada', description: 'Reducir cuota vs plazo' },
+    { url: '/selector-tipo-ahorro/', icon: '💶', name: 'Selector Tipo de Ahorro', description: '¿Dónde poner tus ahorros?' },
+  ],
+
+  'selector-vacaciones': [
+    { url: '/orientador-jet-lag/', icon: '✈️', name: 'Orientador Jet Lag', description: 'Recupera tu ritmo tras un vuelo largo' },
+    { url: '/conversor-zonas-horarias/', icon: '🕐', name: 'Conversor Zonas Horarias', description: 'Calcula la hora en destino' },
+    { url: '/requisitos-nomada-digital/', icon: '💻', name: 'Requisitos Nómada Digital', description: 'Visados y requisitos por país' },
+    { url: '/calculadora-gastos-hogar/', icon: '💰', name: 'Control Gastos', description: 'Planifica tu presupuesto de viaje' },
+  ],
+
+  // TRABAJO Y EMPLEO
+  'selector-contrato-trabajo': [
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Cuota de Autónomo', description: 'Estima tu cuota RETA mensual' },
+    { url: '/asistente-alta-autonomo/', icon: '📋', name: 'Asistente Alta Autónomo', description: 'Trámites para darte de alta' },
+    { url: '/orientador-tarifa-freelance/', icon: '💰', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/test-burnout-laboral/', icon: '🧘', name: 'Test Burnout Laboral', description: '¿Estás al límite en el trabajo?' },
+  ],
+
+  'selector-energia-hogar': [
+    { url: '/selector-calefaccion/', icon: '🌡️', name: 'Selector de Calefacción', description: '¿Qué sistema de calefacción te conviene?' },
+    { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Gastos del Hogar', description: 'Control de tu presupuesto mensual' },
+    { url: '/estimador-reformas-hogar/', icon: '🔨', name: 'Estimador Reformas', description: 'Coste estimado de tu reforma' },
+    { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Selector Seguro Hogar', description: '¿Qué cobertura de seguro necesitas?' },
+  ],
 };
 
 /**
@@ -1463,6 +1497,7 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'selector-zona-residencia': { title: 'Más herramientas sobre vivienda y estilo de vida', icon: '🏡' },
     'selector-dieta': { title: 'Más herramientas de salud y bienestar', icon: '🥗' },
     'selector-ejercicio': { title: 'Más herramientas de salud y bienestar', icon: '🏋️' },
+    'selector-modelo-negocio': { title: 'Más herramientas para emprender', icon: '🏢' },
 
     // Vehículos
     'selector-vehiculo': { title: 'Más herramientas para comprar coche', icon: '🚗' },
@@ -1474,6 +1509,18 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
 
     // Jubilación y ahorro
     'selector-plan-pensiones': { title: 'Más herramientas de jubilación y ahorro', icon: '🏦' },
+
+    // Trabajo y empleo
+    'selector-contrato-trabajo': { title: 'Más herramientas para el trabajo', icon: '💼' },
+
+    // Viajes y ocio
+    'selector-vacaciones': { title: 'Más herramientas para viajar', icon: '✈️' },
+
+    // Hogar y energía
+    'selector-energia-hogar': { title: 'Más herramientas para el hogar', icon: '🏠' },
+
+    // Finanzas — préstamos
+    'selector-tipo-prestamo': { title: 'Más herramientas de finanzas', icon: '💳' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };

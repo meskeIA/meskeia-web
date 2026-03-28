@@ -221,6 +221,7 @@ export const implementedAppsUrls = [
   "/generador-facturas/",           // Facturas para autónomos con IVA/IRPF
   "/calculadora-presupuestos/",     // Presupuestos profesionales para clientes
   "/generador-carruseles/",         // Carruseles para Instagram/LinkedIn
+  "/selector-modelo-negocio/",      // Test para elegir modelo de negocio (tienda, e-commerce, servicios, SaaS, marketplace)
 
   // Física y Química (7 implementadas)
   "/conversor-unidades/",
@@ -393,6 +394,12 @@ export const implementedAppsUrls = [
 
   // Herramientas de tecnología de hogar (2026-03-28)
   "/selector-tipo-television/",           // Test 10 preguntas: OLED, QLED/Mini-LED, LED IPS o LED VA
+
+  // Selectores tercera tanda (2026-03-28)
+  "/selector-vacaciones/",               // Test 10 preguntas: playa, montaña, ciudad, aventura, organizado
+  "/selector-contrato-trabajo/",         // Test 10 preguntas: indefinido, temporal, autónomo, prácticas, funcionario
+  "/selector-tipo-prestamo/",            // Test 10 preguntas: personal, hipotecario, consumo, línea crédito, microcrédito
+  "/selector-energia-hogar/",            // Test 10 preguntas: gas, eléctrico/bomba calor, aerotermia, biomasa, solar
 ];
 
 /**

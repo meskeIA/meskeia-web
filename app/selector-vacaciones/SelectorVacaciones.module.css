@@ -1,0 +1,478 @@
+/* ─── Contenedor principal ─────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ──────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  opacity: 0.9;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Sección de test ───────────────────────────────────────────── */
+.testSection {
+  max-width: 700px;
+  margin: 2.5rem auto 3rem;
+  padding: 0 1.25rem;
+}
+
+/* ─── Barra de progreso ─────────────────────────────────────────── */
+.progreso {
+  margin-bottom: 2rem;
+}
+
+.progresoLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.progresoBar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .progresoBar {
+  background: #444;
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* ─── Pregunta ───────────────────────────────────────────────────── */
+.pregunta {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem 1.75rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
+}
+
+[data-theme='dark'] .pregunta {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+.preguntaNumero {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.preguntaTexto {
+  font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+  line-height: 1.4;
+}
+
+/* ─── Opciones ───────────────────────────────────────────────────── */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.opcionBtn {
+  width: 100%;
+  text-align: left;
+  padding: 0.85rem 1.1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  line-height: 1.4;
+}
+
+.opcionBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.opcionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.opcionBtn.selected {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+[data-theme='dark'] .opcionBtn {
+  border-color: #555;
+  background: #2a2a2a;
+}
+
+[data-theme='dark'] .opcionBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .opcionBtn.selected {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.2);
+}
+
+/* ─── Navegación entre preguntas ─────────────────────────────────── */
+.navegacion {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.btnAnterior,
+.btnSiguiente,
+.btnResultado,
+.btnReiniciar {
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, transform 0.15s, opacity 0.2s;
+}
+
+.btnAnterior {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 2px solid #e0e0e0;
+}
+
+.btnAnterior:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnAnterior:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+[data-theme='dark'] .btnAnterior {
+  border-color: #555;
+}
+
+.btnSiguiente,
+.btnResultado {
+  background: var(--primary);
+  color: #fff;
+  flex: 1;
+  max-width: 220px;
+  text-align: center;
+}
+
+.btnSiguiente:hover:not(:disabled),
+.btnResultado:hover:not(:disabled) {
+  background: var(--secondary);
+  transform: translateY(-1px);
+}
+
+.btnSiguiente:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnSiguiente:focus-visible,
+.btnResultado:focus-visible,
+.btnAnterior:focus-visible,
+.btnReiniciar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnReiniciar {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.btnReiniciar:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+/* ─── Resultado ──────────────────────────────────────────────────── */
+.resultadoSection {
+  max-width: 700px;
+  margin: 2.5rem auto 3rem;
+  padding: 0 1.25rem;
+}
+
+.resultadoCard {
+  border-radius: 16px;
+  padding: 2rem 1.75rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  margin-bottom: 1.5rem;
+}
+
+/* Colores por tipo de recomendación */
+.recomendacion_playa {
+  background: linear-gradient(135deg, #2E86AB 0%, #3d9ec4 100%);
+}
+
+.recomendacion_montana {
+  background: linear-gradient(135deg, #48A9A6 0%, #5cc4c1 100%);
+}
+
+.recomendacion_ciudad {
+  background: linear-gradient(135deg, #6aaa5e 0%, #7dc770 100%);
+}
+
+.recomendacion_aventura {
+  background: linear-gradient(135deg, #e8a020 0%, #f0b535 100%);
+}
+
+.recomendacion_organizado {
+  background: linear-gradient(135deg, #9b59b6 0%, #b07ac9 100%);
+}
+
+.recomendacionEmoji {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.recomendacionTitulo {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+}
+
+.recomendacionSubtitulo {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0 0 1.25rem;
+}
+
+.recomendacionDesc {
+  font-size: 0.97rem;
+  line-height: 1.65;
+  opacity: 0.95;
+  margin: 0;
+}
+
+/* ─── Consejos grid ──────────────────────────────────────────────── */
+.consejosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.consejoCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid var(--primary);
+}
+
+[data-theme='dark'] .consejoCard {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.consejoCard p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ─── Ventajas list ──────────────────────────────────────────────── */
+.ventajasList {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  margin-top: 1.25rem;
+}
+
+[data-theme='dark'] .ventajasList {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.ventajasList h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.ventajasList ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ventajasList li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  padding-left: 1.2rem;
+  position: relative;
+}
+
+.ventajasList li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--secondary);
+  font-weight: 700;
+}
+
+/* ─── warningBox (indicador v2.0) ───────────────────────────────── */
+.warningBox {
+  background: #fff8e6;
+  border: 2px solid #e8a020;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  font-size: 0.9rem;
+  color: #7a5100;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2000;
+  border-color: #c98a10;
+  color: #f0c060;
+}
+
+.warningBox strong {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+/* ─── Sección educativa items ────────────────────────────────────── */
+.eduGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin: 1.25rem 0;
+}
+
+.eduCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .eduCard {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.eduCard h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.eduCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.eduCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.eduCard ul li {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding-left: 1rem;
+  position: relative;
+}
+
+.eduCard ul li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--secondary);
+}
+
+/* ─── Dark mode general ──────────────────────────────────────────── */
+[data-theme='dark'] .pregunta {
+  background: var(--bg-card);
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .pregunta {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .resultadoCard {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .navegacion {
+    flex-wrap: wrap;
+  }
+
+  .btnSiguiente,
+  .btnResultado {
+    max-width: none;
+  }
+}
