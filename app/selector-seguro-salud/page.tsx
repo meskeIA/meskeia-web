@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import styles from './AsesorSeguroSalud.module.css';
+import styles from './SelectorSeguroSalud.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -246,7 +246,7 @@ function calcularResultado(r: Record<number, string>): Resultado {
 
 type Pantalla = 'intro' | 'test' | 'resultado';
 
-export default function AsesorSeguroSalud() {
+export default function SelectorSeguroSalud() {
   const [pantalla, setPantalla] = useState<Pantalla>('intro');
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
@@ -420,9 +420,9 @@ export default function AsesorSeguroSalud() {
         </div>
       )}
 
-      <RelatedApps apps={getRelatedApps('asesor-seguro-salud')} />
-      <ShareCard appName="asesor-seguro-salud" />
-      <Footer appName="asesor-seguro-salud" />
+      <RelatedApps apps={getRelatedApps('selector-seguro-salud')} />
+      <ShareCard appName="selector-seguro-salud" />
+      <Footer appName="selector-seguro-salud" />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import styles from './AsesorVehiculo.module.css';
+import styles from './SelectorVehiculo.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -671,7 +671,7 @@ function calcularRecomendacion(r: Record<number, string>): Resultado {
 // Componente principal
 // ─────────────────────────────────────────────
 
-export default function AsesorVehiculo() {
+export default function SelectorVehiculo() {
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
@@ -747,9 +747,9 @@ export default function AsesorVehiculo() {
           </div>
         </main>
 
-        <RelatedApps apps={getRelatedApps('asesor-vehiculo')} />
-        <ShareCard appName="asesor-vehiculo" />
-        <Footer appName="asesor-vehiculo" />
+        <RelatedApps apps={getRelatedApps('selector-vehiculo')} />
+        <ShareCard appName="selector-vehiculo" />
+        <Footer appName="selector-vehiculo" />
       </div>
     );
   }
@@ -826,7 +826,7 @@ export default function AsesorVehiculo() {
           </div>
         </main>
 
-        <Footer appName="asesor-vehiculo" />
+        <Footer appName="selector-vehiculo" />
       </div>
     );
   }
@@ -1035,7 +1035,7 @@ export default function AsesorVehiculo() {
             variant="educational"
             severity="medium"
             collapsible
-            context="asesor-vehiculo"
+            context="selector-vehiculo"
           />
 
           <EducationalSection
@@ -1093,11 +1093,11 @@ export default function AsesorVehiculo() {
             </div>
           </EducationalSection>
 
-          <RelatedApps apps={getRelatedApps('asesor-vehiculo')} />
-          <ShareCard appName="asesor-vehiculo" />
+          <RelatedApps apps={getRelatedApps('selector-vehiculo')} />
+          <ShareCard appName="selector-vehiculo" />
         </main>
 
-        <Footer appName="asesor-vehiculo" />
+        <Footer appName="selector-vehiculo" />
       </div>
     );
   }

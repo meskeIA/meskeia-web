@@ -529,39 +529,39 @@
           "description": "Divide gastos del piso compartido entre compañeros"
         },
         {
-          "name": "Asesor de Sistema de Calefacción",
-          "slug": "asesor-calefaccion",
-          "url": "https://meskeia.com/asesor-calefaccion/",
+          "name": "Selector de Sistema de Calefacción",
+          "slug": "selector-calefaccion",
+          "url": "https://meskeia.com/selector-calefaccion/",
           "description": "Test de 10 preguntas para saber qué sistema de calefacción conviene según vivienda, clima, uso y presupuesto. Recomienda entre aerotermia, bomba de calor, caldera de gas, pellet o eléctrico con costes orientativos e información de subvenciones"
         },
         {
-          "name": "Asesor de Portátil y PC",
-          "slug": "asesor-portatil",
-          "url": "https://meskeia.com/asesor-portatil/",
+          "name": "Selector de Portátil y PC",
+          "slug": "selector-portatil",
+          "url": "https://meskeia.com/selector-portatil/",
           "description": "Test de 10 preguntas para saber qué ordenador conviene según uso, movilidad, presupuesto y ecosistema. Recomienda formato (portátil, sobremesa, 2 en 1, mini PC), sistema operativo (Windows, Mac, Linux, ChromeOS) y gama con modelos de referencia actualizados"
         },
         {
-          "name": "Asesor de Smartphone",
-          "slug": "asesor-smartphone",
-          "url": "https://meskeia.com/asesor-smartphone/",
+          "name": "Selector de Smartphone",
+          "slug": "selector-smartphone",
+          "url": "https://meskeia.com/selector-smartphone/",
           "description": "Test de 10 preguntas para descubrir qué smartphone conviene según uso, presupuesto y prioridades. Recomienda sistema operativo (iOS o Android), gama (básica, media, alta, pro) y modelos de referencia actualizados con precios orientativos"
         },
         {
-          "name": "Asesor de Mascota",
-          "slug": "asesor-mascota",
-          "url": "https://meskeia.com/asesor-mascota/",
+          "name": "Selector de Mascota",
+          "slug": "selector-mascota",
+          "url": "https://meskeia.com/selector-mascota/",
           "description": "Test de 10 preguntas para descubrir qué tipo de mascota se adapta mejor al estilo de vida, vivienda y disponibilidad. Recomienda entre perro (pequeño, mediano, grande), gato, roedor, pez, pájaro o reptil con costes reales y consejos prácticos"
         },
         {
-          "name": "Asesor de Seguro de Salud",
-          "slug": "asesor-seguro-salud",
-          "url": "https://meskeia.com/asesor-seguro-salud/",
+          "name": "Selector de Seguro de Salud",
+          "slug": "selector-seguro-salud",
+          "url": "https://meskeia.com/selector-seguro-salud/",
           "description": "Test de 10 preguntas para saber si conviene un seguro de salud privado: sanidad pública es suficiente, seguro complementario o seguro completo. Con orientación de precios, coberturas y cuándo compensa contratar"
         },
         {
-          "name": "Asesor de Tipo de Vehículo",
-          "slug": "asesor-vehiculo",
-          "url": "https://meskeia.com/asesor-vehiculo/",
+          "name": "Selector de Tipo de Vehículo",
+          "slug": "selector-vehiculo",
+          "url": "https://meskeia.com/selector-vehiculo/",
           "description": "Test de 9 preguntas para descubrir qué tipo de coche conviene según uso, presupuesto y estilo de vida. Recomienda segmento (urbano, compacto, SUV, familiar) y motorización (gasolina, diésel, híbrido, eléctrico) con comparativa de costes anuales"
         },
         {

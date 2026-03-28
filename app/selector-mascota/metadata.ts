@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Asesor de Mascota — ¿Qué animal se adapta a mí? | meskeIA',
+  title: 'Selector de Mascota — ¿Qué animal se adapta a mí? | meskeIA',
   description:
     'Test de 10 preguntas para saber qué mascota te conviene según tu estilo de vida, vivienda, tiempo disponible y presupuesto. Perro, gato, roedor, pez, pájaro o reptil.',
   keywords: [
     'qué mascota tener',
-    'asesor mascota',
+    'selector mascota',
     'qué perro elegir',
     'mejor mascota para piso',
     'mascota para niños',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
       'Descubre qué animal se adapta a tu estilo de vida, espacio disponible, tiempo libre y presupuesto. Sin romanticismos, con información real.',
     type: 'website',
     locale: 'es_ES',
-    url: 'https://meskeia.com/asesor-mascota/',
+    url: 'https://meskeia.com/selector-mascota/',
     siteName: 'meskeIA',
   },
   twitter: {
@@ -33,15 +33,15 @@ export const metadata: Metadata = {
       'Test de 10 preguntas para encontrar la mascota que mejor encaja con tu vida real.',
   },
   alternates: {
-    canonical: 'https://meskeia.com/asesor-mascota/',
+    canonical: 'https://meskeia.com/selector-mascota/',
   },
   other: {
     'schema:WebApplication': JSON.stringify(
       generateWebAppSchema({
-        name: 'Asesor de Mascota',
+        name: 'Selector de Mascota',
         description:
           'Test orientativo de 10 preguntas para descubrir qué tipo de mascota (perro, gato, roedor, pez, pájaro o reptil) se adapta mejor a tu estilo de vida, espacio, tiempo disponible y presupuesto.',
-        url: 'https://meskeia.com/asesor-mascota/',
+        url: 'https://meskeia.com/selector-mascota/',
         features: [
           'Test de 10 preguntas sobre estilo de vida y situación',
           'Recomendación de tipo de mascota y perfil concreto',

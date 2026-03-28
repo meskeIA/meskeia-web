@@ -96,6 +96,13 @@ const nextConfig: NextConfig = {
       { source: '/entrenador-tablas-multiplicar/', destination: '/tablas-multiplicar/', permanent: true },
       { source: '/constelaciones-cielo/', destination: '/constelaciones-del-cielo/', permanent: true },
       { source: '/simulador-genetica-mendeliana/', destination: '/simulador-genetica/', permanent: true },
+      // Selectores renombrados en marzo 2026 (asesor → selector)
+      { source: '/asesor-vehiculo/', destination: '/selector-vehiculo/', permanent: true },
+      { source: '/asesor-smartphone/', destination: '/selector-smartphone/', permanent: true },
+      { source: '/asesor-calefaccion/', destination: '/selector-calefaccion/', permanent: true },
+      { source: '/asesor-portatil/', destination: '/selector-portatil/', permanent: true },
+      { source: '/asesor-mascota/', destination: '/selector-mascota/', permanent: true },
+      { source: '/asesor-seguro-salud/', destination: '/selector-seguro-salud/', permanent: true },
       // Apps renombradas en marzo 2026 (calculadora/simulador → estimador/orientador)
       { source: '/simulador-hipoteca/', destination: '/estimador-hipoteca/', permanent: true },
       { source: '/simulador-prestamos/', destination: '/estimador-prestamos/', permanent: true },

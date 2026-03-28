@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import styles from './AsesorMascota.module.css';
+import styles from './SelectorMascota.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -336,7 +336,7 @@ function calcularResultado(r: Record<number, string>): Resultado {
 
 type Pantalla = 'intro' | 'test' | 'resultado';
 
-export default function AsesorMascota() {
+export default function SelectorMascota() {
   const [pantalla, setPantalla] = useState<Pantalla>('intro');
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
@@ -504,9 +504,9 @@ export default function AsesorMascota() {
         </div>
       )}
 
-      <RelatedApps apps={getRelatedApps('asesor-mascota')} />
-      <ShareCard appName="asesor-mascota" />
-      <Footer appName="asesor-mascota" />
+      <RelatedApps apps={getRelatedApps('selector-mascota')} />
+      <ShareCard appName="selector-mascota" />
+      <Footer appName="selector-mascota" />
     </div>
   );
 }

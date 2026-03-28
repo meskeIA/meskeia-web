@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import styles from './AsesorPortatil.module.css';
+import styles from './SelectorPortatil.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -467,7 +467,7 @@ function calcularResultado(r: Record<number, string>): Resultado {
 
 type Pantalla = 'intro' | 'test' | 'resultado';
 
-export default function AsesorPortatil() {
+export default function SelectorPortatil() {
   const [pantalla, setPantalla] = useState<Pantalla>('intro');
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
@@ -733,9 +733,9 @@ export default function AsesorPortatil() {
         </div>
       )}
 
-      <RelatedApps apps={getRelatedApps('asesor-portatil')} />
-      <ShareCard appName="asesor-portatil" />
-      <Footer appName="asesor-portatil" />
+      <RelatedApps apps={getRelatedApps('selector-portatil')} />
+      <ShareCard appName="selector-portatil" />
+      <Footer appName="selector-portatil" />
     </div>
   );
 }

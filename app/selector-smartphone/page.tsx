@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import styles from './AsesorSmartphone.module.css';
+import styles from './SelectorSmartphone.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -363,7 +363,7 @@ function calcularResultado(respuestas: Record<number, string>): Resultado {
 
 type Pantalla = 'intro' | 'test' | 'resultado';
 
-export default function AsesorSmartphone() {
+export default function SelectorSmartphone() {
   const [pantalla, setPantalla] = useState<Pantalla>('intro');
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
@@ -653,9 +653,9 @@ export default function AsesorSmartphone() {
         </div>
       )}
 
-      <RelatedApps apps={getRelatedApps('asesor-smartphone')} />
-      <ShareCard appName="asesor-smartphone" />
-      <Footer appName="asesor-smartphone" />
+      <RelatedApps apps={getRelatedApps('selector-smartphone')} />
+      <ShareCard appName="selector-smartphone" />
+      <Footer appName="selector-smartphone" />
     </div>
   );
 }

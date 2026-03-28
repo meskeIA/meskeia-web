@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Asesor de Portátil y PC — ¿Cuál me conviene? | meskeIA',
+  title: 'Selector de Portátil y PC — ¿Cuál me conviene? | meskeIA',
   description:
     'Test de 10 preguntas para saber qué ordenador te conviene: portátil o sobremesa, Windows o Mac, gama de rendimiento y modelos de referencia actualizados para 2025.',
   keywords: [
     'qué portátil comprar',
-    'asesor portátil',
+    'selector portátil',
     'Windows o Mac',
     'mejor ordenador 2025',
     'portátil para trabajo',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
       'Descubre el ordenador ideal para tu perfil: formato, sistema operativo, rendimiento y modelos de referencia. Sin marcas patrocinadas.',
     type: 'website',
     locale: 'es_ES',
-    url: 'https://meskeia.com/asesor-portatil/',
+    url: 'https://meskeia.com/selector-portatil/',
     siteName: 'meskeIA',
   },
   twitter: {
@@ -33,15 +33,15 @@ export const metadata: Metadata = {
       'Test de 10 preguntas para encontrar tu portátil o PC ideal según uso, presupuesto y prioridades.',
   },
   alternates: {
-    canonical: 'https://meskeia.com/asesor-portatil/',
+    canonical: 'https://meskeia.com/selector-portatil/',
   },
   other: {
     'schema:WebApplication': JSON.stringify(
       generateWebAppSchema({
-        name: 'Asesor de Portátil y PC',
+        name: 'Selector de Portátil y PC',
         description:
           'Test orientativo de 10 preguntas para descubrir qué ordenador (portátil o sobremesa, Windows, Mac o Linux, y gama de rendimiento) se adapta mejor a tu uso, presupuesto y prioridades. Incluye modelos de referencia actualizados.',
-        url: 'https://meskeia.com/asesor-portatil/',
+        url: 'https://meskeia.com/selector-portatil/',
         features: [
           'Test de 10 preguntas sobre uso y prioridades',
           'Recomendación de formato (portátil / sobremesa / 2 en 1)',

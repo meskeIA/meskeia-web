@@ -366,12 +366,12 @@ export const implementedAppsUrls = [
   "/calculadora-piscinas/",                // Volumen + dosis cloro, pH, alguicida y sal
 
   // Asesor vehículo (2026-03-26)
-  "/asesor-calefaccion/",                  // Test 10 preguntas: aerotermia, bomba de calor, gas, pellet o eléctrico
-  "/asesor-portatil/",                     // Test 10 preguntas: formato, OS, gama y modelos de referencia
-  "/asesor-smartphone/",                   // Test 10 preguntas: iOS/Android, gama y modelos de referencia
-  "/asesor-vehiculo/",                     // Test 9 preguntas: segmento + motorización + costes anuales comparados
-  "/asesor-mascota/",                      // Test 10 preguntas: perro, gato, roedor, pez, pájaro o reptil
-  "/asesor-seguro-salud/",                 // Test 10 preguntas: sanidad pública, complementario o seguro completo
+  "/selector-calefaccion/",                  // Test 10 preguntas: aerotermia, bomba de calor, gas, pellet o eléctrico
+  "/selector-portatil/",                     // Test 10 preguntas: formato, OS, gama y modelos de referencia
+  "/selector-smartphone/",                   // Test 10 preguntas: iOS/Android, gama y modelos de referencia
+  "/selector-vehiculo/",                     // Test 9 preguntas: segmento + motorización + costes anuales comparados
+  "/selector-mascota/",                      // Test 10 preguntas: perro, gato, roedor, pez, pájaro o reptil
+  "/selector-seguro-salud/",                 // Test 10 preguntas: sanidad pública, complementario o seguro completo
 
   // Herramientas de decisión de vehículo (2026-03-27)
   "/comparador-electrico/",               // Break-even eléctrico vs gasolina, MOVES III, proyección 10 años

@@ -2,14 +2,14 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Asesor de Sistema de Calefacción — ¿Cuál me conviene? | meskeIA',
+  title: 'Selector de Sistema de Calefacción — ¿Cuál me conviene? | meskeIA',
   description:
     'Test de 10 preguntas para saber qué sistema de calefacción te conviene: caldera de gas, bomba de calor, aerotermia, suelo radiante o pellet. Según vivienda, uso y subvenciones disponibles.',
   keywords: [
     'qué calefacción instalar',
     'aerotermia o caldera de gas',
     'bomba de calor o gas natural',
-    'asesor calefacción',
+    'selector calefacción',
     'mejor sistema de calefacción España',
     'cambiar caldera gas',
     'aerotermia precio España',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
       'Aerotermia, bomba de calor, caldera de gas, pellet o suelo radiante. Descubre cuál se adapta mejor a tu vivienda, uso y presupuesto.',
     type: 'website',
     locale: 'es_ES',
-    url: 'https://meskeia.com/asesor-calefaccion/',
+    url: 'https://meskeia.com/selector-calefaccion/',
     siteName: 'meskeIA',
   },
   twitter: {
@@ -33,15 +33,15 @@ export const metadata: Metadata = {
       'Test de 10 preguntas para encontrar tu sistema de calefacción ideal según vivienda, uso y subvenciones disponibles.',
   },
   alternates: {
-    canonical: 'https://meskeia.com/asesor-calefaccion/',
+    canonical: 'https://meskeia.com/selector-calefaccion/',
   },
   other: {
     'schema:WebApplication': JSON.stringify(
       generateWebAppSchema({
-        name: 'Asesor de Sistema de Calefacción',
+        name: 'Selector de Sistema de Calefacción',
         description:
           'Test orientativo de 10 preguntas para descubrir qué sistema de calefacción (aerotermia, bomba de calor, caldera de gas, pellet o suelo radiante) se adapta mejor a tu vivienda, uso y presupuesto. Incluye información sobre subvenciones disponibles.',
-        url: 'https://meskeia.com/asesor-calefaccion/',
+        url: 'https://meskeia.com/selector-calefaccion/',
         features: [
           'Test de 10 preguntas sobre vivienda y uso',
           'Recomendación de sistema principal y alternativa',

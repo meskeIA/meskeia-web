@@ -518,59 +518,59 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/estimador-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
   'calculadora-coste-plazos': finanzasPersonalesApps.filter(a => a.url !== '/estimador-coste-plazos/').slice(0, 4),
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
-  'asesor-calefaccion': [
+  'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },
     { url: '/estimador-reformas-hogar/', icon: '🏗️', name: 'Estimador Reformas', description: 'Presupuesto por tipo de reforma' },
     { url: '/calculadora-huella-carbono/', icon: '🌍', name: 'Huella de Carbono', description: 'Tu impacto ambiental' },
   ],
-  'asesor-portatil': [
-    { url: '/asesor-smartphone/', icon: '📱', name: 'Asesor de Smartphone', description: '¿Qué móvil te conviene?' },
+  'selector-portatil': [
+    { url: '/selector-smartphone/', icon: '📱', name: 'Selector de Smartphone', description: '¿Qué móvil te conviene?' },
     { url: '/test-madurez-digital/', icon: '🤖', name: 'Test Madurez Digital', description: 'Nivel de digitalización de tu empresa' },
     { url: '/calculadora-suscripciones/', icon: '📱', name: 'Calculadora Suscripciones', description: 'Controla lo que gastas al mes' },
-    { url: '/asesor-vehiculo/', icon: '🚗', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+    { url: '/selector-vehiculo/', icon: '🚗', name: 'Selector de Vehículo', description: '¿Qué tipo de coche te conviene?' },
   ],
-  'asesor-smartphone': [
-    { url: '/asesor-portatil/', icon: '💻', name: 'Asesor de Portátil y PC', description: '¿Qué ordenador te conviene?' },
-    { url: '/asesor-vehiculo/', icon: '🚗', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+  'selector-smartphone': [
+    { url: '/selector-portatil/', icon: '💻', name: 'Selector de Portátil y PC', description: '¿Qué ordenador te conviene?' },
+    { url: '/selector-vehiculo/', icon: '🚗', name: 'Selector de Vehículo', description: '¿Qué tipo de coche te conviene?' },
     { url: '/test-madurez-digital/', icon: '🤖', name: 'Test Madurez Digital', description: 'Nivel de digitalización de tu empresa' },
     { url: '/calculadora-suscripciones/', icon: '📱', name: 'Calculadora Suscripciones', description: 'Controla lo que gastas al mes' },
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Seguros', description: 'Guía de seguros en España' },
   ],
-  'asesor-mascota': [
-    { url: '/asesor-seguro-salud/', icon: '🏥', name: 'Asesor Seguro de Salud', description: '¿Necesitas seguro médico privado?' },
+  'selector-mascota': [
+    { url: '/selector-seguro-salud/', icon: '🏥', name: 'Selector Seguro de Salud', description: '¿Necesitas seguro médico privado?' },
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Seguros', description: 'Guía de seguros en España' },
     { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
-    { url: '/asesor-vehiculo/', icon: '🚗', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+    { url: '/selector-vehiculo/', icon: '🚗', name: 'Selector de Vehículo', description: '¿Qué tipo de coche te conviene?' },
   ],
-  'asesor-seguro-salud': [
-    { url: '/asesor-mascota/', icon: '🐾', name: 'Asesor de Mascota', description: '¿Qué animal se adapta a tu vida?' },
+  'selector-seguro-salud': [
+    { url: '/selector-mascota/', icon: '🐾', name: 'Selector de Mascota', description: '¿Qué animal se adapta a tu vida?' },
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador de Seguros', description: 'Guía de todos los seguros en España' },
     { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
     { url: '/calculadora-salario-neto/', icon: '💰', name: 'Calculadora Salario Neto', description: 'Tu sueldo neto real tras IRPF y SS' },
   ],
-  'asesor-vehiculo': [
-    { url: '/asesor-smartphone/', icon: '📱', name: 'Asesor de Smartphone', description: '¿Qué móvil te conviene?' },
+  'selector-vehiculo': [
+    { url: '/selector-smartphone/', icon: '📱', name: 'Selector de Smartphone', description: '¿Qué móvil te conviene?' },
     { url: '/comparador-electrico/', icon: '⚡', name: 'Comparador Eléctrico vs Gasolina', description: '¿Cuándo compensa el eléctrico?' },
     { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
     { url: '/etiqueta-dgt/', icon: '🏷️', name: 'Etiqueta DGT y ZBE', description: '¿Puedes entrar en las zonas de bajas emisiones?' },
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
   ],
   'comparador-vehiculos': [
-    { url: '/asesor-vehiculo/', icon: '🔍', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche me conviene?' },
+    { url: '/selector-vehiculo/', icon: '🔍', name: 'Selector de Vehículo', description: '¿Qué tipo de coche me conviene?' },
     { url: '/comparador-electrico/', icon: '⚡', name: 'Comparador Eléctrico vs Gasolina', description: 'Break-even y ahorro a 10 años' },
     { url: '/estimador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas de amortización' },
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
   ],
   'comparador-electrico': [
-    { url: '/asesor-vehiculo/', icon: '🔍', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche me conviene?' },
+    { url: '/selector-vehiculo/', icon: '🔍', name: 'Selector de Vehículo', description: '¿Qué tipo de coche me conviene?' },
     { url: '/etiqueta-dgt/', icon: '🏷️', name: 'Etiqueta DGT y ZBE', description: 'Etiqueta medioambiental y acceso a ZBE' },
     { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
   ],
   'etiqueta-dgt': [
     { url: '/comparador-electrico/', icon: '⚡', name: 'Comparador Eléctrico vs Gasolina', description: '¿Cuándo compensa el eléctrico?' },
-    { url: '/asesor-vehiculo/', icon: '🔍', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+    { url: '/selector-vehiculo/', icon: '🔍', name: 'Selector de Vehículo', description: '¿Qué tipo de coche te conviene?' },
     { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
   ],
@@ -978,7 +978,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento de Hábitos', description: 'Crea hábitos duraderos' },
   ],
   'guia-comprar-coche': [
-    { url: '/asesor-vehiculo/', icon: '🔍', name: 'Asesor de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+    { url: '/selector-vehiculo/', icon: '🔍', name: 'Selector de Vehículo', description: '¿Qué tipo de coche te conviene?' },
     { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
     { url: '/estimador-prestamos/', icon: '🏦', name: 'Estimador de Préstamos', description: 'Cuota y coste total' },
@@ -1388,18 +1388,18 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'orientador-intereses-demora': { title: 'Más herramientas para autónomos', icon: '📄' },
 
     // Smartphones y tecnología
-    'asesor-smartphone': { title: 'Más herramientas de tecnología', icon: '📱' },
-    'asesor-portatil': { title: 'Más herramientas de tecnología', icon: '💻' },
+    'selector-smartphone': { title: 'Más herramientas de tecnología', icon: '📱' },
+    'selector-portatil': { title: 'Más herramientas de tecnología', icon: '💻' },
 
     // Calefacción y hogar
-    'asesor-calefaccion': { title: 'Más herramientas para el hogar', icon: '🏠' },
+    'selector-calefaccion': { title: 'Más herramientas para el hogar', icon: '🏠' },
 
     // Mascotas y salud
-    'asesor-mascota': { title: 'Más herramientas de salud y bienestar', icon: '🐾' },
-    'asesor-seguro-salud': { title: 'Más herramientas de salud y finanzas', icon: '🏥' },
+    'selector-mascota': { title: 'Más herramientas de salud y bienestar', icon: '🐾' },
+    'selector-seguro-salud': { title: 'Más herramientas de salud y finanzas', icon: '🏥' },
 
     // Vehículos
-    'asesor-vehiculo': { title: 'Más herramientas para comprar coche', icon: '🚗' },
+    'selector-vehiculo': { title: 'Más herramientas para comprar coche', icon: '🚗' },
     'comparador-vehiculos': { title: 'Más herramientas para comprar coche', icon: '🚗' },
     'comparador-electrico': { title: 'Más herramientas de vehículos', icon: '⚡' },
     'etiqueta-dgt': { title: 'Más herramientas de vehículos', icon: '🏷️' },

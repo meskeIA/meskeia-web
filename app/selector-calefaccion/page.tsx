@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import styles from './AsesorCalefaccion.module.css';
+import styles from './SelectorCalefaccion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -345,7 +345,7 @@ function calcularResultado(r: Record<number, string>): Resultado {
 
 type Pantalla = 'intro' | 'test' | 'resultado';
 
-export default function AsesorCalefaccion() {
+export default function SelectorCalefaccion() {
   const [pantalla, setPantalla] = useState<Pantalla>('intro');
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
@@ -621,9 +621,9 @@ export default function AsesorCalefaccion() {
         </div>
       )}
 
-      <RelatedApps apps={getRelatedApps('asesor-calefaccion')} />
-      <ShareCard appName="asesor-calefaccion" />
-      <Footer appName="asesor-calefaccion" />
+      <RelatedApps apps={getRelatedApps('selector-calefaccion')} />
+      <ShareCard appName="selector-calefaccion" />
+      <Footer appName="selector-calefaccion" />
     </div>
   );
 }
