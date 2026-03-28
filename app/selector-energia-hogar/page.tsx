@@ -113,7 +113,7 @@ const PREGUNTAS: Pregunta[] = [
     texto: '¿Qué importancia le das a la sostenibilidad ambiental?',
     opciones: [
       { texto: 'Es mi principal criterio de decisión', pesos: { aerotermia: 4, solar: 4, biomasa: 3 } },
-      { texto: 'Es importante, pero no el único factor', pesos: { aerotermia: 3, solar: 2 } },
+      { texto: 'Es importante, pero no el único factor', pesos: { aerotermia: 2, solar: 2 } },
       { texto: 'Me importa moderadamente', pesos: { gas: 1, aerotermia: 2 } },
       { texto: 'Priorizo el coste sobre la sostenibilidad', pesos: { gas: 3, electrico: 2 } },
     ],
@@ -122,7 +122,7 @@ const PREGUNTAS: Pregunta[] = [
     id: 8,
     texto: '¿Planeas renovar tu sistema de distribución de calor o ya tienes suelo radiante?',
     opciones: [
-      { texto: 'Sí, tengo o voy a instalar suelo radiante', pesos: { aerotermia: 5 } },
+      { texto: 'Sí, tengo o voy a instalar suelo radiante', pesos: { aerotermia: 4 } },
       { texto: 'Tengo radiadores convencionales de alta temperatura', pesos: { gas: 3, biomasa: 2 } },
       { texto: 'Tengo aire acondicionado multisplit', pesos: { electrico: 3 } },
       { texto: 'Estoy construyendo o haciendo reforma integral', pesos: { aerotermia: 4, solar: 3 } },

@@ -57,7 +57,7 @@ const PREGUNTAS: Pregunta[] = [
     id: 2,
     texto: '¿Tienes hipoteca u otras deudas importantes?',
     opciones: [
-      { texto: 'Sí, hipoteca significativa', pesos: { temporal: 4 } },
+      { texto: 'Sí, hipoteca significativa', pesos: { temporal: 3 } },
       { texto: 'Sí, otras deudas (préstamo, empresa)', pesos: { temporal: 3 } },
       { texto: 'Tengo deudas pequeñas', pesos: { temporal: 1 } },
       { texto: 'No tengo deudas relevantes', pesos: { ninguno: 2, ahorro: 1 } },
@@ -127,7 +127,7 @@ const PREGUNTAS: Pregunta[] = [
     id: 9,
     texto: '¿Tienes alguna enfermedad o condición de salud preexistente?',
     opciones: [
-      { texto: 'No, gozo de buena salud', pesos: { temporal: 2, ahorro: 1 } },
+      { texto: 'No, gozo de buena salud', pesos: { ahorro: 1 } },
       { texto: 'Alguna leve ya resuelta', pesos: { temporal: 2 } },
       { texto: 'Condición crónica controlada', pesos: { temporal: 1, mixto: 1 } },
       { texto: 'Condición grave o en tratamiento', pesos: { temporal: 1 } },

@@ -76,7 +76,7 @@ const PREGUNTAS: Pregunta[] = [
       {
         texto: 'Sí, tengo garaje propio y puedo instalar cargador',
         icono: '✅',
-        pesos: { bev: 5, phev: 3 },
+        pesos: { bev: 4, phev: 3 },
       },
       {
         texto: 'Tengo garaje de comunidad, aún sin cargador pero es posible',
@@ -250,7 +250,7 @@ const PREGUNTAS: Pregunta[] = [
       {
         texto: 'Nada, planificaría las recargas sin problema',
         icono: '😎',
-        pesos: { bev: 5 },
+        pesos: { bev: 4 },
       },
     ],
   },
@@ -262,7 +262,7 @@ const PREGUNTAS: Pregunta[] = [
       {
         texto: 'Sí, sería perfecta para mi día a día',
         icono: '✅',
-        pesos: { moto_electrica: 6 },
+        pesos: { moto_electrica: 4 },
       },
       {
         texto: 'Quizás para algunos trayectos, pero no como único vehículo',

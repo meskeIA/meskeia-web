@@ -64,7 +64,7 @@ const PREGUNTAS: Pregunta[] = [
     texto: '¿Cuánto conocimiento financiero tienes?',
     opciones: [
       { texto: 'Muy básico, nunca he invertido', pesos: { indexados: 3, pensiones: 3 } },
-      { texto: 'Conozco conceptos básicos', pesos: { indexados: 3, renta_fija: 2 } },
+      { texto: 'Conozco conceptos básicos', pesos: { indexados: 2, renta_fija: 2 } },
       { texto: 'Sigo los mercados habitualmente', pesos: { acciones: 3, indexados: 2 } },
       { texto: 'Avanzado, analizo empresas y sectores', pesos: { acciones: 4 } },
     ],
@@ -95,7 +95,7 @@ const PREGUNTAS: Pregunta[] = [
     opciones: [
       { texto: 'Sí, tramo IRPF alto, quiero deducir', pesos: { pensiones: 4 } },
       { texto: 'Soy autónomo con ingresos variables', pesos: { pensiones: 3, renta_fija: 2 } },
-      { texto: 'No, situación fiscal normal', pesos: { indexados: 3, acciones: 2 } },
+      { texto: 'No, situación fiscal normal', pesos: { indexados: 2, acciones: 2 } },
       { texto: 'Tengo empresa o sociedad', pesos: { acciones: 2, inmobiliario: 2 } },
     ],
   },
@@ -104,7 +104,7 @@ const PREGUNTAS: Pregunta[] = [
     texto: '¿Te interesa gestionar activamente tus inversiones?',
     opciones: [
       { texto: 'No, prefiero automatizar y olvidarme', pesos: { indexados: 4, pensiones: 3 } },
-      { texto: 'Algo, revisar una vez al año', pesos: { indexados: 3 } },
+      { texto: 'Algo, revisar una vez al año', pesos: { indexados: 2, acciones: 1 } },
       { texto: 'Sí, seguir el mercado habitualmente', pesos: { acciones: 3 } },
       { texto: 'Sí, de forma intensiva', pesos: { acciones: 4 } },
     ],
