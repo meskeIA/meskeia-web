@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 312,
-  "updated": "2026-03-27",
+  "total_tools": 318,
+  "updated": "2026-03-28",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -547,6 +547,18 @@
           "description": "Test de 10 preguntas para descubrir qué smartphone conviene según uso, presupuesto y prioridades. Recomienda sistema operativo (iOS o Android), gama (básica, media, alta, pro) y modelos de referencia actualizados con precios orientativos"
         },
         {
+          "name": "Selector de Tipo de Televisión",
+          "slug": "selector-tipo-television",
+          "url": "https://meskeia.com/selector-tipo-television/",
+          "description": "Test de 10 preguntas para descubrir qué tecnología de panel de TV conviene: OLED, QLED/Mini-LED, LED LCD IPS o LED LCD VA. Analiza uso, iluminación de la habitación, ángulos de visión, gaming y presupuesto"
+        },
+        {
+          "name": "Selector de Coche Nuevo o Usado",
+          "slug": "selector-coche-nuevo-usado",
+          "url": "https://meskeia.com/selector-coche-nuevo-usado/",
+          "description": "Test de 10 preguntas para saber si conviene más un coche nuevo, seminuevo (1-3 años) o de segunda mano según presupuesto, km previstos, importancia de la garantía y etiqueta DGT"
+        },
+        {
           "name": "Selector de Mascota",
           "slug": "selector-mascota",
           "url": "https://meskeia.com/selector-mascota/",
@@ -581,6 +593,12 @@
           "slug": "selector-seguro-hogar",
           "url": "https://meskeia.com/selector-seguro-hogar/",
           "description": "Test de 10 preguntas para saber qué nivel de cobertura de seguro de hogar conviene: básica, estándar o completa. Analiza tipo de vivienda, tenencia, valor del contenido y nivel de riesgo"
+        },
+        {
+          "name": "Selector de Zona de Residencia",
+          "slug": "selector-zona-residencia",
+          "url": "https://meskeia.com/selector-zona-residencia/",
+          "description": "Test de 10 preguntas para descubrir qué tipo de zona de residencia se adapta mejor al estilo de vida, trabajo y familia: ciudad grande, ciudad media, zona rural o pueblo, o costa"
         },
         {
           "name": "Selector de Tipo de Vehículo",
@@ -908,6 +926,24 @@
           "slug": "asistente-constitucion-asociacion",
           "url": "https://meskeia.com/asistente-constitucion-asociacion/",
           "description": "Guía para constituir una asociación sin ánimo de lucro. Acta fundacional y estatutos orientativos"
+        },
+        {
+          "name": "Selector de Forma Jurídica",
+          "slug": "selector-forma-juridica",
+          "url": "https://meskeia.com/selector-forma-juridica/",
+          "description": "Test de 10 preguntas para saber si conviene operar como autónomo o constituir una Sociedad Limitada. Analiza ingresos, riesgo patrimonial, socios, proyección y carga administrativa"
+        },
+        {
+          "name": "Selector de Plan de Pensiones",
+          "slug": "selector-plan-pensiones",
+          "url": "https://meskeia.com/selector-plan-pensiones/",
+          "description": "Test de 10 preguntas para saber si conviene contratar un plan de pensiones individual, de empleo, EPSV (País Vasco/Navarra) o si es mejor otra estrategia de ahorro para la jubilación"
+        },
+        {
+          "name": "Selector de Tipo de Ahorro",
+          "slug": "selector-tipo-ahorro",
+          "url": "https://meskeia.com/selector-tipo-ahorro/",
+          "description": "Test de 10 preguntas para saber qué vehículo de ahorro conviene: cuenta remunerada, depósito a plazo fijo, fondo indexado o una combinación. Análisis según liquidez, horizonte temporal y perfil de riesgo"
         },
         {
           "name": "Estimador Impuesto de Sucesiones",

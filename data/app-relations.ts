@@ -532,10 +532,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'selector-smartphone': [
     { url: '/selector-portatil/', icon: '💻', name: 'Selector de Portátil y PC', description: '¿Qué ordenador te conviene?' },
+    { url: '/selector-tipo-television/', icon: '📺', name: 'Selector de TV', description: '¿OLED, QLED o LED? ¿Qué panel te conviene?' },
     { url: '/selector-vehiculo/', icon: '🚗', name: 'Selector de Vehículo', description: '¿Qué tipo de coche te conviene?' },
     { url: '/test-madurez-digital/', icon: '🤖', name: 'Test Madurez Digital', description: 'Nivel de digitalización de tu empresa' },
     { url: '/calculadora-suscripciones/', icon: '📱', name: 'Calculadora Suscripciones', description: 'Controla lo que gastas al mes' },
-    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Seguros', description: 'Guía de seguros en España' },
+  ],
+  'selector-tipo-television': [
+    { url: '/selector-smartphone/', icon: '📱', name: 'Selector de Smartphone', description: '¿Qué móvil te conviene?' },
+    { url: '/selector-portatil/', icon: '💻', name: 'Selector de Portátil y PC', description: '¿Qué ordenador te conviene?' },
+    { url: '/selector-calefaccion/', icon: '🏠', name: 'Selector de Calefacción', description: '¿Aerotermia, gas o pellet?' },
+    { url: '/calculadora-suscripciones/', icon: '📱', name: 'Calculadora Suscripciones', description: 'Controla lo que gastas al mes' },
   ],
   'selector-mascota': [
     { url: '/selector-seguro-salud/', icon: '🏥', name: 'Selector Seguro de Salud', description: '¿Necesitas seguro médico privado?' },
@@ -560,6 +566,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Estimador de Hipoteca', description: 'Cuota mensual y coste total de tu préstamo' },
     { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Gastos totales al comprar una vivienda' },
     { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Selector Seguro de Hogar', description: '¿Qué cobertura de seguro necesitas?' },
+  ],
+  'selector-zona-residencia': [
+    { url: '/selector-alquiler-vs-compra/', icon: '🏠', name: 'Selector Alquiler o Compra', description: '¿Te conviene más alquilar o comprar?' },
+    { url: '/calculadora-costes-teletrabajo/', icon: '💻', name: 'Costes del Teletrabajo', description: 'Cuánto ahorras trabajando en casa' },
+    { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Gastos totales al comprar una vivienda' },
+    { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Selector Seguro de Hogar', description: '¿Qué cobertura de seguro de hogar necesitas?' },
   ],
   'selector-dieta': [
     { url: '/orientador-imc/', icon: '⚖️', name: 'Orientador IMC', description: 'Calcula tu índice de masa corporal' },
@@ -597,6 +609,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/selector-vehiculo/', icon: '🔍', name: 'Selector de Vehículo', description: '¿Qué tipo de coche te conviene?' },
     { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
+  ],
+  'selector-coche-nuevo-usado': [
+    { url: '/selector-vehiculo/', icon: '🔍', name: 'Selector de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+    { url: '/comparador-vehiculos/', icon: '🚗', name: 'Comparador de Vehículos', description: 'Contado vs financiación vs renting' },
+    { url: '/etiqueta-dgt/', icon: '🏷️', name: 'Etiqueta DGT y ZBE', description: '¿Puedes entrar en las zonas de bajas emisiones?' },
+    { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora Combustible', description: 'Coste anual de carburante' },
+    { url: '/comparador-electrico/', icon: '⚡', name: 'Comparador Eléctrico vs Gasolina', description: '¿Cuándo compensa el eléctrico?' },
   ],
   'calculadora-seguro-vida': [
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Tipos Seguros', description: 'Guía de seguros en España' },
@@ -1165,6 +1184,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
     { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Obligaciones fiscales como autónomo o SL' },
   ],
+  'selector-forma-juridica': [
+    { url: '/comparador-autonomo-vs-sl/', icon: '⚖️', name: 'Comparador Autónomo vs SL', description: 'Comparativa fiscal completa con cifras reales' },
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuánto pagarás a la Seguridad Social' },
+    { url: '/asistente-alta-autonomo/', icon: '📝', name: 'Asistente Alta Autónomo', description: 'Checklist para darte de alta como autónomo' },
+    { url: '/asistente-constitucion-sociedad/', icon: '🏢', name: 'Asistente Constitución Sociedad', description: 'Pasos para constituir tu SL' },
+  ],
   'estimador-impuesto-donaciones': [
     { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Estimador Sucesiones', description: 'Impuesto por recibir una herencia' },
     { url: '/orientacion-tramitacion-herencias/', icon: '📋', name: 'Orientación Herencias', description: 'Checklist y orden de gestiones' },
@@ -1310,6 +1335,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'optimizador-rentas-60': [
     ...jubilacionFiscalApps.filter(a => a.url !== '/optimizador-rentas-60/'),
   ],
+  'selector-plan-pensiones': [
+    ...jubilacionApps.slice(0, 3),
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Calcula cuánto pagarás en la renta' },
+  ],
+  'selector-tipo-ahorro': [
+    { url: '/test-perfil-inversor/', icon: '🎯', name: 'Test Perfil Inversor', description: 'Descubre tu tolerancia al riesgo' },
+    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Simula el crecimiento de tus ahorros' },
+    { url: '/estimador-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto necesitas ahorrar' },
+    { url: '/selector-plan-pensiones/', icon: '🏦', name: 'Selector Plan de Pensiones', description: 'Test: ¿te conviene contratar uno?' },
+  ],
 };
 
 /**
@@ -1408,12 +1443,14 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'estimador-irpf': { title: 'Más herramientas fiscales', icon: '📊' },
     'estimador-plusvalias-irpf': { title: 'Herramientas de fiscalidad patrimonial', icon: '💹' },
     'comparador-autonomo-vs-sl': { title: 'Herramientas para emprendedores', icon: '⚖️' },
+    'selector-forma-juridica': { title: 'Más herramientas para emprendedores', icon: '🏢' },
     'estimador-plusvalia-municipal': { title: 'Más herramientas legales y fiscales', icon: '🏙️' },
     'orientador-intereses-demora': { title: 'Más herramientas para autónomos', icon: '📄' },
 
     // Smartphones y tecnología
     'selector-smartphone': { title: 'Más herramientas de tecnología', icon: '📱' },
     'selector-portatil': { title: 'Más herramientas de tecnología', icon: '💻' },
+    'selector-tipo-television': { title: 'Más herramientas de tecnología y hogar', icon: '📺' },
 
     // Calefacción y hogar
     'selector-calefaccion': { title: 'Más herramientas para el hogar', icon: '🏠' },
@@ -1423,6 +1460,7 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'selector-seguro-salud': { title: 'Más herramientas de salud y finanzas', icon: '🏥' },
     'selector-seguro-hogar': { title: 'Más herramientas para el hogar y seguros', icon: '🏠' },
     'selector-alquiler-vs-compra': { title: 'Más herramientas para decidir sobre vivienda', icon: '🏠' },
+    'selector-zona-residencia': { title: 'Más herramientas sobre vivienda y estilo de vida', icon: '🏡' },
     'selector-dieta': { title: 'Más herramientas de salud y bienestar', icon: '🥗' },
     'selector-ejercicio': { title: 'Más herramientas de salud y bienestar', icon: '🏋️' },
 
@@ -1432,6 +1470,10 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'comparador-electrico': { title: 'Más herramientas de vehículos', icon: '⚡' },
     'etiqueta-dgt': { title: 'Más herramientas de vehículos', icon: '🏷️' },
     'calculadora-combustible': { title: 'Más herramientas de vehículos', icon: '⛽' },
+    'selector-coche-nuevo-usado': { title: 'Más herramientas para comprar coche', icon: '🚗' },
+
+    // Jubilación y ahorro
+    'selector-plan-pensiones': { title: 'Más herramientas de jubilación y ahorro', icon: '🏦' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };

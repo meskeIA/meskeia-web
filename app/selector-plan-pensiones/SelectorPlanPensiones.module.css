@@ -1,0 +1,472 @@
+/* ============================================================
+   Selector Plan de Pensiones — CSS Module meskeIA
+   Paleta: #2E86AB (primary), #48A9A6 (secondary), #7FB3D3 (accent)
+   ============================================================ */
+
+/* ---------- Layout ---------- */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  color: #ffffff;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  margin: 0 auto;
+  max-width: 600px;
+  opacity: 0.92;
+  line-height: 1.5;
+}
+
+/* ---------- Legal Notice ---------- */
+.legalNoticeWrapper {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ---------- Test Section ---------- */
+.testSection {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.pregunta {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.75rem 2rem;
+  box-shadow: 0 2px 12px rgba(46, 134, 171, 0.08);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.preguntaNumero {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+}
+
+.preguntaTexto {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+  line-height: 1.4;
+}
+
+/* ---------- Opciones ---------- */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.opcionBtn {
+  width: 100%;
+  background-color: var(--bg-primary);
+  border: 2px solid rgba(46, 134, 171, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+  line-height: 1.4;
+}
+
+.opcionBtn:hover {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.06);
+}
+
+.opcionBtn.selected {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.12);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.opcionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- Navegación ---------- */
+.navegacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.btnAnterior,
+.btnSiguiente,
+.btnResultado {
+  padding: 0.65rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.18s ease, background-color 0.18s ease;
+  border: none;
+}
+
+.btnAnterior {
+  background-color: var(--bg-primary);
+  border: 2px solid rgba(46, 134, 171, 0.3);
+  color: var(--text-secondary);
+}
+
+.btnAnterior:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnAnterior:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnSiguiente {
+  background-color: var(--primary);
+  color: #ffffff;
+  margin-left: auto;
+}
+
+.btnSiguiente:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnSiguiente:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnResultado {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  margin-left: auto;
+}
+
+.btnResultado:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnResultado:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- Progreso ---------- */
+.progreso {
+  margin-bottom: 1.25rem;
+}
+
+.progresoBar {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(46, 134, 171, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progresoTexto {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* ---------- Resultado ---------- */
+.resultadoSection {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.resultadoCard {
+  background-color: var(--bg-card);
+  border-radius: 14px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.1);
+  border-top: 5px solid var(--primary);
+}
+
+/* Colores por tipo de recomendación */
+.recomendacion_individual {
+  border-top-color: #2E86AB;
+}
+
+.recomendacion_empleo {
+  border-top-color: #48A9A6;
+}
+
+.recomendacion_epsv {
+  border-top-color: #7FB3D3;
+}
+
+.recomendacion_diversificar {
+  border-top-color: #e8a020;
+}
+
+.recomendacion_ninguno {
+  border-top-color: #888888;
+}
+
+.recomendacionEtiqueta {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.recomendacionTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.recomendacionSubtitulo {
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.recomendacionDesc {
+  font-size: 0.97rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* ---------- Razones Grid ---------- */
+.razonesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 520px) {
+  .razonesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.razonCard {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.razonCardTitulo {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.6rem;
+}
+
+.razonCardTitulo.ventajas {
+  color: #2c8a5f;
+}
+
+.razonCardTitulo.inconvenientes {
+  color: #c05c2e;
+}
+
+.razonCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.razonCard ul li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  padding-left: 1.1rem;
+  position: relative;
+  line-height: 1.4;
+}
+
+.razonCard ul li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+}
+
+/* ---------- Alertas ---------- */
+.alertasSection {
+  margin-top: 1rem;
+}
+
+.alertasTitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #c05c2e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.6rem;
+}
+
+.alertaItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 0.75rem;
+  background-color: rgba(232, 160, 32, 0.08);
+  border-left: 3px solid #e8a020;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.alertaItem span[aria-hidden='true'] {
+  flex-shrink: 0;
+}
+
+/* ---------- Warning Box (Patrón v2.0) ---------- */
+.warningBox {
+  background-color: rgba(232, 160, 32, 0.07);
+  border: 1.5px solid rgba(232, 160, 32, 0.45);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+}
+
+.warningBox strong {
+  color: #b87010;
+}
+
+/* ---------- Botón Reiniciar ---------- */
+.btnReiniciar {
+  display: block;
+  margin: 1.5rem auto 0;
+  padding: 0.7rem 2rem;
+  background-color: transparent;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.btnReiniciar:hover {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+.btnReiniciar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- Secciones educativas y disclaimer ---------- */
+.disclaimerWrapper,
+.educationalWrapper,
+.relatedWrapper {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ---------- Dark Mode ---------- */
+[data-theme='dark'] .pregunta {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  border-color: rgba(127, 179, 211, 0.18);
+}
+
+[data-theme='dark'] .opcionBtn {
+  border-color: rgba(127, 179, 211, 0.2);
+}
+
+[data-theme='dark'] .opcionBtn:hover {
+  background-color: rgba(46, 134, 171, 0.12);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .opcionBtn.selected {
+  background-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .resultadoCard {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='dark'] .razonCard {
+  border-color: rgba(127, 179, 211, 0.18);
+}
+
+[data-theme='dark'] .alertaItem {
+  background-color: rgba(232, 160, 32, 0.1);
+}
+
+[data-theme='dark'] .warningBox {
+  background-color: rgba(232, 160, 32, 0.1);
+  border-color: rgba(232, 160, 32, 0.35);
+}
+
+[data-theme='dark'] .warningBox strong {
+  color: #e8a020;
+}
+
+[data-theme='dark'] .btnAnterior {
+  border-color: rgba(127, 179, 211, 0.3);
+}
+
+[data-theme='dark'] .progresoBar {
+  background-color: rgba(127, 179, 211, 0.2);
+}
+
+/* ---------- Animaciones accesibles ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

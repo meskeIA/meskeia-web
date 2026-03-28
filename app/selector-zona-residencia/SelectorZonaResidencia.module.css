@@ -1,0 +1,457 @@
+/* ============================================
+   Selector de Zona de Residencia — CSS Module
+   meskeIA — Paleta oficial
+   ============================================ */
+
+/* Contenedor principal */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  color: #fff;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+  color: #fff;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  margin: 0 auto;
+  max-width: 640px;
+  opacity: 0.93;
+  line-height: 1.6;
+  color: #fff;
+}
+
+/* ============================================
+   AVISO LEGAL
+   ============================================ */
+.legalNoticeWrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ============================================
+   SECCIÓN DEL TEST
+   ============================================ */
+.testSection {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+/* Barra de progreso */
+.progreso {
+  margin-bottom: 2rem;
+}
+
+.progresoBar {
+  background-color: #e0e0e0;
+  border-radius: 99px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progresoFill {
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* Pregunta */
+.pregunta {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
+}
+
+.preguntaNumero {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.preguntaTexto {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0 0 1.5rem;
+}
+
+/* Opciones */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.opcionBtn {
+  background: var(--bg-primary);
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 0.85rem 1.2rem;
+  text-align: left;
+  font-size: 0.97rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+  line-height: 1.45;
+}
+
+.opcionBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+  transform: translateX(3px);
+}
+
+.opcionBtn.selected {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Navegación */
+.navegacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btnAnterior,
+.btnSiguiente,
+.btnResultado {
+  padding: 0.75rem 1.6rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.btnAnterior:hover,
+.btnSiguiente:hover,
+.btnResultado:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.btnAnterior {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 2px solid #e0e0e0;
+}
+
+.btnSiguiente {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btnResultado {
+  background: var(--secondary);
+  color: #fff;
+}
+
+.btnAnterior:disabled,
+.btnSiguiente:disabled,
+.btnResultado:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============================================
+   SECCIÓN RESULTADO
+   ============================================ */
+.resultadoSection {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.resultadoCard {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+  border-top: 6px solid transparent;
+}
+
+/* Colores por recomendación */
+.recomendacion_ciudad_grande {
+  border-top-color: #2E86AB;
+}
+
+.recomendacion_ciudad_media {
+  border-top-color: #48A9A6;
+}
+
+.recomendacion_rural {
+  border-top-color: #6aaa5e;
+}
+
+.recomendacion_costa {
+  border-top-color: #e8a020;
+}
+
+.recomendacionIcono {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  text-align: center;
+}
+
+.recomendacionTitulo {
+  font-size: 1.7rem;
+  font-weight: 800;
+  text-align: center;
+  margin: 0 0 0.4rem;
+  color: var(--text-primary);
+}
+
+.recomendacion_ciudad_grande .recomendacionTitulo { color: #2E86AB; }
+.recomendacion_ciudad_media .recomendacionTitulo { color: #48A9A6; }
+.recomendacion_rural .recomendacionTitulo { color: #6aaa5e; }
+.recomendacion_costa .recomendacionTitulo { color: #e8a020; }
+
+.recomendacionSubtitulo {
+  font-size: 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+  margin: 0 0 1.2rem;
+  font-style: italic;
+}
+
+.recomendacionDesc {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Grid de factores */
+.factoresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.factorCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  text-align: center;
+}
+
+.factorCard h4 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #999);
+  margin: 0 0 0.35rem;
+}
+
+.factorCard p {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Ventajas y consejos */
+.ventajasSection,
+.consejosSection {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.ventajasSection h3,
+.consejosSection h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.8rem;
+}
+
+.ventajasSection ul,
+.consejosSection ul {
+  margin: 0;
+  padding-left: 1.3rem;
+}
+
+.ventajasSection li,
+.consejosSection li {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 0.35rem;
+}
+
+/* Botón reiniciar */
+.btnReiniciar {
+  display: block;
+  width: 100%;
+  padding: 0.9rem 2rem;
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  margin-top: 1.5rem;
+}
+
+.btnReiniciar:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   SECCIÓN EDUCATIVA
+   ============================================ */
+.warningBox {
+  background: rgba(232, 160, 32, 0.08);
+  border: 2px solid #e8a020;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.93rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 1.25rem 0;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 600px) {
+  .hero {
+    padding: 2.5rem 1rem 2rem;
+  }
+
+  .pregunta {
+    padding: 1.5rem 1.2rem;
+  }
+
+  .resultadoCard {
+    padding: 1.75rem 1.2rem;
+  }
+
+  .factoresGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .navegacion {
+    flex-wrap: wrap;
+  }
+
+  .btnAnterior,
+  .btnSiguiente,
+  .btnResultado {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+[data-theme='dark'] .progresoBar {
+  background-color: #3a3a3a;
+}
+
+[data-theme='dark'] .opcionBtn {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .opcionBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .opcionBtn.selected {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.18);
+  color: var(--accent, #7FB3D3);
+}
+
+[data-theme='dark'] .pregunta {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .resultadoCard {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .btnAnterior {
+  border-color: #3a3a3a;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .factorCard {
+  background: #1f1f1f;
+}
+
+[data-theme='dark'] .ventajasSection,
+[data-theme='dark'] .consejosSection {
+  background: #1f1f1f;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(232, 160, 32, 0.12);
+}
+
+[data-theme='dark'] .btnReiniciar {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .btnReiniciar:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Animaciones accesibles */
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

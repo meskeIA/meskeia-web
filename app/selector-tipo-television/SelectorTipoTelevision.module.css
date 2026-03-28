@@ -1,0 +1,518 @@
+/* ============================================================
+   Selector de Tipo de Televisión — CSS Module meskeIA
+   Paleta oficial: #2E86AB (azul), #48A9A6 (teal)
+   ============================================================ */
+
+/* ── Contenedor principal ── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  opacity: 0.92;
+  margin: 0;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* ── LegalNotice wrapper ── */
+.legalNoticeWrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ── Sección del test ── */
+.testSection {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* ── Barra de progreso ── */
+.progreso {
+  margin-bottom: 1.5rem;
+}
+
+.progresoBar {
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 4px;
+  transition: width 0.35s ease;
+}
+
+.progresoTexto {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* ── Tarjeta de pregunta ── */
+.pregunta {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
+}
+
+.preguntaNumero {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+}
+
+.preguntaTexto {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+  line-height: 1.4;
+}
+
+/* ── Opciones ── */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.opcionBtn {
+  width: 100%;
+  text-align: left;
+  padding: 0.85rem 1.1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.97rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  line-height: 1.4;
+}
+
+.opcionBtn:hover {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.06);
+}
+
+.opcionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.opcionBtn.selected {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.1);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ── Navegación ── */
+.navegacion {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.btnAnterior,
+.btnSiguiente,
+.btnResultado {
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.97rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  border: none;
+}
+
+.btnAnterior {
+  background-color: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+.btnAnterior:hover:not(:disabled) {
+  background-color: rgba(46, 134, 171, 0.08);
+}
+
+.btnAnterior:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btnAnterior:focus-visible,
+.btnSiguiente:focus-visible,
+.btnResultado:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSiguiente {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+}
+
+.btnSiguiente:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnSiguiente:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnResultado {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+}
+
+.btnResultado:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnResultado:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Sección de resultado ── */
+.resultadoSection {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.resultadoCard {
+  border-radius: 14px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+/* ── Colores por tecnología ── */
+.tecnologia_oled {
+  border-top: 5px solid #2E86AB;
+  background-color: var(--bg-card);
+}
+
+.tecnologia_qled {
+  border-top: 5px solid #48A9A6;
+  background-color: var(--bg-card);
+}
+
+.tecnologia_led_ips {
+  border-top: 5px solid #6aaa5e;
+  background-color: var(--bg-card);
+}
+
+.tecnologia_led_va {
+  border-top: 5px solid #e8a020;
+  background-color: var(--bg-card);
+}
+
+.tecnologiaEtiqueta {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.4rem;
+}
+
+.tecnologia_oled .tecnologiaEtiqueta { color: #2E86AB; }
+.tecnologia_qled .tecnologiaEtiqueta { color: #48A9A6; }
+.tecnologia_led_ips .tecnologiaEtiqueta { color: #6aaa5e; }
+.tecnologia_led_va .tecnologiaEtiqueta { color: #e8a020; }
+
+.tecnologiaTitulo {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.tecnologiaSubtitulo {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+.tecnologiaDesc {
+  font-size: 0.97rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Grid de especificaciones ── */
+.especsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.especCard {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  text-align: center;
+}
+
+.especTitulo {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.3rem;
+}
+
+.especValor {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Ventajas y limitaciones ── */
+.ventajasSection,
+.limitacionesSection,
+.consejosSection {
+  margin-bottom: 1.25rem;
+}
+
+.ventajasSection h3,
+.limitacionesSection h3,
+.consejosSection h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+  color: var(--text-primary);
+}
+
+.ventajasSection ul,
+.limitacionesSection ul,
+.consejosSection ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ventajasSection li::before {
+  content: '✓ ';
+  color: #6aaa5e;
+  font-weight: 700;
+}
+
+.limitacionesSection li::before {
+  content: '✗ ';
+  color: #e05050;
+  font-weight: 700;
+}
+
+.consejosSection li::before {
+  content: '→ ';
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.ventajasSection li,
+.limitacionesSection li,
+.consejosSection li {
+  font-size: 0.93rem;
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+/* ── Rango de precios ── */
+.rangoPreciosTag {
+  display: inline-block;
+  background-color: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  border-radius: 20px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Warning box (v2.0 obligatorio) ── */
+.warningBox {
+  border: 2px solid #f59e0b;
+  background-color: #fffbeb;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.93rem;
+  color: #78350f;
+  line-height: 1.5;
+  margin-top: 1rem;
+}
+
+/* ── Botón reiniciar ── */
+.btnReiniciar {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.7rem 1.8rem;
+  background-color: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  border-radius: 8px;
+  font-size: 0.97rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btnReiniciar:hover {
+  background-color: rgba(46, 134, 171, 0.08);
+}
+
+.btnReiniciar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Tabla comparativa ── */
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  display: block;
+}
+
+.tablaComparativa th {
+  background-color: var(--primary);
+  color: #ffffff;
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tablaComparativa td {
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid #e0e0e0;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.tablaComparativa tr:nth-child(even) td {
+  background-color: rgba(46, 134, 171, 0.04);
+}
+
+/* ── Dark mode ── */
+[data-theme='dark'] .progresoBar {
+  background-color: #3a3a3a;
+}
+
+[data-theme='dark'] .opcionBtn {
+  border-color: #444;
+  background-color: var(--bg-card);
+}
+
+[data-theme='dark'] .opcionBtn:hover {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .opcionBtn.selected {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .especCard {
+  background-color: #2a2a2a;
+}
+
+[data-theme='dark'] .tablaComparativa td {
+  border-bottom-color: #444;
+}
+
+[data-theme='dark'] .tablaComparativa tr:nth-child(even) td {
+  background-color: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .warningBox {
+  background-color: rgba(245, 158, 11, 0.1);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .tecnologia_oled,
+[data-theme='dark'] .tecnologia_qled,
+[data-theme='dark'] .tecnologia_led_ips,
+[data-theme='dark'] .tecnologia_led_va {
+  background-color: var(--bg-card);
+}
+
+/* ── Animación reducida ── */
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .pregunta {
+    padding: 1.25rem;
+  }
+
+  .resultadoCard {
+    padding: 1.25rem;
+  }
+
+  .navegacion {
+    justify-content: stretch;
+  }
+
+  .btnAnterior,
+  .btnSiguiente,
+  .btnResultado {
+    flex: 1;
+    text-align: center;
+  }
+
+  .especsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

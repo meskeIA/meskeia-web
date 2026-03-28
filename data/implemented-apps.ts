@@ -376,10 +376,23 @@ export const implementedAppsUrls = [
   "/selector-dieta/",                        // Test 10 preguntas: mediterránea, vegetariana, vegana, cetogénica, DASH, ayuno
   "/selector-ejercicio/",                    // Test 10 preguntas: gimnasio, running, natación, ciclismo, yoga, casa
   "/selector-seguro-hogar/",                 // Test 10 preguntas: cobertura básica, estándar o completa
+  "/selector-zona-residencia/",              // Test 10 preguntas: ciudad grande, ciudad media, rural o costa
+
+  "/selector-coche-nuevo-usado/",             // Test 10 preguntas: nuevo, seminuevo o segunda mano
 
   // Herramientas de decisión de vehículo (2026-03-27)
   "/comparador-electrico/",               // Break-even eléctrico vs gasolina, MOVES III, proyección 10 años
   "/etiqueta-dgt/",                       // Etiqueta DGT (CERO/ECO/C/B) + acceso ZBE 7 ciudades
+
+  // Herramientas de forma jurídica (2026-03-28)
+  "/selector-forma-juridica/",            // Test 10 preguntas: ¿autónomo o sociedad limitada?
+
+  // Herramientas de ahorro y jubilación (2026-03-28)
+  "/selector-plan-pensiones/",            // Test 10 preguntas: individual, empleo, EPSV, diversificar o ninguno
+  "/selector-tipo-ahorro/",              // Test 10 preguntas: cuenta remunerada, depósito, fondo indexado o combinación
+
+  // Herramientas de tecnología de hogar (2026-03-28)
+  "/selector-tipo-television/",           // Test 10 preguntas: OLED, QLED/Mini-LED, LED IPS o LED VA
 ];
 
 /**

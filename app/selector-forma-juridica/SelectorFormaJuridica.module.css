@@ -1,0 +1,393 @@
+/* =========================================================
+   SelectorFormaJuridica.module.css
+   Paleta meskeIA — #2E86AB / #48A9A6
+   ========================================================= */
+
+/* ── Contenedor principal ── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  color: #ffffff;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  margin: 0 auto;
+  max-width: 640px;
+  opacity: 0.92;
+  line-height: 1.5;
+}
+
+/* ── Legal Notice wrapper ── */
+.legalNoticeWrapper {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ── Sección de test ── */
+.testSection {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem 2rem;
+}
+
+/* ── Progreso ── */
+.progreso {
+  margin-bottom: 1.5rem;
+}
+
+.progresoBar {
+  width: 100%;
+  height: 6px;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* ── Pregunta ── */
+.pregunta {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
+}
+
+.preguntaNumero {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.6rem;
+}
+
+.preguntaTexto {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+  line-height: 1.45;
+}
+
+/* ── Opciones ── */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.opcionBtn {
+  width: 100%;
+  text-align: left;
+  padding: 0.85rem 1.1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.97rem;
+  cursor: pointer;
+  transition: border-color 0.18s, background-color 0.18s, color 0.18s;
+  line-height: 1.4;
+}
+
+.opcionBtn:hover {
+  border-color: var(--secondary);
+  background-color: rgba(72, 169, 166, 0.06);
+}
+
+.opcionBtn.selected {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ── Navegación ── */
+.navegacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.btnAnterior {
+  padding: 0.7rem 1.4rem;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s, color 0.18s;
+}
+
+.btnAnterior:hover {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+.btnAnterior:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btnSiguiente {
+  padding: 0.7rem 1.6rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.18s;
+}
+
+.btnSiguiente:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnSiguiente:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnResultado {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.18s;
+}
+
+.btnResultado:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnResultado:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Sección resultado ── */
+.resultadoSection {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem 2rem;
+}
+
+/* ── Tarjeta de resultado / veredicto ── */
+.resultadoCard {
+  background-color: var(--bg-card);
+  border-radius: 14px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.09);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.veredictoTitulo {
+  font-size: clamp(1.3rem, 3.5vw, 1.9rem);
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+}
+
+.veredicto_autonomo .veredictoTitulo {
+  color: var(--secondary);
+}
+
+.veredicto_sl .veredictoTitulo {
+  color: var(--primary);
+}
+
+.veredicto_valorar .veredictoTitulo {
+  color: #e8a020;
+}
+
+.veredictoDesc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0.5rem 0 0;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Grid comparativa ── */
+.comparativaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.comparativaCard {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.4rem 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.comparativaTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Listas ventajas / inconvenientes ── */
+.ventajas,
+.inconvenientes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.ventajaItem {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.45;
+}
+
+.ventajaItem::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--secondary);
+  font-weight: 700;
+}
+
+.inconvenienteItem {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.45;
+}
+
+.inconvenienteItem::before {
+  content: '✕';
+  position: absolute;
+  left: 0;
+  color: #e05a5a;
+  font-weight: 700;
+}
+
+/* ── Warning Box (v2.0 marker) ── */
+.warningBox {
+  border: 2px solid #e8a020;
+  background-color: rgba(232, 160, 32, 0.07);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.93rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  margin-top: 1rem;
+}
+
+/* ── Botón reiniciar ── */
+.btnReiniciar {
+  display: block;
+  margin: 1.5rem auto 0;
+  padding: 0.7rem 1.8rem;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--primary);
+  font-size: 0.97rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s, color 0.18s;
+}
+
+.btnReiniciar:hover {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+[data-theme='dark'] .opcionBtn {
+  border-color: #3a3a3a;
+  background-color: var(--bg-card);
+}
+
+[data-theme='dark'] .opcionBtn:hover {
+  border-color: var(--secondary);
+  background-color: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .opcionBtn.selected {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .progresoBar {
+  background-color: #3a3a3a;
+}
+
+[data-theme='dark'] .pregunta {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .comparativaCard {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .resultadoCard {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .warningBox {
+  background-color: rgba(232, 160, 32, 0.1);
+}
+
+/* ── Animaciones respetuosas ── */
+@media (prefers-reduced-motion: reduce) {
+  .container,
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
