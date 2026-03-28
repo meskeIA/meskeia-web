@@ -1,0 +1,456 @@
+/* SelectorMovilidadUrbana.module.css — paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary, #fafafa);
+  color: var(--text-primary, #1a1a1a);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, #2e86ab 0%, #48a9a6 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+/* Quiz */
+.quiz {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.progreso {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666);
+}
+
+.barraProgreso {
+  flex: 1;
+  height: 6px;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.barraProgresoRelleno {
+  height: 100%;
+  background: linear-gradient(90deg, #2e86ab, #48a9a6);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Pregunta */
+.pregunta {
+  background-color: var(--bg-card, #ffffff);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.preguntaHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.preguntaIcono {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.preguntaTexto {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Opciones */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: var(--bg-card, #ffffff);
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, transform 0.1s;
+  text-align: left;
+  font-size: 0.95rem;
+  color: var(--text-primary, #1a1a1a);
+  width: 100%;
+}
+
+.opcion:hover {
+  border-color: #2e86ab;
+  background-color: #f0f7fb;
+  transform: translateX(2px);
+}
+
+.opcion.seleccionada {
+  border-color: #2e86ab;
+  background-color: #e6f3f8;
+  font-weight: 600;
+}
+
+.opcionIcono {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  width: 1.5rem;
+  text-align: center;
+}
+
+.opcionTexto {
+  flex: 1;
+}
+
+.opcionMarca {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.opcion.seleccionada .opcionMarca {
+  border-color: #2e86ab;
+  background-color: #2e86ab;
+}
+
+.opcion.seleccionada .opcionMarca::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ffffff;
+}
+
+/* Botones de navegación */
+.navegacion {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, #2e86ab, #48a9a6);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid #2e86ab;
+  outline-offset: 2px;
+}
+
+.btnSecundario {
+  background-color: transparent;
+  color: var(--text-secondary, #666);
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btnSecundario:hover {
+  border-color: #2e86ab;
+  color: #2e86ab;
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid #2e86ab;
+  outline-offset: 2px;
+}
+
+/* Resultado */
+.resultado {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.resultadoCard {
+  background-color: var(--bg-card, #ffffff);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.resultadoIcono {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.resultadoTitulo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #2e86ab;
+  margin: 0 0 0.5rem;
+}
+
+.resultadoEtiqueta {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #48a9a6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.resultadoDescripcion {
+  font-size: 1rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.resultadoVentajas {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  text-align: left;
+}
+
+.resultadoVentajas li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  font-size: 0.95rem;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.resultadoVentajas li::before {
+  content: '✓';
+  color: #48a9a6;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.costoEstimado {
+  background-color: #f0f7fb;
+  border-left: 4px solid #2e86ab;
+  border-radius: 4px;
+  padding: 0.875rem 1rem;
+  text-align: left;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  margin-bottom: 1.5rem;
+}
+
+.costoEstimado strong {
+  color: var(--text-primary, #1a1a1a);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.btnReiniciar {
+  background-color: transparent;
+  color: #2e86ab;
+  border: 2px solid #2e86ab;
+  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btnReiniciar:hover {
+  background-color: #2e86ab;
+  color: #ffffff;
+}
+
+.btnReiniciar:focus-visible {
+  outline: 2px solid #2e86ab;
+  outline-offset: 2px;
+}
+
+/* Warning box (indicador v2.0) */
+.warningBox {
+  background-color: #fff8e1;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: #795548;
+  display: flex;
+  gap: 0.625rem;
+  align-items: flex-start;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.warningBox .warningIcono {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+
+/* ===== DARK MODE ===== */
+
+[data-theme='dark'] .container {
+  background-color: #1a1a1a;
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .pregunta {
+  background-color: #2a2a2a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .preguntaTexto {
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .opcion {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .opcion:hover {
+  border-color: #7fb3d3;
+  background-color: #1e3040;
+}
+
+[data-theme='dark'] .opcion.seleccionada {
+  border-color: #7fb3d3;
+  background-color: #1a3347;
+}
+
+[data-theme='dark'] .barraProgreso {
+  background-color: #444;
+}
+
+[data-theme='dark'] .resultadoCard {
+  background-color: #2a2a2a;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .costoEstimado {
+  background-color: #1e3040;
+}
+
+[data-theme='dark'] .costoEstimado strong {
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .warningBox {
+  background-color: #2a2200;
+  border-color: #ffc107;
+  color: #ffe0b2;
+}
+
+[data-theme='dark'] .btnSecundario {
+  border-color: #555;
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .btnSecundario:hover {
+  border-color: #7fb3d3;
+  color: #7fb3d3;
+}
+
+[data-theme='dark'] .progreso {
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .resultadoVentajas li {
+  color: #e5e5e5;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1rem 2rem;
+  }
+
+  .pregunta {
+    padding: 1.25rem;
+  }
+
+  .resultadoCard {
+    padding: 1.5rem;
+  }
+
+  .navegacion {
+    flex-direction: column-reverse;
+  }
+
+  .btnPrimary,
+  .btnSecundario {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

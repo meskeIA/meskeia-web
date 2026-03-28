@@ -1463,6 +1463,54 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/selector-herramienta-productividad/', icon: '⚡', name: 'Selector Método de Productividad', description: 'GTD, Pomodoro, Kanban...' },
     { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Temporizador Pomodoro', description: 'Técnica de concentración 25/5' },
   ],
+
+  // Tipo de hipoteca
+  'selector-tipo-hipoteca': [
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador de Hipoteca', description: 'Calcula tu cuota mensual exacta' },
+    { url: '/selector-alquiler-vs-compra/', icon: '🏘️', name: 'Selector Alquiler vs Compra', description: '¿Comprar o alquilar?' },
+    { url: '/selector-tipo-vivienda/', icon: '🏠', name: 'Selector Tipo de Vivienda', description: 'Piso, casa, ático o estudio' },
+    { url: '/selector-tipo-prestamo/', icon: '💳', name: 'Selector Tipo de Préstamo', description: '¿Qué financiación elegir?' },
+  ],
+
+  // Cuenta bancaria
+  'selector-cuenta-bancaria': [
+    { url: '/selector-tipo-ahorro/', icon: '💰', name: 'Selector Tipo de Ahorro', description: '¿Dónde colocar tus ahorros?' },
+    { url: '/selector-inversiones/', icon: '📈', name: 'Selector de Inversiones', description: '¿Fondos, acciones o renta fija?' },
+    { url: '/selector-regimen-fiscal-autonomo/', icon: '🧾', name: 'Selector Régimen Fiscal Autónomo', description: '¿Módulos, directa o SL?' },
+    { url: '/selector-tipo-prestamo/', icon: '💳', name: 'Selector Tipo de Préstamo', description: '¿Qué financiación elegir?' },
+  ],
+
+  // Modalidad de trabajo
+  'selector-modalidad-trabajo': [
+    { url: '/selector-herramienta-productividad/', icon: '⚡', name: 'Selector Método Productividad', description: 'GTD, Pomodoro, Kanban...' },
+    { url: '/selector-contrato-trabajo/', icon: '📋', name: 'Selector Contrato de Trabajo', description: '¿Qué tipo de contrato te conviene?' },
+    { url: '/selector-forma-juridica/', icon: '⚖️', name: 'Selector Forma Jurídica', description: '¿Autónomo o sociedad limitada?' },
+    { url: '/selector-canal-venta/', icon: '🛒', name: 'Selector Canal de Venta', description: '¿Marketplace, tienda propia o RRSS?' },
+  ],
+
+  // Canal de venta
+  'selector-canal-venta': [
+    { url: '/selector-modelo-negocio/', icon: '💼', name: 'Selector Modelo de Negocio', description: '¿Tienda, servicios, SaaS o marketplace?' },
+    { url: '/selector-forma-juridica/', icon: '⚖️', name: 'Selector Forma Jurídica', description: '¿Autónomo o sociedad limitada?' },
+    { url: '/selector-modalidad-trabajo/', icon: '💻', name: 'Selector Modalidad de Trabajo', description: 'Presencial, remoto o nómada' },
+    { url: '/selector-regimen-fiscal-autonomo/', icon: '🧾', name: 'Selector Régimen Fiscal Autónomo', description: '¿Módulos, directa o SL?' },
+  ],
+
+  // Régimen fiscal autónomo
+  'selector-regimen-fiscal-autonomo': [
+    { url: '/selector-forma-juridica/', icon: '⚖️', name: 'Selector Forma Jurídica', description: '¿Autónomo o sociedad limitada?' },
+    { url: '/calculadora-cuota-autonomos/', icon: '💼', name: 'Calculadora Cuota Autónomos', description: 'Calcula tu cuota RETA mensual' },
+    { url: '/selector-cuenta-bancaria/', icon: '🏧', name: 'Selector Cuenta Bancaria', description: '¿Qué tipo de cuenta necesitas?' },
+    { url: '/selector-contrato-trabajo/', icon: '📋', name: 'Selector Contrato de Trabajo', description: '¿Qué tipo de contrato te conviene?' },
+  ],
+
+  // Movilidad urbana
+  'selector-movilidad-urbana': [
+    { url: '/selector-vehiculo-electrico/', icon: '⚡', name: 'Selector Vehículo Eléctrico', description: '¿BEV, PHEV o híbrido?' },
+    { url: '/selector-coche-nuevo-usado/', icon: '🚗', name: 'Selector Coche Nuevo o Usado', description: '¿Nuevo, seminuevo o de ocasión?' },
+    { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora de Combustible', description: 'Coste real de tus desplazamientos' },
+    { url: '/selector-seguro-coche/', icon: '🛡️', name: 'Selector Seguro de Coche', description: '¿Terceros o todo riesgo?' },
+  ],
 };
 
 /**
@@ -1626,6 +1674,18 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
 
     // Hogar y decoración
     'selector-estilo-decoracion': { title: 'Más herramientas sobre el hogar', icon: '🏡' },
+
+    // Finanzas personales — banca e hipotecas
+    'selector-tipo-hipoteca': { title: 'Más herramientas de hipotecas y vivienda', icon: '🏦' },
+    'selector-cuenta-bancaria': { title: 'Más herramientas de finanzas personales', icon: '🏧' },
+
+    // Trabajo y emprendimiento
+    'selector-modalidad-trabajo': { title: 'Más herramientas de productividad y trabajo', icon: '💻' },
+    'selector-canal-venta': { title: 'Más herramientas para emprendedores', icon: '🛒' },
+    'selector-regimen-fiscal-autonomo': { title: 'Más herramientas para autónomos', icon: '🧾' },
+
+    // Movilidad
+    'selector-movilidad-urbana': { title: 'Más herramientas sobre movilidad y transporte', icon: '🚲' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };

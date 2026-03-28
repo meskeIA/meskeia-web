@@ -1,0 +1,497 @@
+/* Selector Régimen Fiscal Autónomo - meskeIA */
+
+/* ==========================================
+   VARIABLES LOCALES
+   ========================================== */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--spacing-xl, 2rem) var(--spacing-lg, 1.5rem);
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* ==========================================
+   HERO
+   ========================================== */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl, 2rem);
+  margin-top: 80px;
+  padding: var(--spacing-2xl, 3rem) var(--spacing-xl, 2rem);
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  border-radius: 16px;
+  color: white;
+}
+
+.heroIcon {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   QUIZ
+   ========================================== */
+.quiz {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.progreso {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.progresoTexto {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666666);
+  white-space: nowrap;
+}
+
+.barraProgreso {
+  flex: 1;
+  height: 6px;
+  background: var(--border, #e5e7eb);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.barraRelleno {
+  height: 100%;
+  background: linear-gradient(90deg, #2E86AB, #48A9A6);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* ==========================================
+   PREGUNTA
+   ========================================== */
+.pregunta {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.preguntaEncabezado {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.preguntaIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.preguntaTexto {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ==========================================
+   OPCIONES
+   ========================================== */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.opcion {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: var(--bg-primary, #FAFAFA);
+  border: 2px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  font-size: 0.95rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.45;
+}
+
+.opcion:hover {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.04);
+  transform: translateX(2px);
+}
+
+.opcion.seleccionada {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.opcionIcono {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ==========================================
+   NAVEGACIÓN QUIZ
+   ========================================== */
+.navQuiz {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.75rem;
+  gap: 1rem;
+}
+
+.btnSecundario {
+  padding: 0.625rem 1.25rem;
+  border: 2px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary, #666666);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btnSecundario:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.btnSecundario:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  padding: 0.75rem 1.75rem;
+  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btnPrimary:focus-visible,
+.btnSecundario:focus-visible,
+.opcion:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   RESULTADO
+   ========================================== */
+.resultado {
+  animation: fadeIn 0.3s ease;
+}
+
+.resultadoCard {
+  background: var(--bg-card);
+  border: 2px solid #2E86AB;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.resultadoEmoji {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.resultadoTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 0 0 0.5rem;
+}
+
+.resultadoSubtitulo {
+  font-size: 1rem;
+  color: var(--text-secondary, #666666);
+  margin: 0 0 1.25rem;
+}
+
+.resultadoDescripcion {
+  font-size: 0.95rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.65;
+  text-align: left;
+  background: rgba(46, 134, 171, 0.05);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 0;
+}
+
+/* ==========================================
+   VENTAJAS / CONSIDERACIONES
+   ========================================== */
+.ventajasGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.ventajasBloque {
+  background: var(--bg-primary, #FAFAFA);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.ventajasTitulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ventajasTitulo.verde {
+  color: #16a34a;
+}
+
+.ventajasTitulo.naranja {
+  color: #d97706;
+}
+
+.ventajasList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ventajasList li {
+  font-size: 0.875rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.4;
+  padding-left: 0;
+}
+
+/* ==========================================
+   WARNING BOX (indicador de versión v2.0)
+   ========================================== */
+.warningBox {
+  background: rgba(217, 119, 6, 0.08);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  display: flex;
+  gap: 0.875rem;
+  align-items: flex-start;
+}
+
+.warningBox p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.55;
+}
+
+.warningIcono {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ==========================================
+   BOTONES RESULTADO
+   ========================================== */
+.accionesFinal {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.btnReset {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #2E86AB;
+  border-radius: 8px;
+  background: transparent;
+  color: #2E86AB;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnReset:hover {
+  background: #2E86AB;
+  color: white;
+}
+
+.btnReset:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   DARK MODE
+   ========================================== */
+[data-theme='dark'] .quiz {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .opcion {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .opcion:hover {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: #2E86AB;
+}
+
+[data-theme='dark'] .opcion.seleccionada {
+  background: rgba(46, 134, 171, 0.15);
+  border-color: #48A9A6;
+}
+
+[data-theme='dark'] .barraProgreso {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme='dark'] .resultadoCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .resultadoDescripcion {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .ventajasBloque {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .ventajasList li {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(217, 119, 6, 0.12);
+  border-color: rgba(217, 119, 6, 0.35);
+}
+
+[data-theme='dark'] .warningBox p {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .btnSecundario {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .btnSecundario:hover {
+  border-color: #48A9A6;
+  color: #48A9A6;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 600px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .ventajasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .quiz {
+    padding: 1.25rem;
+  }
+
+  .resultadoCard {
+    padding: 1.5rem;
+  }
+
+  .navQuiz {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .btnPrimary,
+  .btnSecundario {
+    width: 100%;
+    text-align: center;
+  }
+
+  .accionesFinal {
+    flex-direction: column;
+  }
+
+  .btnReset {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ==========================================
+   MOVIMIENTO REDUCIDO
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

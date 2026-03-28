@@ -411,6 +411,12 @@ export const implementedAppsUrls = [
   "/selector-estilo-decoracion/",        // Test 10 preguntas: minimalista, clásico, industrial, nórdico, mediterráneo
   "/selector-vehiculo-electrico/",       // Test 10 preguntas: BEV, PHEV, HEV, moto eléctrica, esperar
   "/selector-metodo-estudio/",           // Test 10 preguntas: repetición espaciada, mapas mentales, proyectos, Pomodoro, clases
+  "/selector-tipo-hipoteca/",            // Test 10 preguntas: fija, variable, mixta, hipoteca verde
+  "/selector-cuenta-bancaria/",          // Test 10 preguntas: corriente, nómina, joven, ahorro/remunerada, sin cambio
+  "/selector-modalidad-trabajo/",        // Test 10 preguntas: presencial, remoto, híbrido, coworking, nómada digital
+  "/selector-canal-venta/",              // Test 10 preguntas: marketplace, plataforma sectorial, tienda propia, RRSS, directa
+  "/selector-regimen-fiscal-autonomo/",  // Test 10 preguntas: módulos, directa simplificada, directa normal, SL
+  "/selector-movilidad-urbana/",         // Test 10 preguntas: coche, transporte público, moto, bici/patinete, combinación
 ];
 
 /**

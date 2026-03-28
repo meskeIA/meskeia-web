@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 329,
+  "total_tools": 335,
   "updated": "2026-03-28",
   "features": {
     "all_free": true,
@@ -1040,6 +1040,42 @@
           "slug": "selector-metodo-estudio",
           "url": "https://meskeia.com/selector-metodo-estudio/",
           "description": "Test de 10 preguntas para elegir el método de estudio según la forma de aprender: repetición espaciada, mapas mentales, proyectos prácticos, Pomodoro con libros o clases particulares"
+        },
+        {
+          "name": "Selector de Tipo de Hipoteca",
+          "slug": "selector-tipo-hipoteca",
+          "url": "https://meskeia.com/selector-tipo-hipoteca/",
+          "description": "Test de 10 preguntas para elegir el tipo de hipoteca: fija, variable, mixta o hipoteca verde para vivienda eficiente. Análisis según tolerancia al riesgo, plazo y estabilidad laboral"
+        },
+        {
+          "name": "Selector de Cuenta Bancaria",
+          "slug": "selector-cuenta-bancaria",
+          "url": "https://meskeia.com/selector-cuenta-bancaria/",
+          "description": "Test de 10 preguntas para elegir el tipo de cuenta bancaria: corriente estándar, nómina, joven, ahorro remunerada o mantener la actual"
+        },
+        {
+          "name": "Selector de Modalidad de Trabajo",
+          "slug": "selector-modalidad-trabajo",
+          "url": "https://meskeia.com/selector-modalidad-trabajo/",
+          "description": "Test de 10 preguntas para elegir la modalidad de trabajo: presencial en oficina, teletrabajo total, modelo híbrido, coworking o nómada digital"
+        },
+        {
+          "name": "Selector de Canal de Venta",
+          "slug": "selector-canal-venta",
+          "url": "https://meskeia.com/selector-canal-venta/",
+          "description": "Test de 10 preguntas para elegir el canal de venta: marketplace generalista, plataforma sectorial, tienda online propia, venta por redes sociales o venta directa local"
+        },
+        {
+          "name": "Selector Régimen Fiscal Autónomo",
+          "slug": "selector-regimen-fiscal-autonomo",
+          "url": "https://meskeia.com/selector-regimen-fiscal-autonomo/",
+          "description": "Orientador de 10 preguntas para autónomos sobre el régimen fiscal: estimación objetiva (módulos), directa simplificada, directa normal o constituir una SL. Orientativo — consultar asesor fiscal"
+        },
+        {
+          "name": "Selector de Movilidad Urbana",
+          "slug": "selector-movilidad-urbana",
+          "url": "https://meskeia.com/selector-movilidad-urbana/",
+          "description": "Test de 10 preguntas para elegir el medio de transporte urbano: coche propio, transporte público, moto o escúter, bicicleta o patinete eléctrico, o combinación multimodal"
         },
         {
           "name": "Estimador Impuesto de Sucesiones",
